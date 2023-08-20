@@ -5,6 +5,7 @@
 	import initConfig from './editor-config';
 	import initPanel from './panel';
 	import initBlock from './block';
+	import {addFonts} from './style-sheet';
 
 	import 'grapesjs/dist/css/grapes.min.css';
 
@@ -15,6 +16,7 @@
 		addHTMLEdit(editor);
 		initPanel(editor);
 		initBlock(editor);
+		addFonts(editor);
 	});
 </script>
 

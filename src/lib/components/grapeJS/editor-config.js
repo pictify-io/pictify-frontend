@@ -1,4 +1,5 @@
 import plugin from 'grapesjs-blocks-basic';
+import { popularFontsLinks } from './style-sheet';
 
 const swv = 'sw-visibility';
 // const expt = 'export-template';
@@ -11,6 +12,9 @@ const prv = 'preview';
 
 
 const initConfig = {
+    canvas: {
+        styles: popularFontsLinks
+    },
     container: '#gjs',
     fromElement: true,
     height: '400px',
