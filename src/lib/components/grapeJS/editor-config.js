@@ -1,5 +1,6 @@
 import plugin from 'grapesjs-blocks-basic';
 import { popularFontsLinks } from './style-sheet';
+import initPageConfig from './page';
 
 const swv = 'sw-visibility';
 // const expt = 'export-template';
@@ -14,6 +15,9 @@ const prv = 'preview';
 const initConfig = {
     canvas: {
         styles: popularFontsLinks
+    },
+    pageManager: {
+        pages: [initPageConfig]
     },
     container: '#gjs',
     fromElement: true,
