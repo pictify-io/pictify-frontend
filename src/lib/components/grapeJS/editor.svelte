@@ -20,7 +20,7 @@
 	});
 </script>
 
-<section class="flex-col justify-center items-center mx-auto py-10">
+<section class="hidden md:block flex-col justify-center items-center mx-auto py-10">
 	<div class="min-w-300 min-h-300">
 		<div id="gjs" />
 	</div>
