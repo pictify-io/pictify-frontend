@@ -9,7 +9,7 @@ const initPanel = (editor) => {
                 className:
                     'bg-#FFF4DA hover:bg-#FFF4DA text-white py-2 px-4 rounded button custom-editor-button',
                 label: '<button>Create Image</button>',
-                command: 'open-assets',
+                command: 'create-image',
                 attributes: { title: 'Open Assets', type: 'button' }
             },
             {

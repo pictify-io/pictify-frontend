@@ -5,6 +5,7 @@
 	import initConfig from './editor-config';
 	import initPanel from './panel';
 	import initBlock from './block';
+	import initCommands from './command';
 	import {addFonts} from './style-sheet';
 
 	import 'grapesjs/dist/css/grapes.min.css';
@@ -14,6 +15,7 @@
 	onMount(() => {
 		editor = grapesjs.init(initConfig);
 		addHTMLEdit(editor);
+		initCommands(editor);
 		initPanel(editor);
 		initBlock(editor);
 		addFonts(editor);
