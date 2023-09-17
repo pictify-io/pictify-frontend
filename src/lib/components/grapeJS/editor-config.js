@@ -8,7 +8,7 @@ const osm = 'open-sm';
 // const otm = 'open-tm';
 // const ola = 'open-layers';
 const obl = 'open-blocks';
-const ful = 'fullscreen';
+// const ful = 'fullscreen';
 const prv = 'preview';
 
 
@@ -21,11 +21,12 @@ const initConfig = {
     },
     container: '#gjs',
     fromElement: true,
-    height: '400px',
-    width: '900px',
+    height: '500px',
+    width: '1000px',
     noticeOnUnload: 0,
     showDevices: false,
     components: false,
+    deviceManager: false,
     showToolbar: false,
     panels: {
         defaults: [
@@ -51,13 +52,13 @@ const initConfig = {
                         context: prv,
                         attributes: { title: 'Preview' }
                     },
-                    {
-                        id: ful,
-                        className: 'fa fa-arrows-alt',
-                        command: ful,
-                        context: ful,
-                        attributes: { title: 'Fullscreen' }
-                    },
+                    // {
+                    //     id: ful,
+                    //     className: 'fa fa-arrows-alt',
+                    //     command: ful,
+                    //     context: ful,
+                    //     attributes: { title: 'Fullscreen' }
+                    // },
                     // {
                     // 	id: expt,
                     // 	className: 'fa fa-code',

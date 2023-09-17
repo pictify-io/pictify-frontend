@@ -30,7 +30,8 @@ const initPageConfig = {
 </body> 
     `,
     styles: `
-    <style>* {
+    <style>
+    * {
       box-sizing: border-box;
       }
       body {

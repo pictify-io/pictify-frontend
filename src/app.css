@@ -22,6 +22,14 @@
     color: #fff !important;
 }
 
+.gjs-cv-canvas {
+    width: 80% !important;
+}
+
+.gjs-pn-views, .gjs-pn-views-container  {
+    width: 20% !important;
+}
+
 .custom-editor-button {
     background-color: #39445ec3 !important;
     color: #fff;

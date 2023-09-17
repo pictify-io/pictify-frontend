@@ -1,3 +1,5 @@
+import { getHTMLandCSS } from '../../html-to-gif/create-media.js';
+
 const initCommands = (editor) => {
     const commandManager = editor.Commands;
     commandManager.add('create-image', {
@@ -25,14 +27,10 @@ const initCommands = (editor) => {
             if (isOpen) {
                 console.log('Modal is open');
                 setTimeout(() => {
-                    Modal.setContent(`
-                    <div class="flex flex-col">
-                        <div class="flex flex-col">
-                            <p class="text-gray-700 dark:text-gray-300">Image URL</p>
-                            <img src="https://via.placeholder.com/150" alt="Placeholder" class="w-32 h-32 rounded-lg">
-                        </div>
-                    </div>`
-                    );
+                    const htmlCode = editor.getHtml();
+                    const cssCode = editor.getCss();
+                    const html = getHTMLandCSS(htmlCode, cssCode);
+                    console.log(html);
                 }, 2000);
             }
         }
