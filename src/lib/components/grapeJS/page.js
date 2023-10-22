@@ -36,8 +36,6 @@ const initPageConfig = {
       }
       body {
       margin: 0;
-      width: 400px;
-      height: 300px;
       }
       body{
       margin-top:0px;

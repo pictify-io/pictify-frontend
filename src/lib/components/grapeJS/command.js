@@ -1,4 +1,5 @@
 import { getHTMLandCSS } from '../../html-to-gif/create-media.js';
+import { createImagePublic, createGifPublic } from '../../../api/image.js';
 
 const initCommands = (editor) => {
     const commandManager = editor.Commands;
@@ -26,12 +27,18 @@ const initCommands = (editor) => {
             let isOpen = Modal.isOpen();
             if (isOpen) {
                 console.log('Modal is open');
-                setTimeout(() => {
-                    const htmlCode = editor.getHtml();
-                    const cssCode = editor.getCss();
-                    const html = getHTMLandCSS(htmlCode, cssCode);
-                    console.log(html);
-                }, 2000);
+                const htmlCode = editor.getHtml();
+                const cssCode = editor.getCss();
+                const html = getHTMLandCSS(htmlCode, cssCode);
+                const width = editor.Canvas.getWindow().innerWidth;
+                const height = editor.Canvas.getWindow().innerHeight;
+                const image = createImagePublic({
+                    html,
+                    width,
+                    height,
+                });
+                console.log(image);
+                isOpen = false;
             }
         }
     });

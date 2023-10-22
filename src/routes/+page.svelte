@@ -4,6 +4,7 @@
     import Footer from '$lib/components/landingPage/Footer.svelte';
     import TryNow from '../lib/components/landingPage/TryNow.svelte';
     import Editor from '../lib/components/grapeJS/editor.svelte';
+
 </script>
 
 
