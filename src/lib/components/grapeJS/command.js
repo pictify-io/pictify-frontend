@@ -1,5 +1,43 @@
 import { getHTMLandCSS } from '../../html-to-gif/create-media.js';
-import { createImagePublic, createGifPublic } from '../../../api/image.js';
+import { createImagePublic } from '../../../api/image.js';
+import { getTemplate } from '../../../api/template.js';
+
+
+const createImage = async (editor, Modal) => {
+    const htmlCode = editor.getHtml();
+    const cssCode = editor.getCss();
+    const html = await getHTMLandCSS(htmlCode, cssCode);
+    const width = editor.Canvas.getWindow().innerWidth;
+    const height = editor.Canvas.getWindow().innerHeight;
+    const { image } = await createImagePublic({
+        html,
+        width,
+        height,
+    });
+    // const image = {
+    //     "active": true,
+    //     "url": "https://htgf.s3.amazonaws.com/2j8un-1697969904985.png",
+    //     "width": 800,
+    //     "height": 460,
+    //     "createdBy": "public",
+    //     "_id": "6534f6f2b32aa8df57722444",
+    //     "createdAt": "2023-10-22T10:18:26.681Z",
+    //     "uid": "BXYXP941AB",
+    //     "__v": 0
+    // }
+
+    //Set content of modal
+    console.log('Set content of modal');
+    const { template } = await getTemplate({
+        type: 'IMAGE_GENERATED',
+        variables: {
+            imageURL: image.url,
+        }
+    });
+    Modal.setContent(`
+      ${template}
+    `);
+}
 
 const initCommands = (editor) => {
     const commandManager = editor.Commands;
@@ -27,18 +65,7 @@ const initCommands = (editor) => {
             let isOpen = Modal.isOpen();
             if (isOpen) {
                 console.log('Modal is open');
-                const htmlCode = editor.getHtml();
-                const cssCode = editor.getCss();
-                const html = getHTMLandCSS(htmlCode, cssCode);
-                const width = editor.Canvas.getWindow().innerWidth;
-                const height = editor.Canvas.getWindow().innerHeight;
-                const image = createImagePublic({
-                    html,
-                    width,
-                    height,
-                });
-                console.log(image);
-                isOpen = false;
+                createImage(editor, Modal);
             }
         }
     });

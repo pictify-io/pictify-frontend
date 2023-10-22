@@ -28,6 +28,7 @@ const initConfig = {
     components: false,
     deviceManager: false,
     showToolbar: false,
+    editable: false,
     panels: {
         defaults: [
             {
@@ -112,7 +113,8 @@ const initConfig = {
             plugin(editor, {
                 blocks: ['column1', 'column2', 'column3', 'text', 'link', 'image', 'gif'],
                 category: 'Basic',
-                flexGrid: true
+                flexGrid: true,
+                editable: false
             })
     ]
 }
