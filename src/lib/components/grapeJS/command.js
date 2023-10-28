@@ -14,17 +14,6 @@ const createImage = async (editor, Modal) => {
         width,
         height,
     });
-    // const image = {
-    //     "active": true,
-    //     "url": "https://htgf.s3.amazonaws.com/2j8un-1697969904985.png",
-    //     "width": 800,
-    //     "height": 460,
-    //     "createdBy": "public",
-    //     "_id": "6534f6f2b32aa8df57722444",
-    //     "createdAt": "2023-10-22T10:18:26.681Z",
-    //     "uid": "BXYXP941AB",
-    //     "__v": 0
-    // }
 
     //Set content of modal
     console.log('Set content of modal');

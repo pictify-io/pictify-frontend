@@ -2,8 +2,10 @@
     import Nav from '$lib/components/Nav.svelte';
     import Hero from '$lib/components/landingPage/Hero.svelte';
     import Footer from '$lib/components/landingPage/Footer.svelte';
-    import TryNow from '../lib/components/landingPage/TryNow.svelte';
-    import Editor from '../lib/components/grapeJS/editor.svelte';
+    import TryNow from '$lib/components/landingPage/TryNow.svelte';
+    import Editor from '$lib/components/grapeJS/editor.svelte';
+    import UseCase from '$lib/components/landingPage/UseCase.svelte';
+    import Api from '$lib/components/landingPage/Api.svelte';
 
 </script>
 
@@ -12,6 +14,8 @@
     <Nav />
     <Hero />
     <Editor />
+    <Api />
+    <UseCase />
     <TryNow />
     <Footer />
 
