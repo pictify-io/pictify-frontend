@@ -1,5 +1,5 @@
 <script>
-    import Nav from '$lib/components/Nav.svelte';
+    import Nav from '$lib/components/landingPage/Nav.svelte';
     import Hero from '$lib/components/landingPage/Hero.svelte';
     import Footer from '$lib/components/landingPage/Footer.svelte';
     import TryNow from '$lib/components/landingPage/TryNow.svelte';
