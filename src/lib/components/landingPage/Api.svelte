@@ -105,7 +105,8 @@ $image = json_decode($response);
             <div class="text-lg opacity-50 max-w-3xl text-left md:text-center my-8">
                 <p class="">
                     Medify's API is easy to use and can be integrated into your existing workflow in minutes.
-                </p>
+					Create Image's and GIF's from HTML with a simple POST request.
+				</p>
              </div>
 		</div>
 		<div class="hidden sm:block w-100 my-8 overflow-x-auto">
