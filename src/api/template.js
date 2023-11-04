@@ -4,7 +4,7 @@ const getTemplate = async ({
     type,
     variables,
 }) => {
-    const url = `/api/template?type=${type}&variables=${JSON.stringify(variables)}`;
+    const url = `/api/fe/template?type=${type}&variables=${JSON.stringify(variables)}`;
     const response = await backend.get(url);
     return response.data;
 }

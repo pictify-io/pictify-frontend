@@ -21,7 +21,6 @@
 </script>
 
 <div class="min-h-screen flex flex-col">
-<Nav />
 <div class="flex w-100 flex-grow">
     <div class=" border-r-[3px] border-black">
         <SideNav />
