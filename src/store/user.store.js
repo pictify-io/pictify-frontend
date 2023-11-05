@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { login, logout, signup } from '../api/auth';
+import { getUser } from '../api/user';
 import validateEmail from '../util/validateEmail';
 
 export const user = writable({
@@ -82,6 +83,18 @@ export const signupAction = async (email, password) => {
         throw error;
     }
 }
+
+export const getUserAction = async () => {
+    try {
+        const response = await getUser();
+        setUser(response.email, response.token);
+        return response;
+    } catch (error) {
+        clearUser();
+        throw error;
+    }
+}
+
 
 
 

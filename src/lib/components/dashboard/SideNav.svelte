@@ -1,5 +1,5 @@
 <script>
-import { page } from "../../store/pages.store";
+import { page } from "../../../store/pages.store";
 </script>
 <div class="flex flex-col h-full">
     <div class="overflow-y-auto">

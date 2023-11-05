@@ -4,7 +4,7 @@
     import Template from '$lib/components/dashboard/Template.svelte';
     import Footer from '$lib/components/landingPage/Footer.svelte';
 
-    import { page } from "../../lib/store/pages.store";
+    import { page } from "../../store/pages.store";
 
 
     const pages = [
