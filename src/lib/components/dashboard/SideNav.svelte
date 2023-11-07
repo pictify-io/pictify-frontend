@@ -1,5 +1,12 @@
 <script>
 import { page } from "../../../store/pages.store";
+import {logoutAction} from "../../../store/user.store";
+import { goto } from '$app/navigation';
+
+function logout() {
+    logoutAction();
+    goto('/');
+}
 </script>
 <div class="flex flex-col h-full">
     <div class="overflow-y-auto">
@@ -24,6 +31,6 @@ import { page } from "../../../store/pages.store";
        
     </div>
     <div class="p-4 space-y-2 text-gray-700">
-        Logout
+       <a href="#" on:click={logout}>Logout</a> 
     </div>
   </div>

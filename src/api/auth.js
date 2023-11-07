@@ -5,7 +5,7 @@ const login = async ({
     password,
 }) => {
     try {
-        const response = await backend.post('/api/auth/login', {
+        const response = await backend.post('/auth/login', {
             email,
             password,
         });
@@ -21,7 +21,7 @@ const login = async ({
 }
 
 const logout = async () => {
-    const response = await backend.post('/api/auth/logout');
+    const response = await backend.post('/auth/logout');
     return response.data;
 }
 
@@ -30,7 +30,7 @@ const signup = async ({
     password,
 }) => {
     try {
-        const response = await backend.post('/api/auth/signup', {
+        const response = await backend.post('/auth/signup', {
             email,
             password,
         });

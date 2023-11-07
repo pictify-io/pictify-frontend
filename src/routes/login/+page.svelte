@@ -1,47 +1,44 @@
 <script>
 	export let isLogin = false;
 
-    import GoogleIcon from '$lib/assets/login/GoogleIcons.svg';
-    import CheckboxEmpty from '$lib/assets/login/CheckboxEmpty.svg';
-    import Checkbox from '$lib/assets/login/Checkbox.svg';
-    import { goto } from '$app/navigation';
-    import { onMount } from 'svelte';
+	import GoogleIcon from '$lib/assets/login/GoogleIcons.svg';
+	import CheckboxEmpty from '$lib/assets/login/CheckboxEmpty.svg';
+	import Checkbox from '$lib/assets/login/Checkbox.svg';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { loginAction, signupAction, getUserAction, isLoggedIn } from '../../store/user.store';
 
 	let email = '';
 	let password = '';
 	let errorMessage;
 
-    onMount(async () => {
-       await getUserAction();
-         if (isLoggedIn) {
-              goto('/dashboard');
-         }
-    });
+	onMount(async () => {
+		await getUserAction();
+		if (isLoggedIn) {
+			goto('/dashboard');
+		}
+	});
 
-    $: isPasswordLengthValid = password.length >= 8;
-    $: isPasswordContainsNumber = /\d/.test(password);
-    $: isPasswordContainsUpperCase = /[A-Z]/.test(password);
+	$: isPasswordLengthValid = password.length >= 8;
+	$: isPasswordContainsNumber = /\d/.test(password);
+	$: isPasswordContainsUpperCase = /[A-Z]/.test(password);
 
-
-
-    function resetState() {
-        email = '';
-        password = '';
-        errorMessage = '';
-    }
+	function resetState() {
+		email = '';
+		password = '';
+		errorMessage = '';
+	}
 
 	function toggleToLogin() {
 		isLogin = true;
-        resetState();
+		resetState();
 	}
 
 	function toggleToSignUp() {
 		isLogin = false;
-        resetState();
+		resetState();
 	}
-
-  
 
 	async function handleSubmit() {
 		try {
@@ -50,11 +47,28 @@
 			} else {
 				await signupAction(email, password);
 			}
-
+			if (isLoggedIn) {
+				goto('/dashboard');
+			}
 		} catch (e) {
-            console.log(e);
+			console.log(e);
 			errorMessage = e.message;
 		}
+	}
+
+	function handleGoogleLogin() {
+		let newWindow = window.open(PUBLIC_BACKEND_URL + '/login/google', '_blank') || { closed: true };
+
+		const interval = setInterval(() => {
+			if (newWindow.closed) {
+				clearInterval(interval);
+				newWindow = { closed: true };
+				getUserAction();
+				if (isLoggedIn) {
+					goto('/dashboard');
+				}
+			}
+		}, 1000);
 	}
 </script>
 
@@ -95,34 +109,36 @@
 			{#if errorMessage}
 				<div class="text-red-500 mt-2 w-full text-left px-2">{errorMessage}</div>
 			{/if}
-            {#if !isLogin}
-                <div class="w-full">
-                    <div class="flex mt-2 text-left w-full items-center">
-                        {#if !isPasswordLengthValid}
-                            <img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
-                        {:else}
-                            <img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
-                        {/if} 
-                        <div class="text-gray-900 text-xs">Password must be at least 8 characters</div>
-                    </div>
-                    <div class="flex mt-2 text-left w-full items-center">
-                        {#if !isPasswordContainsNumber}
-                            <img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
-                        {:else}
-                            <img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
-                        {/if} 
-                        <div class="text-gray-900 text-xs">Password must contain at least 1 number</div>
-                    </div>
-                    <div class="flex mt-2 text-left w-full items-center">
-                        {#if !isPasswordContainsUpperCase}
-                            <img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
-                        {:else}
-                            <img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
-                        {/if} 
-                        <div class="text-gray-900 text-xs">Password must contain at least 1 uppercase letter</div>
-                    </div> 
-                </div>
-            {/if}
+			{#if !isLogin}
+				<div class="w-full">
+					<div class="flex mt-2 text-left w-full items-center">
+						{#if !isPasswordLengthValid}
+							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+						{:else}
+							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+						{/if}
+						<div class="text-gray-900 text-xs">Password must be at least 8 characters</div>
+					</div>
+					<div class="flex mt-2 text-left w-full items-center">
+						{#if !isPasswordContainsNumber}
+							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+						{:else}
+							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+						{/if}
+						<div class="text-gray-900 text-xs">Password must contain at least 1 number</div>
+					</div>
+					<div class="flex mt-2 text-left w-full items-center">
+						{#if !isPasswordContainsUpperCase}
+							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+						{:else}
+							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+						{/if}
+						<div class="text-gray-900 text-xs">
+							Password must contain at least 1 uppercase letter
+						</div>
+					</div>
+				</div>
+			{/if}
 			<button on:click={handleSubmit} class="bg-gray-900 text-white w-full p-2 rounded-md mt-4">
 				{#if isLogin}
 					Login
@@ -154,7 +170,8 @@
 				</div>
 			</div>
 			<a
-				href="/auth/google"
+				href={null}
+				on:click={handleGoogleLogin}
 				class="flex items-center justify-center bg-gray-900 text-white w-full p-2 rounded-md"
 			>
 				<img src={GoogleIcon} alt="Google icon" class="w-5 h-5 mr-2" />
