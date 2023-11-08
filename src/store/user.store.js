@@ -27,7 +27,7 @@ export const clearUser = () => {
 // Getters
 
 export const isLoggedIn = () => {
-    return user.email !== null;
+    return !!user.email;
 }
 
 export const getToken = () => {

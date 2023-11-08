@@ -2,4 +2,4 @@
 	import Login from '$lib/components/auth/login.svelte';
 
 </script>
-<Login isLogin={true} />
+<Login isLogin={false} />
