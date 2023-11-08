@@ -16,7 +16,6 @@ const createImage = async (editor, Modal) => {
     });
 
     //Set content of modal
-    console.log('Set content of modal');
     const { template } = await getTemplate({
         type: 'IMAGE_GENERATED',
         variables: {
@@ -42,7 +41,6 @@ const createGif = async (editor, Modal) => {
     });
 
     //Set content of modal
-    console.log('Set content of modal');
     const { template } = await getTemplate({
         type: 'GIF_GENERATED',
         variables: {
@@ -78,7 +76,6 @@ const initCommands = (editor) => {
 
             let isOpen = Modal.isOpen();
             if (isOpen) {
-                console.log('Modal is open');
                 createImage(editor, Modal);
             }
         }
@@ -107,7 +104,6 @@ const initCommands = (editor) => {
 
             let isOpen = Modal.isOpen();
             if (isOpen) {
-                console.log('Modal is open');
                 createGif(editor, Modal);
             }
         }

@@ -7,14 +7,14 @@
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { loginAction, signupAction, getUserAction, isLoggedIn } from '../../../store/user.store';
+	import { loginAction, signupAction, getUser, isLoggedIn } from '../../../store/user.store';
 
 	let email = '';
 	let password = '';
 	let errorMessage;
 
 	onMount(async () => {
-		await getUserAction();
+		await getUser();
 		if (isLoggedIn) {
 			goto('/dashboard');
 		}
@@ -32,7 +32,6 @@
 				await signupAction(email, password);
 			}
 			if (isLoggedIn) {
-                await getUserAction();
 				goto('/dashboard');
 			}
 		} catch (e) {
@@ -47,7 +46,7 @@
 			if (newWindow.closed) {
 				clearInterval(interval);
 				newWindow = { closed: true };
-				getUserAction();
+				getUser();
 				if (isLoggedIn) {
 					goto('/dashboard');
 				}

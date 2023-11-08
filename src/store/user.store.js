@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import { login, logout, signup } from '../api/auth';
-import { getUser } from '../api/user';
+import { getUser as getUserAPI } from '../api/user';
 import validateEmail from '../util/validateEmail';
 
 export const user = writable({
@@ -27,7 +28,8 @@ export const clearUser = () => {
 // Getters
 
 export const isLoggedIn = () => {
-    return !!user.email;
+    const currentUser = get(user);
+    return !!currentUser.email;
 }
 
 export const getToken = () => {
@@ -42,6 +44,22 @@ export const getAuthHeader = () => {
     return `Bearer ${user.token}`;
 }
 
+export const getUser = async () => {
+    let userData;
+    try {
+        if (isLoggedIn()) {
+            userData = get(user);
+        } else {
+            const response = await getUserAPI();
+            setUser(response.email, response.token);
+            userData = get(user);
+        }
+    } catch (error) {
+        clearUser();
+        throw error;
+    }
+    return userData;
+}
 // Actions
 
 export const loginAction = async (email, password) => {
@@ -53,7 +71,8 @@ export const loginAction = async (email, password) => {
             email,
             password,
         });
-        setUser(response.email, response.token);
+        const { user: userData } = await getUserAPI();
+        setUser(userData.email, userData.token);
         return response;
     } catch (error) {
         clearUser();
@@ -75,7 +94,8 @@ export const signupAction = async (email, password) => {
             email,
             password,
         });
-        setUser(response.email, response.token);
+        const { user: userData } = await getUserAPI();
+        setUser(userData.email, userData.token);
         return response;
     }
     catch (error) {
@@ -86,7 +106,7 @@ export const signupAction = async (email, password) => {
 
 export const getUserAction = async () => {
     try {
-        const response = await getUser();
+        const response = await getUserAPI();
         setUser(response.email, response.token);
         return response;
     } catch (error) {

@@ -5,11 +5,24 @@
     import Footer from '$lib/components/landingPage/Footer.svelte';
 
     import { page } from "../../store/pages.store";
+    import { getUser} from "../../store/user.store";
+
+    import { onMount } from "svelte";
+    import { goto } from '$app/navigation';
 
 
     const pages = [
     { id: "template", component: Template },
     ];
+
+    let user = null;
+    onMount(() => {
+        user = getUser();
+        if(!user) {
+            goto("/login");
+        }
+    });
+    
 
 	const getComponent = function () {
 		try {

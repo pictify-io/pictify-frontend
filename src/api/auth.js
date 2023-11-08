@@ -11,7 +11,6 @@ const login = async ({
         });
         return response.data;
     } catch (error) {
-        console.log(error.response);
         if (error.response.status === 401)
             throw new Error("Invalid email or password");
         else
