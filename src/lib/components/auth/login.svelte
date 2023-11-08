@@ -32,6 +32,7 @@
 				await signupAction(email, password);
 			}
 			if (isLoggedIn) {
+                await getUserAction();
 				goto('/dashboard');
 			}
 		} catch (e) {
