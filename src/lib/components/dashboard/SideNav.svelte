@@ -16,7 +16,7 @@ function logout() {
             <a href="#" on:click|preventDefault={() => $page = 'template'}>Templates</a>
           </li>
           <li class="text-gray-700 hover:text-gray-900">
-            <a href="#" on:click|preventDefault={() => $page = 'api-usage'}>API Usage</a>
+            <a href="#" on:click|preventDefault={() => $page = 'api-token'}>API Usage</a>
           </li>
           <li class="text-gray-700 hover:text-gray-900">
             <a href="#" on:click|preventDefault={() => $page = 'settings'}>Settings</a>

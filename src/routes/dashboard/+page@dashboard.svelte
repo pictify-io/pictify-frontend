@@ -2,6 +2,7 @@
     import Nav from '$lib/components/dashboard/Nav.svelte';
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
     import Template from '$lib/components/dashboard/Template.svelte';
+    import ApiToken from '$lib/components/dashboard/ApiToken.svelte';
     import Footer from '$lib/components/landingPage/Footer.svelte';
 
     import { page } from "../../store/pages.store";
@@ -13,12 +14,14 @@
 
     const pages = [
     { id: "template", component: Template },
-    ];
+    {id:'api-token', component: ApiToken}
+];
 
     let user = null;
-    onMount(() => {
-        user = getUser();
-        if(!user) {
+    onMount(async () => {
+        user = await getUser();
+        console.log(user);
+        if(!user.email) {
             goto("/login");
         }
     });

@@ -10,6 +10,40 @@ const getUser = async () => {
     }
 }
 
+const getApiToken = async () => {
+    try {
+        const response = await backend.get('/api/users/api-tokens');
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+const createApiToken = async () => {
+    try {
+        const response = await backend.post('/api/users/api-tokens');
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+};
+
+const deleteApiToken = async (apiTokenId) => {
+    try {
+        const response = await backend.delete(`/api/users/api-tokens/${apiTokenId}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+};
+
+
 export {
     getUser,
+    getApiToken,
+    createApiToken,
+    deleteApiToken,
 };

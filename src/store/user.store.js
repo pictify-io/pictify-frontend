@@ -1,12 +1,13 @@
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { login, logout, signup } from '../api/auth';
-import { getUser as getUserAPI } from '../api/user';
+import { getUser as getUserAPI, getApiToken, createApiToken, deleteApiToken } from '../api/user';
 import validateEmail from '../util/validateEmail';
 
 export const user = writable({
     email: null,
     token: null,
+    apiTokens: [],
 });
 
 // Setters
@@ -25,10 +26,17 @@ export const clearUser = () => {
     });
 }
 
+export const setApiTokens = (apiTokens) => {
+    user.update((user) => {
+        user.apiTokens = apiTokens;
+        return user;
+    });
+}
 // Getters
 
 export const isLoggedIn = () => {
     const currentUser = get(user);
+    console.log("called is logged in");
     return !!currentUser.email;
 }
 
@@ -45,13 +53,14 @@ export const getAuthHeader = () => {
 }
 
 export const getUser = async () => {
+    console.log("called get user");
     let userData;
     try {
         if (isLoggedIn()) {
             userData = get(user);
         } else {
             const response = await getUserAPI();
-            setUser(response.email, response.token);
+            setUser(response.user.email, response.user.token);
             userData = get(user);
         }
     } catch (error) {
@@ -114,6 +123,40 @@ export const getUserAction = async () => {
         throw error;
     }
 }
+
+export const getAPITokenAction = async () => {
+    try {
+        const response = await getApiToken();
+        setApiTokens(response.apiTokens);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const createAPITokenAction = async () => {
+    try {
+        await createApiToken();
+        const response = await getApiToken();
+        setApiTokens(response.apiTokens);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const deleteAPITokenAction = async (apiTokenId) => {
+    try {
+        await deleteApiToken(apiTokenId);
+        const response = await getApiToken();
+        setApiTokens(response.apiTokens);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 
