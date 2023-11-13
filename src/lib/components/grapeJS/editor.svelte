@@ -7,18 +7,33 @@
 	import initBlock from './block';
 	import initCommands from './command';
 	import {addFonts} from './style-sheet';
+	import {editor} from '../../../store/editor.store';
 
 	import 'grapesjs/dist/css/grapes.min.css';
 
-	let editor;
+	let editorInstance = null;
+
+	export let isLandingPage = true;
 
 	onMount(() => {
-		editor = grapesjs.init(initConfig);
-		addHTMLEdit(editor);
-		initCommands(editor);
-		initPanel(editor);
-		initBlock(editor);
-		addFonts(editor);
+		if(!isLandingPage) {
+			initConfig.pageManager = {
+		pages: [
+			{
+				component: `<div style="text-align:center"> <h1> Edit this template </h1> </div>`
+			}
+		]
+			}
+		}
+		editorInstance = grapesjs.init(initConfig);
+		addHTMLEdit(editorInstance);
+		if(isLandingPage) {
+			initCommands(editorInstance);
+			initPanel(editorInstance);
+		}
+		initBlock(editorInstance);
+		addFonts(editorInstance);
+		editor.set(editorInstance);
 	});
 </script>
 

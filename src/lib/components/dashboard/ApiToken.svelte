@@ -6,7 +6,7 @@ import Toast from "$lib/components/Toast.svelte";
 import {toast} from "../../../store/toast.store";
 
 let apiTokens = [];
-let unsubscribe;
+let unsubscribe = () => {};
 
 onMount(async () => {
     unsubscribe = user.subscribe((u) => {
