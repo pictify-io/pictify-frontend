@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { getTemplates, getTemplate, updateTemplate, deleteTemplate } from "../api/userTemplate";
+import { getTemplates, getTemplate, updateTemplate, deleteTemplate, createTemplate } from "../api/userTemplate";
 
 export const template = new writable({
     uid: null,
@@ -66,6 +66,19 @@ export const deleteTemplateAction = async (uid) => {
         const response = await deleteTemplate(uid);
         templates.update((templates) => {
             return templates.filter((template) => template.uid !== uid);
+        });
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export const createTemplateAction = async (newTemplate) => {
+    try {
+        const response = await createTemplate(newTemplate);
+        templates.update((templates) => {
+            templates.push(response);
+            return templates;
         });
     }
     catch (error) {

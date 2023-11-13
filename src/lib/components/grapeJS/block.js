@@ -3,7 +3,7 @@ const initBlock = (editor) => {
 
     blockManager.add('variable-image', {
         label: 'Variable Image',
-        content: '<img src="{{image_url}}" alt="Variable Image">',
+        content: '<span><img src="{{image_url}}" alt="Variable Image"></span>',
         attributes: { class: 'fa fa-image' },
         category: 'Variable',
         activate: true,
@@ -13,17 +13,6 @@ const initBlock = (editor) => {
         resizable: true,
         copyable: true,
         pasteable: true,
-        traits: [
-            {
-                type: 'image',
-                label: 'Image URL',
-                name: 'image_url',
-                changeProp: 1
-            }
-        ],
-        toHTML: function (data) {
-            return this.get('content').replace('{{image_url}}', data.image_url);
-        }
     });
 
     blockManager.add('variable-text', {
@@ -45,10 +34,7 @@ const initBlock = (editor) => {
                 name: 'text',
                 changeProp: 1
             }
-        ],
-        toHTML: function (data) {
-            return this.get('content').replace('{{text}}', data.text);
-        }
+        ]
     });
 };
 
