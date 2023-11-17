@@ -30,6 +30,11 @@
     width: 20% !important;
 }
 
+.gjs-pn-options {
+    right: 45% !important;
+}
+ 
+
 .custom-editor-button {
     background-color: #39445ec3 !important;
     color: #fff;

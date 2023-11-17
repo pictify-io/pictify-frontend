@@ -1,15 +1,22 @@
 <script>
+    import {goto} from '$app/navigation';
     export let templates;
+
+    const handleTemplateClick = (template) => {
+        console.log(template);
+        goto(`/dashboard/template/${template.uid}`);
+    }
 </script>
 
 <section>
-    <div class="flex flex-wrap w-full justify-between mt-20">
+    <div class="flex flex-wrap w-full mt-20 gap-5">
         {#each templates as template}
-        <div class="flex-col  border-gray-900 border rounded-md flex ">
+        <div role="button" tabindex="0" class="flex-col  border-gray-900 border-2 rounded-md flex cursor-pointer relative " on:click={handleTemplateClick(template)} on:keydown={(e) => {if (e.key === 'Enter') handleTemplateClick()}}>
             <div class="border-b border-gray-900">
-               <iframe srcdoc={template.html} class="w-64 h-32"></iframe>
+                <div class="absolute top-0 left-0 w-full h-full" style="pointer-events: auto;"></div>
+            <iframe srcdoc={template.html} class="w-[22rem] h-[11rem]" title="Template Preview" scrolling="no"></iframe>
             </div>
-            <div class="p-4">
+            <div class="p-2">
                 <div class="text-lg">
                     {template.name}
                 </div>

@@ -14,7 +14,8 @@ const prv = 'preview';
 
 const initConfig = {
     canvas: {
-        styles: popularFontsLinks
+        styles: popularFontsLinks,
+
     },
     pageManager: {
         pages: [initPageConfig]

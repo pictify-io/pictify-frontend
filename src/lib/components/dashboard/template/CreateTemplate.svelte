@@ -1,18 +1,37 @@
 <script>
-    import Editor from '$lib/components/grapeJS/Editor.svelte';
+    import Editor from '../../../components/grapeJS/editor.svelte';
     import { editor } from '../../../../store/editor.store';
     import { onMount, onDestroy } from 'svelte';
     import { getHTMLandCSS } from '../../../html-to-gif/create-media';
-    import {createTemplateAction} from "../../../../store/template.store";
+    import {createTemplateAction, updateTemplateAction, template} from "../../../../store/template.store";
+    import {get} from "svelte/store";
 
     let grapeEditor;
 
     let templateName = '';
 
 
-    let unsubscribe = () => {};
+    export let isEdit = false;
 
-    const saveTemplate = async () => {
+    let editorTemplate = null;
+
+    let unsubscribe = () => {};
+    let templateUnsubscribe = () => {};
+
+    const updateTemplate = async () => {
+        const grapeHTML = grapeEditor.getHtml();
+        const grapeCSS = grapeEditor.getCss();
+        const html = await getHTMLandCSS(grapeHTML, grapeCSS);
+        template.set({
+            ...get(template),
+            html,
+            name: templateName,
+        });
+
+        await updateTemplateAction();
+    };
+
+    const createTemplate = async () => {
         const grapeHTML = grapeEditor.getHtml();
         const grapeCSS = grapeEditor.getCss();
         const html = await getHTMLandCSS(grapeHTML, grapeCSS);
@@ -25,19 +44,42 @@
         await createTemplateAction(template);
     };
 
+    const saveTemplate = async () => {
+        if (isEdit) {
+            await updateTemplate();
+        } else {
+            await createTemplate();
+        }
+    };
+
     onMount(() => {
         unsubscribe = editor.subscribe((e) => {
             grapeEditor = e;
         });
+
+        templateUnsubscribe = template.subscribe((t) => {
+            editorTemplate = t;
+            if (editorTemplate && isEdit) {
+            templateName = editorTemplate.name;
+            grapeEditor.setComponents(editorTemplate.html);
+            // grapeEditor.setStyle(editorTemplate.css);
+        }
+        });
+
+
+
+
+
     });
 
     onDestroy(() => {
         unsubscribe();
+        templateUnsubscribe();
     });
 </script>
 
 <section class="max-w-6xl p-5 m-auto">
-  
+
     <div class="w-full flex justify-center">
         <div>
             <div class="flex items-center w-full">

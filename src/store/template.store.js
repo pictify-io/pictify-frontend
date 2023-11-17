@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 import { getTemplates, getTemplate, updateTemplate, deleteTemplate, createTemplate } from "../api/userTemplate";
+import { get } from "svelte/store";
 
 export const template = new writable({
     uid: null,
@@ -29,6 +30,13 @@ export const getTemplatesAction = async () => {
 
 export const getTemplateAction = async (uid) => {
     try {
+        template.set({
+            uid: null,
+            name: null,
+            html: null,
+            variables: null,
+            createdAt: null,
+        });
         const response = await getTemplate(uid);
         if (!response.template) {
             response.templates = null;
@@ -40,6 +48,8 @@ export const getTemplateAction = async (uid) => {
             templates[index] = response;
             return templates;
         });
+
+        return template;
     }
     catch (error) {
         throw error;
@@ -49,7 +59,8 @@ export const getTemplateAction = async (uid) => {
 
 export const updateTemplateAction = async () => {
     try {
-        const response = await updateTemplate(template);
+        const data = get(template);
+        const response = await updateTemplate(data);
         templates.update((templates) => {
             const index = templates.findIndex((template) => template.uid === response.uid);
             templates[index] = response;
