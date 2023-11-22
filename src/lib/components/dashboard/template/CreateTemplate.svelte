@@ -7,6 +7,7 @@
     import {get} from "svelte/store";
     import Toast from "$lib/components/Toast.svelte";
     import {toast} from "../../../../store/toast.store";
+    import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 
     let grapeEditor;
 
@@ -14,11 +15,16 @@
 
     export let isEdit = false;
 
-    console.log(isEdit);
     let editorTemplate = null;
 
     let unsubscribe = () => {};
     let templateUnsubscribe = () => {};
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+        toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+    });
+    }
 
     const updateTemplate = async () => {
         const grapeHTML = grapeEditor.getHtml();
@@ -94,6 +100,7 @@
     onDestroy(() => {
         unsubscribe();
         templateUnsubscribe();
+        template.set(null);
     });
 </script>
 
@@ -102,7 +109,19 @@
 
     <div class="w-full flex justify-center">
         <div>
-            <div class="flex items-center w-full">
+            {#if editorTemplate?.uid}
+            <div class="flex w-full ">
+                <div>
+                    Template Id: <span class="text-red-400">{editorTemplate?.uid}</span>
+                </div>
+                <div class="w-4 h-4 ml-2 mt-[2px]">
+                    <button on:click={copyToClipboard(editorTemplate.uid)}>
+                        <img src={CopyIcon} alt="Copy Icon" class="cursor-pointer w-5 mt-[2px]"  title="copy"  />
+                    </button>
+                </div>
+            </div>
+            {/if}
+            <div class="flex items-center w-full mt-4">
 
                 <div class="flex-grow">
                     <input type="text" placeholder="Template Name" class="w-full border-2 border-gray-300 p-2 rounded-md" bind:value={templateName} />

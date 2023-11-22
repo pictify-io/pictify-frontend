@@ -6,8 +6,9 @@
 	import initPanel from './panel';
 	import initBlock from './block';
 	import initCommands from './command';
-	import {addFonts} from './style-sheet';
-	import {editor} from '../../../store/editor.store';
+	import { addFonts } from './style-sheet';
+	import { editor } from '../../../store/editor.store';
+	import initPageConfig from './page';
 
 	import 'grapesjs/dist/css/grapes.min.css';
 
@@ -16,18 +17,22 @@
 	export let isLandingPage = true;
 
 	onMount(() => {
-		if(!isLandingPage) {
+		if (!isLandingPage) {
 			initConfig.pageManager = {
-		pages: [
-			{
-				component: `<div style="text-align:center"> <h1> Edit this template </h1> </div>`
-			}
-		]
-			}
+				pages: [
+					{
+						component: `<div style="text-align:center"> <h1> Edit this template </h1> </div>`
+					}
+				]
+			};
+		} else {
+			initConfig.pageManager = {
+				pages: [initPageConfig]
+			};
 		}
 		editorInstance = grapesjs.init(initConfig);
 		addHTMLEdit(editorInstance);
-		if(isLandingPage) {
+		if (isLandingPage) {
 			initCommands(editorInstance);
 			initPanel(editorInstance);
 		}

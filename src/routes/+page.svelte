@@ -13,7 +13,7 @@
 <section class="w-screen bg-[#FFFDF8] min-h-screen md:h-screen block flex flex-col justify-between md:items-start items-between tails-selected-element lg:overflow-x-hidden md:overflow-x-hidden " data-tails-scripts="//unpkg.com/alpinejs" contenteditable="false">
     <Nav />
     <Hero />
-    <Editor />
+    <Editor isLandingPage={true}/>
     <Api />
     <UseCase />
     <TryNow />
