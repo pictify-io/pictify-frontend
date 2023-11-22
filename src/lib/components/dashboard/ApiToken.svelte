@@ -3,15 +3,17 @@ import {user, getAPITokenAction, createAPITokenAction, deleteAPITokenAction} fro
 import {onMount, onDestroy} from "svelte";
 import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 import Toast from "$lib/components/Toast.svelte";
+import Loader from '$lib/components/Loader.svelte';
 import {toast} from "../../../store/toast.store";
 
 let apiTokens = [];
 let unsubscribe = () => {};
+let isLoading = true;
 
 onMount(async () => {
     unsubscribe = user.subscribe((u) => {
         apiTokens = u.apiTokens || [];
-        console.log(apiTokens);
+        isLoading = false;
     });
      await getAPITokenAction();
 })
@@ -37,6 +39,9 @@ function copyToClipboard(text) {
                 <div >
                     <button class="text-sm text-gray-900 hover:text-gray-900 font-bold py-1 px-4 rounded border-2 border-black" on:click={() => {createAPITokenAction()}}>Create New Token</button>
                 </div>
+        </div>
+        <div class="max-w-6xl p-5 m-auto">
+        <Loader size="8" show={isLoading} />
         </div>
         {#each apiTokens as token}
         <hr class="text-gray-400">

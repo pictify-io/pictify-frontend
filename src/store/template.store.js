@@ -6,6 +6,9 @@ export const template = new writable({
     uid: null,
     name: null,
     html: null,
+    grapeJSData: null,
+    with: null,
+    height: null,
     variables: null,
     createdAt: null,
 });
@@ -36,6 +39,9 @@ export const getTemplateAction = async (uid) => {
             html: null,
             variables: null,
             createdAt: null,
+            grapeJSData: null,
+            with: null,
+            height: null,
         });
         const response = await getTemplate(uid);
         if (!response.template) {

@@ -5,14 +5,18 @@
     import { getHTMLandCSS } from '../../../html-to-gif/create-media';
     import {createTemplateAction, updateTemplateAction, template} from "../../../../store/template.store";
     import {get} from "svelte/store";
+    import Toast from "$lib/components/Toast.svelte";
+    import {toast} from "../../../../store/toast.store";
+    import Loader from '$lib/components/Loader.svelte';
 
     let grapeEditor;
 
     let templateName = '';
 
-
     export let isEdit = false;
 
+    let isLoading = true;
+    console.log(isEdit);
     let editorTemplate = null;
 
     let unsubscribe = () => {};
@@ -22,10 +26,17 @@
         const grapeHTML = grapeEditor.getHtml();
         const grapeCSS = grapeEditor.getCss();
         const html = await getHTMLandCSS(grapeHTML, grapeCSS);
+        const grapeJSData = grapeEditor.getProjectData();
+        const width = grapeEditor.Canvas.getWindow().innerWidth;
+        const height = grapeEditor.Canvas.getWindow().innerHeight;
+ 
         template.set({
             ...get(template),
             html,
             name: templateName,
+            grapeJSData,
+            width,
+            height,
         });
 
         await updateTemplateAction();
@@ -35,10 +46,16 @@
         const grapeHTML = grapeEditor.getHtml();
         const grapeCSS = grapeEditor.getCss();
         const html = await getHTMLandCSS(grapeHTML, grapeCSS);
-
+        const grapeJSData = grapeEditor.getProjectData();
+        const width = grapeEditor.Canvas.getWindow().innerWidth;
+        const height = grapeEditor.Canvas.getWindow().innerHeight;
+ 
         const template = {
             html,
             name: templateName,
+            grapeJSData,
+            width,
+            height,
         };
 
         await createTemplateAction(template);
@@ -47,8 +64,11 @@
     const saveTemplate = async () => {
         if (isEdit) {
             await updateTemplate();
+            toast.set({ message: 'Template Saved !!', duration: 1500 });
+
         } else {
             await createTemplate();
+            toast.set({ message: 'Template Created !!', duration: 1500 });
         }
     };
 
@@ -61,14 +81,17 @@
             editorTemplate = t;
             if (editorTemplate && isEdit) {
             templateName = editorTemplate.name;
-            grapeEditor.setComponents(editorTemplate.html);
+            if(editorTemplate.grapeJSData && grapeEditor) {
+                grapeEditor.loadProjectData(editorTemplate.grapeJSData);
+            } else if(grapeEditor){
+                grapeEditor.setComponents(editorTemplate.html);
+            }
             // grapeEditor.setStyle(editorTemplate.css);
-        }
+        }  
         });
+        console.log("called on mount")
 
-
-
-
+        isLoading = false;
 
     });
 
@@ -79,10 +102,14 @@
 </script>
 
 <section class="max-w-6xl p-5 m-auto">
-
+    <div class="mt-20">
+        <Loader size="16" show={isLoading} />
+    </div>
+    {#if !isLoading}
     <div class="w-full flex justify-center">
         <div>
             <div class="flex items-center w-full">
+
                 <div class="flex-grow">
                     <input type="text" placeholder="Template Name" class="w-full border-2 border-gray-300 p-2 rounded-md" bind:value={templateName} />
                 </div>
@@ -97,4 +124,8 @@
             <Editor isLandingPage={false}/>
         </div>
     </div>
+    {/if}
+
 </section>
+
+<Toast  />
