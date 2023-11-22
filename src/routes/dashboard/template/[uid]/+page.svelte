@@ -4,6 +4,8 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
+    import Loader from '$lib/components/Loader.svelte';
+    let isLoading = true;
 
     export let data = {};
 
@@ -16,9 +18,15 @@
             goto('/dashboard/template');
         }
      await getTemplateAction($page.params.uid);
+        isLoading = false;
     });
 </script>
 
 <div class="h-full w-full">
+    <div class="mt-20">
+        <Loader size="16" show={isLoading} />
+    </div>
+    {#if !isLoading}
     <CreateTemplate isEdit={true}/>
+    {/if}
 </div>

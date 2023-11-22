@@ -7,7 +7,6 @@
     import {get} from "svelte/store";
     import Toast from "$lib/components/Toast.svelte";
     import {toast} from "../../../../store/toast.store";
-    import Loader from '$lib/components/Loader.svelte';
 
     let grapeEditor;
 
@@ -15,7 +14,6 @@
 
     export let isEdit = false;
 
-    let isLoading = true;
     console.log(isEdit);
     let editorTemplate = null;
 
@@ -50,7 +48,7 @@
         const width = grapeEditor.Canvas.getWindow().innerWidth;
         const height = grapeEditor.Canvas.getWindow().innerHeight;
  
-        const template = {
+        const templateData = {
             html,
             name: templateName,
             grapeJSData,
@@ -58,7 +56,7 @@
             height,
         };
 
-        await createTemplateAction(template);
+        await createTemplateAction(templateData);
     };
 
     const saveTemplate = async () => {
@@ -91,8 +89,6 @@
         });
         console.log("called on mount")
 
-        isLoading = false;
-
     });
 
     onDestroy(() => {
@@ -102,10 +98,8 @@
 </script>
 
 <section class="max-w-6xl p-5 m-auto">
-    <div class="mt-20">
-        <Loader size="16" show={isLoading} />
-    </div>
-    {#if !isLoading}
+
+
     <div class="w-full flex justify-center">
         <div>
             <div class="flex items-center w-full">
@@ -124,8 +118,6 @@
             <Editor isLandingPage={false}/>
         </div>
     </div>
-    {/if}
-
 </section>
 
 <Toast  />

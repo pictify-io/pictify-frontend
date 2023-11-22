@@ -16,7 +16,7 @@ onMount(async () => {
         isLoading = false;
     });
      await getAPITokenAction();
-})
+ })
 
 onDestroy(() => {
     unsubscribe();
