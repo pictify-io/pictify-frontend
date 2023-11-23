@@ -23,10 +23,11 @@
 </script>
 
 <div class="h-full w-full">
+    {#if isLoading}
     <div class="mt-20">
         <Loader size="16" show={isLoading} />
     </div>
-    {#if !isLoading}
+    {:else}
     <CreateTemplate isEdit={true}/>
     {/if}
 </div>

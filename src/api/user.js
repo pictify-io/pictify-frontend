@@ -40,10 +40,21 @@ const deleteApiToken = async (apiTokenId) => {
     }
 };
 
+const getPlanDetails = async () => {
+    try {
+        const response = await backend.get('/api/users/plans');
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 
 export {
     getUser,
     getApiToken,
     createApiToken,
     deleteApiToken,
+    getPlanDetails
 };

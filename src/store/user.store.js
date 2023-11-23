@@ -1,21 +1,25 @@
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { login, logout, signup } from '../api/auth';
-import { getUser as getUserAPI, getApiToken, createApiToken, deleteApiToken } from '../api/user';
+import { getUser as getUserAPI, getApiToken, createApiToken, deleteApiToken, getPlanDetails } from '../api/user';
 import validateEmail from '../util/validateEmail';
 
 export const user = writable({
     email: null,
     token: null,
     apiTokens: [],
+    currentPlan: null,
+    planDetails: null,
 });
 
 // Setters
 
-const setUser = (email, token) => {
+const setUser = (email, token, currentPlan) => {
+    console.log("called set user", currentPlan);
     user.set({
         email,
         token,
+        currentPlan,
     });
 }
 
@@ -23,6 +27,7 @@ export const clearUser = () => {
     user.set({
         email: null,
         token: null,
+        currentPlan: null,
     });
 }
 
@@ -60,7 +65,7 @@ export const getUser = async () => {
             userData = get(user);
         } else {
             const response = await getUserAPI();
-            setUser(response.user.email, response.user.token);
+            setUser(response.user.email, response.user.token, response.user.currentPlan);
             userData = get(user);
         }
     } catch (error) {
@@ -81,7 +86,8 @@ export const loginAction = async (email, password) => {
             password,
         });
         const { user: userData } = await getUserAPI();
-        setUser(userData.email, userData.token);
+        console.log(userData);
+        setUser(userData.email, userData.token, userData.currentPlan);
         return response;
     } catch (error) {
         clearUser();
@@ -104,7 +110,7 @@ export const signupAction = async (email, password) => {
             password,
         });
         const { user: userData } = await getUserAPI();
-        setUser(userData.email, userData.token);
+        setUser(userData.email, userData.token, userData.currentPlan);
         return response;
     }
     catch (error) {
@@ -116,7 +122,7 @@ export const signupAction = async (email, password) => {
 export const getUserAction = async () => {
     try {
         const response = await getUserAPI();
-        setUser(response.email, response.token);
+        setUser(response.email, response.token, response.currentPlan);
         return response;
     } catch (error) {
         clearUser();
@@ -150,6 +156,19 @@ export const deleteAPITokenAction = async (apiTokenId) => {
         await deleteApiToken(apiTokenId);
         const response = await getApiToken();
         setApiTokens(response.apiTokens);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getPlanDetailsAction = async () => {
+    try {
+        const response = await getPlanDetails();
+        user.update((user) => {
+            user.planDetails = response;
+            return user;
+        });
         return response;
     } catch (error) {
         throw error;

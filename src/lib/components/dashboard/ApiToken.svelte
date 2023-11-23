@@ -1,21 +1,29 @@
 <script>
-import {user, getAPITokenAction, createAPITokenAction, deleteAPITokenAction} from "../../../store/user.store";
+import {user, getAPITokenAction, createAPITokenAction, deleteAPITokenAction, getPlanDetailsAction} from "../../../store/user.store";
 import {onMount, onDestroy} from "svelte";
 import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 import Toast from "$lib/components/Toast.svelte";
 import Loader from '$lib/components/Loader.svelte';
+import ProgressBar from '$lib/components/ProgressBar.svelte';
 import {toast} from "../../../store/toast.store";
 
 let apiTokens = [];
 let unsubscribe = () => {};
 let isLoading = true;
+let currentPlan = '';
+let planDetails= {};
+let usagePercentage = 0;
 
 onMount(async () => {
     unsubscribe = user.subscribe((u) => {
+        console.log(u);
         apiTokens = u.apiTokens || [];
         isLoading = false;
+        currentPlan = u.currentPlan;
+        planDetails = u.planDetails;
+        usagePercentage = (planDetails?.usage / planDetails?.monthlyLimit) * 100;
     });
-     await getAPITokenAction();
+     Promise.all([getAPITokenAction(), getPlanDetailsAction()]);
  })
 
 onDestroy(() => {
@@ -40,8 +48,19 @@ function copyToClipboard(text) {
                     <button class="text-sm text-gray-900 hover:text-gray-900 font-bold py-1 px-4 rounded border-2 border-black" on:click={() => {createAPITokenAction()}}>Create New Token</button>
                 </div>
         </div>
-        <div class="max-w-6xl p-5 m-auto">
+        <div class="max-w-6xl pt-5 pb-5 m-auto">
         <Loader size="8" show={isLoading} />
+        <div>
+            Current Plan : <span class="text-red-400">{currentPlan}</span>
+        </div>
+        <div class=" mt-4">Usage -:</div>
+        <div class="flex items-center mt-4">
+            <div class="flex-grow">
+                <ProgressBar progress={usagePercentage} />
+            </div>
+            <div class="text-xs text-gray-700 ml-2">{planDetails?.usage} / {planDetails?.monthlyLimit}</div>
+ 
+        </div>
         </div>
         {#each apiTokens as token}
         <hr class="text-gray-400">
