@@ -13,13 +13,13 @@ function logout() {
       <div class="p-4">
         <ul class="space-y-2">
           <li class="text-gray-700 hover:text-gray-900">
-            <a href="/dashboard/template" >Templates</a>
-          </li>
-          <li class="text-gray-700 hover:text-gray-900">
             <a href="/dashboard/api-token">API Usage</a>
           </li>
           <li class="text-gray-700 hover:text-gray-900">
             <a href="/dashboard/settings" >Settings</a>
+          </li>
+          <li class="text-gray-700 hover:text-gray-900">
+            <a href="/dashboard/template" >Templates</a>
           </li>
           <li class="text-gray-700 hover:text-gray-900">
             <a href="#" on:click|preventDefault={() => $page = 'docs'}>Docs and Support</a>

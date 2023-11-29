@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { getTemplates, getTemplate, updateTemplate, deleteTemplate, createTemplate } from "../api/userTemplate";
+import { getTemplates, getTemplate, updateTemplate, deleteTemplate, createTemplate, searchTemplates } from "../api/userTemplate";
 import { get } from "svelte/store";
 
 export const template = new writable({
@@ -103,3 +103,16 @@ export const createTemplateAction = async (newTemplate) => {
     }
 }
 
+
+export const searchTemplatesAction = async (search) => {
+    try {
+        const response = await searchTemplates(search);
+        if (!response.templates) {
+            response.templates = [];
+        }
+        templates.set(response.templates);
+    }
+    catch (error) {
+        throw error;
+    }
+}

@@ -50,10 +50,21 @@ const deleteTemplate = async (uid) => {
     }
 }
 
+
+const searchTemplates = async (search) => {
+    try {
+        const response = await backend.get(`/api/templates/search?q=${search}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
 export {
     getTemplates,
     getTemplate,
     createTemplate,
     updateTemplate,
     deleteTemplate,
+    searchTemplates,
 };

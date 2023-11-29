@@ -4,20 +4,21 @@ import Search from '$lib/components/Search.svelte';
 import PlusIcon from '$lib/assets/dashboard/Plus.svg';
 import {goto} from '$app/navigation';
 
-const options = [
-    {
-        label: 'Option 1',
-        value: 'option-1',
-    },
-    {
-        label: 'Option 2',
-        value: 'option-2',
-    },
-    {
-        label: 'Option 3',
-        value: 'option-3',
-    },
-]
+
+// const options = [
+//     {
+//         label: 'Option 1',
+//         value: 'option-1',
+//     },
+//     {
+//         label: 'Option 2',
+//         value: 'option-2',
+//     },
+//     {
+//         label: 'Option 3',
+//         value: 'option-3',
+//     },
+// ]
 </script>
 
 <div class="p-2">
@@ -27,8 +28,8 @@ const options = [
 
         </div>
         <div class="flex items-center space-x-4">
-            <Dropdown  options={options} />
-            <Dropdown />
+            <!-- <Dropdown  options={options} />
+            <Dropdown /> -->
             <button class="bg-black hover:bg-black text-white font-bold py-1 px-4 rounded ring-1 ring-black ring-opacity-5" on:click={() => {
                 goto('/dashboard/template/create')
             }}>

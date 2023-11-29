@@ -11,7 +11,7 @@
 		if (!user.email) {
 			goto('/login');
 		} else {
-            goto('/dashboard/template');
+            goto('/dashboard/api-token');
         }
 	});
 </script>
