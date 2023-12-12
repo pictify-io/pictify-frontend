@@ -6,13 +6,14 @@
     import Editor from '$lib/components/grapeJS/editor.svelte';
     import UseCase from '$lib/components/landingPage/UseCase.svelte';
     import Api from '$lib/components/landingPage/Api.svelte';
-
+    import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
 </script>
 
 
 <section class="w-screen bg-[#FFFDF8] min-h-screen md:h-screen flex flex-col justify-between md:items-start items-between tails-selected-element lg:overflow-x-hidden md:overflow-x-hidden " data-tails-scripts="//unpkg.com/alpinejs" contenteditable="false">
     <Nav />
     <Hero />
+    <SignUpButton />
     <Editor isLandingPage={true}/>
     <Api />
     <UseCase />

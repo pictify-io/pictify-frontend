@@ -2,7 +2,7 @@
 	let showMobileMenu = false;
 	import { user } from '../../../store/user.store';
 	import { onMount, onDestroy } from 'svelte';
-
+	import { PUBLIC_DOCS_URL } from '$env/static/public';
 
 	let isLoggedIn = false;
 
@@ -94,9 +94,10 @@
 				>Blog</a
 			>
 			<a
-				href="#_"
+				href="{PUBLIC_DOCS_URL}"
+				target="_blank"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>About</a
+				>API Doc</a
 			>
 			<a
 				href="#_"
