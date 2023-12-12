@@ -2,6 +2,12 @@
 import { page } from "../../../store/pages.store";
 import {logoutAction} from "../../../store/user.store";
 import { goto } from '$app/navigation';
+import CollapseIcon from '$lib/assets/dashboard/CollapseArrow.png';
+
+let isMediaListExpanded = false;
+function toggleMediaList() {
+    isMediaListExpanded = !isMediaListExpanded;
+}
 
 function logout() {
     logoutAction();
@@ -16,7 +22,26 @@ function logout() {
             <a href="/dashboard/api-token">API Usage</a>
           </li>
           <li class="text-gray-700 hover:text-gray-900">
-            <a href="/dashboard/settings" >Settings</a>
+            <a href="#" on:click={toggleMediaList}> 
+              <div class="flex items-center">
+                <div>
+                  <span >Created Media </span>
+                </div>
+                <div class="ml-2">
+                  <img src={CollapseIcon} class="w-4" class:rotate-180={!isMediaListExpanded}/>
+                </div>
+              </div>
+            </a>
+            
+           
+            <ul class="space-y-2 ml-4" class:hidden={!isMediaListExpanded}>
+                <li class="text-gray-700 hover:text-gray-900">
+                    <a href="/dashboard/media/images">Images</a>
+                </li>
+                <li class="text-gray-700 hover:text-gray-900">
+                    <a href="/dashboard/media/gifs">Gifs</a>
+                </li>
+            </ul>
           </li>
           <li class="text-gray-700 hover:text-gray-900">
             <a href="/dashboard/template" >Templates</a>

@@ -2,8 +2,7 @@
 	let showMobileMenu = false;
 	import { user } from '../../../store/user.store';
 	import { onMount, onDestroy } from 'svelte';
-	import { get } from 'svelte/store';
-	import { goto } from '$app/navigation';
+
 
 	let isLoggedIn = false;
 

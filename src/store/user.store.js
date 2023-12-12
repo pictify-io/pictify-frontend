@@ -12,6 +12,7 @@ export const user = writable({
     planDetails: null,
 });
 
+export const activeApiToken = writable(null);
 // Setters
 
 const setUser = (email, token, currentPlan) => {
@@ -36,6 +37,10 @@ export const setApiTokens = (apiTokens) => {
         user.apiTokens = apiTokens;
         return user;
     });
+
+    if (apiTokens.length > 0) {
+        activeApiToken.set(apiTokens.filter((apiToken) => apiToken.active)[0]);
+    }
 }
 // Getters
 
