@@ -1,11 +1,11 @@
 <div class="w-100 flex justify-center items-center mx-auto py-10 px-6 text-left md:text-center max-w-4xl space-y-8">
     <div>
  <div class="text-5xl font-bold ">
-    <p>Frustrated with cookie-cutter posts that miss your brand's essence?</p>
+    <p>One API thousand possibilities</p>
  </div>
  <div class="text-lg opacity-50 max-w-3xl text-left md:text-center my-8">
     <p class="">
-        Let Medify be your media superhero! We understand the challenges you encounter when striving to distinguish yourself in the bustling online landscape. 
+       Automate your image and GIF generation with our simple API. Create visuals from HTML, CSS, and JavaScript in seconds. Be it for marketing, social media, or dashboards, Medify's API has you covered.
     </p>
  </div>
 

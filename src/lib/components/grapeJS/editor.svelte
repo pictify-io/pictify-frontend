@@ -43,6 +43,9 @@
 </script>
 
 <section class="hidden md:block flex-col justify-center items-center mx-auto py-10">
+	<div class="w-48 lg:translate-x-[-50px]">
+	<img clas=""src="https://res.cloudinary.com/diroilukd/image/upload/v1702834796/click-here_bjp33s.png"/>
+	</div>
 	<div class="min-w-300 min-h-300">
 		<div id="gjs" />
 	</div>
