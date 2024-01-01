@@ -57,7 +57,7 @@
 	</button>
 	<div
 		class={[
-			'w-full md:flex md:flex-row flex-col md:relative absolute h-screen md:pt-0 pt-20 md:h-full items-stretch justify-between',
+			'w-full flex-col flex md:flex md:flex-row  md:relative absolute h-screen md:pt-0 pt-20 md:h-full items-stretch justify-between',
 			'flex',
 			showMobileMenu ? ' ' : 'hidden'
 		]}
@@ -81,7 +81,7 @@
 			</svg>
 		</button>
 		<nav
-			class="w-full md:space-x-8 font-medium md:bg-transparent bg-[#FFFDF8] md:px-8 h-full flex md:flex-row flex-col z-20 items-center"
+			class="w-full md:space-x-8 font-medium md:bg-transparent bg-[#FFFDF8] md:px-8 flex md:flex-row flex-col z-20 items-center"
 		>
 			<a
 				href="#_"
@@ -105,6 +105,9 @@
 				>Contact</a
 			>
 		</nav>
+		<div class="flex-grow bg-[#FFFDF8]">
+			
+		</div>
 		<div
 			class="flex flex-shrink-0 md:flex-row flex-col md:bg-transparent bg-[#FFFDF8] font-medium border-l-0 md:border-l-[3px] border-black items-center"
 		>

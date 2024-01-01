@@ -122,11 +122,11 @@ $image = json_decode($response);
 </script>
 
 <div
-	class="w-full flex justify-center flex-col sm: px-6 max-w-4xl space-y-8 w-100 mx-auto mb-8 py-10"
+	class="w-full flex justify-center flex-col sm: px-6 max-w-4xl space-y-8 w-100 mx-auto mb-8 pt-10 md:pb-10"
 >
 	<div class="">
 		<div>
-			<div class="text-5xl font-bold text-left md:text-center">
+			<div class="text-4xl sm:text-5xl font-bold text-left md:text-center">
 				<p>Easy To Use API</p>
 			</div>
 			<div class="text-lg opacity-50 max-w-3xl text-left md:text-center my-8">
@@ -136,14 +136,14 @@ $image = json_decode($response);
 				</p>
 			</div>
 		</div>
-		<div class="hidden sm:block w-full my-8 overflow-x-auto">
+		<div class="sm:block w-full my-10 md:my-8 overflow-x-auto">
 			<div class="bg-black w-100 rounded-t flex flex-wrap">
 				<div class="w-3 h-3 bg-red-400 rounded-full m-2 mr-0" />
 				<div class="w-3 h-3 bg-yellow-400 rounded-full m-2 mr-0" />
 				<div class="w-3 h-3 bg-green-400 rounded-full m-2 mr-0" />
 			</div>
 			<div class="border border-gray-500 border-t-0 mt-n2 bg-gray-300 rounded-b py-0">
-				<div class="flex w-100 bg-gray-100">
+				<div class="text-xs md:text-base flex w-100 bg-gray-100">
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('js')}
@@ -173,7 +173,7 @@ $image = json_decode($response);
 						<span class="ml-1">medify.php</span>
 					</button>
 				</div>
-				<div class="text-black-400 flex p-2 min-w-5 whitespace-pre-wrap max-h-xs">
+				<div class="text-xs md:text-base md:text-black-400 flex p-2 min-w-5 whitespace-pre-wrap max-h-xs">
 					{#each Object.keys(codeLanguageMap) as language}
 						{#if language === activeTab}
 							<pre class="bg-gray-300 w-full line-numbers language-{activeTab}"><code

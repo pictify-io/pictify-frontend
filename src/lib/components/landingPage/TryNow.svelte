@@ -7,7 +7,7 @@
     }
 </script>
 
-<div class="w-100 sm:w-90 flex-col justify-center items-center mx-auto py-10">
+<div class="w-100 sm:w-90 flex-col justify-center items-center mx-auto py-10 px-10  md:px-0">
 <div class="relative">
     <div class="w-full h-full absolute inset-0 bg-black rounded-xl translate-y-2 translate-x-2"></div>
     <div class="rounded-xl relative z-20 pl-8 sm:pl-10 pr-8 sm:pr-16 py-8 border-[3px] border-gray-900 bg-[#fff4da]">
