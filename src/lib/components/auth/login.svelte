@@ -14,6 +14,12 @@
 	let errorMessage;
 
 	onMount(async () => {
+		if(!isLogin) {
+			const emailFromParams = new URLSearchParams(window.location.search).get('email');
+			if (emailFromParams) {
+				email = emailFromParams;
+			}
+		}
 		await getUser();
 		if (isLoggedIn) {
 			goto('/dashboard');

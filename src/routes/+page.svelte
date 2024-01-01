@@ -16,6 +16,7 @@
     <SignUpButton />
     <Editor isLandingPage={true}/>
     <Api />
+    <SignUpButton />
     <UseCase />
     <TryNow />
     <Footer />
