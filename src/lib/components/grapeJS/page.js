@@ -61,12 +61,12 @@ const initPageConfig = {
     }
 
     .side-element-1 {
-        animation: rotate 6s linear infinite;
+        animation: rotate 2s linear infinite;
     }
 
     .side-element-2 {
         margin-top: 7rem;
-        animation: rotate 4s linear infinite;
+        animation: rotate 3s linear infinite;
     }
 
     @keyframes rotate {
@@ -74,7 +74,7 @@ const initPageConfig = {
             transform: rotate(0deg);
         }
         to {
-            transform: rotate(360deg);
+            transform: rotate(180deg);
         }
     }
     `
