@@ -16,7 +16,12 @@
 
 	export let isLandingPage = true;
 
+	let isMobile = false;
+
 	onMount(() => {
+		if (window.innerWidth < 768) {
+			isMobile = true;
+		}
 		if (!isLandingPage) {
 			initConfig.pageManager = {
 				pages: [
@@ -30,7 +35,18 @@
 				pages: [initPageConfig]
 			};
 		}
+
+		if(isMobile){
+			initConfig.width = window.innerWidth - 20 + 'px';
+			initConfig.height = '250px';
+			initConfig.panels = { defaults: [] };
+			initConfig.showDevices = 0;
+			initConfig.canvas.style = {
+				width: '100%'
+			};
+		}
 		editorInstance = grapesjs.init(initConfig);
+	
 		addHTMLEdit(editorInstance);
 		if (isLandingPage) {
 			initCommands(editorInstance);
@@ -42,8 +58,8 @@
 	});
 </script>
 
-<section class="hidden md:block flex-col justify-center items-center mx-auto py-10">
-	<div class="w-48 lg:translate-x-[-50px]">
+<section class="my-10 md:block flex-col justify-center items-center mx-auto py-10 sm:my-0">
+	<div class="w-32 sm:w-48 lg:translate-x-[-50px]">
 	<img clas=""src="https://res.cloudinary.com/diroilukd/image/upload/v1702834796/click-here_bjp33s.png"/>
 	</div>
 	<div class="min-w-300 min-h-300">

@@ -77,6 +77,26 @@ const initPageConfig = {
             transform: rotate(180deg);
         }
     }
+
+    @media (max-width: 768px) {
+
+        .text > h1 {
+            font-size: 50px;
+        }
+
+
+        .text > h2 {
+            font-size: 15px;
+        }
+
+        .container> div > img {
+            width: 5rem;
+            height: 5rem;
+            min-width: 70px;
+            min-height: 70px;
+            padding: 1rem;
+        }
+    }
     `
 };
 export default initPageConfig;

@@ -22,8 +22,18 @@
     color: #fff !important;
 }
 
-.gjs-cv-canvas {
-    width: 80% !important;
+
+
+@media screen and (max-width: 768px){
+    .gjs-cv-canvas {
+        width: 100% !important;
+    }
+}
+
+@media screen and (min-width: 768px){
+    .gjs-cv-canvas {
+        width: 80% !important;
+    }
 }
 
 .gjs-pn-views, .gjs-pn-views-container  {
