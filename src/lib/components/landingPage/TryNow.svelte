@@ -23,7 +23,7 @@
                 <img src="https://cdn.devdojo.com/images/january2023/shape-2.png" class="absolute sm:translate-y-0  translate-y-full sm:mt-0 mt-16 w-16 right-0 translate-x-full top-0 h-16 mr-8 sm:mr-1">
             </div>
         </form>
-        <p class="opacity-70 mt-4">* signup to gain early access to our beta program, and be first on the list!</p>
+        <p class="opacity-70 mt-4">* signup to access our beta program, and get exclusive discount!</p>
     </div>
 </div>
 </div>

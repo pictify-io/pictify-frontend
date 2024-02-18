@@ -7,8 +7,8 @@
  </script>
     <Nav />
     <div class="min-h-screen flex flex-col">
-      <div class="flex w-100 flex-grow">
-          <div class=" border-r-[3px] border-black">
+      <div class="flex flex-col sm:flex-row w-100 flex-grow">
+          <div class="sm:border-r-[3px] border-black">
               <SideNav />
           </div>
             <div class="flex-grow">
