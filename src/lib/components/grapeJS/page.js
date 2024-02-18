@@ -7,7 +7,7 @@ const initPageConfig = {
                     class="side-element-1">
             </div>
             <div class="text">
-                <h1>Medify</h1>
+                <h1>Pictify</h1>
                 <h2>Click on create image or create gif to see the API in action</h2>
             </div>
             <div>

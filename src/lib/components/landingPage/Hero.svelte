@@ -13,6 +13,6 @@
         </svg>
     </div>
     <p class="max-w-3xl opacity-50 md:text-center text-lg">
-        Medify offers APIs to convert HTML to image or gif. Connect with your audience by creating personalized and sharable content, making your brand more relatable and engaging.
+        Pictify offers APIs to convert HTML to image or gif. Connect with your audience by creating personalized and sharable content, making your brand more relatable and engaging.
     </p>
 </main>

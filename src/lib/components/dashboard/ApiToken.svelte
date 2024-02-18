@@ -42,7 +42,7 @@ function copyToClipboard(text) {
         <div class="">
         <h1 class="text-lg font-bold">API Tokens</h1>
         <div class="flex flex-col sm:flex-row justify-between sm:items-center mt-10 mb-10">
-                <div class="text-sm sm:text-md text-gray-700">API tokens used to authenticate with Medify API. <br>Treat them like passwords and keep them secret. Learn more in our <a href="https://docs.medify.ai" target="_blank" class="text-blue-500">docs</a>.
+                <div class="text-sm sm:text-md text-gray-700">API tokens used to authenticate with Pictify API. <br>Treat them like passwords and keep them secret. Learn more in our <a href="https://docs.pictify.ai" target="_blank" class="text-blue-500">docs</a>.
                 </div>
                 <div >
                     <button class="mt-10 sm:mt-0 text-sm text-gray-900 hover:text-gray-900 font-bold py-1 px-4 rounded border-2 border-black" on:click={() => {createAPITokenAction()}}>Create New Token</button>

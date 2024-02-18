@@ -5,7 +5,7 @@
  </div>
  <div class="text-lg opacity-50 max-w-3xl text-left md:text-center mt-8 mb-20 md:ml-auto md:mr-auto">
     <p class="">
-       Automate your image and GIF generation with our simple API. Create visuals from HTML, CSS, and JavaScript in seconds. Be it for marketing, social media, or dashboards, Medify's API has you covered.    
+       Automate your image and GIF generation with our simple API. Create visuals from HTML, CSS, and JavaScript in seconds. Be it for marketing, social media, or dashboards, Pictify's API has you covered.    
     </p>
  </div>
 

@@ -29,7 +29,7 @@ const header = {
 
 const config = {
 	method: 'post',
-	url: 'https://api.medify.com/image',
+	url: 'https://api.pictify.com/image',
 	headers: header,
 	data: data
 };
@@ -46,7 +46,7 @@ import (
 )
 
 func main() {
-    url := "https://api.medify.com/image"
+    url := "https://api.pictify.com/image"
 
     payload := []byte('{
 		"html": "<html><body><h1>Hello World</h1></body></html>"
@@ -70,7 +70,7 @@ func main() {
 		py: `import requests
 import json
 
-url = 'https://api.medify.com/image'
+url = 'https://api.pictify.com/image'
 
 payload = {'html': 'Hello World'}
 
@@ -85,7 +85,7 @@ image = response.json()
 `,
 		php: `<?php
 
-$url = 'https://api.medify.com/image';
+$url = 'https://api.pictify.com/image';
 $data = json_encode(array('html' => 'Hello World'));
 $header = array(
     'Authorization: Bearer access_token',
@@ -131,7 +131,7 @@ $image = json_decode($response);
 			</div>
 			<div class="text-lg opacity-50 max-w-3xl text-left md:text-center my-8">
 				<p class="">
-					Medify's API is easy to use and can be integrated into your existing workflow in minutes.
+					Pictify's API is easy to use and can be integrated into your existing workflow in minutes.
 					Create Image's and GIF's from HTML with a simple POST request.
 				</p>
 			</div>
@@ -149,28 +149,28 @@ $image = json_decode($response);
 						on:click={() => changeTab('js')}
 					>
 						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
-						<span class="ml-1">medify.js</span>
+						<span class="ml-1">pictify.js</span>
 					</button>
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('go')}
 					>
 						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
-						<span class="ml-1">medify.go</span>
+						<span class="ml-1">pictify.go</span>
 					</button>
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('py')}
 					>
 						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
-						<span class="ml-1">medify.py</span>
+						<span class="ml-1">pictify.py</span>
 					</button>
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('php')}
 					>
 						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
-						<span class="ml-1">medify.php</span>
+						<span class="ml-1">pictify.php</span>
 					</button>
 				</div>
 				<div class="text-xs md:text-base md:text-black-400 flex p-2 min-w-5 whitespace-pre-wrap max-h-xs">

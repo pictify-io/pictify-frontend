@@ -65,7 +65,7 @@
 	<div class="sm:border-2 sm:min-w-[400px] border-gray-900 p-5 sm:p-10 max-w-sm">
 		<div class="flex flex-col items-center justify-center">
 			<div class="my-5">
-				<span class="text-4xl font-bold font-heading text-shadow">Medify </span>
+				<span class="text-4xl font-bold font-heading text-shadow">Pictify </span>
 				<span class="text-xs font-heading text-gray-700">beta</span>
 			</div>
 			<hr class="border-gray-900 w-full" />
@@ -73,7 +73,7 @@
 			{#if isLogin}
 				<p class="text-gray-700">Login to your account</p>
 			{:else}
-				<p class="text-gray-700">Create your account and start using medify now</p>
+				<p class="text-gray-700">Create your account and start using pictify now</p>
 			{/if}
 		</div>
 		<div class="flex flex-col items-center justify-center mt-10">
