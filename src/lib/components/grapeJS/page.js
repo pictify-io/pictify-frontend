@@ -40,7 +40,7 @@ const initPageConfig = {
     }
 
     .text > h1 {
-        font-family: 'Silkscreen', sans-serif;
+        font-family: 'DynaPuff', sans-serif;
         font-size: 100px;
         color: #ff6b6b;
         margin: 0;

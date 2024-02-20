@@ -5,7 +5,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        heading: ['Silkscreen', 'Inter', 'sans-serif'],
+        heading: ['DynaPuff', 'Inter', 'sans-serif'],
       },
     },
   },
