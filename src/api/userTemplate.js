@@ -2,7 +2,7 @@ import backend from "../service/backend";
 
 const getTemplates = async () => {
     try {
-        const response = await backend.get('/api/templates');
+        const response = await backend.get('/templates');
         return response.data;
     }
     catch (error) {
@@ -12,7 +12,7 @@ const getTemplates = async () => {
 
 const getTemplate = async (uid) => {
     try {
-        const response = await backend.get(`/api/templates/${uid}`);
+        const response = await backend.get(`/templates/${uid}`);
         return response.data;
     }
     catch (error) {
@@ -22,7 +22,7 @@ const getTemplate = async (uid) => {
 
 const createTemplate = async (template) => {
     try {
-        const response = await backend.post('/api/templates', template);
+        const response = await backend.post('/templates', template);
         return response.data;
     }
     catch (error) {
@@ -32,7 +32,7 @@ const createTemplate = async (template) => {
 
 const updateTemplate = async (template) => {
     try {
-        const response = await backend.put(`/api/templates/${template.uid}`, template);
+        const response = await backend.put(`/templates/${template.uid}`, template);
         return response.data;
     }
     catch (error) {
@@ -42,7 +42,7 @@ const updateTemplate = async (template) => {
 
 const deleteTemplate = async (uid) => {
     try {
-        const response = await backend.delete(`/api/templates/${uid}`);
+        const response = await backend.delete(`/templates/${uid}`);
         return response.data;
     }
     catch (error) {
@@ -53,7 +53,7 @@ const deleteTemplate = async (uid) => {
 
 const searchTemplates = async (search) => {
     try {
-        const response = await backend.get(`/api/templates/search?q=${search}`);
+        const response = await backend.get(`/templates/search?q=${search}`);
         return response.data;
     }
     catch (error) {

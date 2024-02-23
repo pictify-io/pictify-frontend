@@ -5,7 +5,7 @@ const createImagePublic = async ({
     width,
     height,
 }) => {
-    const response = await backend.post('/api/image/public', {
+    const response = await backend.post('/image/public', {
         html,
         width,
         height,
@@ -19,7 +19,7 @@ const createGifPublic = async ({
     height,
     duration,
 }) => {
-    const response = await backend.post('/api/gif/public', {
+    const response = await backend.post('/gif/public', {
         html,
         width,
         height,
