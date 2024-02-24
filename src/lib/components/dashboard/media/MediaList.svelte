@@ -1,5 +1,5 @@
 <script>
-    import { onDestroy } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { gifs, images, fetchGifs, fetchImages} from '../../../../store/media.store';
     import Toast from "$lib/components/Toast.svelte";
     import {toast} from "../../../../store/toast.store";
@@ -19,31 +19,30 @@
 
     let mediaList = [];
 
-    $: {
-      (async () => {
-        if (unsubscribe) {
-      unsubscribe();
-    }
 
-    if (mediaType === 'images') {
-      unsubscribe = images.subscribe((i) => {
-        mediaList = i.images || [];
-      });
-    } else if (mediaType === 'gifs') {
-      unsubscribe = gifs.subscribe((g) => {
-        mediaList = g.gifs || [];
-      });
-    }
+    onMount(async () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+
+      if (mediaType === 'images') {
+        unsubscribe = images.subscribe((i) => {
+          mediaList = i.images || [];
+        });
+      } else if (mediaType === 'gifs') {
+        unsubscribe = gifs.subscribe((g) => {
+          mediaList = g.gifs || [];
+        });
+      }
 
       if (mediaType === 'images') {
         await fetchImages();
       } else if (mediaType === 'gifs') {
         await fetchGifs();
       }
-    isLoading = false;
-      })();
-   
-  }
+      isLoading = false;
+    });
+
 
   onDestroy(() => {
     if (unsubscribe) {
