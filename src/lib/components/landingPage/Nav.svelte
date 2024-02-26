@@ -84,7 +84,7 @@
 		<nav
 			class="w-full md:space-x-8 font-medium md:bg-transparent bg-[#FFFDF8] md:px-8 flex md:flex-row flex-col z-20 items-center"
 		>
-			<a
+			<!-- <a
 				href="#_"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Home</a
@@ -93,7 +93,7 @@
 				href="#_"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Blog</a
-			>
+			> -->
 			<a
 				href="{PUBLIC_DOCS_URL}"
 				target="_blank"
@@ -101,7 +101,7 @@
 				>API Doc</a
 			>
 			<a
-				href="#_"
+				href="mailto:support@pectify.io"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Contact</a
 			>
