@@ -29,6 +29,7 @@
 		"grapejs": "^2.0.1",
 		"grapesjs": "^0.21.4",
 		"grapesjs-blocks-basic": "^1.0.2",
+		"posthog-js": "^1.109.0",
 		"prismjs": "^1.29.0"
 	}
 }
