@@ -50,11 +50,38 @@ const getPlanDetails = async () => {
     }
 }
 
+const resetPassword = async ({ password, token }) => {
+    try {
+        const response = await backend.post('/auth/reset-password', {
+            password,
+            token
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+const forgotPassword = async (email) => {
+    try {
+        const response = await backend.post('/auth/forgot-password', {
+            email
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 
 export {
     getUser,
     getApiToken,
     createApiToken,
     deleteApiToken,
-    getPlanDetails
+    getPlanDetails,
+    resetPassword,
+    forgotPassword
 };

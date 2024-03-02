@@ -9,6 +9,21 @@
     import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
 </script>
 
+<svelte:head>
+    <title>Pictify.io</title>
+    <meta name="description" content="Pictify.io is a free HTML to Image and Gif conversion API">
+    <meta name="keywords" content="HTML to image, HTML to gif, HTML to image API, HTML to gif API, HTML CSS to Image API, HTML CSS to Gif API, Gif, API, Pictify.io, Pictify, Pictify API, Pictify.io API, Pictify.io Gif API, Pictify.io HTML to CSS API, Pictify.io HTML to CSS and Gif API, Pictify.io HTML to CSS and Gif conversion API, Pictify.io HTML to CSS and Gif conversion">
+    <meta name="author" content="Pictify.io">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta Property="og:title" content="Pictify.io">
+    <meta Property="og:description" content="Pictify.io is a free HTML to Image and Gif conversion API">
+    <meta Property="og:image" content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png">
+    <meta Property="og:url" content="https://pictify.io">
+    <meta Property="og:type" content="website">
+    <meta Property="og:site_name" content="Pictify.io">
+    <meta Property="og:locale" content="en_US">
+</svelte:head>
+
 
 <section class="w-screen bg-[#FFFDF8] min-h-screen md:h-screen flex flex-col justify-between md:items-start items-between tails-selected-element lg:overflow-x-hidden md:overflow-x-hidden " data-tails-scripts="//unpkg.com/alpinejs" contenteditable="false">
     <Nav />
