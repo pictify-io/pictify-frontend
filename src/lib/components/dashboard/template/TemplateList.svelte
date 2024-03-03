@@ -3,7 +3,6 @@
     export let templates;
 
     const handleTemplateClick = (template) => {
-        console.log(template);
         goto(`/dashboard/template/${template.uid}`);
     }
 </script>

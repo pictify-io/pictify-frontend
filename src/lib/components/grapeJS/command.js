@@ -7,7 +7,6 @@ const createImage = async (editor, Modal) => {
     const htmlCode = editor.getHtml();
     const cssCode = editor.getCss();
     const html = await getHTMLandCSS(htmlCode, cssCode);
-    console.log(html);
     const width = editor.Canvas.getWindow().innerWidth;
     const height = editor.Canvas.getWindow().innerHeight;
     const { image } = await createImagePublic({

@@ -1,6 +1,5 @@
 const initPanel = (editor) => {
     const panelManager = editor.Panels;
-    console.log(panelManager.getPanel('options'));
     panelManager.addPanel({
         id: 'create-image',
         visible: true,

@@ -19,7 +19,6 @@
   $: isPasswordMatch = password === confirmPassword && password.length > 0;
 
   onMount(() => {
-    console.log($page.params.token);
     token = $page.params.token;
   });
 
@@ -34,7 +33,6 @@
       toast.set({ message: 'Password reset successfully', duration: 1500 });
       goto('/login');
     } catch (e) {
-      console.log(e);
       toast.set({ message: e.response.data.message, duration: 1500 });
     }
     isLoading = false;

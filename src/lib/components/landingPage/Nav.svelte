@@ -10,7 +10,6 @@
 
 	onMount(async () => {
 		unsubscribe = user.subscribe((u) => {
-			console.log(u);
 			isLoggedIn = !!u.email;
 		});
 	});

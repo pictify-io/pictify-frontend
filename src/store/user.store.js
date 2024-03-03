@@ -16,7 +16,6 @@ export const activeApiToken = writable(null);
 // Setters
 
 const setUser = (email, token, currentPlan) => {
-    console.log("called set user", currentPlan);
     user.set({
         email,
         token,
@@ -46,7 +45,6 @@ export const setApiTokens = (apiTokens) => {
 
 export const isLoggedIn = () => {
     const currentUser = get(user);
-    console.log("called is logged in");
     return !!currentUser.email;
 }
 
@@ -63,7 +61,6 @@ export const getAuthHeader = () => {
 }
 
 export const getUser = async () => {
-    console.log("called get user");
     let userData;
     try {
         if (isLoggedIn()) {
@@ -91,7 +88,6 @@ export const loginAction = async (email, password) => {
             password,
         });
         const { user: userData } = await getUserAPI();
-        console.log(userData);
         setUser(userData.email, userData.token, userData.currentPlan);
         return response;
     } catch (error) {

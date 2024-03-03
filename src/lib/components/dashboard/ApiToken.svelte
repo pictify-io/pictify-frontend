@@ -16,7 +16,6 @@ let usagePercentage = 0;
 
 onMount(async () => {
     unsubscribe = user.subscribe((u) => {
-        console.log(u);
         apiTokens = u.apiTokens || [];
         isLoading = false;
         currentPlan = u.currentPlan;

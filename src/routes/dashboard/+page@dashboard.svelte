@@ -7,7 +7,6 @@
 	let user = null;
 	onMount(async () => {
 		user = await getUser();
-		console.log(user);
 		if (!user.email) {
 			goto('/login');
 		} else {

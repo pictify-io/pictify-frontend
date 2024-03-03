@@ -11,7 +11,6 @@
     // Read params from the URL
 
     onMount(async () => {
-        console.log($page.params);
         if(!$page.params.uid){
             goto('/dashboard/template');
         }

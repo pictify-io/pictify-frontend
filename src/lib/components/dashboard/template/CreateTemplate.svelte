@@ -93,7 +93,6 @@
             // grapeEditor.setStyle(editorTemplate.css);
         }  
         });
-        console.log("called on mount")
 
     });
 
