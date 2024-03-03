@@ -15,7 +15,7 @@
             Personalized Emails Graphics
         </div>
         <div>
-            <img class="max-w-xs m-auto md:max-w-md border border-black border-2"src="https://htgf.s3.amazonaws.com/bvhew-1703216378968.png"/>
+            <img class="max-w-xs m-auto md:max-w-md border border-black" src="https://htgf.s3.amazonaws.com/bvhew-1703216378968.png" alt="html-email"/>
         </div>
     </div>
     <div class="md:ml-4 mt-10 sm:mt-5">
@@ -23,7 +23,7 @@
             Social Sharing Cards
         </div>
         <div>
-            <img class="max-w-xs m-auto md:max-w-md border border-black border-2"src="https://res.cloudinary.com/diroilukd/image/upload/v1703704940/9nwdk_170_1_thal3x.png">
+            <img class="max-w-xs m-auto md:max-w-md border border-black" src="https://res.cloudinary.com/diroilukd/image/upload/v1703704940/9nwdk_170_1_thal3x.png" alt="html-social-sharing">
         </div>
     </div> 
    </div>
@@ -33,7 +33,7 @@
             Certificates
         </div>
         <div>
-            <img class="max-w-xs m-auto md:max-w-md border border-black border-2"src="https://htgf.s3.amazonaws.com/68lk2-1704017409595.png">
+            <img class="max-w-xs m-auto md:max-w-md border border-black"src="https://htgf.s3.amazonaws.com/68lk2-1704017409595.png" alt="html-certificate">
         </div>
     </div>
     <div class="md:ml-4 mt-10 sm:mt-5">
@@ -41,7 +41,7 @@
             Awards and Badges
         </div>
         <div>
-            <img class="max-w-xs m-auto md:max-w-md border border-black border-2"src="https://res.cloudinary.com/diroilukd/image/upload/v1703809509/Photo_2_rlkesl.png">
+            <img class="max-w-xs m-auto md:max-w-md border border-black"src="https://res.cloudinary.com/diroilukd/image/upload/v1703809509/Photo_2_rlkesl.png" alt="html-awards-and-badge">
         </div>
     </div> 
    </div>

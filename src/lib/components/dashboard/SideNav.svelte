@@ -32,7 +32,7 @@
 								<span>Created Media </span>
 							</div>
 							<div class="ml-2">
-								<img src={CollapseIcon} class="w-4" class:rotate-180={!isMediaListExpanded} />
+								<img src={CollapseIcon} class="w-4" class:rotate-180={!isMediaListExpanded}  alt="collapse-icon"/>
 							</div>
 						</div>
 					</a>

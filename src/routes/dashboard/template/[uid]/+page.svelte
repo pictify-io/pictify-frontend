@@ -7,10 +7,8 @@
     import Loader from '$lib/components/Loader.svelte';
     let isLoading = true;
 
-    export let data = {};
 
     // Read params from the URL
-     export let params = {};
 
     onMount(async () => {
         console.log($page.params);
