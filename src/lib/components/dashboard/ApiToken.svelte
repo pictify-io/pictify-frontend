@@ -59,7 +59,6 @@ function copyToClipboard(text) {
                 <ProgressBar progress={usagePercentage} />
             </div>
             <div class="text-xs text-gray-700 ml-2">{planDetails?.usage} / {planDetails?.monthlyLimit}</div>
- 
         </div>
         </div>
         {#each apiTokens as token}

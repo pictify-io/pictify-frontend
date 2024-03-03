@@ -3,6 +3,7 @@
 	import { logoutAction } from '../../../store/user.store';
 	import { goto } from '$app/navigation';
 	import CollapseIcon from '$lib/assets/dashboard/CollapseArrow.png';
+	import { PUBLIC_DOCS_URL } from '$env/static/public';
 
 	let isMediaListExpanded = false;
 	function toggleMediaList() {
@@ -49,7 +50,7 @@
 					<a href="/dashboard/template">Templates</a>
 				</li>
 				<li class="text-gray-700 hover:text-gray-900">
-					<a href="#" on:click|preventDefault={() => ($page = 'docs')}>Docs and Support</a>
+					<a href="{PUBLIC_DOCS_URL}" target="_blank">Docs and Support</a>
 				</li>
 			</ul>
 		</div>
