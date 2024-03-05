@@ -1,24 +1,28 @@
 <script>
 	import { onMount } from 'svelte';
-	import grapesjs from 'grapesjs';
-	import addHTMLEdit from './html-edit';
-	import initConfig from './editor-config';
-	import initPanel from './panel';
-	import initBlock from './block';
-	import initCommands from './command';
-	import { addFonts } from './style-sheet';
 	import { editor } from '../../../store/editor.store';
-	import initPageConfig from './page';
+
 
 	import 'grapesjs/dist/css/grapes.min.css';
 
 	let editorInstance = null;
+	let isGrapesJSLoaded = false;
 
 	export let isLandingPage = true;
 
 	let isMobile = false;
 
-	onMount(() => {
+	onMount(async () => {
+	const { default: grapesjs } = await import('grapesjs');
+  isGrapesJSLoaded = true;
+  const { default: addHTMLEdit } = await import('./html-edit');
+  const { default: initConfig } = await import('./editor-config');
+  const { default: initPanel } = await import('./panel');
+  const { default: initBlock } = await import('./block');
+  const { default: initCommands } = await import('./command');
+  const { addFonts } = await import('./style-sheet');
+  const { default: initPageConfig } = await import('./page');
+		
 		if (window.innerWidth < 768) {
 			isMobile = true;
 		}
@@ -68,9 +72,16 @@
 			/>
 		{/if}
 	</div>
+	{#if isGrapesJSLoaded}
 	<div class="min-w-300 min-h-300">
 		<div id="gjs" />
 	</div>
+	{:else}
+		<div class="w-32 sm:w-lg">
+			<img src="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png" alt="pictify-html-to-media" />
+		</div>
+	{/if}
+	
 </section>
 
 <style>
