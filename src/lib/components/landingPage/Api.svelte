@@ -1,16 +1,10 @@
 <script>
 	import FileIcon from '$lib/assets/landing-page/file.svg';
-	import Prism from 'prismjs';
-	import 'prismjs/components/prism-markup';
-	import 'prismjs/components/prism-markup-templating';
-	import 'prismjs/components/prism-javascript';
-	import 'prismjs/components/prism-go';
-	import 'prismjs/components/prism-python';
-	import 'prismjs/components/prism-php';
-	import 'prismjs/plugins/line-numbers/prism-line-numbers';
-	import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+	import {onMount} from 'svelte';
+	let Prism;
+	let highlightedCode;
 
-	import 'prismjs/themes/prism-tomorrow.css';
+
 
 	import { afterUpdate } from 'svelte';
 
@@ -107,17 +101,42 @@ $image = json_decode($response);
 `
 	};
 
+	onMount(async () => {
+		Prism = (await import('prismjs')).default;
+
+		await import('prismjs/components/prism-markup');
+		await import('prismjs/components/prism-markup-templating');
+		await import('prismjs/components/prism-javascript');
+		await import('prismjs/components/prism-go');
+		await import('prismjs/components/prism-python');
+		await import('prismjs/components/prism-php');
+		await import('prismjs/plugins/line-numbers/prism-line-numbers');
+		await import('prismjs/plugins/line-numbers/prism-line-numbers.css');
+		await import('prismjs/themes/prism-tomorrow.css');
+
+		highlightedCode = Prism.highlight(
+			codeLanguageMap[activeTab],
+			Prism.languages[activeTab],
+			activeTab
+		);
+	});
+
 	function changeTab(tab) {
 		activeTab = tab;
 	}
-	$: highlightedCode = Prism.highlight(
-		codeLanguageMap[activeTab],
-		Prism.languages[activeTab],
-		activeTab
-	);
+	$: if(Prism) {
+		highlightedCode = Prism.highlight(
+			codeLanguageMap[activeTab],
+			Prism.languages[activeTab],
+			activeTab
+		);
+	}
+
 
 	afterUpdate(() => {
-		Prism.highlightAll();
+		if(Prism) {
+			Prism.highlightAll();
+		}
 	});
 </script>
 
@@ -175,12 +194,22 @@ $image = json_decode($response);
 				</div>
 				<div class="text-xs md:text-base md:text-black-400 flex p-2 min-w-5 whitespace-pre-wrap max-h-xs">
 					{#each Object.keys(codeLanguageMap) as language}
-						{#if language === activeTab}
+						{#if language === activeTab && Prism}
 							<pre class="bg-gray-300 w-full line-numbers language-{activeTab}"><code
 									>{@html highlightedCode}</code
 								></pre>
 						{/if}
 					{/each}
+					{#if !Prism}
+						<div class="w-full h-96 flex justify-center items-center">
+							<pre class="h-full line-numbers language-{activeTab}">
+							<code>
+								Loading...
+								Code to convert HTML to Image or Gif will be shown here
+							</code>
+							</pre>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
