@@ -14,7 +14,7 @@
 
 	onMount(async () => {
 	const { default: grapesjs } = await import('grapesjs');
-  isGrapesJSLoaded = true;
+	isGrapesJSLoaded = true;
   const { default: addHTMLEdit } = await import('./html-edit');
   const { default: initConfig } = await import('./editor-config');
   const { default: initPanel } = await import('./panel');
@@ -22,7 +22,7 @@
   const { default: initCommands } = await import('./command');
   const { addFonts } = await import('./style-sheet');
   const { default: initPageConfig } = await import('./page');
-		
+
 		if (window.innerWidth < 768) {
 			isMobile = true;
 		}
@@ -59,12 +59,13 @@
 		initBlock(editorInstance);
 		addFonts(editorInstance);
 		editor.set(editorInstance);
+
 	});
 </script>
 
 <section class="my-10 md:block flex-col justify-center items-center mx-auto py-10 sm:my-0">
 	<div class="w-32 sm:w-48 lg:translate-x-[-50px]">
-		{#if isLandingPage}
+		{#if isLandingPage && isGrapesJSLoaded}
 			<img
 				alt="click here"
 				clas=""
@@ -77,8 +78,7 @@
 		<div id="gjs" />
 	</div>
 	{:else}
-		<div class="w-32 sm:w-lg">
-			<img src="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png" alt="pictify-html-to-media" />
+		<div class="w-[250px] h-[250px] sm:w-[1000px] sm:h-[500px]">
 		</div>
 	{/if}
 	
