@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	export let background = 'bg-[#ffc480]';
 	export let color = 'text-gray-900';
 </script>
@@ -8,6 +9,9 @@
 	<button
 		type="submit"
 		class="py-3.5 rounded px-6 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium {background} tracking-wide text-lg flex-shrink-0 {color}"
+		on:click={() => {
+			goto('/signup');
+		}}
 		>Start For Free</button
 	>
 </div>
