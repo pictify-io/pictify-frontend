@@ -11,7 +11,7 @@
 
 <svelte:head>
     <title>Pictify.io</title>
-    <meta name="description" content="Pictify.io is a free HTML to Image and Gif conversion API">
+    <meta name="description" content="Pictify.io is a free HTML to Image and Gif API">
     <meta name="keywords" content="HTML to image, HTML to gif, HTML to image API, HTML to gif API, HTML CSS to Image API, HTML CSS to Gif API, Gif, API, Pictify.io, Pictify, Pictify API, Pictify.io API, Pictify.io Gif API, Pictify.io HTML to CSS API, Pictify.io HTML to CSS and Gif API, Pictify.io HTML to CSS and Gif conversion API, Pictify.io HTML to CSS and Gif conversion">
     <meta name="author" content="Pictify.io">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -6,7 +6,7 @@
         </svg>
         <h1 class="text-4xl sm:text-5xl sm:pt-20 lg:pt-5 md:text-5xl lg:text-6xl font-bold tracking-tighter w-full inline-block text-left md:text-center relative">Simple and Robust<span class="sm:hidden">
             &nbsp;
-        </span><br class="sm:block hidden">Media Creation API</h1>
+        </span><br class="sm:block hidden">HTML To Image API</h1>
         <svg class="w-16 lg:w-20 h-auto lg:absolute flex-shrink-0 right-0 bottom-0 md:block hidden translate-y-10 md:translate-y-20 lg:translate-y-4 lg:-translate-x-12 -translate-x-10" viewBox="0 0 92 80" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="m35.213 16.953.595-5.261 2.644 4.587a35.056 35.056 0 0 0 26.432 17.33l5.261.594-4.587 2.644A35.056 35.056 0 0 0 48.23 63.28l-.595 5.26-2.644-4.587a35.056 35.056 0 0 0-26.432-17.328l-5.261-.595 4.587-2.644a35.056 35.056 0 0 0 17.329-26.433Z" fill="#5CF1A4" stroke="#000" stroke-width="2.868"></path>
             <path d="M75.062 40.108c1.07 5.255 1.072 16.52-7.472 19.54m7.422-19.682c1.836 2.965 7.643 8.14 16.187 5.121-8.544 3.02-8.207 15.23-6.971 20.957-1.97-3.343-8.044-9.274-16.588-6.254M12.054 28.012c1.34-5.22 6.126-15.4 14.554-14.369M12.035 28.162c-.274-3.487-2.93-10.719-11.358-11.75C9.104 17.443 14.013 6.262 15.414.542c.226 3.888 2.784 11.92 11.212 12.95" stroke="#000" stroke-width="2.319" stroke-linecap="round"></path>
@@ -15,4 +15,4 @@
     <p class="max-w-3xl opacity-50 md:text-center text-lg">
         Pictify offers APIs to convert HTML to image or gif. Connect with your audience by creating personalized and sharable content, making your brand more relatable and engaging.
     </p>
-</main>
+</main> 
