@@ -14,3 +14,6 @@
         }
 	});
 </script>
+<svelte:head>
+	<title>Pictify.io: Dashboard</title>
+</svelte:head>
