@@ -12,7 +12,7 @@
             <path d="M75.062 40.108c1.07 5.255 1.072 16.52-7.472 19.54m7.422-19.682c1.836 2.965 7.643 8.14 16.187 5.121-8.544 3.02-8.207 15.23-6.971 20.957-1.97-3.343-8.044-9.274-16.588-6.254M12.054 28.012c1.34-5.22 6.126-15.4 14.554-14.369M12.035 28.162c-.274-3.487-2.93-10.719-11.358-11.75C9.104 17.443 14.013 6.262 15.414.542c.226 3.888 2.784 11.92 11.212 12.95" stroke="#000" stroke-width="2.319" stroke-linecap="round"></path>
         </svg>
     </div>
-    <p class="max-w-3xl opacity-50 md:text-center text-lg">
+    <p class="max-w-3xl opacity-70 md:text-center text-lg">
         Pictify offers APIs to convert HTML to image or gif. Connect with your audience by creating personalized and sharable content, making your brand more relatable and engaging.
     </p>
 </main> 
