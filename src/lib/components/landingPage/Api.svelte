@@ -151,7 +151,7 @@ $image = json_decode($response);
 			<div class="text-lg opacity-70 max-w-3xl text-left md:text-center my-8">
 				<p class="">
 					Pictify's API is easy to use and can be integrated into your existing workflow in minutes.
-					Convert HTML to images or gifs with a simple POST request.
+					Create Image's and GIF's from HTML with a simple POST request.
 				</p>
 			</div>
 		</div>
@@ -205,7 +205,6 @@ $image = json_decode($response);
 							<pre class="h-full line-numbers language-{activeTab}">
 							<code>
 								Loading...
-								Code to convert HTML to Image or Gif will be shown here
 							</code>
 							</pre>
 						</div>
