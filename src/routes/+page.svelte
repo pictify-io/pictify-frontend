@@ -7,6 +7,7 @@
     import UseCase from '$lib/components/landingPage/UseCase.svelte';
     import Api from '$lib/components/landingPage/Api.svelte';
     import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
+    import WhyPictify from '$lib/components/landingPage/WhyPictify.svelte';
 </script>
 
 <svelte:head>
@@ -51,6 +52,7 @@
     <Editor isLandingPage={true}/>
     <Api />
     <SignUpButton />
+    <WhyPictify />
     <UseCase />
     <TryNow />
     <Footer />
