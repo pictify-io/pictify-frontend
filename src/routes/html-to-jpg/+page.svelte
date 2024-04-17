@@ -2,6 +2,7 @@
   import Nav from '$lib/components/landingPage/Nav.svelte';
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
+  import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
 
 </script>
 
@@ -20,7 +21,7 @@
   <meta Property="og:locale" content="en_US">
 </svelte:head>
 
-<section class="w-screen bg-[#FFFDF8] min-h-screen  flex flex-col justify-between md:items-start items-between tails-selected-element lg:overflow-x-hidden md:overflow-x-hidden " data-tails-scripts="//unpkg.com/alpinejs" contenteditable="false">
+<section class=" bg-[#FFFDF8] min-h-screen  flex flex-col justify-between md:items-start items-between tails-selected-element lg:overflow-x-hidden md:overflow-x-hidden " data-tails-scripts="//unpkg.com/alpinejs" contenteditable="false">
   <Nav />
 
     <main class=" z-10 w-full  py-5 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-4xl mx-auto">
@@ -39,8 +40,47 @@
          Convert HTML to JPG for free. Pictify offers APIs to convert HTML to image or gif. Input your HTML code, check the preview, and download the JPG image.
       </p>
   </main> 
-  <div class="w-full flex justify-center">
+  <div class="w-full flex justify-center mt-20">
     <CodeEditor />
+  </div>
+  <div class="mt-20 w-full">
+    <div class="text-4xl font-bold text-center ">
+      <p>Best HTML to Image API 🚀</p>
+    </div>
+  </div>
+  <div class="mt-20 px-6  w-full flex justify-center">
+    <div class="max-w-3xl rounded-xl relative z-20 pl-8 sm:pl-10 pr-8 sm:pr-16 py-8 border-[3px] border-gray-900 bg-[#EBEBEB]">
+      <h1 class="text-xl font-bold">HTML To Image: Create personalized images at scale with Pictify.io</h1>
+      <div class="mt-2">
+        <div>
+          Scale your media creation with Pictify.io's HTML to Image API. Convert HTML to image or gif with a simple API call. Be it certificates, social sharing card, or personalized images for email campaigns, Pictify.io has got you covered. 
+        </div>
+        <div class="mt-5">
+          <ul>
+            <li class="w-100 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]">
+              <p class="">⚡️ Fastest HTML to Image/Gif API. All other alternatives fall behind us</p>
+            </li>
+            <li class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]">
+              <p class="">🌏 Images generated are served via CDN by default</p>
+            </li>
+            <li class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]">
+              <p class="">🔄 Access the image instantly. No queues and rate limit</p>
+            </li>
+            <li class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]">
+              <p class="">📸 Images are smart cropped. No whitespace outside the content</p>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-5">
+          <SignUpButton />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-20 w-full">
+    <!-- <div class="text-4xl font-bold text-center ">
+      <p>How to use Pictify.io</p>
+    </div> -->
   </div>
   <Footer />
 </section>
