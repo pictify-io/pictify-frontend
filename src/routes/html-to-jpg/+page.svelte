@@ -48,7 +48,7 @@
       <p>Best HTML to Image API 🚀</p>
     </div>
   </div>
-  <div class="mt-20 px-6  w-full flex justify-center">
+  <div class="mt-20 mb-20 px-6  w-full flex justify-center">
     <div class="max-w-3xl rounded-xl relative z-20 pl-8 sm:pl-10 pr-8 sm:pr-16 py-8 border-[3px] border-gray-900 bg-[#EBEBEB]">
       <h1 class="text-xl font-bold">HTML To Image: Create personalized images at scale with Pictify.io</h1>
       <div class="mt-2">
@@ -76,11 +76,6 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="mt-20 w-full">
-    <!-- <div class="text-4xl font-bold text-center ">
-      <p>How to use Pictify.io</p>
-    </div> -->
   </div>
   <Footer />
 </section>
