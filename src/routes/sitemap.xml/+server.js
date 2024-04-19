@@ -9,6 +9,12 @@ export async function GET() {
           <changefreq>daily</changefreq>
           <priority>0.9</priority>
        </url>
+       <url>
+          <loc>https://pictify.io/html-to-jpg</loc>
+          <lastmod>2024-04-19</lastmod>
+          <changefreq>daily</changefreq>
+          <priority>0.8</priority>
+        </url>
     </urlset>
     `.trim(),
     {
