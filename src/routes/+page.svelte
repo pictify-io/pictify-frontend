@@ -8,6 +8,7 @@
     import Api from '$lib/components/landingPage/Api.svelte';
     import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
     import WhyPictify from '$lib/components/landingPage/WhyPictify.svelte';
+    import Featured from '$lib/components/landingPage/Featured.svelte';
 </script>
 
 <svelte:head>
@@ -54,6 +55,7 @@
     <SignUpButton />
     <WhyPictify />
     <UseCase />
+    <Featured />
     <TryNow />
     <Footer />
 

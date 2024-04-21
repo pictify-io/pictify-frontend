@@ -45,11 +45,6 @@
         </div>
     </div> 
    </div>
-   <div class="mt-10 sm:mt-20 sm:mb-10">
-    <div class="text-center text-2xl font-bold opacity-80">
-       <p>And many more...</p>
-    </div>
-   </div>
 </div>
 </div>
 
