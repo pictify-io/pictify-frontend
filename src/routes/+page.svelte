@@ -9,6 +9,20 @@
     import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
     import WhyPictify from '$lib/components/landingPage/WhyPictify.svelte';
     import Featured from '$lib/components/landingPage/Featured.svelte';
+    import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
+
+    import posthog from 'posthog-js';
+    import { onMount } from 'svelte';
+
+    let isTestFeatureFlag = false;
+
+    onMount(() => {
+      if (posthog.getFeatureFlag('create-image-home') === 'test') {
+        isTestFeatureFlag = true;
+      } else {
+        isTestFeatureFlag = false;
+      }
+    });
 </script>
 
 <svelte:head>
@@ -50,7 +64,27 @@
     <Nav />
     <Hero />
     <SignUpButton />
+    {#if isTestFeatureFlag}
+    <div class="w-full mx-auto flex items-center justify-center my-14">
+      <div>
+      <div class="hidden sm:flex w-[100%]">
+        <div class="flex-1">
+
+        </div>
+        <div class="flex-1">
+          <img
+            alt="click here"
+            class="w-52 translate-x-[150px] mb-4"
+            src="https://res.cloudinary.com/diroilukd/image/upload/v1715193941/arrow-l_jir4in.png"
+          />
+        </div>
+      </div>
+      <CodeEditor isGifEnabled={true}/>
+    </div>
+    </div>
+    {:else}
     <Editor isLandingPage={true}/>
+    {/if}
     <Api />
     <SignUpButton />
     <WhyPictify />
