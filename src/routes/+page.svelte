@@ -17,6 +17,7 @@
     let isTestFeatureFlag = false;
 
     onMount(() => {
+      posthog.featureFlags.override({'create-image-home': 'test'})
       if (posthog.getFeatureFlag('create-image-home') === 'test') {
         isTestFeatureFlag = true;
       } else {
