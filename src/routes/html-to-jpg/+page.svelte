@@ -45,7 +45,26 @@
   </div>
   <div class="mt-20 w-full">
     <div class="text-4xl md:px-0 px-6 font-bold text-left md:text-center ">
-      <p>Best HTML to Image API 🚀</p>
+      <h2>How to convert HTML to JPG</h2>
+    </div>
+    <div class="mt-10 md:px-0 px-6 flex flex-col sm:flex-row max-w-6xl  mx-auto gap-6">
+      <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+        <h3 class="text-xl font-bold">Step 1: Input your HTML code</h3>
+        <p class="mt-2">Paste your HTML code in the editor above. You can also use the default HTML code provided in the editor.</p>
+      </div>
+      <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+        <h3 class="text-xl font-bold">Step 2: Check the preview</h3>
+        <p class="mt-2">Check the preview of the image generated from your HTML code. You can also customize the view port by changing the width, height, and scale.</p>
+      </div>
+      <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+        <h3 class="text-xl font-bold">Step 3: Create the JPG image</h3>
+        <p class="mt-2">Once you are satisfied with the preview, click on the image button to create the JPG image. You can download the image or copy the image URL.</p>
+        </div>
+    </div>
+  </div>
+  <div class="mt-20 w-full">
+    <div class="text-4xl md:px-0 px-6 font-bold text-left md:text-center ">
+      <h2>Best HTML to Image API 🚀</h2>
     </div>
   </div>
   <div class="mt-20 mb-20 md:px-0 px-6  w-full flex justify-center">
