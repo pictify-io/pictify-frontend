@@ -24,7 +24,7 @@
 			}
 		}
 		await getUser();
-		if (isLoggedIn) {
+		if (isLoggedIn()) {
 			goto('/dashboard');
 		}
 	});

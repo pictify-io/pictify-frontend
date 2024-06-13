@@ -6,8 +6,11 @@
 
 	let user = null;
 	onMount(async () => {
+		console.log('Dashboard');
 		user = await getUser();
-		if (!user.email) {
+		console.log("user", user);
+		if (!user || !user?.email) {
+			console.log('User not logged in');
 			goto('/login');
 		} else {
             goto('/dashboard/api-token');

@@ -67,6 +67,9 @@ export const getUser = async () => {
             userData = get(user);
         } else {
             const response = await getUserAPI();
+            if (!response) {
+                return null;
+            }
             setUser(response.user.email, response.user.token, response.user.currentPlan);
             userData = get(user);
         }
@@ -88,6 +91,9 @@ export const loginAction = async (email, password) => {
             password,
         });
         const { user: userData } = await getUserAPI();
+        if (!userData) {
+            return null;
+        }
         setUser(userData.email, userData.token, userData.currentPlan);
         return response;
     } catch (error) {

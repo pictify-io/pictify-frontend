@@ -6,7 +6,7 @@ const getTemplates = async () => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -16,7 +16,7 @@ const getTemplate = async (uid) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -26,7 +26,7 @@ const createTemplate = async (template) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -36,7 +36,7 @@ const updateTemplate = async (template) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -46,7 +46,7 @@ const deleteTemplate = async (uid) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -57,7 +57,7 @@ const searchTemplates = async (search) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 export {

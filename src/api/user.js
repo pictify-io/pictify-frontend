@@ -6,7 +6,7 @@ const getUser = async () => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -16,7 +16,7 @@ const getApiToken = async () => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -26,7 +26,7 @@ const createApiToken = async () => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 };
 
@@ -36,7 +36,7 @@ const deleteApiToken = async (apiTokenId) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 };
 
@@ -46,7 +46,7 @@ const getPlanDetails = async () => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -59,7 +59,7 @@ const resetPassword = async ({ password, token }) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -71,7 +71,8 @@ const forgotPassword = async (email) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+
+        return null;
     }
 }
 

@@ -8,7 +8,7 @@ const getImages = async (token) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
@@ -20,7 +20,7 @@ const getGifs = async (token) => {
         return response.data;
     }
     catch (error) {
-        throw error;
+        return null;
     }
 }
 
