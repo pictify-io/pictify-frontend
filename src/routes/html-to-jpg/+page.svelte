@@ -69,7 +69,7 @@
   </div>
   <div class="mt-20 mb-20 md:px-0 px-6  w-full flex justify-center">
     <div class="max-w-3xl rounded-xl relative z-20 pl-8 sm:pl-10 pr-8 sm:pr-16 py-8 border-[3px] border-gray-900 bg-[#EBEBEB]">
-      <h1 class="text-xl font-bold">HTML To Image: Create personalized images at scale with Pictify.io</h1>
+      <h3 class="text-xl font-bold">HTML To Image: Create personalized images at scale with Pictify.io</h3>
       <div class="mt-2">
         <div>
           Scale your media creation with Pictify.io's HTML to Image API. Convert HTML to image or gif with a simple API call. Be it certificates, social sharing card, or personalized images for email campaigns, Pictify.io has got you covered. 
