@@ -8,7 +8,6 @@
 	onMount(async () => {
 		console.log('Dashboard');
 		user = await getUser();
-		console.log("user", user);
 		if (!user || !user?.email) {
 			console.log('User not logged in');
 			goto('/login');

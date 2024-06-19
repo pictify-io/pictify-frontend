@@ -81,7 +81,6 @@
 		<div class="w-[250px] h-[250px] sm:w-[1000px] sm:h-[500px]">
 		</div>
 	{/if}
-	
 </section>
 
 <style>

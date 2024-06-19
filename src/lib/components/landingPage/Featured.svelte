@@ -7,7 +7,7 @@
   <h1 class="text-2xl sm:text-2xl font-bold text-center md:text-center opacity-80">Featured On</h1>
   <div class=" flex flex-col  gap-5  sm:flex-row justify-between items-center sm:items-center mt-5 sm:mt-10 sm:mb-10 w-full">
     <div>
-      <a href="https://peerlist.io/startups/pictify-io" target="_blank">
+      <a href="https://peerlist.io/suyashthakur/project/pictifyio" target="_blank">
       <img src={PeerlistLogo} alt="Peerlist Logo" class="w-[10rem] sm:w-[12rem] border-gray-600 border-2 rounded-md" />
       </a>
     </div>
