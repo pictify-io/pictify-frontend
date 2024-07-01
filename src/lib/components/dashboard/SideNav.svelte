@@ -32,7 +32,12 @@
 								<span>Created Media </span>
 							</div>
 							<div class="ml-2">
-								<img src={CollapseIcon} class="w-4" class:rotate-180={!isMediaListExpanded}  alt="collapse-icon"/>
+								<img
+									src={CollapseIcon}
+									class="w-4"
+									class:rotate-180={!isMediaListExpanded}
+									alt="collapse-icon"
+								/>
 							</div>
 						</div>
 					</a>
@@ -50,7 +55,7 @@
 					<a href="/dashboard/template">Templates</a>
 				</li>
 				<li class="text-gray-700 hover:text-gray-900">
-					<a href="{PUBLIC_DOCS_URL}" target="_blank">Docs and Support</a>
+					<a href={PUBLIC_DOCS_URL} target="_blank">Docs and Support</a>
 				</li>
 			</ul>
 		</div>
