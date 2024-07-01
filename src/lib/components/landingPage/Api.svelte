@@ -1,10 +1,8 @@
 <script>
 	import FileIcon from '$lib/assets/landing-page/file.svg';
-	import {onMount} from 'svelte';
+	import { onMount } from 'svelte';
 	let Prism;
 	let highlightedCode;
-
-
 
 	import { afterUpdate } from 'svelte';
 
@@ -124,7 +122,7 @@ $image = json_decode($response);
 	function changeTab(tab) {
 		activeTab = tab;
 	}
-	$: if(Prism) {
+	$: if (Prism) {
 		highlightedCode = Prism.highlight(
 			codeLanguageMap[activeTab],
 			Prism.languages[activeTab],
@@ -132,9 +130,8 @@ $image = json_decode($response);
 		);
 	}
 
-
 	afterUpdate(() => {
-		if(Prism) {
+		if (Prism) {
 			Prism.highlightAll();
 		}
 	});
@@ -192,7 +189,9 @@ $image = json_decode($response);
 						<span class="ml-1">pictify.php</span>
 					</button>
 				</div>
-				<div class="text-xs md:text-base md:text-black-400 flex p-2 min-w-5 whitespace-pre-wrap max-h-xs">
+				<div
+					class="text-xs md:text-base md:text-black-400 flex p-2 min-w-5 whitespace-pre-wrap max-h-xs"
+				>
 					{#each Object.keys(codeLanguageMap) as language}
 						{#if language === activeTab && Prism}
 							<pre class="bg-gray-300 w-full line-numbers language-{activeTab}"><code

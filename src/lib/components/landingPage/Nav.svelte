@@ -94,7 +94,7 @@
 				>Blog</a
 			> -->
 			<a
-				href="{PUBLIC_DOCS_URL}"
+				href={PUBLIC_DOCS_URL}
 				target="_blank"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>API Doc</a
@@ -105,9 +105,7 @@
 				>Contact</a
 			>
 		</nav>
-		<div class="flex-grow bg-[#FFFDF8]">
-			
-		</div>
+		<div class="flex-grow bg-[#FFFDF8]" />
 		<div
 			class="flex flex-shrink-0 md:flex-row flex-col md:bg-transparent bg-[#FFFDF8] font-medium border-l-0 md:border-l-[3px] border-black items-center"
 		>

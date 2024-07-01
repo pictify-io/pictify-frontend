@@ -8,8 +8,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { loginAction, signupAction, getUser, isLoggedIn } from '../../../store/user.store';
-	import {forgotPassword} from '../../../api/user';
-
+	import { forgotPassword } from '../../../api/user';
 
 	let email = '';
 	let password = '';
@@ -17,7 +16,7 @@
 	let isForgotPassword = false;
 
 	onMount(async () => {
-		if(!isLogin) {
+		if (!isLogin) {
 			const emailFromParams = new URLSearchParams(window.location.search).get('email');
 			if (emailFromParams) {
 				email = emailFromParams;
@@ -66,7 +65,7 @@
 	function handleForgotPassword() {
 		try {
 			forgotPassword(email);
-			if(!email) {
+			if (!email) {
 				errorMessage = 'Please enter your email';
 				return;
 			}
@@ -107,7 +106,7 @@
 			/>
 			{#if isLogin}
 				<div class="text-left w-full my-2 px-2">
-					<a href="#" class="text-gray-700" on:click={handleForgotPassword} >Forgot password?</a>
+					<a href="#" class="text-gray-700" on:click={handleForgotPassword}>Forgot password?</a>
 				</div>
 			{/if}
 

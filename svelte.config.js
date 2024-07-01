@@ -12,7 +12,7 @@ const config = {
 				include: ['/*'],
 				exclude: ['<all>']
 			}
-		}),
+		})
 	},
 	preprocess: vitePreprocess()
 };

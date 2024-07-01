@@ -1,7 +1,7 @@
 <script>
-    import Template from "$lib/components/dashboard/Template.svelte";
+	import Template from '$lib/components/dashboard/Template.svelte';
 </script>
 
 <div class="h-full w-full">
-    <Template />
+	<Template />
 </div>

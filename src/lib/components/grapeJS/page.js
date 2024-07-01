@@ -1,5 +1,5 @@
 const initPageConfig = {
-    component: `
+	component: `
     <div class="main">
         <div class="container">
             <div>
@@ -15,7 +15,7 @@ const initPageConfig = {
             </div>
 
     `,
-    styles: `
+	styles: `
     body {
         margin: 0;
         padding: 0;
