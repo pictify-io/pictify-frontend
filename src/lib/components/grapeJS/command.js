@@ -2,63 +2,61 @@ import { getHTMLandCSS } from '../../html-to-gif/create-media.js';
 import { createImagePublic, createGifPublic } from '../../../api/image.js';
 import { getTemplate } from '../../../api/template.js';
 
-
 const createImage = async (editor, Modal) => {
-    const htmlCode = editor.getHtml();
-    const cssCode = editor.getCss();
-    const html = await getHTMLandCSS(htmlCode, cssCode);
-    const width = editor.Canvas.getWindow().innerWidth;
-    const height = editor.Canvas.getWindow().innerHeight;
-    const { image } = await createImagePublic({
-        html,
-        width,
-        height,
-    });
+	const htmlCode = editor.getHtml();
+	const cssCode = editor.getCss();
+	const html = await getHTMLandCSS(htmlCode, cssCode);
+	const width = editor.Canvas.getWindow().innerWidth;
+	const height = editor.Canvas.getWindow().innerHeight;
+	const { image } = await createImagePublic({
+		html,
+		width,
+		height
+	});
 
-    //Set content of modal
-    const { template } = await getTemplate({
-        type: 'IMAGE_GENERATED',
-        variables: {
-            imageURL: image.url,
-        }
-    });
-    Modal.setContent(`
+	//Set content of modal
+	const { template } = await getTemplate({
+		type: 'IMAGE_GENERATED',
+		variables: {
+			imageURL: image.url
+		}
+	});
+	Modal.setContent(`
       ${template}
     `);
-}
-
+};
 
 const createGif = async (editor, Modal) => {
-    const htmlCode = editor.getHtml();
-    const cssCode = editor.getCss();
-    const html = await getHTMLandCSS(htmlCode, cssCode);
-    const width = editor.Canvas.getWindow().innerWidth;
-    const height = editor.Canvas.getWindow().innerHeight;
-    const { gif } = await createGifPublic({
-        html,
-        width,
-        height,
-    });
+	const htmlCode = editor.getHtml();
+	const cssCode = editor.getCss();
+	const html = await getHTMLandCSS(htmlCode, cssCode);
+	const width = editor.Canvas.getWindow().innerWidth;
+	const height = editor.Canvas.getWindow().innerHeight;
+	const { gif } = await createGifPublic({
+		html,
+		width,
+		height
+	});
 
-    //Set content of modal
-    const { template } = await getTemplate({
-        type: 'GIF_GENERATED',
-        variables: {
-            gifURL: gif.url,
-        }
-    });
-    Modal.setContent(`
+	//Set content of modal
+	const { template } = await getTemplate({
+		type: 'GIF_GENERATED',
+		variables: {
+			gifURL: gif.url
+		}
+	});
+	Modal.setContent(`
       ${template}
     `);
-}
+};
 const initCommands = (editor) => {
-    const commandManager = editor.Commands;
-    commandManager.add('create-image', {
-        run(editor) {
-            const { Modal } = editor;
-            Modal.open({
-                title: 'Create Image',
-                content: `
+	const commandManager = editor.Commands;
+	commandManager.add('create-image', {
+		run(editor) {
+			const { Modal } = editor;
+			Modal.open({
+				title: 'Create Image',
+				content: `
                 <div role="status" class="w-full text-center">
   <div class="flex w-full justify-center">
     <svg aria-hidden="true" class="mr-2 inline h-8 w-8 animate-spin fill-gray-600 text-gray-200 dark:fill-gray-300 dark:text-gray-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -92,27 +90,26 @@ const initCommands = (editor) => {
       display: inline-block;
       animation: cycleText 10s infinite; /* Adjust the duration as needed */
   }
-                `,
+                `
+			});
 
-            });
+			Modal.onceClose(() => {
+				isOpen = false;
+			});
 
-            Modal.onceClose(() => {
-                isOpen = false;
-            });
+			let isOpen = Modal.isOpen();
+			if (isOpen) {
+				createImage(editor, Modal);
+			}
+		}
+	});
 
-            let isOpen = Modal.isOpen();
-            if (isOpen) {
-                createImage(editor, Modal);
-            }
-        }
-    });
-
-    commandManager.add('create-gif', {
-        run(editor) {
-            const { Modal } = editor;
-            Modal.open({
-                title: 'Create GIF',
-                content: `
+	commandManager.add('create-gif', {
+		run(editor) {
+			const { Modal } = editor;
+			Modal.open({
+				title: 'Create GIF',
+				content: `
                 <div role="status" class="w-full text-center">
                 <div class="flex w-full justify-center">
                   <svg aria-hidden="true" class="mr-2 inline h-8 w-8 animate-spin fill-gray-600 text-gray-200 dark:fill-gray-300 dark:text-gray-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -150,20 +147,19 @@ const initCommands = (editor) => {
                     animation: cycleText 20s infinite; /* Adjust the duration as needed */
                 }
               </style>
-                `,
-            });
+                `
+			});
 
-            Modal.onceClose(() => {
-                isOpen = false;
-            });
+			Modal.onceClose(() => {
+				isOpen = false;
+			});
 
-            let isOpen = Modal.isOpen();
-            if (isOpen) {
-                createGif(editor, Modal);
-            }
-        }
-    });
-
+			let isOpen = Modal.isOpen();
+			if (isOpen) {
+				createGif(editor, Modal);
+			}
+		}
+	});
 };
 
 export default initCommands;

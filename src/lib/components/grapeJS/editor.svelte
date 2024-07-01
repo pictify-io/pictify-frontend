@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { editor } from '../../../store/editor.store';
 
-
 	import 'grapesjs/dist/css/grapes.min.css';
 
 	let editorInstance = null;
@@ -13,15 +12,15 @@
 	let isMobile = false;
 
 	onMount(async () => {
-	const { default: grapesjs } = await import('grapesjs');
-	isGrapesJSLoaded = true;
-  const { default: addHTMLEdit } = await import('./html-edit');
-  const { default: initConfig } = await import('./editor-config');
-  const { default: initPanel } = await import('./panel');
-  const { default: initBlock } = await import('./block');
-  const { default: initCommands } = await import('./command');
-  const { addFonts } = await import('./style-sheet');
-  const { default: initPageConfig } = await import('./page');
+		const { default: grapesjs } = await import('grapesjs');
+		isGrapesJSLoaded = true;
+		const { default: addHTMLEdit } = await import('./html-edit');
+		const { default: initConfig } = await import('./editor-config');
+		const { default: initPanel } = await import('./panel');
+		const { default: initBlock } = await import('./block');
+		const { default: initCommands } = await import('./command');
+		const { addFonts } = await import('./style-sheet');
+		const { default: initPageConfig } = await import('./page');
 
 		if (window.innerWidth < 768) {
 			isMobile = true;
@@ -59,7 +58,6 @@
 		initBlock(editorInstance);
 		addFonts(editorInstance);
 		editor.set(editorInstance);
-
 	});
 </script>
 
@@ -74,12 +72,11 @@
 		{/if}
 	</div>
 	{#if isGrapesJSLoaded}
-	<div class="min-w-300 min-h-300">
-		<div id="gjs" />
-	</div>
-	{:else}
-		<div class="w-[250px] h-[250px] sm:w-[1000px] sm:h-[500px]">
+		<div class="min-w-300 min-h-300">
+			<div id="gjs" />
 		</div>
+	{:else}
+		<div class="w-[250px] h-[250px] sm:w-[1000px] sm:h-[500px]" />
 	{/if}
 </section>
 
