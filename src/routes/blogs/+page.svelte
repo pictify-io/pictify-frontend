@@ -2,36 +2,19 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
+	import {goto} from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { getAllBlogs, getFeaturedBlog } from '../../api/blog';
+	import { blogStore, getBlogsAction } from '../../store/blogs.store';	
 
-	let articles = [];
-	let guides = [];
 	let email = '';
-	let firstBlog;
 
 	onMount(async () => {
-		const {blog} = await getFeaturedBlog();
-		firstBlog = blog;
-
-		const{blogs:guidesList} = await getAllBlogs({
-			type: 'guide',
-		});
-		guides = guidesList;
-
-	for(let i = 0; i < 8; i++){
-		guides.push(guidesList[0]);
-	}
-
-		const {blogs:articlesList} = await getAllBlogs({
-			type: 'article',
-		});
-		articles = articlesList;
-
-		for(let i = 0; i < 8; i++){
-		articles.push(articlesList[0]);
-	}
+		await getBlogsAction(); 
 	});
+
+const handleBlogClick = (slug) => {
+	goto(`/blogs/${slug}`);
+}
 </script>
 
 <section class="bg-[#FFFDF8] min-h-screen md:h-screen">
@@ -88,29 +71,29 @@
 			</div>
 		</div>
 		<div class="flex-1 bg-[#FFF4DA] flex items-center justify-center py-10 p-4 md:py-14 md:px-14 border-b-[3px] border-black">
-      {#if firstBlog}
-			<div class="relative flex flex-col max-w-2xl cursor-pointer group">
+      {#if $blogStore.featured}
+			<div class="relative flex flex-col max-w-2xl cursor-pointer group" on:click={() => handleBlogClick($blogStore.featured.slug)}>
 				<div
 					class="flex flex-col bg-[#FFFDF8] border-black border-4 p-4 rounded-xl z-20 gap-2 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 tracking-wide"
 				>
 					<div class="h-[250px] border-black border-4 rounded-md">
 						<img
-							src={firstBlog?.heroImage}
+							src={$blogStore.featured?.heroImage}
 							class="object-cover w-full h-full"
-							alt={firstBlog?.title}
+							alt={$blogStore.featured?.title}
 						/>
 					</div>
 					<div class="font-bold text-xl md:text-2xl">
 						<h3 class="cursor-pointer">
-              {firstBlog?.title}
+              {$blogStore.featured?.title}
             </h3>
 					</div>
 					<div class="flex mt-4 justify-between font-semibold text-gray-700">
 						<div>
-							-by {firstBlog?.author}
+							-by {$blogStore.featured?.author}
 						</div>
 						<div class="">
-							 {firstBlog?.readingTime} min read
+							 {$blogStore.featured?.readingTime} min read
 						</div>
 					</div>
 				</div>
@@ -125,8 +108,8 @@
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4  gap-6 xl:gap-10 mt-12">
-		{#each guides as guide}
-		<div class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer">
+		{#each $blogStore.guides as guide}
+		<div class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer" on:click={() => handleBlogClick(guide.slug)}>
 			<div class="h-[200px] border-black border-b-4 rounded-top-xl">
 				<img
 					src={guide.heroImage}
@@ -154,8 +137,8 @@
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-10 mt-12">
-		{#each articles as article}
-		<div class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer">
+		{#each $blogStore.articles as article}
+		<div class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer" on:click={() => handleBlogClick(article.slug)} role="button" tabindex="0">
 			<div class="h-[200px] border-black border-b-4 rounded-top-xl">
 				<img
 					src={article.heroImage}
