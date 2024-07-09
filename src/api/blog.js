@@ -14,9 +14,9 @@ const getAllBlogs = async ({ type, limit, offset }) => {
 const getFeaturedBlog = async () => {
 	const response = await backend.get('/blogs/featured');
 	return response.data;
-}
+};
 
-const getBlog = async ({ slug, }) => {
+const getBlog = async ({ slug }) => {
 	const response = await backend.get(`/blogs/${slug}`);
 	return response.data;
 };
