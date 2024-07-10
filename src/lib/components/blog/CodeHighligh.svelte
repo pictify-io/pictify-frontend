@@ -25,7 +25,6 @@
 	onMount(() => {
 		highlightedHtml = refractor.highlight(text, lang);
 		highlightedHtml = toHtml(highlightedHtml);
-		console.log(highlightedHtml);
 	});
 </script>
 
