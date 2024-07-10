@@ -33,7 +33,6 @@
 	"dependencies": {
 		"@codemirror/lang-html": "^6.4.9",
 		"@codemirror/theme-one-dark": "^6.1.2",
-		"axios": "^1.5.0",
 		"github-markdown-css": "^5.6.1",
 		"grapejs": "^2.0.1",
 		"grapesjs": "^0.21.4",

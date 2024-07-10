@@ -114,6 +114,8 @@ body {
 	let iframeContainer;
 	let isImageLoading = false;
 	let img;
+	let previewWidth = 600;
+	let previewHeight = 400;
 
 	onMount(async () => {
 		if (window.innerWidth < 768) {
@@ -147,6 +149,8 @@ body {
 	function updateIframe() {
 		if (previewFrame) {
 			previewFrame.srcdoc = getSrcDoc();
+			previewWidth = parseInt(getComputedStyle(previewFrame).width.replace('px', ''));
+			previewHeight = parseInt(getComputedStyle(previewFrame).height.replace('px', ''));
 		}
 	}
 
@@ -159,8 +163,12 @@ body {
 		isImageLoading = true;
 		currentResultTab = 'image';
 		const html = getSrcDoc();
-		const width = parseInt(getComputedStyle(previewFrame).width.replace('px', ''));
-		const height = parseInt(getComputedStyle(previewFrame).height.replace('px', ''));
+		const width = previewFrame
+			? parseInt(getComputedStyle(previewFrame).width.replace('px', ''))
+			: previewWidth;
+		const height = previewFrame
+			? parseInt(getComputedStyle(previewFrame).height.replace('px', ''))
+			: previewHeight;
 
 		try {
 			const { image } = await createImagePublic({
@@ -179,8 +187,12 @@ body {
 		isImageLoading = true;
 		currentResultTab = 'gif';
 		const html = getSrcDoc();
-		const width = parseInt(getComputedStyle(previewFrame).width.replace('px', ''));
-		const height = parseInt(getComputedStyle(previewFrame).height.replace('px', ''));
+		const width = previewFrame
+			? parseInt(getComputedStyle(previewFrame).width.replace('px', ''))
+			: previewWidth;
+		const height = previewFrame
+			? parseInt(getComputedStyle(previewFrame).height.replace('px', ''))
+			: previewHeight;
 
 		try {
 			const { gif } = await createGifPublic({

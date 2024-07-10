@@ -5,7 +5,7 @@ const getImages = async (token) => {
 		// backend.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
 		const response = await backend.get('/image');
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -16,7 +16,7 @@ const getGifs = async (token) => {
 		// backend.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
 		const response = await backend.get('/gif');
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}

@@ -8,17 +8,17 @@ const getAllBlogs = async ({ type, limit, offset }) => {
 			offset
 		}
 	});
-	return response.data;
+	return response;
 };
 
 const getFeaturedBlog = async () => {
 	const response = await backend.get('/blogs/featured');
-	return response.data;
+	return response;
 };
 
 const getBlog = async ({ slug }) => {
 	const response = await backend.get(`/blogs/${slug}`);
-	return response.data;
+	return response;
 };
 
 export { getAllBlogs, getBlog, getFeaturedBlog };

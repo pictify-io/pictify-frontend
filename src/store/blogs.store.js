@@ -16,6 +16,10 @@ export const getBlogsAction = async () => {
 			getAllBlogs({ type: 'guide' })
 		]);
 
+		if (articles.status === 'rejected' || guides.status === 'rejected') {
+			throw new Error('Failed to fetch blogs');
+		}
+
 		blogStore.set({
 			articles: articles.value.blogs,
 			guides: guides.value.blogs,
@@ -39,7 +43,8 @@ export const getBlogAction = async (slug) => {
 			return store;
 		});
 	} else {
-		const { blog } = await getBlog({ slug });
+		const data = await getBlog({ slug });
+		const blog = data.blog;
 		blogStore.update((store) => {
 			store.selectedBlog = blog;
 			return store;
