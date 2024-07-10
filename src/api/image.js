@@ -6,7 +6,7 @@ const createImagePublic = async ({ html, width, height }) => {
 		width,
 		height
 	});
-	return response.data;
+	return response;
 };
 
 const createGifPublic = async ({ html, width, height, duration }) => {
@@ -16,7 +16,7 @@ const createGifPublic = async ({ html, width, height, duration }) => {
 		height,
 		duration
 	});
-	return response.data;
+	return response;
 };
 
 export { createGifPublic, createImagePublic };

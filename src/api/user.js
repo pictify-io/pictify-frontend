@@ -3,7 +3,7 @@ import backend from '../service/backend';
 const getUser = async () => {
 	try {
 		const response = await backend.get('/api/users');
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -12,7 +12,7 @@ const getUser = async () => {
 const getApiToken = async () => {
 	try {
 		const response = await backend.get('/api/users/api-tokens');
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -21,7 +21,7 @@ const getApiToken = async () => {
 const createApiToken = async () => {
 	try {
 		const response = await backend.post('/api/users/api-tokens');
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -30,7 +30,7 @@ const createApiToken = async () => {
 const deleteApiToken = async (apiTokenId) => {
 	try {
 		const response = await backend.delete(`/api/users/api-tokens/${apiTokenId}`);
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -39,7 +39,7 @@ const deleteApiToken = async (apiTokenId) => {
 const getPlanDetails = async () => {
 	try {
 		const response = await backend.get('/api/users/plans');
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -51,7 +51,7 @@ const resetPassword = async ({ password, token }) => {
 			password,
 			token
 		});
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
@@ -62,7 +62,7 @@ const forgotPassword = async (email) => {
 		const response = await backend.post('/auth/forgot-password', {
 			email
 		});
-		return response.data;
+		return response;
 	} catch (error) {
 		return null;
 	}
