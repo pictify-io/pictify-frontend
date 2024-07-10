@@ -3,50 +3,23 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeHighlight from '$lib/components/blog/CodeHighligh.svelte';
 	import { page } from '$app/stores';
-	import { onMount, onDestroy } from 'svelte';
-	import { blogStore, getBlogAction } from '../../../store/blogs.store';
 	import LinkedInLogo from '$lib/assets/social/linkedin.svg';
 	import TwitterLogo from '$lib/assets/social/twitter.svg';
 	import ShareIcon from '$lib/assets/social/link.svg';
 	import SvelteMarkdown from 'svelte-markdown';
-	// import {refractor} from 'refractor';
-	// import javascript from 'refractor/lang/javascript.js';
-	// import css from 'refractor/lang/css.js';
-	// import bash from 'refractor/lang/bash.js';
-	// import json from 'refractor/lang/json.js';
-	// import markdown from 'refractor/lang/markdown.js';
 
 	import 'github-markdown-css/github-markdown-light.css';
 
-	let blog = {};
-	let unsubscribe = () => {};
-	let formattedDate = '';
-	let source = '';
-
+	export let data;
+	const { blog } = data.props;
+	const formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
+		day: 'numeric', 
+		month: 'short' 
+	});
+	let source = blog.content;
 	const renderers = {
 		code: CodeHighlight
 	};
-
-	onMount(async () => {
-		await getBlogAction($page.params.slug);
-
-		unsubscribe = blogStore.subscribe((b) => {
-			console.log(b);
-			blog = b.selectedBlog;
-			if (blog?.createdAt) {
-				const date = new Date(blog.createdAt);
-				formattedDate = date.toLocaleDateString('en-GB', {
-					day: 'numeric', // "1"
-					month: 'short' // "January"
-				});
-			}
-			source = blog.content;
-		});
-	});
-
-	onDestroy(() => {
-		unsubscribe();
-	});
 </script>
 
 <svelte:head>
@@ -89,6 +62,7 @@
 
 <section>
 	<Nav />
+	{#if blog && blog.title}
 	<div class="w-full flex flex-col-reverse md:flex-row">
 		<div
 			class="flex-1 border-t-2 md:border-r-2 md:border-b-2 border-black flex flex-col max-h-[500px]"
@@ -150,9 +124,9 @@
 		</div>
 	</div>
 
-	<div class="w-full px-10 markdown-body">
+	<div class="w-full py-8 px-12 md:px-20 md:py-12 markdown-body max-w-[1800px] m-auto">
 		<SvelteMarkdown {source} {renderers} />
 	</div>
-
+	{/if}
 	<Footer />
 </section>
