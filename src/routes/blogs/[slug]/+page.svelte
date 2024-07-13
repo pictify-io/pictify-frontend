@@ -2,15 +2,22 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeHighlight from '$lib/components/blog/CodeHighligh.svelte';
+	import BlogList from '$lib/components/blog/BlogList.svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import LinkedInLogo from '$lib/assets/social/linkedin.svg';
 	import TwitterLogo from '$lib/assets/social/twitter.svg';
 	import ShareIcon from '$lib/assets/social/link.svg';
 	import SvelteMarkdown from 'svelte-markdown';
+	import TryNow from '$lib/components/landingPage/TryNow.svelte';
+	import {getRecommendedBlogs} from '../../../api/blog';
+
+	import {onMount} from 'svelte';
 
 	import 'github-markdown-css/github-markdown-light.css';
 
 	export let data;
+	let recommendedBlogs = [];
 	const { blog } = data.props;
 	const formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
 		day: 'numeric',
@@ -20,6 +27,16 @@
 	const renderers = {
 		code: CodeHighlight
 	};
+
+	onMount(() => {
+		getRecommendedBlogs({
+			slug: $page.params.slug,
+			limit: 3
+		}).then((res) => {
+			recommendedBlogs = res?.recommendedBlogs || [];
+		});
+	});
+
 </script>
 
 <svelte:head>
@@ -69,7 +86,7 @@
 			>
 				<img src={blog?.heroImage} class="object-cover w-full h-full" alt={blog?.title} />
 			</div>
-			<div class="flex-1 flex flex-col w-full bg-[#FFF4DA] justify-center gap-5 py-10 md:py-0">
+			<div class="flex-1 flex flex-col w-full bg-[#FFF4DA] justify-center gap-5 py-10 md:py-0  border-black md:border-b-2">
 				{#if blog?.tags?.length > 0}
 					<div class="font-bold text-xl md:text-2xl text-[#FE4A60] px-12">
 						<div>
@@ -128,5 +145,15 @@
 			<SvelteMarkdown {source} {renderers} />
 		</div>
 	{/if}
+	{#if recommendedBlogs.length > 0}
+	<div class="px-12 md:px-20 py-8">
+		<BlogList blogs={recommendedBlogs} title="📝  Recommended Blogs" />
+	</div>
+	{/if}
+	<div class="flex w-full justify-center mt-20">
+		<div class="max-w-3xl">
+			<TryNow />
+		</div>
+	</div>
 	<Footer />
 </section>

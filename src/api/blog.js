@@ -21,4 +21,13 @@ const getBlog = async ({ slug }) => {
 	return response;
 };
 
-export { getAllBlogs, getBlog, getFeaturedBlog };
+const getRecommendedBlogs = async ({ slug, limit }) => {
+	const response = await backend.get(`/blogs/${slug}/recommended`, {
+		params: {
+			limit
+		}
+	});
+	return response;
+};
+
+export { getAllBlogs, getBlog, getFeaturedBlog, getRecommendedBlogs };
