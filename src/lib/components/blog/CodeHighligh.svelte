@@ -10,7 +10,7 @@
 	import bash from 'refractor/lang/bash.js';
 	import json from 'refractor/lang/json.js';
 	import markdown from 'refractor/lang/markdown.js';
-	import 'prismjs/themes/prism.css';
+	import 'prismjs/themes/prism-coy.css';
 
 	import { toHtml } from 'hast-util-to-html';
 

@@ -2,6 +2,8 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
+	import BlogList from '$lib/components/blog/BlogList.svelte';
+
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { blogStore, getBlogsAction } from '../../store/blogs.store';
@@ -110,74 +112,21 @@
 		</div>
 	</div>
 	<div class="px-4 py-8">
-		<div class="py-2 px-6 bg-[#FFF4DA] w-fit border-[3px] border-black rounded-xl">
-			<h2 class="text-3xl font-bold">💻 &nbsp; Guides</h2>
+		{#if $blogStore.guides.length !== 0}
+		<BlogList blogs={$blogStore.guides} title={"🛠️  Guides"} />
+		{/if}
+		{#if $blogStore.articles.length !== 0}
+		<div class="my-20">
+			<BlogList blogs={$blogStore.articles} title={"📚  Articles"} />
 		</div>
-
-		<div
-			class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-10 mt-12"
-		>
-			{#each $blogStore.guides as guide}
-				<div
-					class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer"
-					on:click={() => handleBlogClick(guide.slug)}
-				>
-					<div class="h-[200px] border-black border-b-4 rounded-top-xl">
-						<img src={guide.heroImage} class="object-cover w-full h-full" alt={guide.title} />
-					</div>
-					<div class="font-bold text-xl md:text-xl px-2">
-						<h3 class="cursor-pointer">{guide.title}</h3>
-					</div>
-					<div class="flex px-2 pt-2 font-semibold text-gray-700 justify-between">
-						<div>
-							-by {guide.author}
-						</div>
-						<div class="">
-							{guide.readingTime} min read
-						</div>
-					</div>
-				</div>
-			{/each}
-		</div>
-
-		<div class="py-2 px-6 bg-[#FFF4DA] w-fit border-[3px] border-black rounded-xl my-20">
-			<h2 class="text-3xl font-bold">📰 &nbsp; Articles</h2>
-		</div>
-
-		<div
-			class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-10 mt-12"
-		>
-			{#each $blogStore.articles as article}
-				<div
-					class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer"
-					on:click={() => handleBlogClick(article.slug)}
-					role="button"
-					tabindex="0"
-				>
-					<div class="h-[200px] border-black border-b-4 rounded-top-xl">
-						<img src={article.heroImage} class="object-cover w-full h-full" alt={article.title} />
-					</div>
-					<div class="font-bold text-xl md:text-xl px-2">
-						<h3 class="cursor-pointer">{article.title}</h3>
-					</div>
-					<div class="flex px-2 pt-2 font-semibold text-gray-700 justify-between">
-						<div>
-							-by {article.author}
-						</div>
-						<div class="">
-							{article.readingTime} min read
-						</div>
-					</div>
-				</div>
-			{/each}
-		</div>
+		{/if}
 		<div class="flex w-full justify-center mt-20">
-			<div class="max-w-3xl">
+			<div class="max-w-4xl: md:max-w-3xl">
 				<TryNow />
 			</div>
 		</div>
-		<div class="mt-10">
-			<Footer />
-		</div>
+	</div>
+	<div class="mt-10">
+		<Footer />
 	</div>
 </section>
