@@ -2,9 +2,9 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeHighlight from '$lib/components/blog/CodeHighligh.svelte';
+	import Link from '$lib/components/blog/Link.svelte';
 	import BlogList from '$lib/components/blog/BlogList.svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import LinkedInLogo from '$lib/assets/social/linkedin.svg';
 	import TwitterLogo from '$lib/assets/social/twitter.svg';
 	import ShareIcon from '$lib/assets/social/link.svg';
@@ -25,7 +25,8 @@
 	});
 	let source = blog.content;
 	const renderers = {
-		code: CodeHighlight
+		code: CodeHighlight,
+		link: Link
 	};
 
 	onMount(() => {
