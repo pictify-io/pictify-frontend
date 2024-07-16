@@ -18,12 +18,13 @@
 
 	export let data;
 	let recommendedBlogs = [];
-	const { blog } = data.props;
-	const formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
-		day: 'numeric',
-		month: 'short'
-	});
-	let source = blog.content;
+	$: blog = data.props.blog;	
+  $: formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short'
+  });
+  $: source = blog.content;
+
 	const renderers = {
 		code: CodeHighlight,
 		link: Link
