@@ -42,12 +42,10 @@
 
 <svelte:head>
 	<title>{blog.title}</title>
-	<meta name="description" content={blog.description} />
-	<meta name="keywords" content={blog.keywords} />
+	<meta name="keywords" content={blog.tags.join(', ')} />
 	<meta name="author" content={blog.author} />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta Property="og:title" content={blog.title} />
-	<meta Property="og:description" content={blog.description} />
 	<meta Property="og:image" content={blog.heroImage} />
 	<meta Property="og:url" content={`https://pictify.io/blogs/${$page.params.slug}`} />
 	<meta Property="og:type" content="website" />
