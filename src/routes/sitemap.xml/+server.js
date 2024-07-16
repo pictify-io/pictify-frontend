@@ -1,4 +1,22 @@
+import { getBlogLinks } from '../../api/blog';
+
 export async function GET() {
+
+   const response = await getBlogLinks();
+   const { links } = response;
+   console.log(links);
+   const urls = links.map((link) => {
+      return `
+         <url>
+            <loc>https://pictify.io/${link.slug}</loc>
+            <lastmod>${link.createdAt}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+         </url>
+      `;
+   });
+
+
 	return new Response(
 		`
     <?xml version="1.0" encoding="UTF-8"?>
@@ -15,6 +33,13 @@ export async function GET() {
           <changefreq>daily</changefreq>
           <priority>0.8</priority>
         </url>
+         <url>
+            <loc>https://pictify.io/blogs</loc>
+            <lastmod>2024-04-19</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.8</priority>
+         </url>
+        ${urls.join('')}
     </urlset>
     `.trim(),
 		{
