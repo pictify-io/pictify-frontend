@@ -10,20 +10,20 @@
 	import ShareIcon from '$lib/assets/social/link.svg';
 	import SvelteMarkdown from 'svelte-markdown';
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
-	import {getRecommendedBlogs} from '../../../api/blog';
+	import { getRecommendedBlogs } from '../../../api/blog';
 
-	import {onMount} from 'svelte';
+	import { onMount } from 'svelte';
 
 	import 'github-markdown-css/github-markdown-light.css';
 
 	export let data;
 	let recommendedBlogs = [];
-	$: blog = data.props.blog;	
-  $: formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short'
-  });
-  $: source = blog.content;
+	$: blog = data.props.blog;
+	$: formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
+		day: 'numeric',
+		month: 'short'
+	});
+	$: source = blog.content;
 
 	const renderers = {
 		code: CodeHighlight,
@@ -38,7 +38,6 @@
 			recommendedBlogs = res?.recommendedBlogs || [];
 		});
 	});
-
 </script>
 
 <svelte:head>
@@ -86,7 +85,9 @@
 			>
 				<img src={blog?.heroImage} class="object-cover w-full h-full" alt={blog?.title} />
 			</div>
-			<div class="flex-1 flex flex-col w-full bg-[#FFF4DA] justify-center gap-5 py-10 md:py-0  border-black md:border-b-2">
+			<div
+				class="flex-1 flex flex-col w-full bg-[#FFF4DA] justify-center gap-5 py-10 md:py-0 border-black md:border-b-2"
+			>
 				{#if blog?.tags?.length > 0}
 					<div class="font-bold text-xl md:text-2xl text-[#FE4A60] px-12">
 						<div>
@@ -146,9 +147,9 @@
 		</div>
 	{/if}
 	{#if recommendedBlogs.length > 0}
-	<div class="px-12 md:px-20 py-8">
-		<BlogList blogs={recommendedBlogs} title="📝  Recommended Blogs" />
-	</div>
+		<div class="px-12 md:px-20 py-8">
+			<BlogList blogs={recommendedBlogs} title="📝  Recommended Blogs" />
+		</div>
 	{/if}
 	<div class="flex w-full justify-center mt-20">
 		<div class="max-w-3xl">

@@ -1,11 +1,10 @@
 import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-const isCredentialsSupported = "credentials" in Request.prototype;
+const isCredentialsSupported = 'credentials' in Request.prototype;
 
 const backend = {
 	get: async (url, options = {}) => {
 		const apiUrl = new URL(`${PUBLIC_BACKEND_URL}${url}`);
-
 
 		if (options.params) {
 			Object.keys(options.params).forEach((key) =>

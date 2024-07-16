@@ -1,12 +1,11 @@
 import { getBlogLinks } from '../../api/blog';
 
 export async function GET() {
-
-   const response = await getBlogLinks();
-   const { links } = response;
-   console.log(links);
-   const urls = links.map((link) => {
-      return `
+	const response = await getBlogLinks();
+	const { links } = response;
+	console.log(links);
+	const urls = links.map((link) => {
+		return `
          <url>
             <loc>https://pictify.io/${link.slug}</loc>
             <lastmod>${link.createdAt}</lastmod>
@@ -14,8 +13,7 @@ export async function GET() {
             <priority>0.8</priority>
          </url>
       `;
-   });
-
+	});
 
 	return new Response(
 		`
