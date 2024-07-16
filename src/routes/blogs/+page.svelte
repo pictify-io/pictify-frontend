@@ -113,12 +113,12 @@
 	</div>
 	<div class="px-4 py-8">
 		{#if $blogStore.guides.length !== 0}
-		<BlogList blogs={$blogStore.guides} title={"🛠️  Guides"} />
+			<BlogList blogs={$blogStore.guides} title={'🛠️  Guides'} />
 		{/if}
 		{#if $blogStore.articles.length !== 0}
-		<div class="my-20">
-			<BlogList blogs={$blogStore.articles} title={"📚  Articles"} />
-		</div>
+			<div class="my-20">
+				<BlogList blogs={$blogStore.articles} title={'📚  Articles'} />
+			</div>
 		{/if}
 		<div class="flex w-full justify-center mt-20">
 			<div class="max-w-4xl: md:max-w-3xl">

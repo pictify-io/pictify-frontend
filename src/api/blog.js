@@ -33,6 +33,6 @@ const getRecommendedBlogs = async ({ slug, limit }) => {
 const getBlogLinks = async () => {
 	const response = await backend.get('/blogs/links');
 	return response;
-}
+};
 
 export { getAllBlogs, getBlog, getFeaturedBlog, getRecommendedBlogs, getBlogLinks };
