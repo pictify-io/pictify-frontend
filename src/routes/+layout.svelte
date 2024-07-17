@@ -5,7 +5,10 @@
 	import posthog from 'posthog-js';
 	import { browser } from '$app/environment';
 
-	if (browser) {
+	const isProd = import.meta.env.MODE === 'production';
+
+
+	if (browser && isProd) {
 		console.log('Browser detected');
 		posthog.init('phc_3ecva80rtrdIJiDyYVwsqjy2YI7CbhbAydPApERhNtU', {
 			api_host: 'https://api.pictify.io/posthog',
