@@ -7,7 +7,7 @@ export async function GET() {
 	const urls = links.map((link) => {
 		return `
          <url>
-            <loc>https://pictify.io/${link.slug}</loc>
+            <loc>https://pictify.io/blogs/${link.slug}</loc>
             <lastmod>${link.createdAt}</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.8</priority>
