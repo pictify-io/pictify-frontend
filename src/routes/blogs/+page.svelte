@@ -78,36 +78,35 @@
 			class="flex-1 bg-[#FFF4DA] flex items-center justify-center py-10 p-4 md:py-14 md:px-14 border-b-[3px] border-black"
 		>
 			{#if $blogStore.featured}
-				<div
-					class="relative flex flex-col max-w-2xl cursor-pointer group"
-					on:click={() => handleBlogClick($blogStore.featured.slug)}
-				>
-					<div
-						class="flex flex-col bg-[#FFFDF8] border-black border-4 p-4 rounded-xl z-20 gap-2 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 tracking-wide"
-					>
-						<div class="h-[250px] border-black border-4 rounded-md">
-							<img
-								src={$blogStore.featured?.heroImage}
-								class="object-cover w-full h-full"
-								alt={$blogStore.featured?.title}
-							/>
-						</div>
-						<div class="font-bold text-xl md:text-2xl">
-							<h3 class="cursor-pointer">
-								{$blogStore.featured?.title}
-							</h3>
-						</div>
-						<div class="flex mt-4 justify-between font-semibold text-gray-700">
-							<div>
-								-by {$blogStore.featured?.author}
+				<a href="/blogs/{$blogStore.featured.slug}">
+					<div class="relative flex flex-col max-w-2xl cursor-pointer group">
+						<div
+							class="flex flex-col bg-[#FFFDF8] border-black border-4 p-4 rounded-xl z-20 gap-2 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 tracking-wide"
+						>
+							<div class="h-[250px] border-black border-4 rounded-md">
+								<img
+									src={$blogStore.featured?.heroImage}
+									class="object-cover w-full h-full"
+									alt={$blogStore.featured?.title}
+								/>
 							</div>
-							<div class="">
-								{$blogStore.featured?.readingTime} min read
+							<div class="font-bold text-xl md:text-2xl">
+								<h3 class="cursor-pointer">
+									{$blogStore.featured?.title}
+								</h3>
+							</div>
+							<div class="flex mt-4 justify-between font-semibold text-gray-700">
+								<div>
+									-by {$blogStore.featured?.author}
+								</div>
+								<div class="">
+									{$blogStore.featured?.readingTime} min read
+								</div>
 							</div>
 						</div>
+						<div class="absolute rounded-xl bg-gray-800 translate-y-2 translate-x-2 inset-0 z-10" />
 					</div>
-					<div class="absolute rounded-xl bg-gray-800 translate-y-2 translate-x-2 inset-0 z-10" />
-				</div>
+				</a>
 			{/if}
 		</div>
 	</div>
