@@ -185,5 +185,10 @@
 				</span>
 			</a>
 		</div>
+		{#if !isLogin}
+		<div class="mt-14">
+			* By signing up, you agree to our <a href="/terms" class="text-gray-700" target="_blank">Terms</a> and{' '} <a href="/privacy" class="text-gray-700" target="_blank">Privacy</a> policy.
+		</div>
+		{/if}
 	</div>
 </section>
