@@ -18,6 +18,13 @@
 		goto(`/blogs/${slug}`);
 	};
 </script>
+<svelte:head>
+	<title>HTML to Images: Tips, Tricks, and Tutorials</title>
+	<meta
+		name="description"
+		content="List of guides and articles to help you get started with HTML to Images"
+	/>
+</svelte:head>
 
 <section class="bg-[#FFFDF8] min-h-screen md:h-screen">
 	<Nav />
