@@ -14,9 +14,6 @@
 		await getBlogsAction();
 	});
 
-	const handleBlogClick = (slug) => {
-		goto(`/blogs/${slug}`);
-	};
 </script>
 <svelte:head>
 	<title>HTML to Images: Tips, Tricks, and Tutorials</title>
