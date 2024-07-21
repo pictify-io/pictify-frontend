@@ -2,9 +2,10 @@
   import Nav from '$lib/components/landingPage/Nav.svelte';
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
-    import {getTemplate} from '../../../api/tools/og-image';
+    import {getTemplate, getWebsiteInfo} from '../../../api/tools/og-image';
   import { onMount } from 'svelte';
 
+  let url = '';
   const isValidUrl = (url) => {
     const urlRegex = new RegExp(
       '^(https?:\\/\\/)?' + // protocol
@@ -21,6 +22,15 @@
     } catch (e) {
       return false;
     }
+  };
+
+  const submitUrl = async (url) => {
+    console.log(url);
+    if (!isValidUrl(url)) {
+      return;
+    }
+    const websiteInfo = await getWebsiteInfo(url);
+    console.log(websiteInfo);
   };
 
   const templateNames = ['template-1'];
@@ -100,10 +110,17 @@
           e.target.classList.add('border-red-500');
         }
       }}
+      bind:value={url}
       type="text"
       class="w-full border-[3px] border-gray-900 placeholder-gray-600 text-lg font-medium focus:outline-none py-3.5 px-6 rounded"
       placeholder="Enter you website URL"
     />
+    <button
+      on:click={(event) => { console.log("called"); event.preventDefault(); submitUrl(url); }}
+      class="w-full bg-[#FE4A60] text-white text-lg font-medium py-3.5 rounded mt-4"
+    >
+      Generate
+    </button>
     <div class="my-10 text-lg font-bold">
       Templates
     </div>
