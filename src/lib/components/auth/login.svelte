@@ -14,8 +14,11 @@
 	let password = '';
 	let errorMessage;
 	let isForgotPassword = false;
+	let redirectUrl;
+
 
 	onMount(async () => {
+		redirectUrl = new URLSearchParams(window.location.search).get('redirect');
 		if (!isLogin) {
 			const emailFromParams = new URLSearchParams(window.location.search).get('email');
 			if (emailFromParams) {
@@ -24,8 +27,13 @@
 		}
 		await getUser();
 		if (isLoggedIn()) {
-			goto('/dashboard');
+			if (redirectUrl) {
+				window.location.href = redirectUrl;
+			} else {
+				goto('/dashboard');
+			}
 		}
+
 	});
 
 	$: isPasswordLengthValid = password.length >= 8;
@@ -40,7 +48,11 @@
 				await signupAction(email, password);
 			}
 			if (isLoggedIn) {
+				if (redirectUrl) {
+				window.location.href = redirectUrl;
+			} else {
 				goto('/dashboard');
+			}	
 			}
 		} catch (e) {
 			errorMessage = e.message;
@@ -56,7 +68,11 @@
 				newWindow = { closed: true };
 				getUser();
 				if (isLoggedIn) {
+					if (redirectUrl) {
+					window.location.href = redirectUrl;
+				} else {
 					goto('/dashboard');
+				}
 				}
 			}
 		}, 1000);
@@ -153,11 +169,11 @@
 
 			{#if !isLogin}
 				<p class="text-gray-700 mt-4">
-					Already have an account? <a href="/login" class="text-gray-900">Login</a>
+					Already have an account? <a href="/login?redirect={redirectUrl}" class="text-gray-900">Login</a>
 				</p>
 			{:else}
 				<p class="text-gray-700 mt-4">
-					Don't have an account? <a href="/signup" class="text-gray-900">Sign Up</a>
+					Don't have an account? <a href="/signup?redirect={redirectUrl}" class="text-gray-900">Sign Up</a>
 				</p>
 			{/if}
 			<div class="flex w-full justify-center items-center my-5">
