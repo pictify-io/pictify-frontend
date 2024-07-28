@@ -117,10 +117,10 @@
           </thead>
           <tbody>
             {#each plans as plan, index}
-            <tr class="even:bg-gray-100 hover:bg-gray-200 cursor-pointer" on:click={() => {
+            <tr class="hover:bg-gray-200 cursor-pointer  border-b " on:click={() => {
               selectedPlanIndex = index;
             }}>
-              <td class="text-left p-4 border-b">
+              <td class="text-left p-4">
                 {plan.name}
               </td>
               <td class="text-center">
@@ -129,7 +129,7 @@
               <td class="text-center">
                 {plan.requests_per_month.toLocaleString()}
               </td>
-              <td class="text-center">
+              <td class="text-center text-xl">
                 {#if selectedPlanIndex === index}
                 ✅
                  {/if} 
@@ -137,9 +137,54 @@
             </tr>
             {/each}
           </tbody>
-            <table>
+          <table>
+      </div>
+
+      <div class="m-auto w-[20rem] mt-10">
+        <button
+        class="py-3.5 rounded px-6 hover:-translate-y-px hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-[#ffc480] tracking-wide text-lg flex-shrink-0 text-gray-900"
+        > Get Your API Key
+        </button>
+      </div>
+
+      <div class="mt-20 w-full">
+        <div class="text-3xl md:px-0 px-6 font-bold text-left">
+          <h2>FAQ</h2>
+        </div>
+        <div class="mt-10 md:px-0 px-6 flex flex-col max-w-6xl mx-auto gap-6">
+          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+            <h3 class="text-lg font-bold">What happens if I exceed the monthly limit?</h3>
+            <p class="mt-2">
+              If you exceed your request limit, you can either upgrade to a higher plan or purchase additional requests at a discounted rate.
+            </p>
+          </div>
+          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+            <h3 class="text-lg font-bold">Can I change my plan later?</h3>
+            <p class="mt-2">
+              Yes, you can upgrade or downgrade your plan at any time from your account settings.
+            </p>
+          </div>
+          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+            <h3 class="text-lg font-bold">Can I pay annually?</h3>
+            <p class="mt-2">
+              Yes, please contact us at <a href="mailto:support@pictify.io">support@pictify.io</a> for annual payment options.
+            </p>
+          </div>
+          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+            <h3 class="text-lg font-bold">Do you offer custom plans?</h3>
+            <p class="mt-2">
+              Yes, we offer custom plans for high-volume users. Please contact us at <a href="mailto:support@pictify.io">support@pictify.io</a> for more information.
+            </p>
+          </div>
+          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+            <h3 class="text-lg font-bold">How to debug issues with the API?</h3>
+            <p class="mt-2">
+              If you are facing issues with the API, please check the API documentation or contact us at <a href="mailto:support@pictify.io"> support@pictify.io</a> for assistance. 
+              We will respond to your queries within 48 hours.
+            </p>
       </div>
     </div>
   </main>
+
   <Footer />
 </section>
