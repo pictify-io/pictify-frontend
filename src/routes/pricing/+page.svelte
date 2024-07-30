@@ -63,7 +63,7 @@
       goto(`/signup?redirect=${selectedPlan.purchase_url}`);
       return;
     } else {
-      window.location.href = selectedPlan.purchase_url;
+      window.location.href = selectedPlan.purchase_url ? selectedPlan.purchase_url : '/dashboard/api-token';
     }
   }
 </script>
