@@ -16,19 +16,22 @@
 	let apiTokens = [];
 	let unsubscribe = () => {};
 	let isLoading = true;
-	let currentPlan = '';
+	let currentPlan =  '';
 	let planDetails = {};
 	let usagePercentage = 0;
 
 	onMount(async () => {
+		await getAPITokenAction();
+		await getPlanDetailsAction();
 		unsubscribe = user.subscribe((u) => {
-			apiTokens = u.apiTokens || [];
-			isLoading = false;
-			currentPlan = u.currentPlan;
-			planDetails = u.planDetails;
-			usagePercentage = (planDetails?.usage / planDetails?.monthlyLimit) * 100;
+			if(u.apiTokens && u.apiTokens.length && u.planDetails) {
+				apiTokens = u.apiTokens;
+				planDetails = u.planDetails;
+				currentPlan = u.currentPlan;
+				isLoading = false;
+				usagePercentage = (planDetails.usage / planDetails.monthlyLimit) * 100;
+			}
 		});
-		Promise.all([getAPITokenAction(), getPlanDetailsAction()]);
 	});
 
 	onDestroy(() => {
