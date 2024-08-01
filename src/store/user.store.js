@@ -176,8 +176,10 @@ export const getPlanDetailsAction = async () => {
 	try {
 		const response = await getPlanDetails();
 		user.update((user) => {
-			user.planDetails = response;
-			return user;
+			return {
+				...user,
+				planDetails: response
+			};
 		});
 		return response;
 	} catch (error) {

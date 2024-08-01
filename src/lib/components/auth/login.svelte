@@ -27,7 +27,7 @@
 		}
 		await getUser();
 		if (isLoggedIn()) {
-			if (redirectUrl) {
+			if (redirectUrl && redirectUrl !== 'null') {
 				window.location.href = redirectUrl;
 			} else {
 				goto('/dashboard');
@@ -48,7 +48,7 @@
 				await signupAction(email, password);
 			}
 			if (isLoggedIn) {
-				if (redirectUrl) {
+				if (redirectUrl && redirectUrl !== 'null') {
 				window.location.href = redirectUrl;
 			} else {
 				goto('/dashboard');
@@ -68,7 +68,7 @@
 				newWindow = { closed: true };
 				getUser();
 				if (isLoggedIn) {
-					if (redirectUrl) {
+					if (redirectUrl & redirectUrl !== 'null') {
 					window.location.href = redirectUrl;
 				} else {
 					goto('/dashboard');
@@ -97,7 +97,6 @@
 		<div class="flex flex-col items-center justify-center">
 			<div class="my-5">
 				<span class="text-4xl font-bold font-heading text-shadow">Pictify </span>
-				<span class="text-xs font-heading text-gray-700">beta</span>
 			</div>
 			<hr class="border-gray-900 w-full" />
 			<h1 class="text-xl font-bold my-5">Welcome 👋</h1>

@@ -49,7 +49,7 @@
 				</div>
 			</form>
 			<p class="opacity-70 mt-4">
-				* signup to access our beta program, and get exclusive discount!
+				Sign up  for free and start converting HTML to images and GIFs today.
 			</p>
 		</div>
 	</div>

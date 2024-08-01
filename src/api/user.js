@@ -68,6 +68,15 @@ const forgotPassword = async (email) => {
 	}
 };
 
+const getPaymentPortal = async () => {
+	try {
+		const response = await backend.get('/lemon-squeezy/customer-portal');
+		return response;
+	} catch (error) {
+		return null;
+	}
+}
+
 export {
 	getUser,
 	getApiToken,
@@ -75,5 +84,6 @@ export {
 	deleteApiToken,
 	getPlanDetails,
 	resetPassword,
-	forgotPassword
+	forgotPassword,
+	getPaymentPortal
 };

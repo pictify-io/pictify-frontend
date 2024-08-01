@@ -28,8 +28,6 @@
 		class="flex flex-shrink-0 text-black items-center justify-center h-full p-5 no-underline cursor-pointer"
 	>
 		<span class="text-2xl font-bold font-heading text-shadow">Pictify </span>
-		&nbsp;
-		<span class="text-xs font-heading text-gray-700">beta</span>
 	</a>
 	<button
 		class={[
@@ -100,15 +98,19 @@
 				>API Doc</a
 			>
 			<a
-				href="mailto:support@pectify.io"
+				href="/pricing"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>Contact</a
-			>
+				>Pricing</a>
 			<a
 				href="/blogs"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Blog</a
 			>
+			<a
+			href="mailto:support@pectify.io"
+			class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
+			>Contact</a
+		>
 		</nav>
 		<div class="flex-grow bg-[#FFFDF8]" />
 		<div

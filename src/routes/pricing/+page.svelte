@@ -133,11 +133,11 @@
         </div>
         <div class="mt-10 md:px-0 px-6 flex flex-col max-w-6xl mx-auto gap-6">
           {#each FAQs as faq}
-          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+          <div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB] cursor-pointer">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div
-            class="flex w-full"
+            class="flex w-full  cursor-pointer"
             on:click={() => faq.isOpened = !faq.isOpened}
             >
               <div class="flex-grow">
