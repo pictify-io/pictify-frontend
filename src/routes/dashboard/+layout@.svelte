@@ -3,7 +3,26 @@
 	import Nav from '$lib/components/dashboard/Nav.svelte';
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
+
+	import { getUser } from '../../store/user.store';
+
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+
+	let user = null;
+	onMount(async () => {
+		user = await getUser();
+		if (!user || !user?.email) {
+			goto('/login');
+		} else {
+			goto('/dashboard/api-token');
+		}
+	});
 </script>
+
+<svelte:head>
+	<title>Pictify.io: Dashboard</title>
+</svelte:head>
 
 <Nav />
 <div class="min-h-screen flex flex-col">

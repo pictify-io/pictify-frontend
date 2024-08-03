@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import CollapseIcon from '$lib/assets/dashboard/CollapseArrow.png';
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
-	import {getPaymentPortal} from '../../../api/user';
+	import { getPaymentPortal } from '../../../api/user';
 	import { user } from '../../../store/user.store';
 	import { onMount, onDestroy } from 'svelte';
 
@@ -29,7 +29,7 @@
 
 	async function gotoPaymentPortal() {
 		const paymentPortal = await getPaymentPortal();
-		if(!paymentPortal.portalLink) {
+		if (!paymentPortal.portalLink) {
 			return;
 		}
 		window.open(paymentPortal.portalLink, '_blank');
@@ -51,16 +51,13 @@
 					<a href="/dashboard/api-token">API Usage</a>
 				</li>
 				{#if isPaidPlan}
-				<li class="text-gray-700 hover:text-gray-900">
-					<a
-					href="#"
-					on:click={gotoPaymentPortal}
-					>Subscription</a>
-				</li>
+					<li class="text-gray-700 hover:text-gray-900">
+						<a href="#" on:click={gotoPaymentPortal}>Subscription</a>
+					</li>
 				{:else}
-				<li class="text-gray-700 hover:text-gray-900">
-					<a href="/pricing">Subscription</a>
-				</li>
+					<li class="text-gray-700 hover:text-gray-900">
+						<a href="/pricing">Subscription</a>
+					</li>
 				{/if}
 				<li class="text-gray-700 hover:text-gray-900">
 					<a href="#" on:click={toggleMediaList}>

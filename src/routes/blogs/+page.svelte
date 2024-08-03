@@ -13,8 +13,8 @@
 	onMount(async () => {
 		await getBlogsAction();
 	});
-
 </script>
+
 <svelte:head>
 	<title>HTML to Images: Tips, Tricks, and Tutorials</title>
 	<meta

@@ -16,15 +16,14 @@
 	let apiTokens = [];
 	let unsubscribe = () => {};
 	let isLoading = true;
-	let currentPlan =  '';
+	let currentPlan = '';
 	let planDetails = {};
 	let usagePercentage = 0;
 
 	onMount(async () => {
-		await getAPITokenAction();
-		await getPlanDetailsAction();
+		await Promise.all([getAPITokenAction(), getPlanDetailsAction()]);
 		unsubscribe = user.subscribe((u) => {
-			if(u.apiTokens && u.apiTokens.length && u.planDetails) {
+			if (u.apiTokens && u.apiTokens.length && u.planDetails) {
 				apiTokens = u.apiTokens;
 				planDetails = u.planDetails;
 				currentPlan = u.currentPlan;

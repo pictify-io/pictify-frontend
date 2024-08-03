@@ -8,7 +8,7 @@ const login = async ({ email, password }) => {
 		});
 		return response.data;
 	} catch (error) {
-		if (error.response.status === 401) throw new Error('Invalid email or password');
+		if (error.status === 401) throw new Error('Invalid email or password');
 		else throw new Error('Error logging in');
 	}
 };
@@ -26,7 +26,7 @@ const signup = async ({ email, password }) => {
 		});
 		return response.data;
 	} catch (error) {
-		if (error.response.status === 409) throw new Error('Email already exists');
+		if (error.status === 409) throw new Error('Email already exists');
 		else if (error.response.status === 401) throw new Error(error.response.data.message);
 		else throw new Error('Error signing up');
 	}
