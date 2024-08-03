@@ -2,6 +2,13 @@ import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 const isCredentialsSupported = 'credentials' in Request.prototype;
 
+class HttpError extends Error {
+	constructor(status, message) {
+		super(message);
+		this.status = status;
+	}
+}
+
 const backend = {
 	get: async (url, options = {}) => {
 		const apiUrl = new URL(`${PUBLIC_BACKEND_URL}${url}`);
@@ -22,7 +29,7 @@ const backend = {
 			}
 		});
 		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+			throw new HttpError(response.status, response.statusText);
 		}
 		return response.json();
 	},
@@ -47,7 +54,7 @@ const backend = {
 			body: JSON.stringify(data)
 		});
 		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+			throw new HttpError(response.status, response.statusText);
 		}
 		return response.json();
 	},
@@ -72,7 +79,7 @@ const backend = {
 			body: JSON.stringify(data)
 		});
 		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+			throw new HttpError(response.status, response.statusText);
 		}
 		return response.json();
 	},
@@ -96,7 +103,7 @@ const backend = {
 			}
 		});
 		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+			throw new HttpError(response.status, response.statusText);
 		}
 		return response.json();
 	}

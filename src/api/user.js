@@ -75,7 +75,7 @@ const getPaymentPortal = async () => {
 	} catch (error) {
 		return null;
 	}
-}
+};
 
 export {
 	getUser,

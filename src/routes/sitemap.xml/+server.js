@@ -2,7 +2,7 @@ import { getBlogLinks } from '../../api/blog';
 
 export async function GET() {
 	const response = await getBlogLinks();
-   const { links } = response;
+	const { links } = response;
 	const urls = links.map((link) => {
 		return `
          <url>

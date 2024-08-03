@@ -16,7 +16,6 @@
 	let isForgotPassword = false;
 	let redirectUrl;
 
-
 	onMount(async () => {
 		redirectUrl = new URLSearchParams(window.location.search).get('redirect');
 		if (!isLogin) {
@@ -33,7 +32,6 @@
 				goto('/dashboard');
 			}
 		}
-
 	});
 
 	$: isPasswordLengthValid = password.length >= 8;
@@ -49,10 +47,10 @@
 			}
 			if (isLoggedIn) {
 				if (redirectUrl && redirectUrl !== 'null') {
-				window.location.href = redirectUrl;
-			} else {
-				goto('/dashboard');
-			}	
+					window.location.href = redirectUrl;
+				} else {
+					goto('/dashboard');
+				}
 			}
 		} catch (e) {
 			errorMessage = e.message;
@@ -68,11 +66,11 @@
 				newWindow = { closed: true };
 				getUser();
 				if (isLoggedIn) {
-					if (redirectUrl & redirectUrl !== 'null') {
-					window.location.href = redirectUrl;
-				} else {
-					goto('/dashboard');
-				}
+					if (redirectUrl & (redirectUrl !== 'null')) {
+						window.location.href = redirectUrl;
+					} else {
+						goto('/dashboard');
+					}
 				}
 			}
 		}, 1000);
@@ -168,11 +166,15 @@
 
 			{#if !isLogin}
 				<p class="text-gray-700 mt-4">
-					Already have an account? <a href="/login?redirect={redirectUrl}" class="text-gray-900">Login</a>
+					Already have an account? <a href="/login?redirect={redirectUrl}" class="text-gray-900"
+						>Login</a
+					>
 				</p>
 			{:else}
 				<p class="text-gray-700 mt-4">
-					Don't have an account? <a href="/signup?redirect={redirectUrl}" class="text-gray-900">Sign Up</a>
+					Don't have an account? <a href="/signup?redirect={redirectUrl}" class="text-gray-900"
+						>Sign Up</a
+					>
 				</p>
 			{/if}
 			<div class="flex w-full justify-center items-center my-5">
@@ -201,9 +203,12 @@
 			</a>
 		</div>
 		{#if !isLogin}
-		<div class="mt-14">
-			* By signing up, you agree to our <a href="/terms" class="text-gray-700" target="_blank">Terms</a> and{' '} <a href="/privacy" class="text-gray-700" target="_blank">Privacy</a> policy.
-		</div>
+			<div class="mt-14">
+				* By signing up, you agree to our <a href="/terms" class="text-gray-700" target="_blank"
+					>Terms</a
+				>
+				and{' '} <a href="/privacy" class="text-gray-700" target="_blank">Privacy</a> policy.
+			</div>
 		{/if}
 	</div>
 </section>

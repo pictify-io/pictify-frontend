@@ -8,7 +8,6 @@
 	const isProd = import.meta.env.MODE === 'production';
 
 	if (browser && isProd) {
-		console.log('Browser detected');
 		posthog.init('phc_3ecva80rtrdIJiDyYVwsqjy2YI7CbhbAydPApERhNtU', {
 			api_host: 'https://api.pictify.io/posthog',
 			disable_compression: true

@@ -100,17 +100,18 @@
 			<a
 				href="/pricing"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>Pricing</a>
+				>Pricing</a
+			>
 			<a
 				href="/blogs"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Blog</a
 			>
 			<a
-			href="mailto:support@pectify.io"
-			class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-			>Contact</a
-		>
+				href="mailto:support@pectify.io"
+				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
+				>Contact</a
+			>
 		</nav>
 		<div class="flex-grow bg-[#FFFDF8]" />
 		<div

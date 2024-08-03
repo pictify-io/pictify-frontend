@@ -2,11 +2,6 @@
 	import { goto } from '$app/navigation';
 	export let blogs = [];
 	export let title = '';
-
-	console.log(title);
-	const handleBlogClick = async (slug) => {
-		goto(`/blogs/${slug}`);
-	};
 </script>
 
 <section>

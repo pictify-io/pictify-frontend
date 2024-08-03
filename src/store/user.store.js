@@ -39,8 +39,10 @@ export const clearUser = () => {
 
 export const setApiTokens = (apiTokens) => {
 	user.update((user) => {
-		user.apiTokens = apiTokens;
-		return user;
+		return {
+			...user,
+			apiTokens
+		};
 	});
 
 	if (apiTokens.length > 0) {
