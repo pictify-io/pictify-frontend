@@ -51,11 +51,11 @@ const combinedFonts = popularFonts.map((font, index) => ({
   let isImageGenerating = false;
 
   let websiteInfo;
+  let error = null;
 
 let backgroundColorRgb = websiteInfo?.colors ? {r: websiteInfo.colors[0][0], g: websiteInfo.colors[0][1], b: websiteInfo.colors[0][2]} : {r: 255, g: 255, b: 255};
 let headingColorRgb = websiteInfo?.colors ? {r: websiteInfo.colors[1][0], g: websiteInfo.colors[1][1], b: websiteInfo.colors[1][2]} : {r: 0, g: 0, b: 0};
 let subHeadingColorRgb = websiteInfo?.colors ? {r: websiteInfo.colors[2][0], g: websiteInfo.colors[2][1], b: websiteInfo.colors[2][2]} : {r: 0, g: 0, b: 0};
-
 
 
 let ogImageTemplateWrapper;
@@ -84,13 +84,19 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     if (!isValidUrl(url)) {
       return;
     }
+    error = null;
     isFetchingWebsiteInfo = true;
-    websiteInfo = await getWebsiteInfo(url);
+    try {
+      websiteInfo = await getWebsiteInfo(url);
+    } catch (e) {
+      error = 'Failed to fetch website info';
+      isFetchingWebsiteInfo = false;
+      return;
+    }
     isFetchingWebsiteInfo = false;
     backgroundColorRgb = {r: websiteInfo.colors[0][0], g: websiteInfo.colors[0][1], b: websiteInfo.colors[0][2]};
     headingColorRgb = {r: websiteInfo.colors[1][0], g: websiteInfo.colors[1][1], b: websiteInfo.colors[1][2]};
     subHeadingColorRgb = {r: websiteInfo.colors[2][0], g: websiteInfo.colors[2][1], b: websiteInfo.colors[2][2]};
-    
     
     while(!ogImageTemplateWrapper) {
       await new Promise((resolve) => {
@@ -99,14 +105,31 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     }
 
     const iframe = ogImageTemplateWrapper.querySelector('iframe');
-    await new Promise((resolve) => {
-      iframe.onload = resolve;
-    });
+    if (!iframe.contentWindow.document.body.innerHTML) {
+      await new Promise((resolve) => {
+        iframe.onload = resolve;
+      });
+    }
     
     await updateHTML(selectedTemplate);
   };
 
-  const templateNames = ['template-1'];
+  const templateNames = [
+    'template-1', 
+    'template-2', 
+    'template-3', 
+    'template-4', 
+    'template-5', 
+    'template-6',
+    'template-7',
+    'template-8',
+    'template-9',
+    'template-10',
+    'template-11',
+    'template-12',
+    'template-13',
+    'template-14'
+  ];
   let templates = [];
 
   onMount(async() => {
@@ -119,8 +142,6 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
   });
 
   const updateHTML = (html) => {
-    console.log('updateHTML');
-    console.log(html);
     const iframe = ogImageTemplateWrapper.querySelector('iframe');
 
     const document = iframe.contentWindow.document;
@@ -132,13 +153,23 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
 
     if(logo) {
       if(websiteInfo.logo && websiteInfo.logo.startsWith('<svg')) {
-       
-        logo.outerHTML = websiteInfo.logo;
-        logo.id = 'template-logo';
-        websiteInfo.logo = URL.createObjectURL(new Blob([websiteInfo.logo], {type: 'image/svg+xml'}));
+        console.log('websiteInfo.logo', websiteInfo.logo); 
+        const svgContainer = document.createElement('div');
+        svgContainer.id = 'template-logo';
+        svgContainer.innerHTML = websiteInfo.logo;
+        logo.replaceWith(svgContainer);
+        
+        const svgElement = svgContainer.querySelector('svg');
+        if (svgElement) {
+          svgElement.setAttribute('width', logoWidth);
+          svgElement.setAttribute('height', 'auto');
+        }
       } else {
-      logo.src = websiteInfo.logo;
-      logo.width = logoWidth;
+        const img = document.createElement('img');
+        img.src = websiteInfo.logo;
+        img.width = logoWidth;
+        img.id = 'template-logo';
+        logo.replaceWith(img);
       }
     }
    
@@ -303,7 +334,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
    <div>
     <button
     on:click={(event) => {  event.preventDefault(); submitUrl(url); }}
-    class="w-full px-6 text-gray-900 bg-[#ffc480] border-[3px] border-gray-900 text-lg font-medium py-3.5 rounded mt-4 md:mt-0"
+    class="w-full px-6 text-gray-900 bg-[#ffc480] border-[3px] border-gray-900 text-lg font-medium py-3.5 rounded md:mt-0"
   >
     Fetch Website Info
   </button>
@@ -316,6 +347,11 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
       <div class="mt-5 w-full bg-gray-200 rounded-full h-3 dark:bg-gray-300">
         <div class="bg-gray-900 h-3 rounded-full" style="width: 0%; animation: loading 3s forwards;"></div>
       </div>
+    </div>
+    {/if}
+    {#if error}
+    <div class="text-lg font-bold mt-10 text-red-500">
+      {error}
     </div>
     {/if}
 
@@ -331,19 +367,32 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
             Logo
           </div>
           <div class="mt-2 flex w-full relative items-center">
+            
             {#if websiteInfo.logo}
-            <img src={websiteInfo.logo} class="w-[150px]" alt="input-logo"/>
+            <div>
+              {#if websiteInfo.logo.startsWith('<svg')}
+                <div style="width: 150px;" >
+                  {@html websiteInfo.logo}
+                </div>
+              {:else}
+                <img src={websiteInfo.logo} style="width: 150px;" alt="input-logo"/>
+              {/if}
+            </div>
             {/if}
+            <div>
             <input
               type="file"
-              class="opacity-0 absolute inset-0 w-full cursor-pointer"
+              class="opacity-0  ml-4 inset-0 w-full cursor-pointer"
               accept="image/*"
               placeholder="Upload Logo"
               on:change={updateLogo}
             />
+          </div>
+          <div>
             <label for="fileInput" class="ml-4 p-2 h-fit rounded cursor-pointer bg-gray-700 text-white">
               Upload Logo
             </label>
+          </div>
           </div>
           <div class="mt-4 text-sm text-gray-600">
             <input type="number" class="w-20 border-[3px] border-gray-900 placeholder-gray-600 focus:outline-none p-2 rounded" value={logoWidth} on:input={updateLogoWidth} />
@@ -478,7 +527,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
       Templates
     </div>
  
-    <div class="flex flex-col md:flex-row gap-2 mb-10">
+    <div class="flex flex-col md:flex-row gap-2 justify-between w-100 mb-10 flex-wrap">
     {#each templates as template}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
