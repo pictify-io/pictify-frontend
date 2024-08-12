@@ -119,7 +119,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     'template-2', 
     'template-3', 
     'template-4', 
-    'template-5', 
+    // 'template-5', 
     'template-6',
     'template-7',
     'template-8',
@@ -127,7 +127,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     'template-10',
     'template-11',
     'template-12',
-    'template-13',
+    //'template-13',
     'template-14'
   ];
   let templates = [];
@@ -253,9 +253,45 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     isImageGenerating = false;
   };
 
-
+  function sharePage(platform) {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('Check out this awesome OG Image Generator!');
+    if (platform === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+    } else if (platform === 'linkedin') {
+      window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${encodeURIComponent('OG Image Generator')}&summary=${text}`, '_blank');
+    }
+  }
 
 </script>
+
+<svelte:head>
+  <title>Free OG Image Generator: Create Custom Open Graph Images | Pictify.io</title>
+  <meta name="description" content="Create stunning Open Graph images for free with Pictify.io's OG Image Generator. Boost social media engagement and SEO with custom OG images for your content.">
+  <meta name="keywords" content="OG image generator, Open Graph images, social media images, SEO, content marketing">
+  <link rel="canonical" href="https://pictify.io/tools/og-image-generator">
+  <meta property="og:title" content="OG Image Generator | Pictify.io">
+  <meta property="og:description" content="Create custom Open Graph images to improve your social media presence and SEO.">
+  <meta property="og:image" content="https://pictify.io/og-image-generator-preview.jpg">
+  <meta property="og:url" content="https://pictify.io/tools/og-image-generator">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebApplication",
+    "name": "Pictify.io OG Image Generator",
+    "url": "https://pictify.io/tools/og-image-generator",
+    "description": "Create custom Open Graph images for improved social media engagement and SEO.",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</svelte:head>
 
 
 <section>
@@ -382,7 +418,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
             <div>
             <input
               type="file"
-              class="opacity-0  ml-4 inset-0 w-full cursor-pointer"
+              class="opacity-0  ml-4 inset-0 w-full cursor-pointer absolute w-fit"
               accept="image/*"
               placeholder="Upload Logo"
               on:change={updateLogo}
@@ -496,7 +532,6 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
             </div>
           </button>
           </div>
-       
           <img src={imageUrl} class="w-[150px] mt-4" alt="og-image" />
         </div>
         {/if}
@@ -527,7 +562,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
       Templates
     </div>
  
-    <div class="flex flex-col md:flex-row gap-2 justify-between w-100 mb-10 flex-wrap">
+    <div class="flex flex-col md:flex-row gap-4 justify-between w-100 mb-10 flex-wrap">
     {#each templates as template}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -546,18 +581,153 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
       </div>
     {/each}
   </div>
-</div>
+
+  <!-- Separator -->
+  <div class="max-w-4xl mx-auto px-6 md:px-0 my-20">
+    <div class="border-t-4 border-gray-900 relative">
+      <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
+        <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <section class="mb-16">
+    <h3 class="text-3xl font-bold mb-6">Frequently Asked Questions</h3>
+    <div class="space-y-4">
+      <details class="bg-gray-100 p-4 rounded-lg">
+        <summary class="font-semibold cursor-pointer">What is an OG image?</summary>
+        <p class="mt-2">An OG (Open Graph) image is the image that appears when your content is shared on social media platforms. It's designed to give a visual preview of your content and attract more clicks.</p>
+      </details>
+      <details class="bg-gray-100 p-4 rounded-lg">
+        <summary class="font-semibold cursor-pointer">How do I add an OG image to my website?</summary>
+        <p class="mt-2">To add an OG image to your website, you need to include the appropriate Open Graph meta tags in the &lt;head&gt; section of your HTML. The most important tag for images is og:image, which should contain the URL of your OG image.</p>
+      </details>
+   <details class="bg-gray-100 p-4 rounded-lg">
+    <summary class="font-semibold cursor-pointer">How to use OG Image Generator?</summary>
+    <p class="mt-2">
+      To use OG Image Generator, simply enter your website URL, choose a template, and customize the settings to your liking. Once you're satisfied with the preview, click the "Generate Image" button to download your custom OG image.
+    </p>
+   </details>
+   <details class="bg-gray-100 p-4 rounded-lg">
+    <summary class="font-semibold cursor-pointer">
+      What are the things I can customize?
+    </summary>
+    <p class="mt-2">
+      You can customize the heading, subheading, logo, colors, and fonts to match your brand. You can also choose from our selection of professionally designed templates.
+      Although some template's colors cannot be changed, you can change the font and the logo.
+    </p>
+   </details>
+    </div>
+  </section>
+  
+  <div class="max-w-4xl mx-auto px-6 md:px-0 my-20">
+    <div class="border-t-4 border-gray-900 relative">
+      <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
+        <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <!-- New SEO-optimized sections -->
+  <div class="max-w-4xl mx-auto px-6 md:px-0 mb-20">
+    <h2 class="text-4xl font-bold mb-10 text-center">Learn More About OG Image Generation</h2>
+    
+    <section class="mb-16">
+      <h3 class="text-3xl font-bold mb-6">What is an OG Image Generator?</h3>
+      <p class="text-lg">
+        An OG Image Generator is a powerful tool that creates custom Open Graph images for your website or social media content. These images appear when your links are shared on platforms like Facebook, Twitter, and LinkedIn, significantly improving click-through rates and engagement.
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h3 class="text-3xl font-bold mb-6">Benefits of Using Our OG Image Generator</h3>
+      <ul class="list-disc list-inside text-lg">
+        <li>Create professional-looking OG images in minutes</li>
+        <li>Customize colors, fonts, and layouts to match your brand</li>
+        <li>Improve social media engagement and click-through rates</li>
+        <li>No design skills required - user-friendly interface</li>
+        <li>Multiple templates to choose from for various content types</li>
+      </ul>
+    </section>
+
+    <section class="mb-16">
+      <h3 class="text-3xl font-bold mb-6">How to Use Our OG Image Generator</h3>
+      <ol class="list-decimal list-inside text-lg">
+        <li>Enter your website URL to fetch existing branding elements</li>
+        <li>Choose from our selection of professionally designed templates</li>
+        <li>Customize the heading, subheading, logo, colors, and fonts</li>
+        <li>Preview your OG image in real-time</li>
+        <li>Generate and download your custom OG image</li>
+      </ol>
+    </section>
+
+    <section class="mb-16">
+      <h3 class="text-3xl font-bold mb-6">Why OG Images Matter for SEO and Social Media</h3>
+      <p class="text-lg">
+        Open Graph images play a crucial role in both SEO and social media marketing. They increase visibility, improve click-through rates, and provide a visual preview of your content. By using our OG Image Generator, you can create eye-catching images that stand out in social media feeds and search results, ultimately driving more traffic to your website.
+      </p>
+    </section>
+
+    <!-- New section on best practices -->
+    <section class="mb-16">
+      <h3 class="text-3xl font-bold mb-6">Best Practices for Creating Effective OG Images</h3>
+      <p class="text-lg mb-4">
+        To maximize the impact of your OG images, follow these best practices:
+      </p>
+      <ul class="list-disc list-inside text-lg">
+        <li>Use high-contrast colors to ensure readability</li>
+        <li>Keep text concise and to the point</li>
+        <li>Include your brand logo for consistency</li>
+        <li>Use high-quality, relevant imagery</li>
+        <li>Maintain a 1.91:1 aspect ratio (1200x630 pixels) for optimal display</li>
+        <li>Test your images across different social media platforms</li>
+        <li>Update OG images regularly to keep content fresh</li>
+        <li>Ensure text is legible even at smaller sizes</li>
+      </ul>
+      <p class="text-lg mt-4">
+        By following these guidelines and using our OG Image Generator, you can create compelling OG images that boost your social media presence and drive more traffic to your website.
+      </p>
+    </section>
+  </div>
+
+ 
+  <div class="mt-8 mb-8 flex flex-col md:flex-row justify-center md:space-x-4">
+    <button
+      class="flex items-center justify-center px-6 py-3 bg-[#1DA1F2] text-white font-semibold rounded-full hover:bg-[#1a91da] transition duration-300 ease-in-out"
+      on:click={() => sharePage('twitter')}
+    >
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+      </svg>
+      Share on Twitter
+    </button>
+    <button
+      class="flex items-center justify-center px-6 py-3 mt-4 md:mt-0 bg-[#0A66C2] text-white font-semibold rounded-full hover:bg-[#094d92] transition duration-300 ease-in-out"
+      on:click={() => sharePage('linkedin')}
+    >
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+      Share on LinkedIn
+    </button>
+  </div>
+
   <Footer />
 
-  <style>
-    @keyframes loading {
-      0% {
-        width: 0%;
-      }
-      100% {
-        width: 100%;
-      }
-    }
-  </style>
+
 </section>
+
+<style>
+  @keyframes loading {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+</style>
 
