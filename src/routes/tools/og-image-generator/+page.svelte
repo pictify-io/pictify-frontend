@@ -7,6 +7,8 @@
   import { onMount } from 'svelte';
   import { toast } from '../../../store/toast.store';
   import ColorPicker from 'svelte-awesome-color-picker';
+  import { tweened } from 'svelte/motion';
+  import { cubicOut } from 'svelte/easing';
 
   const popularFontsLinks = [
   'https://fonts.googleapis.com/css2?family=Arial:wght@100;200;300;400;500;600;700;800;900&display=swap',
@@ -270,6 +272,17 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     }
   }
 
+  let progress = tweened(0, {
+    duration: 3000,
+    easing: cubicOut
+  });
+
+  $: if (isFetchingWebsiteInfo) {
+    progress.set(100);
+  } else {
+    progress.set(0);
+  }
+
 </script>
 
 <svelte:head>
@@ -388,7 +401,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     <div class="text-lg font-bold mt-10 text-gray-600">
       Fetching website info...
       <div class="mt-5 w-full bg-gray-200 rounded-full h-3 dark:bg-gray-300">
-        <div class="bg-gray-900 h-3 rounded-full" style="width: 0%; animation: loading 3s forwards;"></div>
+        <div class="bg-gray-900 h-3 rounded-full" style="width: {$progress}%;"></div>
       </div>
     </div>
     {/if}
