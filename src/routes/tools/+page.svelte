@@ -27,7 +27,7 @@
   <meta property="og:title" content="Free Image Generation Tools | Pictify.io">
   <meta property="og:description" content="Explore Pictify.io's free image generation tools. Create OG images and convert HTML to JPG effortlessly with our powerful API.">
   <meta property="og:image" content="https://pictify.io/og-image-tools.jpg">
-  <meta property="og:url" content="https://pictify.io/tools">
+  <meta property="og:url" content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png">
   <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">
   {
