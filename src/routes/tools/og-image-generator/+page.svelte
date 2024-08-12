@@ -200,9 +200,16 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     updateHTML(selectedTemplate);
   };
 
-  const updateLogo = (event) => {
-    websiteInfo.logo = URL.createObjectURL(event.target.files[0]);
-    updateHTML(selectedTemplate);
+  const updateLogo = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        websiteInfo.logo = e.target.result;
+        updateHTML(selectedTemplate);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const updateBackgroundColor = (event) => {
@@ -272,7 +279,7 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
   <link rel="canonical" href="https://pictify.io/tools/og-image-generator">
   <meta property="og:title" content="OG Image Generator | Pictify.io">
   <meta property="og:description" content="Create custom Open Graph images to improve your social media presence and SEO.">
-  <meta property="og:image" content="https://pictify.io/og-image-generator-preview.jpg">
+  <meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
   <meta property="og:url" content="https://pictify.io/tools/og-image-generator">
   <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">
