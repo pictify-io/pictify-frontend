@@ -153,9 +153,9 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
     heading.innerHTML = websiteInfo.heading || '';
     subHeading.innerHTML = websiteInfo.subHeading || '';
 
+
     if(logo) {
       if(websiteInfo.logo && websiteInfo.logo.startsWith('<svg')) {
-        console.log('websiteInfo.logo', websiteInfo.logo); 
         const svgContainer = document.createElement('div');
         svgContainer.id = 'template-logo';
         svgContainer.innerHTML = websiteInfo.logo;
@@ -588,7 +588,12 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="{selectedTemplate === template ? 'border-[3px] border-[#5cf1a4]' : ''} cursor-pointer relative w-fit "
-        on:click={() => selectedTemplate = template}
+        on:click={() => {
+          selectedTemplate = template;
+          setTimeout(() => {
+            updateHTML(template);
+          }, 200);
+        }}
       >
       <div class="absolute inset-0" style="z-index: 1;">
       {#if selectedTemplate === template}

@@ -19,7 +19,7 @@
 
 <svelte:head>
 	<title>Free HTML to JPG Converter | Online Tool by Pictify.io</title>
-	<meta name="description" content="Pictify.io is a free HTML to JPG API" />
+	<meta name="description" content="Convert HTML to high-quality JPG images for free with Pictify.io's online HTML to JPG converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
 	<meta
 		name="keywords"
 		content="HTML to JPG, HTML to JPG API, HTML to JPG conversion, HTML to JPG converter, JPG, API, Pictify.io, Pictify, Pictify API, Pictify.io API, Pictify.io JPG API, Pictify.io HTML to JPG API, Pictify.io HTML to JPG conversion API, Pictify.io HTML to JPG converter"
@@ -27,7 +27,7 @@
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta Property="og:title" content="Pictify.io" />
-	<meta Property="og:description" content="Pictify.io is a free HTML to JPG conversion API" />
+	<meta Property="og:description" content="Convert HTML to high-quality JPG images for free with Pictify.io's online HTML to JPG converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
 	<meta
 		Property="og:image"
 		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
@@ -43,7 +43,7 @@
 			"@type": "WebApplication",
 			"name": "Pictify.io OG Image Generator",
 			"url": "https://pictify.io/tools/og-image-generator",
-			"description": "Create custom Open Graph images for improved social media engagement and SEO.",
+			"description": "Convert HTML to high-quality JPG images for free with Pictify.io's online HTML to JPG converter. Perfect for creating social media content, email marketing visuals, and website mockups.",
 			"applicationCategory": "DesignApplication",
 			"operatingSystem": "Web",
 			"offers": {
