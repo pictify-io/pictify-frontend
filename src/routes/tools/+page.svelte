@@ -15,6 +15,12 @@
       description: "Convert HTML to high-quality JPG images with our free online tool.",
       url: "/tools/html-to-jpg",
       icon: "🔄"
+    },
+    {
+      name: "Online Invoice Generator",
+      description: "Create professional invoices quickly and easily with our free online tool.",
+      url: "/tools/online-invoice-generator",
+      icon: "📄"
     }
   ];
 </script>
@@ -54,6 +60,16 @@
           "name": "HTML to JPG Converter",
           "url": "https://pictify.io/tools/html-to-jpg",
           "description": "Convert HTML to high-quality JPG images with our free online tool."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "WebApplication",
+          "name": "Online Invoice Generator",
+          "url": "https://pictify.io/tools/online-invoice-generator",
+          "description": "Create professional invoices with our free online tool."
         }
       }
     ]
