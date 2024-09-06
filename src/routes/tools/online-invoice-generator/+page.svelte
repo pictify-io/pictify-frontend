@@ -178,9 +178,29 @@
   <link rel="canonical" href="https://pictify.io/tools/online-invoice-generator">
   <meta property="og:title" content="Online Invoice Generator | Pictify.io">
   <meta property="og:description" content="Create custom invoices to streamline your billing process and maintain a professional image.">
-  <meta property="og:image" content="https://media.pictify.io/invoice-generator-og.png">
+  <meta property="og:image" content="https://media.pictify.io/zuhz9-1725661278941.png">
   <meta property="og:url" content="https://pictify.io/tools/online-invoice-generator">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@pictify_io">
+  <meta name="twitter:title" content="Online Invoice Generator | Pictify.io">
+  <meta name="twitter:description" content="Create custom invoices to streamline your billing process and maintain a professional image.">
+  <meta name="twitter:image" content="https://media.pictify.io/zuhz9-1725661278941.png">
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebApplication",
+    "name": "Pictify.io Online Invoice Generator",
+    "url": "https://pictify.io/tools/online-invoice-generator",
+    "description": "Create custom invoices to streamline your billing process and maintain a professional image.",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
 </svelte:head>
 
 <svelte:window bind:innerWidth={windowWidth} />
@@ -503,7 +523,7 @@
       Share on LinkedIn
     </button>
   </div>
-  
+
   <Toast /> 
   <Footer />
 </section>

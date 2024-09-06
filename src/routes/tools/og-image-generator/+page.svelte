@@ -295,6 +295,10 @@ $:previewHeight = ogImageTemplateWrapper ? ogImageTemplateWrapper.offsetWidth  :
   <meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
   <meta property="og:url" content="https://pictify.io/tools/og-image-generator">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@pictify_io">
+  <meta name="twitter:title" content="OG Image Generator | Pictify.io">
+  <meta name="twitter:description" content="Create custom Open Graph images to improve your social media presence and SEO.">
+  <meta name="twitter:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
   <script type="application/ld+json">
   {
     "@context": "http://schema.org",
