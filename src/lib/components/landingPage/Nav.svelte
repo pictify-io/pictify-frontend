@@ -113,7 +113,7 @@
 				>Blog</a
 			>
 			<a
-				href="mailto:support@pectify.io"
+				href="mailto:support@pictify.io"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Contact</a
 			>
