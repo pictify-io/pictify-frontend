@@ -21,6 +21,12 @@
       description: "Create professional invoices quickly and easily with our free online tool.",
       url: "/tools/online-invoice-generator",
       icon: "📄"
+    },
+    {
+      name:"URL to Image Generator",
+      description:"Generate images from any URL with our free online tool.",
+      url:"/tools/url-to-image",
+      icon:"📸"
     }
   ];
 </script>
@@ -71,6 +77,16 @@
           "url": "https://pictify.io/tools/online-invoice-generator",
           "description": "Create professional invoices with our free online tool."
         }
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "item": {
+          "@type": "WebApplication",
+          "name": "URL to Image Generator",
+          "url": "https://pictify.io/tools/url-to-image",
+          "description": "Generate images from any URL with our free online tool."
+        }
       }
     ]
   }
@@ -85,9 +101,9 @@
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mb-4">
         Free Image Generation Tools
       </h1>
-      <p class="text-xl opacity-70 max-w-3xl">
+      <h2 class="text-xl opacity-70 max-w-3xl">
         Explore Pictify.io's powerful and free image generation tools. Boost your content with custom OG images and effortless HTML to JPG conversions.
-      </p>
+      </h2>
     </div>
 
     <div class="w-full grid md:grid-cols-2 gap-8 mt-16">
