@@ -1,11 +1,12 @@
 import backend from '../service/backend';
 
-const createImagePublic = async ({ html, width, height, selector }) => {
+const createImagePublic = async ({ html, width, height, selector, url }) => {
 	const response = await backend.post('/image/public', {
 		html,
 		width,
 		height,
-		selector
+		selector,
+		url
 	});
 	return response;
 };
