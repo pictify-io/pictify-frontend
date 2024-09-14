@@ -3,10 +3,47 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
 	import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	$: format = $page.params.format;
+
+const formatExtensionMap = {
+		jpg: 'jpeg',
+		png: 'png',
+		webp: 'webp',
+};
+
+$: fileExtension = formatExtensionMap[format];
+
+$: if (!fileExtension) {
+	if(browser) {
+		goto('/tools/html-to-jpg');
+	}
+}
+
+
+	let formats = ['jpg', 'png', 'webp',] 
+
+	function handleFormatChange(event) {
+		const newFormat = event.target.value;
+		if(browser) {
+			goto(`/tools/html-to-${newFormat}`);
+		}
+	}
+
+	onMount(() => {
+		// Ensure the correct format is selected on page load
+		const select = document.getElementById('format-select');
+		if (select) {
+			select.value = format;
+		}
+	});
 
 	function sharePage(platform) {
 		const url = encodeURIComponent(window.location.href);
-		const text = encodeURIComponent('Check out this awesome HTML to JPG converter!');
+		const text = encodeURIComponent(`Check out this awesome HTML to ${format.toUpperCase()} converter!`);	
 		if (platform === 'twitter') {
 			window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
 		} else if (platform === 'linkedin') {
@@ -18,16 +55,13 @@
 
 
 <svelte:head>
-	<title>Free HTML to JPG Converter | Online Tool by Pictify.io</title>
-	<meta name="description" content="Convert HTML to high-quality JPG images for free with Pictify.io's online HTML to JPG converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
-	<meta
-		name="keywords"
-		content="HTML to JPG, HTML to JPG API, HTML to JPG conversion, HTML to JPG converter, JPG, API, Pictify.io, Pictify, Pictify API, Pictify.io API, Pictify.io JPG API, Pictify.io HTML to JPG API, Pictify.io HTML to JPG conversion API, Pictify.io HTML to JPG converter"
-	/>
+	<title>Free HTML to {format.toUpperCase()} Converter | Online Tool by Pictify.io</title>
+	<meta name="description" content="Convert HTML to high-quality {format.toUpperCase()} images instantly with Pictify.io's free online converter. Perfect for social media, email marketing, and web design. Try now!" />
+	<meta name="keywords" content="HTML to {format.toUpperCase()}, {format.toUpperCase()} converter, online image converter, web design tool, Pictify.io" />
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta Property="og:title" content="Pictify.io" />
-	<meta Property="og:description" content="Convert HTML to high-quality JPG images for free with Pictify.io's online HTML to JPG converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
+	<meta Property="og:description" content="Convert HTML to high-quality {format.toUpperCase()} images for free with Pictify.io's online HTML to {format.toUpperCase()} converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
 	<meta
 		Property="og:image"
 		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
@@ -36,15 +70,15 @@
 	<meta Property="og:type" content="website" />
 	<meta Property="og:site_name" content="Pictify.io" />
 	<meta Property="og:locale" content="en_US" />
-	<link rel="canonical" href="https://pictify.io/tools/html-to-jpg" />
+	<link rel="canonical" href="https://pictify.io/tools/html-to-{format}" />
 
 	<script type="application/ld+json">
 		{
 			"@context": "http://schema.org",
 			"@type": "WebApplication",
-			"name": "Pictify.io OG Image Generator",
-			"url": "https://pictify.io/tools/og-image-generator",
-			"description": "Convert HTML to high-quality JPG images for free with Pictify.io's online HTML to JPG converter. Perfect for creating social media content, email marketing visuals, and website mockups.",
+			"name": "Pictify.io HTML to {format.toUpperCase()} Converter",
+			"url": "https://pictify.io/tools/html-to-{format}",
+			"description": "Convert HTML to high-quality {format.toUpperCase()} images instantly with Pictify.io's free online converter. Perfect for social media, email marketing, and web design.",
 			"applicationCategory": "DesignApplication",
 			"operatingSystem": "Web",
 			"offers": {
@@ -92,7 +126,16 @@
 			<h1
 				class="text-4xl sm:text-5xl sm:pt-20 lg:pt-5 md:text-5xl lg:text-6xl font-bold tracking-tighter w-full inline-block text-left md:text-center relative"
 			>
-				HTML To JPG
+				 HTML To 
+				<select
+					id="format-select"
+					on:change={handleFormatChange}
+					class="bg-transparent underline text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold tracking-tighter appearance-none cursor-pointer"
+				>
+					{#each formats as f}
+						<option value={f}>{f.toUpperCase()}</option>
+					{/each}
+				</select>
 				<svg
 					class="w-16 lg:w-20 h-auto lg:absolute flex-shrink-0 right-0 bottom-0 md:block hidden translate-y-10 md:translate-y-20 lg:translate-y-4 lg:-translate-x-12 -translate-x-10"
 					viewBox="0 0 92 80"
@@ -115,16 +158,16 @@
 			</h1>
 		</div>
 		<h1 class="max-w-3xl opacity-70 md:text-center text-lg">
-			Convert HTML to JPG for free. Pictify offers APIs to convert HTML to image or gif. Input your
-			HTML code, check the preview, and download the JPG image.
+			Convert HTML to {format.toUpperCase()} for free. Pictify offers APIs to convert HTML to image or gif. Input your
+			HTML code, check the preview, and download the {format.toUpperCase()} image.
 		</h1>
 	</main>
 	<div class="w-full flex justify-center mt-20">
-		<CodeEditor fileExtension="jpeg" />
+		<CodeEditor fileExtension={fileExtension} />
 	</div>
 	<div class="mt-20 w-full">
 		<div class="text-4xl md:px-0 px-6 font-bold text-left md:text-center">
-			<h2>How to convert HTML to JPG</h2>
+			<h2>How to convert HTML to {format.toUpperCase()}</h2>
 		</div>
 		<div class="mt-10 md:px-0 px-6 flex flex-col sm:flex-row max-w-6xl mx-auto gap-6">
 			<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
@@ -142,9 +185,9 @@
 				</p>
 			</div>
 			<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
-				<h3 class="text-xl font-bold">Step 3: Create the JPG image</h3>
+				<h3 class="text-xl font-bold">Step 3: Create the {format.toUpperCase()} image</h3>
 				<p class="mt-2">
-					Once you are satisfied with the preview, click on the image button to create the JPG
+					Once you are satisfied with the preview, click on the image button to create the {format.toUpperCase()}
 					image. You can download the image or copy the image URL.
 				</p>
 			</div>
@@ -203,32 +246,36 @@
 
 	<div class="max-w-4xl mx-auto px-6 md:px-0 mt-20 mb-20">
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Why Use Pictify.io's HTML to JPG Converter?</h2>
+			<h2 class="text-3xl font-bold mb-6">Convert HTML to {format.toUpperCase()} Online - Fast & Free</h2>
+			<p class="text-lg mb-4">
+				Easily transform your HTML code into high-quality {format.toUpperCase()} images with our free online converter. 
+				Perfect for creating social media content, email templates, and website mockups.
+			</p>
 			<ul class="list-disc list-inside text-lg space-y-2">
-				<li>100% Free: Convert HTML to JPG without any cost or hidden fees</li>
+				<li>100% Free: Convert HTML to {format.toUpperCase()} without any cost or hidden fees</li>
 				<li>User-friendly Interface: Simple, intuitive design for easy conversions</li>
-				<li>High-Quality Output: Generate crisp, clear JPG images from your HTML</li>
+				<li>High-Quality Output: Generate crisp, clear {format.toUpperCase()} images from your HTML</li>
 				<li>Customizable Options: Adjust image dimensions and quality settings</li>
-				<li>Fast Processing: Get your JPG images in seconds</li>
+				<li>Fast Processing: Get your {format.toUpperCase()} images in seconds</li>
 				<li>No Installation Required: Use directly in your browser</li>
 				<li>Privacy-Focused: Your HTML code is not stored on our servers</li>
 			</ul>
 		</section>
 	
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Popular Use Cases for HTML to JPG Conversion</h2>
+			<h2 class="text-3xl font-bold mb-6">Popular Use Cases for HTML to {format.toUpperCase()} Conversion</h2>
 			<div class="space-y-4">
 				<div>
 					<h3 class="text-2xl font-semibold mb-2">1. Social Media Content</h3>
-					<p class="text-lg">Create eye-catching images for social media posts by converting HTML designs to JPG format, ensuring consistent appearance across platforms.</p>
+					<p class="text-lg">Create eye-catching images for social media posts by converting HTML designs to {format.toUpperCase()} format, ensuring consistent appearance across platforms.</p>
 				</div>
 				<div>
 					<h3 class="text-2xl font-semibold mb-2">2. Email Marketing</h3>
-					<p class="text-lg">Generate JPG images from HTML email templates to use as fallbacks or to ensure your email designs display correctly in all email clients.</p>
+					<p class="text-lg">Generate {format.toUpperCase()} images from HTML email templates to use as fallbacks or to ensure your email designs display correctly in all email clients.</p>
 				</div>
 				<div>
 					<h3 class="text-2xl font-semibold mb-2">3. Website Mockups</h3>
-					<p class="text-lg">Convert HTML prototypes to JPG images for easy sharing and presentation to clients or team members.</p>
+					<p class="text-lg">Convert HTML prototypes to {format.toUpperCase()} images for easy sharing and presentation to clients or team members.</p>
 				</div>
 				<div>
 					<h3 class="text-2xl font-semibold mb-2">4. Documentation and Tutorials</h3>
@@ -238,10 +285,10 @@
 		</section>
 	
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">HTML to JPG Conversion: Best Practices</h2>
+			<h2 class="text-3xl font-bold mb-6">HTML to {format.toUpperCase()} Conversion: Best Practices</h2>
 			<ul class="list-disc list-inside text-lg space-y-2">
 				<li>Optimize your HTML for conversion by using inline styles when possible</li>
-				<li>Consider the target image dimensions when designing your HTML</li>
+				<li>Consider the target {format.toUpperCase()} dimensions when designing your HTML</li>
 				<li>Use web-safe fonts or include custom fonts in your HTML to ensure accurate rendering</li>
 				<li>Test different quality settings to find the optimal balance between file size and image clarity</li>
 				<li>For complex layouts, consider breaking the design into multiple conversions and combining the results</li>
@@ -252,8 +299,8 @@
 			<h2 class="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
 			<div class="space-y-4">
 				<details class="bg-gray-100 p-4 rounded-lg">
-					<summary class="font-semibold cursor-pointer">How does the HTML to JPG converter work?</summary>
-					<p class="mt-2">Our converter renders your HTML code in a virtual browser environment and captures the output as a high-quality JPG image. This process ensures that your HTML is accurately represented in the final image.</p>
+					<summary class="font-semibold cursor-pointer">How does the HTML to {format.toUpperCase()} converter work?</summary>
+					<p class="mt-2">Our converter renders your HTML code in a virtual browser environment and captures the output as a high-quality {format.toUpperCase()} image. This process ensures that your HTML is accurately represented in the final image.</p>
 				</details>
 				<details class="bg-gray-100 p-4 rounded-lg">
 					<summary class="font-semibold cursor-pointer">Can I convert HTML with external resources?</summary>
@@ -295,3 +342,18 @@
 </div>
 	<Footer />
 </section>
+
+<style>
+    select {
+        border: none;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right .7em top 50%;
+        background-size: .65em auto;
+        padding-right: 1em;
+    }
+</style>
