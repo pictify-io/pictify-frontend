@@ -9,6 +9,7 @@
 	import { toast } from '../../../store/toast.store';
 
 	export let isGifEnabled = false;
+	export let fileExtension = 'png';
 
 	let codeHTML = `
 <html>
@@ -118,6 +119,7 @@ body {
 	let previewHeight = 400;
 
 	onMount(async () => {
+		console.log(fileExtension);
 		if (window.innerWidth < 768) {
 			codeWidth = undefined;
 		}
@@ -174,7 +176,8 @@ body {
 			const { image } = await createImagePublic({
 				html,
 				width,
-				height
+				height,
+				fileExtension	
 			});
 			img = image;
 			isImageLoading = false;

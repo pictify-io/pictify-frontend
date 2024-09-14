@@ -36,6 +36,7 @@
 	<meta Property="og:type" content="website" />
 	<meta Property="og:site_name" content="Pictify.io" />
 	<meta Property="og:locale" content="en_US" />
+	<link rel="canonical" href="https://pictify.io/tools/html-to-jpg" />
 
 	<script type="application/ld+json">
 		{
@@ -119,7 +120,7 @@
 		</h1>
 	</main>
 	<div class="w-full flex justify-center mt-20">
-		<CodeEditor />
+		<CodeEditor fileExtension="jpeg" />
 	</div>
 	<div class="mt-20 w-full">
 		<div class="text-4xl md:px-0 px-6 font-bold text-left md:text-center">
