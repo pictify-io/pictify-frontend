@@ -50,18 +50,43 @@ $: if (!fileExtension) {
 			window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${encodeURIComponent('HTML to JPG Converter')}&summary=${text}`, '_blank');
 		}
 	}
+
+    // Add format-specific information
+    const formatInfo = {
+        jpg: {
+            fullName: "JPG",
+            benefits: ["Excellent compression for photographs", "Smaller file sizes", "Wide compatibility"],
+            bestFor: "photographs and complex images with gradients",
+            drawbacks: "lossy compression, not ideal for text or simple graphics"
+        },
+        png: {
+            fullName: "PNG",
+            benefits: ["Lossless compression", "Supports transparency", "Ideal for graphics and screenshots"],
+            bestFor: "logos, icons, and images with text",
+            drawbacks: "larger file sizes compared to JPG for photographs"
+        },
+        webp: {
+            fullName: "WebP",
+            benefits: ["Superior compression", "Supports both lossy and lossless compression", "Smaller file sizes than JPG and PNG"],
+            bestFor: "web graphics, combining the best of JPG and PNG",
+            drawbacks: "not universally supported by older browsers"
+        }
+    };
+
+    $: currentFormat = formatInfo[format] || formatInfo.jpg;
+    $: otherFormats = Object.keys(formatInfo).filter(f => f !== format);
 </script>
 
 
 
 <svelte:head>
-	<title>Free HTML to {format.toUpperCase()} Converter | Online Tool by Pictify.io</title>
-	<meta name="description" content="Convert HTML to high-quality {format.toUpperCase()} images instantly with Pictify.io's free online converter. Perfect for social media, email marketing, and web design. Try now!" />
-	<meta name="keywords" content="HTML to {format.toUpperCase()}, {format.toUpperCase()} converter, online image converter, web design tool, Pictify.io" />
+	<title>Convert HTML to {currentFormat.fullName} | Free Online {format.toUpperCase()} Image Generator | Pictify.io</title>
+	<meta name="description" content="Transform HTML to high-quality {currentFormat.fullName} images instantly with Pictify.io's free online converter. Ideal for creating {currentFormat.bestFor}. Try our HTML to {format.toUpperCase()} tool now!" />
+	<meta name="keywords" content="HTML to {format.toUpperCase()}, {format.toUpperCase()} converter, online image generator, web design tool, {currentFormat.fullName} image creator, Pictify.io" />
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta Property="og:title" content="Pictify.io" />
-	<meta Property="og:description" content="Convert HTML to high-quality {format.toUpperCase()} images for free with Pictify.io's online HTML to {format.toUpperCase()} converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
+	<meta Property="og:description" content="Convert HTML to high-quality {currentFormat.fullName} images for free with Pictify.io's online HTML to {format.toUpperCase()} converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
 	<meta
 		Property="og:image"
 		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
@@ -76,16 +101,22 @@ $: if (!fileExtension) {
 		{
 			"@context": "http://schema.org",
 			"@type": "WebApplication",
-			"name": "Pictify.io HTML to {format.toUpperCase()} Converter",
+			"name": "Pictify.io HTML to {currentFormat.fullName} Converter",
 			"url": "https://pictify.io/tools/html-to-{format}",
-			"description": "Convert HTML to high-quality {format.toUpperCase()} images instantly with Pictify.io's free online converter. Perfect for social media, email marketing, and web design.",
+			"description": "Convert HTML to high-quality {currentFormat.fullName} images instantly. Create optimized images for websites, social media, and email marketing.",
 			"applicationCategory": "DesignApplication",
 			"operatingSystem": "Web",
 			"offers": {
 				"@type": "Offer",
 				"price": "0",
 				"priceCurrency": "USD"
-			}
+			},
+			"featureList": [
+				"Instant HTML to {currentFormat.fullName} conversion",
+				"Optimized for {currentFormat.bestFor}",
+				"Web-friendly output",
+				"No watermarks"
+			]
 		}
 		</script>
 
@@ -126,175 +157,107 @@ $: if (!fileExtension) {
 			<h1
 				class="text-4xl sm:text-5xl sm:pt-20 lg:pt-5 md:text-5xl lg:text-6xl font-bold tracking-tighter w-full inline-block text-left md:text-center relative"
 			>
-				 HTML To 
-				<select
-					id="format-select"
-					on:change={handleFormatChange}
-					class="bg-transparent underline text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold tracking-tighter appearance-none cursor-pointer"
-				>
-					{#each formats as f}
-						<option value={f}>{f.toUpperCase()}</option>
-					{/each}
-				</select>
-				<svg
-					class="w-16 lg:w-20 h-auto lg:absolute flex-shrink-0 right-0 bottom-0 md:block hidden translate-y-10 md:translate-y-20 lg:translate-y-4 lg:-translate-x-12 -translate-x-10"
-					viewBox="0 0 92 80"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="m35.213 16.953.595-5.261 2.644 4.587a35.056 35.056 0 0 0 26.432 17.33l5.261.594-4.587 2.644A35.056 35.056 0 0 0 48.23 63.28l-.595 5.26-2.644-4.587a35.056 35.056 0 0 0-26.432-17.328l-5.261-.595 4.587-2.644a35.056 35.056 0 0 0 17.329-26.433Z"
-						fill="#5CF1A4"
-						stroke="#000"
-						stroke-width="2.868"
-					/>
-					<path
-						d="M75.062 40.108c1.07 5.255 1.072 16.52-7.472 19.54m7.422-19.682c1.836 2.965 7.643 8.14 16.187 5.121-8.544 3.02-8.207 15.23-6.971 20.957-1.97-3.343-8.044-9.274-16.588-6.254M12.054 28.012c1.34-5.22 6.126-15.4 14.554-14.369M12.035 28.162c-.274-3.487-2.93-10.719-11.358-11.75C9.104 17.443 14.013 6.262 15.414.542c.226 3.888 2.784 11.92 11.212 12.95"
-						stroke="#000"
-						stroke-width="2.319"
-						stroke-linecap="round"
-					/>
-				</svg>
+				 HTML To {format.toUpperCase()} 
 			</h1>
+			<svg
+				class="w-16 lg:w-20 h-auto lg:absolute flex-shrink-0 right-0 bottom-0 md:block hidden translate-y-10 md:translate-y-20 lg:translate-y-4 lg:-translate-x-12 -translate-x-10"
+				viewBox="0 0 92 80"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="m35.213 16.953.595-5.261 2.644 4.587a35.056 35.056 0 0 0 26.432 17.33l5.261.594-4.587 2.644A35.056 35.056 0 0 0 48.23 63.28l-.595 5.26-2.644-4.587a35.056 35.056 0 0 0-26.432-17.328l-5.261-.595 4.587-2.644a35.056 35.056 0 0 0 17.329-26.433Z"
+					fill="#5CF1A4"
+					stroke="#000"
+					stroke-width="2.868"
+				/>
+				<path
+					d="M75.062 40.108c1.07 5.255 1.072 16.52-7.472 19.54m7.422-19.682c1.836 2.965 7.643 8.14 16.187 5.121-8.544 3.02-8.207 15.23-6.971 20.957-1.97-3.343-8.044-9.274-16.588-6.254M12.054 28.012c1.34-5.22 6.126-15.4 14.554-14.369M12.035 28.162c-.274-3.487-2.93-10.719-11.358-11.75C9.104 17.443 14.013 6.262 15.414.542c.226 3.888 2.784 11.92 11.212 12.95"
+					stroke="#000"
+					stroke-width="2.319"
+					stroke-linecap="round"
+				/>
+			</svg>
+
 		</div>
-		<h1 class="max-w-3xl opacity-70 md:text-center text-lg">
-			Convert HTML to {format.toUpperCase()} for free. Pictify offers APIs to convert HTML to image or gif. Input your
-			HTML code, check the preview, and download the {format.toUpperCase()} image.
-		</h1>
+		<h2 class="max-w-3xl opacity-70 md:text-center text-lg mt-4">
+			Transform your HTML into optimized {currentFormat.fullName} images. Perfect for creating {currentFormat.bestFor}.
+		</h2>
 	</main>
 	<div class="w-full flex justify-center mt-20">
 		<CodeEditor fileExtension={fileExtension} />
 	</div>
-	<div class="mt-20 w-full">
-		<div class="text-4xl md:px-0 px-6 font-bold text-left md:text-center">
-			<h2>How to convert HTML to {format.toUpperCase()}</h2>
-		</div>
-		<div class="mt-10 md:px-0 px-6 flex flex-col sm:flex-row max-w-6xl mx-auto gap-6">
-			<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
-				<h3 class="text-xl font-bold">Step 1: Input your HTML code</h3>
-				<p class="mt-2">
-					Paste your HTML code in the editor above. You can also use the default HTML code provided
-					in the editor.
-				</p>
-			</div>
-			<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
-				<h3 class="text-xl font-bold">Step 2: Check the preview</h3>
-				<p class="mt-2">
-					Check the preview of the image generated from your HTML code. You can also customize the
-					view port by changing the width, height, and scale.
-				</p>
-			</div>
-			<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
-				<h3 class="text-xl font-bold">Step 3: Create the {format.toUpperCase()} image</h3>
-				<p class="mt-2">
-					Once you are satisfied with the preview, click on the image button to create the {format.toUpperCase()}
-					image. You can download the image or copy the image URL.
-				</p>
-			</div>
-		</div>
-	</div>
-	<div class="mt-20 w-full">
-		<div class="text-4xl md:px-0 px-6 font-bold text-left md:text-center">
-			<h2>Best HTML to Image API 🚀</h2>
-		</div>
-	</div>
-	<div class="mt-20 mb-20 md:px-0 px-6 w-full flex justify-center">
-		<div
-			class="max-w-3xl rounded-xl relative z-20 pl-8 sm:pl-10 pr-8 sm:pr-16 py-8 border-[3px] border-gray-900 bg-[#EBEBEB]"
-		>
-			<h3 class="text-xl font-bold">
-				HTML To Image: Create personalized images at scale with Pictify.io
-			</h3>
-			<div class="mt-2">
-				<div>
-					Scale your media creation with Pictify.io's HTML to Image API. Convert HTML to image or
-					gif with a simple API call. Be it certificates, social sharing card, or personalized
-					images for email campaigns, Pictify.io has got you covered.
-				</div>
-				<div class="mt-5">
-					<ul>
-						<li
-							class="w-100 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]"
-						>
-							<p class="">
-								⚡️ Fastest HTML to Image/Gif API. All other alternatives fall behind us
-							</p>
-						</li>
-						<li
-							class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]"
-						>
-							<p class="">🌏 Images generated are served via CDN by default</p>
-						</li>
-						<li
-							class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]"
-						>
-							<p class="">🔄 Access the image instantly. No queues and rate limit</p>
-						</li>
-						<li
-							class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fffcf5]"
-						>
-							<p class="">📸 Images are smart cropped. No whitespace outside the content</p>
-						</li>
-					</ul>
-				</div>
-				<div class="mt-5">
-					<SignUpButton />
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<div class="max-w-4xl mx-auto px-6 md:px-0 mt-20 mb-20">
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Convert HTML to {format.toUpperCase()} Online - Fast & Free</h2>
+			<h2 class="text-3xl font-bold mb-6">Convert HTML to {currentFormat.fullName} Online - Fast, Free, and Optimized</h2>
 			<p class="text-lg mb-4">
-				Easily transform your HTML code into high-quality {format.toUpperCase()} images with our free online converter. 
-				Perfect for creating social media content, email templates, and website mockups.
+				Our HTML to {currentFormat.fullName} converter specializes in creating optimized images from your HTML code. Ideal for {currentFormat.bestFor}, our tool ensures your visuals are high-quality and web-ready.
 			</p>
 			<ul class="list-disc list-inside text-lg space-y-2">
-				<li>100% Free: Convert HTML to {format.toUpperCase()} without any cost or hidden fees</li>
-				<li>User-friendly Interface: Simple, intuitive design for easy conversions</li>
-				<li>High-Quality Output: Generate crisp, clear {format.toUpperCase()} images from your HTML</li>
-				<li>Customizable Options: Adjust image dimensions and quality settings</li>
-				<li>Fast Processing: Get your {format.toUpperCase()} images in seconds</li>
-				<li>No Installation Required: Use directly in your browser</li>
-				<li>Privacy-Focused: Your HTML code is not stored on our servers</li>
+				{#each currentFormat.benefits as benefit}
+					<li>{benefit}</li>
+				{/each}
+				<li>Instant Conversion: Get your {currentFormat.fullName} images in seconds</li>
+				<li>Privacy-Focused: Your HTML code is processed securely and not stored</li>
 			</ul>
 		</section>
-	
+
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Popular Use Cases for HTML to {format.toUpperCase()} Conversion</h2>
+			<h2 class="text-3xl font-bold mb-6">Why Choose {currentFormat.fullName} for Your HTML Conversions?</h2>
 			<div class="space-y-4">
 				<div>
-					<h3 class="text-2xl font-semibold mb-2">1. Social Media Content</h3>
-					<p class="text-lg">Create eye-catching images for social media posts by converting HTML designs to {format.toUpperCase()} format, ensuring consistent appearance across platforms.</p>
+					<h3 class="text-2xl font-semibold mb-2">Optimized for {currentFormat.bestFor}</h3>
+					<p class="text-lg">{currentFormat.fullName} is excellent for {currentFormat.bestFor}, making it a go-to choice for many web designers and developers.</p>
 				</div>
 				<div>
-					<h3 class="text-2xl font-semibold mb-2">2. Email Marketing</h3>
-					<p class="text-lg">Generate {format.toUpperCase()} images from HTML email templates to use as fallbacks or to ensure your email designs display correctly in all email clients.</p>
+					<h3 class="text-2xl font-semibold mb-2">Key Advantages</h3>
+					<p class="text-lg">{currentFormat.benefits.join('. ')}.</p>
 				</div>
 				<div>
-					<h3 class="text-2xl font-semibold mb-2">3. Website Mockups</h3>
-					<p class="text-lg">Convert HTML prototypes to {format.toUpperCase()} images for easy sharing and presentation to clients or team members.</p>
-				</div>
-				<div>
-					<h3 class="text-2xl font-semibold mb-2">4. Documentation and Tutorials</h3>
-					<p class="text-lg">Create visual examples of HTML code output for documentation, tutorials, or educational materials.</p>
+					<h3 class="text-2xl font-semibold mb-2">Considerations</h3>
+					<p class="text-lg">While {currentFormat.fullName} excels in many areas, it's worth noting that {currentFormat.drawbacks}.</p>
 				</div>
 			</div>
 		</section>
-	
+
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">HTML to {format.toUpperCase()} Conversion: Best Practices</h2>
+			<h2 class="text-3xl font-bold mb-6">How to convert HTML to {format.toUpperCase()}</h2>
+			<div class="mt-10 flex flex-col sm:flex-row max-w-6xl mx-auto gap-6">
+				<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+					<h3 class="text-xl font-bold">Step 1: Input your HTML code</h3>
+					<p class="mt-2">
+						Paste your HTML code in the editor above. You can also use the default HTML code provided
+						in the editor.
+					</p>
+				</div>
+				<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+					<h3 class="text-xl font-bold">Step 2: Check the preview</h3>
+					<p class="mt-2">
+						Check the preview of the image generated from your HTML code. You can also customize the
+						view port by changing the width, height, and scale.
+					</p>
+				</div>
+				<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
+					<h3 class="text-xl font-bold">Step 3: Create the {format.toUpperCase()} image</h3>
+					<p class="mt-2">
+						Once you are satisfied with the preview, click on the image button to create the {format.toUpperCase()}
+						image. You can download the image or copy the image URL.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-16">
+			<h2 class="text-3xl font-bold mb-6">HTML to {currentFormat.fullName} Conversion: Best Practices</h2>
 			<ul class="list-disc list-inside text-lg space-y-2">
-				<li>Optimize your HTML for conversion by using inline styles when possible</li>
-				<li>Consider the target {format.toUpperCase()} dimensions when designing your HTML</li>
-				<li>Use web-safe fonts or include custom fonts in your HTML to ensure accurate rendering</li>
-				<li>Test different quality settings to find the optimal balance between file size and image clarity</li>
-				<li>For complex layouts, consider breaking the design into multiple conversions and combining the results</li>
+				<li>Optimize your HTML design for {currentFormat.bestFor}</li>
+				<li>Consider the final image dimensions to optimize your HTML layout</li>
+				<li>Test your {currentFormat.fullName} images across different devices to ensure consistent appearance</li>
+				<li>Use appropriate compression settings to balance quality and file size</li>
+				<li>For text-heavy designs, ensure readability after conversion</li>
 			</ul>
 		</section>
-	
+
 		<section class="mb-16">
 			<h2 class="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
 			<div class="space-y-4">
@@ -315,6 +278,31 @@ $: if (!fileExtension) {
 					<p class="mt-2">Yes, we take your privacy seriously. Your HTML code is processed in real-time and is not stored on our servers. Once the conversion is complete, all data is immediately deleted.</p>
 				</details>
 			</div>
+		</section>
+
+		<section class="mb-16">
+			<h2 class="text-3xl font-bold mb-6">Unlock the Power of HTML to {currentFormat.fullName} Conversion</h2>
+			<p class="text-lg mb-4">
+				Whether you're creating visuals for social media, optimizing images for faster web pages, or generating graphics for email marketing, our HTML to {currentFormat.fullName} converter provides the perfect solution. Experience the unique advantages that {currentFormat.fullName} offers, and take your web design to the next level with Pictify.io.
+			</p>
+			<p class="text-lg">
+				Ready to transform your HTML into optimized {currentFormat.fullName} images? Try our free converter now and see the difference for yourself!
+			</p>
+		</section>
+
+		<section class="mb-16">
+			<h2 class="text-3xl font-bold mb-6">Looking for other formats?</h2>
+			<p class="text-lg mb-4">Try our other HTML to image converters:</p>
+			<ul class="list-disc list-inside text-lg space-y-2">
+				{#each otherFormats as otherFormat}
+					<li>
+						<a href="/tools/html-to-{otherFormat}" class="text-blue-600 hover:underline">
+							Convert HTML to {formatInfo[otherFormat].fullName}
+						</a>
+						 - Perfect for {formatInfo[otherFormat].bestFor}
+					</li>
+				{/each}
+			</ul>
 		</section>
 	</div>
 
@@ -342,18 +330,3 @@ $: if (!fileExtension) {
 </div>
 	<Footer />
 </section>
-
-<style>
-    select {
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-        background-repeat: no-repeat;
-        background-position: right .7em top 50%;
-        background-size: .65em auto;
-        padding-right: 1em;
-    }
-</style>
