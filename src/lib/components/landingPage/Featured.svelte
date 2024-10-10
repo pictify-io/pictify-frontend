@@ -4,7 +4,7 @@
 </script>
 
 <div class="max-w-6xl p-4 mt-20 sm:p-5 m-auto">
-	<h3 class="text-2xl sm:text-2xl font-bold text-center md:text-center opacity-80">Featured On</h3>
+	<h3 class="text-2xl sm:text-2xl font-bold text-center md:text-center opacity-80">Trusted By Industry Leaders</h3>
 	<div
 		class=" flex flex-col gap-5 sm:flex-row justify-between items-center sm:items-center mt-5 sm:mt-10 sm:mb-10 w-full"
 	>
@@ -41,3 +41,5 @@
 		</div>
 	</div>
 </div>
+
+

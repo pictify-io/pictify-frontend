@@ -138,7 +138,7 @@ $image = json_decode($response);
 </script>
 
 <div
-	class="w-full flex justify-center flex-col sm: px-6 max-w-4xl space-y-8 w-100 mx-auto mb-8 pt-10 md:pb-10"
+	class="w-full flex justify-center flex-col sm: px-6 max-w-4xl space-y-8 w-100 mx-auto mb-8 pt-10 md:mt-20 md:pb-10"
 >
 	<div class="">
 		<div>

@@ -1,50 +1,67 @@
-<div
-	class="w-100 flex-col justify-center items-center mx-auto mt-20 md:mt-20 py-5 px-6 text-left md:text-center max-w-4xl space-y-8"
->
-	<div class="text-4xl sm:text-5xl font-bold">
-		<p>Why Pictify</p>
-	</div>
+<script>
+  import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import FeatureCard from './FeatureCard.svelte';
+	import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
 
-	<div class="flex flex-col sm:flex-row">
-		<div class="sm:mr-4 sm:flex-1">
-			<ul class="text-lg max-w-3xl text-left md:text-center mt-8 sm:mb-4 md:ml-auto md:mr-auto">
-				<li
-					class="w-100 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fff4da]"
-				>
-					<p class="">⚡️ Fastest HTML to Image/Gif API. All other alternatives fall behind us</p>
-				</li>
-				<li
-					class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fff4da]"
-				>
-					<p class="">🌏 Images generated are served via CDN by default</p>
-				</li>
-				<li
-					class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fff4da]"
-				>
-					<p class="">🖥️ Images from website. Use URL to generate image or gif</p>
-				</li>
-			</ul>
-		</div>
-		<div class="sm:ml-4 sm:flex-1">
-			<ul
-				class="text-lg max-w-3xl text-left md:text-center mt-4 sm:mt-8 mb-10 sm:mb-4 md:ml-auto md:mr-auto"
-			>
-				<li
-					class="w-100 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fff4da]"
-				>
-					<p class="">🔄 Access the image instantly. No queues and rate limit</p>
-				</li>
-				<li
-					class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fff4da]"
-				>
-					<p class="">📸 Images are smart cropped. No whitespace outside the content</p>
-				</li>
-				<li
-					class="w-100 mt-4 rounded-xl pl-8 sm:pl-6 pr-8 sm:pr-6 py-4 border-[3px] border-gray-900 bg-[#fff4da]"
-				>
-					<p class="">⚙️ Advance options to customize selector, viewport dimensions and more.</p>
-				</li>
-			</ul>
-		</div>
-	</div>
-</div>
+  let visible = false;
+  onMount(() => {
+    visible = true;
+  });
+</script>
+
+<section class=" py-20 w-full " id="why-pictify">
+   <div class="container mx-auto px-4 max-w-4xl">
+    <h2 class="text-4xl sm:text-5xl font-bold text-center mb-12">
+      Why <span class="text-[#ff6b6b]">10,000+ Developers</span> Choose Pictify
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      {#if visible}
+        <div class="space-y-6" transition:fade={{ duration: 500, delay: 200 }}>
+          <FeatureCard
+            icon="⚡"
+            title="5x Faster Conversion"
+            description="Our HTML to Image/GIF API outperforms competitors, ensuring rapid content creation."
+          />
+          <FeatureCard
+            icon="🌐"
+            title="Global CDN Delivery"
+            description="99.9% uptime with lightning-fast loading times worldwide."
+          />
+          <FeatureCard
+            icon="🖥️"
+            title="One-Click Website Capture"
+            description="Convert any URL into high-quality images or GIFs instantly."
+          />
+        </div>
+        <div class="space-y-6" transition:fade={{ duration: 500, delay: 400 }}>
+          <FeatureCard
+            icon="🚀"
+            title="No Rate Limits"
+            description="Scale your projects without worrying about API restrictions."
+          />
+          <FeatureCard
+            icon="✂️"
+            title="AI-Powered Smart Cropping"
+            description="Perfect images every time with our intelligent algorithm."
+          />
+          <FeatureCard
+            icon="🎛️"
+            title="Developer-Friendly Customization"
+            description="Fine-tune results with advanced options for pixel-perfect output."
+          />
+        </div>
+      {/if}
+    </div>
+
+    <div class="text-center">
+      <p class="text-xl mb-6">Join the thousands of developers who've streamlined their workflow with Pictify</p>
+      <SignUpButton />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Add any additional styles here */
+</style>

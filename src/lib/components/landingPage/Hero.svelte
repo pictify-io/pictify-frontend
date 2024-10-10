@@ -26,7 +26,7 @@
 		<h1
 			class="text-4xl sm:text-5xl sm:pt-20 lg:pt-5 md:text-5xl lg:text-6xl font-bold tracking-tighter w-full inline-block text-left md:text-center relative"
 		>
-			Simple and Robust<span class="sm:hidden"> &nbsp; </span><br class="sm:block hidden" />HTML To
+			Simple & Powerful<span class="sm:hidden"> &nbsp; </span><br class="sm:block hidden" />HTML To
 			Image API
 		</h1>
 		<svg
@@ -49,8 +49,8 @@
 			/>
 		</svg>
 	</div>
-	<p class="max-w-3xl opacity-70 md:text-center text-lg">
-		Pictify offers APIs to convert HTML to image or gif. Connect with your audience by creating
-		personalized and sharable content, making your brand more relatable and engaging.
+	<p class="max-w-3xl opacity-80 md:text-center text-xl mb-8">
+		Transform your HTML into stunning images and GIFs instantly. Boost engagement, create shareable content, and make your brand stand out with Pictify's powerful API.
 	</p>
+
 </main>
