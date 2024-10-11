@@ -80,9 +80,9 @@ $: if (!fileExtension) {
 
 
 <svelte:head>
-	<title>Convert HTML to {currentFormat.fullName} | Free Online {format.toUpperCase()} Image Generator | Pictify.io</title>
-	<meta name="description" content="Transform HTML to high-quality {currentFormat.fullName} images instantly with Pictify.io's free online converter. Ideal for creating {currentFormat.bestFor}. Try our HTML to {format.toUpperCase()} tool now!" />
-	<meta name="keywords" content="HTML to {format.toUpperCase()}, {format.toUpperCase()} converter, online image generator, web design tool, {currentFormat.fullName} image creator, Pictify.io" />
+	<title>Convert Image from HTML | HTML to {currentFormat.fullName} | Free Online HTML Image Generator | Pictify.io</title>
+	<meta name="description" content="Convert image from HTML easily with Pictify.io. Transform HTML to {currentFormat.fullName} images instantly. Perfect for {currentFormat.bestFor}. Try our HTML to {format.toUpperCase()} image converter now!" />
+	<meta name="keywords" content="convert image from HTML, HTML to {format.toUpperCase()}, {format.toUpperCase()} converter, online image generator, web design tool, {currentFormat.fullName} image creator, Pictify.io" />
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta Property="og:title" content="Pictify.io" />
@@ -136,7 +136,7 @@ $: if (!fileExtension) {
 			class="relative w-full mx-auto flex sm:flex-row flex-col justify-center items-start sm:items-center"
 		>
 			<svg
-				class="h-auto w-16 sm:w-20 md:w-24 flex-shrink-0 p-2 md:relative sm:absolute lg:absolute left-0 lg:-translate-x-full lg:ml-32 md:translate-x-5 sm:-translate-y-16 md:-translate-y-0 -translate-x-2 lg:-translate-y-0"
+				class="h-auto w-16 sm:w-20 md:w-24 flex-shrink-0 p-2 md:relative sm:absolute lg:absolute left-0 lg:-translate-x-36 lg:ml-32 md:translate-x-4 sm:-translate-y-16 md:-translate-y-0 -translate-x-2 lg:-translate-y-0"
 				viewBox="0 0 91 98"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
@@ -157,31 +157,31 @@ $: if (!fileExtension) {
 			<h1
 				class="text-4xl sm:text-5xl sm:pt-20 lg:pt-5 md:text-5xl lg:text-6xl font-bold tracking-tighter w-full inline-block text-left md:text-center relative"
 			>
-				 HTML To {format.toUpperCase()} 
+				 Convert HTML to {format.toUpperCase()} Image
 			</h1>
 			<svg
-				class="w-16 lg:w-20 h-auto lg:absolute flex-shrink-0 right-0 bottom-0 md:block hidden translate-y-10 md:translate-y-20 lg:translate-y-4 lg:-translate-x-12 -translate-x-10"
+				class="w-16 lg:w-20 h-auto lg:absolute flex-shrink-0 right-0 bottom-0 md:block hidden translate-y-10 md:translate-y-20 lg:translate-y-4 lg:translate-x-8 -translate-x-12"
 				viewBox="0 0 92 80"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
-				<path
-					d="m35.213 16.953.595-5.261 2.644 4.587a35.056 35.056 0 0 0 26.432 17.33l5.261.594-4.587 2.644A35.056 35.056 0 0 0 48.23 63.28l-.595 5.26-2.644-4.587a35.056 35.056 0 0 0-26.432-17.328l-5.261-.595 4.587-2.644a35.056 35.056 0 0 0 17.329-26.433Z"
-					fill="#5CF1A4"
-					stroke="#000"
-					stroke-width="2.868"
-				/>
-				<path
-					d="M75.062 40.108c1.07 5.255 1.072 16.52-7.472 19.54m7.422-19.682c1.836 2.965 7.643 8.14 16.187 5.121-8.544 3.02-8.207 15.23-6.971 20.957-1.97-3.343-8.044-9.274-16.588-6.254M12.054 28.012c1.34-5.22 6.126-15.4 14.554-14.369M12.035 28.162c-.274-3.487-2.93-10.719-11.358-11.75C9.104 17.443 14.013 6.262 15.414.542c.226 3.888 2.784 11.92 11.212 12.95"
-					stroke="#000"
-					stroke-width="2.319"
+			<path
+			d="m35.213 16.953.595-5.261 2.644 4.587a35.056 35.056 0 0 0 26.432 17.33l5.261.594-4.587 2.644A35.056 35.056 0 0 0 48.23 63.28l-.595 5.26-2.644-4.587a35.056 35.056 0 0 0-26.432-17.328l-5.261-.595 4.587-2.644a35.056 35.056 0 0 0 17.329-26.433Z"
+			fill="#5CF1A4"
+			stroke="#000"
+			stroke-width="2.868"
+		/>
+		<path
+			d="M75.062 40.108c1.07 5.255 1.072 16.52-7.472 19.54m7.422-19.682c1.836 2.965 7.643 8.14 16.187 5.121-8.544 3.02-8.207 15.23-6.971 20.957-1.97-3.343-8.044-9.274-16.588-6.254M12.054 28.012c1.34-5.22 6.126-15.4 14.554-14.369M12.035 28.162c-.274-3.487-2.93-10.719-11.358-11.75C9.104 17.443 14.013 6.262 15.414.542c.226 3.888 2.784 11.92 11.212 12.95"
+			stroke="#000"
+			stroke-width="2.319"
 					stroke-linecap="round"
-				/>
+			/>
 			</svg>
 
 		</div>
 		<h2 class="max-w-3xl opacity-70 md:text-center text-lg mt-4">
-			Transform your HTML into optimized {currentFormat.fullName} images. Perfect for creating {currentFormat.bestFor}.
+			Convert image from HTML into optimized {currentFormat.fullName} format. Perfect for creating {currentFormat.bestFor}.
 		</h2>
 	</main>
 	<div class="w-full flex justify-center mt-20">
@@ -189,9 +189,9 @@ $: if (!fileExtension) {
 	</div>
 	<div class="max-w-4xl mx-auto px-6 md:px-0 mt-20 mb-20">
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Convert HTML to {currentFormat.fullName} Online - Fast, Free, and Optimized</h2>
+			<h2 class="text-3xl font-bold mb-6">Convert Image from HTML to {currentFormat.fullName} Online - Fast, Free, and Optimized</h2>
 			<p class="text-lg mb-4">
-				Our HTML to {currentFormat.fullName} converter specializes in creating optimized images from your HTML code. Ideal for {currentFormat.bestFor}, our tool ensures your visuals are high-quality and web-ready.
+				Our HTML to image converter specializes in creating optimized {currentFormat.fullName} images from your HTML code. Ideal for {currentFormat.bestFor}, our tool ensures your visuals are high-quality and web-ready.
 			</p>
 			<ul class="list-disc list-inside text-lg space-y-2">
 				{#each currentFormat.benefits as benefit}
@@ -203,7 +203,7 @@ $: if (!fileExtension) {
 		</section>
 
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Why Choose {currentFormat.fullName} for Your HTML Conversions?</h2>
+			<h2 class="text-3xl font-bold mb-6">Why Choose Our Tool to Convert Image from HTML to {currentFormat.fullName}?</h2>
 			<div class="space-y-4">
 				<div>
 					<h3 class="text-2xl font-semibold mb-2">Optimized for {currentFormat.bestFor}</h3>
@@ -221,13 +221,12 @@ $: if (!fileExtension) {
 		</section>
 
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">How to convert HTML to {format.toUpperCase()}</h2>
+			<h2 class="text-3xl font-bold mb-6">How to Convert Image from HTML to {format.toUpperCase()}</h2>
 			<div class="mt-10 flex flex-col sm:flex-row max-w-6xl mx-auto gap-6">
 				<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
 					<h3 class="text-xl font-bold">Step 1: Input your HTML code</h3>
 					<p class="mt-2">
-						Paste your HTML code in the editor above. You can also use the default HTML code provided
-						in the editor.
+						Paste your HTML code in the editor above to convert it into an image. You can also use the default HTML code provided.
 					</p>
 				</div>
 				<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
@@ -262,7 +261,7 @@ $: if (!fileExtension) {
 			<h2 class="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
 			<div class="space-y-4">
 				<details class="bg-gray-100 p-4 rounded-lg">
-					<summary class="font-semibold cursor-pointer">How does the HTML to {format.toUpperCase()} converter work?</summary>
+					<summary class="font-semibold cursor-pointer">How does the image conversion from HTML to {format.toUpperCase()} work?</summary>
 					<p class="mt-2">Our converter renders your HTML code in a virtual browser environment and captures the output as a high-quality {format.toUpperCase()} image. This process ensures that your HTML is accurately represented in the final image.</p>
 				</details>
 				<details class="bg-gray-100 p-4 rounded-lg">
@@ -281,12 +280,12 @@ $: if (!fileExtension) {
 		</section>
 
 		<section class="mb-16">
-			<h2 class="text-3xl font-bold mb-6">Unlock the Power of HTML to {currentFormat.fullName} Conversion</h2>
+			<h2 class="text-3xl font-bold mb-6">Unlock the Power of Converting Images from HTML to {currentFormat.fullName}</h2>
 			<p class="text-lg mb-4">
-				Whether you're creating visuals for social media, optimizing images for faster web pages, or generating graphics for email marketing, our HTML to {currentFormat.fullName} converter provides the perfect solution. Experience the unique advantages that {currentFormat.fullName} offers, and take your web design to the next level with Pictify.io.
+				Whether you're creating visuals for social media, optimizing images for faster web pages, or generating graphics for email marketing, our HTML to image converter provides the perfect solution. Experience the unique advantages of converting HTML to {currentFormat.fullName}, and take your web design to the next level with Pictify.io.
 			</p>
 			<p class="text-lg">
-				Ready to transform your HTML into optimized {currentFormat.fullName} images? Try our free converter now and see the difference for yourself!
+				Ready to convert your HTML into optimized {currentFormat.fullName} images? Try our free converter now and see the difference for yourself!
 			</p>
 		</section>
 
