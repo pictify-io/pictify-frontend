@@ -61,7 +61,7 @@ export async function GET() {
             <priority>0.8</priority>
          </url>
          <url>
-            <loc>https://pictify.io/tools/url-to-image</loc>
+            <loc>https://pictify.io/tools/url-to-image-generator</loc>
             <lastmod>2024-04-19</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
