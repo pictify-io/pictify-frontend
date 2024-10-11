@@ -25,7 +25,7 @@
     {
       name:"URL to Image Generator",
       description:"Generate images from any URL with our free online tool.",
-      url:"/tools/url-to-image",
+      url:"/tools/url-to-image-generator",
       icon:"📸"
     }
   ];
@@ -84,7 +84,7 @@
         "item": {
           "@type": "WebApplication",
           "name": "URL to Image Generator",
-          "url": "https://pictify.io/tools/url-to-image",
+          "url": "https://pictify.io/tools/url-to-image-generator",
           "description": "Generate images from any URL with our free online tool."
         }
       }

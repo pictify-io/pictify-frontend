@@ -201,11 +201,11 @@
   <title>URL to Image Generator | Pictify.io</title>
   <meta name="description" content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.">
   <meta name="keywords" content="URL to Image Generator, image generator, URL to image, web to image, screenshot, social media image, thumbnail, web preview">
-  <link rel="canonical" href="https://pictify.io/tools/url-to-image">
+  <link rel="canonical" href="https://pictify.io/tools/url-to-image-generator">
   <meta property="og:title" content="URL to Image Generator | Pictify.io">
   <meta property="og:description" content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.">
   <meta property="og:image" content="https://media.pictify.io/r49i0-1725792197198.png">
-  <meta property="og:url" content="https://pictify.io/tools/url-to-image">
+  <meta property="og:url" content="https://pictify.io/tools/url-to-image-generator">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@pictify_io">
   <meta name="twitter:title" content="URL to Image Generator | Pictify.io">
@@ -216,7 +216,7 @@
     "@context": "http://schema.org",
     "@type": "WebApplication",
     "name": "Pictify.io URL to Image Generator",
-    "url": "https://pictify.io/tools/url-to-image",
+    "url": "https://pictify.io/tools/url-to-image-generator",
     "description": "Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.",
     "applicationCategory": "DesignApplication",
     "operatingSystem": "Web",
