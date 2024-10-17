@@ -151,8 +151,8 @@
 			<BlogList blogs={recommendedBlogs} title="📝  Recommended Blogs" />
 		</div>
 	{/if}
-	<div class="flex w-full justify-center mt-20">
-		<div class="max-w-3xl">
+	<div class="flex w-full justify-center mt-20 border-t-[3px]  border-gray-900">
+		<div class="w-full">
 			<TryNow />
 		</div>
 	</div>

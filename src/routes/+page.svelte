@@ -107,7 +107,10 @@
 	<WhyPictify />
 	<UseCase />
 	<Featured />
-	<TryNow />
+	<div class="flex w-full justify-center mt-20 border-t-[3px]  border-gray-900">
+		<TryNow />
+	</div>
+	
 	
 	<Footer />
 </section>

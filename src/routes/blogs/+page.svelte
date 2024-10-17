@@ -4,15 +4,13 @@
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
 	import BlogList from '$lib/components/blog/BlogList.svelte';
 
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { blogStore, getBlogsAction } from '../../store/blogs.store';
-
 	let email = '';
 
-	onMount(async () => {
-		await getBlogsAction();
-	});
+	export let data;
+	let articles = data.props.articles;
+	let guides = data.props.guides;
+	let featured = data.props.featured;
+
 </script>
 
 <svelte:head>
@@ -81,30 +79,30 @@
 		<div
 			class="flex-1 bg-[#FFF4DA] flex items-center justify-center py-10 p-4 md:py-14 md:px-14 border-b-[3px] border-black"
 		>
-			{#if $blogStore.featured}
-				<a href="/blogs/{$blogStore.featured.slug}">
+			{#if featured}
+				<a href="/blogs/{featured.slug}">
 					<div class="relative flex flex-col max-w-2xl cursor-pointer group">
 						<div
 							class="flex flex-col bg-[#FFFDF8] border-black border-4 p-4 rounded-xl z-20 gap-2 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 tracking-wide"
 						>
 							<div class="h-[250px] border-black border-4 rounded-md">
 								<img
-									src={$blogStore.featured?.heroImage}
+									src={featured?.heroImage}
 									class="object-cover w-full h-full"
-									alt={$blogStore.featured?.title}
+									alt={featured?.title}
 								/>
 							</div>
 							<div class="font-bold text-xl md:text-2xl">
 								<h3 class="cursor-pointer">
-									{$blogStore.featured?.title}
+									{featured?.title}
 								</h3>
 							</div>
 							<div class="flex mt-4 justify-between font-semibold text-gray-700">
 								<div>
-									-by {$blogStore.featured?.author}
+									-by {featured?.author}
 								</div>
 								<div class="">
-									{$blogStore.featured?.readingTime} min read
+									{featured?.readingTime} min read
 								</div>
 							</div>
 						</div>
@@ -115,21 +113,21 @@
 		</div>
 	</div>
 	<div class="px-4 py-8">
-		{#if $blogStore.guides.length !== 0}
-			<BlogList blogs={$blogStore.guides} title={'🛠️  Guides'} />
+		{#if guides.length !== 0}
+			<BlogList blogs={guides} title={'🛠️  Guides'} />
 		{/if}
-		{#if $blogStore.articles.length !== 0}
+		{#if articles.length !== 0}
 			<div class="my-20">
-				<BlogList blogs={$blogStore.articles} title={'📚  Articles'} />
+				<BlogList blogs={articles} title={'📚  Articles'} />
 			</div>
 		{/if}
-		<div class="flex w-full justify-center mt-20">
-			<div class="max-w-4xl: md:max-w-3xl">
-				<TryNow />
-			</div>
+	</div>
+	<div class="flex w-full justify-center mt-20 border-t-[3px]  border-gray-900 ">
+		<div class="w-full">
+			<TryNow />
 		</div>
 	</div>
-	<div class="mt-10">
+	<div class="">
 		<Footer />
 	</div>
 </section>
