@@ -108,7 +108,7 @@ body {
 
 `;
 
-	let codeWidth = '38vw';
+	let codeWidth = undefined;
 	let currentTab = 'html';
 	let currentResultTab = 'preview';
 	let previewFrame;
@@ -120,9 +120,6 @@ body {
 
 	onMount(async () => {
 		console.log(fileExtension);
-		if (window.innerWidth < 768) {
-			codeWidth = undefined;
-		}
 		updateIframe();
 	});
 
@@ -217,11 +214,9 @@ body {
 	}
 </script>
 
-<section>
-	<div
-		class="flex flex-col md:flex-row border-black border-4 w-[76vw] md:min-h-[400px] xl:h-[500px] max-w-[1200px]"
-	>
-		<div class="flex-1">
+<section class="w-full">
+	<div class="flex flex-col md:flex-row border-black border-4 md:min-h-[400px] xl:h-[500px] max-w-[1200px] mx-auto">
+		<div class="w-full md:w-1/2 flex flex-col">
 			<div class="flex bg-black p-2">
 				<button
 					on:click={() => (currentTab = 'html')}
@@ -236,82 +231,95 @@ body {
 						: 'bg-gray-500 text-white'}">CSS</button
 				>
 			</div>
-			{#if currentTab === 'html'}
-				<CodeMirror
-					bind:codeHTML
-					value={codeHTML}
-					lang={html({
-						selfClosingTags: true
-					})}
-					on:change={(e) => {
-						codeHTML = e.detail;
-						updateIframe();
-					}}
-					styles={{
-						'&': {
-							width: codeWidth,
-							maxHeight: '440px',
-							minHeight: '440px',
-							maxWidth: '600px'
-						}
-					}}
-				/>
-			{:else if currentTab === 'css'}
-				<CodeMirror
-					bind:code={codeCSS}
-					value={codeCSS}
-					lang={css()}
-					on:change={(e) => {
-						codeCSS = `${e.detail}`;
-						updateIframe();
-					}}
-					styles={{
-						'&': {
-							width: codeWidth,
-							maxHeight: '440px',
-							minHeight: '440px',
-							maxWidth: '600px'
-						}
-					}}
-				/>
-			{/if}
-		</div>
-		<div class="md:border-l-2 flex-1">
-			<div class="flex bg-black p-2">
-				<button
-					on:click={() => (currentResultTab = 'preview')}
-					class="px-4 py-2 rounded text-sm {currentResultTab === 'preview'
-						? 'bg-white text-black'
-						: 'bg-gray-500 text-white'}">Preview</button
-				>
-				<button
-					on:click={() => {
-						createImage();
-					}}
-					class="mx-4 px-4 py-2 rounded text-sm {currentResultTab === 'image'
-						? 'bg-white text-black'
-						: 'bg-gray-500 text-white'}">Image</button
-				>
-				{#if isGifEnabled}
-					<button
-						on:click={() => {
-							createGif();
+			<div class="flex-1 overflow-auto">
+				{#if currentTab === 'html'}
+					<CodeMirror
+						bind:codeHTML
+						value={codeHTML}
+						lang={html({
+							selfClosingTags: true
+						})}
+						on:change={(e) => {
+							codeHTML = e.detail;
+							updateIframe();
 						}}
-						class="mx-2 px-6 py-2 rounded text-sm {currentResultTab === 'gif'
-							? 'bg-white text-black'
-							: 'bg-gray-500 text-white'}">Gif</button
-					>
+						styles={{
+							'&': {
+								height: '100%',
+								minHeight: '400px'
+							}
+						}}
+					/>
+				{:else if currentTab === 'css'}
+					<CodeMirror
+						bind:code={codeCSS}
+						value={codeCSS}
+						lang={css()}
+						on:change={(e) => {
+							codeCSS = `${e.detail}`;
+							updateIframe();
+						}}
+						styles={{
+							'&': {
+								height: '100%',
+								minHeight: '400px'
+							}
+						}}
+					/>
 				{/if}
 			</div>
+		</div>
+		<div class="w-full md:w-1/2 flex flex-col border-t-4 md:border-t-0 md:border-l-4 border-black">
+			<div class="flex bg-black p-2 justify-between items-center">
+				<div class="flex items-center gap-4">
+					<button
+						on:click={() => (currentResultTab = 'preview')}
+						class="px-4 py-2 rounded text-sm {currentResultTab === 'preview'
+							? 'bg-white text-black'
+							: 'bg-gray-500 text-white'}">Preview</button
+					>
+					<div class="relative">
+						<div class="absolute -top-1 -right-1">
+							<span class="flex h-2 w-2">
+								<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b6b] opacity-75"></span>
+								<span class="relative inline-flex rounded-full h-2 w-2 bg-[#ff6b6b]"></span>
+							</span>
+						</div>
+						<button
+							on:click={() => {
+								createImage();
+							}}
+							class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+							Generate Image
+						</button>
+					</div>
+					{#if isGifEnabled}
+						<button
+							on:click={() => {
+								createGif();
+							}}
+							class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition-colors flex items-center gap-2">
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+							</svg>
+							Create GIF
+						</button>
+					{/if}
+				</div>
+			</div>
 			{#if currentResultTab === 'preview'}
-				<div class="overflow-auto">
+				<div class="flex-1 flex flex-col">
 					{#if previewFrame}
-						<div class="flex gap-4 justify-center items-center p-2 bg-gray-200">
+						<div class="flex gap-4 justify-center items-center p-2 bg-gray-100 border-b border-gray-200">
 							<div>
-								<label for="scale" class="text-sm">scale</label>
+								<label for="scale" class="text-sm text-gray-600">Scale</label>
 								<input
 									type="number"
-									class=" border-black border-b-2 text-sm bg-gray-200 ml-1 text-center"
+									class="w-16 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-sm bg-transparent ml-1 text-center outline-none"
 									value="1"
 									min="0.1"
 									max="2"
@@ -322,24 +330,23 @@ body {
 								/>
 							</div>
 							<div class="flex-grow" />
-							<div>
+							<div class="flex items-center gap-2">
+								<span class="text-sm text-gray-600">Size</span>
 								<input
 									type="number"
-									class=" border-black border-b-2 text-sm bg-gray-200 text-center"
-									value={parseInt(getComputedStyle(previewFrame).width.replace('px', ''))}
+									class="w-20 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-sm bg-transparent text-center outline-none"
+									value={previewWidth}
 									min="100"
 									max="800"
 									on:input={(e) => {
 										previewFrame.style.width = `${e.target.value}px`;
 									}}
 								/>
-							</div>
-							<div class="text-m">X</div>
-							<div>
+								<span class="text-gray-400">×</span>
 								<input
 									type="number"
-									class="border-black border-b-2 text-sm bg-gray-200 text-center"
-									value={parseInt(getComputedStyle(previewFrame).height.replace('px', ''))}
+									class="w-20 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-sm bg-transparent text-center outline-none"
+									value={previewHeight}
 									min="100"
 									max="600"
 									on:input={(e) => {
@@ -349,64 +356,49 @@ body {
 							</div>
 						</div>
 					{/if}
-					<div bind:this={iframeContainer}>
+					<div bind:this={iframeContainer} class="flex-1 overflow-auto">
 						<iframe
-							class="w-full min-h-[400px] max-h-[600px]"
+							class="w-full h-[400px] bg-white"
 							title="code-preview"
 							srcdoc={getSrcDoc()}
 							bind:this={previewFrame}
 						/>
 					</div>
 				</div>
-			{:else if currentResultTab === 'image'}
+			{:else if currentResultTab === 'image' || currentResultTab === 'gif'}
 				{#if isImageLoading}
-					<div class="flex justify-center items-center min-h-[400px] max-h-[600px]">
+					<div class="flex flex-col justify-center items-center min-h-[400px] bg-gray-50">
 						<Loader size="16" show={isImageLoading} />
+						<p class="mt-4 text-sm text-gray-600">Generating your {currentResultTab}...</p>
 					</div>
 				{:else}
-					<div class="flex flex-col md:flex-row gap-2 justify-center items-center p-2 bg-gray-200">
-						<div>
-							<a href={img.url} class="text-xs text-black px-2 py-1">{img.url}</a>
+					<div class="flex flex-col flex-1">
+						<div class="flex flex-col md:flex-row gap-2 justify-between items-center p-3 bg-gray-100 border-b border-gray-200">
+							<div class="flex items-center gap-2">
+								<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								<span class="text-sm text-gray-900">Generated successfully!</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<a href={img.url} class="text-xs text-[#ff6b6b] hover:underline" target="_blank">Open in new tab →</a>
+								<button
+									on:click={() => {
+										copyToClipboard(img.url);
+									}}
+									class="text-xs bg-black hover:bg-gray-800 text-white py-1.5 px-3 rounded flex items-center gap-2 transition-colors"
+								>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+									</svg>
+									Copy URL
+								</button>
+							</div>
 						</div>
-						<div>
-							<button
-								on:click={() => {
-									copyToClipboard(img.url);
-								}}
-								class="text-xs bg-black hover:bg-black text-white py-1 px-2 rounded"
-							>
-								<div class="flex justify-between items-center">
-									<div>Copy URL</div>
-								</div>
-							</button>
-						</div>
-					</div>
-					<img src={img.url} alt="html-output" class="w-full" />
-				{/if}
-			{:else if currentResultTab === 'gif'}
-				{#if isImageLoading}
-					<div class="flex justify-center items-center min-h-[400px] max-h-[600px]">
-						<Loader size="16" show={isImageLoading} />
-					</div>
-				{:else}
-					<div class="flex flex-col md:flex-row gap-2 justify-center items-center p-2 bg-gray-200">
-						<div>
-							<a href={img.url} class="text-xs text-black px-2 py-1">{img.url}</a>
-						</div>
-						<div>
-							<button
-								on:click={() => {
-									copyToClipboard(img.url);
-								}}
-								class="text-xs bg-black hover:bg-black text-white py-1 px-2 rounded"
-							>
-								<div class="flex justify-between items-center">
-									<div>Copy URL</div>
-								</div>
-							</button>
+						<div class="flex-1 overflow-auto">
+							<img src={img.url} alt="Generated output" class="w-full h-auto" />
 						</div>
 					</div>
-					<img src={img.url} alt="html-output" class="w-full" />
 				{/if}
 			{/if}
 		</div>

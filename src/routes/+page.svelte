@@ -14,14 +14,14 @@
 	import posthog from 'posthog-js';
 	import { onMount } from 'svelte';
 
-	let isTestFeatureFlag = false;
+	let isTestFeatureFlag = true;
 
 	onMount(() => {
 		posthog.featureFlags.override({ 'create-image-home': 'test' });
 		if (posthog.getFeatureFlag('create-image-home') === 'test') {
 			isTestFeatureFlag = true;
 		} else {
-			isTestFeatureFlag = false;
+			isTestFeatureFlag = true;
 		}
 	});
 </script>
@@ -76,41 +76,77 @@
 </svelte:head>
 
 <section
-	class="w-screen bg-[#FFFDF8] min-h-screen md:h-screen flex flex-col justify-between md:items-start items-between tails-selected-element lg:overflow-x-hidden md:overflow-x-hidden"
+	class="w-screen bg-[#FFFDF8] min-h-screen flex flex-col justify-between md:items-start items-between lg:overflow-x-hidden md:overflow-x-hidden"
 	data-tails-scripts="//unpkg.com/alpinejs"
 	contenteditable="false"
 >
 	<Nav />
+	
+	<!-- Hero Section -->
 	<Hero />
-	<SignUpButton />
+
+	<!-- Interactive Demo Section -->
 	{#if isTestFeatureFlag}
-		<div class="w-full mx-auto flex items-center justify-center my-14">
-			<div>
-				<div class="hidden sm:flex w-[100%]">
-					<div class="flex-1" />
-					<div class="flex-1">
-						<img
-							alt="click here"
-							class="w-52 translate-x-[150px] mb-4"
-							src="https://res.cloudinary.com/diroilukd/image/upload/v1715193941/arrow-l_jir4in.png"
-						/>
-					</div>
+		<div class="w-full bg-white border-t-2 border-b-2 border-gray-900 py-16 md:py-20 relative overflow-hidden">
+			<!-- Decorative elements -->
+			<div class="absolute inset-0 overflow-hidden pointer-events-none">
+				<div class="absolute top-0 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-[#ff6b6b]/10 to-transparent rounded-full blur-[100px] transform -translate-y-1/2 animate-float"></div>
+				<div class="absolute bottom-0 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-[#ffc480]/10 to-transparent rounded-full blur-[100px] transform translate-y-1/2 animate-float-delayed"></div>
+			</div>
+
+			<div class="max-w-5xl mx-auto px-4 relative">
+				<div class="text-center space-y-4 mb-12">
+					<h2 class="text-4xl sm:text-5xl font-bold text-gray-900">Try it <span class="text-[#ff6b6b]">yourself</span></h2>
+					<p class="text-lg text-gray-700 max-w-2xl mx-auto">Experience the power of Pictify's HTML to Image conversion in real-time</p>
 				</div>
-				<CodeEditor isGifEnabled={true} />
+
+							<div class="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl border-2 border-gray-900 shadow-lg">
+					<CodeEditor isGifEnabled={true} />
+				</div>
+
+				<div class="mt-8 text-center">
+					<p class="text-sm text-gray-600">Want to see more examples? Check out our <a href="https://docs.pictify.io/" target="_blank" class="text-[#ff6b6b] hover:underline font-medium">documentation</a></p>
+				</div>
 			</div>
 		</div>
 	{:else}
 		<Editor isLandingPage={true} />
 	{/if}
-	<Api />
-	<!-- <SignUpButton /> -->
-	<WhyPictify />
-	<UseCase />
-	<Featured />
-	<div class="flex w-full justify-center mt-20 border-t-[3px]  border-gray-900">
-		<TryNow />
+
+	<!-- Features Section -->
+	<div class="w-full bg-white  border-t-2 border-b-2 border-gray-900">
+		<div class="max-w-5xl mx-auto px-4">
+			<WhyPictify />
+		</div>
 	</div>
-	
-	
+
+	<!-- API Documentation -->
+	<div class="w-full  px-4">
+		<div class="max-w-5xl mx-auto">
+			<Api />
+		</div>
+	</div>
+
+	<!-- Use Cases -->
+	<div class="w-full bg-white  border-t-2 border-b-2 border-gray-900">
+		<div class="max-w-5xl mx-auto px-4">
+			<UseCase />
+		</div>
+	</div>
+
+	<!-- Social Proof -->
+	<div class="w-full  px-4">
+		<div class="max-w-5xl mx-auto">
+			<Featured />
+		</div>
+	</div>
+
+	<!-- Final CTA -->
+	<div class="w-full bg-white  border-t-2 border-gray-900">
+		<div class="max-w-5xl mx-auto px-4">
+			<TryNow />
+		</div>
+	</div>
+
 	<Footer />
 </section>
