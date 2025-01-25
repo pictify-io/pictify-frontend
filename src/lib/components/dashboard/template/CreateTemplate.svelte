@@ -16,66 +16,110 @@
 	let grapeEditor;
 
 	let templateName = '';
-
+	let templateType = 'og-image'; // Default type
 	export let isEdit = false;
 
 	let editorTemplate = null;
 
 	let unsubscribe = () => {};
 	let templateUnsubscribe = () => {};
+	let isSaving = false;
+
+	const templateTypes = [
+		{ label: 'OG Image', value: 'og-image' },
+		{ label: 'Invoice', value: 'invoice' },
+		{ label: 'Social Media', value: 'social-media' }
+	];
 
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+			toast.set({ message: 'Copied to clipboard!', duration: 1500 });
 		});
 	}
 
 	const updateTemplate = async () => {
-		const grapeHTML = grapeEditor.getHtml();
-		const grapeCSS = grapeEditor.getCss();
-		const html = await getHTMLandCSS(grapeHTML, grapeCSS);
-		const grapeJSData = grapeEditor.getProjectData();
-		const width = grapeEditor.Canvas.getWindow().innerWidth;
-		const height = grapeEditor.Canvas.getWindow().innerHeight;
+		if (!templateName.trim()) {
+			toast.set({ message: 'Please enter a template name', duration: 1500 });
+			return;
+		}
 
-		template.set({
-			...get(template),
-			html,
-			name: templateName,
-			grapeJSData,
-			width,
-			height
-		});
+		isSaving = true;
+		try {
+			const grapeHTML = grapeEditor.getHtml();
+			const grapeCSS = grapeEditor.getCss();
+			const html = await getHTMLandCSS(grapeHTML, grapeCSS);
+			const grapeJSData = grapeEditor.getProjectData();
+			const width = grapeEditor.Canvas.getWindow().innerWidth;
+			const height = grapeEditor.Canvas.getWindow().innerHeight;
 
-		await updateTemplateAction();
+			const templateData = {
+				...editorTemplate,
+				html,
+				name: templateName,
+				grapeJSData,
+				width,
+				height,
+				type: templateType
+			};
+
+			const result = await updateTemplateAction(templateData);
+			if (result) {
+				toast.set({ message: 'Template updated successfully!', duration: 1500 });
+			} else {
+				toast.set({ message: 'Failed to update template', duration: 1500 });
+			}
+		} catch (error) {
+			console.error('Error updating template:', error);
+			toast.set({ message: 'Failed to update template', duration: 1500 });
+		} finally {
+			isSaving = false;
+		}
 	};
 
 	const createTemplate = async () => {
-		const grapeHTML = grapeEditor.getHtml();
-		const grapeCSS = grapeEditor.getCss();
-		const html = await getHTMLandCSS(grapeHTML, grapeCSS);
-		const grapeJSData = grapeEditor.getProjectData();
-		const width = grapeEditor.Canvas.getWindow().innerWidth;
-		const height = grapeEditor.Canvas.getWindow().innerHeight;
+		if (!templateName.trim()) {
+			toast.set({ message: 'Please enter a template name', duration: 1500 });
+			return;
+		}
 
-		const templateData = {
-			html,
-			name: templateName,
-			grapeJSData,
-			width,
-			height
-		};
+		isSaving = true;
+		try {
+			const grapeHTML = grapeEditor.getHtml();
+			const grapeCSS = grapeEditor.getCss();
+			const html = await getHTMLandCSS(grapeHTML, grapeCSS);
+			const grapeJSData = grapeEditor.getProjectData();
+			const width = grapeEditor.Canvas.getWindow().innerWidth;
+			const height = grapeEditor.Canvas.getWindow().innerHeight;
 
-		await createTemplateAction(templateData);
+			const templateData = {
+				html,
+				name: templateName,
+				grapeJSData,
+				width,
+				height,
+				type: templateType
+			};
+
+			const result = await createTemplateAction(templateData);
+			if (result) {
+				toast.set({ message: 'Template created successfully!', duration: 1500 });
+				templateName = '';
+			} else {
+				toast.set({ message: 'Failed to create template', duration: 1500 });
+			}
+		} catch (error) {
+			console.error('Error creating template:', error);
+			toast.set({ message: 'Failed to create template', duration: 1500 });
+		} finally {
+			isSaving = false;
+		}
 	};
 
 	const saveTemplate = async () => {
 		if (isEdit) {
 			await updateTemplate();
-			toast.set({ message: 'Template Saved !!', duration: 1500 });
 		} else {
 			await createTemplate();
-			toast.set({ message: 'Template Created !!', duration: 1500 });
 		}
 	};
 
@@ -88,12 +132,12 @@
 			editorTemplate = t;
 			if (editorTemplate && isEdit) {
 				templateName = editorTemplate.name;
+				templateType = editorTemplate.type || 'og-image';
 				if (editorTemplate.grapeJSData && grapeEditor) {
 					grapeEditor.loadProjectData(editorTemplate.grapeJSData);
 				} else if (grapeEditor) {
 					grapeEditor.setComponents(editorTemplate.html);
 				}
-				// grapeEditor.setStyle(editorTemplate.css);
 			}
 		});
 	});
@@ -107,14 +151,14 @@
 
 <section class="max-w-6xl p-5 m-auto">
 	<div class="w-full flex justify-center">
-		<div>
+		<div class="w-full">
 			{#if editorTemplate?.uid}
 				<div class="flex w-full">
 					<div>
 						Template Id: <span class="text-red-400">{editorTemplate?.uid}</span>
 					</div>
 					<div class="w-4 h-4 ml-2 mt-[2px]">
-						<button on:click={copyToClipboard(editorTemplate.uid)}>
+						<button on:click={() => copyToClipboard(editorTemplate.uid)}>
 							<img
 								src={CopyIcon}
 								alt="Copy Icon"
@@ -125,7 +169,7 @@
 					</div>
 				</div>
 			{/if}
-			<div class="flex items-center w-full mt-4">
+			<div class="flex flex-col md:flex-row gap-4 items-start w-full mt-4">
 				<div class="flex-grow">
 					<input
 						type="text"
@@ -134,18 +178,37 @@
 						bind:value={templateName}
 					/>
 				</div>
-				<div class="ml-5">
-					<button
-						class="bg-black hover:bg-black text-white font-bold py-2 px-4 rounded ring-1 ring-black ring-opacity-5"
-						on:click={saveTemplate}
+				<div class="w-full md:w-48">
+					<select
+						bind:value={templateType}
+						class="w-full border-2 border-gray-300 p-2 rounded-md bg-white"
 					>
-						<div class="flex justify-between items-center">
-							<div>Save Template</div>
+						{#each templateTypes as type}
+							<option value={type.value}>{type.label}</option>
+						{/each}
+					</select>
+				</div>
+				<div>
+					<button
+						class="w-full md:w-auto bg-black hover:bg-black/80 text-white font-bold py-2 px-6 rounded ring-1 ring-black ring-opacity-5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						on:click={saveTemplate}
+						disabled={isSaving}
+					>
+						<div class="flex justify-between items-center gap-2">
+							{#if isSaving}
+								<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								</svg>
+							{/if}
+							<div>{isEdit ? 'Update' : 'Create'} Template</div>
 						</div>
 					</button>
 				</div>
 			</div>
-			<Editor isLandingPage={false} />
+			<div class="mt-4">
+				<Editor isLandingPage={false} />
+			</div>
 		</div>
 	</div>
 </section>

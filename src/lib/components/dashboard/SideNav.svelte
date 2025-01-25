@@ -10,9 +10,14 @@
 
 	let isMediaListExpanded = false;
 	let isPaidPlan = false;
+	let isToolsExpanded = false;
 
 	function toggleMediaList() {
 		isMediaListExpanded = !isMediaListExpanded;
+	}
+
+	function toggleToolsList() {
+		isToolsExpanded = !isToolsExpanded;
 	}
 
 	let unsubscribe = () => {};
@@ -87,6 +92,29 @@
 				</li>
 				<li class="text-gray-700 hover:text-gray-900">
 					<a href="/dashboard/template">Templates</a>
+				</li>
+				<li class="text-gray-700 hover:text-gray-900">
+					<a href="#" on:click={toggleToolsList}>
+						<div class="flex items-center">
+							<div>
+								<span>Tools</span>
+							</div>
+							<div class="ml-2">
+								<img
+									src={CollapseIcon}
+									class="w-4"
+									class:rotate-180={!isToolsExpanded}
+									alt="collapse-icon"
+								/>
+							</div>
+						</div>
+					</a>
+
+					<ul class="space-y-2 ml-4" class:hidden={!isToolsExpanded}>
+						<li class="text-gray-700 hover:text-gray-900">
+							<a href="/dashboard/tools/og-image-generator">OG Image Generator</a>
+						</li>
+					</ul>
 				</li>
 				<li class="text-gray-700 hover:text-gray-900">
 					<a href={PUBLIC_DOCS_URL} target="_blank">Docs and Support</a>
