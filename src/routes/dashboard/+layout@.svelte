@@ -14,7 +14,9 @@
 		user = await getUser();
 		if (!user || !user?.email) {
 			goto('/login');
-		} else {
+		}
+		
+		if (window.location.pathname === '/dashboard') {
 			goto('/dashboard/api-token');
 		}
 	});

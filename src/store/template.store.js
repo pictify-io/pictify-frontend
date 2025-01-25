@@ -1,38 +1,40 @@
 import { writable } from 'svelte/store';
 import {
 	getTemplates,
-	getTemplate,
+	getTemplateById,
 	updateTemplate,
 	deleteTemplate,
 	createTemplate,
-	searchTemplates
-} from '../api/userTemplate';
-import { get } from 'svelte/store';
+	searchTemplates,
+	getTemplatesForType
+} from '../api/template';
 
-export const template = new writable({
+export const template = writable({
 	uid: null,
 	name: null,
 	html: null,
 	grapeJSData: null,
-	with: null,
+	width: null,
 	height: null,
 	variables: null,
-	createdAt: null
+	createdAt: null,
+	type: null
 });
 
-export const templates = new writable([]);
+export const templates = writable([]);
 
 // Actions
-
 export const getTemplatesAction = async () => {
 	try {
 		const response = await getTemplates();
-		if (!response.templates) {
-			response.templates = [];
+		if (!response?.templates) {
+			templates.set([]);
+			return;
 		}
 		templates.set(response.templates);
 	} catch (error) {
-		throw error;
+		console.error('Error fetching templates:', error);
+		templates.set([]);
 	}
 };
 
@@ -45,72 +47,98 @@ export const getTemplateAction = async (uid) => {
 			variables: null,
 			createdAt: null,
 			grapeJSData: null,
-			with: null,
-			height: null
+			width: null,
+			height: null,
+			type: null
 		});
-		const response = await getTemplate(uid);
-		if (!response.template) {
-			response.templates = null;
+
+		const response = await getTemplateById(uid);
+		if (!response?.template) {
+			return null;
 		}
 
 		template.set(response.template);
-		templates.update((templates) => {
-			const index = templates.findIndex((template) => template.uid === response.uid);
-			templates[index] = response;
-			return templates;
-		});
-
-		return template;
+		return response.template;
 	} catch (error) {
-		throw error;
+		console.error('Error fetching template:', error);
+		return null;
 	}
 };
 
-export const updateTemplateAction = async () => {
+export const createTemplateAction = async (templateData) => {
 	try {
-		const data = get(template);
-		const response = await updateTemplate(data);
-		templates.update((templates) => {
-			const index = templates.findIndex((template) => template.uid === response.uid);
-			templates[index] = response;
-			return templates;
-		});
+		const response = await createTemplate(templateData);
+		if (!response?.template) {
+			return null;
+		}
+
+		templates.update(t => [...t, response.template]);
+		return response.template;
 	} catch (error) {
-		throw error;
+		console.error('Error creating template:', error);
+		return null;
+	}
+};
+
+export const updateTemplateAction = async (templateData) => {
+	try {
+		const response = await updateTemplate(templateData);
+		if (!response?.template) {
+			return null;
+		}
+
+		templates.update(t => {
+			const index = t.findIndex(temp => temp.uid === response.template.uid);
+			if (index !== -1) {
+				t[index] = response.template;
+			}
+			return t;
+		});
+		return response.template;
+	} catch (error) {
+		console.error('Error updating template:', error);
+		return null;
 	}
 };
 
 export const deleteTemplateAction = async (uid) => {
 	try {
 		const response = await deleteTemplate(uid);
-		templates.update((templates) => {
-			return templates.filter((template) => template.uid !== uid);
-		});
+		if (response?.message) {
+			templates.update(t => t.filter(temp => temp.uid !== uid));
+			return true;
+		}
+		return false;
 	} catch (error) {
-		throw error;
+		console.error('Error deleting template:', error);
+		return false;
 	}
 };
 
-export const createTemplateAction = async (newTemplate) => {
+export const searchTemplatesAction = async (query) => {
 	try {
-		const response = await createTemplate(newTemplate);
-		templates.update((templates) => {
-			templates.push(response);
-			return templates;
-		});
-	} catch (error) {
-		throw error;
-	}
-};
-
-export const searchTemplatesAction = async (search) => {
-	try {
-		const response = await searchTemplates(search);
-		if (!response.templates) {
-			response.templates = [];
+		const response = await searchTemplates(query);
+		if (!response?.templates) {
+			templates.set([]);
+			return;
 		}
 		templates.set(response.templates);
 	} catch (error) {
-		throw error;
+		console.error('Error searching templates:', error);
+		templates.set([]);
+	}
+};
+
+export const getTemplatesForTypeAction = async (type) => {
+	try {
+		const response = await getTemplatesForType(type);
+		if (!response?.templates) {
+			templates.set([]);
+			return;
+		}
+		templates.set(response.templates);
+	} catch (error) {
+		console.error('Error fetching templates by type:', error);
+		templates.set([]);
 	}
 };
