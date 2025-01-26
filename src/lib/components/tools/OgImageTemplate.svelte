@@ -3,6 +3,8 @@
   export let width = 1200;
   export let height = 600;
   export let scale = 0.3;
+
+
 </script>
 
 <div style="width: {width * scale}px; height: {height * scale}px;">

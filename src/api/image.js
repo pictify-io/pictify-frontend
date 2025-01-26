@@ -22,4 +22,30 @@ const createGifPublic = async ({ html, width, height, duration }) => {
 	return response;
 };
 
-export { createGifPublic, createImagePublic };
+const createOgImage = async ({ template, heading, description, logo, apiKey }) => {
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const response = await backend.post('/image/og-image', {
+		template,
+		heading,
+		description,
+		logo
+	}, { headers });
+	return response;
+};
+
+const getOgImageTemplates = async (apiKey) => {
+	const config = apiKey ? { headers: { Authorization: `Bearer ${apiKey}` } } : {};
+	const response = await backend.get('/templates/type/og-image', config);
+	return response;
+};
+
+const checkApiHealth = async () => {
+	try {
+		await backend.get('/healthcheck');
+		return true;
+	} catch (error) {
+		return false;
+	}
+};
+
+export { createGifPublic, createImagePublic, createOgImage, getOgImageTemplates, checkApiHealth };

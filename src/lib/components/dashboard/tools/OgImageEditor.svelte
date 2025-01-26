@@ -111,6 +111,8 @@
 		}
 	}
 
+	
+
 	const editorConfig = {
 		basicSetup: true,
 		extensions: [EditorView.lineWrapping],
@@ -440,19 +442,37 @@
 <div class="border-2 border-gray-900 rounded-md">
 	<!-- Preview Section -->
 	<div class="border-b-2 border-gray-900">
-		<div class="flex bg-black p-2">
-			<button
-				on:click={() => currentTab = 'visual'}
-				class="px-4 py-2 rounded text-sm {currentTab === 'visual' ? 'bg-white text-black' : 'bg-gray-500 text-white'}"
-			>
-				Visual Editor
-			</button>
-			<button
-				on:click={() => currentTab = 'code'}
-				class="ml-4 px-4 py-2 rounded text-sm {currentTab === 'code' ? 'bg-white text-black' : 'bg-gray-500 text-white'}"
-			>
-				HTML
-			</button>
+		<div class="flex bg-black p-2 justify-between items-center">
+			<div class="flex">
+					<button
+						on:click={() => currentTab = 'visual'}
+						class="px-4 py-2 rounded text-sm {currentTab === 'visual' ? 'bg-white text-black' : 'bg-gray-500 text-white'}"
+					>
+						Visual Editor
+					</button>
+					<button
+						on:click={() => currentTab = 'code'}
+						class="ml-4 px-4 py-2 rounded text-sm {currentTab === 'code' ? 'bg-white text-black' : 'bg-gray-500 text-white'}"
+					>
+						HTML
+					</button>
+			</div>
+			{#if isSavedTemplate && template?.uid}
+				<div class="ml-4 px-3 py-1 bg-gray-700 text-white rounded text-xs font-mono flex items-center gap-2">
+					<span>UID: {template.uid}</span>
+					<button
+						class="hover:text-[#ff6b6b] transition-colors"
+						on:click={() => {
+							navigator.clipboard.writeText(template.uid);
+							toast.set({ message: 'UID copied to clipboard', duration: 1500 });
+						}}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+						</svg>
+					</button>
+				</div>
+			{/if}
 		</div>
 		<div class="p-6">
 			{#if currentTab === 'visual'}
