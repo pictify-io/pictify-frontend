@@ -516,7 +516,7 @@ const response = await fetch('https://api.pictify.io/og-image', {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "ratingCount": "{totalImagesGenerated}"
+      "ratingCount": "4192"
     }
   }
   </script>
