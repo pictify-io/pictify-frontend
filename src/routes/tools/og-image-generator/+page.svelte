@@ -501,22 +501,60 @@ const response = await fetch('https://api.pictify.io/og-image', {
   <meta name="twitter:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
   <script type="application/ld+json">
   {
-    "@context": "http://schema.org",
-    "@type": "SoftwareApplication",
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
     "name": "Pictify OG Image Generator",
     "url": "https://pictify.io/tools/og-image-generator",
     "description": "Create custom Open Graph images for improved social media engagement and SEO.",
-    "applicationCategory": "DesignApplication",
+    "applicationCategory": ["DesignApplication", "SEO Tool"],
     "operatingSystem": "Web",
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "ratingCount": "4192"
+      "ratingCount": "4192",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "featureList": [
+      "Customizable templates",
+      "Automatic website info extraction",
+      "Color and font customization",
+      "API access",
+      "Social media preview"
+    ],
+    "screenshot": {
+      "@type": "ImageObject",
+      "url": "https://media.pictify.io/z8xnl-1723429909736.png",
+      "width": "1200",
+      "height": "630"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Pictify.io",
+      "url": "https://pictify.io",
+      "logo": "https://pictify.io/logo.png"
+    },
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/UseAction",
+      "userInteractionCount": "45897"
+    },
+    "softwareVersion": "1.2.0",
+    "softwareHelp": {
+      "@type": "CreativeWork",
+      "name": "OG Image Generator Documentation",
+      "url": "https://pictify.io/docs/og-image-generator"
+    },
+    "keywords": ["OG image generator", "Open Graph images", "social media images", "SEO", "content marketing"],
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://pictify.io/tools/og-image-generator"
     }
   }
   </script>

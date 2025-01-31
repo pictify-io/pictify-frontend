@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { html } from '@codemirror/lang-html';
 	import { css } from '@codemirror/lang-css';
@@ -9,6 +9,7 @@
 	import { toast } from '../../../store/toast.store';
 
 	export let isGifEnabled = false;
+	export let isPreviewEnabled = true;
 	export let fileExtension = 'png';
 
 	let codeHTML = `
@@ -118,6 +119,8 @@ body {
 	let previewWidth = 600;
 	let previewHeight = 400;
 
+	const dispatch = createEventDispatcher();
+
 	onMount(async () => {
 		console.log(fileExtension);
 		updateIframe();
@@ -150,6 +153,7 @@ body {
 			previewFrame.srcdoc = getSrcDoc();
 			previewWidth = parseInt(getComputedStyle(previewFrame).width.replace('px', ''));
 			previewHeight = parseInt(getComputedStyle(previewFrame).height.replace('px', ''));
+			dispatch('previewUpdated', { html: getSrcDoc(), width: previewWidth, height: previewHeight });
 		}
 	}
 
@@ -177,6 +181,7 @@ body {
 				fileExtension	
 			});
 			img = image;
+			dispatch('imageGenerated', { image });
 			isImageLoading = false;
 		} catch (e) {
 			console.error(e);
@@ -271,6 +276,7 @@ body {
 		</div>
 		<div class="w-full md:w-1/2 flex flex-col border-t-4 md:border-t-0 md:border-l-4 border-black">
 			<div class="flex bg-black p-2 justify-between items-center">
+				{#if isPreviewEnabled}
 				<div class="flex items-center gap-4">
 					<button
 						on:click={() => (currentResultTab = 'preview')}
@@ -310,6 +316,13 @@ body {
 						</button>
 					{/if}
 				</div>
+				{/if}
+				{#if !isPreviewEnabled}
+					<div class="flex items-center gap-4">
+						<div class="py-[1.125rem] px-4">
+						</div>
+					</div>
+				{/if}
 			</div>
 			{#if currentResultTab === 'preview'}
 				<div class="flex-1 flex flex-col">
