@@ -10,6 +10,7 @@
 	import WhyPictify from '$lib/components/landingPage/WhyPictify.svelte';
 	import Featured from '$lib/components/landingPage/Featured.svelte';
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
+	import AgentScreenshotDemo from '$lib/components/landingPage/AgentScreenshotDemo.svelte';
 
 	import posthog from 'posthog-js';
 	import { onMount } from 'svelte';
@@ -112,6 +113,9 @@
 	{:else}
 		<Editor isLandingPage={true} />
 	{/if}
+
+	<!-- AI Agent Demo -->
+	<AgentScreenshotDemo />
 
 	<!-- Features Section -->
 	<div class="w-full bg-white  border-t-2 border-b-2 border-gray-900">

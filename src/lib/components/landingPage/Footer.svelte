@@ -7,6 +7,6 @@
 			<a href="/terms" class="text-sm opacity-70 hover:opacity-100">Terms</a>
 			<a href="/privacy" class="text-sm opacity-70 hover:opacity-100">Privacy</a>
 		</div>
-		<p class="text-sm opacity-70 mt-3">© 2024 Pictify.io</p>
+		<p class="text-sm opacity-70 mt-3">© 2025 Pictify.io</p>
 	</div>
 </footer>

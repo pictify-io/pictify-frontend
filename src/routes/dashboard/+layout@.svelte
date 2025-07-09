@@ -14,9 +14,12 @@
 		user = await getUser();
 		if (!user || !user?.email) {
 			goto('/login');
+			return;
 		}
 		
-		if (window.location.pathname === '/dashboard') {
+		// Only redirect to api-token if user is on the exact dashboard root path
+		const currentPath = window.location.pathname;
+		if (currentPath === '/dashboard' || currentPath === '/dashboard/') {
 			goto('/dashboard/api-token');
 		}
 	});

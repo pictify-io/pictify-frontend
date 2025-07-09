@@ -5,6 +5,13 @@
 
   const tools = [
     {
+      name: "AI Agent Screenshot",
+      description: "Use natural language to automatically capture screenshots of any website content.",
+      url: "/dashboard/tools/agent-screenshot",
+      icon: "🤖",
+      badge: "New"
+    },
+    {
       name: "OG Image Generator",
       description: "Create custom Open Graph images for improved social media engagement and SEO.",
       url: "/tools/og-image-generator",
@@ -109,7 +116,12 @@
     <div class="w-full grid md:grid-cols-2 gap-8 mt-16">
       {#each tools as tool}
         <a href={tool.url} class="block cursor-pointer">
-          <div class="h-full p-4 cursor-pointer  bg-white border-3 border-gray-900 rounded-xl transition-transform hover:scale-105">
+          <div class="h-full p-4 cursor-pointer  bg-white border-3 border-gray-900 rounded-xl transition-transform hover:scale-105 relative">
+            {#if tool.badge}
+              <div class="absolute -top-2 -right-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                {tool.badge}
+              </div>
+            {/if}
             <div class="text-4xl cursor-pointer mb-4">{tool.icon}</div>
             <h2 class="text-2xl cursor-pointer font-bold mb-2">{tool.name}</h2>
             <p class="text-lg cursor-pointer opacity-70">{tool.description}</p>

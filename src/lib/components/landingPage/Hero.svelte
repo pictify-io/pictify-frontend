@@ -46,7 +46,7 @@
 			</h1>
 			
 			<p class="text-lg md:text-xl text-gray-800 max-w-2xl leading-relaxed font-medium px-4 md:px-0">
-				The most reliable HTML to image API, trusted by 10,000+ developers. Generate pixel-perfect images in milliseconds.
+				The most reliable HTML to image API, trusted by 10,000+ developers. Generate pixel-perfect images in milliseconds with our powerful API or let our AI agent capture any website automatically.
 			</p>
 
 			<div class="flex flex-col sm:flex-row items-center gap-4 md:gap-5 w-full max-w-md pt-4">
