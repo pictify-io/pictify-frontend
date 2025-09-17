@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
-import { login, logout, signup } from '../api/auth';
+import { login, logout, signup, impersonate } from '../api/auth';
 import {
 	getUser as getUserAPI,
 	getApiToken,
@@ -127,6 +127,22 @@ export const signupAction = async (email, password) => {
 		return response;
 	} catch (error) {
 		clearUser();
+		throw error;
+	}
+};
+
+export const impersonateAction = async (password, email, userId) => {
+	try {
+		if (!password) throw new Error('Admin password is required');
+		if (!email && !userId) throw new Error('Provide either email or userId');
+		await impersonate({ password, email, userId });
+		const { user: userData } = await getUserAPI();
+		if (!userData) {
+			return null;
+		}
+		setUser(userData.email, userData.token, userData.currentPlan);
+		return userData;
+	} catch (error) {
 		throw error;
 	}
 };

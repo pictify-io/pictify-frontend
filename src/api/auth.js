@@ -32,4 +32,18 @@ const signup = async ({ email, password }) => {
 	}
 };
 
-export { login, logout, signup };
+const impersonate = async ({ password, email, userId }) => {
+	try {
+		const response = await backend.post('/auth/impersonate', {
+			password,
+			email,
+			userId
+		});
+		return response.data;
+	} catch (error) {
+		if (error.status === 401) throw new Error('Invalid admin credentials');
+		else throw new Error('Error impersonating user');
+	}
+};
+
+export { login, logout, signup, impersonate };
