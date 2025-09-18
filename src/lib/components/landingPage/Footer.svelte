@@ -6,6 +6,7 @@
 		<div class="mt-3 flex justify-center space-x-4">
 			<a href="/terms" class="text-sm opacity-70 hover:opacity-100">Terms</a>
 			<a href="/privacy" class="text-sm opacity-70 hover:opacity-100">Privacy</a>
+			<a href="https://status.pictify.io" target="_blank" class="text-sm opacity-70 hover:opacity-100">Status</a>
 		</div>
 		<p class="text-sm opacity-70 mt-3">© 2025 Pictify.io</p>
 	</div>

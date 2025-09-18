@@ -210,7 +210,7 @@
 			<!-- Divider -->
 			<div class="border-t border-gray-200 my-4"></div>
 
-			<!-- Docs and Support -->
+            <!-- Docs and Support -->
 			<a
 				href={PUBLIC_DOCS_URL}
 				target="_blank"
@@ -221,6 +221,16 @@
 				</svg>
 				Docs & Support
 			</a>
+            <a
+                href="https://status.pictify.io"
+                target="_blank"
+                class="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 hover:shadow-sm hover:border hover:border-gray-200"
+            >
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Status
+            </a>
 		</nav>
 	</div>
 

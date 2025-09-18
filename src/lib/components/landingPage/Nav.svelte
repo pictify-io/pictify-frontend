@@ -113,6 +113,12 @@
 				>Blog</a
 			>
 			<a
+				href="https://status.pictify.io"
+				target="_blank"
+				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
+				>Status</a
+			>
+			<a
 				href="mailto:support@pictify.io"
 				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
 				>Contact</a
