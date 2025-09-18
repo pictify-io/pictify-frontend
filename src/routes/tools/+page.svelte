@@ -12,6 +12,13 @@
       badge: "New"
     },
     {
+      name: "Code to Image (Syntax Highlighter)",
+      description: "Turn code snippets into beautiful images with themes and fonts.",
+      url: "/tools/code-to-image",
+      icon: "🧑‍💻",
+      badge: "New"
+    },
+    {
       name: "OG Image Generator",
       description: "Create custom Open Graph images for improved social media engagement and SEO.",
       url: "/tools/og-image-generator",
