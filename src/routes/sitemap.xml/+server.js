@@ -1,4 +1,5 @@
 import { getBlogLinks } from '../../api/blog';
+import { formats, popularSizes, ogPlatforms, useCases } from '$lib/pseo/config.js';
 
 export async function GET() {
 	const response = await getBlogLinks();
@@ -13,6 +14,39 @@ export async function GET() {
          </url>
       `;
 	});
+
+   // PSEO: html-to-[format] size variants (from config)
+   const popularFormats = formats.map((f) => f.id);
+   const today = new Date().toISOString().slice(0, 10);
+   const variantUrls = popularFormats.flatMap((fmt) =>
+      popularSizes.map((sz) => `
+			<url>
+				<loc>https://pictify.io/tools/html-to-${fmt}/${sz}</loc>
+				<lastmod>${today}</lastmod>
+				<changefreq>weekly</changefreq>
+				<priority>0.7</priority>
+			</url>
+		`)
+   );
+
+   // OG platform pages
+   const ogPlatformUrls = ogPlatforms.map((p) => `
+		<url>
+			<loc>https://pictify.io/tools/og-image-generator/${p.id}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>0.7</priority>
+		</url>
+	`);
+
+   const useCaseUrls = useCases.map((useCase) => `
+		<url>
+			<loc>https://pictify.io/tools/${useCase.id}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>0.6</priority>
+		</url>
+	`);
 
 	return new Response(
 		`
@@ -78,7 +112,16 @@ export async function GET() {
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
-        ${urls.join('')}
+         <url>
+            <loc>https://pictify.io/tools/code-to-image</loc>
+            <lastmod>2024-04-19</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.8</priority>
+         </url>
+	   		${variantUrls.join('')}
+	   		${ogPlatformUrls.join('')}
+	   		${useCaseUrls.join('')}
+	   		${urls.join('')}
     </urlset>
     `.trim(),
 		{

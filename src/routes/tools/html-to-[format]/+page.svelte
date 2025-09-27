@@ -1,7 +1,9 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
+import Nav from '$lib/components/landingPage/Nav.svelte';
+import { popularSizes as configPopularSizes, useCases, useCaseDetails, ogPlatforms } from '$lib/pseo/config.js';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
+	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -10,6 +12,37 @@
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
 	$: format = $page.params.format;
+
+	// Support optional size parameter from nested route: /tools/html-to-[format]/[dimensions]
+	function parseDimensions(dim) {
+		const match = (dim || '').toLowerCase().match(/^(\d+)x(\d+)$/);
+		if (!match) return { width: null, height: null };
+		const width = parseInt(match[1], 10);
+		const height = parseInt(match[2], 10);
+		if (Number.isNaN(width) || Number.isNaN(height) || width <= 0 || height <= 0) {
+			return { width: null, height: null };
+		}
+		return { width, height };
+	}
+
+	$: rawDimensions = $page.params.dimensions;
+	$: ({ width: dimWidth, height: dimHeight } = parseDimensions(rawDimensions));
+	$: hasSize = !!(dimWidth && dimHeight);
+	$: sizeString = hasSize ? `${dimWidth}x${dimHeight}` : '';
+
+	// SEO head computed values (dimension-aware)
+	$: headTitle = hasSize
+		? `HTML to ${(currentFormat && currentFormat.fullName) || 'Image'} ${sizeString} Converter | Pictify.io`
+		: `Convert Image from HTML | HTML to ${format || 'Image'} | Free Online HTML Image Generator | Pictify.io`;
+	$: headDescription = hasSize
+		? `Convert HTML to ${(currentFormat && currentFormat.fullName) || 'image'} at ${sizeString} instantly. Perfect for ${(currentFormat && currentFormat.bestFor) || 'web use'}.`
+		: `Convert HTML to ${format || 'image'} easily with Pictify.io. Transform HTML to ${(format && format.toUpperCase && format.toUpperCase()) || 'IMAGE'} images instantly. Perfect for ${(currentFormat && currentFormat.bestFor) || 'web use'}. Try our HTML to ${(format && format.toUpperCase && format.toUpperCase()) || 'IMAGE'} image converter now!`;
+	$: canonicalUrl = hasSize
+		? `https://pictify.io/tools/html-to-${format}/${sizeString}`
+		: `https://pictify.io/tools/html-to-${format}`;
+	$: ogDescription = hasSize
+		? `Convert HTML to high-quality ${(currentFormat && currentFormat.fullName) || 'Image'} ${sizeString} images for free with Pictify.io's online HTML to ${(format && format.toUpperCase && format.toUpperCase()) || ''} converter.`
+		: `Convert HTML to high-quality ${(currentFormat && currentFormat.fullName) || 'Image'} images for free with Pictify.io's online HTML to ${(format && format.toUpperCase && format.toUpperCase()) || ''} converter. Perfect for creating social media content, email marketing visuals, and website mockups.`;
 
 	// Add copyToClipboard function
 	function copyToClipboard(text) {
@@ -34,7 +67,10 @@ $: if (!fileExtension) {
 	}
 }
 
-	let formats = ['jpg', 'png', 'webp',] 
+let formats = ['jpg', 'png', 'webp',]
+const popularSizes = configPopularSizes;
+const popularUseCases = useCases.slice(0, 3);
+const featuredPlatforms = ogPlatforms.slice(0, 3);
 
 	function handleFormatChange(event) {
 		const newFormat = event.target.value;
@@ -66,6 +102,22 @@ $: if (!fileExtension) {
 			}
 		}
 
+		// Apply preselected dimensions from size variant pages, if present
+		if (browser) {
+			const storedWidth = localStorage.getItem('pictify_html_to_image_width');
+			const storedHeight = localStorage.getItem('pictify_html_to_image_height');
+			if (storedWidth && storedHeight) {
+				const widthVal = parseInt(storedWidth, 10);
+				const heightVal = parseInt(storedHeight, 10);
+				if (!Number.isNaN(widthVal) && !Number.isNaN(heightVal) && widthVal > 0 && heightVal > 0) {
+					previewWidth = widthVal;
+					previewHeight = heightVal;
+				}
+				localStorage.removeItem('pictify_html_to_image_width');
+				localStorage.removeItem('pictify_html_to_image_height');
+			}
+		}
+
 		// Ensure the correct format is selected on page load
 		const select = document.getElementById('format-select');
 		if (select) {
@@ -92,9 +144,23 @@ $: if (!fileExtension) {
 		isUserLoggedIn = !!userData.email;
 	});
 
-	let totalImagesGenerated = 34567; // Social proof counter
-	let generationCount = 0;
-	let showUpgradePrompt = false;
+let totalImagesGenerated = 34567; // Social proof counter
+let generationCount = 0;
+let showUpgradePrompt = false;
+const apiFeatureBullets = [
+	'Convert HTML to PNG, JPG, or WebP at any size with one API call',
+	'Automate bulk generation for invoices, OG images, certificates, and receipts',
+	'Serve CDN-hosted assets instantly with usage analytics and token controls'
+];
+const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d '{
+    "html": "YOUR_HTML_HERE",
+    "width": WIDTH_PLACEHOLDER,
+    "height": HEIGHT_PLACEHOLDER,
+    "fileExtension": "FORMAT_PLACEHOLDER"
+  }'`;
 
 
 	let imageUrl = '';
@@ -103,11 +169,20 @@ $: if (!fileExtension) {
 	let previewHeight = 630;
 	let previewHtml = '';
 
+	// Apply dimensions if present in URL params
+	$: if (hasSize) {
+		previewWidth = dimWidth;
+		previewHeight = dimHeight;
+	}
+
 	function handlePreviewUpdate(event) {
 		const { html, width, height } = event.detail;
 		previewHtml = html;
-		previewWidth = width;
-		previewHeight = height;
+		// Only allow the editor to control dimensions when no size is locked from the URL
+		if (!hasSize) {
+			previewWidth = width;
+			previewHeight = height;
+		}
 	}
 
 	async function generateImage() {
@@ -135,10 +210,12 @@ $: if (!fileExtension) {
 				html = html.replace('</body>', `${watermarkDiv}</body>`);
 			}
 			
+			const widthToUse = hasSize ? dimWidth : previewWidth;
+			const heightToUse = hasSize ? dimHeight : previewHeight;
 			const {image} = await createImagePublic({
 				html,
-				width: previewWidth,
-				height: previewHeight,
+				width: widthToUse,
+				height: heightToUse,
 				fileExtension: fileExtension
 			});
 			
@@ -236,13 +313,13 @@ $: if (!fileExtension) {
 	// Add state for contextual prompts
 	let showFirstGenerationPrompt = false;
 
-	// Enhanced Schema Markup
+	// Enhanced Schema Markup (dimension-aware)
 	$: schemaMarkup = format ? {
 		"@context": "https://schema.org",
 		"@type": "WebApplication",
-		"name": `HTML to ${currentFormat?.fullName || 'Image'} Converter`,
-		"url": `https://pictify.io/tools/html-to-${format}`,
-		"description": `Convert HTML to high-quality ${currentFormat?.fullName || 'image'} instantly. Create optimized images for websites, social media, and email marketing.`,
+		"name": hasSize ? `HTML to ${currentFormat?.fullName || 'Image'} ${sizeString} Converter` : `HTML to ${currentFormat?.fullName || 'Image'} Converter`,
+		"url": hasSize ? `https://pictify.io/tools/html-to-${format}/${sizeString}` : `https://pictify.io/tools/html-to-${format}`,
+		"description": hasSize ? `Convert HTML to high-quality ${currentFormat?.fullName || 'image'} at ${sizeString} instantly. Create optimized images for websites, social media, and email marketing.` : `Convert HTML to high-quality ${currentFormat?.fullName || 'image'} instantly. Create optimized images for websites, social media, and email marketing.`,
 		"applicationCategory": "DesignApplication",
 		"operatingSystem": "Web",
 		"offers": {
@@ -251,7 +328,7 @@ $: if (!fileExtension) {
 			"priceCurrency": "USD"
 		},
 		"featureList": [
-			`Instant HTML to ${currentFormat?.fullName || 'Image'} conversion`,
+			`Instant HTML to ${currentFormat?.fullName || 'Image'} conversion${hasSize ? ` at ${sizeString}` : ''}`,
 			`Optimized for ${currentFormat?.bestFor || 'web use'}`,
 			"Web-friendly output",
 			"No watermarks"
@@ -259,8 +336,8 @@ $: if (!fileExtension) {
 		"mainEntity": [
 			{
 				"@type": "HowTo",
-				"name": `How to Convert HTML to ${currentFormat?.fullName || 'Image'}`,
-				"description": `Step-by-step guide to convert HTML to ${currentFormat?.fullName || 'Image'} images`,
+				"name": hasSize ? `How to Convert HTML to ${currentFormat?.fullName || 'Image'} (${sizeString})` : `How to Convert HTML to ${currentFormat?.fullName || 'Image'}`,
+				"description": hasSize ? `Step-by-step guide to convert HTML to ${currentFormat?.fullName || 'Image'} images at ${sizeString}` : `Step-by-step guide to convert HTML to ${currentFormat?.fullName || 'Image'} images`,
 				"step": [
 					{
 						"@type": "HowToStep",
@@ -274,7 +351,7 @@ $: if (!fileExtension) {
 					},
 					{
 						"@type": "HowToStep",
-						"text": `Generate your ${currentFormat?.fullName || 'Image'} image`,
+						"text": hasSize ? `Generate your ${currentFormat?.fullName || 'Image'} image at ${sizeString}` : `Generate your ${currentFormat?.fullName || 'Image'} image`,
 						"url": `https://pictify.io/tools/html-to-${format}#generate`
 					}
 				]
@@ -305,22 +382,22 @@ $: if (!fileExtension) {
 </script>
 
 <svelte:head>
-	<title>Convert Image from HTML | HTML to {format|| 'Image'} | Free Online HTML Image Generator | Pictify.io</title>
-	<meta name="description" content="Convert HTML to {format|| 'image'} easily with Pictify.io. Transform HTML to {format?.toUpperCase() || 'IMAGE'} images instantly. Perfect for {currentFormat?.bestFor || 'web use'}. Try our HTML to {format?.toUpperCase() || 'IMAGE'} image converter now!" />
-	<meta name="keywords" content="convert image from HTML, HTML to {format.toUpperCase()}, {format.toUpperCase()} converter, online image generator, web design tool, {currentFormat.fullName} image creator, Pictify.io" />
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={hasSize ? `convert image from HTML, HTML to ${format.toUpperCase()} ${sizeString}, ${format.toUpperCase()} converter, ${sizeString} image, online image generator, web design tool, ${currentFormat.fullName} image creator, Pictify.io` : `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${currentFormat.fullName} image creator, Pictify.io`} />
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta Property="og:title" content="Pictify.io" />
-	<meta Property="og:description" content="Convert HTML to high-quality {currentFormat.fullName} images for free with Pictify.io's online HTML to {format.toUpperCase()} converter. Perfect for creating social media content, email marketing visuals, and website mockups." />
+	<meta Property="og:description" content={ogDescription} />
 	<meta
 		Property="og:image"
 		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
 	/>
-	<meta Property="og:url" content="https://pictify.io" />
+	<meta Property="og:url" content={canonicalUrl} />
 	<meta Property="og:type" content="website" />
 	<meta Property="og:site_name" content="Pictify.io" />
 	<meta Property="og:locale" content="en_US" />
-	<link rel="canonical" href="https://pictify.io/tools/html-to-{format}" />
+	<link rel="canonical" href={canonicalUrl} />
 
 	{#if schemaMarkup}
 	{@html `<script type="application/ld+json">
@@ -350,11 +427,11 @@ $: if (!fileExtension) {
 
 			<div class="space-y-4">
 				<h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight">
-					HTML to {currentFormat.fullName}<br/><span class="text-[#ff6b6b]">Converter</span>
+					HTML to {currentFormat.fullName}{#if hasSize} &nbsp;({sizeString}){/if}<br/><span class="text-[#ff6b6b]">Converter</span>
 				</h1>
 				
 				<p class="text-lg text-gray-600 max-w-2xl leading-relaxed px-4 md:px-0">
-					Transform your HTML code into high-quality {currentFormat.fullName} images instantly. Perfect for {currentFormat.bestFor}.
+					Transform your HTML code into high-quality {currentFormat.fullName} images {#if hasSize} at {sizeString}{/if} instantly. Perfect for {currentFormat.bestFor}.
 				</p>
 			</div>
 
@@ -382,6 +459,17 @@ $: if (!fileExtension) {
 							</button>
 						{/each}
 					</div>
+					{#if hasSize}
+						<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+							{#each popularSizes as sz}
+								<a href={`/tools/html-to-${format}/${sz}`} class="group">
+									<div class={`px-4 py-2 rounded-lg border text-sm text-center transition-all duration-200 ${sizeString === sz ? 'border-[#ff6b6b] bg-[#ff6b6b]/5 text-[#ff6b6b] font-semibold' : 'border-gray-200 hover:border-gray-300 bg-white/80'}`}>
+										{sz}
+									</div>
+								</a>
+							{/each}
+						</div>
+					{/if}
 					<p class="text-xs text-gray-500">Selected format is optimized for {currentFormat.bestFor}</p>
 				</div>
 			</div>
@@ -414,8 +502,8 @@ $: if (!fileExtension) {
 							<div class="relative group">
 								<div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
 							<a 
-								href="/signup?redirect=/tools/html-to-{format}"
-									class="py-2 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-white transition-all hover:shadow-lg hover:brightness-105 inline-block text-sm"
+								href={`/signup?redirect=/tools/html-to-${format}`}
+								class="py-2 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-white transition-all hover:shadow-lg hover:brightness-105 inline-block text-sm"
 							>
 								Sign Up Free
 							</a>
@@ -433,6 +521,8 @@ $: if (!fileExtension) {
 				<CodeEditor
 					isPreviewEnabled={false}
 					fileExtension={fileExtension}
+					targetWidth={hasSize ? dimWidth : undefined}
+					targetHeight={hasSize ? dimHeight : undefined}
 					on:previewUpdated={handlePreviewUpdate}
 				/>
 				
@@ -493,7 +583,7 @@ $: if (!fileExtension) {
 
 				<!-- Generated Image Preview -->
 				<div class="mb-8 overflow-hidden rounded-xl border border-gray-200">
-					<div class="aspect-[1200/630] relative w-full">
+					<div class="relative w-full" style={hasSize ? `aspect-ratio: ${dimWidth} / ${dimHeight}` : 'aspect-ratio: 1200 / 630'}>
 						<img 
 							src={imageUrl} 
 							alt="Generated Image" 
@@ -535,7 +625,7 @@ $: if (!fileExtension) {
 								<div class="relative group">
 									<div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
 									<a 
-										href="/signup?redirect=/tools/html-to-{format}"
+										href={`/signup?redirect=/tools/html-to-${format}`}
 										class="block py-3 px-6 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-white transition-all hover:shadow-lg hover:brightness-105"
 									>
 										Sign Up Free
@@ -553,7 +643,7 @@ $: if (!fileExtension) {
 							<div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
 							<button 
 								class="py-4 rounded-lg px-8 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-lg flex-shrink-0 text-white transition-all hover:shadow-lg hover:brightness-105"
-								on:click={() => window.location.href = '/signup?redirect=/tools/html-to-{format}'}
+								on:click={() => window.location.href = `/signup?redirect=/tools/html-to-${format}`}
 							>
 								<span class="relative inline-flex items-center gap-2">
 									<span>Create Free Account</span>
@@ -644,7 +734,7 @@ $: if (!fileExtension) {
 						<div class="relative group w-full">
 							<div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
 							<a 
-								href="/signup?redirect=/tools/html-to-{format}"
+								href={`/signup?redirect=/tools/html-to-${format}`}
 								class="block w-full py-3 px-6 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-center text-white transition-all hover:shadow-lg hover:brightness-105"
 							>
 								Create Free Account
@@ -711,7 +801,7 @@ $: if (!fileExtension) {
 						<div class="relative group w-full">
 							<div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
 							<a 
-								href="/signup?redirect=/tools/html-to-{format}"
+								href={`/signup?redirect=/tools/html-to-${format}`}
 								class="block w-full py-3 px-6 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-center text-white transition-all hover:shadow-lg hover:brightness-105"
 							>
 								Sign Up Free
@@ -729,9 +819,9 @@ $: if (!fileExtension) {
 			</div>
 		{/if}
 
-		<!-- Features Grid -->
+    <!-- Features Grid -->
 		<div class="w-full max-w-6xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm transform hover:shadow-md transition-all duration-300">
-			<h2 class="text-2xl font-bold text-gray-900 mb-6">Key Features</h2>
+				<h2 class="text-2xl font-bold text-gray-900 mb-6">Key Features {#if hasSize} for {currentFormat.fullName} at {sizeString}{/if}</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
 				{#each currentFormat.benefits as benefit}
 					<div class="bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:scale-105">
@@ -742,7 +832,7 @@ $: if (!fileExtension) {
 								</svg>
 							</div>
 							<div class="text-center">
-								<p class="text-gray-700">{benefit}</p>
+								<p class="text-gray-700">{benefit} {#if hasSize} — works great at {sizeString}{/if}</p>
 							</div>
 						</div>
 					</div>
@@ -750,17 +840,50 @@ $: if (!fileExtension) {
 			</div>
 		</div>
 
+    <!-- Popular Use Cases -->
+    <section class="mb-16">
+      <ApiPromptSection
+        title={`Ship HTML → ${currentFormat.fullName} via API`}
+        description="Render marketing visuals, invoices, or personalized content at scale without managing browsers or queues."
+        featurePoints={apiFeatureBullets}
+				codeLanguage="bash"
+        codeSnippet={apiSnippetTemplate
+          .replace('WIDTH_PLACEHOLDER', (hasSize ? dimWidth : previewWidth) || 1200)
+          .replace('HEIGHT_PLACEHOLDER', (hasSize ? dimHeight : previewHeight) || 630)
+          .replace('FORMAT_PLACEHOLDER', format)}
+        docsUrl="https://docs.pictify.io"
+        docsLabel="View HTML → Image API docs"
+        secondaryCtaUrl="/dashboard/api-playground"
+        secondaryCtaLabel="Open API Playground"
+        note="Talk to sales for dedicated regions, SLAs, or volume pricing."
+      />
+    </section>
+
 		<!-- Other Formats Section -->
 		<div class="w-full max-w-6xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm transform hover:shadow-md transition-all duration-300">
-			<h2 class="text-2xl font-bold text-gray-900 mb-6">Try Other Formats</h2>
+				<h2 class="text-2xl font-bold text-gray-900 mb-6">Try Other Formats {#if hasSize} at {sizeString}{/if}</h2>
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{#each otherFormats as otherFormat}
 					<a
-						href="/tools/html-to-{otherFormat}"
-						class="p-6 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 hover:border-[#ff6b6b]/30 transition-all"
+						href={`/tools/html-to-${otherFormat}`}
+						class="flex items-center gap-3 p-4 transition border rounded-xl group border-gray-200/80 bg-white/70 hover:border-[#ff6b6b]/50 hover:bg-white"
 					>
-						<h3 class="text-xl font-bold text-gray-900 mb-2">HTML to {formatInfo[otherFormat].fullName}</h3>
+						<h3 class="text-xl font-bold text-gray-900 mb-2">{formatInfo[otherFormat].fullName}</h3>
 						<p class="text-gray-700">Perfect for {formatInfo[otherFormat].bestFor}</p>
+					</a>
+				{/each}
+			</div>
+		</div>
+
+		<!-- Related OG Image Workflows -->
+		<div class="w-full max-w-6xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm transform hover:shadow-md transition-all duration-300">
+			<h2 class="text-2xl font-bold text-gray-900 mb-6">Need social previews?</h2>
+			<p class="text-gray-700 mb-4">Create platform-optimized Open Graph images after exporting your HTML. Start with these popular workflows:</p>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				{#each featuredPlatforms as platform}
+					<a href={`/tools/og-image-generator/${platform.id}`} class="bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 p-6 hover:border-[#ff6b6b]/40 transition-all">
+						<h3 class="text-xl font-semibold text-gray-900 mb-2">{platform.label}</h3>
+						<p class="text-sm text-gray-600">Design branded OG images tailored for {platform.label} in a few clicks.</p>
 					</a>
 				{/each}
 			</div>
@@ -794,7 +917,7 @@ $: if (!fileExtension) {
 		<div class="max-w-6xl mx-auto px-6 md:px-0 mt-20">
 			<!-- How it Works Section -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">How to Convert HTML to {currentFormat.fullName}</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">How to Convert HTML to {currentFormat.fullName} {#if hasSize} ({sizeString}){/if}</h2>
 				<div class="mt-10 flex flex-col sm:flex-row max-w-6xl mx-auto gap-6">
 					<div class="flex-1 rounded-xl p-4 border-[3px] border-gray-900 bg-[#EBEBEB]">
 						<h3 class="text-xl font-bold">Step 1: Input HTML</h3>
@@ -813,7 +936,7 @@ $: if (!fileExtension) {
 
 			<!-- Best Practices Section -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">Best Practices for {currentFormat.fullName} Conversion</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">Best Practices for {currentFormat.fullName} Conversion {#if hasSize} at {sizeString}{/if}</h2>
 				<ul class="text-lg text-gray-700 space-y-4">
 					<li class="flex items-start gap-3">
 						<svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -929,7 +1052,7 @@ $: if (!fileExtension) {
 
 			<!-- Introduction Section -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">Convert Image from HTML to {currentFormat.fullName} Online - Fast, Free, and Optimized</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">Convert HTML to {currentFormat.fullName} Images {#if hasSize} at {sizeString}{/if} — Fast, Free, and Optimized</h2>
 				<p class="text-lg mb-4 text-gray-700">
 					Our HTML to image converter specializes in creating optimized {currentFormat.fullName} images from your HTML code. Ideal for {currentFormat.bestFor}, our tool ensures your visuals are high-quality and web-ready.
 				</p>
@@ -959,7 +1082,7 @@ $: if (!fileExtension) {
 
 			<!-- Why Choose Section -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">Why Choose Our Tool to Convert Image from HTML to {currentFormat.fullName}?</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">Why Choose Our HTML to {currentFormat.fullName} Tool {#if hasSize} for {sizeString}{/if}?</h2>
 				<div class="space-y-6">
 					<div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
 						<h3 class="text-2xl font-semibold mb-2 text-gray-900">Optimized for {currentFormat.bestFor}</h3>
@@ -978,7 +1101,7 @@ $: if (!fileExtension) {
 
 			<!-- Add this section after the "Why Choose Section" -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">{currentFormat.fullName} vs Other Image Formats</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">{currentFormat.fullName} vs Other Image Formats {#if hasSize} (considering {sizeString}){/if}</h2>
 				
 				<!-- Comparison Table -->
 				<div class="overflow-x-auto">
@@ -1029,7 +1152,7 @@ $: if (!fileExtension) {
 
 			<!-- Case Studies Section -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">Real-World Use Cases</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">Real-World Use Cases {#if hasSize} that fit {sizeString}{/if}</h2>
 				
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
@@ -1053,7 +1176,7 @@ $: if (!fileExtension) {
 
 			<!-- Technical Details Section -->
 			<section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-				<h2 class="text-3xl font-bold mb-6 text-gray-900">Technical Specifications</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-900">Technical Specifications {#if hasSize} at {sizeString}{/if}</h2>
 				
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">

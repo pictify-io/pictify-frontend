@@ -10,6 +10,26 @@
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { user } from '../../../store/user.store';
+  import { ogPlatforms, popularSizes as configPopularSizes, platformGuides, platformRecommendedSizes, parseSize } from '$lib/pseo/config.js';
+  import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+
+  // Optional platform prop to specialize content (e.g., 'wordpress')
+  export let platform = null;
+  $: platformObj = typeof platform === 'string' ? (ogPlatforms.find(p => p.id === platform) || { id: platform, label: platform }) : platform;
+  $: platformLabel = platformObj?.label;
+  $: isPlatform = !!platformLabel;
+  $: recommendedSizes = configPopularSizes;
+  $: platformSizes = isPlatform ? (platformRecommendedSizes[platformObj.id] || recommendedSizes) : recommendedSizes;
+  $: platformSteps = isPlatform ? (platformGuides[platformObj.id] || []) : [];
+
+  // If a platform is provided, adapt default preview dimensions to its recommended size
+  $: if (isPlatform && platformSizes && platformSizes.length) {
+    const dims = parseSize(platformSizes[0]);
+    if (dims.width && dims.height) {
+      previewWidth = dims.width;
+      previewHeight = dims.height;
+    }
+  }
 
   // Growth metrics
   let totalImagesGenerated = 45897; // Social proof counter
@@ -383,18 +403,32 @@ const combinedFonts = popularFonts.map((font, index) => ({
   };
 
   // Add these variables to the existing script section
+  const apiExampleCode = `curl -X POST https://api.pictify.io/image/og-image \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d '{
+    "template": "template-1",
+    "heading": "Launch Day",
+    "description": "Ship product updates in style",
+    "logo": "https://cdn.pictify.io/logo.png"
+  }'`;
+
   let generationCount = 0;
   let showUpgradePrompt = false;
-
-  const apiExampleCode = `
-const response = await fetch('https://api.pictify.io/og-image', {
-  method: 'POST',
-  headers: { 'Authorization': 'Bearer YOUR_API_KEY' },
-  body: JSON.stringify({
-    title: 'My Awesome Post',
-    template: 'modern-gradient'
-  })
-});`;
+  const defaultApiFeatureBullets = [
+    'Personalize OG images at publish-time with dynamic data',
+    'Serve optimized assets from our global CDN in milliseconds',
+    'Rotate tokens, monitor usage, and manage limits from the dashboard'
+  ];
+  const apiCtaDetails = {
+    title: 'Ship OG images straight from your product',
+    description: 'Use our REST API to generate branded OG art on publish, across marketing workflows, or inside your SaaS with a single call.',
+    featurePoints: defaultApiFeatureBullets,
+    codeSnippet: apiExampleCode,
+    docsUrl: 'https://docs.pictify.io/',
+    docsLabel: 'View OG Image API docs',
+    secondaryCtaLabel: 'See code examples'
+  };
 
   // Modify the generateImage function
   const generateImage = async () => {
@@ -486,26 +520,35 @@ const response = await fetch('https://api.pictify.io/og-image', {
 </script>
 
 <svelte:head>
-  <title>Free OG Image Generator: Create Custom Open Graph Images | Pictify.io</title>
-  <meta name="description" content="Create stunning Open Graph images for free with Pictify.io's OG Image Generator. Boost social media engagement and SEO with custom OG images for your content.">
-  <meta name="keywords" content="OG image generator, Open Graph images, social media images, SEO, content marketing">
-  <link rel="canonical" href="https://pictify.io/tools/og-image-generator">
-  <meta property="og:title" content="Best OG Image Generator | Create Open Graph Images Free">
-  <meta property="og:description" content="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.">
-  <meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
-  <meta property="og:url" content="https://pictify.io/tools/og-image-generator">
+  {#if isPlatform}
+    <title>OG Image Generator for {platformLabel} | Pictify.io</title>
+    <meta name="description" content={`Create perfect Open Graph images for ${platformLabel}. Customize templates, fonts, and colors with Pictify.io.`}>
+    <link rel="canonical" href={`https://pictify.io/tools/og-image-generator/${platformObj.id}`}>  
+    <meta property="og:title" content={`OG Image Generator for ${platformLabel} | Pictify.io`}>
+    <meta property="og:description" content={`Design ${platformLabel} OG images in seconds with Pictify.io.`}>
+    <meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
+    <meta property="og:url" content={`https://pictify.io/tools/og-image-generator/${platformObj.id}`}>  
+  {:else}
+    <title>Free OG Image Generator: Create Custom Open Graph Images | Pictify.io</title>
+    <meta name="description" content="Create stunning Open Graph images for free with Pictify.io's OG Image Generator. Boost social media engagement and SEO with custom OG images for your content.">
+    <link rel="canonical" href="https://pictify.io/tools/og-image-generator">
+    <meta property="og:title" content="Best OG Image Generator | Create Open Graph Images Free">
+    <meta property="og:description" content="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.">
+    <meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
+    <meta property="og:url" content="https://pictify.io/tools/og-image-generator">
+  {/if}
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@pictify_io">
-  <meta name="twitter:title" content="Best OG Image Generator | Create Open Graph Images Free">
-  <meta name="twitter:description" content="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.">
+  <meta name="twitter:title" content={isPlatform ? `OG Image Generator for ${platformLabel} | Pictify.io` : 'Best OG Image Generator | Create Open Graph Images Free'}>
+  <meta name="twitter:description" content={isPlatform ? `Design ${platformLabel} OG images in seconds with Pictify.io.` : 'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'}>
   <meta name="twitter:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Pictify OG Image Generator",
-    "url": "https://pictify.io/tools/og-image-generator",
-    "description": "Create custom Open Graph images for improved social media engagement and SEO.",
+    "name": {"@json":"Pictify OG Image Generator"},
+    "url": {"@json": isPlatform ? `https://pictify.io/tools/og-image-generator/${platformObj.id}` : 'https://pictify.io/tools/og-image-generator'},
+    "description": {"@json": isPlatform ? `Create custom ${platformLabel} Open Graph images for improved social media engagement and SEO.` : 'Create custom Open Graph images for improved social media engagement and SEO.'},
     "applicationCategory": ["DesignApplication", "SEO Tool"],
     "operatingSystem": "Web",
     "offers": {
@@ -552,10 +595,7 @@ const response = await fetch('https://api.pictify.io/og-image', {
       "url": "https://pictify.io/docs/og-image-generator"
     },
     "keywords": ["OG image generator", "Open Graph images", "social media images", "SEO", "content marketing"],
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://pictify.io/tools/og-image-generator"
-    }
+    "mainEntityOfPage": {"@json": {"@type":"WebPage","@id": isPlatform ? `https://pictify.io/tools/og-image-generator/${platformObj.id}` : 'https://pictify.io/tools/og-image-generator'}}
   }
   </script>
 </svelte:head>
@@ -581,12 +621,23 @@ const response = await fetch('https://api.pictify.io/og-image', {
       </div>
 
       <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-gray-900 leading-tight">
-        OG Image<br/><span class="text-[#ff6b6b]">Generator</span>
+        OG Image<br/><span class="text-[#ff6b6b]">Generator</span>{#if isPlatform}<br/><span class="text-xl md:text-2xl font-medium text-gray-700">for {platformLabel}</span>{/if}
       </h1>
       
       <p class="text-lg md:text-xl text-gray-800 max-w-2xl leading-relaxed font-medium px-4 md:px-0">
-        Generate stunning Open Graph images for your website or blog with our OG Image Generator.
+        {#if isPlatform}
+          Generate stunning Open Graph images tailored for {platformLabel}. Choose a template and customize it to match your brand.
+        {:else}
+          Generate stunning Open Graph images for your website or blog with our OG Image Generator.
+        {/if}
       </p>
+      {#if isPlatform}
+      <div class="flex flex-wrap justify-center gap-2 mt-2">
+        {#each platformSizes as sz}
+          <a href={`/tools/html-to-jpg/${sz}`} class="px-3 py-1 rounded border border-gray-300 text-sm bg-white hover:border-gray-400">{sz}</a>
+        {/each}
+      </div>
+      {/if}
         </div>
 
       <!-- Creation Mode Selector -->
@@ -673,7 +724,11 @@ const response = await fetch('https://api.pictify.io/og-image', {
         {:else}
           <!-- No form needed for direct creation mode -->
           <p class="text-center text-gray-700">
-            Choose a template below and start customizing your OG image.
+            {#if isPlatform}
+              Choose a template below and start customizing an OG image for {platformLabel}. Recommended size: 1200×630.
+            {:else}
+              Choose a template below and start customizing your OG image.
+            {/if}
           </p>
         {/if}
       </div>
@@ -1064,7 +1119,7 @@ const response = await fetch('https://api.pictify.io/og-image', {
     <!-- Featured templates section -->
     <div class="w-full max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm transform hover:shadow-md transition-all duration-300 mt-12">
       <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">Featured Templates</h2>
+      <h2 class="text-2xl font-bold text-gray-900">{isPlatform ? `Featured Templates for ${platformLabel}` : 'Featured Templates'}</h2>
         {#if !isUserLoggedIn}
           <a href="/signup?redirect=/dashboard/tools/og-image-generator" class="text-[#ff6b6b] hover:text-[#ff5252] font-medium flex items-center gap-1 transition-colors">
             Sign up free for more templates
@@ -1100,7 +1155,7 @@ const response = await fetch('https://api.pictify.io/og-image', {
     <!-- Premium templates section -->
     {#if isUserLoggedIn}
       <div class="w-full max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm transform hover:shadow-md transition-all duration-300 mt-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-8">All Templates</h2>
+      <h2 class="text-2xl font-bold text-gray-900 mb-8">{isPlatform ? `All Templates for ${platformLabel}` : 'All Templates'}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {#each templates.slice(6) as template}
             <div class="relative group cursor-pointer bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
@@ -1160,11 +1215,11 @@ const response = await fetch('https://api.pictify.io/og-image', {
 
     <!-- FAQ section -->
     <section class="w-full max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm transform hover:shadow-md transition-all duration-300 mt-12">
-      <h2 class="text-2xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
+      <h2 class="text-2xl font-bold text-gray-900 mb-8">{isPlatform ? `Frequently Asked Questions about ${platformLabel}` : 'Frequently Asked Questions'}</h2>
       <div class="space-y-4">
         <details class="group">
           <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-            <span class="font-semibold text-gray-900">What is an OG image?</span>
+            <span class="font-semibold text-gray-900">What is an OG image{isPlatform ? ` on ${platformLabel}` : ''}?</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
@@ -1176,13 +1231,23 @@ const response = await fetch('https://api.pictify.io/og-image', {
 
         <details class="group">
           <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-            <span class="font-semibold text-gray-900">How do I add an OG image to my website?</span>
+            <span class="font-semibold text-gray-900">How do I add an OG image {isPlatform ? `to ${platformLabel}` : 'to my website'}?</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </summary>
           <div class="mt-4 px-4 text-gray-700">
-            To add an OG image to your website, you need to include the appropriate Open Graph meta tags in the &lt;head&gt; section of your HTML. The most important tag for images is og:image, which should contain the URL of your OG image.
+            {#if isPlatform}
+              {#if platformSteps.length}
+                <ol class="list-decimal list-inside space-y-1">
+                  {#each platformSteps as s}<li>{s}</li>{/each}
+                </ol>
+              {:else}
+                Include the appropriate Open Graph meta tags (og:image, og:title, og:description) in your page head and validate with the platform's debugger.
+              {/if}
+            {:else}
+              To add an OG image to your website, include Open Graph meta tags in the &lt;head&gt;. The most important tag for images is og:image, which should contain the absolute URL of your OG image.
+            {/if}
           </div>
         </details>
 
@@ -1322,6 +1387,19 @@ const response = await fetch('https://api.pictify.io/og-image', {
     {/if}
 
     <!-- New SEO-optimized sections -->
+    <ApiPromptSection
+      title={apiCtaDetails.title}
+      description={apiCtaDetails.description}
+      featurePoints={apiCtaDetails.featurePoints}
+      codeSnippet={apiCtaDetails.codeSnippet}
+      codeLanguage="bash"
+      docsUrl={apiCtaDetails.docsUrl}
+      docsLabel={apiCtaDetails.docsLabel}
+      secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
+      secondaryCtaUrl="https://docs.pictify.io/examples"
+      note="Contact us for volume pricing or dedicated rendering regions."
+    />
+
     <div class="max-w-4xl mx-auto px-6 md:px-0 mb-20">
       <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center bg-gradient-to-r from-[#ff6b6b] to-[#ff8e8e] bg-clip-text text-transparent">Learn More About OG Image Generation</h2>
       

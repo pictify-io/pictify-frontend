@@ -2,6 +2,7 @@
   import Nav from '$lib/components/landingPage/Nav.svelte';
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import Toast from '$lib/components/Toast.svelte';
+  import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
   import { onMount } from 'svelte';
   import { toast } from '../../../store/toast.store';
   import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
@@ -15,6 +16,20 @@
   let isPreviewLoaded = false;
   let iframeWrapper;
   let isLoading = false;
+const apiFeatureBullets = [
+	"Capture full-page or element-level screenshots across thousands of URLs",
+	"Schedule batch crawls and deliver CDN-hosted images instantly",
+	"Manage API usage, tokens, and webhooks directly from the dashboard"
+];
+const apiSnippet = `curl -X POST https://api.pictify.io/image \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d '{
+    "url": "https://example.com",
+    "selector": "#main-content",
+    "width": 1600,
+    "height": 900
+  }'`;
 
   let iframeElement;
   let isIframeReady = false;
@@ -316,6 +331,7 @@
       </button>
     </div>
 
+
     {#if isImageGenerating}
       <div class="mt-8">
         <div class="w-full text-gray-900 text-lg font-medium py-3.5 rounded bg-gray-100 shadow-md">
@@ -346,7 +362,21 @@
         <img src={imageUrl} alt="Generated Image" class="w-full max-w-3xl mt-4 m-auto h-auto rounded-lg shadow-md" />
       </div>
     {/if}
+
+    <ApiPromptSection
+    title="Automate URL screenshots with our API"
+    description="Trigger screenshot captures from scripts, CRON jobs, or workflows and receive CDN-hosted images in seconds."
+    featurePoints={apiFeatureBullets}
+    codeSnippet={apiSnippet}
+    codeLanguage="bash"
+    docsUrl="https://docs.pictify.io/"
+    docsLabel="Read URL to Image docs"
+    secondaryCtaUrl="/dashboard/api-playground"
+    secondaryCtaLabel="Run sample request"
+    note="Need JS execution, authentication, or regional rendering? Contact us for advanced plans."
+  />
   </div>
+
 
   <!-- Separator -->
   <div class="max-w-4xl mx-auto px-6 md:px-0 my-20">
