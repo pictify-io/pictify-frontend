@@ -516,7 +516,81 @@ const combinedFonts = popularFonts.map((font, index) => ({
     // ... rest of existing onMount code ...
   });
 
- 
+  $: canonicalUrl =
+    isPlatform && platformObj?.id
+      ? `https://pictify.io/tools/og-image-generator/${platformObj.id}`
+      : 'https://pictify.io/tools/og-image-generator';
+
+  $: structuredDataDescription =
+    isPlatform && platformLabel
+      ? `Create custom ${platformLabel} Open Graph images for improved social media engagement and SEO.`
+      : 'Create custom Open Graph images for improved social media engagement and SEO.';
+
+  $: structuredData =
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Pictify OG Image Generator',
+      url: canonicalUrl,
+      description: structuredDataDescription,
+      applicationCategory: ['DesignApplication', 'SEO Tool'],
+      operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock'
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        ratingCount: '4192',
+        bestRating: '5',
+        worstRating: '1'
+      },
+      featureList: [
+        'Customizable templates',
+        'Automatic website info extraction',
+        'Color and font customization',
+        'API access',
+        'Social media preview'
+      ],
+      screenshot: {
+        '@type': 'ImageObject',
+        url: 'https://media.pictify.io/z8xnl-1723429909736.png',
+        width: '1200',
+        height: '630'
+      },
+      creator: {
+        '@type': 'Organization',
+        name: 'Pictify.io',
+        url: 'https://pictify.io',
+        logo: 'https://pictify.io/logo.png'
+      },
+      interactionStatistic: {
+        '@type': 'InteractionCounter',
+        interactionType: 'https://schema.org/UseAction',
+        userInteractionCount: '45897'
+      },
+      softwareVersion: '1.2.0',
+      softwareHelp: {
+        '@type': 'CreativeWork',
+        name: 'OG Image Generator Documentation',
+        url: 'https://pictify.io/docs/og-image-generator'
+      },
+      keywords: [
+        'OG image generator',
+        'Open Graph images',
+        'social media images',
+        'SEO',
+        'content marketing'
+      ],
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': canonicalUrl
+      }
+    };
+  
 </script>
 
 <svelte:head>
@@ -543,60 +617,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
   <meta name="twitter:description" content={isPlatform ? `Design ${platformLabel} OG images in seconds with Pictify.io.` : 'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'}>
   <meta name="twitter:image" content="https://media.pictify.io/z8xnl-1723429909736.png">
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": {"@json":"Pictify OG Image Generator"},
-    "url": {"@json": isPlatform ? `https://pictify.io/tools/og-image-generator/${platformObj.id}` : 'https://pictify.io/tools/og-image-generator'},
-    "description": {"@json": isPlatform ? `Create custom ${platformLabel} Open Graph images for improved social media engagement and SEO.` : 'Create custom Open Graph images for improved social media engagement and SEO.'},
-    "applicationCategory": ["DesignApplication", "SEO Tool"],
-    "operatingSystem": "Web",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "ratingCount": "4192",
-      "bestRating": "5",
-      "worstRating": "1"
-    },
-    "featureList": [
-      "Customizable templates",
-      "Automatic website info extraction",
-      "Color and font customization",
-      "API access",
-      "Social media preview"
-    ],
-    "screenshot": {
-      "@type": "ImageObject",
-      "url": "https://media.pictify.io/z8xnl-1723429909736.png",
-      "width": "1200",
-      "height": "630"
-    },
-    "creator": {
-      "@type": "Organization",
-      "name": "Pictify.io",
-      "url": "https://pictify.io",
-      "logo": "https://pictify.io/logo.png"
-    },
-    "interactionStatistic": {
-      "@type": "InteractionCounter",
-      "interactionType": "https://schema.org/UseAction",
-      "userInteractionCount": "45897"
-    },
-    "softwareVersion": "1.2.0",
-    "softwareHelp": {
-      "@type": "CreativeWork",
-      "name": "OG Image Generator Documentation",
-      "url": "https://pictify.io/docs/og-image-generator"
-    },
-    "keywords": ["OG image generator", "Open Graph images", "social media images", "SEO", "content marketing"],
-    "mainEntityOfPage": {"@json": {"@type":"WebPage","@id": isPlatform ? `https://pictify.io/tools/og-image-generator/${platformObj.id}` : 'https://pictify.io/tools/og-image-generator'}}
-  }
+    {JSON.stringify(structuredData)}
   </script>
 </svelte:head>
 

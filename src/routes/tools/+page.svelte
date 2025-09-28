@@ -5,44 +5,61 @@
 
   const tools = [
     {
-      name: "AI Agent Screenshot",
-      description: "Use natural language to automatically capture screenshots of any website content.",
-      url: "/dashboard/tools/agent-screenshot",
-      icon: "🤖",
-      badge: "New"
+      name: 'AI Agent Screenshot',
+      description: 'Use natural language to automatically capture screenshots of any website content.',
+      url: '/dashboard/tools/agent-screenshot',
+      icon: '🤖',
+      badge: 'New'
     },
     {
-      name: "Code to Image (Syntax Highlighter)",
-      description: "Turn code snippets into beautiful images with themes and fonts.",
-      url: "/tools/code-to-image",
-      icon: "🧑‍💻",
-      badge: "New"
+      name: 'Code to Image (Syntax Highlighter)',
+      description: 'Turn code snippets into beautiful images with themes and fonts.',
+      url: '/tools/code-to-image',
+      icon: '🧑‍💻',
+      badge: 'New'
     },
     {
-      name: "OG Image Generator",
-      description: "Create custom Open Graph images for improved social media engagement and SEO.",
-      url: "/tools/og-image-generator",
-      icon: "🖼️"
+      name: 'OG Image Generator',
+      description: 'Create custom Open Graph images for improved social media engagement and SEO.',
+      url: '/tools/og-image-generator',
+      icon: '🖼️'
     },
     {
-      name: "HTML to JPG Converter",
-      description: "Convert HTML to high-quality JPG images with our free online tool.",
-      url: "/tools/html-to-jpg",
-      icon: "🔄"
+      name: 'HTML to JPG Converter',
+      description: 'Convert HTML to high-quality JPG images with our free online tool.',
+      url: '/tools/html-to-jpg',
+      icon: '🔄'
     },
     {
-      name: "Online Invoice Generator",
-      description: "Create professional invoices quickly and easily with our free online tool.",
-      url: "/tools/online-invoice-generator",
-      icon: "📄"
+      name: 'Online Invoice Generator',
+      description: 'Create professional invoices quickly and easily with our free online tool.',
+      url: '/tools/online-invoice-generator',
+      icon: '📄'
     },
     {
-      name:"URL to Image Generator",
-      description:"Generate images from any URL with our free online tool.",
-      url:"/tools/url-to-image-generator",
-      icon:"📸"
+      name: 'URL to Image Generator',
+      description: 'Generate images from any URL with our free online tool.',
+      url: '/tools/url-to-image-generator',
+      icon: '📸'
     }
   ];
+
+  const itemListStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Pictify.io Free Image Generation Tools',
+    description: 'A collection of free image generation tools provided by Pictify.io',
+    itemListElement: tools.map((tool, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'WebApplication',
+        name: tool.name,
+        url: `https://pictify.io${tool.url.replace('/dashboard', '')}`,
+        description: tool.description
+      }
+    }))
+  };
 </script>
 
 <svelte:head>
@@ -56,54 +73,7 @@
   <meta property="og:url" content="https://pictify.io/tools">
   <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "ItemList",
-    "name": "Pictify.io Free Image Generation Tools",
-    "description": "A collection of free image generation tools provided by Pictify.io",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "item": {
-          "@type": "WebApplication",
-          "name": "OG Image Generator",
-          "url": "https://pictify.io/tools/og-image-generator",
-          "description": "Create custom Open Graph images for improved social media engagement and SEO."
-        }
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "item": {
-          "@type": "WebApplication",
-          "name": "HTML to JPG Converter",
-          "url": "https://pictify.io/tools/html-to-jpg",
-          "description": "Convert HTML to high-quality JPG images with our free online tool."
-        }
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "item": {
-          "@type": "WebApplication",
-          "name": "Online Invoice Generator",
-          "url": "https://pictify.io/tools/online-invoice-generator",
-          "description": "Create professional invoices with our free online tool."
-        }
-      },
-      {
-        "@type": "ListItem",
-        "position": 4,
-        "item": {
-          "@type": "WebApplication",
-          "name": "URL to Image Generator",
-          "url": "https://pictify.io/tools/url-to-image-generator",
-          "description": "Generate images from any URL with our free online tool."
-        }
-      }
-    ]
-  }
+    {JSON.stringify(itemListStructuredData)}
   </script>
 </svelte:head>
 

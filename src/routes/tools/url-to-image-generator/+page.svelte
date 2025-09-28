@@ -8,14 +8,30 @@
   import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
   import { createImagePublic } from '../../../api/image.js';
 
-  let url = '';
-  let selector = '';
-  let overlayElement;
-  let imageUrl = '';
-  let isImageGenerating = false;
-  let isPreviewLoaded = false;
-  let iframeWrapper;
-  let isLoading = false;
+let url = '';
+let selector = '';
+let overlayElement;
+let imageUrl = '';
+let isImageGenerating = false;
+let isPreviewLoaded = false;
+let iframeWrapper;
+let isLoading = false;
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: 'Pictify.io URL to Image Generator',
+	url: 'https://pictify.io/tools/url-to-image-generator',
+	description:
+		'Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.',
+	applicationCategory: ['DesignApplication', 'Utility'],
+	operatingSystem: 'Web',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+		availability: 'https://schema.org/InStock'
+	}
+};
 const apiFeatureBullets = [
 	"Capture full-page or element-level screenshots across thousands of URLs",
 	"Schedule batch crawls and deliver CDN-hosted images instantly",
@@ -227,20 +243,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
   <meta name="twitter:description" content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.">
   <meta name="twitter:image" content="https://media.pictify.io/r49i0-1725792197198.png">
   <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebApplication",
-    "name": "Pictify.io URL to Image Generator",
-    "url": "https://pictify.io/tools/url-to-image-generator",
-    "description": "Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.",
-    "applicationCategory": "DesignApplication",
-    "operatingSystem": "Web",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    }
-  }
+    {JSON.stringify(structuredData)}
   </script>
 </svelte:head>
 

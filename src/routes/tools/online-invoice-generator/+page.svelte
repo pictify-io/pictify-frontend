@@ -32,6 +32,23 @@
   let invoiceTemplateWrapper;
   let windowWidth;
 
+const structuredDataJson = JSON.stringify({
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: 'Pictify.io Online Invoice Generator',
+	url: 'https://pictify.io/tools/online-invoice-generator',
+	description:
+		'Create custom invoices to streamline your billing process and maintain a professional image.',
+	applicationCategory: ['BusinessApplication', 'Utility'],
+	operatingSystem: 'Web',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+		availability: 'https://schema.org/InStock'
+	}
+});
+
   // Function to calculate iframe scale based on window width
   function calculateScale(width) {
     if (width < 640) return 0.3; // Mobile
@@ -186,20 +203,7 @@
   <meta name="twitter:description" content="Create custom invoices to streamline your billing process and maintain a professional image.">
   <meta name="twitter:image" content="https://media.pictify.io/zuhz9-1725661278941.png">
   <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebApplication",
-    "name": "Pictify.io Online Invoice Generator",
-    "url": "https://pictify.io/tools/online-invoice-generator",
-    "description": "Create custom invoices to streamline your billing process and maintain a professional image.",
-    "applicationCategory": "DesignApplication",
-    "operatingSystem": "Web",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    }
-  }
+    {structuredDataJson}
   </script>
 </svelte:head>
 

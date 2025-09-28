@@ -53,26 +53,28 @@
 	<meta property="og:site_name" content="Pictify.io" />
 	<meta property="og:locale" content="en_US" />
 	<script type="application/ld+json">
-	{
-	  "@context": "https://schema.org/",
-	  "@type": "SoftwareApplication",
-	  "name": "Pictify.io",
-	  "url": "https://pictify.io",
-	  "image": "https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png",
-	  "description": "Transform HTML to stunning images and GIFs with Pictify.io's powerful API. Create shareable content, boost engagement, and make your brand stand out.",
-	  "applicationCategory": "DesignApplication",
-	  "operatingSystem": "Web",
-	  "offers": {
-		"@type": "Offer",
-		"price": "0",
-		"priceCurrency": "USD"
-	  },
-	  "aggregateRating": {
-		"@type": "AggregateRating",
-		"ratingValue": "4.8",
-		"ratingCount": "7"
-	  }
-	}
+		{JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'SoftwareApplication',
+			name: 'Pictify.io',
+			url: 'https://pictify.io',
+			image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
+			description:
+				"Transform HTML to stunning images and GIFs with Pictify.io's powerful API. Create shareable content, boost engagement, and make your brand stand out.",
+			applicationCategory: ['DesignApplication', 'Utility'],
+			operatingSystem: 'Web',
+			offers: {
+				'@type': 'Offer',
+				price: '0',
+				priceCurrency: 'USD',
+				availability: 'https://schema.org/InStock'
+			},
+			aggregateRating: {
+				'@type': 'AggregateRating',
+				ratingValue: '4.8',
+				ratingCount: '7'
+			}
+		})}
 	</script>
 </svelte:head>
 
