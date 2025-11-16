@@ -2,6 +2,7 @@
 	import '../../app.css';
 	import Nav from '$lib/components/dashboard/Nav.svelte';
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
+	import VerifyEmailBanner from '$lib/components/dashboard/VerifyEmailBanner.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 
 	import { getUser } from '../../store/user.store';
@@ -30,6 +31,9 @@
 </svelte:head>
 
 <Nav />
+{#if user?.isEmailVerified === false}
+	<VerifyEmailBanner email={user?.email} />
+{/if}
 <div class="min-h-screen flex flex-col">
 	<div class="flex flex-col sm:flex-row w-100 flex-grow">
 		<div class="sm:border-r-[3px] border-black">

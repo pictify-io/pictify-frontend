@@ -32,6 +32,35 @@ const signup = async ({ email, password }) => {
 	}
 };
 
+const verifyEmail = async ({ token }) => {
+	if (!token) {
+		throw new Error('Verification token is required');
+	}
+	try {
+		const response = await backend.post('/auth/verify-email', {
+			token
+		});
+		return response;
+	} catch (error) {
+		if (error.status === 400) {
+			throw new Error('Your verification link is invalid or expired');
+		}
+		throw new Error('Error verifying email');
+	}
+};
+
+const resendVerificationEmail = async () => {
+	try {
+		const response = await backend.post('/auth/resend-verification');
+		return response;
+	} catch (error) {
+		if (error.status === 429) {
+			throw new Error('Verification email was just sent. Please try again in a moment.');
+		}
+		throw new Error('Unable to resend verification email right now');
+	}
+};
+
 const impersonate = async ({ password, email, userId }) => {
 	try {
 		const response = await backend.post('/auth/impersonate', {
@@ -46,4 +75,4 @@ const impersonate = async ({ password, email, userId }) => {
 	}
 };
 
-export { login, logout, signup, impersonate };
+export { login, logout, signup, verifyEmail, resendVerificationEmail, impersonate };

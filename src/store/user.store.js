@@ -10,31 +10,43 @@ import {
 } from '../api/user';
 import validateEmail from '../util/validateEmail';
 
-export const user = writable({
+const createDefaultUserState = () => ({
 	email: null,
 	token: null,
 	apiTokens: [],
 	currentPlan: null,
-	planDetails: null
+	planDetails: null,
+	isEmailVerified: null,
+	verification: null
 });
+
+const normalizeUserPayload = (payload = {}) => {
+	return {
+		email: payload?.email ?? null,
+		token: payload?.token ?? null,
+		currentPlan: payload?.currentPlan ?? null,
+		isEmailVerified: payload?.isEmailVerified ?? null,
+		verification: payload?.verification ?? null
+	};
+};
+
+const extractUser = (response) => response?.user ?? response ?? null;
+
+export const user = writable(createDefaultUserState());
 
 export const activeApiToken = writable(null);
 // Setters
 
-const setUser = (email, token, currentPlan) => {
+const setUser = (userPayload = {}) => {
+	const normalized = normalizeUserPayload(userPayload);
 	user.set({
-		email,
-		token,
-		currentPlan
+		...createDefaultUserState(),
+		...normalized
 	});
 };
 
 export const clearUser = () => {
-	user.set({
-		email: null,
-		token: null,
-		currentPlan: null
-	});
+	user.set(createDefaultUserState());
 };
 
 export const setApiTokens = (apiTokens) => {
@@ -57,15 +69,16 @@ export const isLoggedIn = () => {
 };
 
 export const getToken = () => {
-	return user.token;
+	return get(user).token;
 };
 
 export const getEmail = () => {
-	return user.email;
+	return get(user).email;
 };
 
 export const getAuthHeader = () => {
-	return `Bearer ${user.token}`;
+	const token = get(user).token;
+	return token ? `Bearer ${token}` : '';
 };
 
 export const getUser = async () => {
@@ -78,7 +91,11 @@ export const getUser = async () => {
 			if (!response) {
 				return null;
 			}
-			setUser(response.user.email, response.user.token, response.user.currentPlan);
+			const payload = extractUser(response);
+			if (!payload) {
+				return null;
+			}
+			setUser(payload);
 			userData = get(user);
 		}
 	} catch (error) {
@@ -97,11 +114,12 @@ export const loginAction = async (email, password) => {
 			email,
 			password
 		});
-		const { user: userData } = await getUserAPI();
+		const apiResponse = await getUserAPI();
+		const userData = extractUser(apiResponse);
 		if (!userData) {
 			return null;
 		}
-		setUser(userData.email, userData.token, userData.currentPlan);
+		setUser(userData);
 		return response;
 	} catch (error) {
 		clearUser();
@@ -122,8 +140,11 @@ export const signupAction = async (email, password) => {
 			email,
 			password
 		});
-		const { user: userData } = await getUserAPI();
-		setUser(userData.email, userData.token, userData.currentPlan);
+		const apiResponse = await getUserAPI();
+		const userData = extractUser(apiResponse);
+		if (userData) {
+			setUser(userData);
+		}
 		return response;
 	} catch (error) {
 		clearUser();
@@ -136,11 +157,12 @@ export const impersonateAction = async (password, email, userId) => {
 		if (!password) throw new Error('Admin password is required');
 		if (!email && !userId) throw new Error('Provide either email or userId');
 		await impersonate({ password, email, userId });
-		const { user: userData } = await getUserAPI();
+		const apiResponse = await getUserAPI();
+		const userData = extractUser(apiResponse);
 		if (!userData) {
 			return null;
 		}
-		setUser(userData.email, userData.token, userData.currentPlan);
+		setUser(userData);
 		return userData;
 	} catch (error) {
 		throw error;
@@ -150,8 +172,11 @@ export const impersonateAction = async (password, email, userId) => {
 export const getUserAction = async () => {
 	try {
 		const response = await getUserAPI();
-		setUser(response.email, response.token, response.currentPlan);
-		return response;
+		const payload = extractUser(response);
+		if (payload) {
+			setUser(payload);
+		}
+		return payload;
 	} catch (error) {
 		clearUser();
 		throw error;

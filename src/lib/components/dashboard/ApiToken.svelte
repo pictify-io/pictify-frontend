@@ -20,15 +20,27 @@
 	let planDetails = {};
 	let usagePercentage = 0;
 
+	$: planUsageCount =
+		typeof planDetails?.usage === 'number'
+			? planDetails.usage
+			: planDetails?.usage?.count ?? 0;
+
+	$: planMonthlyLimit =
+		typeof planDetails?.monthlyLimit === 'number'
+			? planDetails.monthlyLimit
+			: planDetails?.limit ?? planDetails?.quota ?? 0;
+
+	$: usagePercentage =
+		planMonthlyLimit > 0 ? (planUsageCount / planMonthlyLimit) * 100 : 0;
+
 	onMount(async () => {
 		await Promise.all([getAPITokenAction(), getPlanDetailsAction()]);
 		unsubscribe = user.subscribe((u) => {
-			if (u.apiTokens && u.apiTokens.length && u.planDetails) {
+				if (u.apiTokens && u.apiTokens.length && u.planDetails) {
 				apiTokens = u.apiTokens;
 				planDetails = u.planDetails;
 				currentPlan = u.currentPlan;
 				isLoading = false;
-				usagePercentage = (planDetails.usage / planDetails.monthlyLimit) * 100;
 			}
 		});
 	});
@@ -74,7 +86,7 @@
 						<ProgressBar progress={usagePercentage} />
 					</div>
 					<div class="text-xs text-gray-700 ml-2">
-						{planDetails?.usage} / {planDetails?.monthlyLimit}
+						{planUsageCount} / {planMonthlyLimit > 0 ? planMonthlyLimit : '∞'}
 					</div>
 				</div>
 			</div>

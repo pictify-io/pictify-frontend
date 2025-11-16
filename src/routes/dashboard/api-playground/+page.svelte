@@ -5,6 +5,7 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import { createImage, createGif, createAgentScreenshot } from '../../../api/image';
 	import { onMount, onDestroy } from 'svelte';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	let apiToken = '';
 	let selectedEndpoint = 'image';
@@ -15,6 +16,7 @@
 
 	let hasTriedToFetchTokens = false;
 	let unsubscribe = () => {};
+	let copiedCurl = false;
 	
 	onMount(() => {
 		// Subscribe to user store to get API token
@@ -169,6 +171,18 @@
 		}
 	}
 
+	function handleCopyCurl() {
+		if (!curlExample) return;
+
+		copyToClipboard(curlExample.copy);
+		copiedCurl = true;
+		setTimeout(() => {
+			copiedCurl = false;
+		}, 2000);
+	}
+
+	const escapeSingleQuotes = (value = '') => value.replace(/'/g, `'"'"'`);
+
 	function setSelectedEndpoint(endpoint) {
 		selectedEndpoint = endpoint;
 		response = null;
@@ -176,10 +190,39 @@
 	}
 
 	// Reactive curl example
+	$: backendBaseUrl = (() => {
+		const fallbackUrl = browser ? window.location.origin : 'https://pictify.io';
+		const rawUrl = PUBLIC_BACKEND_URL || fallbackUrl;
+		return rawUrl?.replace(/\/$/, '') || '';
+	})();
+
 	$: curlExample = (() => {
-		const baseUrl = browser ? window.location.origin : 'https://pictify.io';
+		if (!backendBaseUrl) {
+			return null;
+		}
 		const authToken = apiToken || 'YOUR_API_TOKEN';
-		
+
+		const buildExample = (path, payload) => {
+			const payloadPretty = JSON.stringify(payload, null, 2);
+			const payloadSingleLine = JSON.stringify(payload);
+			const displayLines = [
+				`curl -X POST ${backendBaseUrl}${path}`,
+				`  -H "Content-Type: application/json"`,
+				`  -H "Authorization: Bearer ${authToken}"`,
+				`  --data-raw '${payloadPretty}'`
+			];
+			const copyLines = [
+				`curl -X POST ${backendBaseUrl}${path}`,
+				`-H "Content-Type: application/json"`,
+				`-H "Authorization: Bearer ${authToken}"`,
+				`--data-raw '${escapeSingleQuotes(payloadSingleLine)}'`
+			];
+			return {
+				display: displayLines.join(' \\\n'),
+				copy: copyLines.join(' ')
+			};
+		};
+
 		if (selectedEndpoint === 'image') {
 			const payload = {
 				html: imageParams.html,
@@ -191,10 +234,7 @@
 			if (imageParams.url) {
 				payload.url = imageParams.url;
 			}
-			return `curl -X POST ${baseUrl}/api/image \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer ${authToken}" \\
-  -d '${JSON.stringify(payload, null, 2)}'`;
+			return buildExample('/image', payload);
 		} else if (selectedEndpoint === 'gif') {
 			const payload = {
 				html: gifParams.html,
@@ -206,20 +246,14 @@
 			if (gifParams.url) {
 				payload.url = gifParams.url;
 			}
-			return `curl -X POST ${baseUrl}/api/gif \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer ${authToken}" \\
-  -d '${JSON.stringify(payload, null, 2)}'`;
+			return buildExample('/gif', payload);
 		} else if (selectedEndpoint === 'agent') {
 			const payload = {
 				prompt: agentParams.prompt
 			};
-			return `curl -X POST ${baseUrl}/api/image/agent-screenshot \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer ${authToken}" \\
-  -d '${JSON.stringify(payload, null, 2)}'`;
+			return buildExample('/image/agent-screenshot', payload);
 		}
-		return '';
+		return null;
 	})();
 
 	// Reactive request payload
@@ -575,19 +609,31 @@
 							<div class="flex items-center justify-between mb-4">
 								<h3 class="text-sm font-medium text-gray-900">Request Preview</h3>
 								<button
-									class="text-xs text-[#ff6b6b] hover:text-[#ff5252] flex items-center gap-1"
-									on:click={() => copyToClipboard(JSON.stringify(requestPayload, null, 2))}
+									class={`text-xs flex items-center gap-1 rounded px-2 py-1 ${
+										copiedCurl
+											? 'bg-green-100 text-green-800 border border-green-200'
+											: 'text-[#ff6b6b] hover:text-[#ff5252]'
+									}`}
+									on:click={handleCopyCurl}
+									disabled={!curlExample}
 								>
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-										<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-										<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-									</svg>
-									Copy
+									{#if copiedCurl}
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3.25-3.25a1 1 0 011.414-1.414l2.543 2.543 6.543-6.543a1 1 0 011.414 0z" clip-rule="evenodd" />
+										</svg>
+										Copied
+									{:else}
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+											<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+											<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+										</svg>
+										Copy
+									{/if}
 								</button>
 							</div>
 							<div class="bg-gray-900 rounded-lg p-4">
-								<div class="text-gray-300 text-sm font-mono">
-									{curlExample}
+								<div class="text-gray-300 text-sm font-mono whitespace-pre-wrap">
+									{curlExample?.display || 'Select an endpoint to view a sample cURL request.'}
 								</div>
 							</div>
 						</div>
