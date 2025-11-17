@@ -39,7 +39,7 @@
 		"grapesjs": "^0.21.4",
 		"grapesjs-blocks-basic": "^1.0.2",
 		"hast-util-to-html": "^9.0.1",
-		"posthog-js": "^1.148.0",
+		"posthog-js": "^1.257.2",
 		"prismjs": "^1.29.0",
 		"refractor": "^4.8.1",
 		"svelte-awesome-color-picker": "^3.1.0",

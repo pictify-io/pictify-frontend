@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/icon.png" />
@@ -18,7 +19,12 @@
 				href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Manrope:wght@400;600;700;800&family=Silkscreen&family=DynaPuff:wght@400..700&display=swap"
 			/>
 		</noscript>
-
+		<script>function initApollo() {
+				var n = Math.random().toString(36).substring(7), o = document.createElement("script");
+				o.src = "https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache=" + n, o.async = !0, o.defer = !0,
+					o.onload = function () { window.trackingFunctions.onLoad({ appId: "6870a8d0c60b0d001987bd60" }) },
+					document.head.appendChild(o)
+			} initApollo();</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

@@ -153,20 +153,16 @@ export const signupAction = async (email, password) => {
 };
 
 export const impersonateAction = async (password, email, userId) => {
-	try {
-		if (!password) throw new Error('Admin password is required');
-		if (!email && !userId) throw new Error('Provide either email or userId');
-		await impersonate({ password, email, userId });
-		const apiResponse = await getUserAPI();
-		const userData = extractUser(apiResponse);
-		if (!userData) {
-			return null;
-		}
-		setUser(userData);
-		return userData;
-	} catch (error) {
-		throw error;
+	if (!password) throw new Error('Admin password is required');
+	if (!email && !userId) throw new Error('Provide either email or userId');
+	await impersonate({ password, email, userId });
+	const apiResponse = await getUserAPI();
+	const userData = extractUser(apiResponse);
+	if (!userData) {
+		return null;
 	}
+	setUser(userData);
+	return userData;
 };
 
 export const getUserAction = async () => {
@@ -184,48 +180,32 @@ export const getUserAction = async () => {
 };
 
 export const getAPITokenAction = async () => {
-	try {
-		const response = await getApiToken();
-		setApiTokens(response.apiTokens);
-		return response;
-	} catch (error) {
-		throw error;
-	}
+	const response = await getApiToken();
+	setApiTokens(response.apiTokens);
+	return response;
 };
 
 export const createAPITokenAction = async () => {
-	try {
-		await createApiToken();
-		const response = await getApiToken();
-		setApiTokens(response.apiTokens);
-		return response;
-	} catch (error) {
-		throw error;
-	}
+	await createApiToken();
+	const response = await getApiToken();
+	setApiTokens(response.apiTokens);
+	return response;
 };
 
 export const deleteAPITokenAction = async (apiTokenId) => {
-	try {
-		await deleteApiToken(apiTokenId);
-		const response = await getApiToken();
-		setApiTokens(response.apiTokens);
-		return response;
-	} catch (error) {
-		throw error;
-	}
+	await deleteApiToken(apiTokenId);
+	const response = await getApiToken();
+	setApiTokens(response.apiTokens);
+	return response;
 };
 
 export const getPlanDetailsAction = async () => {
-	try {
-		const response = await getPlanDetails();
-		user.update((user) => {
-			return {
-				...user,
-				planDetails: response
-			};
-		});
-		return response;
-	} catch (error) {
-		throw error;
-	}
+	const response = await getPlanDetails();
+	user.update((user) => {
+		return {
+			...user,
+			planDetails: response
+		};
+	});
+	return response;
 };
