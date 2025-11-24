@@ -1,8 +1,6 @@
 <script>
-	import { page } from '../../../store/pages.store';
 	import { logoutAction } from '../../../store/user.store';
 	import { goto } from '$app/navigation';
-	import CollapseIcon from '$lib/assets/dashboard/CollapseArrow.png';
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
 	import { getPaymentPortal } from '../../../api/user';
 	import { user } from '../../../store/user.store';
@@ -10,14 +8,9 @@
 
 	let isMediaListExpanded = false;
 	let isPaidPlan = false;
-	let isToolsExpanded = false;
 
 	function toggleMediaList() {
 		isMediaListExpanded = !isMediaListExpanded;
-	}
-
-	function toggleToolsList() {
-		isToolsExpanded = !isToolsExpanded;
 	}
 
 	let unsubscribe = () => {};
@@ -167,45 +160,6 @@
 				</svg>
 				AI Agent Screenshot
 			</a>
-
-			<!-- Tools Section -->
-			<div class="space-y-1">
-				<button
-					on:click={toggleToolsList}
-					class="group flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 hover:shadow-sm hover:border hover:border-gray-200"
-				>
-					<div class="flex items-center">
-						<svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-						</svg>
-						Tools
-					</div>
-					<svg
-						class="w-4 h-4 text-gray-400 transform"
-						class:rotate-180={isToolsExpanded}
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-					</svg>
-				</button>
-
-				{#if isToolsExpanded}
-					<div class="pl-4 space-y-1">
-						<a
-							href="/dashboard/tools/og-image-generator"
-							class="group flex items-center px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900"
-						>
-							<svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-							</svg>
-							OG Image Generator
-						</a>
-					</div>
-				{/if}
-			</div>
 
 			<!-- Divider -->
 			<div class="border-t border-gray-200 my-4"></div>

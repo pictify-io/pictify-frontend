@@ -3,7 +3,6 @@
 	import Hero from '$lib/components/landingPage/Hero.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
-	import Editor from '$lib/components/grapeJS/editor.svelte';
 	import UseCase from '$lib/components/landingPage/UseCase.svelte';
 	import Api from '$lib/components/landingPage/Api.svelte';
 	import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
@@ -89,7 +88,6 @@
 	<Hero />
 
 	<!-- Interactive Demo Section -->
-	{#if isTestFeatureFlag}
 		<div class="w-full bg-white border-t-2 border-b-2 border-gray-900 py-16 md:py-20 relative overflow-hidden">
 			<!-- Decorative elements -->
 			<div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -112,9 +110,6 @@
 				</div>
 			</div>
 		</div>
-	{:else}
-		<Editor isLandingPage={true} />
-	{/if}
 
 	<!-- AI Agent Demo -->
 	<AgentScreenshotDemo />

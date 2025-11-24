@@ -1,9 +1,15 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 	export let templates;
 
 	const handleTemplateClick = (template) => {
-		goto(`/dashboard/template/${template.uid}`);
+		const url = `/template-workspace/${template.uid}`;
+		if (browser) {
+			window.open(url, '_blank', 'noopener,noreferrer');
+		} else {
+			goto(url);
+		}
 	};
 </script>
 
@@ -14,9 +20,9 @@
 				role="button"
 				tabindex="0"
 				class="flex-col border-gray-900 border-2 rounded-md flex cursor-pointer relative"
-				on:click={handleTemplateClick(template)}
+				on:click={() => handleTemplateClick(template)}
 				on:keydown={(e) => {
-					if (e.key === 'Enter') handleTemplateClick();
+					if (e.key === 'Enter') handleTemplateClick(template);
 				}}
 			>
 				<div class="border-b border-gray-900">

@@ -3,14 +3,30 @@
 	import Nav from '$lib/components/dashboard/Nav.svelte';
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
 	import VerifyEmailBanner from '$lib/components/dashboard/VerifyEmailBanner.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
 
 	import { getUser } from '../../store/user.store';
 
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
+	import { page } from '$app/stores';
+
 	let user = null;
+	let isSidebarOpen = false;
+
+	function toggleSidebar() {
+		isSidebarOpen = !isSidebarOpen;
+	}
+
+	function closeSidebar() {
+		isSidebarOpen = false;
+	}
+
+	// Close sidebar on route change
+	$: if ($page.url.pathname) {
+		closeSidebar();
+	}
+
 	onMount(async () => {
 		user = await getUser();
 		if (!user || !user?.email) {
@@ -30,18 +46,38 @@
 	<title>Pictify.io: Dashboard</title>
 </svelte:head>
 
-<Nav />
-{#if user?.isEmailVerified === false}
-	<VerifyEmailBanner email={user?.email} />
-{/if}
-<div class="min-h-screen flex flex-col">
-	<div class="flex flex-col sm:flex-row w-100 flex-grow">
-		<div class="sm:border-r-[3px] border-black">
+<div class="h-screen flex flex-col overflow-hidden">
+	<Nav on:toggleSidebar={toggleSidebar} />
+	{#if user?.isEmailVerified === false}
+		<VerifyEmailBanner email={user?.email} />
+	{/if}
+	<div class="flex flex-col sm:flex-row w-full flex-grow overflow-hidden relative">
+		<!-- Backdrop for mobile -->
+		{#if isSidebarOpen}
+			<div 
+				class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+				on:click={closeSidebar}
+				on:keydown={(e) => e.key === 'Escape' && closeSidebar()}
+				role="button"
+				tabindex="0"
+			></div>
+		{/if}
+
+		<!-- Sidebar -->
+		<div 
+			class="
+				fixed inset-y-0 left-0 z-50 w-64 bg-white transition-transform duration-300 ease-in-out transform 
+				sm:relative sm:translate-x-0 sm:block sm:z-0 sm:border-r-[3px] sm:border-black sm:h-full sm:overflow-hidden
+				{isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+			"
+		>
 			<SideNav />
 		</div>
-		<div class="flex-grow">
-			<slot />
+
+		<div class="flex-grow h-full overflow-y-auto min-w-0 flex flex-col">
+			<div class="flex-grow">
+				<slot />
+			</div>
 		</div>
 	</div>
-	<Footer />
 </div>
