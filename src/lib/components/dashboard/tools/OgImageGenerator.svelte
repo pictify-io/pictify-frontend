@@ -299,7 +299,7 @@
 				name: settings.heading || 'Untitled Template',
 				width: settings.width || 1200,
 				height: settings.height || 600,
-				grapeJSData: null
+				fabricJSData: null
 			};
 
 			const savedTemplate = await createTemplateAction(templateData);
@@ -326,7 +326,7 @@
 				name: settings.heading || 'Untitled Template',
 				width: settings.width || 1200,
 				height: settings.height || 600,
-				grapeJSData: null
+				fabricJSData: null
 			};
 
 			const updatedTemplate = await updateTemplateAction(templateData);

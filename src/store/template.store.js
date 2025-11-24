@@ -13,7 +13,7 @@ export const template = writable({
 	uid: null,
 	name: null,
 	html: null,
-	grapeJSData: null,
+  fabricJSData: null,
 	width: null,
 	height: null,
 	variables: null,
@@ -46,7 +46,7 @@ export const getTemplateAction = async (uid) => {
 			html: null,
 			variables: null,
 			createdAt: null,
-			grapeJSData: null,
+    fabricJSData: null,
 			width: null,
 			height: null,
 			type: null

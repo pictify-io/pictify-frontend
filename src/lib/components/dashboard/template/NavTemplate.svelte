@@ -2,6 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import PlusIcon from '$lib/assets/dashboard/Plus.svg';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	const dispatch = createEventDispatcher();
 	let searchTimeout;
@@ -16,6 +17,15 @@
 		searchTimeout = setTimeout(() => {
 			dispatch('search', query);
 		}, 300);
+	};
+
+	const openTemplateCreator = () => {
+		const url = '/template-workspace/create';
+		if (browser) {
+			window.open(url, '_blank', 'noopener,noreferrer');
+		} else {
+			goto(url);
+		}
 	};
 </script>
 
@@ -32,9 +42,7 @@
 		</div>
 		<button
 			class="bg-black hover:bg-black/80 text-white font-bold py-2 px-4 rounded ring-1 ring-black ring-opacity-5 transition-colors flex items-center gap-2"
-			on:click={() => {
-				goto('/dashboard/template/create');
-			}}
+			on:click={openTemplateCreator}
 		>
 			<img src={PlusIcon} alt="Plus icon" class="w-5 h-5" />
 			<span>Create</span>

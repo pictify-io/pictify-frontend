@@ -38,7 +38,7 @@
 	});
 </script>
 
-<div class="h-full w-full max-w-6xl m-auto p-5">
+<div class="w-full max-w-6xl m-auto p-5">
 	<NavTemplate on:search={handleSearch} />
 	{#if templateList.length === 0 && !isLoading && !searchQuery}
 		<EmptyTemplate />

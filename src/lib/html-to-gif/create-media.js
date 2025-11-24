@@ -1,4 +1,4 @@
-import { popularFontsLinks } from '../components/grapeJS/style-sheet.js';
+import { popularFontsLinks } from '../utils/fonts.js';
 
 const getHTMLandCSS = (html, css) => {
 	const fonts = popularFontsLinks.map((link) => `<link href="${link}" rel="stylesheet">`).join('');
