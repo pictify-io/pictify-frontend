@@ -1,41 +1,57 @@
 /**
- * Agentic Copilot API Client
- * Frontend API methods for interacting with agentic copilot
+ * Swarm Copilot API Client
+ * Frontend API methods for interacting with swarm copilot
  */
 
 import { PUBLIC_BACKEND_URL } from '$env/static/public';
 import backend from '../service/backend';
 
-const AGENTIC_BASE = '/copilot-agentic';
+const SWARM_BASE = '/copilot-swarm';
 
-export const generateAgentic = async (prompt, canvasState, conversationHistory = [], options = {}) => {
+/**
+ * Generate design using swarm copilot
+ * @param {string} prompt - User's design prompt
+ * @param {object} canvasState - Current canvas state
+ * @param {object} options - Generation options (maxRefinements, targetScore)
+ * @returns {Promise<object>} Generated design result
+ */
+export const generateSwarm = async (prompt, canvasState, options = {}) => {
   try {
-    const response = await backend.post(`${AGENTIC_BASE}/generate`, {
+    const response = await backend.post(`${SWARM_BASE}/generate`, {
       prompt,
       canvasState,
-      conversationHistory,
-      selfCorrect: options.selfCorrect !== false,
-      autoApprove: options.autoApprove || false
+      options: {
+        maxRefinements: options.maxRefinements || 2,
+        targetScore: options.targetScore || 7
+      }
     });
     return response;
   } catch (error) {
-    console.error('Error in generateAgentic:', error);
+    console.error('Error in generateSwarm:', error);
     throw error;
   }
 };
 
-export const streamAgenticGenerate = async ({
+/**
+ * Stream design generation using swarm copilot
+ * @param {object} params - Generation parameters
+ * @param {string} params.prompt - User's design prompt
+ * @param {object} params.canvasState - Current canvas state
+ * @param {object} params.options - Generation options
+ * @param {function} params.onStep - Callback for step updates
+ * @param {function} params.onComplete - Callback for completion
+ * @param {function} params.onError - Callback for errors
+ */
+export const streamSwarmGenerate = async ({
   prompt,
   canvasState,
-  conversationHistory = [],
   options = {},
   onStep,
   onComplete,
   onError
 }) => {
   const controller = new AbortController();
-  const url = new URL(`${PUBLIC_BACKEND_URL}${AGENTIC_BASE}/generate`);
-  url.searchParams.set('stream', 'true');
+  const url = new URL(`${PUBLIC_BACKEND_URL}${SWARM_BASE}/generate-stream`);
 
   try {
     const response = await fetch(url, {
@@ -48,9 +64,10 @@ export const streamAgenticGenerate = async ({
       body: JSON.stringify({
         prompt,
         canvasState,
-        conversationHistory,
-        selfCorrect: options.selfCorrect !== false,
-        autoApprove: options.autoApprove || false
+        options: {
+          maxRefinements: options.maxRefinements || 2,
+          targetScore: options.targetScore || 7
+        }
       }),
       signal: controller.signal
     });
@@ -94,9 +111,12 @@ export const streamAgenticGenerate = async ({
             try {
               const parsed = JSON.parse(dataPayload);
               if (eventName === 'step') {
+                // Step event contains { step, canvasState }
                 onStep?.(parsed);
               } else if (eventName === 'complete') {
                 onComplete?.(parsed);
+              } else if (eventName === 'error') {
+                onError?.(new Error(parsed.message || 'Unknown error'));
               }
             } catch (error) {
               console.warn('Failed to parse SSE payload', error);
@@ -134,51 +154,6 @@ export const streamAgenticGenerate = async ({
     controller.abort();
     console.error('Error starting copilot stream:', error);
     onError?.(error);
-    throw error;
-  }
-};
-
-export const approveStep = async ({ stepId, threadId }) => {
-  if (!stepId) {
-    throw new Error('Missing stepId for approval');
-  }
-  try {
-    const response = await backend.post(`${AGENTIC_BASE}/execute-step`, {
-      stepId,
-      approved: true,
-      threadId
-    });
-    return response;
-  } catch (error) {
-    console.error('Error approving step:', error);
-    throw error;
-  }
-};
-
-export const rejectStep = async ({
-  stepId,
-  threadId,
-  feedback,
-  canvasState,
-  conversationHistory = [],
-  prompt
-}) => {
-  if (!stepId) {
-    throw new Error('Missing stepId for rejection');
-  }
-  try {
-    const response = await backend.post(`${AGENTIC_BASE}/execute-step`, {
-      stepId,
-      approved: false,
-      feedback,
-      threadId,
-      canvasState,
-      conversationHistory,
-      prompt
-    });
-    return response;
-  } catch (error) {
-    console.error('Error rejecting step:', error);
     throw error;
   }
 };

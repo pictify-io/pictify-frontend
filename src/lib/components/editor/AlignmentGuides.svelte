@@ -10,6 +10,12 @@
 	let gridSize = 10;
 	let showGrid = false;
 	
+	// Performance optimization
+	let lastMoveTime = 0;
+	const THROTTLE_MS = 16; // ~60fps
+	const MAX_OBJECTS_TO_COMPARE = 10; // Limit comparisons for performance
+	let rafId = null;
+	
 	// Alignment options
 	const alignments = [
 		{ id: 'left', icon: 'fa-solid fa-align-left', label: 'Align Left', action: alignLeft },
@@ -32,10 +38,25 @@
 	}
 	
 	function handleObjectMoving(e) {
+		// Throttle for performance
+		const now = Date.now();
+		if (now - lastMoveTime < THROTTLE_MS) {
+			return;
+		}
+		lastMoveTime = now;
+		
 		const obj = e.target;
 		if (!obj) return;
 		
-		const canvasObjects = canvas.getObjects().filter(o => o !== obj && o.visible);
+		// Get all visible objects except the moving one
+		const allObjects = canvas.getObjects().filter(o => o !== obj && o.visible && !o.guideline && !o.grid);
+		
+		// Performance: limit number of objects to compare
+		// Prioritize nearby objects for snapping
+		const canvasObjects = allObjects.length > MAX_OBJECTS_TO_COMPARE
+			? getNearestObjects(obj, allObjects, MAX_OBJECTS_TO_COMPARE)
+			: allObjects;
+		
 		guidelines = [];
 		
 		const objLeft = obj.left;
@@ -62,8 +83,8 @@
 			guidelines.push({ type: 'horizontal', position: canvasCenterY });
 		}
 		
-		// Check alignment with other objects
-		canvasObjects.forEach(target => {
+		// Check alignment with other objects (limited set for performance)
+		for (const target of canvasObjects) {
 			const targetLeft = target.left;
 			const targetTop = target.top;
 			const targetWidth = target.width * target.scaleX;
@@ -77,30 +98,35 @@
 			if (Math.abs(objLeft - targetLeft) < snapDistance) {
 				obj.left = targetLeft;
 				guidelines.push({ type: 'vertical', position: targetLeft });
+				continue; // Skip other checks for this object
 			}
 			
 			// Right edge
 			if (Math.abs(objRight - targetRight) < snapDistance) {
 				obj.left = targetRight - objWidth;
 				guidelines.push({ type: 'vertical', position: targetRight });
+				continue;
 			}
 			
 			// Center horizontal
 			if (Math.abs(objCenterX - targetCenterX) < snapDistance) {
 				obj.left = targetCenterX - objWidth / 2;
 				guidelines.push({ type: 'vertical', position: targetCenterX });
+				continue;
 			}
 			
 			// Top edge
 			if (Math.abs(objTop - targetTop) < snapDistance) {
 				obj.top = targetTop;
 				guidelines.push({ type: 'horizontal', position: targetTop });
+				continue;
 			}
 			
 			// Bottom edge
 			if (Math.abs(objBottom - targetBottom) < snapDistance) {
 				obj.top = targetBottom - objHeight;
 				guidelines.push({ type: 'horizontal', position: targetBottom });
+				continue;
 			}
 			
 			// Center vertical
@@ -108,7 +134,7 @@
 				obj.top = targetCenterY - objHeight / 2;
 				guidelines.push({ type: 'horizontal', position: targetCenterY });
 			}
-		});
+		}
 		
 		// Grid snapping
 		if (snapToGrid) {
@@ -116,7 +142,32 @@
 			obj.top = Math.round(obj.top / gridSize) * gridSize;
 		}
 		
-		drawGuidelines();
+		// Use RAF for smoother rendering
+		if (rafId) {
+			cancelAnimationFrame(rafId);
+		}
+		rafId = requestAnimationFrame(() => drawGuidelines());
+	}
+	
+	/**
+	 * Get nearest objects to the moving object for performance
+	 */
+	function getNearestObjects(movingObj, objects, limit) {
+		// Calculate distances and sort
+		const objCenterX = movingObj.left + (movingObj.width * movingObj.scaleX) / 2;
+		 const objCenterY = movingObj.top + (movingObj.height * movingObj.scaleY) / 2;
+		
+		const withDistances = objects.map(obj => {
+			const centerX = obj.left + (obj.width * obj.scaleX) / 2;
+			const centerY = obj.top + (obj.height * obj.scaleY) / 2;
+			const distance = Math.sqrt(
+				Math.pow(centerX - objCenterX, 2) + Math.pow(centerY - objCenterY, 2)
+			);
+			return { obj, distance };
+		});
+		
+		withDistances.sort((a, b) => a.distance - b.distance);
+		return withDistances.slice(0, limit).map(item => item.obj);
 	}
 	
 	function handleObjectScaling(e) {
@@ -140,38 +191,62 @@
 	function drawGuidelines() {
 		if (!canvas) return;
 		
-		// Remove old guidelines
-		const oldGuidelines = canvas.getObjects().filter(obj => obj.guideline);
-		oldGuidelines.forEach(obj => canvas.remove(obj));
+		// Remove old guidelines efficiently
+		const objects = canvas.getObjects();
+		const toRemove = [];
+		for (let i = objects.length - 1; i >= 0; i--) {
+			if (objects[i].guideline) {
+				toRemove.push(objects[i]);
+			}
+		}
+		toRemove.forEach(obj => canvas.remove(obj));
 		
-		guidelines.forEach(guide => {
+		// Limit number of guidelines for performance
+		const maxGuidelines = 4; // Max 4 guidelines at once
+		const limitedGuidelines = guidelines.slice(0, maxGuidelines);
+		
+		limitedGuidelines.forEach(guide => {
 			const line = new Line(
 				guide.type === 'vertical' 
 					? [guide.position, 0, guide.position, canvas.height]
 					: [0, guide.position, canvas.width, guide.position],
 				{
-					stroke: '#ff0000', // Brighter color for visibility
+					stroke: '#ff0000',
 					strokeWidth: 1,
 					strokeDashArray: [5, 5],
 					selectable: false,
 					evented: false,
 					guideline: true,
-					excludeFromExport: true // Don't include in JSON/Image export
+					excludeFromExport: true
 				}
 			);
 			canvas.add(line);
-			canvas.bringObjectToFront(line); // Bring to front!
+			canvas.bringObjectToFront(line);
 		});
 		
-		canvas.renderAll();
+		// Use requestRenderAll instead of renderAll for better performance
+		canvas.requestRenderAll();
 	}
 	
 	function clearGuidelines() {
 		if (!canvas) return;
+		
+		// Cancel any pending RAF
+		if (rafId) {
+			cancelAnimationFrame(rafId);
+			rafId = null;
+		}
+		
 		guidelines = [];
-		const oldGuidelines = canvas.getObjects().filter(obj => obj.guideline);
-		oldGuidelines.forEach(obj => canvas.remove(obj));
-		canvas.renderAll();
+		const objects = canvas.getObjects();
+		const toRemove = [];
+		for (let i = objects.length - 1; i >= 0; i--) {
+			if (objects[i].guideline) {
+				toRemove.push(objects[i]);
+			}
+		}
+		toRemove.forEach(obj => canvas.remove(obj));
+		canvas.requestRenderAll();
 	}
 	
 	function getCanvasDimension(axis) {
