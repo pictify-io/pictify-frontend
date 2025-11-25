@@ -1,10 +1,9 @@
 <script>
 	import { onDestroy } from 'svelte';
 	import { editor } from '../../../store/editor.store';
-	import { streamAgenticGenerate, approveStep as approveStepApi, rejectStep as rejectStepApi } from '../../../api/copilot-agentic';
+	import { streamSwarmGenerate } from '../../../api/copilot-swarm';
 	import { tick } from 'svelte';
 	import { fade, fly, slide } from 'svelte/transition';
-	import StepCard from './StepCard.svelte';
 	import { copilotExecution, copilotActions } from '../../../store/copilot.store';
 
 	let messages = [];
@@ -14,11 +13,18 @@
 	let streamError = '';
 	let chatContainer;
 	let activeStream = null;
-	let lastAppliedStepNumber = null;
 	
 	// History for Undo
 	let previousState = null;
 	let canUndo = false;
+
+	// Quality metrics from swarm
+	let lastQualityScore = null;
+	let lastQualityStrengths = [];
+	
+	// Agent progress tracking for streaming
+	let currentAgent = null;
+	let agentSteps = [];
 
 	const QUICK_ACTIONS = [
 		"Make it modern",
@@ -63,53 +69,91 @@
 		}
 
 		await new Promise((resolve) => {
-			$editor.loadFromJSON(canvasJson, () => {
-				$editor.renderAll();
-				
-				// Force a second render after a delay to ensure all objects are drawn
-				setTimeout(() => {
-					$editor.requestRenderAll();
-					console.log('[Copilot] Canvas rendered with', $editor.getObjects().length, 'objects');
-					resolve();
-				}, 50);
+		$editor.loadFromJSON(canvasJson, () => {
+			// Log canvas and first few objects for debugging
+			console.log('[Copilot] Canvas dimensions after load:', {
+				width: $editor.width,
+				height: $editor.height,
+				zoom: $editor.getZoom()
 			});
+			
+			const objects = $editor.getObjects();
+			if (objects.length > 0) {
+				console.log('[Copilot] First object:', {
+					type: objects[0].type,
+					left: objects[0].left,
+					top: objects[0].top,
+					width: objects[0].width,
+					height: objects[0].height,
+					fill: objects[0].fill,
+					opacity: objects[0].opacity,
+					visible: objects[0].visible
+				});
+			}
+			
+			// Explicitly render all objects
+			$editor.renderAll();
+			$editor.requestRenderAll();
+			
+			// Force a second render after a delay to ensure all objects are drawn
+			setTimeout(() => {
+				$editor.renderAll();
+				$editor.requestRenderAll();
+				console.log('[Copilot] Canvas rendered with', $editor.getObjects().length, 'objects');
+				resolve();
+			}, 100);
 		});
+	});
 
-		// End batch after render completes
-		if (typeof window !== 'undefined' && window.__historyBatchEnd) {
-			window.__historyBatchEnd();
-		}
+	// End batch after render completes
+	if (typeof window !== 'undefined' && window.__historyBatchEnd) {
+		window.__historyBatchEnd();
+	}
 	}
 
 	/**
 	 * Handle incoming step payload from SSE
-	 * Apply canvas updates immediately for real-time feedback
+	 * Payload contains: { step, canvasState }
 	 */
 	async function handleStepPayload(payload = {}) {
-		if (!payload.steps || !Array.isArray(payload.steps)) {
-			return;
-		}
-
-		console.log('[Copilot] Received step payload:', {
-			stepCount: payload.steps.length,
-			steps: payload.steps.map(s => ({ num: s.stepNumber, tool: s.tool, hasCanvas: !!s.canvasState }))
-		});
-
-		// Process each new step
-		for (const step of payload.steps) {
-			// Update the store with the new step
+		console.log('[Copilot Swarm] Received step payload:', payload);
+		console.log('[Copilot Swarm] Canvas state present?', !!payload.canvasState);
+		
+		const { step, canvasState } = payload;
+		
+		if (step) {
+			// Track current agent
+			currentAgent = step.agent;
+			
+			// Add step to agent steps list
+			agentSteps = [...agentSteps, step];
+			
+			// Update copilot store with the step
 			copilotActions.upsertSteps([step]);
 			
-			// Apply canvas state immediately if present and NEW
-			// Use strict ordering to prevent re-applying old steps
-			const currentLastStep = lastAppliedStepNumber || 0;
-			if (step?.canvasState && step.stepNumber > currentLastStep) {
-				console.log('[Copilot] Applying step', step.stepNumber, '- Tool:', step.tool);
-				lastAppliedStepNumber = step.stepNumber;
-				await applyCanvasState(step.canvasState);
-			} else if (step?.canvasState && step.stepNumber <= currentLastStep) {
-				console.log('[Copilot] Skipping already applied step', step.stepNumber);
+			// Add assistant message for agent progress
+			if (step.status === 'started') {
+				const agentEmoji = {
+					'Creative Director': '🎨',
+					'Content Writer': '✍️',
+					'Design Composer': '🎯',
+					'Vision Critic': '👁️',
+					'Canvas': '🖼️'
+				};
+				const emoji = agentEmoji[step.agent] || '🤖';
+				messages = [...messages, { 
+					role: 'system', 
+					content: `${emoji} ${step.agent}: ${step.description}` 
+				}];
 			}
+		}
+		
+		// Apply canvas state if provided (real-time preview)
+		if (canvasState) {
+			console.log('[Copilot Swarm] Applying canvas state from step event');
+			await applyCanvasState(canvasState);
+		} else {
+			console.log('[Copilot Swarm] No canvas state in step payload');
 		}
 		
 		scrollToBottom();
@@ -118,33 +162,54 @@
 	async function handleCompletePayload(payload = {}) {
 		cleanupStream();
 		
-		// Apply any final steps
-		if (payload.steps?.length) {
-			for (const step of payload.steps) {
-				copilotActions.upsertSteps([step]);
-				
-				// Apply canvas state immediately if present and NEW
-				const currentLastStep = lastAppliedStepNumber || 0;
-				if (step?.canvasState && step.stepNumber > currentLastStep) {
-					console.log('[Copilot] Applying final step', step.stepNumber);
-					lastAppliedStepNumber = step.stepNumber;
-					await applyCanvasState(step.canvasState);
-				}
-			}
+		console.log('[Copilot Swarm] Generation complete:', payload);
+		console.log('[Copilot Swarm] Complete payload keys:', Object.keys(payload));
+		console.log('[Copilot Swarm] Canvas state present?', !!payload.canvasState);
+		
+		// Extract canvas state from swarm response
+		if (payload.success && payload.canvasState) {
+			console.log('[Copilot Swarm] Applying final canvas state from complete event');
+			await applyCanvasState(payload.canvasState);
+		} else {
+			console.warn('[Copilot Swarm] No canvas state in complete payload or generation failed', {
+				success: payload.success,
+				hasCanvasState: !!payload.canvasState
+			});
 		}
 		
-		copilotActions.setThreadContext({
-			threadId: payload.threadId,
-			checkpointId: payload.checkpointId,
-			needsUserInput: payload.needsUserInput
-		});
+		// Store quality metrics
+		if (payload.quality) {
+			lastQualityScore = payload.quality.score;
+			lastQualityStrengths = payload.quality.strengths || [];
+		}
+		
+		// Update store with execution steps if provided
+		if (payload.executedSteps) {
+			copilotActions.upsertSteps(payload.executedSteps);
+		}
+		
 		copilotActions.setLoading(false);
 		isLoading = false;
-		if (payload.isComplete) {
-			messages = [...messages, { role: 'assistant', content: 'Design update complete.' }];
-		} else if (payload.needsUserInput) {
-			messages = [...messages, { role: 'assistant', content: 'Copilot needs your input to continue.' }];
+		currentAgent = null;
+		
+		if (payload.success) {
+			let responseMessage = '✨ Design generated successfully!';
+			if (payload.design?.reasoning) {
+				responseMessage = payload.design.reasoning;
+			}
+			if (lastQualityScore) {
+				responseMessage += ` (Quality: ${lastQualityScore}/10)`;
+			}
+			if (payload.totalTimeMs) {
+				const seconds = (payload.totalTimeMs / 1000).toFixed(1);
+				responseMessage += ` • Generated in ${seconds}s`;
+			}
+			messages = [...messages, { role: 'assistant', content: responseMessage }];
+		} else {
+			error = payload.error || 'Generation failed';
+			messages = [...messages, { role: 'assistant', content: `Error: ${error}` }];
 		}
+		
 		scrollToBottom();
 	}
 
@@ -155,6 +220,7 @@
 		copilotActions.setError(streamError);
 		copilotActions.setLoading(false);
 		isLoading = false;
+		messages = [...messages, { role: 'assistant', content: `Error: ${streamError}` }];
 	}
 
 	async function scrollToBottom() {
@@ -179,6 +245,8 @@
 		isLoading = true;
 		error = '';
 		streamError = '';
+		lastQualityScore = null;
+		lastQualityStrengths = [];
 		
 		await scrollToBottom();
 
@@ -187,15 +255,18 @@
 		try {
 			copilotActions.startExecution([]);
 			copilotActions.setLoading(true);
-			lastAppliedStepNumber = null; // Reset for new execution
+			agentSteps = [];
+			currentAgent = null;
 
 			cleanupStream();
 
-			activeStream = await streamAgenticGenerate({
+			activeStream = await streamSwarmGenerate({
 				prompt: textToUse,
 				canvasState,
-				conversationHistory: messages,
-				options: { selfCorrect: true, autoApprove: false },
+				options: { 
+					maxRefinements: 2,
+					targetScore: 7
+				},
 				onStep: (payload) => handleStepPayload(payload),
 				onComplete: (payload) => handleCompletePayload(payload),
 				onError: (err) => handleStreamFailure(err)
@@ -205,6 +276,7 @@
 			error = 'Something went wrong. Please try again.';
 			copilotActions.setError(error);
 			isLoading = false;
+			messages = [...messages, { role: 'assistant', content: `Error: ${error}` }];
 		}
 	}
 
@@ -224,6 +296,10 @@
 		messages = [];
 		canUndo = false;
 		previousState = null;
+		lastQualityScore = null;
+		lastQualityStrengths = [];
+		agentSteps = [];
+		currentAgent = null;
 		copilotActions.clearExecution();
 		cleanupStream();
 	}
@@ -238,64 +314,6 @@
 		a.download = 'template.json';
 		a.click();
 		URL.revokeObjectURL(url);
-	}
-
-	async function handleApproveStep(stepIndex) {
-		const checkpointId = $copilotExecution.checkpointId;
-		if (!checkpointId) {
-			error = 'No checkpoint available to approve.';
-			return;
-		}
-		try {
-			copilotActions.setLoading(true);
-			const response = await approveStepApi({
-				stepId: checkpointId,
-				threadId: $copilotExecution.threadId
-			});
-			handleStepPayload(response || {});
-			copilotActions.approveStep(stepIndex);
-			copilotActions.setThreadContext({
-				threadId: response?.threadId,
-				checkpointId: response?.checkpointId,
-				needsUserInput: response?.needsUserInput
-			});
-		} catch (err) {
-			console.error(err);
-			error = 'Failed to approve step.';
-			copilotActions.setError(error);
-		} finally {
-			copilotActions.setLoading(false);
-		}
-	}
-
-	function handleRejectStep(stepIndex) {
-		copilotActions.rejectStep(stepIndex);
-	}
-
-	async function handleRegenerateStep(stepIndex, feedback) {
-		if (!feedback?.trim()) {
-			error = 'Please provide feedback before regenerating.';
-			return;
-		}
-		const checkpointId = $copilotExecution.checkpointId;
-		try {
-			copilotActions.setLoading(true);
-			const response = await rejectStepApi({
-				stepId: checkpointId,
-				threadId: $copilotExecution.threadId,
-				feedback,
-				canvasState: $editor ? $editor.toJSON() : null,
-				conversationHistory: messages,
-				prompt: feedback
-			});
-			handleCompletePayload(response || {});
-		} catch (err) {
-			console.error(err);
-			error = 'Failed to regenerate this step.';
-			copilotActions.setError(error);
-		} finally {
-			copilotActions.setLoading(false);
-		}
 	}
 
 	function handleKeydown(e) {
@@ -316,6 +334,11 @@
 				</svg>
 			</div>
 			<span class="font-semibold text-gray-800 text-sm">Design Copilot</span>
+			{#if lastQualityScore}
+				<span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
+					{lastQualityScore}/10
+				</span>
+			{/if}
 		</div>
 		
 		<div class="flex items-center gap-1">
@@ -388,6 +411,9 @@
 					<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
 					<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
 					<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+					{#if currentAgent}
+						<span class="ml-2 text-xs text-gray-500">{currentAgent}...</span>
+					{/if}
 				</div>
 			</div>
 		{/if}
@@ -405,30 +431,52 @@
 		{/if}
 
 		{#if $copilotExecution.currentSteps.length > 0}
-			<div class="pt-4 border-t border-gray-200 space-y-3">
-				<div class="flex items-center justify-between">
-					<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
-						Execution Steps
-						{#if $copilotExecution.isLoading}
-							<span class="text-blue-500 animate-pulse">running…</span>
-						{/if}
-					</p>
-					{#if $copilotExecution.threadId}
-						<span class="text-[10px] text-gray-400 truncate max-w-[180px]" title={$copilotExecution.threadId}>
-							Thread {$copilotExecution.threadId}
-						</span>
+			<div class="pt-4 border-t border-gray-200 space-y-2">
+				<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
+					Execution Steps
+					{#if $copilotExecution.isLoading}
+						<span class="text-blue-500 animate-pulse">running…</span>
 					{/if}
+				</p>
+				<div class="space-y-1.5">
+					{#each $copilotExecution.currentSteps as step, index}
+						<div class="bg-white border border-gray-200 rounded-lg p-2 text-xs">
+							<div class="flex items-start gap-2">
+								<span class="font-mono text-gray-400">#{step.stepNumber || index + 1}</span>
+								<div class="flex-1">
+									<div class="font-medium text-gray-700">{step.tool || 'Unknown'}</div>
+									{#if step.reasoning}
+										<div class="text-gray-500 mt-0.5">{step.reasoning}</div>
+									{/if}
+								</div>
+								{#if step.success}
+									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500 shrink-0 mt-0.5">
+										<polyline points="20 6 9 17 4 12"></polyline>
+									</svg>
+								{:else if step.error}
+									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500 shrink-0 mt-0.5">
+										<circle cx="12" cy="12" r="10"></circle>
+										<line x1="15" y1="9" x2="9" y2="15"></line>
+										<line x1="9" y1="9" x2="15" y2="15"></line>
+									</svg>
+								{/if}
+							</div>
+						</div>
+					{/each}
 				</div>
-				{#each $copilotExecution.currentSteps as step, index}
-					<StepCard
-						{step}
-						stepIndex={index}
-						isActive={$copilotExecution.currentStepIndex === index}
-						onApprove={handleApproveStep}
-						onReject={handleRejectStep}
-						onRegenerate={handleRegenerateStep}
-					/>
-				{/each}
+			</div>
+		{/if}
+
+		{#if lastQualityStrengths.length > 0}
+			<div class="pt-2 space-y-2">
+				<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Design Strengths</p>
+				<div class="flex flex-wrap gap-1.5">
+					{#each lastQualityStrengths as strength}
+						<span class="text-xs px-2 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
+							{strength}
+						</span>
+					{/each}
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -465,9 +513,9 @@
 		<div class="mt-2 flex justify-between items-center px-1">
 			<span class="text-[10px] text-gray-400 flex items-center gap-1">
 				<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+					<path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
 				</svg>
-				Context aware
+				Swarm AI · Multi-Agent
 			</span>
 			<button 
 				class="text-[10px] text-gray-400 hover:text-gray-600 transition-colors"
