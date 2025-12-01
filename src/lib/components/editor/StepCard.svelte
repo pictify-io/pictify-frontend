@@ -17,7 +17,7 @@ let feedbackText = '';
 
 $: statusColor = {
   pending: 'bg-yellow-50 border-yellow-200',
-  executing: 'bg-blue-50 border-blue-200',
+  executing: 'bg-[#ff6b6b]/10 border-[#ff6b6b]/20',
   validated: 'bg-green-50 border-green-200',
   approved: 'bg-green-50 border-green-200',
   rejected: 'bg-red-50 border-red-200',
@@ -56,7 +56,7 @@ const summarizeElement = (element = {}) => {
 <div 
   class="step-card border-2 rounded-xl p-4 mb-3 transition-all {statusColor}"
   class:ring-2={isActive}
-  class:ring-blue-400={isActive}
+  class:ring-[#ff6b6b]={isActive}
   transition:fly={{ y: 20, duration: 300 }}
 >
   <!-- Header -->
@@ -130,7 +130,7 @@ const summarizeElement = (element = {}) => {
         </ul>
       {/if}
       {#if step.diffSummary.updated?.length}
-        <p class="text-xs text-blue-700 font-semibold mt-1">Updated</p>
+        <p class="text-xs text-[#ff6b6b] font-semibold mt-1">Updated</p>
         <ul class="text-xs text-gray-600 list-disc list-inside">
           {#each step.diffSummary.updated.slice(0, 3) as updatedEl}
             <li>
@@ -225,7 +225,7 @@ const summarizeElement = (element = {}) => {
       />
       <button
         on:click={() => onRegenerate(stepIndex, feedbackText)}
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
+        class="w-full bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] hover:brightness-110 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
       >
         ↻ Regenerate with Feedback
       </button>

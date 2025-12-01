@@ -1,24 +1,24 @@
 import { writable } from 'svelte/store';
-import { get } from 'svelte/store';
-import { activeApiToken } from './user.store';
 import { getImages, getGifs } from '../api/media';
 
-export const gifs = writable([]);
-export const images = writable([]);
+// Store structure: { items: [], pagination: { total, limit, offset, hasMore } }
+export const gifs = writable({ 
+	gifs: [], 
+	pagination: { total: 0, limit: 12, offset: 0, hasMore: false } 
+});
+export const images = writable({ 
+	images: [], 
+	pagination: { total: 0, limit: 12, offset: 0, hasMore: false } 
+});
 
-export const totalMediaCount = writable(0);
-
-export const fetchGifs = async () => {
-	// const token = get(activeApiToken)?.token;
-	// if (!token) return console.error('No token found');
-
-	const gifsData = await getGifs();
+export const fetchGifs = async ({ limit = 12, offset = 0 } = {}) => {
+	const gifsData = await getGifs({ limit, offset });
 	gifs.set(gifsData);
+	return gifsData;
 };
 
-export const fetchImages = async () => {
-	// const token = get(activeApiToken)?.token;
-	// if (!token) return console.error('No token found');
-	const imagesData = await getImages();
+export const fetchImages = async ({ limit = 12, offset = 0 } = {}) => {
+	const imagesData = await getImages({ limit, offset });
 	images.set(imagesData);
+	return imagesData;
 };

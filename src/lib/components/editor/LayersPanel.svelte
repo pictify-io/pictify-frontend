@@ -9,6 +9,7 @@
 	let isDraggingLayer = false;
 	let unsubscribe = () => {};
 	let dragPlaceholder = null;
+	let expandedGroupIds = new Set();
 	
 	// Layer types with icons
 	const layerIcons = {
@@ -67,22 +68,55 @@
 			return;
 		}
 		
-		const objects = $editor
-			.getObjects()
-			.filter(shouldDisplayLayer);
+		const objects = $editor.getObjects();
 		
-		layers = objects
-			.map((obj, i) => ({
-				id: resolveLayerId(obj, i),
-				name: obj.name || `${obj.type} ${i + 1}`,
-				type: obj.type,
-				visible: obj.visible !== false,
-				locked: isObjectLocked(obj),
-				opacity: obj.opacity !== undefined ? obj.opacity : 1,
-				object: obj,
-				index: i
-			}))
-			.reverse();
+		const processObjects = (objs, depth = 0, parentId = null) => {
+			let result = [];
+			// Iterate in reverse order (top to bottom)
+			for (let i = objs.length - 1; i >= 0; i--) {
+				const obj = objs[i];
+				if (!shouldDisplayLayer(obj)) continue;
+				
+				const layerId = resolveLayerId(obj, i);
+				const isGroup = obj.type === 'group' && obj._objects && obj._objects.length > 0;
+				const isExpanded = expandedGroupIds.has(layerId);
+				
+				const layer = {
+					id: layerId,
+					name: obj.name || `${obj.type} ${i + 1}`,
+					type: obj.type,
+					visible: obj.visible !== false,
+					locked: isObjectLocked(obj),
+					opacity: obj.opacity !== undefined ? obj.opacity : 1,
+					object: obj,
+					index: i,
+					depth: depth,
+					isGroup: isGroup,
+					isExpanded: isExpanded,
+					parentId: parentId
+				};
+				
+				result.push(layer);
+				
+				if (isGroup && isExpanded) {
+					result = result.concat(processObjects(obj._objects, depth + 1, layerId));
+				}
+			}
+			return result;
+		};
+		
+		layers = processObjects(objects);
+	}
+
+	function toggleGroupExpansion(layer, event) {
+		event.stopPropagation();
+		if (expandedGroupIds.has(layer.id)) {
+			expandedGroupIds.delete(layer.id);
+		} else {
+			expandedGroupIds.add(layer.id);
+		}
+		expandedGroupIds = new Set(expandedGroupIds); // Trigger reactivity
+		updateLayers();
 	}
 
 	function toggleVisibility(layer, event) {
@@ -267,6 +301,48 @@
 	
 	function reorderCanvasLayers(draggedObj, targetObj, insertAfter) {
 		if (!$editor || !draggedObj || !targetObj) {
+			return;
+		}
+
+		// Check if both are in the same group
+		const draggedGroup = draggedObj.group;
+		const targetGroup = targetObj.group;
+
+		// If they are in different groups (or one is in group and other is not),
+		// we skip reordering for now to avoid complex coordinate transformations
+		if (draggedGroup !== targetGroup) {
+			return;
+		}
+
+		// If inside a group
+		if (draggedGroup) {
+			const objects = draggedGroup._objects;
+			const draggedIndex = objects.indexOf(draggedObj);
+			const targetIndex = objects.indexOf(targetObj);
+			
+			if (draggedIndex === -1 || targetIndex === -1) return;
+			if (draggedIndex === targetIndex) return;
+			
+			// Calculate new position
+			// UI is reversed (top is highest index), so logic is same as root
+			const effectiveInsertAfter = !insertAfter; 
+			let newPosition = targetIndex;
+			
+			if (draggedIndex < targetIndex) {
+				newPosition = effectiveInsertAfter ? targetIndex : targetIndex - 1;
+			} else {
+				newPosition = effectiveInsertAfter ? targetIndex + 1 : targetIndex;
+			}
+			
+			newPosition = Math.max(0, Math.min(newPosition, objects.length - 1));
+			
+			// Reorder in array
+			objects.splice(draggedIndex, 1);
+			objects.splice(newPosition, 0, draggedObj);
+			
+			draggedGroup.addWithUpdate(); // Recalculate group bounds/layout
+			$editor.renderAll();
+			notifyLayerChange(draggedGroup);
 			return;
 		}
 		
@@ -454,6 +530,7 @@
 			{#each layers as layer (layer.id)}
 				<div 
 					class="layer-item"
+					style="padding-left: {12 + layer.depth * 20}px"
 					class:selected={$selectedComponent === layer.object}
 					class:hidden-layer={!layer.visible}
 					class:locked={layer.locked}
@@ -473,6 +550,17 @@
 					on:keydown={(e) => e.key === 'Enter' && selectLayer(layer)}
 				>
 					<div class="layer-content">
+						{#if layer.isGroup}
+							<button 
+								class="expand-btn" 
+								on:click={(e) => toggleGroupExpansion(layer, e)}
+							>
+								<i class="fa fa-chevron-{layer.isExpanded ? 'down' : 'right'}"></i>
+							</button>
+						{:else}
+							<span class="expand-spacer"></span>
+						{/if}
+
 						{#if !layer.locked}
 							<span class="drag-handle" title="Drag to reorder">
 								<i class="fa fa-grip-vertical"></i>
@@ -711,6 +799,35 @@
 		gap: 10px;
 		flex: 1;
 		min-width: 0;
+	}
+	
+	.expand-btn {
+		background: none;
+		border: none;
+		padding: 4px;
+		cursor: pointer;
+		color: #6b7280;
+		width: 20px;
+		height: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: -4px;
+	}
+	
+	.expand-btn:hover {
+		color: #374151;
+		background-color: #f3f4f6;
+		border-radius: 4px;
+	}
+	
+	.expand-btn i {
+		font-size: 10px;
+	}
+
+	.expand-spacer {
+		width: 20px;
+		margin-right: -4px;
 	}
 	
 	.drag-handle {

@@ -328,7 +328,7 @@
 	<!-- Header -->
 	<div class="px-4 py-3 border-b border-gray-200 bg-white flex justify-between items-center shrink-0">
 		<div class="flex items-center gap-2">
-			<div class="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
+			<div class="w-6 h-6 rounded-lg bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-sm">
 				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
 				</svg>
@@ -384,7 +384,7 @@
 				<div class="grid grid-cols-1 gap-2 w-full max-w-xs">
 					{#each QUICK_ACTIONS as action}
 						<button 
-							class="text-xs text-left px-3 py-2 bg-white border border-gray-200 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors shadow-sm"
+							class="text-xs text-left px-3 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#ff6b6b] hover:text-[#ff6b6b] transition-colors shadow-sm"
 							on:click={() => handleGenerate(action)}
 						>
 							{action}
@@ -399,7 +399,7 @@
 				class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}"
 				transition:fly={{ y: 10, duration: 200 }}
 			>
-				<div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm {msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm' : msg.role === 'system' ? 'bg-gray-200 text-gray-600 text-xs py-1 px-2 rounded-lg' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'}">
+				<div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm {msg.role === 'user' ? 'bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] text-white rounded-tr-sm' : msg.role === 'system' ? 'bg-gray-200 text-gray-600 text-xs py-1 px-2 rounded-lg' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'}">
 					{msg.content}
 				</div>
 			</div>
@@ -408,9 +408,9 @@
 		{#if isLoading}
 			<div class="flex justify-start" transition:fade>
 				<div class="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2 shadow-sm">
-					<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-					<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-					<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+					<div class="w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+					<div class="w-1.5 h-1.5 bg-[#ffc480] rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+					<div class="w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-bounce" style="animation-delay: 300ms"></div>
 					{#if currentAgent}
 						<span class="ml-2 text-xs text-gray-500">{currentAgent}...</span>
 					{/if}
@@ -435,7 +435,7 @@
 				<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
 					Execution Steps
 					{#if $copilotExecution.isLoading}
-						<span class="text-blue-500 animate-pulse">running…</span>
+						<span class="text-[#ff6b6b] animate-pulse">running…</span>
 					{/if}
 				</p>
 				<div class="space-y-1.5">
@@ -472,7 +472,7 @@
 				<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Design Strengths</p>
 				<div class="flex flex-wrap gap-1.5">
 					{#each lastQualityStrengths as strength}
-						<span class="text-xs px-2 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
+						<span class="text-xs px-2 py-1 rounded-md bg-[#ff6b6b]/10 text-[#ff6b6b] border border-[#ff6b6b]/20">
 							{strength}
 						</span>
 					{/each}
@@ -488,14 +488,14 @@
 				bind:value={prompt}
 				on:keydown={handleKeydown}
 				rows="1"
-				class="w-full pl-4 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm resize-none shadow-sm transition-all min-h-[50px] max-h-[150px]"
+				class="w-full pl-4 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff6b6b]/20 focus:border-[#ff6b6b] text-sm resize-none shadow-sm transition-all min-h-[50px] max-h-[150px]"
 				placeholder="Describe your design..."
 				disabled={isLoading}
 			></textarea>
 			<button
 				on:click={() => handleGenerate()}
 				disabled={isLoading || !prompt.trim()}
-				class="absolute right-2 bottom-2 p-2 text-blue-600 hover:bg-blue-50 rounded-lg disabled:text-gray-300 disabled:hover:bg-transparent transition-colors"
+				class="absolute right-2 bottom-2 p-2 text-[#ff6b6b] hover:bg-[#ff6b6b]/10 rounded-lg disabled:text-gray-300 disabled:hover:bg-transparent transition-colors"
 			>
 				{#if isLoading}
 					<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

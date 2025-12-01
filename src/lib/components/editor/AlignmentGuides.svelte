@@ -8,7 +8,7 @@
 	let snapDistance = 5;
 	let snapToGrid = false;
 	let gridSize = 10;
-	let showGrid = false;
+
 	
 	// Performance optimization
 	let lastMoveTime = 0;
@@ -383,62 +383,7 @@
 		canvas.renderAll();
 	}
 	
-	function toggleGrid() {
-		showGrid = !showGrid;
-		if (showGrid) {
-			drawGrid();
-		} else {
-			clearGrid();
-		}
-	}
-	
-	function drawGrid() {
-		if (!canvas) return;
-		
-		clearGrid();
-		
-		const gridOptions = {
-			stroke: '#e5e5e5',
-			strokeWidth: 1,
-			selectable: false,
-			evented: false,
-			grid: true,
-			excludeFromExport: true
-		};
-		
-		// Draw vertical lines
-		for (let i = 0; i < canvas.width; i += gridSize) {
-			const line = new Line([i, 0, i, canvas.height], gridOptions);
-			canvas.add(line);
-			// Don't send completely to back if there's a background rect
-			// But for now, let's keep it simple. 
-			// If user has a background rect, grid might be hidden.
-			// We'll try to bring forward just a bit or assume transparent bg.
-			canvas.sendObjectToBack(line);
-		}
-		
-		// Draw horizontal lines
-		for (let i = 0; i < canvas.height; i += gridSize) {
-			const line = new Line([0, i, canvas.width, i], gridOptions);
-			canvas.add(line);
-			canvas.sendObjectToBack(line);
-		}
-		
-		// Move background image/rect to very back if exists
-		const bgObj = canvas.getObjects().find(o => o.name === 'background' || o.type === 'rect' && o.width === canvas.width);
-		if (bgObj) {
-			canvas.sendObjectToBack(bgObj);
-		}
-		
-		canvas.renderAll();
-	}
-	
-	function clearGrid() {
-		if (!canvas) return;
-		const gridLines = canvas.getObjects().filter(obj => obj.grid);
-		gridLines.forEach(obj => canvas.remove(obj));
-		canvas.renderAll();
-	}
+
 	
 	onMount(() => {
 		editor.subscribe(e => {
@@ -481,21 +426,11 @@
 			<input 
 				type="checkbox" 
 				bind:checked={snapToGrid}
-				on:change={() => snapToGrid && !showGrid && toggleGrid()}
 			/>
 			<span>Snap to Grid</span>
 		</label>
 		
-		<label class="checkbox-label">
-			<input 
-				type="checkbox" 
-				bind:checked={showGrid}
-				on:change={toggleGrid}
-			/>
-			<span>Show Grid</span>
-		</label>
-		
-		{#if snapToGrid || showGrid}
+		{#if snapToGrid}
 			<div class="grid-size-control">
 				<label for="grid-size">Size:</label>
 				<input 
@@ -505,7 +440,7 @@
 					min="5"
 					max="50"
 					step="5"
-					on:change={() => showGrid && drawGrid()}
+
 				/>
 			</div>
 		{/if}

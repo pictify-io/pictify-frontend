@@ -119,7 +119,7 @@
 		// Draw lines between points
 		for (let i = 0; i < polygonPoints.length - 1; i++) {
 			const line = new Path(`M ${polygonPoints[i].x} ${polygonPoints[i].y} L ${polygonPoints[i + 1].x} ${polygonPoints[i + 1].y}`, {
-				stroke: '#3b82f6',
+				stroke: '#ff6b6b',
 				strokeWidth: 2,
 				fill: '',
 				selectable: false,
@@ -136,7 +136,7 @@
 				left: point.x,
 				top: point.y,
 				radius: 4,
-				fill: '#3b82f6',
+				fill: '#ff6b6b',
 				originX: 'center',
 				originY: 'center',
 				selectable: false,
@@ -193,8 +193,8 @@
 					top: center.top,
 					width: 150,
 					height: 100,
-					fill: '#3b82f6',
-					stroke: '#2563eb',
+					fill: '#ff6b6b',
+					stroke: '#eb5a5a',
 					strokeWidth: 0,
 					originX: 'center',
 					originY: 'center'
@@ -284,8 +284,8 @@
 					top: center.top,
 					width: 150,
 					height: 100,
-					fill: '#06b6d4',
-					stroke: '#0891b2',
+					fill: '#14b8a6',
+					stroke: '#0d9488',
 					strokeWidth: 0,
 					rx: 15,
 					ry: 15,
@@ -497,8 +497,8 @@
 	}
 	
 	.tabs button.active {
-		color: #3b82f6;
-		border-bottom-color: #3b82f6;
+		color: #ff6b6b;
+		border-bottom-color: #ff6b6b;
 		background: white;
 	}
 	
@@ -534,7 +534,7 @@
 	
 	.search-box input:focus {
 		outline: none;
-		border-color: #3b82f6;
+		border-color: #ff6b6b;
 	}
 	
 	.grid {
@@ -563,8 +563,8 @@
 	}
 	
 	.item:hover {
-		border-color: #3b82f6;
-		background: #f0f9ff;
+		border-color: #ff6b6b;
+		background: #ff6b6b/5;
 		transform: translateY(-2px);
 		box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 	}
@@ -611,7 +611,7 @@
 	
 	/* Drawing mode indicator */
 	.mode-indicator {
-		background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+		background: linear-gradient(135deg, #ff6b6b 0%, #ffc480 100%);
 		color: white;
 		padding: 12px 16px;
 		display: flex;
@@ -620,7 +620,7 @@
 		gap: 12px;
 		font-size: 12px;
 		font-weight: 500;
-		border-bottom: 1px solid #2563eb;
+		border-bottom: 1px solid #ffc480;
 		flex-shrink: 0;
 		animation: slideDown 0.3s ease-out;
 	}
@@ -664,13 +664,13 @@
 	
 	/* Active tool state */
 	.item.active {
-		border-color: #3b82f6;
-		background: #dbeafe;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+		border-color: #ff6b6b;
+		background: #ff6b6b/10;
+		box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
 	}
 	
 	.item.active .label {
-		color: #1e40af;
+		color: #ff6b6b;
 		font-weight: 600;
 	}
 

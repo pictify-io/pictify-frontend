@@ -57,27 +57,38 @@
 	}
 
 	// Initialize local stops from value
-	$: {
-		if (supportsGradient && isGradientValue(value)) {
-			const incomingStops = ensureIds(normalizeStops(toGradientStops(value, defaultColor)));
+	// We use a function to avoid circular dependency on localStops in the reactive statement
+	function updateLocalStopsFromValue(val) {
+		if (supportsGradient && isGradientValue(val)) {
+			const parsedStops = normalizeStops(toGradientStops(val, defaultColor));
 			
-			if (!draggingId) {
-				// Always update when value changes (unless dragging)
-				localStops = incomingStops;
+			// Check if stops are effectively the same to avoid losing IDs/selection
+			// This prevents resetting activeStopId when value round-trips from parent
+			const isSame = localStops.length === parsedStops.length && localStops.every((s, i) => {
+				const p = parsedStops[i];
+				const offsetMatch = Math.abs(s.offset - p.offset) < 0.001;
+				const colorMatch = s.color === p.color;
+				return offsetMatch && colorMatch;
+			});
+			
+			if (!draggingId && !isSame) {
+				localStops = ensureIds(parsedStops);
 				if (!activeStopId || !localStops.find(s => s.id === activeStopId)) {
 					activeStopId = localStops[0]?.id;
 				}
 				// Extract and restore gradient angle
-				if (typeof value === 'object' && value.coords) {
-					gradientAngle = extractGradientAngle(value);
+				if (typeof val === 'object' && val.coords) {
+					gradientAngle = extractGradientAngle(val);
 				}
 			}
-		} else if (!isGradientValue(value)) {
+		} else if (!isGradientValue(val)) {
             // Reset to default stops for solid colors
-            localStops = ensureIds(toGradientStops(value, defaultColor));
+            localStops = ensureIds(toGradientStops(val, defaultColor));
             activeStopId = localStops[0]?.id;
         }
 	}
+
+	$: updateLocalStopsFromValue(value);
 
 	$: solidColor = typeof value === 'string' && value && !isGradientValue(value) ? value : defaultColor;
 	$: mode = supportsGradient && isGradientValue(value) ? 'gradient' : 'solid';
@@ -216,7 +227,15 @@
         updateGradient();
 	}
 
+	let justFinishedDragging = false;
+
 	function handleWindowMouseUp() {
+		if (draggingId) {
+			justFinishedDragging = true;
+			setTimeout(() => {
+				justFinishedDragging = false;
+			}, 100);
+		}
 		draggingId = null;
 	}
     
@@ -248,15 +267,26 @@
 			if (modalPosition.top + modalHeight > window.innerHeight - 20) {
 				modalPosition.top = window.innerHeight - modalHeight - 20;
 			}
+		} else {
+			// Removed debug log
 		}
 	}
 
 	function handleClickOutside(e) {
-		if (showColorPicker && pickerButton && !pickerButton.contains(e.target)) {
-			const modal = document.querySelector('.color-picker-modal');
-			if (modal && !modal.contains(e.target)) {
-				showColorPicker = false;
-			}
+		if (!showColorPicker) return;
+		
+		// Ignore clicks on elements that were removed from DOM (e.g. due to re-render)
+		if (!e.target.isConnected) {
+			console.log('[ColorPicker] Ignoring click on detached element');
+			return;
+		}
+		
+		const isInsideButton = pickerButton && pickerButton.contains(e.target);
+		const isInsideModal = e.target.closest('.color-picker-modal');
+		
+		if (!isInsideButton && !isInsideModal) {
+			console.log('[ColorPicker] Click outside detected, closing');
+			showColorPicker = false;
 		}
 	}
 
@@ -327,6 +357,18 @@
 			window.removeEventListener('click', handleClickOutside);
 		};
 	});
+
+	// Portal action to move element to body
+	function portal(node) {
+		document.body.appendChild(node);
+		return {
+			destroy() {
+				if (node.parentNode) {
+					node.parentNode.removeChild(node);
+				}
+			}
+		};
+	}
 </script>
 
 <svelte:window on:mousemove={handleWindowMouseMove} on:mouseup={handleWindowMouseUp} />
@@ -339,7 +381,7 @@
 			bind:this={pickerButton}
 			type="button"
 			class="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-gray-300 hover:border-gray-400 transition-colors bg-white"
-			on:click|stopPropagation={toggleColorPicker}
+			on:click={(e) => { console.log('[ColorPicker] Button clicked!'); e.stopPropagation(); toggleColorPicker(); }}
 		>
 			<!-- Color Preview Swatch -->
 			<div class="relative w-6 h-6 rounded overflow-hidden border border-gray-200">
@@ -357,8 +399,9 @@
 <!-- Modal Color Picker -->
 {#if showColorPicker}
 	<div 
-		class="fixed z-[9999] color-picker-modal"
-		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px;"
+		use:portal
+		class="fixed color-picker-modal"
+		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px; z-index: 999999 !important;"
 	>
 		<div class="bg-white rounded-lg shadow-2xl overflow-hidden">
 			<!-- Header with close button -->
@@ -417,7 +460,7 @@
 						{#each gradientPresets as preset}
 							<button
 								type="button"
-								class="h-8 rounded overflow-hidden border border-gray-200 hover:border-blue-500 transition-all hover:scale-105"
+								class="h-8 rounded overflow-hidden border border-gray-200 hover:border-[#ff6b6b] transition-all hover:scale-105"
 								style="background: linear-gradient({preset.angle}deg, {preset.colors.join(', ')})"
 								on:click={() => applyPreset(preset)}
 								title={preset.name}
@@ -461,7 +504,7 @@
 								on:dblclick={() => handleStopDelete(stop.id)}
 							>
 								<div 
-									class="w-5 h-5 rounded-full border-2 shadow-lg transition-all hover:scale-110 {activeStopId === stop.id ? 'border-blue-500 scale-110 ring-2 ring-blue-500/30' : 'border-white'}"
+									class="w-5 h-5 rounded-full border-2 shadow-lg transition-all hover:scale-110 {activeStopId === stop.id ? 'border-[#ff6b6b] scale-110 ring-2 ring-[#ff6b6b]/30' : 'border-white'}"
 									style="background-color: {stop.color}"
 								></div>
 							</button>
@@ -481,7 +524,7 @@
 							step="1"
 							value={gradientAngle}
 							on:input={handleAngleChange}
-							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ff6b6b]"
 						/>
 						<div class="flex justify-between text-[9px] text-gray-400 mt-0.5">
 							<span>0°</span>
@@ -615,9 +658,9 @@
 						{/if}
 					</div>
 				</div>
+			</div>
 		</div>
 	</div>
-</div>
 {/if}
 
 <style>
@@ -699,8 +742,8 @@
 	}
 	
 	.btn-harmony:hover:not(:disabled) {
-		border-color: #3b82f6;
-		background-color: #eff6ff;
+		border-color: #ff6b6b;
+		background-color: #ff6b6b/5;
 	}
 	
 	.btn-harmony:disabled {

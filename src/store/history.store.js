@@ -6,3 +6,7 @@ export const canRedo = writable(false);
 // These are used to trigger actions from the UI (TopBar) to the Canvas
 export const triggerUndo = writable(0);
 export const triggerRedo = writable(0);
+
+// State for unsaved changes
+export const isDirty = writable(false);
+export const triggerMarkSaved = writable(0);

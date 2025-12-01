@@ -1,8 +1,8 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
-	import { Canvas } from 'fabric'; // v6 import
+	import { Canvas, ActiveSelection } from 'fabric'; // v6 import
 	import { editor, editorActions } from '../../../store/editor.store';
-	import { canUndo, canRedo, triggerUndo, triggerRedo } from '../../../store/history.store';
+	import { canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved } from '../../../store/history.store';
 
 	let scale = 1;
 	let containerWidth = 0;
@@ -13,6 +13,7 @@
 	// Undo/Redo History Management
 	let historyStack = [];
 	let historyIndex = -1;
+	let savedHistoryIndex = -1; // Tracks the index where the last save occurred
 	let isPerformingUndoRedo = false;
 	let isLoadingCanvas = false; // Flag to prevent saves during initial load
 	let isBatchingOperations = false; // Flag to batch multiple operations into one history entry
@@ -44,6 +45,7 @@
 	function updateHistoryFlags() {
 		canUndo.set(historyIndex > 0);
 		canRedo.set(historyIndex < historyStack.length - 1);
+		isDirty.set(historyIndex !== savedHistoryIndex);
 	}
 
 	function performUndo() {
@@ -104,8 +106,10 @@
 	// Subscribe to undo/redo triggers with previous value tracking
 	let unsubscribeUndo;
 	let unsubscribeRedo;
+	let unsubscribeMarkSaved;
 	let previousUndoValue;
 	let previousRedoValue;
+	let previousMarkSavedValue;
 
 	function updateScale() {
 		if (!canvasContainer || !fabricCanvas) return;
@@ -236,6 +240,48 @@
 			}
 		});
 
+		// Handle double click to ungroup and edit items
+		fabricCanvas.on('mouse:dblclick', (e) => {
+			const target = e.target;
+			if (target && target.type === 'group') {
+				// Manual ungroup implementation since toActiveSelection is missing
+				// 1. Get items and restore their canvas coordinates
+				const items = target._objects.concat(); // Copy array
+				
+				// Restore objects to their original state (canvas coordinates)
+				if (typeof target._restoreObjectsState === 'function') {
+					target._restoreObjectsState();
+				} else {
+					// Fallback if _restoreObjectsState is missing (unlikely for Group)
+					// We would need manual matrix multiplication here
+					console.warn('_restoreObjectsState missing on group');
+				}
+
+				// 2. Remove group from canvas
+				fabricCanvas.remove(target);
+				
+				// 3. Add items back to canvas
+				items.forEach(obj => {
+					fabricCanvas.add(obj);
+				});
+				
+				// 4. Create active selection
+				const activeSelection = new ActiveSelection(items, {
+					canvas: fabricCanvas
+				});
+				
+				fabricCanvas.setActiveObject(activeSelection);
+				fabricCanvas.requestRenderAll();
+				
+				// Update selection in store
+				editorActions.selectComponent(activeSelection);
+				
+				// Save state since structure changed
+				saveState();
+				console.log('🔓 Group ungrouped manually via double-click');
+			}
+		});
+
 		// Subscribe to undo/redo triggers - track previous value to avoid firing on initial subscription
 		unsubscribeUndo = triggerUndo.subscribe((value) => {
 			console.log('🔔 triggerUndo subscription fired. Value:', value, 'Previous:', previousUndoValue);
@@ -255,12 +301,24 @@
 			previousRedoValue = value;
 		});
 
+		unsubscribeMarkSaved = triggerMarkSaved.subscribe((value) => {
+			if (previousMarkSavedValue !== undefined && value !== previousMarkSavedValue) {
+				console.log('💾 Marking current state as saved. Index:', historyIndex);
+				savedHistoryIndex = historyIndex;
+				updateHistoryFlags();
+			}
+			previousMarkSavedValue = value;
+		});
+
 		// Allow canvas to finish initializing before saving initial state
 		// This prevents saving an empty canvas as the first state
 		isLoadingCanvas = true;
 		setTimeout(() => {
 			isLoadingCanvas = false;
 			saveState();
+			// Initial state is considered saved
+			savedHistoryIndex = historyIndex;
+			updateHistoryFlags();
 			console.log('🎨 Canvas initialization complete, history tracking started');
 		}, 500); // Increased delay to ensure canvas is fully set up
 
@@ -296,7 +354,9 @@
 			return;
 		}
 
-		if (e.key === 'Delete' || e.key === 'Backspace') {
+		// Only use Delete key (not Backspace) for deleting objects
+		// On Mac, Backspace is for text editing, Delete (Fn+Delete) is for object deletion
+		if (e.key === 'Delete') {
 			const activeObject = fabricCanvas.getActiveObject();
 			if (activeObject && !activeObject.isEditing) {
 				fabricCanvas.remove(activeObject);
@@ -314,6 +374,7 @@
 		}
 		if (unsubscribeUndo) unsubscribeUndo();
 		if (unsubscribeRedo) unsubscribeRedo();
+		if (unsubscribeMarkSaved) unsubscribeMarkSaved();
 		if (fabricCanvas) {
 			fabricCanvas.dispose();
 		}
