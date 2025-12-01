@@ -6,9 +6,9 @@ const getTemplate = async ({ type, variables }) => {
 	return response;
 };
 
-const getTemplates = async () => {
+const getTemplates = async ({ page = 1, limit = 12, sort = 'newest' } = {}) => {
 	try {
-		const response = await backend.get('/templates');
+		const response = await backend.get(`/templates?page=${page}&limit=${limit}&sort=${sort}`);
 		return response;
 	} catch (error) {
 		return null;
@@ -51,9 +51,9 @@ const deleteTemplate = async (uid) => {
 	}
 };
 
-const searchTemplates = async (search) => {
+const searchTemplates = async (search, { page = 1, limit = 12 } = {}) => {
 	try {
-		const response = await backend.get(`/templates/search?q=${search}`);
+		const response = await backend.get(`/templates/search?q=${encodeURIComponent(search)}&page=${page}&limit=${limit}`);
 		return response;
 	} catch (error) {
 		return null;
@@ -69,6 +69,44 @@ const getTemplatesForType = async (type) => {
 	}
 };
 
+/**
+ * Render a template with variable values
+ * @param {string} uid - Template UID
+ * @param {Object} variables - Variable key-value pairs
+ * @param {Object} options - Render options (format, quality)
+ * @returns {Promise<Object>} - { url, width, height, format }
+ */
+const renderTemplate = async (uid, variables = {}, options = {}) => {
+	try {
+		const response = await backend.post(`/templates/${uid}/render`, {
+			variables,
+			format: options.format || 'png',
+			quality: options.quality || 0.9
+		}, {
+			headers: options.headers || {}
+		});
+		return response;
+	} catch (error) {
+		console.error('Error rendering template:', error);
+		throw error;
+	}
+};
+
+/**
+ * Get template variables definition
+ * @param {string} uid - Template UID
+ * @returns {Promise<Object>} - { templateUid, templateName, variables }
+ */
+const getTemplateVariables = async (uid) => {
+	try {
+		const response = await backend.get(`/templates/${uid}/variables`);
+		return response;
+	} catch (error) {
+		console.error('Error fetching template variables:', error);
+		return null;
+	}
+};
+
 export {
 	getTemplate,
 	getTemplates,
@@ -77,5 +115,7 @@ export {
 	updateTemplate,
 	deleteTemplate,
 	searchTemplates,
-	getTemplatesForType
+	getTemplatesForType,
+	renderTemplate,
+	getTemplateVariables
 };

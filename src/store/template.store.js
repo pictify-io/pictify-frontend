@@ -23,18 +23,46 @@ export const template = writable({
 
 export const templates = writable([]);
 
+// Pagination state
+export const templatesPagination = writable({
+	page: 1,
+	limit: 12,
+	total: 0,
+	totalPages: 0,
+	hasNext: false,
+	hasPrev: false,
+	sort: 'newest'
+});
+
 // Actions
-export const getTemplatesAction = async () => {
+export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest' } = {}) => {
 	try {
-		const response = await getTemplates();
+		const response = await getTemplates({ page, limit, sort });
 		if (!response?.templates) {
 			templates.set([]);
-			return;
+			templatesPagination.set({
+				page: 1,
+				limit,
+				total: 0,
+				totalPages: 0,
+				hasNext: false,
+				hasPrev: false,
+				sort
+			});
+			return { templates: [], pagination: null };
 		}
 		templates.set(response.templates);
+		if (response.pagination) {
+			templatesPagination.set({
+				...response.pagination,
+				sort
+			});
+		}
+		return response;
 	} catch (error) {
 		console.error('Error fetching templates:', error);
 		templates.set([]);
+		return { templates: [], pagination: null };
 	}
 };
 
@@ -115,17 +143,34 @@ export const deleteTemplateAction = async (uid) => {
 	}
 };
 
-export const searchTemplatesAction = async (query) => {
+export const searchTemplatesAction = async (query, { page = 1, limit = 12 } = {}) => {
 	try {
-		const response = await searchTemplates(query);
+		const response = await searchTemplates(query, { page, limit });
 		if (!response?.templates) {
 			templates.set([]);
-			return;
+			templatesPagination.set({
+				page: 1,
+				limit,
+				total: 0,
+				totalPages: 0,
+				hasNext: false,
+				hasPrev: false,
+				sort: 'newest'
+			});
+			return { templates: [], pagination: null };
 		}
 		templates.set(response.templates);
+		if (response.pagination) {
+			templatesPagination.set({
+				...response.pagination,
+				sort: 'newest'
+			});
+		}
+		return response;
 	} catch (error) {
 		console.error('Error searching templates:', error);
 		templates.set([]);
+		return { templates: [], pagination: null };
 	}
 };
 

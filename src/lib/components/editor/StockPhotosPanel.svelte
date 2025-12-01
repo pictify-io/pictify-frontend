@@ -415,7 +415,7 @@
 	
 	.search-box input:focus {
 		outline: none;
-		border-color: #3b82f6;
+		border-color: #ff6b6b;
 	}
 	
 	.clear-btn {
@@ -441,7 +441,7 @@
 	
 	.search-btn {
 		padding: 8px 12px;
-		background: #3b82f6;
+		background: #ff6b6b;
 		color: white;
 		border: none;
 		border-radius: 6px;
@@ -455,7 +455,7 @@
 	}
 	
 	.search-btn:hover:not(:disabled) {
-		background: #2563eb;
+		background: #eb5a5a;
 	}
 	
 	.search-btn:disabled {
@@ -502,9 +502,9 @@
 	}
 	
 	.tag:hover {
-		background: #3b82f6;
+		background: #ff6b6b;
 		color: white;
-		border-color: #3b82f6;
+		border-color: #ff6b6b;
 	}
 	
 	/* Messages */
@@ -567,7 +567,7 @@
 	
 	.loading-state i {
 		font-size: 24px;
-		color: #3b82f6;
+		color: #ff6b6b;
 	}
 	
 	/* Photos Grid */
@@ -658,7 +658,7 @@
 	}
 	
 	.photo-attribution a {
-		color: #3b82f6;
+		color: #ff6b6b;
 		text-decoration: none;
 		font-weight: 500;
 		word-break: break-word;
@@ -686,15 +686,15 @@
 	
 	.load-more-btn:hover {
 		background: #f5f5f5;
-		border-color: #3b82f6;
-		color: #3b82f6;
+		border-color: #ff6b6b;
+		color: #ff6b6b;
 	}
 	
 	.loading-more {
 		text-align: center;
 		padding: 12px;
 		padding-right: 20px;
-		color: #3b82f6;
+		color: #ff6b6b;
 	}
 	
 	/* Empty State */
@@ -740,7 +740,7 @@
 	}
 	
 	.footer-credit a {
-		color: #3b82f6;
+		color: #ff6b6b;
 		text-decoration: none;
 		font-weight: 500;
 	}

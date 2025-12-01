@@ -7,6 +7,15 @@
 import { writable, derived } from 'svelte/store';
 
 /**
+ * Copilot drawer UI state
+ */
+export const copilotDrawer = writable({
+  isOpen: false,
+  height: 400, // default height in pixels
+  isMinimized: false
+});
+
+/**
  * Copilot execution state
  */
 export const copilotExecution = writable({
@@ -182,6 +191,54 @@ export const copilotActions = {
       needsUserInput: typeof needsUserInput === 'boolean'
         ? needsUserInput
         : state.needsUserInput
+    }));
+  },
+
+  /**
+   * Drawer control actions
+   */
+  toggleDrawer: () => {
+    copilotDrawer.update(state => ({
+      ...state,
+      isOpen: !state.isOpen,
+      isMinimized: false
+    }));
+  },
+
+  openDrawer: () => {
+    copilotDrawer.update(state => ({
+      ...state,
+      isOpen: true,
+      isMinimized: false
+    }));
+  },
+
+  closeDrawer: () => {
+    copilotDrawer.update(state => ({
+      ...state,
+      isOpen: false,
+      isMinimized: false
+    }));
+  },
+
+  minimizeDrawer: () => {
+    copilotDrawer.update(state => ({
+      ...state,
+      isMinimized: true
+    }));
+  },
+
+  maximizeDrawer: () => {
+    copilotDrawer.update(state => ({
+      ...state,
+      isMinimized: false
+    }));
+  },
+
+  setDrawerHeight: (height) => {
+    copilotDrawer.update(state => ({
+      ...state,
+      height: Math.max(200, Math.min(height, window.innerHeight * 0.8))
     }));
   }
 };

@@ -29,7 +29,16 @@ const backend = {
 			}
 		});
 		if (!response.ok) {
-			throw new HttpError(response.status, response.statusText);
+			let message = response.statusText;
+			try {
+				const data = await response.json();
+				if (data && data.message) {
+					message = data.message;
+				}
+			} catch (e) {
+				// ignore
+			}
+			throw new HttpError(response.status, message);
 		}
 		return response.json();
 	},
@@ -54,7 +63,16 @@ const backend = {
 			body: JSON.stringify(data)
 		});
 		if (!response.ok) {
-			throw new HttpError(response.status, response.statusText);
+			let message = response.statusText;
+			try {
+				const data = await response.json();
+				if (data && data.message) {
+					message = data.message;
+				}
+			} catch (e) {
+				// ignore
+			}
+			throw new HttpError(response.status, message);
 		}
 		return response.json();
 	},
@@ -79,7 +97,16 @@ const backend = {
 			body: JSON.stringify(data)
 		});
 		if (!response.ok) {
-			throw new HttpError(response.status, response.statusText);
+			let message = response.statusText;
+			try {
+				const data = await response.json();
+				if (data && data.message) {
+					message = data.message;
+				}
+			} catch (e) {
+				// ignore
+			}
+			throw new HttpError(response.status, message);
 		}
 		return response.json();
 	},
@@ -103,7 +130,16 @@ const backend = {
 			}
 		});
 		if (!response.ok) {
-			throw new HttpError(response.status, response.statusText);
+			let message = response.statusText;
+			try {
+				const data = await response.json();
+				if (data && data.message) {
+					message = data.message;
+				}
+			} catch (e) {
+				// ignore
+			}
+			throw new HttpError(response.status, message);
 		}
 		return response.json();
 	}

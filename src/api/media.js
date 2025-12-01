@@ -1,24 +1,22 @@
 import backend from '../service/backend';
 
-const getImages = async (token) => {
+const getImages = async ({ limit = 12, offset = 0 } = {}) => {
 	try {
-		// backend.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-		const response = await backend.get('/image');
+		const response = await backend.get(`/image?limit=${limit}&offset=${offset}`);
 		return response;
 	} catch (error) {
-		return null;
+		console.error('Error fetching images:', error);
+		return { images: [], pagination: { total: 0, limit, offset, hasMore: false } };
 	}
 };
 
-const getGifs = async (token) => {
+const getGifs = async ({ limit = 12, offset = 0 } = {}) => {
 	try {
-		// backend.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-		const response = await backend.get('/gif');
+		const response = await backend.get(`/gif?limit=${limit}&offset=${offset}`);
 		return response;
 	} catch (error) {
-		return null;
+		console.error('Error fetching gifs:', error);
+		return { gifs: [], pagination: { total: 0, limit, offset, hasMore: false } };
 	}
 };
 

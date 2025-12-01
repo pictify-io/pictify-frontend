@@ -140,26 +140,18 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 		<div class="pointer-events-auto">
 			{#if !isOpen}
 				<button
-					class="group flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-md rounded-full shadow-lg border border-white/40 hover:scale-110 transition-all duration-300 hover:shadow-xl ring-1 ring-black/5"
+					class="group flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] backdrop-blur-md rounded-full shadow-lg border-2 border-black hover:scale-110 transition-all duration-300 hover:shadow-xl"
 					on:click={toggleOpen}
 					title="Edit with Copilot (Cmd+K)"
 					in:scaleAnim={{ duration: 300, start: 0.8, easing: cubicOut }}
 				>
-					<div class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M5 16C5.55228 16 6 15.5523 6 15C6 14.4477 5.55228 14 5 14C4.44772 14 4 14.4477 4 15C4 15.5523 4.44772 16 5 16Z" fill="url(#paint0_linear)"/>
-							<path d="M17 4C17.5523 4 18 3.55228 18 3C18 2.44772 17.5523 2 17 2C16.4477 2 16 2.44772 16 3C16 3.55228 16.4477 4 17 4Z" fill="url(#paint0_linear)"/>
-							<path d="M19 16C19.5523 16 20 15.5523 20 15C20 14.4477 19.5523 14 19 14C18.4477 14 18 14.4477 18 15C18 15.5523 18.4477 16 19 16Z" fill="url(#paint0_linear)"/>
-							<path d="M12 19C12.5523 19 13 18.5523 13 18C13 17.4477 12.5523 17 12 17C11.4477 17 11 17.4477 11 18C11 18.5523 11.4477 19 12 19Z" fill="url(#paint0_linear)"/>
-							<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5858 5.58579C16.3668 4.80474 17.6332 4.80474 18.4142 5.58579C19.1953 6.36683 19.1953 7.63316 18.4142 8.41421L8.41421 18.4142C7.63316 19.1953 6.36683 19.1953 5.58579 18.4142C4.80474 17.6332 4.80474 16.3668 5.58579 15.5858L15.5858 5.58579ZM17 7L7 17L8.41421 18.4142L18.4142 8.41421L17 7Z" fill="url(#paint0_linear)"/>
-							<defs>
-								<linearGradient id="paint0_linear" x1="4" y1="2" x2="20" y2="19" gradientUnits="userSpaceOnUse">
-									<stop stop-color="#2563EB"/>
-									<stop offset="1" stop-color="#9333EA"/>
-								</linearGradient>
-							</defs>
-						</svg>
-					</div>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M5 16C5.55228 16 6 15.5523 6 15C6 14.4477 5.55228 14 5 14C4.44772 14 4 14.4477 4 15C4 15.5523 4.44772 16 5 16Z" fill="white"/>
+						<path d="M17 4C17.5523 4 18 3.55228 18 3C18 2.44772 17.5523 2 17 2C16.4477 2 16 2.44772 16 3C16 3.55228 16.4477 4 17 4Z" fill="white"/>
+						<path d="M19 16C19.5523 16 20 15.5523 20 15C20 14.4477 19.5523 14 19 14C18.4477 14 18 14.4477 18 15C18 15.5523 18.4477 16 19 16Z" fill="white"/>
+						<path d="M12 19C12.5523 19 13 18.5523 13 18C13 17.4477 12.5523 17 12 17C11.4477 17 11 17.4477 11 18C11 18.5523 11.4477 19 12 19Z" fill="white"/>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5858 5.58579C16.3668 4.80474 17.6332 4.80474 18.4142 5.58579C19.1953 6.36683 19.1953 7.63316 18.4142 8.41421L8.41421 18.4142C7.63316 19.1953 6.36683 19.1953 5.58579 18.4142C4.80474 17.6332 4.80474 16.3668 5.58579 15.5858L15.5858 5.58579ZM17 7L7 17L8.41421 18.4142L18.4142 8.41421L17 7Z" fill="white"/>
+					</svg>
 				</button>
 			{:else}
 				<div 
@@ -167,9 +159,9 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 					transition:fly={{ y: 10, duration: 300, easing: cubicOut }}
 				>
 					<!-- Header -->
-					<div class="px-4 py-3 bg-gradient-to-r from-gray-50/80 to-white/80 border-b border-gray-100 flex items-center justify-between">
+					<div class="px-4 py-3 bg-[#FFFDF8] border-b-2 border-black flex items-center justify-between">
 						<div class="flex items-center gap-2">
-							<div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm ring-2 ring-white">
+							<div class="w-6 h-6 rounded-full bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-sm ring-2 ring-white">
 								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
 								</svg>
@@ -194,7 +186,7 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 							bind:value={prompt}
 							on:keydown={handleKeydown}
 							placeholder="Describe how you want to change this element..."
-							class="w-full text-sm border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 min-h-[100px] resize-none bg-white/60 mb-3 placeholder-gray-400 transition-all shadow-inner"
+							class="w-full text-sm border-2 border-black/10 rounded-xl p-3 focus:border-[#ff6b6b] focus:ring-2 focus:ring-[#ff6b6b]/20 min-h-[100px] resize-none bg-white/60 mb-3 placeholder-gray-400 transition-all shadow-inner"
 							disabled={isLoading}
 							autofocus
 						></textarea>
@@ -213,14 +205,14 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 						<div class="flex justify-between items-center">
 							<span class="text-[11px] text-gray-400 font-medium px-1 flex items-center gap-1">
 								{#if isLoading}
-									<span class="animate-pulse text-blue-500 font-semibold">Generating changes...</span>
+									<span class="animate-pulse text-[#ff6b6b] font-semibold">Generating changes...</span>
 								{:else}
 									<span class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 text-[10px]">Enter</span> to generate
 								{/if}
 							</span>
 
 							<button
-								class="bg-black text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95"
+								class="bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95"
 								on:click={handleGenerate}
 								disabled={isLoading || !prompt.trim()}
 							>
