@@ -462,17 +462,19 @@
       toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
     });
   }
-  // Avoid literal <style> so Svelte's CSS preprocessor doesn't try to parse runtime styles
+  // Avoid literal style tags so Svelte's CSS preprocessor doesn't try to parse runtime content
   function returnStyleTag(css) {
-    const styleTagRegex = /<style>([\s\S]*?)<\/style>/;
-    const match = styleTagRegex.exec(css);
+    // Build tag strings using character codes to completely avoid any style-like text
+    const openTag = String.fromCharCode(60, 115, 116, 121, 108, 101, 62);
+    const closeTag = String.fromCharCode(60, 47, 115, 116, 121, 108, 101, 62);
+    const tagRegex = new RegExp(openTag + '([\\s\\S]*?)' + closeTag);
+    const match = tagRegex.exec(css);
     if (match) {
       return css;
     }
     return css
-      .replace('[styleOpen]', '<$>')
-      .replace('[styleClose]', '</$>')
-      .replaceAll('$', 'style');
+      .replace('[styleOpen]', openTag)
+      .replace('[styleClose]', closeTag);
   }
 </script>
 
@@ -485,373 +487,348 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
-<section>
+<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
   <Nav />
-  <main class="w-full py-6 px-6 flex flex-col items-center justify-center space-y-10 max-w-5xl mx-auto">
-    <div class="text-center">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter">Code Snippet <span class="text-[#ff6b6b]">to Image</span></h1>
-      <p class="text-lg opacity-80 mt-3">Create beautiful, syntax‑highlighted code screenshots. Free tool powered by our HTML → Image API.</p>
+  
+  <!-- Background Elements -->
+  <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+
+  <main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 mb-6">
+        <div class="flex gap-1">
+          <span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse"></span>
+          <span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse delay-75"></span>
+          <span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse delay-150"></span>
+        </div>
+        <span class="text-sm font-bold text-gray-900 tracking-wide uppercase">Free Tool</span>
+      </div>
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 leading-[1.1] tracking-tight mb-8">
+        Code Snippet <span class="text-[#ff6b6b] relative inline-block">
+          to Image
+          <svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
+            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
+          </svg>
+        </span>
+      </h1>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto font-medium">Create beautiful, syntax‑highlighted code screenshots for your social media and blogs.</p>
     </div>
 
-    <!-- Usage Progress Bar for non-logged in users -->
-    {#if !isUserLoggedIn}
-      <div class="w-full max-w-5xl mx-auto">
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-4 shadow-sm">
-          <div class="flex items-center gap-4">
-            <div class="flex-1">
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="text-sm font-medium text-gray-700">Guest Generations</span>
-                <span class="text-sm font-medium text-gray-700">{freeGenerationsUsed}/{maxFreeGenerations}</span>
+    <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8 items-start">
+      
+      <!-- Left Column: Controls -->
+      <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl p-6 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+          Configuration
+        </h2>
+
+        <div class="space-y-6">
+          <!-- Language & Theme -->
+          <div class="space-y-4">
+            <div>
+              <label for="language" class="block text-sm font-bold text-gray-900 mb-1.5">Language</label>
+              <div class="relative">
+                <select id="language" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={language} on:change={() => { /* update filename via reactive */ }}>
+                  {#each languageOptions as opt}
+                    <option value={opt.id}>{opt.name}</option>
+                  {/each}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
               </div>
-              <div class="w-full bg-gray-100 rounded-full h-2">
-                <div 
-                  class="bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] h-2 rounded-full transition-all duration-500" 
-                  style="width: {usagePercentage}%" 
-                />
-              </div>
-              {#if remainingGenerations > 0}
-                <p class="text-sm text-gray-500 mt-1.5">Sign up free to unlock unlimited generations</p>
-              {:else}
-                <p class="text-sm text-gray-500 mt-1.5">Sign up free to unlock unlimited generations</p>
-              {/if}
             </div>
-            {#if remainingGenerations > 0}
-              <div class="flex-shrink-0">
-                <div class="relative group">
-                  <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-                  <a 
-                    href="/signup?redirect=/tools/code-to-image"
-                    class="py-2 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-white transition-all hover:shadow-lg hover:brightness-105 inline-block text-sm"
-                  >
-                    Sign Up Free
-                  </a>
+
+            <div>
+              <label for="theme" class="block text-sm font-bold text-gray-900 mb-1.5">Theme</label>
+              <div class="relative">
+                <select id="theme" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={themeId}>
+                  {#each themeOptions as opt}
+                    <option value={opt.id}>{opt.name}</option>
+                  {/each}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label for="font" class="block text-sm font-bold text-gray-900 mb-1.5">Font</label>
+              <div class="relative">
+                <select id="font" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={fontId}>
+                  {#each fontOptions as opt}
+                    <option value={opt.id}>{opt.name}</option>
+                  {/each}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-px bg-gray-200"></div>
+
+          <!-- Appearance -->
+          <div class="space-y-4">
+            <div>
+              <label for="backdrop" class="block text-sm font-bold text-gray-900 mb-1.5">Background</label>
+              <div class="relative">
+                <select id="backdrop" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={backdrop}>
+                  {#each backdropOptions as option}
+                    <option value={option.id}>{option.name}</option>
+                  {/each}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            {#if backdrop === 'solid'}
+              <div>
+                <label for="solidBg" class="block text-sm font-bold text-gray-900 mb-1.5">Color</label>
+                <div class="flex items-center gap-2">
+                  <input id="solidBg" class="h-10 w-full border-[3px] border-gray-900 rounded-lg cursor-pointer shadow-[2px_2px_0_0_#1f2937] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all" type="color" bind:value={solidBackground} />
+                  <input type="text" class="w-24 border-[3px] border-gray-900 rounded-lg p-2 text-sm font-mono shadow-[2px_2px_0_0_#1f2937] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none" bind:value={solidBackground} />
                 </div>
               </div>
             {/if}
+            {#if backdrop === 'custom-gradient'}
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="gradientStart" class="block text-xs font-bold text-gray-900 mb-1">Start</label>
+                  <input id="gradientStart" class="h-8 w-full border-[3px] border-gray-900 rounded-lg cursor-pointer" type="color" bind:value={customGradientStart} />
+                </div>
+                <div>
+                  <label for="gradientEnd" class="block text-xs font-bold text-gray-900 mb-1">End</label>
+                  <input id="gradientEnd" class="h-8 w-full border-[3px] border-gray-900 rounded-lg cursor-pointer" type="color" bind:value={customGradientEnd} />
+                </div>
+              </div>
+            {/if}
+
+            <div>
+              <label for="padding" class="block text-sm font-bold text-gray-900 mb-1.5">Padding ({padding}px)</label>
+              <input id="padding" type="range" min="16" max="128" bind:value={padding} class="w-full cursor-pointer" />
+            </div>
           </div>
+
+          <div class="h-px bg-gray-200"></div>
+
+          <!-- Window Settings -->
+          <div class="space-y-4">
+             <div class="flex items-center justify-between">
+              <label for="chrome" class="text-sm font-bold text-gray-900">Window Controls</label>
+              <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                <input type="checkbox" name="chrome" id="chrome" bind:checked={showWindowChrome} class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-[3px] border-gray-900 appearance-none cursor-pointer checked:right-0 checked:bg-[#ff6b6b] checked:border-gray-900"/>
+                <label for="chrome" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-100 cursor-pointer border-[3px] border-gray-900"></label>
+              </div>
+            </div>
+
+             <div class="flex items-center justify-between">
+              <label for="lineNumbers" class="text-sm font-bold text-gray-900">Line Numbers</label>
+              <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                <input type="checkbox" name="lineNumbers" id="lineNumbers" bind:checked={showLineNumbers} class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-[3px] border-gray-900 appearance-none cursor-pointer checked:right-0 checked:bg-[#ff6b6b] checked:border-gray-900"/>
+                <label for="lineNumbers" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-100 cursor-pointer border-[3px] border-gray-900"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-px bg-gray-200"></div>
+
+          <!-- Advanced Styling -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+              Advanced Styling
+            </h3>
+            
+            <div>
+              <label for="fontSize" class="block text-xs font-bold text-gray-700 mb-1.5">Font Size ({fontSize}px)</label>
+              <input id="fontSize" type="range" min="10" max="24" bind:value={fontSize} class="w-full cursor-pointer" />
+            </div>
+
+            <div>
+              <label for="lineHeight" class="block text-xs font-bold text-gray-700 mb-1.5">Line Height ({lineHeight})</label>
+              <input id="lineHeight" type="range" min="1" max="2.5" step="0.1" bind:value={lineHeight} class="w-full cursor-pointer" />
+            </div>
+
+            <div>
+              <label for="opacity" class="block text-xs font-bold text-gray-700 mb-1.5">Card Opacity ({Math.round(cardOpacity * 100)}%)</label>
+              <input id="opacity" type="range" min="0" max="1" step="0.05" bind:value={cardOpacity} class="w-full cursor-pointer" />
+            </div>
+
+            <div>
+              <label for="shadow" class="block text-xs font-bold text-gray-700 mb-1.5">Shadow Intensity</label>
+              <input id="shadow" type="range" min="0" max="1" step="0.05" bind:value={shadowIntensity} class="w-full cursor-pointer" />
+            </div>
+
+            <div>
+              <label for="blur" class="block text-xs font-bold text-gray-700 mb-1.5">Blur Effect ({blurEffect}px)</label>
+              <input id="blur" type="range" min="0" max="20" bind:value={blurEffect} class="w-full cursor-pointer" />
+            </div>
+
+            <div>
+              <label for="radius" class="block text-xs font-bold text-gray-700 mb-1.5">Border Radius ({borderRadius}px)</label>
+              <input id="radius" type="range" min="0" max="32" bind:value={borderRadius} class="w-full cursor-pointer" />
+            </div>
+
+            <div>
+              <label for="tabWidth" class="block text-xs font-bold text-gray-700 mb-1.5">Tab Width ({codeTabWidth})</label>
+              <input id="tabWidth" type="range" min="2" max="8" step="2" bind:value={codeTabWidth} class="w-full cursor-pointer" />
+            </div>
+          </div>
+
         </div>
       </div>
-    {/if}
 
-    <div class="w-full bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 md:p-6 shadow-sm">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label for="language" class="text-sm text-gray-600">Language</label>
-          <select id="language" class="w-full border-2 border-gray-200 p-2 rounded-lg" bind:value={language} on:change={() => { /* update filename via reactive */ }}>
-            {#each languageOptions as opt}
-              <option value={opt.id}>{opt.name}</option>
-            {/each}
-          </select>
-        </div>
-        <div>
-          <label for="theme" class="text-sm text-gray-600">Theme</label>
-          <select id="theme" class="w-full border-2 border-gray-200 p-2 rounded-lg" bind:value={themeId}>
-            {#each themeOptions as opt}
-              <option value={opt.id}>
-                {opt.name}
-              </option>
-            {/each}
-          </select>
-        </div>
-        <div>
-          <label for="font" class="text-sm text-gray-600">Font</label>
-          <select id="font" class="w-full border-2 border-gray-200 p-2 rounded-lg" bind:value={fontId}>
-            {#each fontOptions as opt}
-              <option value={opt.id}>{opt.name}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="flex items-center gap-2">
-            <input id="chrome" type="checkbox" bind:checked={showWindowChrome} />
-            <label for="chrome" class="text-sm text-gray-700">Show window frame</label>
-          </div>
-          <div>
-            <label for="padding" class="text-sm text-gray-600">Padding</label>
-            <input id="padding" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="8" max="64" bind:value={padding} />
-          </div>
-          <div>
-            <label for="radius" class="text-sm text-gray-600">Border radius</label>
-            <input id="radius" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="0" max="24" bind:value={borderRadius} />
-          </div>
-          <div>
-            <label for="backdrop" class="text-sm text-gray-600">Backdrop</label>
-            <select id="backdrop" class="w-full border-2 border-gray-200 p-2 rounded-lg" bind:value={backdrop}>
-              {#each backdropOptions as option}
-                <option value={option.id}>{option.name}</option>
-              {/each}
-            </select>
-          </div>
-          {#if backdrop === 'solid'}
-            <div>
-              <label for="solidBg" class="text-sm text-gray-600">Background</label>
-              <input id="solidBg" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="color" bind:value={solidBackground} />
-            </div>
-          {/if}
-          {#if backdrop === 'custom-gradient'}
-            <div>
-              <label for="gradientStart" class="text-sm text-gray-600">Gradient Start</label>
-              <input id="gradientStart" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="color" bind:value={customGradientStart} />
-            </div>
-            <div>
-              <label for="gradientEnd" class="text-sm text-gray-600">Gradient End</label>
-              <input id="gradientEnd" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="color" bind:value={customGradientEnd} />
-            </div>
-          {/if}
-          <div>
-            <label for="filename" class="text-sm text-gray-600">Filename</label>
-            <input id="filename" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="text" bind:value={filename} />
-          </div>
-        </div>
+      <!-- Right Column: Preview & Editor -->
+      <div class="space-y-6">
         
-        <!-- Advanced Styling Options -->
-        <div class="md:col-span-3 mt-6 pt-6 border-t border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">Advanced Styling</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label for="fontSize" class="text-sm text-gray-600">Font Size</label>
-              <input id="fontSize" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="10" max="32" bind:value={fontSize} />
-            </div>
-            <div>
-              <label for="lineHeight" class="text-sm text-gray-600">Line Height</label>
-              <input id="lineHeight" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="1" max="3" step="0.1" bind:value={lineHeight} />
-            </div>
-            <div>
-              <label for="tabWidth" class="text-sm text-gray-600">Tab Width</label>
-              <input id="tabWidth" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="1" max="8" bind:value={codeTabWidth} />
-            </div>
+        <!-- Editor Area -->
+        <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden">
+          <div class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <input id="lineNumbers" type="checkbox" bind:checked={showLineNumbers} />
-              <label for="lineNumbers" class="text-sm text-gray-700">Show line numbers</label>
+              <div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
+              <div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900"></div>
+              <div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900"></div>
+              <span class="ml-2 text-sm font-bold text-gray-700">Code Editor</span>
             </div>
-            <div>
-              <label for="cardOpacity" class="text-sm text-gray-600">Card Opacity</label>
-              <input id="cardOpacity" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="0" max="1" step="0.1" bind:value={cardOpacity} />
-            </div>
-            <div>
-              <label for="shadowIntensity" class="text-sm text-gray-600">Shadow Intensity</label>
-              <input id="shadowIntensity" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="0" max="1" step="0.05" bind:value={shadowIntensity} />
-            </div>
-            <div>
-              <label for="blurEffect" class="text-sm text-gray-600">Blur Effect</label>
-              <input id="blurEffect" class="w-full border-2 border-gray-200 p-2 rounded-lg" type="number" min="0" max="20" bind:value={blurEffect} />
-            </div>
+            <button 
+              class="text-xs font-bold text-[#ff6b6b] hover:text-[#ff4f4f] underline decoration-2 underline-offset-2"
+              on:click={() => { code = sampleCode[language] || ''; isUsingSample = true; }}
+            >
+              Reset to Sample
+            </button>
           </div>
+          <textarea 
+            id="codeInput" 
+            class="w-full p-6 font-mono text-sm min-h-[200px] focus:outline-none resize-y bg-white" 
+            bind:value={code}
+            on:input={() => { isUsingSample = false; }}
+            placeholder="Paste your code here..."
+            spellcheck="false"
+          ></textarea>
         </div>
-      </div>
-      <div class="mt-4">
-        <div class="flex items-center justify-between">
-        <label for="codeInput" class="text-sm text-gray-600">Code</label>
-          <button 
-            type="button" 
-            class="text-xs text-blue-600 hover:text-blue-800 underline"
-            on:click={() => { code = sampleCode[language] || ''; isUsingSample = true; }}
+
+        <!-- Action Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-xl p-4">
+           <div class="flex items-center gap-2">
+             <button 
+              on:click={() => { currentTab = 'preview'; }} 
+              class="px-4 py-2 rounded-lg font-bold text-sm border-[3px] border-gray-900 transition-all {currentTab === 'preview' ? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#000]' : 'bg-white text-gray-900 hover:bg-gray-50 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 hover:-translate-x-0.5'}"
+            >
+              Preview
+            </button>
+             {#if previewFrame}
+              <div class="hidden sm:flex items-center gap-2 ml-4">
+                <span class="text-xs font-bold text-gray-500 uppercase">Size:</span>
+                <input type="number" class="w-16 border-b-[3px] border-gray-900 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none font-mono" bind:value={previewWidth} min="400" max="1600" on:input={() => { if (previewFrame) { previewFrame.style.width = `${previewWidth}px`; } }} />
+                <span class="text-gray-400">×</span>
+                <input type="number" class="w-16 border-b-[3px] border-gray-900 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none font-mono" bind:value={previewHeight} min="300" max="1200" on:input={() => { if (previewFrame) { previewFrame.style.height = `${previewHeight}px`; } }} />
+              </div>
+            {/if}
+           </div>
+
+           <button 
+            on:click={generateImage} 
+            disabled={isGenerating}
+            class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-6 py-2.5 rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#1f2937] transition-all font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Load sample for {languageOptions.find(l => l.id === language)?.name}
+            {#if isGenerating}
+              <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Generating...
+            {:else}
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Download Image
+            {/if}
           </button>
         </div>
-        <textarea 
-          id="codeInput" 
-          class="w-full border-2 border-gray-200 p-3 rounded-xl font-mono text-sm min-h-[160px]" 
-          bind:value={code}
-          on:input={() => { isUsingSample = false; }}
-          placeholder="Enter your code here or click 'Load sample' above..."
-        />
-      </div>
-    </div>
 
-    <div class="w-full grid grid-cols-1 gap-4">
-      <div class="flex bg-black p-2 justify-between items-center rounded-lg">
-        <div class="flex items-center gap-2">
-          <button on:click={() => { currentTab = 'preview'; }} class="px-4 py-2 rounded text-sm {currentTab === 'preview' ? 'bg-white text-black' : 'bg-gray-500 text-white'}">Preview</button>
-          <button on:click={generateImage} class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Generate Image
-          </button>
-        </div>
-        {#if previewFrame}
-          <div class="flex items-center gap-2 text-white">
-            <span class="text-xs opacity-80">Size</span>
-            <input id="widthInput" type="number" class="w-20 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none text-white" bind:value={previewWidth} min="400" max="1600" on:input={() => { if (previewFrame) { previewFrame.style.width = `${previewWidth}px`; } }} />
-            <span class="text-gray-400">×</span>
-            <input id="heightInput" type="number" class="w-20 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none text-white" bind:value={previewHeight} min="300" max="1200" on:input={() => { if (previewFrame) { previewFrame.style.height = `${previewHeight}px`; } }} />
-            <span class="ml-4 text-xs opacity-80">Scale</span>
-            <input type="number" class="w-16 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none text-white" value="1" min="0.5" max="2" step="0.1" on:input={(e) => updateScale(e.target.value)} />
-          </div>
-        {/if}
-      </div>
-
-      {#if currentTab === 'preview'}
-        <div class="flex-1 flex flex-col border-4 border-black rounded-lg overflow-hidden">
-          <div bind:this={iframeContainer} class="flex-1 overflow-auto">
-            {#key srcdocKey}
-              <iframe
-                class="w-full h-[560px] bg-transparent"
-                title="code-image-preview"
-                srcdoc={srcdocContent}
-                bind:this={previewFrame}
-              />
-            {/key}
-          </div>
-        </div>
-      {:else}
-        {#if isGenerating}
-          <div class="flex flex-col justify-center items-center min-h-[400px] bg-gray-50 border-4 border-black rounded-lg">
-            <Loader size="16" show={isGenerating} />
-            <p class="mt-4 text-sm text-gray-600">Generating your image...</p>
-          </div>
-        {:else if generatedImage}
-          <div class="flex flex-col border-4 border-black rounded-lg overflow-hidden">
-            <div class="flex items-center justify-between p-3 bg-gray-100 border-b border-gray-200">
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-sm text-gray-900">Generated successfully!</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <a href={generatedImage.url} class="text-xs text-[#ff6b6b] hover:underline" target="_blank">Open in new tab →</a>
-                <button on:click={() => copyToClipboard(generatedImage.url)} class="text-xs bg-black hover:bg-gray-800 text-white py-1.5 px-3 rounded flex items-center gap-2 transition-colors">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                  </svg>
-                  Copy URL
-                </button>
-              </div>
+        <!-- Preview Area -->
+        <div class="bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden relative min-h-[600px] flex items-center justify-center bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
+          {#if currentTab === 'preview'}
+            <div class="w-full h-full overflow-auto p-8 flex items-center justify-center" bind:this={iframeContainer}>
+               {#key srcdocKey}
+                <iframe
+                  class="bg-transparent transition-all duration-300 ease-out shadow-2xl"
+                  title="code-image-preview"
+                  srcdoc={srcdocContent}
+                  bind:this={previewFrame}
+                  style="width: {previewWidth}px; height: {previewHeight}px; border: none;"
+                />
+              {/key}
             </div>
-            <div class="flex-1 overflow-auto bg-white">
-              <img src={generatedImage.url} alt="Generated output" class="w-full h-auto" />
-            </div>
-          </div>
-
-          <!-- Growth Loop Elements after image generation -->
-          <div class="mt-8 bg-gradient-to-br from-[#ff6b6b]/5 to-[#ffc480]/5 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 md:p-8">
-            <div class="text-center mb-8">
-              <h3 class="text-2xl font-bold text-gray-900 mb-2">🎉 Your Code Image is Ready!</h3>
-              <p class="text-gray-700">Join {totalImagesGenerated.toLocaleString()} others creating beautiful code images</p>
-            </div>
-
-            <!-- Growth Loop Elements -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <!-- Social Proof -->
-              <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
-                <div class="flex items-center gap-4 mb-4">
-                  <div class="w-12 h-12 bg-[#ff6b6b]/10 rounded-xl flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#ff6b6b]" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold text-gray-900">Time Saved</h4>
-                    <p class="text-sm text-gray-600">10+ minutes per image on average</p>
-                  </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 mt-4">
-                  <div class="bg-gray-50/80 backdrop-blur-sm rounded-lg p-3 text-center">
-                    <p class="text-lg font-semibold text-gray-900">&lt; 3 sec</p>
-                    <p class="text-xs text-gray-600">Generation Time</p>
-                  </div>
-                  <div class="bg-gray-50/80 backdrop-blur-sm rounded-lg p-3 text-center">
-                    <p class="text-lg font-semibold text-gray-900">25+</p>
-                    <p class="text-xs text-gray-600">Languages</p>
-                  </div>
-                  <div class="bg-gray-50/80 backdrop-blur-sm rounded-lg p-3 text-center">
-                    <p class="text-lg font-semibold text-gray-900">18+</p>
-                    <p class="text-xs text-gray-600">Themes</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Usage Stats -->
-              <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
-                <div class="flex items-center gap-4 mb-4">
-                  <div class="w-12 h-12 bg-[#ff6b6b]/10 rounded-xl flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#ff6b6b]" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h10a1 1 0 110 2H9a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold text-gray-900">Growing Fast</h4>
-                    <p class="text-sm text-gray-600">{Math.floor(totalImagesGenerated * 0.15).toLocaleString()} images this week</p>
-                  </div>
-                </div>
-                <div class="h-8 bg-gray-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] w-[78%]" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {#if !isUserLoggedIn}
-                <div class="relative w-auto flex-shrink-0 group">
-                  <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-                  <button 
-                    class="py-4 rounded-lg px-8 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-lg flex-shrink-0 text-white transition-all hover:shadow-lg hover:brightness-105"
-                    on:click={() => window.location.href = '/signup?redirect=/tools/code-to-image'}
-                  >
-                    <span class="relative inline-flex items-center gap-2">
-                      <span>Create Free Account</span>
-                      <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </span>
-                  </button>
-                </div>
-              {/if}
-
-              <!-- Share Buttons -->
-              <div class="grid grid-cols-2 gap-4 {isUserLoggedIn ? 'md:col-span-2' : ''}">
-                <div class="relative group w-full">
-                  <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-                  <button 
-                    class="py-4 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-black tracking-wide text-sm text-white transition-all hover:shadow-lg hover:brightness-105"
-                    on:click={() => {
-                      const shareUrl = encodeURIComponent(window.location.href);
-                      const text = encodeURIComponent('Check out this awesome Code to Image Generator! Create beautiful syntax-highlighted code images instantly.');
-                      window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`, '_blank');
-                    }}
-                  >
-                    <span class="relative inline-flex items-center gap-2 justify-center">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                      </svg>
-                      <span class="hidden md:inline">Share</span>
-                    </span>
-                  </button>
-                </div>
+          {:else if generatedImage}
+             <div class="flex flex-col items-center justify-center w-full h-full p-8">
+                <img src={generatedImage.url} alt="Generated output" class="max-w-full h-auto shadow-2xl rounded-lg border-[3px] border-gray-900" />
                 
-                <div class="relative group w-full">
-                  <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-                  <button 
-                    class="py-4 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-[#0A66C2] tracking-wide text-sm text-white transition-all hover:shadow-lg hover:brightness-105"
-                    on:click={() => {
-                      const shareUrl = encodeURIComponent(window.location.href);
-                      const text = encodeURIComponent('Check out this awesome Code to Image Generator! Create beautiful syntax-highlighted code images instantly.');
-                      window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${encodeURIComponent('Code to Image Generator - Pictify.io')}&summary=${text}`, '_blank');
-                    }}
-                  >
-                    <span class="relative inline-flex items-center gap-2 justify-center">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                      </svg>
-                      <span class="hidden md:inline">Share</span>
-                    </span>
-                  </button>
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                  <a href={generatedImage.url} target="_blank" class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-lg font-bold hover:bg-gray-50 transition-colors">Open in New Tab</a>
+                  <button on:click={() => copyToClipboard(generatedImage.url)} class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 rounded-lg font-bold hover:bg-gray-800 transition-colors">Copy URL</button>
                 </div>
-              </div>
-            </div>
-          </div>
-        {/if}
-      {/if}
+
+                <!-- Share Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 w-full max-w-md">
+                  <div class="relative group w-full">
+                    <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
+                    <button 
+                      class="py-3 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-black tracking-wide text-sm text-white transition-all hover:shadow-lg hover:brightness-105"
+                      on:click={() => {
+                        const shareUrl = encodeURIComponent(window.location.href);
+                        const text = encodeURIComponent('Check out this awesome Code to Image Generator! Create beautiful syntax-highlighted code images instantly.');
+                        window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`, '_blank');
+                      }}
+                    >
+                      <span class="relative inline-flex items-center gap-2 justify-center">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span class="hidden md:inline">Share on X</span>
+                      </span>
+                    </button>
+                  </div>
+                  
+                  <div class="relative group w-full">
+                    <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
+                    <button 
+                      class="py-3 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-[#0A66C2] tracking-wide text-sm text-white transition-all hover:shadow-lg hover:brightness-105"
+                      on:click={() => {
+                        const shareUrl = encodeURIComponent(window.location.href);
+                        const text = encodeURIComponent('Check out this awesome Code to Image Generator! Create beautiful syntax-highlighted code images instantly.');
+                        window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${encodeURIComponent('Code to Image Generator - Pictify.io')}&summary=${text}`, '_blank');
+                      }}
+                    >
+                      <span class="relative inline-flex items-center gap-2 justify-center">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        <span class="hidden md:inline">Share on LinkedIn</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+             </div>
+          {/if}
+        </div>
+      </div>
     </div>
+                
+
 
     <!-- SEO Content Sections -->
     <div class="max-w-6xl mx-auto px-6 md:px-0 mt-20">
       <!-- Separator -->
-      <div class="border-t-4 border-gray-900 relative mb-16">
+      <div class="border-t-[3px] border-gray-900 relative mb-16">
         <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
           <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
@@ -862,23 +839,29 @@
       <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center bg-gradient-to-r from-[#ff6b6b] to-[#ff8e8e] bg-clip-text text-transparent">Learn More About Code to Image Generation</h2>
       
       <!-- What is a Code to Image Generator Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">💻</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Overview
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-6 text-gray-900">
           What is a Code to Image Generator?
         </h3>
-        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+        <p class="text-lg text-gray-700 leading-relaxed mb-4 font-medium">
           A Code to Image Generator is a powerful tool that converts your source code into beautiful, syntax-highlighted images. Perfect for sharing code snippets on social media, creating documentation, presentations, or blog posts. Our generator supports multiple programming languages and offers extensive customization options including themes, fonts, and styling.
         </p>
-        <p class="text-lg text-gray-700 leading-relaxed">
+        <p class="text-lg text-gray-700 leading-relaxed font-medium">
           Whether you're a developer sharing code on Twitter, a technical writer creating documentation, or an educator preparing programming tutorials, our code to image generator makes your code visually appealing and professional-looking.
         </p>
       </section>
 
       <!-- Benefits Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">✨</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ff6b6b] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Features
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           Benefits of Using Our Code to Image Generator
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -938,9 +921,12 @@
       </section>
 
       <!-- How to Use Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">🚀</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#4ade80] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Guide
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           How to Use Our Code to Image Generator
         </h3>
         <div class="space-y-6">
@@ -983,48 +969,51 @@
       </section>
 
       <!-- Real-World Use Cases Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">🌍</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+          Applications
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           Real-World Use Cases
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
             <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
               <span class="text-2xl">📱</span>
               Social Media Sharing
             </h4>
             <p class="text-gray-700">Share beautiful code snippets on Twitter, LinkedIn, Instagram, and other social platforms. Stand out with professional-looking code images that get more engagement.</p>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
             <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
               <span class="text-2xl">📚</span>
               Documentation & Tutorials
             </h4>
             <p class="text-gray-700">Create stunning code examples for technical documentation, API guides, and programming tutorials. Make your documentation more visually appealing and easier to follow.</p>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
             <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
               <span class="text-2xl">🎯</span>
               Presentations & Slides
             </h4>
             <p class="text-gray-700">Include beautiful code images in your technical presentations, conference talks, and educational slides. Perfect for highlighting key code concepts.</p>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
             <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
               <span class="text-2xl">✍️</span>
               Blog Posts & Articles
             </h4>
             <p class="text-gray-700">Enhance your technical blog posts and articles with syntax-highlighted code images. Make your content more engaging and professional-looking.</p>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
             <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
               <span class="text-2xl">🏫</span>
               Education & Teaching
             </h4>
             <p class="text-gray-700">Create clear, readable code examples for programming courses, workshops, and educational materials. Help students understand code structure visually.</p>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
             <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
               <span class="text-2xl">💼</span>
               Portfolio & Resume
@@ -1035,9 +1024,12 @@
       </section>
 
       <!-- Best Practices Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">⭐</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ff6b6b] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          Tips
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           Best Practices for Creating Code Images
         </h3>
         <p class="text-lg text-gray-700 leading-relaxed mb-6">
@@ -1138,80 +1130,83 @@
       </section>
 
       <!-- FAQ Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-8 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">❓</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#4ade80] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          FAQ
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           Frequently Asked Questions
         </h3>
         <div class="space-y-4">
-          <details class="group">
-            <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-              <span class="font-semibold text-gray-900">What programming languages are supported?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
+              <span>What programming languages are supported?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="mt-4 px-4 text-gray-700">
+            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
               We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more. Each language gets proper syntax highlighting automatically.
             </div>
           </details>
 
-          <details class="group">
-            <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-              <span class="font-semibold text-gray-900">Can I customize the appearance of my code images?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
+              <span>Can I customize the appearance of my code images?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="mt-4 px-4 text-gray-700">
+            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
               Absolutely! You can choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, add window frames, and even apply advanced effects like shadows, blur, and opacity. The preview updates in real-time so you can see exactly how your image will look.
             </div>
           </details>
 
-          <details class="group">
-            <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-              <span class="font-semibold text-gray-900">What image formats are supported?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
+              <span>What image formats are supported?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="mt-4 px-4 text-gray-700">
+            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
               Currently, we generate high-quality PNG images, which are perfect for social media, documentation, and presentations. PNG format ensures crisp text rendering and supports transparency for flexible use in various contexts.
             </div>
           </details>
 
-          <details class="group">
-            <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-              <span class="font-semibold text-gray-900">Is there a limit on code length?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
+              <span>Is there a limit on code length?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="mt-4 px-4 text-gray-700">
+            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
               While there's no strict character limit, we recommend keeping code snippets reasonably sized for best visual results. Very long code may result in smaller text or require scrolling. For best results, focus on the most important parts of your code.
             </div>
           </details>
 
-          <details class="group">
-            <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-              <span class="font-semibold text-gray-900">Can I use the generated images commercially?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
+              <span>Can I use the generated images commercially?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="mt-4 px-4 text-gray-700">
+            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
               Yes! All images generated with our code to image generator can be used for both personal and commercial purposes. There are no watermarks and no licensing restrictions on the output images.
             </div>
           </details>
 
-          <details class="group">
-            <summary class="flex items-center justify-between cursor-pointer bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 transition-all hover:border-[#ff6b6b]/30">
-              <span class="font-semibold text-gray-900">How do I share code images on social media?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
+              <span>How do I share code images on social media?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="mt-4 px-4 text-gray-700">
+            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
               After generating your code image, you can download it directly or copy the image URL. Most social media platforms work well with our standard image dimensions. For Twitter, consider using a more horizontal aspect ratio, while Instagram works well with square formats.
             </div>
           </details>
@@ -1219,89 +1214,92 @@
       </section>
 
       <!-- Supported Languages Section -->
-      <section class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-        <h3 class="text-3xl font-bold mb-8 text-gray-900 flex items-center gap-3">
-          <span class="text-[#ff6b6b]">🔧</span>
+      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          Languages
+        </div>
+        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           Supported Programming Languages
         </h3>
-        <p class="text-lg text-gray-700 leading-relaxed mb-6">
+        <p class="text-lg text-gray-700 leading-relaxed mb-6 font-medium">
           Our code to image generator supports syntax highlighting for all major programming languages and file formats:
         </p>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">⚡</div>
-            <span class="font-medium text-gray-900">JavaScript</span>
+            <span class="font-bold text-gray-900">JavaScript</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🔷</div>
-            <span class="font-medium text-gray-900">TypeScript</span>
+            <span class="font-bold text-gray-900">TypeScript</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🐍</div>
-            <span class="font-medium text-gray-900">Python</span>
+            <span class="font-bold text-gray-900">Python</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">☕</div>
-            <span class="font-medium text-gray-900">Java</span>
+            <span class="font-bold text-gray-900">Java</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">⚙️</div>
-            <span class="font-medium text-gray-900">C++</span>
+            <span class="font-bold text-gray-900">C++</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🔷</div>
-            <span class="font-medium text-gray-900">C#</span>
+            <span class="font-bold text-gray-900">C#</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🐘</div>
-            <span class="font-medium text-gray-900">PHP</span>
+            <span class="font-bold text-gray-900">PHP</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">💎</div>
-            <span class="font-medium text-gray-900">Ruby</span>
+            <span class="font-bold text-gray-900">Ruby</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🐹</div>
-            <span class="font-medium text-gray-900">Go</span>
+            <span class="font-bold text-gray-900">Go</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🦀</div>
-            <span class="font-medium text-gray-900">Rust</span>
+            <span class="font-bold text-gray-900">Rust</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🍎</div>
-            <span class="font-medium text-gray-900">Swift</span>
+            <span class="font-bold text-gray-900">Swift</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🌐</div>
-            <span class="font-medium text-gray-900">HTML</span>
+            <span class="font-bold text-gray-900">HTML</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🎨</div>
-            <span class="font-medium text-gray-900">CSS</span>
+            <span class="font-bold text-gray-900">CSS</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">💅</div>
-            <span class="font-medium text-gray-900">SCSS</span>
+            <span class="font-bold text-gray-900">SCSS</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">🗃️</div>
-            <span class="font-medium text-gray-900">SQL</span>
+            <span class="font-bold text-gray-900">SQL</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">📄</div>
-            <span class="font-medium text-gray-900">JSON</span>
+            <span class="font-bold text-gray-900">JSON</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">📝</div>
-            <span class="font-medium text-gray-900">YAML</span>
+            <span class="font-bold text-gray-900">YAML</span>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-200 hover:border-[#ff6b6b]/30 transition-all">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
             <div class="text-2xl mb-2">📋</div>
-            <span class="font-medium text-gray-900">Markdown</span>
+            <span class="font-bold text-gray-900">Markdown</span>
           </div>
         </div>
-        <p class="text-center text-gray-600 mt-6">
+        <p class="text-center text-gray-600 mt-6 font-medium">
           And many more! Each language gets proper syntax highlighting and formatting automatically.
         </p>
       </section>
@@ -1326,7 +1324,7 @@
     <!-- First Generation Prompt -->
     {#if showFirstGenerationPrompt}
       <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl max-w-md w-full mx-auto p-8 shadow-lg">
+        <div class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl max-w-md w-full mx-auto p-8 shadow-[8px_8px_0_0_#1f2937]">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-2xl font-bold text-gray-900">🎉 Great First Image!</h3>
             <button 
@@ -1387,7 +1385,7 @@
     <!-- Upgrade Prompt -->
     {#if showUpgradePrompt}
       <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl max-w-md w-full mx-auto p-8 shadow-lg">
+        <div class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl max-w-md w-full mx-auto p-8 shadow-[8px_8px_0_0_#1f2937]">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-2xl font-bold text-gray-900">🎨 Ready to Create More?</h3>
             <button 
@@ -1457,4 +1455,85 @@
   
 </section>
 
+<style>
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 12px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-left: 3px solid #111827;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #ffc480;
+    border: 3px solid #111827;
+    border-radius: 0;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #ffb05c;
+  }
 
+  /* Neo-Brutalist Range Input */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: transparent;
+  }
+  
+  input[type="range"]:focus {
+    outline: none;
+  }
+  
+  /* Webkit (Chrome, Safari, Edge) */
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #ff6b6b;
+    border: 3px solid #111827;
+    cursor: pointer;
+    margin-top: -8px;
+    box-shadow: 2px 2px 0 0 #1f2937;
+    transition: all 0.1s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 #1f2937;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 0 #1f2937;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #111827;
+    border-radius: 2px;
+  }
+  
+  /* Firefox */
+  input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #ff6b6b;
+    border: 3px solid #111827;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 0 #1f2937;
+  }
+
+  input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #111827;
+    border-radius: 2px;
+  }
+</style>
