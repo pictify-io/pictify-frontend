@@ -836,7 +836,14 @@
         </div>
       </div>
 
-      <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center bg-gradient-to-r from-[#ff6b6b] to-[#ff8e8e] bg-clip-text text-transparent">Learn More About Code to Image Generation</h2>
+      <h2 class="text-4xl md:text-6xl font-black mb-16 text-center text-gray-900 tracking-tight">
+        Learn More About <span class="relative inline-block text-[#ff6b6b]">
+          Code to Image
+          <svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
+            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
+          </svg>
+        </span> Generation
+      </h2>
       
       <!-- What is a Code to Image Generator Section -->
       <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
@@ -864,59 +871,62 @@
         <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
           Benefits of Using Our Code to Image Generator
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ul class="text-lg text-gray-700 space-y-4">
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Support for 25+ programming languages including JavaScript, Python, Java, C++, and more</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>18+ beautiful syntax highlighting themes including dark and light options</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Customizable window frames and backgrounds for professional appearance</span>
-            </li>
-          </ul>
-          <ul class="text-lg text-gray-700 space-y-4">
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Advanced styling options including opacity, shadows, and blur effects</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Real-time preview to see exactly how your image will look</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>High-quality PNG output perfect for social media and documentation</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-6 h-6 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>No watermarks and completely free to use</span>
-            </li>
-          </ul>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-[#ff6b6b]/10 p-2 rounded-lg border-2 border-gray-900 text-[#ff6b6b] flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">Support for 25+ programming languages including JavaScript, Python, Java, C++, and more</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-[#ffc480]/10 p-2 rounded-lg border-2 border-gray-900 text-[#ffc480] flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">18+ beautiful syntax highlighting themes including dark and light options</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-[#4ade80]/10 p-2 rounded-lg border-2 border-gray-900 text-[#4ade80] flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-blue-100 p-2 rounded-lg border-2 border-gray-900 text-blue-500 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">Customizable window frames and backgrounds for professional appearance</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-purple-100 p-2 rounded-lg border-2 border-gray-900 text-purple-500 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">Advanced styling options including opacity, shadows, and blur effects</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-pink-100 p-2 rounded-lg border-2 border-gray-900 text-pink-500 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">Real-time preview to see exactly how your image will look</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-yellow-100 p-2 rounded-lg border-2 border-gray-900 text-yellow-600 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">High-quality PNG output perfect for social media and documentation</span>
+          </div>
+
+          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
+            <div class="bg-green-100 p-2 rounded-lg border-2 border-gray-900 text-green-600 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="font-bold text-gray-900 mt-1">No watermarks and completely free to use</span>
+          </div>
         </div>
       </section>
 
@@ -931,35 +941,35 @@
         </h3>
         <div class="space-y-6">
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">1</span>
             <div>
               <h4 class="font-semibold text-xl text-gray-900 mb-2">Choose Your Programming Language</h4>
               <p class="text-gray-700">Select from 25+ supported programming languages including JavaScript, Python, Java, C++, TypeScript, and more. Each language gets proper syntax highlighting automatically.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">2</span>
             <div>
               <h4 class="font-semibold text-xl text-gray-900 mb-2">Paste or Type Your Code</h4>
               <p class="text-gray-700">Enter your code in the text area. You can use our sample code for each language or paste your own code snippet. The preview will update in real-time.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">3</span>
             <div>
               <h4 class="font-semibold text-xl text-gray-900 mb-2">Customize the Appearance</h4>
               <p class="text-gray-700">Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background styles, and advanced effects like shadows and blur.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">4</span>
             <div>
               <h4 class="font-semibold text-xl text-gray-900 mb-2">Preview Your Image</h4>
               <p class="text-gray-700">See exactly how your code image will look with our real-time preview. Adjust dimensions, scaling, and other settings as needed.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">5</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">5</span>
             <div>
               <h4 class="font-semibold text-xl text-gray-900 mb-2">Generate and Download</h4>
               <p class="text-gray-700">Click "Generate Image" to create your high-quality PNG image. Copy the URL or download the image directly to use in your projects.</p>
@@ -1035,97 +1045,104 @@
         <p class="text-lg text-gray-700 leading-relaxed mb-6">
           To create the most effective and professional-looking code images, follow these best practices:
         </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="space-y-4">
-            <h4 class="font-semibold text-xl text-gray-900">Code Quality & Readability</h4>
-            <ul class="text-lg text-gray-700 space-y-3">
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <h4 class="font-black text-xl text-gray-900 flex items-center gap-2">
+              <span class="w-8 h-8 bg-[#ff6b6b] text-white rounded-lg border-2 border-gray-900 flex items-center justify-center text-sm shadow-[2px_2px_0_0_#1f2937]">&lt;/&gt;</span>
+              Code Quality
+            </h4>
+            <div class="space-y-3">
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <span>Keep code snippets concise and focused on the main concept</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <span class="font-bold text-gray-900">Keep code snippets concise and focused on the main concept</span>
+              </div>
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <span>Use proper indentation and formatting for better readability</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <span class="font-bold text-gray-900">Use proper indentation and formatting for better readability</span>
+              </div>
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <span>Include meaningful comments when necessary</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <span class="font-bold text-gray-900">Include meaningful comments when necessary</span>
+              </div>
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
-                <span>Remove or replace sensitive information like API keys</span>
-              </li>
-            </ul>
+                <span class="font-bold text-gray-900">Remove or replace sensitive information like API keys</span>
+              </div>
+            </div>
           </div>
+
           <div class="space-y-4">
-            <h4 class="font-semibold text-xl text-gray-900">Visual Design & Styling</h4>
-            <ul class="text-lg text-gray-700 space-y-3">
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <h4 class="font-black text-xl text-gray-900 flex items-center gap-2">
+               <span class="w-8 h-8 bg-[#4ade80] text-gray-900 rounded-lg border-2 border-gray-900 flex items-center justify-center text-sm shadow-[2px_2px_0_0_#1f2937]">🎨</span>
+               Visual Design
+            </h4>
+            <div class="space-y-3">
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
                 </svg>
-                <span>Choose themes that match your brand or presentation style</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <span class="font-bold text-gray-900">Choose themes that match your brand or presentation style</span>
+              </div>
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <span>Use high-contrast themes for better readability</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <span class="font-bold text-gray-900">Use high-contrast themes for better readability</span>
+              </div>
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
                 </svg>
-                <span>Select fonts that are clear and professional-looking</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <span class="font-bold text-gray-900">Select fonts that are clear and professional-looking</span>
+              </div>
+              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
+                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
                 </svg>
-                <span>Use appropriate padding and spacing for clean appearance</span>
-              </li>
-            </ul>
+                <span class="font-bold text-gray-900">Use appropriate padding and spacing for clean appearance</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="mt-8 p-6 bg-gradient-to-r from-[#ff6b6b]/5 to-[#ffc480]/5 rounded-xl border border-gray-200">
-          <h4 class="font-semibold text-xl text-gray-900 mb-3 flex items-center gap-2">
-            <span class="text-2xl">💡</span>
+        <div class="mt-8 p-6 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
+          <h4 class="font-black text-xl text-gray-900 mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 bg-[#ffc480] text-gray-900 rounded-lg border-2 border-gray-900 flex items-center justify-center text-sm shadow-[2px_2px_0_0_#1f2937]">💡</span>
             Pro Tips
           </h4>
-          <ul class="text-lg text-gray-700 space-y-3">
-            <li class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
+              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span>Use line numbers for longer code snippets to help with references</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              <span class="font-bold text-gray-700">Use line numbers for longer code snippets to help with references</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
+              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span>Test different background styles to find what works best for your use case</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              <span class="font-bold text-gray-700">Test different background styles to find what works best for your use case</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
+              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span>Consider your target platform's image size requirements when setting dimensions</span>
-            </li>
-            <li class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-[#ff6b6b] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              <span class="font-bold text-gray-700">Consider your target platform's image size requirements when setting dimensions</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
+              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span>Save your favorite settings combinations for consistency across projects</span>
-            </li>
-          </ul>
+              <span class="font-bold text-gray-700">Save your favorite settings combinations for consistency across projects</span>
+            </div>
+          </div>
         </div>
       </section>
 
