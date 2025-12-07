@@ -633,7 +633,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
     <!-- Hero Content -->
     <div class="flex flex-col items-center space-y-8 text-center max-w-4xl mx-auto mb-16 relative">
       <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1">
-        <span class="text-lg">🎨</span>
+        <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
         <span class="font-bold text-gray-900">Create Beautiful OG Images</span>
       </div>
 
@@ -767,7 +767,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
           <div class="w-full flex justify-center">
             <div class="relative w-full shadow-2xl rounded-lg overflow-hidden" style="padding-top: 52.5%;">
               <div class="absolute inset-0">
-                <OgImageTemplate html={selectedTemplate} width={1200} height={630} scale={0.5} />
+                <OgImageTemplate html={typeof selectedTemplate === 'string' ? selectedTemplate : selectedTemplate.html} width={1200} height={630} scale={0.5} />
               </div>
             </div>
           </div>
@@ -778,7 +778,9 @@ const combinedFonts = popularFonts.map((font, index) => ({
           <!-- Logo section -->
           <div class="space-y-6">
             <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="bg-[#ffc480] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm shadow-[2px_2px_0_0_#1f2937]">🖼️</span>
+              <span class="bg-[#ffc480] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm shadow-[2px_2px_0_0_#1f2937]">
+                <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </span>
               Logo
             </h3>
             <div class="flex flex-col gap-4 p-6 bg-gray-50 rounded-2xl border-[3px] border-gray-200">
@@ -827,7 +829,9 @@ const combinedFonts = popularFonts.map((font, index) => ({
           <!-- Text content section -->
           <div class="space-y-6">
             <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="bg-[#ff6b6b] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm text-white shadow-[2px_2px_0_0_#1f2937]">Aa</span>
+              <span class="bg-[#ff6b6b] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm text-white shadow-[2px_2px_0_0_#1f2937]">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </span>
               Content
             </h3>
             <div class="space-y-4">
@@ -856,7 +860,9 @@ const combinedFonts = popularFonts.map((font, index) => ({
           <!-- Style controls -->
           <div class="space-y-6">
             <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="bg-[#4ade80] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm shadow-[2px_2px_0_0_#1f2937]">✨</span>
+              <span class="bg-[#4ade80] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm shadow-[2px_2px_0_0_#1f2937]">
+                <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              </span>
               Style
             </h3>
             <div class="p-6 bg-gray-50 rounded-2xl border-[3px] border-gray-200 space-y-6">
@@ -997,7 +1003,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
             <div class="relative aspect-[1.91/1] bg-gray-100">
               <div class="absolute inset-0 flex items-center justify-center">
                 <div class="w-full h-full transform scale-[0.3] origin-top-left" style="width: 1200px; height: 630px;">
-                  <OgImageTemplate html={template} width={1200} height={630} scale={1} />
+                  <OgImageTemplate html={typeof template === 'string' ? template : template.html} width={1200} height={630} scale={1} />
                 </div>
               </div>
               
@@ -1051,7 +1057,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
         <section class="bg-white rounded-3xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-transform">
           <div class="bg-[#ffc480] w-12 h-12 rounded-xl border-2 border-gray-900 flex items-center justify-center mb-6 shadow-[2px_2px_0_0_#1f2937]">
-            <span class="text-2xl">📚</span>
+            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
           </div>
           <h3 class="text-2xl font-black mb-4 text-gray-900">What is an OG Image?</h3>
           <p class="text-lg text-gray-700 leading-relaxed font-medium">
@@ -1061,7 +1067,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
 
         <section class="bg-white rounded-3xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-transform">
           <div class="bg-[#ff6b6b] w-12 h-12 rounded-xl border-2 border-gray-900 flex items-center justify-center mb-6 shadow-[2px_2px_0_0_#1f2937]">
-            <span class="text-2xl text-white">💎</span>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
           <h3 class="text-2xl font-black mb-4 text-gray-900">Why Use This Tool?</h3>
           <ul class="space-y-3">
