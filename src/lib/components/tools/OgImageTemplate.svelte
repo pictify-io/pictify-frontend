@@ -45,7 +45,7 @@
 			srcdoc={html}
 			class="w-full h-full border-none bg-transparent"
 			scrolling="no"
-			sandbox="allow-scripts"
+			sandbox="allow-scripts allow-same-origin"
 			on:load={handleLoad}
 		></iframe>
 	</div>
