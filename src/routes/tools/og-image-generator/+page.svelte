@@ -995,25 +995,26 @@ const combinedFonts = popularFonts.map((font, index) => ({
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {#each templates.slice(0, 6) as template}
-          <div class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative">
+          <div 
+            class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative cursor-pointer"
+            on:click={() => selectTemplate(template)}
+            on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
+            role="button"
+            tabindex="0"
+          >
             <div class="p-3 bg-gray-50 border-b-[3px] border-gray-900 flex gap-1.5">
-              <div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
             </div>
-            <div class="relative aspect-[1.91/1] bg-gray-100">
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-full h-full transform scale-[0.3] origin-top-left" style="width: 1200px; height: 630px;">
-                  <OgImageTemplate html={typeof template === 'string' ? template : template.html} width={1200} height={630} scale={1} />
-                </div>
-              </div>
+            <div class="relative bg-gray-100 overflow-hidden" style="height: 200px;">
+              <OgImageTemplate html={typeof template === 'string' ? template : template.html} width={1200} height={630} scale={0.32} />
               
               <!-- Hover Overlay -->
-              <div class="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center backdrop-blur-[2px] cursor-pointer"
-                on:click={() => selectTemplate(template)}
-              >
-                <button class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:scale-105 transition-transform">
+              <div class="absolute inset-0 bg-gray-900/70 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center backdrop-blur-[2px]">
+                <span class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b]">
                   Use Template
-                </button>
+                </span>
               </div>
             </div>
           </div>
