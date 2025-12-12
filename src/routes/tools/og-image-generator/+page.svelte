@@ -763,12 +763,10 @@ const combinedFonts = popularFonts.map((font, index) => ({
         </div>
 
         <!-- Preview section -->
-        <div class="bg-gray-100 rounded-2xl p-8 mb-10 border-[3px] border-gray-200">
-          <div class="w-full flex justify-center">
-            <div class="relative w-full shadow-2xl rounded-lg overflow-hidden" style="padding-top: 52.5%;">
-              <div class="absolute inset-0">
-                <OgImageTemplate html={typeof selectedTemplate === 'string' ? selectedTemplate : selectedTemplate.html} width={1200} height={630} scale={0.5} />
-              </div>
+        <div class="bg-gray-100 rounded-2xl p-6 md:p-8 mb-10 border-[3px] border-gray-200">
+          <div class="flex justify-center items-center">
+            <div class="rounded-xl overflow-hidden border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]">
+              <OgImageTemplate html={typeof selectedTemplate === 'string' ? selectedTemplate : selectedTemplate.html} width={1200} height={630} scale={0.5} />
             </div>
           </div>
         </div>
