@@ -247,47 +247,107 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
   </script>
 </svelte:head>
 
-<section>
+<div class="min-h-screen bg-[#FFFDF8] relative overflow-hidden font-sans text-gray-900 selection:bg-[#ff6b6b] selection:text-white">
+  <!-- Background Pattern -->
+  <div class="fixed inset-0 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 24px 24px;"></div>
+
   <Nav />
-  <main class="z-10 w-full py-5 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-4xl mx-auto">
-    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter w-full inline-block text-left md:text-center">
-      URL to Image Generator
-    </h1>
-    <h2 class="max-w-3xl opacity-90 md:text-center text-xl">
-      Convert webpage to an image with our easy-to-use URL to Image Generator.
-    </h2>
-  </main>
 
-  <div class="px-6 md:px-0 mt-20 w-full max-w-4xl m-auto">
-    <div class="w-full flex flex-col gap-4 md:flex-row">
-      <div class="flex-grow">
-        <input
-          bind:value={url}
-          type="text"
-          class="w-full border-[3px] border-gray-900 placeholder-gray-600 text-lg font-medium focus:outline-none py-3.5 px-6 rounded"
-          placeholder="Enter a URL"
-        />
-      </div>
-      <div>
-        <button
-          on:click={loadPreview}
-          class="w-full px-6 text-gray-900 bg-[#ffc480] border-[3px] border-gray-900 text-lg font-medium py-3.5 rounded md:mt-0"
-        >
-          Load Preview
-        </button>
-      </div>
+  <main class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative cursor-crosshair">
+    
+    <!-- Hero Section -->
+    <div class="relative flex flex-col items-center justify-center text-center mb-20 pt-10">
+        <!-- Decorative Floating Elements -->
+        <div class="absolute top-0 right-[10%] w-24 h-24 bg-[#ff6b6b] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div class="absolute top-10 left-[10%] w-32 h-32 bg-[#4ade80] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-10 left-[20%] w-28 h-28 bg-[#ffc480] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
+        <!-- Badge -->
+        <div class="relative mb-6 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+             <div class="absolute inset-0 bg-black translate-x-1 translate-y-1"></div>
+             <span class="relative inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-black font-black uppercase tracking-widest text-xs shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+                Free Tool
+             </span>
+        </div>
+        
+        <!-- Main Title -->
+        <div class="relative mb-6">
+            <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] text-black uppercase transform hover:scale-[1.01] transition-transform duration-300">
+                URL to <br class="md:hidden" />
+                <span class="relative inline-block text-[#ff6b6b]">Image</span>
+            </h1>
+            <div class="absolute -z-10 top-2 left-2 text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] text-gray-200 uppercase select-none">
+                URL to <br class="md:hidden" /> Image
+            </div>
+        </div>
+
+        <!-- Description -->
+        <p class="max-w-2xl text-xl md:text-2xl font-bold text-gray-700 leading-relaxed bg-white/50 backdrop-blur-sm border-[3px] border-black p-6 shadow-[6px_6px_0_0_#9ca3af] relative">
+            <span class="absolute -top-3 -left-3">
+                <svg class="w-8 h-8 text-black animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </span>
+            Convert any webpage URL into a high-quality image instantly. Perfect for archiving, thumbnails, and social previews.
+        </p>
     </div>
 
-    <!-- Add this disclaimer after the input and button -->
-    <div class="mt-4 text-sm text-gray-600 bg-yellow-100 border border-yellow-400 p-3 rounded">
-      <strong>Disclaimer:</strong> Due to security restrictions, previews may not be available for all websites. However, the image generation process will still work for most URLs.
-    </div>
+  <div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
+      <!-- Control Board -->
+      <div class="bg-white border-[3px] border-black shadow-[8px_8px_0_0_#000] relative">
+          <!-- Header/Window Bar -->
+          <div class="bg-black text-white px-4 py-2 flex justify-between items-center border-b-[3px] border-black">
+              <div class="flex gap-2">
+                  <div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-white"></div>
+                  <div class="w-3 h-3 rounded-full bg-[#ffc480] border border-white"></div>
+                  <div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white"></div>
+              </div>
+              <div class="font-mono font-bold tracking-widest text-sm uppercase">SYSTEM_INPUT_TERMINAL</div>
+              <div class="w-16 flex justify-end">
+                  <div class="space-y-1">
+                      <div class="w-4 h-0.5 bg-white"></div>
+                      <div class="w-4 h-0.5 bg-white"></div>
+                  </div>
+              </div>
+          </div>
 
-    <div class="mt-8">
-      <h3 class="text-2xl font-bold mb-4">Preview</h3>
+          <!-- Content -->
+          <div class="p-6 md:p-8 bg-white" style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 10px 10px;">
+              <div class="w-full flex flex-col gap-6 md:flex-row items-stretch">
+                  <div class="flex-grow group relative">
+                      <div class="absolute -top-3 left-4 bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider">Target URL</div>
+                      <input
+                          bind:value={url}
+                          type="text"
+                          class="w-full h-full border-[3px] border-black bg-white placeholder-gray-400 text-lg font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#ff6b6b] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all px-6 py-4"
+                          placeholder="https://example.com"
+                      />
+                  </div>
+                  <div class="md:w-auto w-full">
+                      <button
+                          on:click={loadPreview}
+                          class="w-full h-full px-8 py-4 bg-[#ffc480] text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+                      >
+                          Initialize
+                      </button>
+                  </div>
+              </div>
+
+               <!-- Add this disclaimer after the input and button -->
+                <div class="mt-6 text-xs md:text-sm font-bold text-black bg-[#fff] border-[2px] border-black p-4 shadow-[4px_4px_0_0_#ccc] flex items-start gap-3">
+                    <span class="text-xl">⚠️</span>
+                    <p>DISCLAIMER: Due to CORS and security policies, live previews may be restricted for some domains. The capture engine operates server-side and will bypass these limitations.</p>
+                </div>
+          </div>
+      </div>
+  </div>
+
+    <div class="mt-8 w-full max-w-5xl mx-auto">
+      <h3 class="text-4xl font-black mb-6 uppercase text-center md:text-left drop-shadow-sm">
+          <span class="bg-black text-white px-2 py-1 transform -rotate-1 inline-block">Visual</span> 
+          Confirmation
+      </h3>
       <div 
       bind:this={iframeWrapper}
-      class="border-2 border-gray-300 p-2 rounded overflow-hidden" style="height: 600px; position: relative;">
+      class="border-[4px] border-black bg-white p-2 shadow-[12px_12px_0_0_#000] relative" style="height: 600px;">
         {#if isLoading}
           <div class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
             <div class="loader"></div>
@@ -306,220 +366,250 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
       </div>
     </div>
 
-    <div class="mt-8">
-      <h3 class="text-2xl font-bold mb-4">Selector</h3>
-      <div class="flex items-center gap-2">
-        <input
-          bind:value={selector}
-          type="text"
-          class="w-full border-[3px] border-gray-900 placeholder-gray-600 text-lg font-medium focus:outline-none py-3.5 px-6 rounded"
-          placeholder="Click on an element in the preview to select it"
-        />
-        <button
-          on:click={clearSelector}
-          class="px-4 py-3.5 bg-gray-200 text-gray-700 border-[3px] border-gray-900 text-lg font-medium rounded hover:bg-gray-300 transition-colors duration-300"
-        >
-          Clear
-        </button>
-      </div>
-    </div>
-
-    <div class="mt-8">
-      <button
-        on:click={generateImage}
-        disabled={!url || !iframeElement}
-        class="w-full bg-green-500 text-white text-lg font-medium py-3.5 rounded hover:bg-green-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Generate Image
-      </button>
-    </div>
-
-
-    {#if isImageGenerating}
-      <div class="mt-8">
-        <div class="w-full text-gray-900 text-lg font-medium py-3.5 rounded bg-gray-100 shadow-md">
-          <p class="text-center mb-2">Generating Image...</p>
-          <div class="w-11/12 mx-auto bg-gray-200 rounded-full h-3">
-            <div class="bg-gray-900 h-3 rounded-full loading-bar"></div>
+      <div class="bg-gray-100 border-t-[3px] border-black p-4 flex flex-col md:flex-row gap-4 items-center">
+          <div class="flex-grow w-full">
+              <span class="block font-black uppercase text-xs mb-1 tracking-wider">Element Selector (Optional)</span>
+              <div class="flex">
+                 <div class="bg-black text-white px-3 py-2 font-mono text-sm flex items-center justify-center border-y-[3px] border-l-[3px] border-black">
+                     &gt;_
+                 </div>
+                 <input
+                  bind:value={selector}
+                  type="text"
+                  class="w-full border-[3px] border-black placeholder-gray-500 text-sm font-mono focus:outline-none py-2 px-4"
+                  placeholder="Click element in preview or type selector..."
+                 />
+                 <button
+                  on:click={clearSelector}
+                  class="bg-white border-y-[3px] border-r-[3px] border-black px-3 hover:bg-gray-200 transition-colors"
+                  title="Clear Selector"
+                 >
+                     <svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 6l12 12M18 6L6 18" />
+                     </svg>
+                 </button>
+              </div>
           </div>
-        </div>
+          <div class="w-full md:w-auto flex-shrink-0 pt-5">
+              <button
+                  on:click={generateImage}
+                  disabled={!url || !iframeElement || isImageGenerating}
+                  class="w-full md:w-auto px-8 py-3 bg-[#4ade80] text-black border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
+              >
+                  {#if isImageGenerating}
+                      <svg class="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Rendering...
+                  {:else}
+                      <span>Generate Image</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  {/if}
+              </button>
+          </div>
       </div>
-    {/if}
 
     {#if imageUrl}
-      <div class="mt-8 p-6 bg-white rounded-lg shadow-lg m-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold">Generated Image</h3>
-          <button
-            on:click={() => copyToClipboard(imageUrl)}
-            class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors duration-300"
-          >
-            Copy URL
-          </button>
-        </div>
-        <div class="mb-4 break-all">
-          <a href={imageUrl} download="generated-image.jpg" class="text-black hover:underline">
-            {imageUrl}
-          </a>
-        </div>
-        <img src={imageUrl} alt="Generated Image" class="w-full max-w-3xl mt-4 m-auto h-auto rounded-lg shadow-md" />
-      </div>
+    <div class="mt-16 w-full max-w-5xl mx-auto px-2 md:px-0 z-20">
+         <!-- Success Window -->
+         <div class="border-[4px] border-black bg-[#4ade80] shadow-[12px_12px_0_0_#000]">
+             <!-- Header -->
+             <div class="bg-black text-white px-4 py-2 flex justify-between items-center">
+                 <div class="font-mono font-bold uppercase tracking-widest">STATUS: 200 OK</div>
+                 <!-- Decorative Close Button -->
+                 <div class="w-6 h-6 bg-white flex items-center justify-center border-2 border-transparent hover:border-black cursor-pointer">
+                    <span class="text-black font-black leading-none pb-0.5">×</span>
+                 </div>
+             </div>
+             <!-- Content -->
+             <div class="p-6 md:p-8 bg-white border-t-[3px] border-black">
+                 <h3 class="text-4xl font-black uppercase mb-6 text-center tracking-tighter">Capture Complete!</h3>
+                 
+                 <!-- URL & Copy -->
+                 <div class="flex flex-col md:flex-row gap-4 mb-8">
+                      <div class="flex-grow bg-gray-100 border-[3px] border-black p-3 font-mono text-xs md:text-sm break-all flex items-center">
+                          {imageUrl}
+                      </div>
+                      <button 
+                        on:click={() => copyToClipboard(imageUrl)}
+                        class="bg-black text-white px-6 py-3 font-bold uppercase border-[3px] border-black hover:bg-white hover:text-black transition-colors flex-shrink-0"
+                      >
+                          Copy URL
+                      </button>
+                 </div>
+
+                 <!-- Preview -->
+                 <div class="border-[3px] border-black bg-[#f3f4f6] p-4 shadow-[8px_8px_0_0_#ccc] mb-8 relative">
+                     <div class="absolute top-2 left-2 w-2 h-2 bg-black rounded-full"></div>
+                     <div class="absolute top-2 right-2 w-2 h-2 bg-black rounded-full"></div>
+                     <div class="absolute bottom-2 left-2 w-2 h-2 bg-black rounded-full"></div>
+                     <div class="absolute bottom-2 right-2 w-2 h-2 bg-black rounded-full"></div>
+                     <a href={imageUrl} target="_blank" rel="noopener noreferrer">
+                        <img src={imageUrl} alt="Generated Screenshot" class="w-full h-auto border-[2px] border-black hover:opacity-95 transition-opacity" />
+                     </a>
+                 </div>
+
+                 <!-- Actions -->
+                 <div class="flex flex-col md:flex-row gap-4 justify-center">
+                     <a href={imageUrl} download="screenshot.jpg" class="px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center">
+                         Download Image
+                     </a>
+                     <a href="/signup" class="px-8 py-4 bg-white text-black border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center">
+                         Automate via API
+                     </a>
+                 </div>
+             </div>
+         </div>
+    </div>
     {/if}
 
-    <ApiPromptSection
-    title="Automate URL screenshots with our API"
-    description="Trigger screenshot captures from scripts, CRON jobs, or workflows and receive CDN-hosted images in seconds."
-    featurePoints={apiFeatureBullets}
-    codeSnippet={apiSnippet}
-    codeLanguage="bash"
-    docsUrl="https://docs.pictify.io/"
-    docsLabel="Read URL to Image docs"
-    secondaryCtaUrl="/dashboard/api-playground"
-    secondaryCtaLabel="Run sample request"
-    note="Need JS execution, authentication, or regional rendering? Contact us for advanced plans."
-  />
-  </div>
+    <div class="max-w-7xl mx-auto px-2 md:px-0 mt-20 mb-20">
+      <section class="mb-16 border-[3px] border-black p-2 bg-black shadow-[12px_12px_0_0_#9ca3af]">
+        <div class="bg-white border-[3px] border-black p-6 md:p-8">
+            <ApiPromptSection
+            title="Automate URL screenshots with our API"
+            description="Trigger screenshot captures from scripts, CRON jobs, or workflows and receive CDN-hosted images in seconds."
+            featurePoints={apiFeatureBullets}
+            codeSnippet={apiSnippet}
+            codeLanguage="bash"
+            docsUrl="https://docs.pictify.io/"
+            docsLabel="Read URL to Image docs"
+            secondaryCtaUrl="/dashboard/api-playground"
+            secondaryCtaLabel="Run sample request"
+            note="Need JS execution, authentication, or regional rendering? Contact us for advanced plans."
+          />
+        </div>
+      </section>
+    </div>
 
 
   <!-- Separator -->
   <div class="max-w-4xl mx-auto px-6 md:px-0 my-20">
-    <div class="border-t-4 border-gray-900 relative">
-      <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
-        <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-        </svg>
+    <div class="border-t-[4px] border-black relative">
+      <div class="absolute left-1/2 -top-5 -translate-x-1/2 bg-[#FFFDF8] px-4">
+        <div class="w-10 h-10 bg-black text-white flex items-center justify-center border-[3px] border-black rotate-45 transform hover:rotate-90 transition-transform duration-500">
+             <div class="-rotate-45">✦</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <section class="max-w-4xl mx-auto px-6 md:px-0 mb-16">
-    <h3 class="text-3xl font-bold mb-6">Frequently Asked Questions</h3>
+  <section class="max-w-5xl mx-auto px-6 md:px-0 mb-16 border-[3px] border-black bg-white shadow-[8px_8px_0_0_#9ca3af] p-8">
+    <h3 class="text-3xl font-black mb-8 uppercase">Frequently Asked Questions</h3>
     <div class="space-y-4">
-      <details class="bg-gray-100 p-4 rounded-lg">
-        <summary class="font-semibold cursor-pointer">What is a URL to Image converter?</summary>
-        <p class="mt-2">A URL to Image converter is a tool that takes a web page URL as input and generates an image of that web page. It's useful for creating screenshots, thumbnails, or visual representations of websites without manually capturing them.</p>
+      <details class="group">
+        <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+          <span class="font-black text-lg text-gray-900 uppercase">What is URL to Image?</span>
+          <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+          </span>
+        </summary>
+        <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+          A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for archives, thumbnails, and proofs.
+        </div>
       </details>
-      <details class="bg-gray-100 p-4 rounded-lg">
-        <summary class="font-semibold cursor-pointer">How does the URL to Image generator work?</summary>
-        <p class="mt-2">Our URL to Image generator works by rendering the web page associated with the provided URL in a virtual browser environment. It then captures a screenshot of the rendered page and converts it into an image file that you can download or use in your projects.</p>
+      <details class="group">
+        <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+          <span class="font-black text-lg text-gray-900 uppercase">How does it work?</span>
+          <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+          </span>
+        </summary>
+        <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+          We spawn a headless browser in the cloud, navigate to your URL, wait for assets to load, and take a high-fidelity screenshot.
+        </div>
       </details>
-      <details class="bg-gray-100 p-4 rounded-lg">
-        <summary class="font-semibold cursor-pointer">What are the common uses for a URL to Image tool?</summary>
-        <p class="mt-2">URL to Image tools are commonly used for creating thumbnails for web directories, generating social media preview images, archiving web pages visually, creating visual bookmarks, and automating screenshot capture for web testing or monitoring purposes.</p>
-      </details>
-      <details class="bg-gray-100 p-4 rounded-lg">
-        <summary class="font-semibold cursor-pointer">Can I customize the image output?</summary>
-        <p class="mt-2">Yes, our URL to Image generator allows you to customize various aspects of the output image. You can adjust the image dimensions, select specific elements on the page to capture, and even modify the delay before capture to ensure dynamic content is loaded.</p>
+      <details class="group">
+        <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+          <span class="font-black text-lg text-gray-900 uppercase">Can I customize it?</span>
+          <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+          </span>
+        </summary>
+        <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+          Yes! You can select specific elements, set custom viewport sizes, and handle cookie banners via our API.
+        </div>
       </details>
     </div>
   </section>
 
-  <div class="max-w-4xl mx-auto px-6 md:px-0 my-20">
-    <div class="border-t-4 border-gray-900 relative">
-      <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
-        <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <div class="max-w-4xl mx-auto px-6 md:px-0 mb-20">
-    <h2 class="text-4xl font-bold mb-10 text-center">Learn More About URL to Image Conversion</h2>
+  <!-- Content Grid -->
+  <div class="max-w-7xl mx-auto px-6 md:px-0 mb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
     
-    <section class="mb-16">
-      <h3 class="text-3xl font-bold mb-6">What is a URL to Image Generator?</h3>
-      <p class="text-lg">
-        A URL to Image Generator is a powerful tool that converts web pages into image files. It allows you to create visual representations of websites quickly and easily, without the need for manual screenshots or complex image editing software.
-      </p>
-    </section>
-
-    <section class="mb-16">
-      <h3 class="text-3xl font-bold mb-6">Benefits of Using Our URL to Image Generator</h3>
-      <ul class="list-disc list-inside text-lg">
-        <li>Quickly create images from any web page URL</li>
-        <li>Customize image dimensions and capture specific elements</li>
-        <li>Generate thumbnails for web directories or visual bookmarks</li>
-        <li>Create social media preview images automatically</li>
-        <li>Archive web pages visually for future reference</li>
-        <li>Automate screenshot capture for web testing and monitoring</li>
+    <!-- Learn More -->
+    <section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-[8px_8px_0_0_#000]">
+      <h3 class="text-2xl font-black mb-6 uppercase">Why Use This Tool?</h3>
+      <ul class="space-y-4">
+        <li class="flex gap-4 items-start">
+            <div class="bg-black text-white p-1 mt-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg></div>
+            <span class="font-bold text-lg">Instant Archiving of web pages</span>
+        </li>
+        <li class="flex gap-4 items-start">
+            <div class="bg-black text-white p-1 mt-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg></div>
+            <span class="font-bold text-lg">Generate OG Images for social media</span>
+        </li>
+        <li class="flex gap-4 items-start">
+            <div class="bg-black text-white p-1 mt-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg></div>
+            <span class="font-bold text-lg">Visual monitoring for QA teams</span>
+        </li>
       </ul>
     </section>
 
-    <section class="mb-16">
-      <h3 class="text-3xl font-bold mb-6">How to Use Our URL to Image Generator</h3>
-      <ol class="list-decimal list-inside text-lg">
-        <li>Enter the URL of the web page you want to convert</li>
-        <li>Customize the image dimensions if needed</li>
-        <li>Select specific elements to capture (optional)</li>
-        <li>Adjust the capture delay for dynamic content (if necessary)</li>
-        <li>Click the "Generate Image" button</li>
-        <li>Download or copy the URL of the generated image</li>
-      </ol>
-    </section>
-
-    <section class="mb-16">
-      <h3 class="text-3xl font-bold mb-6">Why URL to Image Conversion Matters</h3>
-      <p class="text-lg">
-        URL to Image conversion is essential for various web-related tasks. It enables easy creation of visual content for social media, improves user experience in web directories, aids in web archiving, and facilitates automated testing and monitoring of web applications. By using our URL to Image Generator, you can streamline these processes and save valuable time and resources.
-      </p>
-    </section>
-
-    <section class="mb-16">
-      <h3 class="text-3xl font-bold mb-6">Best Practices for URL to Image Conversion</h3>
-      <p class="text-lg mb-4">
-        To get the most out of your URL to Image conversions, consider these best practices:
-      </p>
-      <ul class="list-disc list-inside text-lg">
-        <li>Ensure the target web page is fully loaded before capture</li>
-        <li>Adjust image dimensions to fit your specific use case</li>
-        <li>Use selective capture for important elements when full-page images are too large</li>
-        <li>Consider mobile and desktop versions of websites for comprehensive coverage</li>
-        <li>Regularly update your image captures to keep content fresh</li>
-        <li>Use appropriate file formats (e.g., JPEG for photographs, PNG for graphics)</li>
-        <li>Optimize image file sizes for faster loading times</li>
-        <li>Respect copyright and usage rights when capturing and using images</li>
+    <!-- Best Practices -->
+    <section class="border-[3px] border-black p-6 md:p-8 bg-[#fffdf8] shadow-[8px_8px_0_0_#000]">
+      <h3 class="text-2xl font-black mb-6 uppercase">Pro Tips</h3>
+      <ul class="space-y-4">
+        <li class="flex gap-4 items-start">
+            <span class="font-black text-[#ff6b6b] text-xl">01.</span>
+            <span class="font-bold text-lg">Ensure the URL is publicly accessible.</span>
+        </li>
+        <li class="flex gap-4 items-start">
+            <span class="font-black text-[#ffc480] text-xl">02.</span>
+            <span class="font-bold text-lg">Use the selector to remove ads/navbars.</span>
+        </li>
+        <li class="flex gap-4 items-start">
+            <span class="font-black text-[#4ade80] text-xl">03.</span>
+            <span class="font-bold text-lg">Check mobile viewports for responsive sites.</span>
+        </li>
       </ul>
-      <p class="text-lg mt-4">
-        By following these guidelines and using our URL to Image Generator, you can create high-quality, useful images from web pages for various applications and projects.
-      </p>
     </section>
+
   </div>
 
-  <div class="mt-8 mb-8 flex flex-col md:flex-row justify-center md:space-x-4">
+  <div class="mt-8 mb-20 w-full max-w-4xl mx-auto text-center">
+      <p class="font-bold text-gray-500 uppercase tracking-widest mb-6">Spread the word</p>
+    <div class="flex flex-col md:flex-row justify-center md:space-x-6">
     <button
-      class="flex items-center justify-center px-6 py-3 bg-[#1DA1F2] text-white font-semibold rounded-full hover:bg-[#1a91da] transition duration-300 ease-in-out"
+      class="flex items-center justify-center px-8 py-4 bg-[#1DA1F2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#1DA1F2] transition-all shadow-[4px_4px_0_0_#000] mb-4 md:mb-0"
       on:click={() => sharePage('twitter')}
     >
-      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
       </svg>
       Share on Twitter
     </button>
     <button
-      class="flex items-center justify-center px-6 py-3 mt-4 md:mt-0 bg-[#0A66C2] text-white font-semibold rounded-full hover:bg-[#094d92] transition duration-300 ease-in-out"
+      class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-[4px_4px_0_0_#000]"
       on:click={() => sharePage('linkedin')}
     >
-      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
       </svg>
       Share on LinkedIn
     </button>
+    </div>
   </div>
 
   <Toast />
   <Footer />
-</section>
+  </main>
+</div>
 
 <style>
   @keyframes loading {
     0% { width: 0%; }
     100% { width: 100%; }
-  }
-
-  .loading-bar {
-    width: 0%;
-    animation: loading 3s forwards;
   }
 
   .loader {
