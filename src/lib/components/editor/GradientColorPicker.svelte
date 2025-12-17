@@ -15,6 +15,7 @@
 
 	// Helper to generate IDs
 	const generateId = () => Math.random().toString(36).substr(2, 9);
+    const angleId = generateId();
 
 	// Ensure stops have unique IDs
 	const ensureIds = (stops) => {
@@ -376,22 +377,22 @@
 <div class="space-y-2">
 	<!-- Label and Color Preview Button -->
 	<div class="flex items-center justify-between">
-		<div class="text-xs font-medium text-gray-700">{label}</div>
+		<div class="text-xs font-black text-gray-900 uppercase tracking-wider">{label}</div>
 		<button
 			bind:this={pickerButton}
 			type="button"
-			class="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-gray-300 hover:border-gray-400 transition-colors bg-white"
+			class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all bg-white"
 			on:click={(e) => { console.log('[ColorPicker] Button clicked!'); e.stopPropagation(); toggleColorPicker(); }}
 		>
 			<!-- Color Preview Swatch -->
-			<div class="relative w-6 h-6 rounded overflow-hidden border border-gray-200">
+			<div class="relative w-6 h-6 rounded overflow-hidden border-[2px] border-gray-900">
 				<!-- Checkerboard background -->
 				<div class="absolute inset-0 opacity-30" 
 					 style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;">
 				</div>
 				<div class="absolute inset-0" style="background: {previewBackground}"></div>
 			</div>
-			<i class="fa fa-chevron-down text-[10px] text-gray-400"></i>
+			<i class="fa fa-chevron-down text-[10px] text-gray-900"></i>
 		</button>
 	</div>
 </div>
@@ -400,29 +401,29 @@
 {#if showColorPicker}
 	<div 
 		use:portal
-		class="fixed color-picker-modal"
+		class="fixed color-picker-modal border-[3px] border-gray-900 rounded-lg shadow-[8px_8px_0_0_#1f2937] overflow-hidden bg-white"
 		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px; z-index: 999999 !important;"
 	>
-		<div class="bg-white rounded-lg shadow-2xl overflow-hidden">
+		<div class="bg-white">
 			<!-- Header with close button -->
-		<div class="px-3 py-2 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-			<span class="text-xs font-semibold text-gray-700">{label}</span>
+		<div class="px-3 py-2 border-b-[2px] border-gray-900 flex items-center justify-between bg-[#FFFDF8]">
+			<span class="text-xs font-black text-gray-900 uppercase tracking-widest">{label}</span>
 			<div class="flex items-center gap-1">
 				<!-- Eyedropper Button -->
 				{#if supportsEyeDropper}
 					<button
 						type="button"
-						class="p-1.5 rounded hover:bg-gray-200 transition-colors"
+						class="p-1.5 rounded border-[2px] border-transparent hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
 						on:click={handleEyedropper}
 						title="Pick color from screen"
 					>
-						<i class="fa fa-eye-dropper text-xs text-gray-600"></i>
+						<i class="fa fa-eye-dropper text-xs text-gray-900"></i>
 					</button>
 				{/if}
 				<!-- Close Button -->
 				<button
 					type="button"
-					class="text-gray-400 hover:text-gray-600 transition-colors p-1"
+					class="text-gray-900 hover:text-red-600 transition-colors p-1"
 					on:click={() => showColorPicker = false}
 				>
 					<i class="fa fa-times text-sm"></i>
@@ -432,18 +433,18 @@
 
 			<!-- Mode Switcher (only if gradient supported) -->
 			{#if supportsGradient}
-				<div class="px-3 py-2 bg-white border-b border-gray-200">
-					<div class="flex bg-gray-100 rounded-md p-0.5">
+				<div class="px-3 py-2 bg-white border-b-[2px] border-gray-900">
+					<div class="flex bg-gray-900 rounded-md p-1 border-[2px] border-gray-900">
 						<button
 							type="button"
-							class="flex-1 px-3 py-1.5 text-xs font-medium rounded transition-all {mode === 'solid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode === 'solid' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-white hover:text-[#ffc480]'}"
 							on:click={switchToSolid}
 						>
 							Solid
 						</button>
 						<button
 							type="button"
-							class="flex-1 px-3 py-1.5 text-xs font-medium rounded transition-all {mode === 'gradient' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode === 'gradient' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-white hover:text-[#ffc480]'}"
 							on:click={switchToGradient}
 						>
 							Gradient
@@ -454,13 +455,13 @@
 			
 			<!-- Gradient Presets (shown in gradient mode) -->
 			{#if mode === 'gradient'}
-				<div class="px-3 py-2 bg-gray-50 border-b border-gray-200">
-					<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-semibold tracking-wide">Quick Presets</div>
+				<div class="px-3 py-2 bg-[#FFFDF8] border-b-[2px] border-gray-900">
+					<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">Quick Presets</div>
 					<div class="grid grid-cols-3 gap-1.5">
 						{#each gradientPresets as preset}
 							<button
 								type="button"
-								class="h-8 rounded overflow-hidden border border-gray-200 hover:border-[#ff6b6b] transition-all hover:scale-105"
+								class="h-8 rounded overflow-hidden border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#ffc480] transition-all hover:-translate-y-0.5"
 								style="background: linear-gradient({preset.angle}deg, {preset.colors.join(', ')})"
 								on:click={() => applyPreset(preset)}
 								title={preset.name}
@@ -474,11 +475,11 @@
 
 			<!-- Gradient Bar (shown in gradient mode) -->
 			{#if mode === 'gradient'}
-				<div class="px-3 py-3 bg-white border-b border-gray-200">
-					<div class="text-[10px] text-gray-500 mb-2">
-						Click to add stops • Drag to move • Double-click to delete
+				<div class="px-3 py-3 bg-white border-b-[2px] border-gray-900">
+					<div class="text-[10px] text-gray-500 mb-2 font-bold uppercase">
+						Click to add • Drag to move • Dbl-click delete
 					</div>
-					<div class="relative h-8 w-full select-none rounded overflow-hidden mb-2">
+					<div class="relative h-8 w-full select-none rounded overflow-hidden mb-2 border-[2px] border-gray-900">
 						<!-- Checkerboard background -->
 						<div class="absolute inset-0 opacity-30" 
 							 style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;">
@@ -504,7 +505,7 @@
 								on:dblclick={() => handleStopDelete(stop.id)}
 							>
 								<div 
-									class="w-5 h-5 rounded-full border-2 shadow-lg transition-all hover:scale-110 {activeStopId === stop.id ? 'border-[#ff6b6b] scale-110 ring-2 ring-[#ff6b6b]/30' : 'border-white'}"
+									class="w-5 h-5 rounded-full border-[2px] shadow-sm transition-all hover:scale-110 {activeStopId === stop.id ? 'border-gray-900 scale-110 shadow-[0_0_0_2px_#ffc480]' : 'border-white ring-1 ring-gray-900'}"
 									style="background-color: {stop.color}"
 								></div>
 							</button>
@@ -514,23 +515,22 @@
 					<!-- Gradient Angle Control -->
 					<div class="mt-3">
 						<div class="flex items-center justify-between mb-1.5">
-							<label class="text-xs text-gray-600 font-medium">Angle</label>
-							<span class="text-xs text-gray-500">{gradientAngle}°</span>
+							<label for="{angleId}" class="text-xs text-gray-900 font-black uppercase">Angle</label>
+							<span class="text-xs text-gray-900 font-mono bg-gray-100 px-1 rounded border border-gray-900">{gradientAngle}°</span>
 						</div>
 						<input
+                            id="{angleId}"
 							type="range"
 							min="0"
 							max="360"
 							step="1"
 							value={gradientAngle}
 							on:input={handleAngleChange}
-							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ff6b6b]"
+							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-900 border border-gray-900"
 						/>
-						<div class="flex justify-between text-[9px] text-gray-400 mt-0.5">
+						<div class="flex justify-between text-[9px] text-gray-400 mt-0.5 font-mono">
 							<span>0°</span>
-							<span>90°</span>
 							<span>180°</span>
-							<span>270°</span>
 							<span>360°</span>
 						</div>
 					</div>
@@ -539,14 +539,14 @@
 
 			<!-- Gradient Stop Delete Button -->
 			{#if mode === 'gradient' && activeStopId && localStops.length > 2}
-				<div class="px-3 pb-2 bg-white border-b border-gray-200">
+				<div class="px-3 pb-2 bg-white border-b-[2px] border-gray-900 pt-2">
 					<button 
 						type="button"
-						class="w-full text-xs text-red-600 hover:text-red-700 px-2 py-1.5 rounded hover:bg-red-50 transition-colors flex items-center justify-center gap-1.5"
+						class="w-full text-xs font-black uppercase tracking-wider text-white bg-[#ff6b6b] px-2 py-1.5 rounded border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all flex items-center justify-center gap-1.5"
 						on:click={() => handleStopDelete(activeStopId)}
 					>
 						<i class="fa fa-trash"></i>
-						<span>Delete</span>
+						<span>Delete Stop</span>
 					</button>
 				</div>
 			{/if}
@@ -569,18 +569,18 @@
 					{/if}
 					
 					<!-- Canvas Palette Section -->
-					<div class="px-3 py-3 bg-gray-50 border-t border-gray-200 space-y-2">
+					<div class="px-3 py-3 bg-[#FFFDF8] border-t-[2px] border-gray-900 space-y-3 mt-3 rounded border-[2px]">
 						<!-- Canvas Colors -->
 						{#if canvasColors.length > 0}
 							<div>
-								<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-semibold tracking-wide">
-									Canvas Colors ({canvasColors.length})
+								<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">
+									Canvas Colors
 								</div>
 								<div class="flex flex-wrap gap-1.5">
 									{#each canvasColors.slice(0, 8) as color}
 										<button
 											type="button"
-											class="w-7 h-7 rounded border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer"
+											class="w-7 h-7 rounded border-[2px] border-gray-900 shadow-sm hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all cursor-pointer"
 											style="background-color: {color}"
 											on:click={() => applyPaletteColor(color)}
 											title="Apply {color}"
@@ -592,8 +592,8 @@
 						
 						<!-- Generate Harmonies -->
 						<div>
-							<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-semibold tracking-wide">
-								Generate Harmony
+							<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">
+								Harmony
 							</div>
 							<div class="grid grid-cols-2 gap-1">
 								<button 
@@ -634,14 +634,14 @@
 						<!-- Generated Palette -->
 						{#if generatedPalette.length > 0}
 							<div>
-								<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-semibold tracking-wide">
-									Generated Colors
+								<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">
+									Generated
 								</div>
 								<div class="flex flex-wrap gap-1.5">
 									{#each generatedPalette as color}
 										<button
 											type="button"
-											class="relative w-8 h-8 rounded border-2 border-white shadow hover:scale-110 transition-transform cursor-pointer"
+											class="relative w-8 h-8 rounded border-[2px] border-gray-900 shadow hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all cursor-pointer"
 											style="background-color: {color}"
 											on:click={() => applyPaletteColor(color)}
 											title="Click to apply {color}"
@@ -733,22 +733,25 @@
 	.btn-harmony {
 		padding: 0.375rem 0.5rem;
 		font-size: 10px;
-		font-weight: 500;
+		font-weight: 800;
+        text-transform: uppercase;
 		background-color: white;
-		border: 1px solid #e5e7eb;
+		border: 2px solid #111827;
 		border-radius: 0.375rem;
 		transition: all 0.2s;
 		cursor: pointer;
+        color: #111827;
 	}
 	
 	.btn-harmony:hover:not(:disabled) {
-		border-color: #ff6b6b;
-		background-color: #ff6b6b/5;
+		background-color: #ffc480;
+        box-shadow: 2px 2px 0 0 #1f2937;
+        transform: translate(-1px, -1px);
 	}
 	
 	.btn-harmony:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+        border-color: #d1d5db;
 	}
 </style>
-

@@ -405,7 +405,7 @@
 
 <div class="alignment-toolbar">
 	<div class="toolbar-section">
-		<span class="section-label">Align</span>
+		<span class="section-label">ALIGN</span>
 		<div class="button-group">
 			{#each alignments as align}
 				<button 
@@ -427,12 +427,12 @@
 				type="checkbox" 
 				bind:checked={snapToGrid}
 			/>
-			<span>Snap to Grid</span>
+			<span>GRID SNAP</span>
 		</label>
 		
 		{#if snapToGrid}
 			<div class="grid-size-control">
-				<label for="grid-size">Size:</label>
+				<label for="grid-size">SIZE:</label>
 				<input 
 					id="grid-size"
 					type="number" 
@@ -440,7 +440,6 @@
 					min="5"
 					max="50"
 					step="5"
-
 				/>
 			</div>
 		{/if}
@@ -453,15 +452,15 @@
 		top: 20px;
 		left: 50%;
 		transform: translateX(-50%);
-		background: white;
-		border: 1px solid #e5e5e5;
+		background: #FFFDF8;
+		border: 3px solid #111827;
 		border-radius: 8px;
-		padding: 8px 12px;
+		padding: 10px 16px;
 		display: flex;
 		flex-wrap: nowrap;
 		align-items: center;
-		gap: 12px;
-		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		gap: 16px;
+		box-shadow: 6px 6px 0 0 #111827;
 		z-index: 50;
 		font-size: 13px;
 		max-width: 95vw;
@@ -472,22 +471,24 @@
 	.toolbar-section {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 10px;
 		flex-wrap: nowrap;
 		flex-shrink: 0;
 	}
 	
 	.section-label {
-		font-size: 12px;
-		color: #666;
-		font-weight: 500;
+		font-size: 10px;
+		color: #111827;
+		font-weight: 900;
 		white-space: nowrap;
 		flex-shrink: 0;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
 	}
 	
 	.button-group {
 		display: flex;
-		gap: 4px;
+		gap: 6px;
 		flex-wrap: nowrap;
 		flex-shrink: 0;
 	}
@@ -495,42 +496,64 @@
 	.toolbar-btn {
 		width: 32px;
 		height: 32px;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		background: white;
 		border-radius: 4px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 16px;
-		transition: all 0.15s;
+		font-size: 14px;
+		color: #111827;
+		transition: all 0.1s ease;
 		flex-shrink: 0;
+		box-shadow: 2px 2px 0 0 #111827;
 	}
 	
 	.toolbar-btn:hover {
-		background: #f5f5f5;
-		border-color: #3b82f6;
+		background: #ffc480;
+		transform: translate(-1px, -1px);
+		box-shadow: 3px 3px 0 0 #111827;
 	}
 	
 	.toolbar-btn:active {
-		background: #e5e5e5;
+		background: #ffc480;
+		transform: translate(1px, 1px);
+		box-shadow: none;
 	}
 	
 	.toolbar-divider {
-		width: 1px;
-		height: 24px;
-		background: #e5e5e5;
+		width: 3px;
+		height: 28px;
+		background: #111827;
 		flex-shrink: 0;
+		border-radius: 2px;
 	}
 	
 	.checkbox-label {
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 8px;
 		cursor: pointer;
 		user-select: none;
 		white-space: nowrap;
 		flex-shrink: 0;
+		padding: 6px 10px;
+		background: white;
+		border: 2px solid #111827;
+		border-radius: 4px;
+		box-shadow: 2px 2px 0 0 #111827;
+		transition: all 0.1s ease;
+	}
+	
+	.checkbox-label:hover {
+		background: #f3f4f6;
+		transform: translate(-1px, -1px);
+		box-shadow: 3px 3px 0 0 #111827;
+	}
+	
+	.checkbox-label:has(input:checked) {
+		background: #ffc480;
 	}
 	
 	.checkbox-label input[type="checkbox"] {
@@ -538,83 +561,136 @@
 		height: 16px;
 		cursor: pointer;
 		flex-shrink: 0;
+		accent-color: #111827;
+		border: 2px solid #111827;
 	}
 	
 	.checkbox-label span {
-		font-size: 12px;
-		color: #333;
+		font-size: 10px;
+		font-weight: 900;
+		color: #111827;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
 	}
 	
 	.grid-size-control {
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 8px;
 		margin-left: 8px;
-		padding-left: 8px;
-		border-left: 1px solid #e5e5e5;
+		padding-left: 12px;
+		border-left: 3px solid #111827;
 		flex-shrink: 0;
 	}
 	
 	.grid-size-control label {
-		font-size: 12px;
-		color: #666;
+		font-size: 10px;
+		font-weight: 900;
+		color: #111827;
 		white-space: nowrap;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
 	}
 	
 	.grid-size-control input {
-		width: 60px;
-		padding: 4px 8px;
-		border: 1px solid #e5e5e5;
+		width: 56px;
+		padding: 6px 8px;
+		border: 2px solid #111827;
 		border-radius: 4px;
 		font-size: 12px;
+		font-weight: 700;
+		font-family: monospace;
+		background: white;
+		box-shadow: 2px 2px 0 0 #111827;
+		transition: all 0.1s ease;
+		outline: none;
+	}
+	
+	.grid-size-control input:focus {
+		box-shadow: 4px 4px 0 0 #ffc480;
+		transform: translate(-1px, -1px);
+	}
+	
+	.grid-size-control input::-webkit-inner-spin-button,
+	.grid-size-control input::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	
+	.grid-size-control input[type=number] {
+		-moz-appearance: textfield;
+		appearance: textfield;
 	}
 	
 	/* Mobile responsiveness */
 	@media (max-width: 1024px) {
 		.alignment-toolbar {
-			top: 10px;
-			padding: 6px 8px;
-			gap: 6px;
+			top: 12px;
+			padding: 8px 12px;
+			gap: 10px;
 			font-size: 12px;
 			flex-wrap: wrap;
+			box-shadow: 4px 4px 0 0 #111827;
 		}
 		
 		.toolbar-section {
-			gap: 6px;
+			gap: 8px;
 		}
 		
 		.button-group {
-			gap: 3px;
+			gap: 4px;
+		}
+		
+		.toolbar-btn {
+			width: 30px;
+			height: 30px;
 		}
 	}
 	
 	@media (max-width: 768px) {
 		.alignment-toolbar {
-			padding: 4px 6px;
-			gap: 4px;
+			padding: 6px 10px;
+			gap: 8px;
+			border-width: 2px;
+			box-shadow: 3px 3px 0 0 #111827;
 		}
 		
 		.toolbar-btn {
 			width: 28px;
 			height: 28px;
-			font-size: 14px;
+			font-size: 12px;
+			box-shadow: 1px 1px 0 0 #111827;
 		}
 		
 		.section-label {
 			display: none;
 		}
 		
+		.checkbox-label {
+			padding: 4px 8px;
+			box-shadow: 1px 1px 0 0 #111827;
+		}
+		
 		.checkbox-label span {
-			font-size: 11px;
+			font-size: 9px;
 		}
 		
 		.toolbar-divider {
-			display: none;
+			width: 2px;
+			height: 20px;
 		}
 		
 		.grid-size-control {
 			margin-left: 4px;
-			padding-left: 4px;
+			padding-left: 8px;
+			border-left-width: 2px;
+		}
+		
+		.grid-size-control input {
+			width: 48px;
+			padding: 4px 6px;
+			font-size: 11px;
+			box-shadow: 1px 1px 0 0 #111827;
 		}
 	}
 </style>

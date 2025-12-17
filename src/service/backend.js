@@ -142,6 +142,43 @@ const backend = {
 			throw new HttpError(response.status, message);
 		}
 		return response.json();
+	},
+
+	// Upload FormData (for file uploads)
+	postFormData: async (url, formData, options = {}) => {
+		const apiUrl = new URL(`${PUBLIC_BACKEND_URL}${url}`);
+
+		if (options.params) {
+			Object.keys(options.params).forEach((key) =>
+				apiUrl.searchParams.append(key, options.params[key])
+			);
+		}
+
+		const response = await fetch(apiUrl, {
+			...options,
+			credentials: isCredentialsSupported ? 'include' : undefined,
+			method: 'POST',
+			// Don't set Content-Type header - browser will set it with boundary for FormData
+			headers: {
+				...options.headers
+			},
+			body: formData
+		});
+		if (!response.ok) {
+			let message = response.statusText;
+			try {
+				const data = await response.json();
+				if (data && data.message) {
+					message = data.message;
+				} else if (data && data.error) {
+					message = data.error;
+				}
+			} catch (e) {
+				// ignore
+			}
+			throw new HttpError(response.status, message);
+		}
+		return response.json();
 	}
 };
 

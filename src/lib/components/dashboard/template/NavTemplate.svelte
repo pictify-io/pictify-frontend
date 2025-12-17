@@ -29,22 +29,29 @@
 	};
 </script>
 
-<div class="p-2">
+<div class="py-2">
 	<div class="flex items-center justify-between gap-4">
 		<div class="flex-grow max-w-md">
+			<div class="relative">
+				<svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+				</svg>
 			<input
 				type="text"
 				placeholder="Search templates..."
-				class="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:border-black focus:outline-none transition-colors"
+					class="w-full pl-12 pr-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-medium focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_0_#ffc480] transition-all duration-200"
 				bind:value={searchQuery}
 				on:input={handleSearch}
 			/>
+			</div>
 		</div>
 		<button
-			class="bg-black hover:bg-black/80 text-white font-bold py-2 px-4 rounded ring-1 ring-black ring-opacity-5 transition-colors flex items-center gap-2"
+			class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-bold py-3 px-5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 flex items-center gap-2"
 			on:click={openTemplateCreator}
 		>
-			<img src={PlusIcon} alt="Plus icon" class="w-5 h-5" />
+			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+			</svg>
 			<span>Create</span>
 		</button>
 	</div>

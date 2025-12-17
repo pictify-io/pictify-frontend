@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { user, getAPITokenAction } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
+	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { createImage, createGif, createAgentScreenshot } from '../../../api/image';
 	import { onMount, onDestroy } from 'svelte';
@@ -336,387 +337,455 @@
 	<title>API Playground - Pictify.io</title>
 </svelte:head>
 
-	<div class="h-full w-full max-w-6xl m-auto p-5">
-		<!-- Content Area -->
-		<div class="mt-8 space-y-8">
-		<!-- API Overview -->
-		<div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8">
-			<div class="max-w-4xl mx-auto">
-				<div class="flex items-start justify-between mb-6">
-					<div class="flex-1">
-						<h2 class="text-2xl font-bold mb-2">API Documentation</h2>
-						<p class="text-gray-700">
-							Test and experiment with Pictify.io API endpoints. Select an endpoint from the list to get started.
-						</p>
+<div class="min-h-screen w-full bg-[#FFFDF8] relative overflow-hidden">
+	<!-- Background Grid -->
+	<div class="absolute inset-0 opacity-5 pointer-events-none" 
+		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
+	</div>
+
+	<div class="max-w-7xl mx-auto p-4 sm:p-6 md:p-10 relative z-10">
+		<!-- Header -->
+		<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
+			<div>
+				<div class="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3">
+					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse"></span>
+					Dev Tools
+				</div>
+				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+					API <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Playground</span>
+				</h1>
+			</div>
+			
+			<!-- Status Badge -->
+			<div class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[4px_4px_0_0_#1f2937]">
+				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-[#4ade80] rounded-full animate-pulse"></div>
+				<span class="text-[10px] sm:text-xs font-black text-gray-900 uppercase tracking-wider">System OK</span>
+			</div>
+		</div>
+
+		<!-- Main Grid -->
+		<div class="grid grid-cols-12 gap-4 sm:gap-6 md:gap-8">
+			
+			<!-- Left Panel: Navigation & Auth -->
+			<div class="col-span-12 lg:col-span-4 space-y-4 sm:space-y-6 md:space-y-8">
+				
+				<!-- Auth Card -->
+				<div class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2">
+						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+						<h3 class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wide">Authentication</h3>
 					</div>
-					<div class="flex items-center gap-4 ml-8">
-						<div class="flex items-center gap-2">
-							<div class="h-2 w-2 rounded-full bg-green-500"></div>
-							<span class="text-sm text-gray-600">API Status: Operational</span>
-						</div>
+					<div class="p-3 sm:p-4 md:p-5 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
 						{#if isUserLoggedIn && apiToken}
-							<button
-								class="px-4 py-2 bg-[#ff6b6b] text-white rounded-lg hover:bg-[#ff5252] whitespace-nowrap"
-								on:click={() => copyToClipboard(apiToken)}
-							>
-								Copy API Key
-							</button>
+							<div class="relative group">
+								<div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+									<span class="text-[10px] sm:text-xs font-black text-gray-400">KEY</span>
+								</div>
+								<input
+									type="password"
+									class="w-full pl-8 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-3 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-mono font-bold text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] sm:focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									value={apiToken}
+									readonly
+								/>
+								<button
+									class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-1 sm:p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-900"
+									on:click={() => copyToClipboard(apiToken)}
+									title="Copy API Key"
+								>
+									<svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+									</svg>
+								</button>
+							</div>
 						{:else}
-							<a
-								href="/dashboard/api-token"
-								class="px-4 py-2 bg-[#ff6b6b] text-white rounded-lg hover:bg-[#ff5252] whitespace-nowrap"
-							>
-								Get API Key
-							</a>
+							<div class="text-center py-3 sm:py-4">
+								<p class="text-xs sm:text-sm font-bold text-gray-600 mb-3 sm:mb-4">API Key Required</p>
+								<a href="/dashboard/api-token" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#ff6b6b] text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+									Get API Key
+								</a>
+							</div>
 						{/if}
 					</div>
 				</div>
 
-				<!-- Main API Playground -->
-				<div class="grid grid-cols-12 gap-6">
-					<!-- Left Panel - Endpoints & Auth -->
-					<div class="col-span-4 space-y-6">
-						<!-- Authentication -->
-						<div class="bg-gray-50 rounded-xl p-4">
-							<h3 class="text-sm font-medium text-gray-900 mb-2">Authentication</h3>
-							<div class="space-y-2">
-								{#if isUserLoggedIn && apiToken}
-									<div class="relative">
-										<input
-											type="password"
-											class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md text-sm bg-gray-100"
-											value={apiToken}
-											readonly
-										/>
-										<button
-											class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-											on:click={() => copyToClipboard(apiToken)}
-										>
-											<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-												<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-												<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-											</svg>
-										</button>
-									</div>
-								{:else}
-									<div class="text-sm text-gray-600">
-										Please <a href="/dashboard/api-token" class="text-[#ff6b6b] hover:text-[#ff5252]">get an API key</a> to test the endpoints.
-									</div>
+				<!-- Endpoints Menu -->
+				<div class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2">
+						<svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
+						<h3 class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wide">Endpoints</h3>
+					</div>
+					<div class="p-1.5 sm:p-2 space-y-1.5 sm:space-y-2 bg-[#FFFDF8]">
+						<button
+							class="w-full p-3 rounded-xl border-[3px] text-left transition-all group relative overflow-hidden {selectedEndpoint === 'image' 
+								? 'border-gray-900 bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480]' 
+								: 'border-transparent hover:bg-gray-100 hover:border-gray-300 text-gray-600 hover:text-gray-900'}"
+							on:click={() => setSelectedEndpoint('image')}
+						>
+							<div class="flex items-center justify-between relative z-10">
+								<div class="flex items-center gap-3">
+									<span class="px-2 py-1 text-[10px] font-black rounded bg-[#ff6b6b] text-white border border-gray-900">POST</span>
+									<span class="text-sm font-mono font-bold">/image</span>
+								</div>
+								{#if selectedEndpoint === 'image'}
+									<div class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse"></div>
 								{/if}
 							</div>
-						</div>
+						</button>
 
-													<!-- Endpoints List -->
-							<div>
-								<h3 class="text-sm font-medium text-gray-900 mb-2">Available Endpoints</h3>
-								<div class="space-y-2">
-									<button
-										class="w-full p-3 rounded-xl border-2 text-left transition-all {selectedEndpoint === 'image' ? 'border-[#ff6b6b] bg-[#ff6b6b]/5' : 'border-gray-200 hover:border-[#ff6b6b]/30'}"
-										on:click={() => setSelectedEndpoint('image')}
-									>
-										<div class="flex items-center gap-2 mb-1">
-											<span class="px-2 py-0.5 text-xs font-medium rounded bg-gray-900 text-white">POST</span>
-											<span class="text-sm font-mono text-gray-600">/image</span>
-										</div>
-										<p class="text-xs text-gray-600">Generate a new image from HTML</p>
-									</button>
-									<button
-										class="w-full p-3 rounded-xl border-2 text-left transition-all {selectedEndpoint === 'gif' ? 'border-[#ff6b6b] bg-[#ff6b6b]/5' : 'border-gray-200 hover:border-[#ff6b6b]/30'}"
-										on:click={() => setSelectedEndpoint('gif')}
-									>
-										<div class="flex items-center gap-2 mb-1">
-											<span class="px-2 py-0.5 text-xs font-medium rounded bg-gray-900 text-white">POST</span>
-											<span class="text-sm font-mono text-gray-600">/gif</span>
-										</div>
-										<p class="text-xs text-gray-600">Generate a new GIF from animated HTML</p>
-									</button>
-									<button
-										class="w-full p-3 rounded-xl border-2 text-left transition-all {selectedEndpoint === 'agent' ? 'border-[#ff6b6b] bg-[#ff6b6b]/5' : 'border-gray-200 hover:border-[#ff6b6b]/30'}"
-										on:click={() => setSelectedEndpoint('agent')}
-									>
-										<div class="flex items-center gap-2 mb-1">
-											<span class="px-2 py-0.5 text-xs font-medium rounded bg-gray-900 text-white">POST</span>
-											<span class="text-sm font-mono text-gray-600">/image/agent-screenshot</span>
-										</div>
-										<p class="text-xs text-gray-600">Take a screenshot using AI agent</p>
-									</button>
+						<button
+							class="w-full p-3 rounded-xl border-[3px] text-left transition-all group relative overflow-hidden {selectedEndpoint === 'gif' 
+								? 'border-gray-900 bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480]' 
+								: 'border-transparent hover:bg-gray-100 hover:border-gray-300 text-gray-600 hover:text-gray-900'}"
+							on:click={() => setSelectedEndpoint('gif')}
+						>
+							<div class="flex items-center justify-between relative z-10">
+								<div class="flex items-center gap-3">
+									<span class="px-2 py-1 text-[10px] font-black rounded bg-[#ff6b6b] text-white border border-gray-900">POST</span>
+									<span class="text-sm font-mono font-bold">/gif</span>
 								</div>
+								{#if selectedEndpoint === 'gif'}
+									<div class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse"></div>
+								{/if}
 							</div>
-					</div>
+						</button>
 
-					<!-- Right Panel - Parameters & Response -->
-					<div class="col-span-8 space-y-6">
-						<!-- Parameters -->
-						<div class="bg-gray-50 rounded-xl p-4">
-							<h3 class="text-sm font-medium text-gray-900 mb-4">Request Parameters</h3>
-							<div class="space-y-4">
+						<button
+							class="w-full p-3 rounded-xl border-[3px] text-left transition-all group relative overflow-hidden {selectedEndpoint === 'agent' 
+								? 'border-gray-900 bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480]' 
+								: 'border-transparent hover:bg-gray-100 hover:border-gray-300 text-gray-600 hover:text-gray-900'}"
+							on:click={() => setSelectedEndpoint('agent')}
+						>
+							<div class="flex items-center justify-between relative z-10">
+								<div class="flex items-center gap-3">
+									<span class="px-2 py-1 text-[10px] font-black rounded bg-[#ff6b6b] text-white border border-gray-900">POST</span>
+									<span class="text-sm font-mono font-bold">/agent-screenshot</span>
+								</div>
+								{#if selectedEndpoint === 'agent'}
+									<div class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse"></div>
+								{/if}
+							</div>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Right Panel: Console -->
+			<div class="col-span-12 lg:col-span-8 space-y-4 sm:space-y-6 md:space-y-8">
+				
+				<!-- Request Builder -->
+				<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div class="bg-gray-100 p-4 border-b-[3px] border-gray-900 flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
+							<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900"></div>
+							<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900"></div>
+						</div>
+						<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Request Configuration</h3>
+					</div>
+					
+					<div class="p-6 space-y-6">
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							{#if selectedEndpoint === 'image' || selectedEndpoint === 'gif'}
+								<div class="md:col-span-2">
+									<label for="html-input" class="flex items-center justify-between text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+										<span>HTML Payload</span>
+										<span class="text-[10px] bg-[#ff6b6b] text-white px-2 py-0.5 rounded border border-gray-900">REQUIRED</span>
+									</label>
+									<div class="relative">
+										{#if selectedEndpoint === 'image'}
+											<textarea
+												id="html-input"
+												class="w-full h-48 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
+												bind:value={imageParams.html}
+											></textarea>
+										{:else}
+											<textarea
+												id="html-input"
+												class="w-full h-48 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
+												bind:value={gifParams.html}
+											></textarea>
+										{/if}
+										<div class="absolute bottom-3 right-3 text-[10px] font-bold text-gray-400 uppercase">HTML/CSS</div>
+									</div>
+								</div>
+
+								<div>
+									<label for="width-input" class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Width (px)</label>
+									{#if selectedEndpoint === 'image'}
+										<input
+											id="width-input"
+											type="number"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={imageParams.width}
+										/>
+									{:else}
+										<input
+											id="width-input"
+											type="number"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={gifParams.width}
+										/>
+									{/if}
+								</div>
+
+								<div>
+									<label for="height-input" class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Height (px)</label>
+									{#if selectedEndpoint === 'image'}
+										<input
+											id="height-input"
+											type="number"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={imageParams.height}
+										/>
+									{:else}
+										<input
+											id="height-input"
+											type="number"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={gifParams.height}
+										/>
+									{/if}
+								</div>
+
 								{#if selectedEndpoint === 'image'}
 									<div>
-										<label class="flex items-center gap-2 text-sm mb-1">
-											<span class="font-medium">html</span>
-											<span class="text-xs text-red-500">Required</span>
-										</label>
-										<p class="text-xs text-gray-600 mb-2">HTML content to convert to image</p>
-										<textarea
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											rows="3"
-											bind:value={imageParams.html}
-										></textarea>
-									</div>
-									<div class="grid grid-cols-2 gap-4">
-										<div>
-											<label class="flex items-center gap-2 text-sm mb-1">
-												<span class="font-medium">width</span>
-												<span class="text-xs text-red-500">Required</span>
-											</label>
-											<input
-												type="number"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-												bind:value={imageParams.width}
-											/>
-										</div>
-										<div>
-											<label class="flex items-center gap-2 text-sm mb-1">
-												<span class="font-medium">height</span>
-												<span class="text-xs text-red-500">Required</span>
-											</label>
-											<input
-												type="number"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-												bind:value={imageParams.height}
-											/>
+										<label for="format-input" class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Format</label>
+										<div class="relative">
+											<select
+												id="format-input"
+												class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
+												bind:value={imageParams.fileExtension}
+											>
+												<option value="png">PNG</option>
+												<option value="jpg">JPG</option>
+												<option value="webp">WebP</option>
+											</select>
+											<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+												<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+											</div>
 										</div>
 									</div>
 									<div>
-										<label class="text-sm mb-1 block font-medium">url</label>
-										<p class="text-xs text-gray-600 mb-2">URL to capture instead of HTML (optional)</p>
+										<label for="selector-input" class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">CSS Selector</label>
 										<input
+											id="selector-input"
 											type="text"
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											placeholder="https://example.com"
-											bind:value={imageParams.url}
-										/>
-									</div>
-									<div>
-										<label class="text-sm mb-1 block font-medium">selector</label>
-										<p class="text-xs text-gray-600 mb-2">CSS selector to capture (optional)</p>
-										<input
-											type="text"
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
 											placeholder="body"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
 											bind:value={imageParams.selector}
 										/>
 									</div>
+								{:else}
 									<div>
-										<label class="text-sm mb-1 block font-medium">fileExtension</label>
-										<p class="text-xs text-gray-600 mb-2">Output format</p>
-										<select
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											bind:value={imageParams.fileExtension}
-										>
-											<option value="png">PNG</option>
-											<option value="jpg">JPG</option>
-											<option value="jpeg">JPEG</option>
-											<option value="webp">WebP</option>
-										</select>
-									</div>
-								{:else if selectedEndpoint === 'gif'}
-									<div>
-										<label class="flex items-center gap-2 text-sm mb-1">
-											<span class="font-medium">html</span>
-											<span class="text-xs text-red-500">Required</span>
-										</label>
-										<p class="text-xs text-gray-600 mb-2">HTML content with CSS animations</p>
-										<textarea
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											rows="3"
-											bind:value={gifParams.html}
-										></textarea>
-									</div>
-									<div class="grid grid-cols-3 gap-4">
-										<div>
-											<label class="flex items-center gap-2 text-sm mb-1">
-												<span class="font-medium">width</span>
-												<span class="text-xs text-red-500">Required</span>
-											</label>
-											<input
-												type="number"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-												bind:value={gifParams.width}
-											/>
-										</div>
-										<div>
-											<label class="flex items-center gap-2 text-sm mb-1">
-												<span class="font-medium">height</span>
-												<span class="text-xs text-red-500">Required</span>
-											</label>
-											<input
-												type="number"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-												bind:value={gifParams.height}
-											/>
-										</div>
-										<div>
-											<label class="text-sm mb-1 block font-medium">framesPerSecond</label>
-											<input
-												type="number"
-												min="1"
-												max="30"
-												class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-												bind:value={gifParams.framesPerSecond}
-											/>
-										</div>
-									</div>
-									<div>
-										<label class="text-sm mb-1 block font-medium">url</label>
-										<p class="text-xs text-gray-600 mb-2">URL to capture instead of HTML (optional)</p>
+										<label for="fps-input" class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">FPS</label>
 										<input
-											type="text"
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											placeholder="https://example.com"
-											bind:value={gifParams.url}
+											id="fps-input"
+											type="number"
+											min="1"
+											max="30"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={gifParams.framesPerSecond}
 										/>
 									</div>
-									<div>
-										<label class="text-sm mb-1 block font-medium">selector</label>
-										<p class="text-xs text-gray-600 mb-2">CSS selector to capture (optional)</p>
-										<input
-											type="text"
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											placeholder="body"
-											bind:value={gifParams.selector}
-										/>
+								{/if}
+
+							{:else if selectedEndpoint === 'agent'}
+								<div class="md:col-span-2">
+									<label for="prompt-input" class="flex items-center justify-between text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+										<span>Prompt</span>
+										<span class="text-[10px] bg-[#ff6b6b] text-white px-2 py-0.5 rounded border border-gray-900">REQUIRED</span>
+									</label>
+									<textarea
+										id="prompt-input"
+										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
+										bind:value={agentParams.prompt}
+										placeholder="Describe what you want to capture..."
+									></textarea>
+								</div>
+							{/if}
+						</div>
+
+						<div class="pt-4 border-t-[3px] border-gray-200 border-dashed">
+							<button
+								class="w-full py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-[4px_4px_0_0_#1f2937]"
+								on:click={currentTestFunction}
+								disabled={!apiToken || !isValidParams || loading}
+							>
+								{#if loading}
+									<span class="flex items-center justify-center gap-2">
+										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										</svg>
+										Processing Request...
+									</span>
+								{:else}
+									Run Request
+								{/if}
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- CURL & Response -->
+				<div class="relative group">
+					<!-- Terminal Window -->
+					<div class="bg-[#1a1b26] rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col min-h-[400px]">
+						<!-- Terminal Header -->
+						<div class="bg-[#16161e] border-b-[3px] border-gray-900 p-3 flex items-center justify-between shrink-0">
+							<div class="flex items-center gap-2">
+								<div class="flex gap-1.5 mr-4">
+									<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
+									<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900"></div>
+									<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900"></div>
+								</div>
+								<div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded bg-gray-800/50 border border-gray-700/50">
+									<svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+									</svg>
+									<span class="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-wider">bash — 80x24</span>
+								</div>
+							</div>
+							
+							{#if curlExample && !response}
+								<button 
+									class="flex items-center gap-2 px-3 py-1.5 bg-[#ffc480] text-gray-900 text-[10px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all active:translate-y-[2px]"
+									on:click={handleCopyCurl}
+								>
+									{#if copiedCurl}
+										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+										<span>Copied</span>
+									{:else}
+										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+										<span>Copy</span>
+									{/if}
+								</button>
+							{:else if response}
+								<button 
+									class="flex items-center gap-2 px-3 py-1.5 bg-gray-800 text-gray-400 text-[10px] font-black uppercase tracking-widest rounded border-[2px] border-gray-700 hover:text-white hover:border-white transition-all"
+									on:click={() => { response = null; responseJson = ''; }}
+								>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+									Clear
+								</button>
+							{/if}
+						</div>
+
+						<!-- Terminal Content -->
+						<div class="flex-1 p-6 font-mono text-sm relative overflow-hidden">
+							<!-- Matrix/Grid Background -->
+							<div class="absolute inset-0 opacity-10 pointer-events-none" 
+								style="background-image: linear-gradient(#4ade80 1px, transparent 1px), linear-gradient(90deg, #4ade80 1px, transparent 1px); background-size: 20px 20px;">
+							</div>
+
+							<div class="relative z-10">
+								{#if response}
+									<!-- Response View -->
+									<div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+										<!-- Status Bar -->
+										<div class="flex items-center gap-3 pb-4 border-b border-gray-800/50">
+											<div class="flex items-center gap-2 text-[#4ade80]">
+												<span class="text-lg">➜</span>
+												<span class="font-black text-lg">200 OK</span>
+											</div>
+											<span class="text-gray-600">|</span>
+											<span class="text-gray-500 text-xs">{(new Date()).toLocaleTimeString()}</span>
+										</div>
+										
+										<!-- Generated Asset Preview -->
+										{#if response.url || response.gif?.url}
+											<div class="relative group/preview">
+												<div class="absolute -inset-1 bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] opacity-20 blur rounded-xl group-hover/preview:opacity-40 transition-opacity"></div>
+												<div class="relative bg-[#16161e] rounded-xl border-2 border-gray-700 overflow-hidden">
+													<!-- Header -->
+													<div class="px-4 py-2 bg-gray-800/50 border-b border-gray-700 flex items-center justify-between">
+														<span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Preview Output</span>
+														<div class="flex gap-2">
+															<button 
+																class="p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-white transition-colors"
+																on:click={() => copyToClipboard(response.url || response.gif?.url)}
+																title="Copy URL"
+															>
+																<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+															</button>
+															<a 
+																href={response.url || response.gif?.url} 
+																target="_blank"
+																class="p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-white transition-colors"
+																title="Open in new tab"
+															>
+																<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+															</a>
+														</div>
+													</div>
+													<!-- Image -->
+													<div class="p-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwYXRoIGQ9Ik0wIDBoNHY0SDB6bTQgNGg0djRINHoiIGZpbGw9IiMzMzMiIGZpbGwtb3BhY2l0eT0iLjEiLz48L3N2Zz4=')]">
+														<img 
+															src={response.url || response.gif?.url} 
+															alt="Result" 
+															class="w-full rounded shadow-2xl"
+														/>
+													</div>
+												</div>
+											</div>
+										{/if}
+
+										<!-- JSON Response -->
+										<div class="relative">
+											<div class="absolute left-0 top-0 bottom-0 w-[2px] bg-[#4ade80]/20"></div>
+											<div class="pl-4">
+												<div class="text-[10px] font-bold text-gray-500 mb-2 uppercase">JSON Payload</div>
+												<pre class="text-[#a9b1d6] overflow-x-auto custom-scrollbar text-xs leading-relaxed">{responseJson}</pre>
+											</div>
+										</div>
 									</div>
-								{:else if selectedEndpoint === 'agent'}
-									<div>
-										<label class="flex items-center gap-2 text-sm mb-1">
-											<span class="font-medium">prompt</span>
-											<span class="text-xs text-red-500">Required</span>
-										</label>
-										<p class="text-xs text-gray-600 mb-2">Natural language description of what to screenshot</p>
-										<textarea
-											class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-											rows="3"
-											bind:value={agentParams.prompt}
-										></textarea>
+								{:else}
+									<!-- cURL View -->
+									<div class="space-y-2">
+										<div class="flex items-center gap-2 text-gray-500 mb-4 select-none">
+											<span>$</span>
+											<span class="text-[#7aa2f7]">curl_request.sh</span>
+										</div>
+										
+										{#if curlExample}
+											<div class="group/code relative">
+												<!-- Syntax Highlighted cURL -->
+												<div class="text-[#c0caf5] whitespace-pre-wrap break-all leading-loose">
+													<span class="text-[#f7768e]">curl</span>
+													<span class="text-[#bb9af7]"> -X</span> <span class="text-[#7aa2f7]">POST</span> {backendBaseUrl}{endpointPath} \
+													<span class="block pl-4">
+														<span class="text-[#bb9af7]">-H</span> <span class="text-[#9ece6a]">&quot;Content-Type: application/json&quot;</span> \
+													</span>
+													<span class="block pl-4">
+														<span class="text-[#bb9af7]">-H</span> <span class="text-[#9ece6a]">&quot;Authorization: Bearer {apiToken || 'YOUR_TOKEN'}&quot;</span> \
+													</span>
+													<span class="block pl-4">
+														<span class="text-[#bb9af7]">--data-raw</span> <span class="text-[#e0af68]">&#39;{JSON.stringify(requestPayload, null, 2)}&#39;</span>
+													</span>
+												</div>
+												
+												<!-- Blinking Cursor -->
+												<span class="inline-block w-2.5 h-5 bg-[#a9b1d6] animate-pulse align-middle ml-1 mt-1"></span>
+											</div>
+										{:else}
+											<div class="flex flex-col items-center justify-center h-[200px] text-gray-600">
+												<div class="w-8 h-8 border-2 border-gray-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+												<p class="text-xs uppercase tracking-wider">Initializing...</p>
+											</div>
+										{/if}
 									</div>
 								{/if}
 							</div>
 						</div>
-
-						<!-- Request Preview -->
-						<div class="bg-gray-50 rounded-xl p-4">
-							<div class="flex items-center justify-between mb-4">
-								<h3 class="text-sm font-medium text-gray-900">Request Preview</h3>
-								<button
-									class={`text-xs flex items-center gap-1 rounded px-2 py-1 ${
-										copiedCurl
-											? 'bg-green-100 text-green-800 border border-green-200'
-											: 'text-[#ff6b6b] hover:text-[#ff5252]'
-									}`}
-									on:click={handleCopyCurl}
-									disabled={!curlExample}
-								>
-									{#if copiedCurl}
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3.25-3.25a1 1 0 011.414-1.414l2.543 2.543 6.543-6.543a1 1 0 011.414 0z" clip-rule="evenodd" />
-										</svg>
-										Copied
-									{:else}
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-											<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-											<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-										</svg>
-										Copy
-									{/if}
-								</button>
-							</div>
-							<div class="bg-gray-900 rounded-lg p-4">
-								<div class="text-gray-300 text-sm font-mono whitespace-pre-wrap">
-									{curlExample?.display || 'Select an endpoint to view a sample cURL request.'}
-								</div>
-							</div>
-						</div>
-
-						<!-- Test Button -->
-						<button
-							class="w-full bg-[#ff6b6b] text-white py-2 px-4 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-							on:click={currentTestFunction}
-							disabled={!apiToken || !isValidParams || loading}
-						>
-							{#if loading}
-								<span class="flex items-center justify-center gap-2">
-									<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-									</svg>
-									Generating...
-								</span>
-							{:else}
-								{!apiToken ? 'API Key Required' : 'Test Endpoint'}
-							{/if}
-						</button>
-
-						<!-- Response -->
-						{#if response}
-							<div class="bg-gray-50 rounded-xl p-4">
-								<div class="flex items-center justify-between mb-4">
-									<div class="flex items-center gap-3">
-										<h3 class="text-sm font-medium text-gray-900">Response</h3>
-										<span class="px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-800">
-											Status: 200
-										</span>
-									</div>
-									<button
-										class="text-xs text-[#ff6b6b] hover:text-[#ff5252] flex items-center gap-1"
-										on:click={() => copyToClipboard(responseJson)}
-									>
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-											<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-											<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-										</svg>
-										Copy
-									</button>
-								</div>
-								<div class="bg-gray-900 rounded-lg p-4">
-									<pre class="text-gray-300 text-sm overflow-x-auto"><code>{responseJson}</code></pre>
-								</div>
-							</div>
-
-							<!-- Generated Media Preview -->
-							{#if response.url || response.gif?.url}
-								<div class="bg-gray-50 rounded-xl p-4 mt-4">
-									<h3 class="text-sm font-medium text-gray-900 mb-4">Generated Media</h3>
-									<img
-										src={response.url || response.gif?.url}
-										alt="Generated media"
-										class="w-full rounded-lg shadow-lg"
-									/>
-									<div class="mt-4">
-										<div class="flex items-center justify-between">
-											<span class="text-xs text-gray-600">Media URL</span>
-											<button
-												class="text-xs text-[#ff6b6b] hover:text-[#ff5252] flex items-center gap-1"
-												on:click={() => copyToClipboard(response.url || response.gif?.url)}
-											>
-												<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-													<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-													<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-												</svg>
-												Copy
-											</button>
-										</div>
-										<div class="bg-gray-100 p-3 rounded-lg mt-2 font-mono text-xs break-all">
-											{response.url || response.gif?.url}
-										</div>
-									</div>
-								</div>
-							{/if}
-						{/if}
 					</div>
+					
+					<!-- Decorative Elements underneath -->
+					<div class="absolute -z-10 -bottom-2 -right-2 w-full h-full bg-gray-900/5 rounded-2xl border border-gray-900/10"></div>
 				</div>
+
 			</div>
 		</div>
 	</div>
 </div>
 
+<Toast />

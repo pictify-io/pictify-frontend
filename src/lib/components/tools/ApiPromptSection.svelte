@@ -9,10 +9,11 @@
   export let featurePoints = [];
   export let docsUrl = 'https://docs.pictify.io/';
   export let docsLabel = 'Read API docs';
-  export let ctaUrl = '/dashboard/api-token';
-  export let ctaLabel = 'Get API Key';
-  export let secondaryCtaUrl = '/dashboard/api-playground';
-  export let secondaryCtaLabel = 'Open API Playground';
+  // Keep public pages frictionless: route gated actions via signup.
+  export let ctaUrl = '/signup?redirect=/dashboard/api-token';
+  export let ctaLabel = 'Get free API key';
+  export let secondaryCtaUrl = 'https://docs.pictify.io/examples';
+  export let secondaryCtaLabel = 'See examples';
   export let showSecondaryCta = true;
   export let note = '';
 
@@ -23,6 +24,8 @@
   ];
 
   $: points = featurePoints.length ? featurePoints : defaultFeatures;
+
+  const isExternalUrl = (url) => /^https?:\/\//i.test(String(url || ''));
 
   const escapeHtml = (source) =>
     source
@@ -82,7 +85,8 @@
           <a
             class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-6 py-3.5 text-base font-bold text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#ff6b6b] hover:bg-gray-800"
             href={ctaUrl}
-            target="_blank"
+            target={isExternalUrl(ctaUrl) ? "_blank" : undefined}
+            rel={isExternalUrl(ctaUrl) ? "noreferrer" : undefined}
           >
             {ctaLabel}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,8 +97,8 @@
           <a
             class="inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-gray-900 px-6 py-3.5 text-base font-bold text-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] hover:bg-gray-50"
             href={docsUrl}
-            target="_blank"
-            rel="noreferrer"
+            target={isExternalUrl(docsUrl) ? "_blank" : undefined}
+            rel={isExternalUrl(docsUrl) ? "noreferrer" : undefined}
           >
             {docsLabel}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +110,8 @@
             <a
               class="inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-gray-900 border-dashed px-6 py-3.5 text-base font-bold text-gray-700 bg-transparent hover:bg-[#ffc480]/10 transition-colors"
               href={secondaryCtaUrl}
-              target="_blank"
+              target={isExternalUrl(secondaryCtaUrl) ? "_blank" : undefined}
+              rel={isExternalUrl(secondaryCtaUrl) ? "noreferrer" : undefined}
             >
               {secondaryCtaLabel}
             </a>

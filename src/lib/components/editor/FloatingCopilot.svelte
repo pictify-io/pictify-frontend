@@ -140,7 +140,7 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 		<div class="pointer-events-auto">
 			{#if !isOpen}
 				<button
-					class="group flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] backdrop-blur-md rounded-full shadow-lg border-2 border-black hover:scale-110 transition-all duration-300 hover:shadow-xl"
+					class="group flex items-center justify-center w-10 h-10 bg-[#ffc480] rounded-full shadow-[4px_4px_0_0_#1f2937] border-[3px] border-gray-900 hover:scale-110 transition-all duration-300 hover:shadow-xl"
 					on:click={toggleOpen}
 					title="Edit with Copilot (Cmd+K)"
 					in:scaleAnim={{ duration: 300, start: 0.8, easing: cubicOut }}
@@ -155,11 +155,11 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 				</button>
 			{:else}
 				<div 
-					class="w-[320px] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden ring-1 ring-black/5"
+					class="w-[320px] bg-[#FFFDF8] rounded-xl shadow-[8px_8px_0_0_#1f2937] border-[3px] border-gray-900 overflow-hidden"
 					transition:fly={{ y: 10, duration: 300, easing: cubicOut }}
 				>
 					<!-- Header -->
-					<div class="px-4 py-3 bg-[#FFFDF8] border-b-2 border-black flex items-center justify-between">
+					<div class="px-4 py-3 bg-[#FFFDF8] border-b-[3px] border-gray-900 flex items-center justify-between">
 						<div class="flex items-center gap-2">
 							<div class="w-6 h-6 rounded-full bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-sm ring-2 ring-white">
 								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -186,7 +186,7 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 							bind:value={prompt}
 							on:keydown={handleKeydown}
 							placeholder="Describe how you want to change this element..."
-							class="w-full text-sm border-2 border-black/10 rounded-xl p-3 focus:border-[#ff6b6b] focus:ring-2 focus:ring-[#ff6b6b]/20 min-h-[100px] resize-none bg-white/60 mb-3 placeholder-gray-400 transition-all shadow-inner"
+							class="w-full text-sm border-2 border-gray-900 rounded-lg p-3 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 min-h-[100px] resize-none bg-white mb-3 placeholder-gray-500 transition-all shadow-[4px_4px_0_0_#1f2937] font-medium"
 							disabled={isLoading}
 							autofocus
 						></textarea>
@@ -212,7 +212,7 @@ $: screenY = canvasRect ? canvasRect.top + (coords.y * zoomFactor) : 0;
 							</span>
 
 							<button
-								class="bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95"
+								class="bg-gray-900 text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 active:scale-95"
 								on:click={handleGenerate}
 								disabled={isLoading || !prompt.trim()}
 							>

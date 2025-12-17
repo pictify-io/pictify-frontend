@@ -26,9 +26,9 @@
 		
 		if (diffDays === 1) return 'Today';
 		if (diffDays === 2) return 'Yesterday';
-		if (diffDays <= 7) return `${diffDays - 1} days ago`;
+		if (diffDays <= 7) return `${diffDays - 1}d ago`;
 		
-		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 	};
 
 	// Get thumbnail URL with cache-busting based on updatedAt
@@ -120,7 +120,7 @@
 	const getDimensionLabel = (template) => {
 		const width = template.width || 1080;
 		const height = template.height || 1080;
-		return `${width} × ${height}`;
+		return `${width}x${height}`;
 	};
 
 	// Pagination handlers
@@ -174,128 +174,132 @@
 
 <section>
 	<!-- Template Grid -->
-	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full mt-8">
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8">
 		{#each templates as template (template.uid)}
 			<div
 				role="button"
 				tabindex="0"
-				class="template-card group bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-[#ff6b6b]"
+				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] sm:hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col"
 				on:click={() => handleTemplateClick(template)}
 				on:keydown={(e) => {
 					if (e.key === 'Enter') handleTemplateClick(template);
 				}}
 			>
-				<!-- Preview Container -->
-				<div class="relative bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200 overflow-hidden flex items-center justify-center" style="height: 180px;">
-					{#if template.thumbnail}
-						<!-- Use thumbnail if available (with cache-busting) -->
-						<img 
-							src={getThumbnailUrl(template)} 
-							alt={template.name}
-							class="w-full h-full object-contain"
-							loading="lazy"
-						/>
-					{:else if generateSvgPreview(template)}
-						<!-- Render SVG from FabricJS data -->
-						<div class="w-full h-full p-2 flex items-center justify-center">
-							{@html generateSvgPreview(template)}
-						</div>
-					{:else}
-						<!-- Placeholder for empty templates -->
-						<div class="flex flex-col items-center justify-center w-full h-full text-gray-400">
-							<svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-							</svg>
-							<span class="text-xs">No preview</span>
-						</div>
-					{/if}
-					
-					<!-- Dimension badge -->
-					<div class="absolute bottom-2 left-2 z-20">
-						<span class="text-[10px] font-medium text-gray-500 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-sm">
-							{getDimensionLabel(template)}
-						</span>
-				</div>
-				
-				<!-- Hover overlay -->
-				<div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 z-20 pointer-events-none" />
-				
-				<!-- Open icon on hover -->
-				<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 pointer-events-none">
-					<div class="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-						<svg class="w-4 h-4 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-						</svg>
+				<!-- Card Header / Tab -->
+				<div class="h-7 sm:h-8 bg-gray-100 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center justify-between px-2 sm:px-3">
+					<div class="flex items-center gap-1 sm:gap-1.5">
+						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
+						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
+						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
+					</div>
+					<div class="text-[9px] sm:text-[10px] font-bold font-mono text-gray-500 uppercase tracking-wider">
+						{getDimensionLabel(template)}
 					</div>
 				</div>
+
+				<!-- Preview Container -->
+				<div class="relative aspect-[4/3] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] overflow-hidden group-hover:bg-gray-50 transition-colors">
+					<div class="absolute inset-0 flex items-center justify-center p-3 sm:p-4 md:p-6 transition-transform duration-300 group-hover:scale-105">
+						{#if template.thumbnail}
+							<img 
+								src={getThumbnailUrl(template)} 
+								alt={template.name}
+								class="w-full h-full object-contain drop-shadow-lg"
+								loading="lazy"
+							/>
+						{:else if generateSvgPreview(template)}
+							<div class="w-full h-full drop-shadow-lg">
+								{@html generateSvgPreview(template)}
+							</div>
+						{:else}
+							<div class="flex flex-col items-center justify-center w-full h-full text-gray-300">
+								<svg class="w-16 h-16 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+								</svg>
+								<span class="text-xs font-black uppercase tracking-widest opacity-50">Empty</span>
+							</div>
+						{/if}
+					</div>
+
+				<!-- Hover Overlay Actions -->
+				<div class="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/10 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+					<button class="bg-[#ffc480] text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_#000] transition-all transform translate-y-4 group-hover:translate-y-0">
+						Edit Template
+					</button>
+				</div>
 			</div>
-				
-				<!-- Template Info -->
-				<div class="p-4">
-					<h3 class="font-semibold text-gray-900 text-base mb-2 line-clamp-1 group-hover:text-[#ff6b6b] transition-colors">
+			
+			<!-- Footer Info -->
+			<div class="p-3 sm:p-4 border-t-[2px] sm:border-t-[3px] border-gray-900 bg-white flex-1 flex flex-col justify-between">
+				<div>
+					<h3 class="font-black text-gray-900 text-base sm:text-lg leading-tight mb-2 sm:mb-3 line-clamp-1" title={template.name}>
 						{template.name}
 					</h3>
-					<div class="flex items-center justify-between">
-					<div class="flex items-center gap-2 text-xs text-gray-500">
-						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-						</svg>
-						<span>{formatDate(template.createdAt)}</span>
+					
+					<div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+						<!-- Date Tag -->
+						<div class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 border border-gray-300 rounded text-[9px] sm:text-[10px] font-bold uppercase text-gray-600 tracking-wide">
+							<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+							{formatDate(template.createdAt)}
 						</div>
+						
+						<!-- Usage Tag -->
 						{#if template.usageCount > 0}
-							<div class="flex items-center gap-1 text-xs text-gray-400">
-								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-								</svg>
-								<span>{template.usageCount}</span>
+							<div class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#4ade80]/20 border border-[#4ade80] rounded text-[9px] sm:text-[10px] font-bold uppercase text-gray-900 tracking-wide">
+								<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+								{template.usageCount} Runs
 							</div>
 						{/if}
 					</div>
 				</div>
+			</div>
 			</div>
 		{/each}
 	</div>
 
 	<!-- Pagination -->
 	{#if pagination.totalPages > 1}
-		<div class="flex items-center justify-between mt-10 pt-6 border-t border-gray-200">
+		<div class="flex flex-col sm:flex-row items-center justify-between mt-8 sm:mt-12 pt-6 sm:pt-8 border-t-[2px] sm:border-t-[3px] border-gray-900 gap-4 sm:gap-6">
 			<!-- Results count -->
-			<div class="text-sm text-gray-500">
-				Showing <span class="font-medium text-gray-700">{(pagination.page - 1) * pagination.limit + 1}</span>
-				to <span class="font-medium text-gray-700">{Math.min(pagination.page * pagination.limit, pagination.total)}</span>
-				of <span class="font-medium text-gray-700">{pagination.total}</span> templates
+			<div class="flex items-center gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-sm">
+				<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse"></div>
+				<div class="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wide">
+					<span class="hidden sm:inline">Showing </span><span class="text-gray-900">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> / <span class="text-gray-900">{pagination.total}</span>
+				</div>
 			</div>
 
 			<!-- Page controls -->
-			<div class="flex items-center gap-1">
+			<div class="flex items-center gap-1.5 sm:gap-2">
 				<!-- Previous button -->
 				<button
 					on:click={prevPage}
 					disabled={!pagination.hasPrev}
-					class="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+					class="group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
 						{pagination.hasPrev 
-							? 'text-gray-700 hover:bg-gray-100 hover:text-[#ff6b6b]' 
-							: 'text-gray-300 cursor-not-allowed'}"
+							? 'hover:bg-gray-900 hover:text-white shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]' 
+							: 'opacity-50 cursor-not-allowed bg-gray-100'}"
+					title="Previous Page"
+					aria-label="Previous Page"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
 					</svg>
-					<span class="hidden sm:inline">Previous</span>
 				</button>
 
 				<!-- Page numbers -->
-				<div class="flex items-center gap-1 mx-2">
+				<div class="flex items-center gap-1 sm:gap-2 mx-1 sm:mx-2 bg-gray-100 p-0.5 sm:p-1 rounded-lg border border-gray-200">
 					{#each getPageNumbers() as pageNum}
 						{#if pageNum === '...'}
-							<span class="px-2 py-1 text-gray-400">...</span>
+							<span class="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 font-black text-[10px] sm:text-xs">...</span>
 						{:else}
 							<button
 								on:click={() => goToPage(pageNum)}
-								class="w-9 h-9 text-sm font-medium rounded-lg transition-all duration-200
+								class="w-6 h-6 sm:w-8 sm:h-8 text-[10px] sm:text-xs font-black rounded-md transition-all duration-200 flex items-center justify-center
 									{pageNum === pagination.page 
-										? 'bg-[#ff6b6b] text-white shadow-md shadow-[#ff6b6b]/30' 
-										: 'text-gray-600 hover:bg-gray-100 hover:text-[#ff6b6b]'}"
+										? 'bg-gray-900 text-white shadow-md scale-105' 
+										: 'text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm'}"
+								aria-label="Page {pageNum}"
+								aria-current={pageNum === pagination.page ? 'page' : undefined}
 							>
 								{pageNum}
 							</button>
@@ -307,14 +311,15 @@
 				<button
 					on:click={nextPage}
 					disabled={!pagination.hasNext}
-					class="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+					class="group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
 						{pagination.hasNext 
-							? 'text-gray-700 hover:bg-gray-100 hover:text-[#ff6b6b]' 
-							: 'text-gray-300 cursor-not-allowed'}"
+							? 'hover:bg-gray-900 hover:text-white shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]' 
+							: 'opacity-50 cursor-not-allowed bg-gray-100'}"
+					title="Next Page"
+					aria-label="Next Page"
 				>
-					<span class="hidden sm:inline">Next</span>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
 					</svg>
 				</button>
 			</div>
@@ -323,11 +328,6 @@
 </section>
 
 <style>
-	.template-card {
-		/* Prevent layout shift on hover */
-		will-change: transform;
-	}
-	
 	.line-clamp-1 {
 		overflow: hidden;
 		display: -webkit-box;

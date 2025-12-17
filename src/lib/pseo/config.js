@@ -7,11 +7,77 @@ export const formats = [
 	{ id: 'webp', label: 'WebP' }
 ];
 
+// Simple HTML generators for pSEO workflows (keeps new use-cases lightweight)
+const simpleCardTemplate = ({
+	title = 'Title',
+	subtitle = 'Subtitle',
+	badge = 'Pictify',
+	accent = '#ff6b6b',
+	background = '#FFFDF8'
+} = {}) => `<html>
+  <head>
+    <style>
+      body { margin:0; padding:48px; background:${background}; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+      .card { max-width:980px; margin:0 auto; background:#fff; border:3px solid #111827; border-radius:24px; padding:34px; box-shadow: 16px 16px 0 0 #111827; }
+      .badge { display:inline-block; padding:8px 14px; background:${accent}; color:#fff; border:2px solid #111827; border-radius:999px; font-weight:800; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; }
+      h1 { margin:18px 0 10px; font-size:44px; line-height:1.05; color:#111827; }
+      p { margin:0; font-size:18px; line-height:1.55; color:#374151; font-weight:600; }
+      .row { display:flex; gap:14px; margin-top:22px; flex-wrap:wrap; }
+      .pill { display:inline-block; padding:10px 14px; border:2px solid #111827; border-radius:999px; font-weight:800; font-size:13px; background:#fff; }
+      .pill strong { color:${accent}; }
+      .footer { margin-top:26px; padding-top:18px; border-top:2px dashed rgba(17,24,39,0.35); font-size:13px; color:#6b7280; font-weight:700; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight:800; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <span class="badge">${badge}</span>
+      <h1>${title}</h1>
+      <p>${subtitle}</p>
+      <div class="row">
+        <span class="pill"><strong>Template</strong> → variables</span>
+        <span class="pill"><strong>API</strong> → variants</span>
+        <span class="pill"><strong>CDN</strong> → deliver</span>
+      </div>
+      <div class="footer">Tip: bind variables like <code>{{title}}</code>, <code>{{price}}</code>, <code>{{date}}</code> and batch render via API.</div>
+    </div>
+  </body>
+</html>`;
+
+const simpleMonoCardTemplate = ({
+	title = 'API Output',
+	body = '{ "ok": true }',
+	accent = '#111827',
+	background = '#FFFDF8'
+} = {}) => `<html>
+  <head>
+    <style>
+      body { margin:0; padding:48px; background:${background}; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+      .card { max-width:980px; margin:0 auto; background:#fff; border:3px solid #111827; border-radius:22px; overflow:hidden; box-shadow: 16px 16px 0 0 #111827; }
+      .top { background:${accent}; color:#fff; padding:18px 24px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; font-size:12px; display:flex; justify-content:space-between; }
+      pre { margin:0; padding:22px 24px; font-size:14px; line-height:1.6; background:#0b1220; color:#e5e7eb; overflow:auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="top"><span>${title}</span><span>200</span></div>
+      <pre>${body}</pre>
+    </div>
+  </body>
+</html>`;
+
 export const popularSizes = [
 	'1200x630', // OG default
+	'1200x675', // X (Twitter) large image
+	'1200x628', // Ads common
 	'1080x1080', // Square
-	'1920x1080', // 16:9 HD
-	'1024x512' // Twitter legacy
+	'1080x1350', // IG portrait
+	'1080x1920', // Stories/Reels
+	'1600x900', // 16:9
+	'1280x720', // 16:9 HD
+	'1920x1080', // 16:9 FHD
+	'800x1200', // Docs / receipts / invoices
+	'1024x512' // Legacy
 ];
 
 export const ogPlatforms = [
@@ -82,7 +148,27 @@ export const useCases = [
 	{ id: 'table', label: 'HTML Table to Image' },
 	{ id: 'markdown', label: 'Markdown to Image' },
 	{ id: 'certificate', label: 'Certificate from HTML' },
-	{ id: 'code', label: 'Code to Image' }
+	{ id: 'code', label: 'Code to Image' },
+	{ id: 'receipt', label: 'Receipt Generator' },
+	{ id: 'badge', label: 'Badge Generator' },
+	{ id: 'quote-card', label: 'Quote Card Generator' },
+	{ id: 'tweet-card', label: 'Tweet Card Generator' },
+	{ id: 'product-banner', label: 'Product Promo Banner' },
+	{ id: 'pricing-card', label: 'Pricing Card Generator' },
+	{ id: 'changelog-card', label: 'Changelog Card Generator' },
+	{ id: 'release-notes-card', label: 'Release Notes Card' },
+	{ id: 'api-response-card', label: 'API Response Card' },
+	{ id: 'json-to-image', label: 'JSON to Image' },
+	{ id: 'status-update', label: 'Status Update Card' },
+	{ id: 'leaderboard', label: 'Leaderboard Card' },
+	{ id: 'kpi-card', label: 'KPI Snapshot Card' },
+	{ id: 'testimonial', label: 'Testimonial Card' },
+	{ id: 'webinar-promo', label: 'Webinar Promo Banner' },
+	{ id: 'event-ticket', label: 'Event Ticket Generator' },
+	{ id: 'job-post', label: 'Job Post Card' },
+	{ id: 'feature-flag-banner', label: 'Feature Flag Banner' },
+	{ id: 'report-cover', label: 'Report Cover' },
+	{ id: 'roadmap-card', label: 'Roadmap Card' }
 ];
 
 export const useCaseDetails = {
@@ -430,6 +516,514 @@ await createImage({
 			{ q: 'Is there a character limit for code?', a: 'No strict limit, but ensure the canvas width/height is large enough for readability. You can always increase dimensions before generation.' }
 		],
 		related: ['markdown', 'html-email']
+	},
+	'receipt': {
+		label: 'Receipt Generator',
+		description: 'Generate branded receipts as images for emails, downloads, and customer portals.',
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['800x1200', '1080x1350'],
+		templateHtml: simpleCardTemplate({
+			title: 'Receipt #{{orderId}}',
+			subtitle: '{{storeName}} · total {{total}} · {{date}}',
+			badge: 'RECEIPT',
+			accent: '#111827',
+			background: '#f8fafc'
+		}),
+		overview: [
+			'Receipts are transactional media: one template, thousands of variable sets.',
+			'Render branded receipts from order data via API and reuse across email, portal, and support flows.'
+		],
+		painPoints: ['Manual screenshots or PDFs', 'Inconsistent formatting across devices', 'Hard to reissue at scale'],
+		workflow: [
+			{ title: 'Design once', detail: 'Create a receipt layout and bind variables like orderId, line items, and total.' },
+			{ title: 'Render per order', detail: 'Call the API with order variables to generate a receipt URL instantly.' },
+			{ title: 'Batch reissue', detail: 'Re-render receipts for many orders in one batch job when needed.' }
+		],
+		faqs: [
+			{ q: 'Can I include multiple line items?', a: 'Yes. Use multiple rows or build a repeatable block in the template workspace.' },
+			{ q: 'Can I embed the receipt in email?', a: 'Yes. Use the generated CDN URL in your transactional emails.' }
+		],
+		related: ['html-email', 'table']
+	},
+	'badge': {
+		label: 'Badge Generator',
+		description: 'Generate achievement badges, labels, and milestones as shareable images.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1080x1080', '1200x630'],
+		templateHtml: simpleCardTemplate({
+			title: 'Achievement: {{badgeName}}',
+			subtitle: 'Awarded to {{userName}} · {{date}}',
+			badge: 'BADGE',
+			accent: '#4ade80',
+			background: '#f0fdf4'
+		}),
+		overview: [
+			'Badges are a lightweight, personalized growth loop artifact.',
+			'Generate badges for users, cohorts, and campaigns using one reusable template.'
+		],
+		painPoints: ['Manual badge design', 'Inconsistent sizes across channels', 'No scalable way to generate cohorts'],
+		workflow: [
+			{ title: 'Pick a badge layout', detail: 'Design a badge style once with your brand fonts and colors.' },
+			{ title: 'Bind variables', detail: 'Use variables for badgeName, userName, tier, and date.' },
+			{ title: 'Render at scale', detail: 'Batch render for cohorts and embed URLs across product surfaces.' }
+		],
+		faqs: [{ q: 'Do transparent backgrounds work?', a: 'Yes. Use PNG/WebP and keep the background transparent.' }],
+		related: ['certificate', 'quote-card']
+	},
+	'quote-card': {
+		label: 'Quote Card Generator',
+		description: 'Turn quotes into branded social cards from a reusable template.',
+		recommendedFormats: ['png', 'jpg', 'webp'],
+		recommendedSizes: ['1080x1080', '1080x1350', '1200x630'],
+		templateHtml: simpleCardTemplate({
+			title: '“{{quote}}”',
+			subtitle: '— {{author}} · {{company}}',
+			badge: 'QUOTE',
+			accent: '#ff6b6b',
+			background: '#fff7ed'
+		}),
+		overview: [
+			'Quote cards are repeatable content with a consistent format.',
+			'Render quote variations from your CMS or spreadsheet via API and keep branding consistent.'
+		],
+		painPoints: ['Design bottlenecks for social posts', 'Manual resizing for each platform', 'Inconsistent typography'],
+		workflow: [
+			{ title: 'Create quote template', detail: 'Design quote + author + company layout once.' },
+			{ title: 'Render per quote', detail: 'Send quote variables and generate an image instantly.' },
+			{ title: 'Batch for campaigns', detail: 'Generate dozens of quote assets in a single batch job.' }
+		],
+		faqs: [{ q: 'What about long quotes?', a: 'Increase height or adjust font size/line height in the template.' }],
+		related: ['tweet-card', 'testimonial']
+	},
+	'tweet-card': {
+		label: 'Tweet Card Generator',
+		description: 'Generate tweet-style cards for announcements, stats, and viral content.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x675', '1080x1350'],
+		templateHtml: simpleCardTemplate({
+			title: '{{tweetText}}',
+			subtitle: '— @{{handle}} · {{date}}',
+			badge: 'TWEET',
+			accent: '#0ea5e9',
+			background: '#f0f9ff'
+		}),
+		overview: [
+			'Tweet cards are a fast way to ship social assets without screenshots.',
+			'Render tweet cards programmatically from your content pipeline and publish consistently.'
+		],
+		painPoints: ['Manual screenshots', 'Inconsistent formatting', 'Slow content production'],
+		workflow: [
+			{ title: 'Design the template', detail: 'Create tweet layout once with variables for text, handle, and date.' },
+			{ title: 'Render for channels', detail: 'Generate platform-specific sizes (X, LinkedIn, IG).' },
+			{ title: 'Batch schedule', detail: 'Batch render cards for a week of content.' }
+		],
+		faqs: [{ q: 'Can I include an avatar?', a: 'Yes. Add an image layer bound to an avatar URL variable.' }],
+		related: ['quote-card', 'status-update']
+	},
+	'product-banner': {
+		label: 'Product Promo Banner',
+		description: 'Generate product promo banners for ads, landing pages, and email campaigns.',
+		recommendedFormats: ['png', 'jpg', 'webp'],
+		recommendedSizes: ['1200x628', '1200x630', '1600x900'],
+		templateHtml: simpleCardTemplate({
+			title: '{{productName}}',
+			subtitle: '{{tagline}} · from {{price}}',
+			badge: 'PROMO',
+			accent: '#a855f7',
+			background: '#faf5ff'
+		}),
+		overview: [
+			'Promo banners often need many variants: pricing tiers, audiences, and copy tests.',
+			'Use one template and render variants via API to scale marketing ops.'
+		],
+		painPoints: ['Design time per variant', 'Slow A/B iteration', 'Brand drift across teams'],
+		workflow: [
+			{ title: 'Design banner template', detail: 'Create a layout with variables for name, tagline, and price.' },
+			{ title: 'Render variants', detail: 'Generate variants for each segment or campaign.' },
+			{ title: 'Ship everywhere', detail: 'Use CDN URLs across ads, landing pages, and emails.' }
+		],
+		faqs: [{ q: 'Can I render multiple sizes per campaign?', a: 'Yes. Render the same template at different sizes for each platform.' }],
+		related: ['pricing-card', 'webinar-promo']
+	},
+	'pricing-card': {
+		label: 'Pricing Card Generator',
+		description: 'Generate pricing cards for landing pages, email, and sales decks.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1080x1080'],
+		templateHtml: simpleCardTemplate({
+			title: '{{planName}} · {{price}}/mo',
+			subtitle: 'Best for {{segment}} · {{feature1}} · {{feature2}}',
+			badge: 'PRICING',
+			accent: '#f59e0b',
+			background: '#fffbeb'
+		}),
+		overview: [
+			'Pricing assets must stay consistent across channels as plans evolve.',
+			'Render plan cards from structured data (plans/currencies) to keep everything in sync.'
+		],
+		painPoints: ['Outdated pricing screenshots', 'Manual work for multiple currencies', 'Inconsistent design across teams'],
+		workflow: [
+			{ title: 'Design once', detail: 'Create a plan card layout with variables for name/price/features.' },
+			{ title: 'Render per plan', detail: 'Generate cards for each tier and currency.' },
+			{ title: 'Batch updates', detail: 'Re-render when pricing or brand changes.' }
+		],
+		faqs: [{ q: 'Can I mark “Most popular”?', a: 'Yes. Use conditional logic in the template workspace.' }],
+		related: ['product-banner', 'report-cover']
+	},
+	'changelog-card': {
+		label: 'Changelog Card Generator',
+		description: 'Generate changelog cards for release announcements and social posts.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1080x1080'],
+		templateHtml: simpleCardTemplate({
+			title: 'Changelog: {{version}}',
+			subtitle: '{{headline}} · {{date}}',
+			badge: 'CHANGELOG',
+			accent: '#22c55e',
+			background: '#f0fdf4'
+		}),
+		overview: [
+			'Changelog announcements are a repeatable workflow that benefits from automation.',
+			'Generate release cards from Git tags, CI pipelines, or docs in a consistent format.'
+		],
+		painPoints: ['Manual social assets per release', 'Slow announcements', 'Inconsistent formatting'],
+		workflow: [
+			{ title: 'Create changelog template', detail: 'Design a layout for version, headline, and date.' },
+			{ title: 'Render from CI', detail: 'Trigger generation automatically on release.' },
+			{ title: 'Distribute', detail: 'Use CDN URLs across social, docs, and email.' }
+		],
+		faqs: [{ q: 'Can I include multiple bullets?', a: 'Yes. Add a list section in the template and increase height.' }],
+		related: ['release-notes-card', 'status-update']
+	},
+	'release-notes-card': {
+		label: 'Release Notes Card',
+		description: 'Turn release notes into branded cards for product updates.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900'],
+		templateHtml: simpleCardTemplate({
+			title: 'What’s new: {{title}}',
+			subtitle: '{{summary}}',
+			badge: 'RELEASE',
+			accent: '#6366f1',
+			background: '#eef2ff'
+		}),
+		overview: [
+			'Release notes live across blog, docs, email, and social — consistency matters.',
+			'Render a card per update from your source of truth and publish everywhere.'
+		],
+		painPoints: ['Copy/paste across channels', 'Design drift', 'Slow content production'],
+		workflow: [
+			{ title: 'Design template', detail: 'Create title/summary layout once with brand styling.' },
+			{ title: 'Render from docs', detail: 'Generate from markdown or release metadata via API.' },
+			{ title: 'Publish', detail: 'Use the image URL across all channels.' }
+		],
+		faqs: [{ q: 'Can I include screenshots?', a: 'Yes. Add an image layer bound to a screenshot URL variable.' }],
+		related: ['changelog-card', 'markdown']
+	},
+	'api-response-card': {
+		label: 'API Response Card',
+		description: 'Render API responses as images for docs, support, and marketing.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900'],
+		templateHtml: simpleMonoCardTemplate({
+			title: 'API_RESPONSE',
+			body: `{
+  "id": "{{id}}",
+  "status": "{{status}}",
+  "url": "{{url}}"
+}`
+		}),
+		overview: [
+			'API response screenshots are a common docs and support tax.',
+			'Render consistent response cards from real payloads so examples stay current and readable.'
+		],
+		painPoints: ['Manual screenshots', 'Stale examples in docs', 'Inconsistent formatting'],
+		workflow: [
+			{ title: 'Create response layout', detail: 'Use a monospaced response card template.' },
+			{ title: 'Bind fields', detail: 'Bind variables for the fields you want to showcase.' },
+			{ title: 'Generate on build', detail: 'Render cards during docs builds or CI runs.' }
+		],
+		faqs: [{ q: 'Can I render full JSON?', a: 'Yes, but increase canvas size or focus on key fields for readability.' }],
+		related: ['json-to-image', 'code']
+	},
+	'json-to-image': {
+		label: 'JSON to Image',
+		description: 'Convert JSON payloads into crisp, readable images (no more blurry screenshots).',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900', '1920x1080'],
+		templateHtml: simpleMonoCardTemplate({
+			title: 'JSON',
+			body: `{
+  "user": {
+    "id": "{{id}}",
+    "name": "{{name}}",
+    "plan": "{{plan}}"
+  },
+  "timestamp": "{{timestamp}}"
+}`
+		}),
+		overview: [
+			'JSON appears everywhere: docs, support, sales engineering, and incident writeups.',
+			'Turn JSON into consistent branded images that can be shared in tickets, docs, and presentations.'
+		],
+		painPoints: ['Screenshots blur text', 'Payloads get stale', 'Hard to standardize formatting'],
+		workflow: [
+			{ title: 'Define the JSON shape', detail: 'Pick the fields you want to display and bind variables.' },
+			{ title: 'Render on demand', detail: 'Generate images whenever payloads change.' },
+			{ title: 'Batch examples', detail: 'Render multiple example payloads for docs or onboarding.' }
+		],
+		faqs: [{ q: 'Can I highlight keys?', a: 'Yes. Use CSS in the template to style keys/values.' }],
+		related: ['api-response-card', 'code']
+	},
+	'status-update': {
+		label: 'Status Update Card',
+		description: 'Generate branded status updates for incidents, outages, and maintenance windows.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1080x1080'],
+		templateHtml: simpleCardTemplate({
+			title: 'Status: {{status}}',
+			subtitle: '{{message}} · {{time}}',
+			badge: 'STATUS',
+			accent: '#ef4444',
+			background: '#fff1f2'
+		}),
+		overview: [
+			'When something breaks, teams need fast and consistent communication.',
+			'Generate status cards from incident systems and distribute instantly across channels.'
+		],
+		painPoints: ['No time for design during incidents', 'Inconsistent messaging', 'Slow updates across channels'],
+		workflow: [
+			{ title: 'Design template', detail: 'Create a layout for status, message, and timestamp.' },
+			{ title: 'Render from incident data', detail: 'Send incident fields to generate an image URL.' },
+			{ title: 'Distribute', detail: 'Use the URL in social, email, and internal channels.' }
+		],
+		faqs: [{ q: 'Can I color-code status (green/yellow/red)?', a: 'Yes. Use conditional logic in the template workspace.' }],
+		related: ['changelog-card', 'tweet-card']
+	},
+	'leaderboard': {
+		label: 'Leaderboard Card',
+		description: 'Generate leaderboard snapshots for communities, contests, and gamification.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900'],
+		templateHtml: simpleCardTemplate({
+			title: 'Leaderboard · {{period}}',
+			subtitle: 'Top: {{name1}} · {{name2}} · {{name3}}',
+			badge: 'LEADERBOARD',
+			accent: '#f59e0b',
+			background: '#fffbeb'
+		}),
+		overview: [
+			'Leaderboards drive engagement when they are frequent and easy to share.',
+			'Render leaderboard cards from your metrics pipeline and distribute to communities automatically.'
+		],
+		painPoints: ['Manual exports', 'Inconsistent weekly formatting', 'Slow to publish updates'],
+		workflow: [
+			{ title: 'Design layout', detail: 'Create a leaderboard card with variables for names and scores.' },
+			{ title: 'Render from data', detail: 'Send top results and generate an image URL.' },
+			{ title: 'Publish', detail: 'Post in Slack/Discord or embed in newsletters.' }
+		],
+		faqs: [{ q: 'Can I show more entries?', a: 'Yes. Increase height and add more rows/variables.' }],
+		related: ['kpi-card', 'status-update']
+	},
+	'kpi-card': {
+		label: 'KPI Snapshot Card',
+		description: 'Render KPI snapshots for reports, weekly updates, and exec comms.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900', '1920x1080'],
+		templateHtml: simpleCardTemplate({
+			title: '{{metricName}}: {{value}}',
+			subtitle: 'Δ {{delta}} · {{period}} · source: {{source}}',
+			badge: 'KPI',
+			accent: '#22c55e',
+			background: '#f0fdf4'
+		}),
+		overview: [
+			'KPI communication is repetitive — and ideal for templates + automation.',
+			'Render KPI cards directly from analytics outputs and embed them in docs, decks, and email.'
+		],
+		painPoints: ['Copy/paste from dashboards', 'Blurry screenshots', 'Formatting inconsistency'],
+		workflow: [
+			{ title: 'Create KPI template', detail: 'Design a card with variables for metric name/value/delta.' },
+			{ title: 'Render from analytics', detail: 'Call the API from your reporting job.' },
+			{ title: 'Distribute', detail: 'Embed URLs in Notion, decks, or newsletters.' }
+		],
+		faqs: [{ q: 'Can I render charts?', a: 'Yes. Render charts in HTML or add a chart image layer.' }],
+		related: ['table', 'leaderboard']
+	},
+	'testimonial': {
+		label: 'Testimonial Card',
+		description: 'Generate testimonial cards for social proof and marketing pages.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1080x1080', '1080x1350'],
+		templateHtml: simpleCardTemplate({
+			title: '“{{testimonial}}”',
+			subtitle: '— {{name}}, {{role}} @ {{company}}',
+			badge: 'SOCIAL PROOF',
+			accent: '#ff6b6b',
+			background: '#fff7ed'
+		}),
+		overview: [
+			'Testimonials are high leverage but tedious to turn into polished assets.',
+			'Render testimonial variations from CRM/spreadsheets and keep design consistent everywhere.'
+		],
+		painPoints: ['Manual design work', 'Inconsistent styling', 'Slow iteration on landing pages'],
+		workflow: [
+			{ title: 'Design template', detail: 'Create a layout with testimonial + attribution variables.' },
+			{ title: 'Render per entry', detail: 'Generate a card for each testimonial automatically.' },
+			{ title: 'Batch refresh', detail: 'Re-render when brand or typography changes.' }
+		],
+		faqs: [{ q: 'Can I add a customer logo?', a: 'Yes. Add an image layer bound to a logo URL variable.' }],
+		related: ['quote-card', 'product-banner']
+	},
+	'webinar-promo': {
+		label: 'Webinar Promo Banner',
+		description: 'Create webinar promo banners for registrations and social campaigns.',
+		recommendedFormats: ['png', 'jpg', 'webp'],
+		recommendedSizes: ['1200x628', '1080x1350', '1200x630'],
+		templateHtml: simpleCardTemplate({
+			title: '{{webinarTitle}}',
+			subtitle: '{{date}} · {{speaker}} · Register now',
+			badge: 'WEBINAR',
+			accent: '#0ea5e9',
+			background: '#f0f9ff'
+		}),
+		overview: [
+			'Event marketing repeats the same pattern: title, date, speaker, CTA.',
+			'Render promo banners from your events database and ship assets on demand via API.'
+		],
+		painPoints: ['Design workload for every event', 'Inconsistent templates', 'Slow turnaround for campaigns'],
+		workflow: [
+			{ title: 'Create promo template', detail: 'Design a layout for title/date/speaker/CTA.' },
+			{ title: 'Render per event', detail: 'Generate a banner for each webinar automatically.' },
+			{ title: 'Batch for series', detail: 'Render an entire series in one batch job.' }
+		],
+		faqs: [{ q: 'Can I add speaker photos?', a: 'Yes. Bind image URLs for headshots in the template.' }],
+		related: ['event-ticket', 'product-banner']
+	},
+	'event-ticket': {
+		label: 'Event Ticket Generator',
+		description: 'Generate branded tickets and passes from registration data.',
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['1200x630', '1600x900'],
+		templateHtml: simpleCardTemplate({
+			title: 'Ticket: {{eventName}}',
+			subtitle: '{{date}} · {{attendeeName}} · {{seat}}',
+			badge: 'TICKET',
+			accent: '#111827',
+			background: '#f8fafc'
+		}),
+		overview: [
+			'Tickets are templates + attendee variables — perfect for automation.',
+			'Generate passes per attendee and distribute via email or portals with CDN URLs.'
+		],
+		painPoints: ['Manual ticket creation', 'Hard to reissue', 'Inconsistent formatting'],
+		workflow: [
+			{ title: 'Design ticket template', detail: 'Create a layout with event and attendee variables.' },
+			{ title: 'Render per attendee', detail: 'Generate a unique ticket for each registration.' },
+			{ title: 'Batch deliver', detail: 'Batch render and send through your email provider.' }
+		],
+		faqs: [{ q: 'Can I include QR codes?', a: 'Yes. Bind a QR image URL into the template.' }],
+		related: ['webinar-promo', 'certificate']
+	},
+	'job-post': {
+		label: 'Job Post Card',
+		description: 'Generate job post cards for recruiting and social sharing.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1080x1350', '1200x630'],
+		templateHtml: simpleCardTemplate({
+			title: 'We’re hiring: {{role}}',
+			subtitle: '{{location}} · {{team}} · Apply now',
+			badge: 'HIRING',
+			accent: '#6366f1',
+			background: '#eef2ff'
+		}),
+		overview: [
+			'Hiring content is repetitive and often needs variants per role and channel.',
+			'Render consistent job cards from your ATS data and publish automatically.'
+		],
+		painPoints: ['Manual design per role', 'Brand inconsistency', 'Slow updates when details change'],
+		workflow: [
+			{ title: 'Design template', detail: 'Create a job card layout once.' },
+			{ title: 'Render from ATS', detail: 'Use role/team/location variables to generate images.' },
+			{ title: 'Batch distribute', detail: 'Generate all openings weekly and share across channels.' }
+		],
+		faqs: [{ q: 'Can I include salary ranges?', a: 'Yes. Add variables like {{salaryMin}}–{{salaryMax}}.' }],
+		related: ['tweet-card', 'product-banner']
+	},
+	'feature-flag-banner': {
+		label: 'Feature Flag Banner',
+		description: 'Generate feature flag banners for docs, rollouts, and internal comms.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900'],
+		templateHtml: simpleCardTemplate({
+			title: 'Feature flag: {{flagName}}',
+			subtitle: '{{status}} · rollout {{rollout}} · owner {{owner}}',
+			badge: 'FLAG',
+			accent: '#f59e0b',
+			background: '#fffbeb'
+		}),
+		overview: [
+			'Feature flags change frequently and need clear communication.',
+			'Generate banners from your flagging system to keep docs and rollouts consistent.'
+		],
+		painPoints: ['Outdated docs', 'Manual formatting', 'Confusing rollout comms'],
+		workflow: [
+			{ title: 'Create banner template', detail: 'Design a layout for flag name/status/rollout.' },
+			{ title: 'Render on changes', detail: 'Generate a new banner whenever status or rollout changes.' },
+			{ title: 'Publish', detail: 'Use image URLs across docs and internal channels.' }
+		],
+		faqs: [{ q: 'Can I show environments (prod/staging)?', a: 'Yes. Add variables and conditional blocks for each environment.' }],
+		related: ['release-notes-card', 'status-update']
+	},
+	'report-cover': {
+		label: 'Report Cover',
+		description: 'Generate consistent report covers for decks, PDFs, and quarterly updates.',
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['1600x900', '1920x1080', '1200x630'],
+		templateHtml: simpleCardTemplate({
+			title: '{{reportTitle}}',
+			subtitle: '{{period}} · prepared for {{audience}}',
+			badge: 'REPORT',
+			accent: '#111827',
+			background: '#f8fafc'
+		}),
+		overview: [
+			'Report covers are templates with a small set of changing variables.',
+			'Generate covers automatically so every report looks on-brand and consistent.'
+		],
+		painPoints: ['Manual cover updates', 'Inconsistent styling', 'Slow reporting cycles'],
+		workflow: [
+			{ title: 'Design cover template', detail: 'Create a cover layout with title and period variables.' },
+			{ title: 'Render from reporting job', detail: 'Generate covers when reports are produced.' },
+			{ title: 'Batch variants', detail: 'Render per team, region, or audience.' }
+		],
+		faqs: [{ q: 'Can I use this as a PDF cover?', a: 'Yes. Use the image as a first page cover or embed it in your PDF flow.' }],
+		related: ['kpi-card', 'table']
+	},
+	'roadmap-card': {
+		label: 'Roadmap Card',
+		description: 'Generate roadmap cards for product planning and stakeholder updates.',
+		recommendedFormats: ['png', 'webp'],
+		recommendedSizes: ['1200x630', '1600x900'],
+		templateHtml: simpleCardTemplate({
+			title: 'Roadmap: {{quarter}}',
+			subtitle: '{{theme}} · bets: {{item1}}, {{item2}}, {{item3}}',
+			badge: 'ROADMAP',
+			accent: '#6366f1',
+			background: '#eef2ff'
+		}),
+		overview: [
+			'Roadmaps change often and need a consistent way to share updates.',
+			'Render roadmap cards from planning exports and keep stakeholder comms aligned.'
+		],
+		painPoints: ['Manual slides every month', 'Outdated visuals', 'Slow stakeholder communication'],
+		workflow: [
+			{ title: 'Create roadmap template', detail: 'Design a card for quarter/theme and top items.' },
+			{ title: 'Render from planning data', detail: 'Pull key items and render via API.' },
+			{ title: 'Distribute', detail: 'Use the image URL in docs, email, and exec updates.' }
+		],
+		faqs: [{ q: 'Can I include lanes (now/next/later)?', a: 'Yes. Create a 3-column layout and bind variables for each lane.' }],
+		related: ['status-update', 'kpi-card']
 	}
 };
 

@@ -292,8 +292,8 @@
 				{#if showDataEditor}
 					<div class="data-editor">
 						<div class="chart-type-select">
-							<label>Chart Type</label>
-							<select bind:value={selectedChartType}>
+							<label for="chart-type">Chart Type</label>
+							<select id="chart-type" bind:value={selectedChartType}>
 								{#each chartTypes as chart}
 									<option value={chart.type}>{chart.name}</option>
 								{/each}
@@ -316,7 +316,7 @@
 						</div>
 						
 						<div class="input-group">
-							<label>Title (optional)</label>
+							<label for="chart-title">Title (optional)</label>
 							<input 
 								type="text" 
 								bind:value={chartConfig.title}
@@ -326,7 +326,7 @@
 						
 						<div class="input-group">
 							<div class="flex justify-between items-center mb-1">
-								<label>Data (JSON)</label>
+								<label for="data-json">Data (JSON)</label>
 								<button class="text-link" on:click={loadSampleData}>
 									Load Sample
 								</button>
@@ -412,14 +412,14 @@
 		height: 100%;
 		display: flex;
 		flex-direction: column;
-		background: white;
+		background: #FFFDF8;
 		overflow: hidden;
 	}
 	
 	.tabs {
 		display: flex;
-		border-bottom: 1px solid #e5e5e5;
-		background: #fafafa;
+		border-bottom: 3px solid #111827;
+		background: #FFFDF8;
 		flex-shrink: 0;
 	}
 	
@@ -430,24 +430,26 @@
 		border: none;
 		cursor: pointer;
 		font-size: 13px;
-		font-weight: 500;
-		color: #666;
+		font-weight: 700;
+		color: #111827;
 		transition: all 0.15s;
-		border-bottom: 2px solid transparent;
+		border-bottom: 3px solid transparent;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
 	}
 	
 	.tabs button:hover {
-		color: #333;
-		background: #f5f5f5;
+		color: #000;
+		background: #f3f4f6;
 	}
 	
 	.tabs button.active {
-		color: #ff6b6b;
-		border-bottom-color: #ff6b6b;
-		background: white;
+		color: #111827;
+		border-bottom-color: #ffc480;
+		background: #FFFDF8;
 	}
 	
 	.content {
@@ -456,6 +458,7 @@
 		overflow-x: hidden;
 		padding: 16px;
 		min-height: 0;
+        background: #FFFDF8;
 	}
 	
 	.section {
@@ -464,10 +467,10 @@
 	
 	.section-title {
 		font-size: 11px;
-		font-weight: 600;
-		color: #888;
+		font-weight: 900;
+		color: #111827;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0.1em;
 		margin-bottom: 10px;
 	}
 	
@@ -480,65 +483,73 @@
 	.item {
 		padding: 16px 8px;
 		background: white;
-		border: 1px solid #e5e5e5;
-		border-radius: 8px;
+		border: 2px solid #111827;
+		border-radius: 6px;
 		cursor: pointer;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: 6px;
-		transition: all 0.15s;
+		transition: all 0.1s;
+        box-shadow: 2px 2px 0 0 #111827;
 	}
 	
 	.item:hover {
-		border-color: #ff6b6b;
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+		border-color: #111827;
+		transform: translate(-2px, -2px);
+		box-shadow: 4px 4px 0 0 #ffc480;
+        background: #fff;
 	}
 	
 	.item .icon {
 		font-size: 24px;
-		color: #666;
+		color: #111827;
 		transition: color 0.15s;
 	}
 	
 	.item:hover .icon {
-		color: #ff6b6b;
+		color: #000;
 	}
 	
 	.item .label {
 		font-size: 11px;
-		color: #666;
+		color: #111827;
 		text-align: center;
+        font-weight: 700;
+        text-transform: uppercase;
 	}
 	
 	.toggle-btn {
 		width: 100%;
 		padding: 10px 12px;
-		background: #f8f9fa;
-		border: 1px solid #e5e5e5;
+		background: #FFFDF8;
+		border: 2px solid #111827;
 		border-radius: 6px;
 		cursor: pointer;
 		font-size: 12px;
-		font-weight: 500;
-		color: #333;
+		font-weight: 700;
+		color: #111827;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		transition: all 0.15s;
+        box-shadow: 2px 2px 0 0 #111827;
+        text-transform: uppercase;
 	}
 	
 	.toggle-btn:hover {
-		background: #f0f0f0;
-		border-color: #ccc;
+		background: #fff;
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0 0 #111827;
 	}
 	
 	.data-editor {
 		margin-top: 12px;
 		padding: 12px;
-		background: #fafafa;
-		border: 1px solid #e5e5e5;
+		background: #fff;
+		border: 2px solid #111827;
 		border-radius: 8px;
+        box-shadow: 4px 4px 0 0 #1f2937;
 	}
 	
 	.chart-type-select {
@@ -548,19 +559,28 @@
 	.chart-type-select label {
 		display: block;
 		font-size: 11px;
-		font-weight: 500;
-		color: #666;
+		font-weight: 800;
+		color: #111827;
 		margin-bottom: 4px;
+        text-transform: uppercase;
 	}
 	
 	.chart-type-select select {
 		width: 100%;
 		padding: 8px;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		border-radius: 6px;
 		font-size: 12px;
 		background: white;
+        font-weight: 600;
+        color: #111827;
+        box-shadow: 2px 2px 0 0 #111827;
 	}
+
+    .chart-type-select select:focus {
+        outline: none;
+        box-shadow: 2px 2px 0 0 #ffc480;
+    }
 	
 	.config-row {
 		display: flex;
@@ -571,16 +591,19 @@
 	.config-row label {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 6px;
 		font-size: 11px;
-		color: #666;
+		color: #111827;
 		cursor: pointer;
+        font-weight: 600;
+        text-transform: uppercase;
 	}
 	
 	.config-row input[type="checkbox"] {
-		width: 14px;
-		height: 14px;
-		accent-color: #ff6b6b;
+		width: 16px;
+		height: 16px;
+		accent-color: #111827;
+        border: 2px solid #111827;
 	}
 	
 	.input-group {
@@ -590,19 +613,23 @@
 	.input-group label {
 		display: block;
 		font-size: 11px;
-		font-weight: 500;
-		color: #666;
+		font-weight: 800;
+		color: #111827;
 		margin-bottom: 4px;
+        text-transform: uppercase;
 	}
 	
 	.input-group input[type="text"],
 	.input-group textarea {
 		width: 100%;
 		padding: 8px;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		border-radius: 6px;
 		font-size: 12px;
 		font-family: inherit;
+        background: #fff;
+        color: #111827;
+        font-weight: 500;
 	}
 	
 	.input-group textarea {
@@ -613,41 +640,50 @@
 	.input-group input:focus,
 	.input-group textarea:focus {
 		outline: none;
-		border-color: #ff6b6b;
-		box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.1);
+		border-color: #111827;
+		box-shadow: 2px 2px 0 0 #ffc480;
 	}
 	
 	.text-link {
 		font-size: 10px;
-		color: #ff6b6b;
+		color: #111827;
 		background: none;
 		border: none;
 		cursor: pointer;
 		text-decoration: underline;
+        font-weight: 700;
 	}
+    
+    .text-link:hover {
+        color: #000;
+    }
 	
 	.error-text {
 		font-size: 10px;
 		color: #ef4444;
 		margin-top: 4px;
+        font-weight: 600;
 	}
 	
 	.add-btn {
 		width: 100%;
 		padding: 10px;
-		background: linear-gradient(135deg, #ff6b6b 0%, #ffc480 100%);
+		background: #111827;
 		color: white;
 		border: none;
 		border-radius: 6px;
 		font-size: 12px;
-		font-weight: 600;
+		font-weight: 800;
 		cursor: pointer;
 		transition: all 0.15s;
+        text-transform: uppercase;
+        box-shadow: 2px 2px 0 0 #000;
 	}
 	
 	.add-btn:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+		transform: translate(-1px, -1px);
+		box-shadow: 4px 4px 0 0 #ffc480;
+        color: #ffc480;
 	}
 	
 	.style-grid {
@@ -659,7 +695,7 @@
 	.style-item {
 		padding: 8px;
 		background: white;
-		border: 2px solid #e5e5e5;
+		border: 2px solid #111827;
 		border-radius: 8px;
 		cursor: pointer;
 		display: flex;
@@ -667,15 +703,19 @@
 		align-items: center;
 		gap: 6px;
 		transition: all 0.15s;
+        box-shadow: 2px 2px 0 0 #111827;
 	}
 	
 	.style-item:hover {
-		border-color: #ff6b6b;
+		transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0 0 #ffc480;
 	}
 	
 	.style-item.active {
-		border-color: #ff6b6b;
-		background: rgba(255, 107, 107, 0.05);
+		border-color: #111827;
+		background: #ffc480;
+        box-shadow: inset 2px 2px 0 0 #111827;
+        transform: translate(1px, 1px);
 	}
 	
 	.style-preview {
@@ -683,7 +723,7 @@
 		height: 32px;
 		border-radius: 4px;
 		overflow: hidden;
-		border: 1px solid;
+		border: 2px solid #111827;
 		display: flex;
 		flex-direction: column;
 	}
@@ -698,8 +738,10 @@
 	
 	.style-name {
 		font-size: 9px;
-		color: #666;
+		color: #111827;
 		text-align: center;
+        font-weight: 700;
+        text-transform: uppercase;
 	}
 	
 	.info-box {
@@ -707,21 +749,23 @@
 		gap: 8px;
 		padding: 12px;
 		background: #f0f9ff;
-		border: 1px solid #bae6fd;
+		border: 2px solid #111827;
 		border-radius: 8px;
 		margin-top: 16px;
+        box-shadow: 4px 4px 0 0 #111827;
 	}
 	
 	.info-box i {
-		color: #0284c7;
+		color: #111827;
 		flex-shrink: 0;
 		margin-top: 2px;
 	}
 	
 	.info-box p {
 		font-size: 11px;
-		color: #0369a1;
+		color: #111827;
 		line-height: 1.4;
+        font-weight: 500;
 	}
 	
 	/* Scrollbar */
@@ -734,12 +778,11 @@
 	}
 	
 	.content::-webkit-scrollbar-thumb {
-		background: #d0d0d0;
+		background: #111827;
 		border-radius: 3px;
 	}
 	
 	.content::-webkit-scrollbar-thumb:hover {
-		background: #b0b0b0;
+		background: #000;
 	}
 </style>
-

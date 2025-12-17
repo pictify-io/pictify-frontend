@@ -3,6 +3,7 @@
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import Toast from '$lib/components/Toast.svelte';
   import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+  import NextSteps from '$lib/components/tools/NextSteps.svelte';
   import { onMount } from 'svelte';
   import { toast } from '../../../store/toast.store';
   import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
@@ -49,6 +50,27 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
 
   let iframeElement;
   let isIframeReady = false;
+
+  function buildCurlSnippetFromUrl(urlValue, selectorValue) {
+    const payload = {
+      url: String(urlValue || 'https://example.com'),
+      selector: String(selectorValue || ''),
+      width: 1200,
+      height: 630
+    };
+    return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(payload, null, 2)}'`;
+  }
+
+  $: nextStepsCurlSnippet = buildCurlSnippetFromUrl(url, selector);
+  $: nextStepsTemplateDraft = imageUrl ? {
+    version: 1,
+    name: 'Screenshot template',
+    type: 'og-image',
+    width: 1200,
+    height: 630,
+    backgroundImageUrl: imageUrl,
+    source: 'url-to-image'
+  } : null;
 
 
   const isValidUrl = (url) => {
@@ -256,38 +278,31 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
   <main class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative cursor-crosshair">
     
     <!-- Hero Section -->
-    <div class="relative flex flex-col items-center justify-center text-center mb-20 pt-10">
-        <!-- Decorative Floating Elements -->
-        <div class="absolute top-0 right-[10%] w-24 h-24 bg-[#ff6b6b] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div class="absolute top-10 left-[10%] w-32 h-32 bg-[#4ade80] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-10 left-[20%] w-28 h-28 bg-[#ffc480] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10">
 
         <!-- Badge -->
-        <div class="relative mb-6 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
-             <div class="absolute inset-0 bg-black translate-x-1 translate-y-1"></div>
-             <span class="relative inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-black font-black uppercase tracking-widest text-xs shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-                Free Tool
-             </span>
-        </div>
-        
-        <!-- Main Title -->
-        <div class="relative mb-6">
-            <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] text-black uppercase transform hover:scale-[1.01] transition-transform duration-300">
-                URL to <br class="md:hidden" />
-                <span class="relative inline-block text-[#ff6b6b]">Image</span>
-            </h1>
-            <div class="absolute -z-10 top-2 left-2 text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] text-gray-200 uppercase select-none">
-                URL to <br class="md:hidden" /> Image
+        <div class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8">
+            <div class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                ★ Free Tool
             </div>
         </div>
 
-        <!-- Description -->
-        <p class="max-w-2xl text-xl md:text-2xl font-bold text-gray-700 leading-relaxed bg-white/50 backdrop-blur-sm border-[3px] border-black p-6 shadow-[6px_6px_0_0_#9ca3af] relative">
-            <span class="absolute -top-3 -left-3">
-                <svg class="w-8 h-8 text-black animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        <!-- Main Title -->
+        <h1 class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8">
+            <span class="block sm:inline">URL TO</span>
+            <span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
+                <span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
+                <span class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"></span>
             </span>
-            Convert any webpage URL into a high-quality image instantly. Perfect for archiving, thumbnails, and social previews.
-        </p>
+        </h1>
+
+        <!-- Description -->
+        <div class="max-w-2xl mx-auto px-2">
+            <p class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]">
+                Convert any webpage URL into a high-quality <span class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span> instantly.
+                <span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold">Perfect for archiving, thumbnails, and social previews</span>
+            </p>
+        </div>
     </div>
 
   <div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
@@ -364,9 +379,8 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
           sandbox="allow-scripts allow-same-origin"
         ></iframe>
       </div>
-    </div>
-
-      <div class="bg-gray-100 border-t-[3px] border-black p-4 flex flex-col md:flex-row gap-4 items-center">
+      <!-- Element Selector Bar -->
+      <div class="bg-gray-100 border-[3px] border-t-0 border-black p-4 flex flex-col md:flex-row gap-4 items-center">
           <div class="flex-grow w-full">
               <span class="block font-black uppercase text-xs mb-1 tracking-wider">Element Selector (Optional)</span>
               <div class="flex">
@@ -409,6 +423,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
               </button>
           </div>
       </div>
+    </div>
 
     {#if imageUrl}
     <div class="mt-16 w-full max-w-5xl mx-auto px-2 md:px-0 z-20">
@@ -455,18 +470,24 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
                      <a href={imageUrl} download="screenshot.jpg" class="px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center">
                          Download Image
                      </a>
-                     <a href="/signup" class="px-8 py-4 bg-white text-black border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center">
-                         Automate via API
+                     <a href="/signup?redirect=/dashboard/api-token" class="px-8 py-4 bg-white text-black border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center">
+                         Get free API key
                      </a>
                  </div>
+
+                 <NextSteps
+                   heading="Next steps"
+                   description="Copy the API request, turn this capture into a reusable template, and batch render variants."
+                   curlSnippet={nextStepsCurlSnippet}
+                   templateDraft={nextStepsTemplateDraft}
+                 />
              </div>
          </div>
     </div>
     {/if}
 
-    <div class="max-w-7xl mx-auto px-2 md:px-0 mt-20 mb-20">
-      <section class="mb-16 border-[3px] border-black p-2 bg-black shadow-[12px_12px_0_0_#9ca3af]">
-        <div class="bg-white border-[3px] border-black p-6 md:p-8">
+    <div class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-20 mb-20">
+      <section>
             <ApiPromptSection
             title="Automate URL screenshots with our API"
             description="Trigger screenshot captures from scripts, CRON jobs, or workflows and receive CDN-hosted images in seconds."
@@ -475,17 +496,16 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
             codeLanguage="bash"
             docsUrl="https://docs.pictify.io/"
             docsLabel="Read URL to Image docs"
-            secondaryCtaUrl="/dashboard/api-playground"
-            secondaryCtaLabel="Run sample request"
+            secondaryCtaUrl="https://docs.pictify.io/examples"
+            secondaryCtaLabel="See examples"
             note="Need JS execution, authentication, or regional rendering? Contact us for advanced plans."
           />
-        </div>
       </section>
     </div>
 
 
   <!-- Separator -->
-  <div class="max-w-4xl mx-auto px-6 md:px-0 my-20">
+  <div class="w-full max-w-5xl mx-auto px-2 md:px-0 my-20">
     <div class="border-t-[4px] border-black relative">
       <div class="absolute left-1/2 -top-5 -translate-x-1/2 bg-[#FFFDF8] px-4">
         <div class="w-10 h-10 bg-black text-white flex items-center justify-center border-[3px] border-black rotate-45 transform hover:rotate-90 transition-transform duration-500">
@@ -495,14 +515,16 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
     </div>
   </div>
 
-  <section class="max-w-5xl mx-auto px-6 md:px-0 mb-16 border-[3px] border-black bg-white shadow-[8px_8px_0_0_#9ca3af] p-8">
-    <h3 class="text-3xl font-black mb-8 uppercase">Frequently Asked Questions</h3>
-    <div class="space-y-4">
+  <!-- FAQ Section -->
+  <section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
+    <div class="border-[3px] border-black p-6 md:p-8 bg-white shadow-[8px_8px_0_0_#9ca3af]">
+    <h2 class="text-3xl font-black mb-8 text-black uppercase">FAQ</h2>
+    <div class="space-y-4 w-full">
       <details class="group">
         <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
           <span class="font-black text-lg text-gray-900 uppercase">What is URL to Image?</span>
           <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
           </span>
         </summary>
         <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
@@ -513,7 +535,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
         <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
           <span class="font-black text-lg text-gray-900 uppercase">How does it work?</span>
           <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
           </span>
         </summary>
         <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
@@ -524,18 +546,30 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
         <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
           <span class="font-black text-lg text-gray-900 uppercase">Can I customize it?</span>
           <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
           </span>
         </summary>
         <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
           Yes! You can select specific elements, set custom viewport sizes, and handle cookie banners via our API.
         </div>
       </details>
+      <details class="group">
+        <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+          <span class="font-black text-lg text-gray-900 uppercase">Privacy?</span>
+          <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+          </span>
+        </summary>
+        <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+          We do not store your URLs or generated images. All processing is done on-the-fly and images are cached temporarily on our CDN for performance.
+        </div>
+      </details>
+    </div>
     </div>
   </section>
 
   <!-- Content Grid -->
-  <div class="max-w-7xl mx-auto px-6 md:px-0 mb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
     
     <!-- Learn More -->
     <section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-[8px_8px_0_0_#000]">
@@ -577,7 +611,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
 
   </div>
 
-  <div class="mt-8 mb-20 w-full max-w-4xl mx-auto text-center">
+  <div class="mt-8 mb-20 w-full max-w-5xl mx-auto px-2 md:px-0 text-center">
       <p class="font-bold text-gray-500 uppercase tracking-widest mb-6">Spread the word</p>
     <div class="flex flex-col md:flex-row justify-center md:space-x-6">
     <button

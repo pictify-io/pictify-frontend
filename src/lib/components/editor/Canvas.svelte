@@ -334,8 +334,11 @@
 	// ... (handleSelection, handleSelectionCleared, handleKeyDown remain same)
 
 	function handleSelection(e) {
-		const selected = e.selected ? e.selected[0] : fabricCanvas.getActiveObject();
-		editorActions.selectComponent(selected);
+		// Always use getActiveObject() to get the current selection
+		// This returns an ActiveSelection when multiple objects are selected
+		// or the single object when only one is selected
+		const activeObject = fabricCanvas.getActiveObject();
+		editorActions.selectComponent(activeObject);
 	}
 
 	function handleSelectionCleared() {
@@ -407,9 +410,10 @@
 	}
 </script>
 
-<div class="absolute inset-0 bg-gray-100/80 overflow-hidden flex items-center justify-center p-8" style="padding-top: 80px;">
+<div class="absolute inset-0 bg-[#e5e5e5] overflow-hidden flex items-center justify-center p-8" 
+	style="padding-top: 80px; background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 20px 20px;">
 	<div 
-		class="shadow-2xl border border-gray-200/50 bg-white transition-transform duration-200 ease-out origin-center ring-1 ring-black/5"
+		class="shadow-[8px_8px_0_0_#1f2937] border-[3px] border-gray-900 bg-white transition-transform duration-200 ease-out origin-center"
 		style="transform: scale({scale});"
 	>
 		<div bind:this={canvasContainer}>

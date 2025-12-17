@@ -1,10 +1,18 @@
 <script>
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { editor } from '../../../store/editor.store';
 	import { streamSwarmGenerate } from '../../../api/copilot-swarm';
 	import { tick } from 'svelte';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { copilotExecution, copilotActions } from '../../../store/copilot.store';
+	import { 
+		canUseFeature, 
+		trackFeatureUsage, 
+		featureGates,
+		plgStatus,
+		showMilestoneCelebration,
+	} from '../../../store/plg.store';
+	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 
 	let messages = [];
 	let prompt = '';
@@ -25,6 +33,19 @@
 	// Agent progress tracking for streaming
 	let currentAgent = null;
 	let agentSteps = [];
+	
+	// PLG Feature gating
+	let aiCopilotLimit = null;
+	let featureLimitReached = false;
+	
+	$: isPaidPlan = $plgStatus.isPaidPlan;
+	$: aiCopilotUsage = $featureGates.aiCopilot;
+	
+	onMount(async () => {
+		// Check feature availability on mount
+		aiCopilotLimit = await canUseFeature('aiCopilot');
+		featureLimitReached = !aiCopilotLimit?.allowed;
+	});
 
 	const QUICK_ACTIONS = [
 		"Make it modern",
@@ -234,6 +255,28 @@
 		const textToUse = customPrompt || prompt;
 		if (!textToUse.trim()) return;
 		
+		// Check feature limit for free users
+		if (!isPaidPlan) {
+			const limitCheck = await canUseFeature('aiCopilot');
+			if (!limitCheck.allowed) {
+				featureLimitReached = true;
+				error = 'You\'ve reached your AI Copilot limit for this month. Upgrade to continue!';
+				messages = [...messages, { 
+					role: 'system', 
+					content: '🔒 AI Copilot limit reached. Upgrade for unlimited AI generations!' 
+				}];
+				return;
+			}
+			
+			// Show warning if close to limit
+			if (limitCheck.remaining <= 1) {
+				messages = [...messages, { 
+					role: 'system', 
+					content: `⚠️ Last free AI generation! Upgrade for unlimited access.` 
+				}];
+			}
+		}
+		
 		if ($editor) {
 			previousState = JSON.stringify($editor.toJSON());
 			canUndo = true;
@@ -268,7 +311,20 @@
 					targetScore: 7
 				},
 				onStep: (payload) => handleStepPayload(payload),
-				onComplete: (payload) => handleCompletePayload(payload),
+				onComplete: async (payload) => {
+					await handleCompletePayload(payload);
+					
+					// Track feature usage after successful generation
+					if (payload.success && !isPaidPlan) {
+						const result = await trackFeatureUsage('aiCopilot');
+						if (result.milestone?.isNew) {
+							showMilestoneCelebration(result.milestone);
+						}
+						// Update limit check
+						aiCopilotLimit = await canUseFeature('aiCopilot');
+						featureLimitReached = !aiCopilotLimit?.allowed;
+					}
+				},
 				onError: (err) => handleStreamFailure(err)
 			});
 		} catch (err) {
@@ -325,15 +381,46 @@
 </script>
 
 <div class="flex flex-col h-full bg-gray-50/50">
+	<!-- Feature limit banner -->
+	{#if featureLimitReached && !isPaidPlan}
+		<div class="px-4 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-2">
+					<span class="text-lg">🔒</span>
+					<div>
+						<p class="text-sm font-semibold">AI Copilot Limit Reached</p>
+						<p class="text-xs opacity-90">Upgrade for unlimited AI generations</p>
+					</div>
+				</div>
+				<button 
+					on:click={() => openUpgradeModal('ai_copilot')}
+					class="px-3 py-1.5 bg-white text-purple-600 text-xs font-bold rounded-lg hover:bg-gray-100 transition-colors"
+				>
+					Upgrade
+				</button>
+			</div>
+		</div>
+	{:else if !isPaidPlan && aiCopilotLimit?.remaining > 0 && aiCopilotLimit?.remaining <= 3}
+		<div class="px-4 py-2 bg-amber-50 border-b border-amber-200 text-amber-800 text-xs flex items-center justify-between">
+			<span>⚡ {aiCopilotLimit.remaining} free AI generation{aiCopilotLimit.remaining !== 1 ? 's' : ''} remaining</span>
+			<button on:click={() => openUpgradeModal('ai_copilot')} class="font-semibold text-amber-700 hover:underline">Upgrade</button>
+		</div>
+	{/if}
+
 	<!-- Header -->
-	<div class="px-4 py-3 border-b border-gray-200 bg-white flex justify-between items-center shrink-0">
+	<div class="px-4 py-3 border-b border-gray-900 bg-white flex justify-between items-center shrink-0">
 		<div class="flex items-center gap-2">
-			<div class="w-6 h-6 rounded-lg bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-sm">
+			<div class="w-6 h-6 rounded-lg bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]">
 				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
 				</svg>
 			</div>
 			<span class="font-semibold text-gray-800 text-sm">Design Copilot</span>
+			{#if !isPaidPlan && aiCopilotLimit?.remaining >= 0}
+				<span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
+					{aiCopilotLimit.remaining}/{aiCopilotLimit.limit} left
+				</span>
+			{/if}
 			{#if lastQualityScore}
 				<span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
 					{lastQualityScore}/10
@@ -374,7 +461,7 @@
 	>
 		{#if messages.length === 0}
 			<div class="flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
-				<div class="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mb-2">
+				<div class="w-12 h-12 rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] bg-gray-100 flex items-center justify-center mb-2">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300">
 						<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
 					</svg>
@@ -384,7 +471,7 @@
 				<div class="grid grid-cols-1 gap-2 w-full max-w-xs">
 					{#each QUICK_ACTIONS as action}
 						<button 
-							class="text-xs text-left px-3 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#ff6b6b] hover:text-[#ff6b6b] transition-colors shadow-sm"
+							class="text-xs text-left px-3 py-2 bg-white border border-gray-900 rounded-lg hover:border-[#ff6b6b] hover:text-[#ff6b6b] transition-colors shadow-[2px_2px_0_0_#1f2937]"
 							on:click={() => handleGenerate(action)}
 						>
 							{action}
@@ -399,7 +486,7 @@
 				class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}"
 				transition:fly={{ y: 10, duration: 200 }}
 			>
-				<div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm {msg.role === 'user' ? 'bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] text-white rounded-tr-sm' : msg.role === 'system' ? 'bg-gray-200 text-gray-600 text-xs py-1 px-2 rounded-lg' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'}">
+				<div class="max-w-[85%] rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] px-4 py-3 text-sm shadow-[2px_2px_0_0_#1f2937] {msg.role === 'user' ? 'bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] text-white rounded-tr-sm' : msg.role === 'system' ? 'bg-gray-200 text-gray-600 text-xs py-1 px-2 rounded-lg' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'}">
 					{msg.content}
 				</div>
 			</div>
@@ -407,7 +494,7 @@
 
 		{#if isLoading}
 			<div class="flex justify-start" transition:fade>
-				<div class="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2 shadow-sm">
+				<div class="bg-white border border-gray-100 rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-tl-sm px-4 py-3 flex items-center gap-2 shadow-[2px_2px_0_0_#1f2937]">
 					<div class="w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-bounce" style="animation-delay: 0ms"></div>
 					<div class="w-1.5 h-1.5 bg-[#ffc480] rounded-full animate-bounce" style="animation-delay: 150ms"></div>
 					<div class="w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-bounce" style="animation-delay: 300ms"></div>
@@ -431,7 +518,7 @@
 		{/if}
 
 		{#if $copilotExecution.currentSteps.length > 0}
-			<div class="pt-4 border-t border-gray-200 space-y-2">
+			<div class="pt-4 border-t border-gray-900 space-y-2">
 				<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
 					Execution Steps
 					{#if $copilotExecution.isLoading}
@@ -440,7 +527,7 @@
 				</p>
 				<div class="space-y-1.5">
 					{#each $copilotExecution.currentSteps as step, index}
-						<div class="bg-white border border-gray-200 rounded-lg p-2 text-xs">
+						<div class="bg-white border border-gray-900 rounded-lg p-2 text-xs">
 							<div class="flex items-start gap-2">
 								<span class="font-mono text-gray-400">#{step.stepNumber || index + 1}</span>
 								<div class="flex-1">
@@ -482,13 +569,13 @@
 	</div>
 
 	<!-- Input Area -->
-	<div class="p-4 border-t border-gray-200 bg-white shrink-0">
+	<div class="p-4 border-t border-gray-900 bg-white shrink-0">
 		<div class="relative group">
 			<textarea
 				bind:value={prompt}
 				on:keydown={handleKeydown}
 				rows="1"
-				class="w-full pl-4 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff6b6b]/20 focus:border-[#ff6b6b] text-sm resize-none shadow-sm transition-all min-h-[50px] max-h-[150px]"
+				class="w-full pl-4 pr-12 py-3 border border-gray-900 rounded-lg focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] text-sm resize-none shadow-[2px_2px_0_0_#1f2937] transition-all min-h-[50px] max-h-[150px]"
 				placeholder="Describe your design..."
 				disabled={isLoading}
 			></textarea>

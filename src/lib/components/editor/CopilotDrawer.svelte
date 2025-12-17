@@ -360,7 +360,7 @@
 
 {#if $copilotDrawer.isOpen}
 	<div 
-		class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.08)] z-50 flex flex-col transition-all duration-300 rounded-t-2xl border-t border-white/20"
+		class="fixed bottom-0 left-0 right-0 bg-[#FFFDF8] border-t-[3px] border-gray-900 z-50 flex flex-col transition-all duration-300 rounded-t-xl shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]"
 		style="height: {$copilotDrawer.isMinimized ? '48px' : `${$copilotDrawer.height}px`}"
 		transition:fly={{ y: 100, duration: 300 }}
 	>
@@ -375,7 +375,7 @@
 		{/if}
 
 		<!-- Header -->
-	<div class="px-3 py-1.5 flex justify-between items-center shrink-0 relative z-20 border-b border-gray-100/50">
+	<div class="px-3 py-1.5 flex justify-between items-center shrink-0 relative z-20 border-b-[3px] border-gray-900 bg-[#FFFDF8]">
 		<div class="flex items-center gap-2">
 			<div class="w-6 h-6 rounded-lg bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-sm text-white">
 				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -581,14 +581,14 @@
 							bind:value={prompt}
 							on:keydown={handleKeydown}
 							rows="1"
-							class="relative block w-full pl-3 pr-12 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-[#ff6b6b]/10 focus:border-[#ff6b6b] text-sm resize-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all min-h-[44px] max-h-[160px] placeholder-gray-400"
+							class="relative block w-full pl-3 pr-12 py-2.5 bg-white border-2 border-gray-900 rounded-lg focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 text-sm resize-none shadow-[4px_4px_0_0_#1f2937] transition-all min-h-[44px] max-h-[160px] placeholder-gray-400"
 							placeholder="Describe your design changes..."
 							disabled={isLoading}
 						></textarea>
 						<button
 							on:click={() => handleGenerate()}
 							disabled={isLoading || !prompt.trim()}
-							class="absolute right-2 bottom-2 p-2 text-white bg-gradient-to-r from-[#ff6b6b] to-[#ff5252] hover:from-[#ff5252] hover:to-[#ff4040] rounded-lg disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-[#ff6b6b]/20 active:scale-95 z-10"
+							class="absolute right-2 bottom-2 p-2 text-white bg-gray-900 hover:bg-black rounded-lg disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 active:scale-95 z-10"
 						>
 							{#if isLoading}
 								<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

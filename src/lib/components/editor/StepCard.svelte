@@ -16,14 +16,14 @@ export let onRegenerate = () => {};
 let feedbackText = '';
 
 $: statusColor = {
-  pending: 'bg-yellow-50 border-yellow-200',
-  executing: 'bg-[#ff6b6b]/10 border-[#ff6b6b]/20',
-  validated: 'bg-green-50 border-green-200',
-  approved: 'bg-green-50 border-green-200',
-  rejected: 'bg-red-50 border-red-200',
-  needs_correction: 'bg-orange-50 border-orange-200',
-  self_corrected: 'bg-purple-50 border-purple-200'
-}[step.status] || 'bg-gray-50 border-gray-200';
+  pending: 'bg-yellow-50',
+  executing: 'bg-[#ff6b6b]/10',
+  validated: 'bg-green-50',
+  approved: 'bg-green-100',
+  rejected: 'bg-red-50',
+  needs_correction: 'bg-orange-50',
+  self_corrected: 'bg-purple-50'
+}[step.status] || 'bg-gray-50';
 
 $: statusIcon = {
   pending: '⏳',
@@ -54,7 +54,7 @@ const summarizeElement = (element = {}) => {
 </script>
 
 <div 
-  class="step-card border-2 rounded-xl p-4 mb-3 transition-all {statusColor}"
+  class="step-card border-[3px] border-gray-900 rounded-lg p-4 mb-3 transition-all shadow-[4px_4px_0_0_#1f2937] {statusColor}"
   class:ring-2={isActive}
   class:ring-[#ff6b6b]={isActive}
   transition:fly={{ y: 20, duration: 300 }}
@@ -62,9 +62,9 @@ const summarizeElement = (element = {}) => {
   <!-- Header -->
   <div class="flex items-center justify-between mb-3">
     <div class="flex items-center gap-2">
-      <span class="text-lg font-bold text-gray-700">Step {stepIndex + 1}</span>
+      <span class="text-lg font-black text-gray-900 uppercase tracking-wide">Step {stepIndex + 1}</span>
       <span class="text-2xl">{statusIcon}</span>
-      <span class="text-xs font-semibold px-2 py-1 rounded bg-white/50">
+      <span class="text-xs font-bold uppercase px-2 py-1 rounded bg-white border-2 border-gray-900 shadow-[2px_2px_0_0_#000]">
         {step.status}
       </span>
     </div>
@@ -72,11 +72,11 @@ const summarizeElement = (element = {}) => {
 
   <!-- Description & Reasoning -->
   <div class="mb-3">
-    <p class="text-sm font-medium text-gray-800 mb-1">
+    <p class="text-sm font-bold text-gray-900 mb-1">
       💭 {step.description || step.reasoning}
     </p>
     {#if step.reasoning && step.description !== step.reasoning}
-      <p class="text-xs text-gray-600 italic">
+      <p class="text-xs text-gray-700 italic font-medium">
         {step.reasoning}
       </p>
     {/if}
@@ -88,28 +88,28 @@ const summarizeElement = (element = {}) => {
       <img
         src={step.thumbnail}
         alt="Preview for step {stepIndex + 1}"
-        class="w-full rounded-lg border border-gray-200 bg-white object-contain max-h-48"
+        class="w-full rounded-lg border-2 border-gray-900 bg-white object-contain max-h-48 shadow-[2px_2px_0_0_#1f2937]"
       />
     </div>
   {/if}
 
   <!-- Tool Info -->
   <details class="mb-3">
-    <summary class="text-xs font-medium text-gray-600 cursor-pointer hover:text-gray-800">
-      🛠️ Tool: <code class="bg-white px-1 py-0.5 rounded">{step.tool}</code>
+    <summary class="text-xs font-bold text-gray-700 cursor-pointer hover:text-black uppercase tracking-wider">
+      🛠️ Tool: <code class="bg-white border border-gray-900 px-1 py-0.5 rounded">{step.tool}</code>
     </summary>
-    <pre class="text-xs bg-white p-2 rounded mt-2 overflow-auto max-h-32">{JSON.stringify(step.args || {}, null, 2)}</pre>
+    <pre class="text-xs bg-white border-2 border-gray-900 p-2 rounded-lg mt-2 overflow-auto max-h-32 shadow-[2px_2px_0_0_#1f2937]">{JSON.stringify(step.args || {}, null, 2)}</pre>
   </details>
 
   {#if hasDiffSummary}
-    <div class="diff-summary border rounded-lg p-3 mb-3 bg-white/60">
-      <p class="text-xs font-semibold text-gray-700 mb-2">🔍 Canvas changes</p>
+    <div class="diff-summary border-2 border-gray-900 rounded-lg p-3 mb-3 bg-white shadow-[2px_2px_0_0_#1f2937]">
+      <p class="text-xs font-black text-gray-900 mb-2 uppercase">🔍 Canvas changes</p>
       {#if step.diffSummary.backgroundChanged}
-        <p class="text-xs text-gray-600 mb-1">• Background color updated</p>
+        <p class="text-xs text-gray-700 mb-1 font-medium">• Background color updated</p>
       {/if}
       {#if step.diffSummary.added?.length}
-        <p class="text-xs text-green-700 font-semibold">Added</p>
-        <ul class="text-xs text-gray-600 list-disc list-inside mb-1">
+        <p class="text-xs text-green-700 font-bold uppercase">Added</p>
+        <ul class="text-xs text-gray-700 list-disc list-inside mb-1 font-medium">
           {#each step.diffSummary.added.slice(0, 3) as addedEl}
             <li>{summarizeElement(addedEl)}</li>
           {/each}
@@ -119,8 +119,8 @@ const summarizeElement = (element = {}) => {
         </ul>
       {/if}
       {#if step.diffSummary.removed?.length}
-        <p class="text-xs text-red-700 font-semibold mt-1">Removed</p>
-        <ul class="text-xs text-gray-600 list-disc list-inside mb-1">
+        <p class="text-xs text-red-700 font-bold uppercase mt-1">Removed</p>
+        <ul class="text-xs text-gray-700 list-disc list-inside mb-1 font-medium">
           {#each step.diffSummary.removed.slice(0, 3) as removedEl}
             <li>{summarizeElement(removedEl)}</li>
           {/each}
@@ -130,8 +130,8 @@ const summarizeElement = (element = {}) => {
         </ul>
       {/if}
       {#if step.diffSummary.updated?.length}
-        <p class="text-xs text-[#ff6b6b] font-semibold mt-1">Updated</p>
-        <ul class="text-xs text-gray-600 list-disc list-inside">
+        <p class="text-xs text-[#ff6b6b] font-bold uppercase mt-1">Updated</p>
+        <ul class="text-xs text-gray-700 list-disc list-inside font-medium">
           {#each step.diffSummary.updated.slice(0, 3) as updatedEl}
             <li>
               {summarizeElement(updatedEl.after)} –
@@ -148,14 +148,14 @@ const summarizeElement = (element = {}) => {
 
   <!-- Vision Validation Results -->
   {#if step.validation}
-    <div class="validation-section border-t pt-3 mt-3" transition:fade>
+    <div class="validation-section border-t-2 border-gray-900 pt-3 mt-3" transition:fade>
       <div class="flex items-start gap-2 mb-2">
         <span class="text-lg">{step.validation.isValid ? '✅' : '⚠️'}</span>
         <div class="flex-1">
-          <p class="text-xs font-semibold mb-1">
+          <p class="text-xs font-black uppercase mb-1">
             {step.validation.isValid ? 'Validation Passed' : 'Issues Detected'}
           </p>
-          <p class="text-xs text-gray-700">
+          <p class="text-xs text-gray-700 font-medium">
             🤖 {step.validation.analysis}
           </p>
         </div>
@@ -167,16 +167,16 @@ const summarizeElement = (element = {}) => {
           <img 
             src={step.validation.screenshot} 
             alt="Canvas after step {stepIndex + 1}"
-            class="w-full rounded border border-gray-200 max-h-40 object-contain bg-white"
+            class="w-full rounded-lg border-2 border-gray-900 max-h-40 object-contain bg-white shadow-[2px_2px_0_0_#1f2937]"
           />
         </div>
       {/if}
 
       <!-- Issues -->
       {#if step.validation.issues && step.validation.issues.length > 0}
-        <div class="mt-2 bg-red-50 p-2 rounded">
-          <p class="text-xs font-semibold text-red-700 mb-1">Issues:</p>
-          <ul class="text-xs text-red-600 list-disc list-inside">
+        <div class="mt-2 bg-red-50 border-2 border-gray-900 p-2 rounded-lg shadow-[2px_2px_0_0_#1f2937]">
+          <p class="text-xs font-black text-red-700 mb-1 uppercase">Issues:</p>
+          <ul class="text-xs text-red-700 list-disc list-inside font-medium">
             {#each step.validation.issues as issue}
               <li>{issue}</li>
             {/each}
@@ -186,11 +186,11 @@ const summarizeElement = (element = {}) => {
 
       <!-- Self-Corrections -->
       {#if step.validation.suggestions && step.validation.suggestions.length > 0}
-        <div class="mt-2 bg-purple-50 p-2 rounded">
-          <p class="text-xs font-semibold text-purple-700 mb-1">🔧 Self-corrections applied:</p>
+        <div class="mt-2 bg-purple-50 border-2 border-gray-900 p-2 rounded-lg shadow-[2px_2px_0_0_#1f2937]">
+          <p class="text-xs font-black text-purple-700 mb-1 uppercase">🔧 Self-corrections applied:</p>
           {#each step.validation.suggestions as correction}
-            <div class="text-xs text-purple-600 mb-1">
-              <code class="bg-white px-1 rounded">{correction.tool}</code>: {correction.reasoning}
+            <div class="text-xs text-purple-700 mb-1 font-medium">
+              <code class="bg-white border border-purple-200 px-1 rounded">{correction.tool}</code>: {correction.reasoning}
             </div>
           {/each}
         </div>
@@ -200,16 +200,16 @@ const summarizeElement = (element = {}) => {
 
   <!-- Actions -->
   {#if step.status === 'pending' || step.status === 'validated'}
-    <div class="flex gap-2 mt-3 pt-3 border-t">
+    <div class="flex gap-2 mt-3 pt-3 border-t-2 border-gray-900">
       <button
         on:click={() => onApprove(stepIndex)}
-        class="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
+        class="flex-1 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
       >
         ✓ Approve
       </button>
       <button
         on:click={() => onReject(stepIndex)}
-        class="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
+        class="flex-1 bg-[#f87171] hover:bg-[#ef4444] text-white text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
       >
         ✗ Reject
       </button>
@@ -217,15 +217,15 @@ const summarizeElement = (element = {}) => {
   {/if}
 
   {#if step.status === 'rejected'}
-    <div class="mt-3 pt-3 border-t" transition:fade>
+    <div class="mt-3 pt-3 border-t-2 border-gray-900" transition:fade>
       <textarea
         bind:value={feedbackText}
         placeholder="Why did you reject this? (helps copilot improve)"
-        class="w-full text-xs border border-gray-300 rounded p-2 mb-2 min-h-[60px]"
+        class="w-full text-xs border-2 border-gray-900 rounded-lg p-2 mb-2 min-h-[60px] focus:shadow-[4px_4px_0_0_#ffc480] font-medium"
       />
       <button
         on:click={() => onRegenerate(stepIndex, feedbackText)}
-        class="w-full bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] hover:brightness-110 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
+        class="w-full bg-[#ffc480] hover:bg-[#ffb040] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
       >
         ↻ Regenerate with Feedback
       </button>
@@ -233,12 +233,3 @@ const summarizeElement = (element = {}) => {
   {/if}
 </div>
 
-<style>
-  .step-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .step-card.ring-2 {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-</style>

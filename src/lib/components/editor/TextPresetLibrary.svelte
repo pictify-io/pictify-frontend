@@ -591,7 +591,7 @@
 	<div class="grid grid-cols-1 gap-3">
 		{#each presets as preset}
 			<button
-				class="relative w-full p-4 bg-white border border-gray-200 rounded-xl text-left hover:border-[#ff6b6b] hover:shadow-lg transition-all group overflow-hidden"
+				class="relative w-full p-4 bg-white border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] text-left hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-1 transition-all group overflow-hidden"
 				on:click={() => applyPreset(preset)}
 			>
 				<!-- Preset Preview -->
@@ -625,7 +625,7 @@
 					<span class="text-sm font-semibold text-gray-700 group-hover:text-[#ff6b6b]">
 						{preset.name}
 					</span>
-					<span class="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full group-hover:bg-[#ff6b6b]/10 group-hover:text-[#ff6b6b]">
+					<span class="text-xs px-2 py-1 bg-white text-gray-900 border border-gray-900 rounded-md font-bold uppercase tracking-wide group-hover:bg-gray-900 group-hover:text-white">
 						{preset.category}
 					</span>
 				</div>
