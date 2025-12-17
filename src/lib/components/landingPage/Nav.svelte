@@ -5,7 +5,6 @@
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
 
 	let isLoggedIn = false;
-
 	let unsubscribe = () => {};
 
 	onMount(async () => {
@@ -21,137 +20,162 @@
 </script>
 
 <header
-	class="w-full h-20 z-30 border-b-[3px] border-black flex justify-between relative items-stretch md:divide-x-[3px] divide-black"
+	class="w-full h-20 z-50 border-b-[3px] border-gray-900 bg-[#FFFDF8] sticky top-0 flex justify-between items-stretch"
 >
+	<!-- Brand Logo -->
 	<a
 		href="/"
-		class="flex flex-shrink-0 text-black items-center justify-center h-full p-5 no-underline cursor-pointer"
+		class="flex flex-shrink-0 items-center justify-center px-6 sm:px-8 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-[#ffc480] transition-all group relative overflow-hidden"
 	>
-		<span class="text-2xl font-bold font-heading text-shadow">Pictify </span>
+		<!-- Decorative Corner Accent -->
+		<div class="absolute top-0 left-0 w-2 h-2 sm:w-3 sm:h-3 border-r border-b border-gray-900 bg-white"></div>
+		
+		<div class="flex items-center gap-2 sm:gap-3">
+			<!-- Logo Icon (Abstract Shapes) -->
+			<div class="w-8 h-8 sm:w-9 sm:h-9 bg-gray-900 rounded-md flex items-center justify-center shadow-[3px_3px_0_0_#ffc480] group-hover:shadow-none group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-all border-2 border-transparent">
+				<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
+				</svg>
+			</div>
+			
+			<!-- Text -->
+			<span class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight group-hover:translate-x-1 transition-transform">PICTIFY</span>
+		</div>
 	</a>
-	<button
-		class={[
-			'p-5 h-full w-20 border-l-[3px] flex md:hidden border-black items-center justify-center'
-		]}
-		class:hidden={showMobileMenu}
-		on:click={() => {
-			showMobileMenu = true;
-		}}
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke-width="1.5"
-			stroke="currentColor"
-			class="w-8 h-8"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-			/>
-		</svg>
-	</button>
-	<div
-		class={[
-			'w-full flex-col flex md:flex md:flex-row  md:relative absolute h-screen md:pt-0 pt-20 md:h-full items-stretch justify-between',
-			'flex',
-			showMobileMenu ? ' ' : 'hidden'
-		]}
-		class:hidden={!showMobileMenu}
-	>
-		<button
-			class="p-5 h-20 w-20 border-l-[3px] border-b-[3px] flex md:hidden absolute top-0 right-0 border-black items-center justify-center"
-			on:click={() => {
-				showMobileMenu = false;
-			}}
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="1.5"
-				stroke="currentColor"
-				class="w-8 h-8"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-			</svg>
-		</button>
-		<nav
-			class="w-full md:space-x-8 font-medium md:bg-transparent bg-[#FFFDF8] md:px-8 flex md:flex-row flex-col z-20 items-center"
-		>
-			<!-- <a
-				href="#_"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>Home</a
-			>
-			<a
-				href="#_"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>Blog</a
-			> -->
+
+	<!-- Desktop Nav (Centered) -->
+	<nav class="hidden md:flex flex-1 items-center justify-center">
+		<div class="flex items-center space-x-1">
 			<a
 				href={PUBLIC_DOCS_URL}
 				target="_blank"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>API Doc</a
+				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				>Docs</a
 			>
 			<a
 				href="/pricing"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
+				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				>Pricing</a
 			>
 			<a
 				href="/tools"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
+				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				>Tools</a
-			>	
+			>
+			<a
+				href="/templates"
+				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				>Templates</a
+			>
 			<a
 				href="/blogs"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
+				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				>Blog</a
 			>
-			<a
-				href="https://status.pictify.io"
-				target="_blank"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>Status</a
-			>
-			<a
-				href="mailto:support@pictify.io"
-				class="hover:underline md:border-b-0 text-center py-6 border-b-[3px] border-black md:w-auto w-full cursor-pointer"
-				>Contact</a
-			>
-		</nav>
-		<div class="flex-grow bg-[#FFFDF8]" />
-		<div
-			class="flex flex-shrink-0 md:flex-row flex-col md:bg-transparent bg-[#FFFDF8] font-medium border-l-0 md:border-l-[3px] border-black items-center"
-		>
+		</div>
+	</nav>
+
+	<!-- Right Side Actions -->
+	<div class="flex items-stretch">
+		
+		<!-- Desktop Auth Buttons -->
+		<div class="hidden md:flex h-full items-stretch border-l-[3px] border-gray-900">
 			{#if !isLoggedIn}
 				<a
 					href="/login"
-					class="px-8 md:border-t-0 border-t-[3px] border-black md:w-auto w-full justify-center flex space-x-2 md:py-0 py-6 cursor-pointer"
+					class="px-8 flex items-center justify-center text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors uppercase tracking-wide"
 				>
-					<!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 -ml-2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"></path>
-                </svg> -->
-					<span>Sign In</span>
+					Sign In
 				</a>
-			{/if}
-			{#if isLoggedIn}
-				<a
-					href="/dashboard"
-					class="px-8 bg-black h-full md:py-0 py-6 md:w-auto w-full text-white flex items-center justify-center cursor-pointer"
-					>Dashboard</a
-				>
-			{:else}
 				<a
 					href="/login"
-					class="px-8 bg-black h-full md:py-0 py-6 md:w-auto w-full text-white flex items-center justify-center cursor-pointer"
-					>Start For Free</a
+					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-[#ff6b6b] hover:text-gray-900 transition-all uppercase tracking-wide border-l-[3px] border-gray-900"
 				>
+					Start For Free
+				</a>
+			{:else}
+				<a
+					href="/dashboard"
+					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-[#4ade80] hover:text-gray-900 transition-all uppercase tracking-wide"
+				>
+					Dashboard
+				</a>
 			{/if}
 		</div>
+
+		<!-- Mobile Menu Button -->
+		<button
+			class="md:hidden w-20 border-l-[3px] border-gray-900 flex items-center justify-center hover:bg-gray-100 transition-colors"
+			on:click={() => (showMobileMenu = !showMobileMenu)}
+			aria-label="Toggle Menu"
+		>
+			{#if showMobileMenu}
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+				</svg>
+			{/if}
+		</button>
 	</div>
 </header>
+
+<!-- Mobile Menu Overlay -->
+{#if showMobileMenu}
+	<div class="fixed inset-0 z-40 bg-[#FFFDF8] pt-20 md:hidden overflow-y-auto">
+		<nav class="flex flex-col p-6 space-y-4">
+			<a
+				href={PUBLIC_DOCS_URL}
+				target="_blank"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>Docs</a
+			>
+			<a
+				href="/pricing"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>Pricing</a
+			>
+			<a
+				href="/tools"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>Tools</a
+			>
+			<a
+				href="/templates"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>Templates</a
+			>
+			<a
+				href="/blogs"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>Blog</a
+			>
+			
+			<div class="h-px bg-gray-900 opacity-10 my-2"></div>
+
+			{#if !isLoggedIn}
+				<a
+					href="/login"
+					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-gray-100 rounded-xl uppercase active:translate-y-1 active:shadow-[2px_2px_0_0_#000] transition-all"
+				>
+					Sign In
+				</a>
+				<a
+					href="/login"
+					class="p-4 text-center text-lg font-black text-white border-[3px] border-gray-900 bg-[#ff6b6b] shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>
+					Start For Free
+				</a>
+			{:else}
+				<a
+					href="/dashboard"
+					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-[#4ade80] shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				>
+					Dashboard
+				</a>
+			{/if}
+		</nav>
+	</div>
+{/if}

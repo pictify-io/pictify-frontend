@@ -373,6 +373,8 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		box-sizing: border-box;
+        background: #FFFDF8;
+        padding: 16px;
 	}
 	
 	/* Search Section */
@@ -381,7 +383,7 @@
 		gap: 8px;
 		position: sticky;
 		top: 0;
-		background: white;
+		background: #FFFDF8;
 		z-index: 10;
 		padding-bottom: 8px;
 		padding-right: 8px;
@@ -401,21 +403,28 @@
 		left: 12px;
 		top: 50%;
 		transform: translateY(-50%);
-		color: #999;
+		color: #111827;
 	}
 	
 	.search-box input {
 		width: 100%;
 		padding: 8px 32px 8px 36px;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		border-radius: 6px;
 		font-size: 13px;
 		box-sizing: border-box;
+        font-weight: 600;
+        color: #111827;
+        box-shadow: 2px 2px 0 0 #111827;
+        transition: all 0.1s;
+        text-transform: uppercase;
 	}
 	
 	.search-box input:focus {
 		outline: none;
-		border-color: #ff6b6b;
+		border-color: #111827;
+        box-shadow: 2px 2px 0 0 #ffc480;
+        transform: translate(-1px, -1px);
 	}
 	
 	.clear-btn {
@@ -441,21 +450,26 @@
 	
 	.search-btn {
 		padding: 8px 12px;
-		background: #ff6b6b;
+		background: #111827;
 		color: white;
 		border: none;
 		border-radius: 6px;
 		font-size: 12px;
-		font-weight: 500;
+		font-weight: 800;
 		cursor: pointer;
-		transition: background 0.15s;
+		transition: all 0.15s;
 		white-space: nowrap;
 		flex-shrink: 0;
 		min-width: 70px;
+        text-transform: uppercase;
+        box-shadow: 2px 2px 0 0 #000;
 	}
 	
 	.search-btn:hover:not(:disabled) {
-		background: #eb5a5a;
+		background: #000;
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 0 #ffc480;
+        color: #ffc480;
 	}
 	
 	.search-btn:disabled {
@@ -475,10 +489,10 @@
 	
 	.suggestions-label {
 		font-size: 11px;
-		font-weight: 600;
-		color: #666;
+		font-weight: 900;
+		color: #111827;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0.1em;
 	}
 	
 	.suggestions-tags {
@@ -492,19 +506,23 @@
 	
 	.tag {
 		padding: 4px 10px;
-		background: #f5f5f5;
-		border: 1px solid #e5e5e5;
+		background: #fff;
+		border: 2px solid #111827;
 		border-radius: 12px;
 		font-size: 11px;
-		color: #666;
+		color: #111827;
 		cursor: pointer;
 		transition: all 0.15s;
+        font-weight: 700;
+        text-transform: uppercase;
 	}
 	
 	.tag:hover {
-		background: #ff6b6b;
-		color: white;
-		border-color: #ff6b6b;
+		background: #111827;
+		color: #fff;
+		border-color: #111827;
+        transform: translate(-1px, -1px);
+        box-shadow: 2px 2px 0 0 #ffc480;
 	}
 	
 	/* Messages */
@@ -518,18 +536,19 @@
 		align-items: flex-start;
 		width: 100%;
 		box-sizing: border-box;
+        border: 2px solid #111827;
+        box-shadow: 4px 4px 0 0 #111827;
+        font-weight: 500;
 	}
 	
 	.error-message {
 		background: #fee;
 		color: #c33;
-		border: 1px solid #fcc;
 	}
 	
 	.info-message {
 		background: #e0f2fe;
 		color: #0369a1;
-		border: 1px solid #bae6fd;
 		flex-direction: row;
 	}
 	
@@ -561,13 +580,13 @@
 		align-items: center;
 		justify-content: center;
 		padding: 40px 28px 40px 20px;
-		color: #999;
+		color: #111827;
 		gap: 8px;
 	}
 	
 	.loading-state i {
 		font-size: 24px;
-		color: #ff6b6b;
+		color: #111827;
 	}
 	
 	/* Photos Grid */
@@ -595,10 +614,17 @@
 		padding-top: 56.25%; /* 16:9 aspect ratio */
 		overflow: hidden;
 		border-radius: 8px;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		cursor: pointer;
 		background: #f5f5f5;
+        box-shadow: 2px 2px 0 0 #111827;
+        transition: all 0.1s;
 	}
+    
+    .photo-item:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0 0 #ffc480;
+    }
 	
 	.photo-item img {
 		position: absolute;
@@ -638,8 +664,9 @@
 		justify-content: center;
 		flex: 1;
 		font-size: 14px;
-		font-weight: 500;
+		font-weight: 700;
 		gap: 8px;
+        text-transform: uppercase;
 	}
 	
 	.photo-info i {
@@ -648,24 +675,27 @@
 	
 	.photo-attribution {
 		font-size: 10px;
-		color: #666;
+		color: #111827;
 		line-height: 1.4;
 		padding: 0 2px;
 		word-wrap: break-word;
 		overflow-wrap: break-word;
 		max-width: 100%;
 		box-sizing: border-box;
+        font-weight: 600;
 	}
 	
 	.photo-attribution a {
-		color: #ff6b6b;
+		color: #111827;
 		text-decoration: none;
-		font-weight: 500;
+		font-weight: 800;
 		word-break: break-word;
 	}
 	
 	.photo-attribution a:hover {
 		text-decoration: underline;
+        color: #ffc480;
+        background: #111827;
 	}
 	
 	/* Load More */
@@ -674,27 +704,30 @@
 		margin-right: 8px;
 		padding: 12px;
 		background: white;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		border-radius: 6px;
 		cursor: pointer;
 		font-size: 13px;
-		font-weight: 500;
-		color: #666;
+		font-weight: 700;
+		color: #111827;
 		transition: all 0.15s;
 		box-sizing: border-box;
+        text-transform: uppercase;
+        box-shadow: 2px 2px 0 0 #111827;
 	}
 	
 	.load-more-btn:hover {
-		background: #f5f5f5;
-		border-color: #ff6b6b;
-		color: #ff6b6b;
+		background: #111827;
+		color: #fff;
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 0 #ffc480;
 	}
 	
 	.loading-more {
 		text-align: center;
 		padding: 12px;
 		padding-right: 20px;
-		color: #ff6b6b;
+		color: #111827;
 	}
 	
 	/* Empty State */
@@ -704,7 +737,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 40px 28px 40px 20px;
-		color: #999;
+		color: #111827;
 		gap: 8px;
 	}
 	
@@ -715,8 +748,9 @@
 	
 	.empty-state p {
 		font-size: 14px;
-		font-weight: 500;
+		font-weight: 700;
 		margin: 0;
+        text-transform: uppercase;
 	}
 	
 	.empty-state span {
@@ -727,22 +761,23 @@
 	.footer-credit {
 		position: sticky;
 		bottom: 0;
-		background: white;
-		border-top: 1px solid #e5e5e5;
+		background: #FFFDF8;
+		border-top: 3px solid #111827;
 		padding: 8px;
 		padding-right: 16px;
 		text-align: center;
 		font-size: 10px;
-		color: #999;
+		color: #111827;
 		margin-top: auto;
 		width: 100%;
 		box-sizing: border-box;
+        font-weight: 600;
 	}
 	
 	.footer-credit a {
-		color: #ff6b6b;
+		color: #111827;
 		text-decoration: none;
-		font-weight: 500;
+		font-weight: 800;
 	}
 	
 	.footer-credit a:hover {
@@ -759,12 +794,11 @@
 	}
 	
 	.stock-photos-panel::-webkit-scrollbar-thumb {
-		background: #d0d0d0;
+		background: #111827;
 		border-radius: 3px;
 	}
 	
 	.stock-photos-panel::-webkit-scrollbar-thumb:hover {
-		background: #b0b0b0;
+		background: #000;
 	}
 </style>
-

@@ -150,256 +150,281 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="w-full min-h-screen bg-white">
-	<div class="max-w-7xl mx-auto p-6">
-		<!-- Header -->
-		<div class="flex items-center gap-3 mb-8">
-		<h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-			{#if mediaType === 'images'}
-				<svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-				</svg>
-				Images
-			{:else}
-				<svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-				</svg>
-				GIFs
-			{/if}
-		</h1>
-		{#if !isLoading && pagination.total > 0}
-			<span class="bg-[#ff6b6b] text-white text-xs font-semibold px-3 py-1 rounded-full">
-				{pagination.total} {mediaType}
-			</span>
-		{/if}
+<div class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden">
+	<!-- Background Grid -->
+	<div class="absolute inset-0 opacity-5 pointer-events-none" 
+		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
 	</div>
 
-	<!-- Content -->
-	{#if isLoading}
-		<div class="flex flex-col items-center justify-center py-20">
-			<Loader size="16" show={isLoading} />
-			<p class="text-gray-500 mt-4">Loading your {mediaType}...</p>
-		</div>
-	{:else if mediaList.length === 0}
-		<div class="flex flex-col items-center justify-center py-20 bg-white border border-gray-200 rounded-xl">
-			<div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-				{#if mediaType === 'images'}
-					<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-					</svg>
-				{:else}
-					<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-					</svg>
-				{/if}
+	<div class="max-w-7xl mx-auto p-6 relative z-10">
+		<!-- Header -->
+		<div class="flex items-center justify-between mb-10">
+			<div class="flex items-center gap-4">
+				<div class="w-12 h-12 bg-gray-900 rounded-xl border-[3px] border-gray-900 flex items-center justify-center shadow-[4px_4px_0_0_#ffc480]">
+					{#if mediaType === 'images'}
+						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+						</svg>
+					{:else}
+						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+						</svg>
+					{/if}
+				</div>
+				<div>
+					<h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter leading-none">
+						{mediaType === 'images' ? 'Image' : 'GIF'} <span class="text-[#ff6b6b]">Gallery</span>
+					</h1>
+					<div class="flex items-center gap-2 mt-1">
+						<div class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse"></div>
+						<p class="text-xs font-bold text-gray-500 uppercase tracking-wider">
+							System Status: Active
+						</p>
+					</div>
+				</div>
 			</div>
-			<h2 class="text-lg font-semibold text-gray-900 mb-1">No {mediaType} yet</h2>
-			<p class="text-gray-500 text-sm">Create your first {mediaType === 'images' ? 'image' : 'GIF'} using the editor or API</p>
+
+			{#if !isLoading && pagination.total > 0}
+				<div class="bg-white border-[3px] border-gray-900 px-4 py-2 rounded-xl shadow-[4px_4px_0_0_#1f2937] flex items-center gap-3">
+					<span class="text-xs font-black text-gray-400 uppercase tracking-wide">Total Items</span>
+					<span class="text-xl font-black text-gray-900 tabular-nums">{pagination.total}</span>
+				</div>
+			{/if}
 		</div>
-	{:else}
-		<!-- Media Grid -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" class:opacity-50={isLoadingMore}>
-			{#each mediaList as media, index (media.id || index)}
-				<div
-					role="button"
-					tabindex="0"
-					class="media-card group bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-[#ff6b6b]"
-					on:click={() => openLightbox(media)}
-					on:keydown={(e) => e.key === 'Enter' && openLightbox(media)}
-				>
-					<!-- Preview Container -->
-					<div class="relative bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200 overflow-hidden" style="height: 180px;">
-						<img 
-							src={media.url} 
-							alt="Media item"
-							class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-							loading="lazy"
-						/>
+
+		<!-- Content -->
+		{#if isLoading}
+			<div class="flex flex-col items-center justify-center py-32">
+				<Loader size="16" show={isLoading} />
+				<p class="text-gray-400 text-xs font-black uppercase tracking-widest mt-6 animate-pulse">Loading Media Assets...</p>
+			</div>
+		{:else if mediaList.length === 0}
+			<div class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm">
+				<div class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-[4px_4px_0_0_#1f2937]">
+					{#if mediaType === 'images'}
+						<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+						</svg>
+					{:else}
+						<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+						</svg>
+					{/if}
+				</div>
+				<h2 class="text-2xl font-black text-gray-900 uppercase tracking-wide mb-2">No {mediaType} Generated</h2>
+				<p class="text-gray-500 font-bold max-w-md text-center">
+					Start generating {mediaType === 'images' ? 'images' : 'GIFs'} from your templates to see them appear here.
+				</p>
+			</div>
+		{:else}
+			<!-- Media Grid -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-10" class:opacity-50={isLoadingMore}>
+				{#each mediaList as media, index (media.id || index)}
+					<div
+						role="button"
+						tabindex="0"
+						class="media-card group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1"
+						on:click={() => openLightbox(media)}
+						on:keydown={(e) => e.key === 'Enter' && openLightbox(media)}
+					>
+						<!-- Preview Container -->
+						<div class="relative bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-b-[3px] border-gray-900 overflow-hidden h-[220px] group-hover:bg-gray-50 transition-colors">
+							<img 
+								src={media.url} 
+								alt="Media item"
+								class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
+								loading="lazy"
+							/>
+							
+							<!-- Dimension badge -->
+							{#if media.width && media.height}
+								<div class="absolute bottom-3 left-3 z-20">
+									<span class="text-[10px] font-black text-gray-900 bg-white px-2 py-1 rounded border-[2px] border-gray-900 uppercase tracking-wide shadow-sm">
+										{media.width} × {media.height}
+									</span>
+								</div>
+							{/if}
+							
+							<!-- Hover overlay -->
+							<div class="absolute inset-0 bg-gray-900/5 group-hover:bg-gray-900/10 transition-colors duration-300 z-10 pointer-events-none" />
+							
+							<!-- Action buttons on hover -->
+							<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-30 flex gap-2">
+								<button
+									on:click={(e) => copyToClipboard(media.url, e)}
+									class="bg-white rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									title="Copy URL"
+								>
+									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+									</svg>
+								</button>
+								<button
+									on:click={(e) => downloadMedia(media.url, e)}
+									class="bg-[#ff6b6b] rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									title="Download"
+								>
+									<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+									</svg>
+								</button>
+							</div>
+						</div>
 						
-						<!-- Dimension badge -->
-						{#if media.width && media.height}
-							<div class="absolute bottom-2 left-2 z-20">
-								<span class="text-[10px] font-medium text-gray-500 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-sm">
-									{media.width} × {media.height}
+						<!-- Info -->
+						<div class="p-4 bg-white">
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-2">
+									<div class="w-2 h-2 rounded-full bg-gray-300"></div>
+									<span class="text-xs text-gray-500 font-bold uppercase tracking-wide">{formatDate(media.createdAt)}</span>
+								</div>
+								<span class="text-[9px] font-black text-gray-900 bg-[#ffc480]/30 px-2 py-0.5 rounded border border-[#ffc480] uppercase tracking-wider">
+									{mediaType === 'images' ? 'PNG' : 'GIF'}
 								</span>
 							</div>
-						{/if}
-						
-						<!-- Hover overlay -->
-						<div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 z-10 pointer-events-none" />
-						
-						<!-- Action buttons on hover -->
-						<div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex gap-2">
-							<button
-								on:click={(e) => copyToClipboard(media.url, e)}
-								class="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
-								title="Copy URL"
-							>
-								<svg class="w-4 h-4 text-gray-700 hover:text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-								</svg>
-							</button>
-							<button
-								on:click={(e) => downloadMedia(media.url, e)}
-								class="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
-								title="Download"
-							>
-								<svg class="w-4 h-4 text-gray-700 hover:text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-								</svg>
-							</button>
-						</div>
-						
-						<!-- Expand icon -->
-						<div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
-							<div class="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-								<svg class="w-4 h-4 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-								</svg>
-							</div>
 						</div>
 					</div>
-					
-					<!-- Info -->
-					<div class="p-4">
-						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-2 text-xs text-gray-500">
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-								</svg>
-								<span>{formatDate(media.createdAt)}</span>
-							</div>
-							<span class="text-[10px] font-medium text-gray-400 uppercase">
-								{mediaType === 'images' ? 'PNG' : 'GIF'}
-							</span>
-						</div>
-					</div>
-				</div>
-			{/each}
-		</div>
-
-		<!-- Pagination -->
-		{#if totalPages > 1}
-			<div class="flex items-center justify-between mt-10 pt-6 border-t border-gray-200">
-				<!-- Results count -->
-				<div class="text-sm text-gray-500">
-					Showing <span class="font-medium text-gray-700">{(currentPage - 1) * itemsPerPage + 1}</span>
-					to <span class="font-medium text-gray-700">{Math.min(currentPage * itemsPerPage, pagination.total)}</span>
-					of <span class="font-medium text-gray-700">{pagination.total}</span> {mediaType}
-				</div>
-
-				<!-- Page controls -->
-				<div class="flex items-center gap-1">
-					<!-- Previous button -->
-					<button
-						on:click={() => loadPage(currentPage - 1)}
-						disabled={!hasPrev || isLoadingMore}
-						class="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
-							{hasPrev 
-								? 'text-gray-700 hover:bg-gray-100 hover:text-[#ff6b6b]' 
-								: 'text-gray-300 cursor-not-allowed'}"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-						</svg>
-						<span class="hidden sm:inline">Previous</span>
-					</button>
-
-					<!-- Page numbers -->
-					<div class="flex items-center gap-1 mx-2">
-						{#each getPageNumbers() as pageNum}
-							{#if pageNum === '...'}
-								<span class="px-2 py-1 text-gray-400">...</span>
-							{:else}
-								<button
-									on:click={() => loadPage(pageNum)}
-									disabled={isLoadingMore}
-									class="w-9 h-9 text-sm font-medium rounded-lg transition-all duration-200
-										{pageNum === currentPage 
-											? 'bg-[#ff6b6b] text-white shadow-md shadow-[#ff6b6b]/30' 
-											: 'text-gray-600 hover:bg-gray-100 hover:text-[#ff6b6b]'}"
-								>
-									{pageNum}
-								</button>
-							{/if}
-						{/each}
-					</div>
-
-					<!-- Next button -->
-					<button
-						on:click={() => loadPage(currentPage + 1)}
-						disabled={!hasNext || isLoadingMore}
-						class="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
-							{hasNext 
-								? 'text-gray-700 hover:bg-gray-100 hover:text-[#ff6b6b]' 
-								: 'text-gray-300 cursor-not-allowed'}"
-					>
-						<span class="hidden sm:inline">Next</span>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-						</svg>
-					</button>
-				</div>
+				{/each}
 			</div>
+
+			<!-- Pagination -->
+			{#if totalPages > 1}
+				<div class="flex items-center justify-between mt-12 pt-8 border-t-[3px] border-gray-900">
+					<!-- Results count -->
+					<div class="bg-white border-[2px] border-gray-900 px-4 py-2 rounded-lg shadow-sm">
+						<span class="text-xs font-bold text-gray-500 uppercase tracking-wide">Showing</span>
+						<span class="text-sm font-black text-gray-900 ml-1">{(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, pagination.total)}</span>
+					</div>
+
+					<!-- Page controls -->
+					<div class="flex items-center gap-2">
+						<!-- Previous button -->
+						<button
+							on:click={() => loadPage(currentPage - 1)}
+							disabled={!hasPrev || isLoadingMore}
+							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
+							{hasPrev 
+								? 'bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]' 
+								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
+						>
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+							</svg>
+						</button>
+
+						<!-- Page numbers -->
+						<div class="flex items-center gap-2 px-2">
+							{#each getPageNumbers() as pageNum}
+								{#if pageNum === '...'}
+									<span class="text-gray-400 font-black text-xs">...</span>
+								{:else}
+									<button
+										on:click={() => loadPage(pageNum)}
+										disabled={isLoadingMore}
+										class="w-8 h-8 text-xs font-black rounded-md border-[2px] transition-all duration-200 flex items-center justify-center
+										{pageNum === currentPage 
+											? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#ffc480]' 
+											: 'bg-white border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-900'}"
+									>
+										{pageNum}
+									</button>
+								{/if}
+							{/each}
+						</div>
+
+						<!-- Next button -->
+						<button
+							on:click={() => loadPage(currentPage + 1)}
+							disabled={!hasNext || isLoadingMore}
+							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
+							{hasNext 
+								? 'bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]' 
+								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
+						>
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+							</svg>
+						</button>
+					</div>
+				</div>
+			{/if}
 		{/if}
-	{/if}
 	</div>
 </div>
 
 <!-- Lightbox Modal -->
 {#if showLightbox && selectedMedia}
+	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 	<div 
-		class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+		class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
 		on:click={closeLightbox}
-		on:keydown={(e) => e.key === 'Escape' && closeLightbox()}
 		role="dialog"
 		aria-modal="true"
+		aria-labelledby="lightbox-title"
 		tabindex="-1"
 	>
 		<!-- Close button -->
 		<button 
-			class="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors z-10"
+			class="absolute top-6 right-6 w-12 h-12 bg-white rounded-xl border-[3px] border-gray-900 flex items-center justify-center transition-all shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] z-50"
 			on:click={closeLightbox}
+			aria-label="Close lightbox"
 		>
-			<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+			<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
 			</svg>
 		</button>
 		
-		<div class="max-w-5xl max-h-[90vh] flex flex-col" on:click|stopPropagation>
-			<!-- Image -->
-			<img 
-				src={selectedMedia.url} 
-				alt="Full size media" 
-				class="max-w-full max-h-[calc(90vh-80px)] object-contain rounded-lg shadow-2xl"
-			/>
+		<h2 id="lightbox-title" class="sr-only">Image Preview</h2>
+		
+		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+		<div class="max-w-6xl w-full max-h-[90vh] flex flex-col relative" on:click|stopPropagation>
+			<!-- Image Frame -->
+			<div class="bg-white rounded-2xl border-[3px] border-gray-900 p-2 shadow-[12px_12px_0_0_#000] relative overflow-hidden">
+				<!-- Pattern Background -->
+				<div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50 pointer-events-none"></div>
+				
+				<div class="relative z-10 bg-white/50 rounded-xl overflow-hidden flex items-center justify-center min-h-[400px]">
+					<img 
+						src={selectedMedia.url} 
+						alt="Full size media" 
+						class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"
+					/>
+				</div>
+			</div>
 			
 			<!-- Toolbar -->
-			<div class="flex items-center justify-between mt-4 px-2">
-				<div class="flex items-center gap-4 text-white/80 text-sm">
+			<div class="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4 px-2">
+				<div class="flex items-center gap-3">
 					{#if selectedMedia.width && selectedMedia.height}
-						<span>{selectedMedia.width} × {selectedMedia.height}</span>
+						<div class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20">
+							<svg class="w-4 h-4 text-[#ffc480]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+							<span class="text-xs font-bold text-white font-mono">{selectedMedia.width} × {selectedMedia.height}</span>
+						</div>
 					{/if}
 					{#if selectedMedia.createdAt}
-						<span>{formatDate(selectedMedia.createdAt)}</span>
+						<div class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20">
+							<svg class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+							<span class="text-xs font-bold text-white uppercase">{formatDate(selectedMedia.createdAt)}</span>
+						</div>
 					{/if}
 				</div>
-				<div class="flex gap-3">
+
+				<div class="flex gap-3 w-full sm:w-auto">
 					<button 
-						class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-sm font-medium"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => copyToClipboard(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
 						</svg>
-						Copy URL
+						Copy Link
 					</button>
 					<button 
-						class="flex items-center gap-2 px-4 py-2 bg-[#ff6b6b] hover:bg-[#ff5252] text-white rounded-lg transition-colors text-sm font-medium shadow-lg shadow-[#ff6b6b]/30"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#ff6b6b] text-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => downloadMedia(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
 						</svg>
 						Download
 					</button>

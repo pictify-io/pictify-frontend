@@ -4,9 +4,11 @@
   import { createImagePublic } from '../../../api/image.js';
   import { user } from '../../../store/user.store';
   import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+  import NextSteps from '$lib/components/tools/NextSteps.svelte';
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import Toast from '$lib/components/Toast.svelte';
   import { onMount } from 'svelte';
+  import { page } from '$app/stores';
 
   // Syntax highlighting via refractor (Prism under the hood)
   import { refractor } from 'refractor';
@@ -136,6 +138,8 @@
   let usageKey = 'pictify_code_image_usage';
   let maxFreeGenerations = 5;
   let freeGenerationsUsed = 0;
+  let shareBonusGenerations = 0; // +1/day via share (guest only)
+  const bonusKey = usageKey + '_bonus';
   let isUserLoggedIn = false;
   let showUpgradePrompt = false;
   let showFirstGenerationPrompt = false;
@@ -147,8 +151,9 @@
   });
 
   // Computed properties for usage tracking
-  $: remainingGenerations = maxFreeGenerations - freeGenerationsUsed;
-  $: usagePercentage = (freeGenerationsUsed / maxFreeGenerations) * 100;
+  $: effectiveMaxFreeGenerations = maxFreeGenerations + (isUserLoggedIn ? 0 : shareBonusGenerations);
+  $: remainingGenerations = effectiveMaxFreeGenerations - freeGenerationsUsed;
+  $: usagePercentage = effectiveMaxFreeGenerations ? (freeGenerationsUsed / effectiveMaxFreeGenerations) * 100 : 0;
 
   // Sample code snippets for different languages
   const sampleCode = {
@@ -382,6 +387,24 @@
   }
 
   onMount(() => {
+    // Apply presets from query params (used by /templates gallery)
+    const params = $page?.url?.searchParams;
+    if (params) {
+      const qLang = params.get('language');
+      const qTheme = params.get('theme');
+      const qFont = params.get('font');
+      const qW = parseInt(params.get('width') || '', 10);
+      const qH = parseInt(params.get('height') || '', 10);
+
+      if (qLang) language = qLang;
+      if (qTheme && themeOptions.some((t) => t.id === qTheme)) themeId = qTheme;
+      if (qFont && fontOptions.some((f) => f.id === qFont)) fontId = qFont;
+      if (!Number.isNaN(qW) && !Number.isNaN(qH) && qW > 0 && qH > 0) {
+        previewWidth = qW;
+        previewHeight = qH;
+      }
+    }
+
     updatePreviewSize();
     
     if (typeof window !== 'undefined') {
@@ -391,20 +414,53 @@
         freeGenerationsUsed = parseInt(usage);
       }
 
+      // Load share bonus
+      const bonus = localStorage.getItem(bonusKey);
+      if (bonus) {
+        shareBonusGenerations = parseInt(bonus);
+      }
+
       // Reset usage if it's a new day
       const lastUsageDate = localStorage.getItem(usageKey + '_date');
+      const lastBonusDate = localStorage.getItem(bonusKey + '_date');
       const today = new Date().toDateString();
       if (lastUsageDate !== today) {
         freeGenerationsUsed = 0;
         localStorage.setItem(usageKey, '0');
         localStorage.setItem(usageKey + '_date', today);
       }
+      if (lastBonusDate !== today) {
+        shareBonusGenerations = 0;
+        localStorage.setItem(bonusKey, '0');
+        localStorage.setItem(bonusKey + '_date', today);
+      }
     }
   });
 
+  function buildCurlSnippetFromHtml(html, width, height) {
+    const payload = {
+      html: String(html || ''),
+      width: Number(width) || 1200,
+      height: Number(height) || 630,
+      fileExtension: 'png'
+    };
+    return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(payload, null, 2)}'`;
+  }
+
+  $: nextStepsCurlSnippet = buildCurlSnippetFromHtml(buildSrcDoc(), previewWidth, previewHeight);
+  $: nextStepsTemplateDraft = generatedImage?.url ? {
+    version: 1,
+    name: 'Code card template',
+    type: 'social-media',
+    width: previewWidth,
+    height: previewHeight,
+    backgroundImageUrl: generatedImage.url,
+    source: 'code-to-image'
+  } : null;
+
   async function generateImage() {
     // Check if non-logged in user has reached limit
-    if (!isUserLoggedIn && freeGenerationsUsed >= maxFreeGenerations) {
+    if (!isUserLoggedIn && freeGenerationsUsed >= effectiveMaxFreeGenerations) {
       showUpgradePrompt = true;
       return;
     }
@@ -444,7 +500,7 @@
       if (!isUserLoggedIn) {
         if (freeGenerationsUsed === 1) {
           showFirstGenerationPrompt = true;
-        } else if (freeGenerationsUsed >= maxFreeGenerations) {
+        } else if (freeGenerationsUsed >= effectiveMaxFreeGenerations) {
           showUpgradePrompt = true;
         }
       }
@@ -461,6 +517,31 @@
     navigator.clipboard.writeText(text).then(() => {
       toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
     });
+  }
+
+  // Share reward: +1 guest generation today (once)
+  function handleSocialShare(platform) {
+    if (typeof window === 'undefined') return;
+    const shareUrl = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('Check out this awesome Code to Image Generator!');
+
+    if (platform === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`, '_blank');
+    } else if (platform === 'linkedin') {
+      window.open(
+        `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${encodeURIComponent('Code to Image Generator')}&summary=${text}`,
+        '_blank'
+      );
+    }
+
+    if (!isUserLoggedIn && shareBonusGenerations < 1) {
+      shareBonusGenerations = 1;
+      try {
+        localStorage.setItem(bonusKey, String(shareBonusGenerations));
+        localStorage.setItem(bonusKey + '_date', new Date().toDateString());
+      } catch (e) {}
+      toast.set({ message: 'Thanks for sharing! +1 extra guest generation unlocked for today.', duration: 2500 });
+    }
   }
   // Avoid literal style tags so Svelte's CSS preprocessor doesn't try to parse runtime content
   function returnStyleTag(css) {
@@ -495,97 +576,112 @@
   <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
   <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
 
-  <main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
+  <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-24 md:pb-32 relative z-10">
     
-    <!-- Header -->
-    <div class="text-center mb-12">
-      <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 mb-6">
-        <div class="flex gap-1">
-          <span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse"></span>
-          <span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse delay-75"></span>
-          <span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse delay-150"></span>
+    <!-- Hero Section -->
+    <div class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10">
+
+      <!-- Badge -->
+      <div class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8">
+        <div class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+          ★ Free Tool
         </div>
-        <span class="text-sm font-bold text-gray-900 tracking-wide uppercase">Free Tool</span>
       </div>
-      <h1 class="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 leading-[1.1] tracking-tight mb-8">
-        Code Snippet <span class="text-[#ff6b6b] relative inline-block">
-          to Image
-          <svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
-            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
-          </svg>
+
+      <!-- Main Title -->
+      <h1 class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8">
+        <span class="block sm:inline">CODE TO</span>
+        <span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
+          <span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
+          <span class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"></span>
         </span>
       </h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto font-medium">Create beautiful, syntax‑highlighted code screenshots for your social media and blogs.</p>
+
+      <!-- Description -->
+      <div class="max-w-2xl mx-auto px-2">
+        <p class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]">
+          Create beautiful, <span class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black">syntax-highlighted</span> code screenshots.
+          <span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold">Perfect for social media, blogs, and documentation</span>
+        </p>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 lg:gap-8 items-start">
       
       <!-- Left Column: Controls -->
-      <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl p-6 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-          Configuration
-        </h2>
+      <div class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] lg:shadow-[8px_8px_0_0_#000] lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1">
+        <!-- Terminal Header -->
+        <div class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] border-black">
+          <h2 class="font-bold font-mono tracking-widest text-xs uppercase flex items-center gap-2">
+            <span class="animate-pulse">_</span> CONFIG
+          </h2>
+          <div class="flex gap-2">
+            <div class="w-3 h-3 bg-[#ff6b6b] border border-black"></div>
+            <div class="w-3 h-3 bg-[#ffc480] border border-black"></div>
+            <div class="w-3 h-3 bg-[#4ade80] border border-black"></div>
+          </div>
+        </div>
+        <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar max-h-[60vh] lg:max-h-[calc(100vh-14rem)]">
 
         <div class="space-y-6">
           <!-- Language & Theme -->
           <div class="space-y-4">
             <div>
-              <label for="language" class="block text-sm font-bold text-gray-900 mb-1.5">Language</label>
+              <label for="language" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Language</label>
               <div class="relative">
-                <select id="language" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={language} on:change={() => { /* update filename via reactive */ }}>
+                <select id="language" class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer" bind:value={language} on:change={() => { /* update filename via reactive */ }}>
                   {#each languageOptions as opt}
                     <option value={opt.id}>{opt.name}</option>
                   {/each}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black">
                   <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
               </div>
             </div>
 
             <div>
-              <label for="theme" class="block text-sm font-bold text-gray-900 mb-1.5">Theme</label>
+              <label for="theme" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Theme</label>
               <div class="relative">
-                <select id="theme" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={themeId}>
+                <select id="theme" class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer" bind:value={themeId}>
                   {#each themeOptions as opt}
                     <option value={opt.id}>{opt.name}</option>
                   {/each}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black">
                   <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
               </div>
             </div>
 
             <div>
-              <label for="font" class="block text-sm font-bold text-gray-900 mb-1.5">Font</label>
+              <label for="font" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Font</label>
               <div class="relative">
-                <select id="font" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={fontId}>
+                <select id="font" class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer" bind:value={fontId}>
                   {#each fontOptions as opt}
                     <option value={opt.id}>{opt.name}</option>
                   {/each}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black">
                   <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="h-px bg-gray-200"></div>
+          <div class="h-[3px] bg-black"></div>
 
           <!-- Appearance -->
           <div class="space-y-4">
             <div>
-              <label for="backdrop" class="block text-sm font-bold text-gray-900 mb-1.5">Background</label>
+              <label for="backdrop" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Background</label>
               <div class="relative">
-                <select id="backdrop" class="w-full bg-white border-[3px] border-gray-900 text-gray-900 text-sm font-bold rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:shadow-[2px_2px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none" bind:value={backdrop}>
+                <select id="backdrop" class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer" bind:value={backdrop}>
                   {#each backdropOptions as option}
                     <option value={option.id}>{option.name}</option>
                   {/each}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black">
                   <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
               </div>
@@ -593,28 +689,28 @@
 
             {#if backdrop === 'solid'}
               <div>
-                <label for="solidBg" class="block text-sm font-bold text-gray-900 mb-1.5">Color</label>
+                <label for="solidBg" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Color</label>
                 <div class="flex items-center gap-2">
-                  <input id="solidBg" class="h-10 w-full border-[3px] border-gray-900 rounded-lg cursor-pointer shadow-[2px_2px_0_0_#1f2937] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all" type="color" bind:value={solidBackground} />
-                  <input type="text" class="w-24 border-[3px] border-gray-900 rounded-lg p-2 text-sm font-mono shadow-[2px_2px_0_0_#1f2937] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none" bind:value={solidBackground} />
+                  <input id="solidBg" class="h-10 w-full border-[3px] border-black cursor-pointer shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all" type="color" bind:value={solidBackground} />
+                  <input type="text" class="w-24 border-[3px] border-black p-2 text-sm font-mono shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none" bind:value={solidBackground} />
                 </div>
               </div>
             {/if}
             {#if backdrop === 'custom-gradient'}
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label for="gradientStart" class="block text-xs font-bold text-gray-900 mb-1">Start</label>
-                  <input id="gradientStart" class="h-8 w-full border-[3px] border-gray-900 rounded-lg cursor-pointer" type="color" bind:value={customGradientStart} />
+                  <label for="gradientStart" class="block text-xs font-black text-black mb-1 uppercase tracking-wider">Start</label>
+                  <input id="gradientStart" class="h-8 w-full border-[3px] border-black cursor-pointer shadow-[2px_2px_0_0_#000]" type="color" bind:value={customGradientStart} />
                 </div>
                 <div>
-                  <label for="gradientEnd" class="block text-xs font-bold text-gray-900 mb-1">End</label>
-                  <input id="gradientEnd" class="h-8 w-full border-[3px] border-gray-900 rounded-lg cursor-pointer" type="color" bind:value={customGradientEnd} />
+                  <label for="gradientEnd" class="block text-xs font-black text-black mb-1 uppercase tracking-wider">End</label>
+                  <input id="gradientEnd" class="h-8 w-full border-[3px] border-black cursor-pointer shadow-[2px_2px_0_0_#000]" type="color" bind:value={customGradientEnd} />
                 </div>
               </div>
             {/if}
 
             <div>
-              <label for="padding" class="block text-sm font-bold text-gray-900 mb-1.5">Padding ({padding}px)</label>
+              <label for="padding" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Padding ({padding}px)</label>
               <input id="padding" type="range" min="16" max="128" bind:value={padding} class="w-full cursor-pointer" />
             </div>
           </div>
@@ -622,94 +718,98 @@
           <div class="h-px bg-gray-200"></div>
 
           <!-- Window Settings -->
-          <div class="space-y-4">
-             <div class="flex items-center justify-between">
-              <label for="chrome" class="text-sm font-bold text-gray-900">Window Controls</label>
-              <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="chrome" id="chrome" bind:checked={showWindowChrome} class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-[3px] border-gray-900 appearance-none cursor-pointer checked:right-0 checked:bg-[#ff6b6b] checked:border-gray-900"/>
-                <label for="chrome" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-100 cursor-pointer border-[3px] border-gray-900"></label>
+          <div class="space-y-3">
+             <div class="flex items-center justify-between p-3 bg-[#f8f8f8] border-[2px] border-black">
+              <label for="chrome" class="text-xs font-black text-black uppercase tracking-wider">Window Controls</label>
+              <div class="relative inline-block w-12 align-middle select-none">
+                <input type="checkbox" name="chrome" id="chrome" bind:checked={showWindowChrome} class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-[#ff6b6b]"/>
+                <label for="chrome" class="toggle-label block overflow-hidden h-6 bg-gray-200 cursor-pointer border-[3px] border-black"></label>
               </div>
             </div>
 
-             <div class="flex items-center justify-between">
-              <label for="lineNumbers" class="text-sm font-bold text-gray-900">Line Numbers</label>
-              <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="lineNumbers" id="lineNumbers" bind:checked={showLineNumbers} class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-[3px] border-gray-900 appearance-none cursor-pointer checked:right-0 checked:bg-[#ff6b6b] checked:border-gray-900"/>
-                <label for="lineNumbers" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-100 cursor-pointer border-[3px] border-gray-900"></label>
+             <div class="flex items-center justify-between p-3 bg-[#f8f8f8] border-[2px] border-black">
+              <label for="lineNumbers" class="text-xs font-black text-black uppercase tracking-wider">Line Numbers</label>
+              <div class="relative inline-block w-12 align-middle select-none">
+                <input type="checkbox" name="lineNumbers" id="lineNumbers" bind:checked={showLineNumbers} class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-[#ff6b6b]"/>
+                <label for="lineNumbers" class="toggle-label block overflow-hidden h-6 bg-gray-200 cursor-pointer border-[3px] border-black"></label>
               </div>
             </div>
           </div>
 
-          <div class="h-px bg-gray-200"></div>
+          <div class="h-[3px] bg-black"></div>
 
           <!-- Advanced Styling -->
           <div class="space-y-4">
-            <h3 class="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+            <h3 class="text-xs font-black text-black uppercase tracking-widest flex items-center gap-2 pb-2 border-b-[2px] border-black">
+              <span class="w-5 h-5 bg-[#ffc480] border-[2px] border-black flex items-center justify-center text-xs">⚙</span>
               Advanced Styling
             </h3>
             
             <div>
-              <label for="fontSize" class="block text-xs font-bold text-gray-700 mb-1.5">Font Size ({fontSize}px)</label>
+              <label for="fontSize" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Font Size ({fontSize}px)</label>
               <input id="fontSize" type="range" min="10" max="24" bind:value={fontSize} class="w-full cursor-pointer" />
             </div>
 
             <div>
-              <label for="lineHeight" class="block text-xs font-bold text-gray-700 mb-1.5">Line Height ({lineHeight})</label>
+              <label for="lineHeight" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Line Height ({lineHeight})</label>
               <input id="lineHeight" type="range" min="1" max="2.5" step="0.1" bind:value={lineHeight} class="w-full cursor-pointer" />
             </div>
 
             <div>
-              <label for="opacity" class="block text-xs font-bold text-gray-700 mb-1.5">Card Opacity ({Math.round(cardOpacity * 100)}%)</label>
+              <label for="opacity" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Card Opacity ({Math.round(cardOpacity * 100)}%)</label>
               <input id="opacity" type="range" min="0" max="1" step="0.05" bind:value={cardOpacity} class="w-full cursor-pointer" />
             </div>
 
             <div>
-              <label for="shadow" class="block text-xs font-bold text-gray-700 mb-1.5">Shadow Intensity</label>
+              <label for="shadow" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Shadow Intensity</label>
               <input id="shadow" type="range" min="0" max="1" step="0.05" bind:value={shadowIntensity} class="w-full cursor-pointer" />
             </div>
 
             <div>
-              <label for="blur" class="block text-xs font-bold text-gray-700 mb-1.5">Blur Effect ({blurEffect}px)</label>
+              <label for="blur" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Blur ({blurEffect}px)</label>
               <input id="blur" type="range" min="0" max="20" bind:value={blurEffect} class="w-full cursor-pointer" />
             </div>
 
             <div>
-              <label for="radius" class="block text-xs font-bold text-gray-700 mb-1.5">Border Radius ({borderRadius}px)</label>
+              <label for="radius" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Border Radius ({borderRadius}px)</label>
               <input id="radius" type="range" min="0" max="32" bind:value={borderRadius} class="w-full cursor-pointer" />
             </div>
 
             <div>
-              <label for="tabWidth" class="block text-xs font-bold text-gray-700 mb-1.5">Tab Width ({codeTabWidth})</label>
+              <label for="tabWidth" class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider">Tab Width ({codeTabWidth})</label>
               <input id="tabWidth" type="range" min="2" max="8" step="2" bind:value={codeTabWidth} class="w-full cursor-pointer" />
             </div>
           </div>
 
         </div>
+        </div>
       </div>
 
       <!-- Right Column: Preview & Editor -->
-      <div class="space-y-6">
+      <div class="space-y-4 sm:space-y-6 order-1 lg:order-2">
         
         <!-- Editor Area -->
-        <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden">
-          <div class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between">
+        <div class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] overflow-hidden">
+          <!-- Terminal Header -->
+          <div class="bg-black text-white px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between border-b-[3px] border-black">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-              <div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900"></div>
-              <div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900"></div>
-              <span class="ml-2 text-sm font-bold text-gray-700">Code Editor</span>
+              <div class="flex gap-1.5 sm:gap-2 mr-2 sm:mr-4">
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#ff6b6b] border border-black"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#ffc480] border border-black"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#4ade80] border border-black"></div>
+              </div>
+              <span class="font-mono text-[10px] sm:text-xs tracking-widest uppercase">~ code_editor</span>
             </div>
             <button 
-              class="text-xs font-bold text-[#ff6b6b] hover:text-[#ff4f4f] underline decoration-2 underline-offset-2"
+              class="px-2 sm:px-3 py-1 bg-[#ff6b6b] hover:bg-[#ff5252] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               on:click={() => { code = sampleCode[language] || ''; isUsingSample = true; }}
             >
-              Reset to Sample
+              Reset
             </button>
           </div>
           <textarea 
             id="codeInput" 
-            class="w-full p-6 font-mono text-sm min-h-[200px] focus:outline-none resize-y bg-white" 
+            class="w-full p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[150px] sm:min-h-[200px] focus:outline-none resize-y bg-white border-none" 
             bind:value={code}
             on:input={() => { isUsingSample = false; }}
             placeholder="Paste your code here..."
@@ -718,20 +818,20 @@
         </div>
 
         <!-- Action Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-4 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-xl p-4">
-           <div class="flex items-center gap-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#e5e7eb] border-[3px] border-black p-3 sm:p-4">
+           <div class="flex items-center gap-2 sm:gap-3">
              <button 
               on:click={() => { currentTab = 'preview'; }} 
-              class="px-4 py-2 rounded-lg font-bold text-sm border-[3px] border-gray-900 transition-all {currentTab === 'preview' ? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#000]' : 'bg-white text-gray-900 hover:bg-gray-50 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 hover:-translate-x-0.5'}"
+              class="px-3 sm:px-5 py-2 font-bold text-xs sm:text-sm border-[3px] border-black transition-all {currentTab === 'preview' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#ffc480]'}"
             >
-              Preview
+              PREVIEW
             </button>
              {#if previewFrame}
-              <div class="hidden sm:flex items-center gap-2 ml-4">
-                <span class="text-xs font-bold text-gray-500 uppercase">Size:</span>
-                <input type="number" class="w-16 border-b-[3px] border-gray-900 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none font-mono" bind:value={previewWidth} min="400" max="1600" on:input={() => { if (previewFrame) { previewFrame.style.width = `${previewWidth}px`; } }} />
-                <span class="text-gray-400">×</span>
-                <input type="number" class="w-16 border-b-[3px] border-gray-900 focus:border-[#ff6b6b] text-xs bg-transparent text-center outline-none font-mono" bind:value={previewHeight} min="300" max="1200" on:input={() => { if (previewFrame) { previewFrame.style.height = `${previewHeight}px`; } }} />
+              <div class="hidden md:flex items-center gap-2 ml-2 px-3 py-1.5 bg-white border-[3px] border-black">
+                <span class="text-[10px] font-bold text-black uppercase tracking-wider">SIZE:</span>
+                <input type="number" class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-[#ff6b6b]" bind:value={previewWidth} min="400" max="1600" on:input={() => { if (previewFrame) { previewFrame.style.width = `${previewWidth}px`; } }} />
+                <span class="font-bold text-xs">×</span>
+                <input type="number" class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-[#ff6b6b]" bind:value={previewHeight} min="300" max="1200" on:input={() => { if (previewFrame) { previewFrame.style.height = `${previewHeight}px`; } }} />
               </div>
             {/if}
            </div>
@@ -739,86 +839,98 @@
            <button 
             on:click={generateImage} 
             disabled={isGenerating}
-            class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-6 py-2.5 rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#1f2937] transition-all font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-4 sm:px-8 py-2.5 sm:py-3 border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
           >
             {#if isGenerating}
-              <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Generating...
+              <span class="hidden xs:inline">GENERATING...</span>
+              <span class="xs:hidden">...</span>
             {:else}
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              Download Image
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <span class="hidden sm:inline">DOWNLOAD IMAGE</span>
+              <span class="sm:hidden">GENERATE</span>
             {/if}
           </button>
         </div>
 
         <!-- Preview Area -->
-        <div class="bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden relative min-h-[600px] flex items-center justify-center bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
-          {#if currentTab === 'preview'}
-            <div class="w-full h-full overflow-auto p-8 flex items-center justify-center" bind:this={iframeContainer}>
-               {#key srcdocKey}
-                <iframe
-                  class="bg-transparent transition-all duration-300 ease-out shadow-2xl"
-                  title="code-image-preview"
-                  srcdoc={srcdocContent}
-                  bind:this={previewFrame}
-                  style="width: {previewWidth}px; height: {previewHeight}px; border: none;"
-                />
-              {/key}
+        <div class="bg-white border-[3px] border-black overflow-hidden relative min-h-[350px] sm:min-h-[500px] lg:min-h-[600px]">
+          <!-- Preview Header -->
+          <div class="bg-[#e5e7eb] px-3 sm:px-4 py-2 border-b-[3px] border-black flex items-center justify-between">
+            <span class="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider">PREVIEW OUTPUT</span>
+            <div class="flex gap-1">
+              <div class="w-2 h-2 bg-black"></div>
+              <div class="w-2 h-2 bg-black"></div>
+              <div class="w-2 h-2 bg-black"></div>
             </div>
-          {:else if generatedImage}
-             <div class="flex flex-col items-center justify-center w-full h-full p-8">
-                <img src={generatedImage.url} alt="Generated output" class="max-w-full h-auto shadow-2xl rounded-lg border-[3px] border-gray-900" />
+          </div>
+          <!-- Checkered Preview Background -->
+          <div class="min-h-[300px] sm:min-h-[450px] lg:min-h-[550px] flex items-center justify-center overflow-auto" style="background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;">
+            {#if currentTab === 'preview'}
+              <div class="w-full h-full overflow-auto p-4 sm:p-8 flex items-center justify-center" bind:this={iframeContainer}>
+                {#key srcdocKey}
+                  <iframe
+                    class="bg-transparent transition-all duration-300 ease-out border-[3px] border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,0.2)] max-w-full"
+                    title="code-image-preview"
+                    srcdoc={srcdocContent}
+                    bind:this={previewFrame}
+                    style="width: min({previewWidth}px, 100%); height: {previewHeight}px;"
+                  />
+                {/key}
+              </div>
+            {:else if generatedImage}
+              <div class="flex flex-col items-center justify-center w-full h-full p-4 sm:p-8">
+                <img src={generatedImage.url} alt="Generated output" class="max-w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000]" />
                 
-                <div class="mt-8 flex flex-wrap justify-center gap-4">
-                  <a href={generatedImage.url} target="_blank" class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-lg font-bold hover:bg-gray-50 transition-colors">Open in New Tab</a>
-                  <button on:click={() => copyToClipboard(generatedImage.url)} class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 rounded-lg font-bold hover:bg-gray-800 transition-colors">Copy URL</button>
+                <!-- Success Badge -->
+                <div class="mt-4 sm:mt-6 px-3 sm:px-4 py-2 bg-[#4ade80] border-[3px] border-black text-black font-bold text-xs sm:text-sm text-center">
+                  ✓ IMAGE GENERATED
+                </div>
+                
+                <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto">
+                  <a href={generatedImage.url} target="_blank" class="px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-[3px] border-black font-bold uppercase tracking-wide hover:bg-[#ffc480] transition-colors shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] text-center text-sm">Open in Tab</a>
+                  <button on:click={() => copyToClipboard(generatedImage.url)} class="px-4 sm:px-6 py-2.5 sm:py-3 bg-black text-white border-[3px] border-black font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors shadow-[3px_3px_0_0_#666] sm:shadow-[4px_4px_0_0_#666] hover:shadow-[2px_2px_0_0_#666] hover:translate-x-[1px] hover:translate-y-[1px] text-sm">Copy URL</button>
                 </div>
 
                 <!-- Share Buttons -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 w-full max-w-md">
-                  <div class="relative group w-full">
-                    <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-                    <button 
-                      class="py-3 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-black tracking-wide text-sm text-white transition-all hover:shadow-lg hover:brightness-105"
-                      on:click={() => {
-                        const shareUrl = encodeURIComponent(window.location.href);
-                        const text = encodeURIComponent('Check out this awesome Code to Image Generator! Create beautiful syntax-highlighted code images instantly.');
-                        window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`, '_blank');
-                      }}
-                    >
-                      <span class="relative inline-flex items-center gap-2 justify-center">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
-                        <span class="hidden md:inline">Share on X</span>
-                      </span>
-                    </button>
-                  </div>
+                <div class="grid grid-cols-2 gap-2 sm:gap-4 mt-4 sm:mt-6 w-full max-w-md">
+                  <button 
+                    class="py-2 sm:py-3 px-3 sm:px-6 w-full border-[3px] border-black font-bold bg-black tracking-wide text-xs sm:text-sm text-white shadow-[3px_3px_0_0_#444] sm:shadow-[4px_4px_0_0_#444] hover:shadow-[2px_2px_0_0_#444] hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase"
+                    on:click={() => handleSocialShare('twitter')}
+                  >
+                    <span class="inline-flex items-center gap-1.5 sm:gap-2 justify-center">
+                      <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                      <span class="hidden xs:inline">Share on</span> X
+                    </span>
+                  </button>
                   
-                  <div class="relative group w-full">
-                    <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-                    <button 
-                      class="py-3 px-4 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-[#0A66C2] tracking-wide text-sm text-white transition-all hover:shadow-lg hover:brightness-105"
-                      on:click={() => {
-                        const shareUrl = encodeURIComponent(window.location.href);
-                        const text = encodeURIComponent('Check out this awesome Code to Image Generator! Create beautiful syntax-highlighted code images instantly.');
-                        window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${encodeURIComponent('Code to Image Generator - Pictify.io')}&summary=${text}`, '_blank');
-                      }}
-                    >
-                      <span class="relative inline-flex items-center gap-2 justify-center">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
-                        <span class="hidden md:inline">Share on LinkedIn</span>
-                      </span>
-                    </button>
-                  </div>
+                  <button 
+                    class="py-2 sm:py-3 px-3 sm:px-6 w-full border-[3px] border-black font-bold bg-[#0A66C2] tracking-wide text-xs sm:text-sm text-white shadow-[3px_3px_0_0_#084c94] sm:shadow-[4px_4px_0_0_#084c94] hover:shadow-[2px_2px_0_0_#084c94] hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase"
+                    on:click={() => handleSocialShare('linkedin')}
+                  >
+                    <span class="inline-flex items-center gap-1.5 sm:gap-2 justify-center">
+                      <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                      <span class="hidden xs:inline">Share on</span> LinkedIn
+                    </span>
+                  </button>
                 </div>
-             </div>
-          {/if}
+
+                <NextSteps
+                  heading="Next steps"
+                  description="Copy the API request, save this output as a template background, and batch render variants."
+                  curlSnippet={nextStepsCurlSnippet}
+                  templateDraft={nextStepsTemplateDraft}
+                />
+              </div>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
@@ -826,499 +938,487 @@
 
 
     <!-- SEO Content Sections -->
-    <div class="max-w-6xl mx-auto px-6 md:px-0 mt-20">
+    <div class="max-w-5xl mx-auto px-0 mt-12 sm:mt-16 lg:mt-20">
       <!-- Separator -->
-      <div class="border-t-[3px] border-gray-900 relative mb-16">
-        <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
-          <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-          </svg>
+      <div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
+        <div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-[#FFFDF8] px-4 sm:px-6">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+            <span class="font-black text-sm sm:text-lg">?</span>
+          </div>
         </div>
       </div>
 
-      <h2 class="text-4xl md:text-6xl font-black mb-16 text-center text-gray-900 tracking-tight">
-        Learn More About <span class="relative inline-block text-[#ff6b6b]">
-          Code to Image
-          <svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
-            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
-          </svg>
-        </span> Generation
+      <h2 class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black mb-8 sm:mb-12 lg:mb-16 text-center text-gray-900 tracking-tighter px-2">
+        LEARN MORE ABOUT <br class="md:hidden"/>
+        <span class="relative inline-block text-white mt-2">
+          <span class="relative z-10 px-2 sm:px-4">CODE TO IMAGE</span>
+          <span class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"></span>
+        </span>
       </h2>
       
       <!-- What is a Code to Image Generator Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Overview
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-6 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight">
           What is a Code to Image Generator?
         </h3>
-        <p class="text-lg text-gray-700 leading-relaxed mb-4 font-medium">
-          A Code to Image Generator is a powerful tool that converts your source code into beautiful, syntax-highlighted images. Perfect for sharing code snippets on social media, creating documentation, presentations, or blog posts. Our generator supports multiple programming languages and offers extensive customization options including themes, fonts, and styling.
+        <p class="text-sm sm:text-base text-gray-700 leading-relaxed mb-3 sm:mb-4 font-medium">
+          A Code to Image Generator is a powerful tool that converts your source code into beautiful, syntax-highlighted images. Perfect for sharing code snippets on social media, creating documentation, presentations, or blog posts.
         </p>
-        <p class="text-lg text-gray-700 leading-relaxed font-medium">
-          Whether you're a developer sharing code on Twitter, a technical writer creating documentation, or an educator preparing programming tutorials, our code to image generator makes your code visually appealing and professional-looking.
+        <p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+          Whether you're a developer sharing code on Twitter, a technical writer creating documentation, or an educator preparing tutorials, our code to image generator makes your code visually appealing.
         </p>
       </section>
 
       <!-- Benefits Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ff6b6b] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ff6b6b] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
           Features
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight">
           Benefits of Using Our Code to Image Generator
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-[#ff6b6b]/10 p-2 rounded-lg border-2 border-gray-900 text-[#ff6b6b] flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#ff6b6b] p-2 border-[2px] border-black text-white flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">Support for 25+ programming languages including JavaScript, Python, Java, C++, and more</span>
+            <span class="font-bold text-black text-sm">Support for 25+ programming languages including JavaScript, Python, Java, C++, and more</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-[#ffc480]/10 p-2 rounded-lg border-2 border-gray-900 text-[#ffc480] flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#ffc480] p-2 border-[2px] border-black text-black flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">18+ beautiful syntax highlighting themes including dark and light options</span>
+            <span class="font-bold text-black text-sm">18+ beautiful syntax highlighting themes including dark and light options</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-[#4ade80]/10 p-2 rounded-lg border-2 border-gray-900 text-[#4ade80] flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#4ade80] p-2 border-[2px] border-black text-black flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span>
+            <span class="font-bold text-black text-sm">12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-blue-100 p-2 rounded-lg border-2 border-gray-900 text-blue-500 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#60a5fa] p-2 border-[2px] border-black text-white flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">Customizable window frames and backgrounds for professional appearance</span>
+            <span class="font-bold text-black text-sm">Customizable window frames and backgrounds for professional appearance</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-purple-100 p-2 rounded-lg border-2 border-gray-900 text-purple-500 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#a78bfa] p-2 border-[2px] border-black text-white flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">Advanced styling options including opacity, shadows, and blur effects</span>
+            <span class="font-bold text-black text-sm">Advanced styling options including opacity, shadows, and blur effects</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-pink-100 p-2 rounded-lg border-2 border-gray-900 text-pink-500 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#f472b6] p-2 border-[2px] border-black text-white flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">Real-time preview to see exactly how your image will look</span>
+            <span class="font-bold text-black text-sm">Real-time preview to see exactly how your image will look</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-yellow-100 p-2 rounded-lg border-2 border-gray-900 text-yellow-600 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#facc15] p-2 border-[2px] border-black text-black flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">High-quality PNG output perfect for social media and documentation</span>
+            <span class="font-bold text-black text-sm">High-quality PNG output perfect for social media and documentation</span>
           </div>
 
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transition-transform hover:-translate-y-1">
-            <div class="bg-green-100 p-2 rounded-lg border-2 border-gray-900 text-green-600 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="bg-[#22c55e] p-2 border-[2px] border-black text-white flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <span class="font-bold text-gray-900 mt-1">No watermarks and completely free to use</span>
+            <span class="font-bold text-black text-sm">Free to try (guest limits may apply). Create a free account to remove watermarks.</span>
           </div>
         </div>
       </section>
 
       <!-- How to Use Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#4ade80] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           Guide
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight">
           How to Use Our Code to Image Generator
         </h3>
-        <div class="space-y-6">
+        <div class="space-y-5">
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">1</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]">1</span>
             <div>
-              <h4 class="font-semibold text-xl text-gray-900 mb-2">Choose Your Programming Language</h4>
-              <p class="text-gray-700">Select from 25+ supported programming languages including JavaScript, Python, Java, C++, TypeScript, and more. Each language gets proper syntax highlighting automatically.</p>
+              <h4 class="font-black text-lg text-black mb-1">Choose Your Programming Language</h4>
+              <p class="text-gray-600 text-sm">Select from 25+ supported programming languages including JavaScript, Python, Java, C++, TypeScript, and more.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">2</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]">2</span>
             <div>
-              <h4 class="font-semibold text-xl text-gray-900 mb-2">Paste or Type Your Code</h4>
-              <p class="text-gray-700">Enter your code in the text area. You can use our sample code for each language or paste your own code snippet. The preview will update in real-time.</p>
+              <h4 class="font-black text-lg text-black mb-1">Paste or Type Your Code</h4>
+              <p class="text-gray-600 text-sm">Enter your code in the text area. You can use our sample code for each language or paste your own code snippet.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">3</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]">3</span>
             <div>
-              <h4 class="font-semibold text-xl text-gray-900 mb-2">Customize the Appearance</h4>
-              <p class="text-gray-700">Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background styles, and advanced effects like shadows and blur.</p>
+              <h4 class="font-black text-lg text-black mb-1">Customize the Appearance</h4>
+              <p class="text-gray-600 text-sm">Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background styles, and advanced effects.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">4</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]">4</span>
             <div>
-              <h4 class="font-semibold text-xl text-gray-900 mb-2">Preview Your Image</h4>
-              <p class="text-gray-700">See exactly how your code image will look with our real-time preview. Adjust dimensions, scaling, and other settings as needed.</p>
+              <h4 class="font-black text-lg text-black mb-1">Preview Your Image</h4>
+              <p class="text-gray-600 text-sm">See exactly how your code image will look with our real-time preview. Adjust dimensions and settings as needed.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="bg-[#ff6b6b] text-white w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">5</span>
+            <span class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]">5</span>
             <div>
-              <h4 class="font-semibold text-xl text-gray-900 mb-2">Generate and Download</h4>
-              <p class="text-gray-700">Click "Generate Image" to create your high-quality PNG image. Copy the URL or download the image directly to use in your projects.</p>
+              <h4 class="font-black text-lg text-black mb-1">Generate and Download</h4>
+              <p class="text-gray-600 text-sm">Click "Generate Image" to create your high-quality PNG image. Copy the URL or download directly to use in your projects.</p>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Real-World Use Cases Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
           Applications
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight">
           Real-World Use Cases
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
-            <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              <span class="text-2xl">📱</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
+              <span class="w-8 h-8 bg-[#ff6b6b] border-[2px] border-black flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+              </span>
               Social Media Sharing
             </h4>
-            <p class="text-gray-700">Share beautiful code snippets on Twitter, LinkedIn, Instagram, and other social platforms. Stand out with professional-looking code images that get more engagement.</p>
+            <p class="text-gray-600 text-sm">Share beautiful code snippets on Twitter, LinkedIn, Instagram. Stand out with professional-looking code images.</p>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
-            <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              <span class="text-2xl">📚</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
+              <span class="w-8 h-8 bg-[#ffc480] border-[2px] border-black flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              </span>
               Documentation & Tutorials
             </h4>
-            <p class="text-gray-700">Create stunning code examples for technical documentation, API guides, and programming tutorials. Make your documentation more visually appealing and easier to follow.</p>
+            <p class="text-gray-600 text-sm">Create stunning code examples for technical documentation, API guides, and programming tutorials.</p>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
-            <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              <span class="text-2xl">🎯</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
+              <span class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+              </span>
               Presentations & Slides
             </h4>
-            <p class="text-gray-700">Include beautiful code images in your technical presentations, conference talks, and educational slides. Perfect for highlighting key code concepts.</p>
+            <p class="text-gray-600 text-sm">Include beautiful code images in your technical presentations, conference talks, and educational slides.</p>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
-            <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              <span class="text-2xl">✍️</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
+              <span class="w-8 h-8 bg-[#60a5fa] border-[2px] border-black flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </span>
               Blog Posts & Articles
             </h4>
-            <p class="text-gray-700">Enhance your technical blog posts and articles with syntax-highlighted code images. Make your content more engaging and professional-looking.</p>
+            <p class="text-gray-600 text-sm">Enhance your technical blog posts and articles with syntax-highlighted code images.</p>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
-            <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              <span class="text-2xl">🏫</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
+              <span class="w-8 h-8 bg-[#a78bfa] border-[2px] border-black flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+              </span>
               Education & Teaching
             </h4>
-            <p class="text-gray-700">Create clear, readable code examples for programming courses, workshops, and educational materials. Help students understand code structure visually.</p>
+            <p class="text-gray-600 text-sm">Create clear, readable code examples for programming courses, workshops, and educational materials.</p>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
-            <h4 class="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              <span class="text-2xl">💼</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
+              <span class="w-8 h-8 bg-black border-[2px] border-black flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </span>
               Portfolio & Resume
             </h4>
-            <p class="text-gray-700">Showcase your coding skills in portfolios and resumes with beautiful code screenshots. Demonstrate your expertise in various programming languages.</p>
+            <p class="text-gray-600 text-sm">Showcase your coding skills in portfolios and resumes with beautiful code screenshots.</p>
           </div>
         </div>
       </section>
 
       <!-- Best Practices Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ff6b6b] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ff6b6b] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
           Tips
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight">
           Best Practices for Creating Code Images
         </h3>
-        <p class="text-lg text-gray-700 leading-relaxed mb-6">
+        <p class="text-base text-gray-600 leading-relaxed mb-6">
           To create the most effective and professional-looking code images, follow these best practices:
         </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-4">
-            <h4 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="w-8 h-8 bg-[#ff6b6b] text-white rounded-lg border-2 border-gray-900 flex items-center justify-center text-sm shadow-[2px_2px_0_0_#1f2937]">&lt;/&gt;</span>
+            <h4 class="font-black text-lg text-black flex items-center gap-2">
+              <span class="w-8 h-8 bg-[#ff6b6b] text-white border-[2px] border-black flex items-center justify-center text-sm shadow-[2px_2px_0_0_#000]">&lt;/&gt;</span>
               Code Quality
             </h4>
-            <div class="space-y-3">
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <div class="space-y-2">
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Keep code snippets concise and focused on the main concept</span>
+                <span class="font-bold text-black text-sm">Keep code snippets concise and focused</span>
               </div>
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Use proper indentation and formatting for better readability</span>
+                <span class="font-bold text-black text-sm">Use proper indentation and formatting</span>
               </div>
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Include meaningful comments when necessary</span>
+                <span class="font-bold text-black text-sm">Include meaningful comments when necessary</span>
               </div>
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#ff6b6b] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Remove or replace sensitive information like API keys</span>
+                <span class="font-bold text-black text-sm">Remove sensitive information like API keys</span>
               </div>
             </div>
           </div>
 
           <div class="space-y-4">
-            <h4 class="font-black text-xl text-gray-900 flex items-center gap-2">
-               <span class="w-8 h-8 bg-[#4ade80] text-gray-900 rounded-lg border-2 border-gray-900 flex items-center justify-center text-sm shadow-[2px_2px_0_0_#1f2937]">🎨</span>
+            <h4 class="font-black text-lg text-black flex items-center gap-2">
+               <span class="w-8 h-8 bg-[#4ade80] text-black border-[2px] border-black flex items-center justify-center text-sm shadow-[2px_2px_0_0_#000]">🎨</span>
                Visual Design
             </h4>
-            <div class="space-y-3">
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+            <div class="space-y-2">
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Choose themes that match your brand or presentation style</span>
+                <span class="font-bold text-black text-sm">Choose themes that match your brand</span>
               </div>
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Use high-contrast themes for better readability</span>
+                <span class="font-bold text-black text-sm">Use high-contrast themes for readability</span>
               </div>
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Select fonts that are clear and professional-looking</span>
+                <span class="font-bold text-black text-sm">Select clear, professional-looking fonts</span>
               </div>
-              <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-3 transition-transform hover:-translate-y-1">
-                <svg class="w-6 h-6 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+              <div class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <svg class="w-5 h-5 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span class="font-bold text-gray-900">Use appropriate padding and spacing for clean appearance</span>
+                <span class="font-bold text-black text-sm">Use appropriate padding and spacing</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="mt-8 p-6 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
-          <h4 class="font-black text-xl text-gray-900 mb-4 flex items-center gap-2">
-            <span class="w-8 h-8 bg-[#ffc480] text-gray-900 rounded-lg border-2 border-gray-900 flex items-center justify-center text-sm shadow-[2px_2px_0_0_#1f2937]">💡</span>
+        <div class="mt-8 p-5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_#000]">
+          <h4 class="font-black text-lg text-black mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 bg-black text-white border-[2px] border-black flex items-center justify-center text-sm">💡</span>
             Pro Tips
           </h4>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
-              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span class="font-bold text-gray-700">Use line numbers for longer code snippets to help with references</span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="flex items-start gap-2 p-2">
+              <span class="font-black text-black">→</span>
+              <span class="font-bold text-black text-sm">Use line numbers for longer code snippets</span>
             </div>
-            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
-              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span class="font-bold text-gray-700">Test different background styles to find what works best for your use case</span>
+            <div class="flex items-start gap-2 p-2">
+              <span class="font-black text-black">→</span>
+              <span class="font-bold text-black text-sm">Test different background styles</span>
             </div>
-            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
-              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span class="font-bold text-gray-700">Consider your target platform's image size requirements when setting dimensions</span>
+            <div class="flex items-start gap-2 p-2">
+              <span class="font-black text-black">→</span>
+              <span class="font-bold text-black text-sm">Consider platform-specific image sizes</span>
             </div>
-            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-transparent hover:border-gray-200">
-              <svg class="w-5 h-5 text-[#ffc480] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span class="font-bold text-gray-700">Save your favorite settings combinations for consistency across projects</span>
+            <div class="flex items-start gap-2 p-2">
+              <span class="font-black text-black">→</span>
+              <span class="font-bold text-black text-sm">Save favorite settings for consistency</span>
             </div>
           </div>
         </div>
       </section>
 
       <!-- FAQ Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#4ade80] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           FAQ
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight">
           Frequently Asked Questions
         </h3>
-        <div class="space-y-4">
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
-            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
-              <span>What programming languages are supported?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+        <div class="space-y-3">
+          <details class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <summary class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none">
+              <span class="text-sm">What programming languages are supported?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
-              We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more. Each language gets proper syntax highlighting automatically.
+            <div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+              We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more.
             </div>
           </details>
 
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
-            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
-              <span>Can I customize the appearance of my code images?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <summary class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none">
+              <span class="text-sm">Can I customize the appearance?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
-              Absolutely! You can choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, add window frames, and even apply advanced effects like shadows, blur, and opacity. The preview updates in real-time so you can see exactly how your image will look.
+            <div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+              Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur.
             </div>
           </details>
 
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
-            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
-              <span>What image formats are supported?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <summary class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none">
+              <span class="text-sm">What image formats are supported?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
-              Currently, we generate high-quality PNG images, which are perfect for social media, documentation, and presentations. PNG format ensures crisp text rendering and supports transparency for flexible use in various contexts.
+            <div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+              We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support.
             </div>
           </details>
 
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
-            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
-              <span>Is there a limit on code length?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <summary class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none">
+              <span class="text-sm">Is there a limit on code length?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
-              While there's no strict character limit, we recommend keeping code snippets reasonably sized for best visual results. Very long code may result in smaller text or require scrolling. For best results, focus on the most important parts of your code.
+            <div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+              No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code.
             </div>
           </details>
 
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
-            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
-              <span>Can I use the generated images commercially?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+          <details class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <summary class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none">
+              <span class="text-sm">Can I use images commercially?</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </summary>
-            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
-              Yes! All images generated with our code to image generator can be used for both personal and commercial purposes. There are no watermarks and no licensing restrictions on the output images.
-            </div>
-          </details>
-
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5">
-            <summary class="flex items-center justify-between cursor-pointer p-5 font-bold text-gray-900 select-none">
-              <span>How do I share code images on social media?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900 group-open:rotate-180 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </summary>
-            <div class="p-5 pt-0 text-gray-700 border-t-[3px] border-gray-900 bg-gray-50 leading-relaxed">
-              After generating your code image, you can download it directly or copy the image URL. Most social media platforms work well with our standard image dimensions. For Twitter, consider using a more horizontal aspect ratio, while Instagram works well with square formats.
+            <div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+              Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks.
             </div>
           </details>
         </div>
       </section>
 
       <!-- Supported Languages Section -->
-      <section class="mb-16 bg-[#FFFDF8] border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] rounded-3xl p-8 md:p-10 hover:translate-y-[-2px] transition-all duration-300">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-[3px] border-gray-900 text-xs font-bold mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+      <section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]">
+          <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
           Languages
         </div>
-        <h3 class="text-3xl md:text-4xl font-black mb-8 text-gray-900">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight">
           Supported Programming Languages
         </h3>
-        <p class="text-lg text-gray-700 leading-relaxed mb-6 font-medium">
-          Our code to image generator supports syntax highlighting for all major programming languages and file formats:
+        <p class="text-sm sm:text-base text-gray-600 leading-relaxed mb-4 sm:mb-6">
+          Our code to image generator supports syntax highlighting for all major programming languages:
         </p>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">⚡</div>
-            <span class="font-bold text-gray-900">JavaScript</span>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">⚡</div>
+            <span class="font-bold text-black text-xs">JavaScript</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🔷</div>
-            <span class="font-bold text-gray-900">TypeScript</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🔷</div>
+            <span class="font-bold text-black text-xs">TypeScript</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🐍</div>
-            <span class="font-bold text-gray-900">Python</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🐍</div>
+            <span class="font-bold text-black text-xs">Python</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">☕</div>
-            <span class="font-bold text-gray-900">Java</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">☕</div>
+            <span class="font-bold text-black text-xs">Java</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">⚙️</div>
-            <span class="font-bold text-gray-900">C++</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">⚙️</div>
+            <span class="font-bold text-black text-xs">C++</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🔷</div>
-            <span class="font-bold text-gray-900">C#</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🔷</div>
+            <span class="font-bold text-black text-xs">C#</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🐘</div>
-            <span class="font-bold text-gray-900">PHP</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🐘</div>
+            <span class="font-bold text-black text-xs">PHP</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">💎</div>
-            <span class="font-bold text-gray-900">Ruby</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">💎</div>
+            <span class="font-bold text-black text-xs">Ruby</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🐹</div>
-            <span class="font-bold text-gray-900">Go</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🐹</div>
+            <span class="font-bold text-black text-xs">Go</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🦀</div>
-            <span class="font-bold text-gray-900">Rust</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🦀</div>
+            <span class="font-bold text-black text-xs">Rust</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🍎</div>
-            <span class="font-bold text-gray-900">Swift</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🍎</div>
+            <span class="font-bold text-black text-xs">Swift</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🌐</div>
-            <span class="font-bold text-gray-900">HTML</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🌐</div>
+            <span class="font-bold text-black text-xs">HTML</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🎨</div>
-            <span class="font-bold text-gray-900">CSS</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🎨</div>
+            <span class="font-bold text-black text-xs">CSS</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">💅</div>
-            <span class="font-bold text-gray-900">SCSS</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">🗃️</div>
+            <span class="font-bold text-black text-xs">SQL</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">🗃️</div>
-            <span class="font-bold text-gray-900">SQL</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">📄</div>
+            <span class="font-bold text-black text-xs">JSON</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">📄</div>
-            <span class="font-bold text-gray-900">JSON</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">📝</div>
+            <span class="font-bold text-black text-xs">YAML</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">📝</div>
-            <span class="font-bold text-gray-900">YAML</span>
+          <div class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">📋</div>
+            <span class="font-bold text-black text-xs">Markdown</span>
           </div>
-          <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 text-center shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
-            <div class="text-2xl mb-2">📋</div>
-            <span class="font-bold text-gray-900">Markdown</span>
+          <div class="bg-[#ff6b6b] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <div class="text-xl mb-1">+</div>
+            <span class="font-bold text-white text-xs">More!</span>
           </div>
         </div>
-        <p class="text-center text-gray-600 mt-6 font-medium">
-          And many more! Each language gets proper syntax highlighting and formatting automatically.
-        </p>
       </section>
 
       <!-- Social Sharing Section -->
@@ -1331,8 +1431,8 @@
           codeLanguage="bash"
           docsUrl="https://docs.pictify.io/"
           docsLabel="Explore HTML to Image API"
-          secondaryCtaUrl="/dashboard/api-playground"
-          secondaryCtaLabel="Try in API Playground"
+          secondaryCtaUrl="https://docs.pictify.io/examples"
+          secondaryCtaLabel="See examples"
           note="Need custom fonts or private templates? Talk to us for enterprise access."
         />
       </section>
@@ -1340,60 +1440,52 @@
 
     <!-- First Generation Prompt -->
     {#if showFirstGenerationPrompt}
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl max-w-md w-full mx-auto p-8 shadow-[8px_8px_0_0_#1f2937]">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">🎉 Great First Image!</h3>
+      <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
+          <!-- Modal Header -->
+          <div class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
+            <h3 class="text-lg font-black text-black uppercase tracking-wider">🎉 Great First Image!</h3>
             <button 
-              class="text-gray-500 hover:text-gray-700"
+              class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-[#ff6b6b] hover:text-white transition-colors"
               on:click={() => showFirstGenerationPrompt = false}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <span class="font-black">×</span>
             </button>
           </div>
 
-          <p class="text-gray-700 mb-6">Create a free account to unlock:</p>
-          
-          <ul class="space-y-3 mb-6">
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="font-medium">Unlimited image generations</span>
-            </li>
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              No watermarks
-            </li>
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              API Access
-            </li>
-          </ul>
+          <div class="p-6">
+            <p class="text-black font-bold mb-4">Create a free account to unlock:</p>
+            
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#4ade80]">✓</span>
+                <span class="font-bold text-black text-sm">Unlimited image generations</span>
+              </li>
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#4ade80]">✓</span>
+                <span class="font-bold text-black text-sm">No watermarks</span>
+              </li>
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#4ade80]">✓</span>
+                <span class="font-bold text-black text-sm">API Access</span>
+              </li>
+            </ul>
 
-          <div class="space-y-4">
-            <div class="relative group w-full">
-              <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
+            <div class="space-y-3">
               <a 
                 href="/signup?redirect=/tools/code-to-image"
-                class="block w-full py-3 px-6 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-center text-white transition-all hover:shadow-lg hover:brightness-105"
+                class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               >
                 Create Free Account
               </a>
-            </div>
 
-            <button
-              class="w-full py-3 px-6 rounded-lg font-medium text-gray-700 hover:text-[#ff6b6b] transition-colors"
-              on:click={() => showFirstGenerationPrompt = false}
-            >
-              Continue as Guest
-            </button>
+              <button
+                class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide"
+                on:click={() => showFirstGenerationPrompt = false}
+              >
+                Continue as Guest
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1401,66 +1493,56 @@
 
     <!-- Upgrade Prompt -->
     {#if showUpgradePrompt}
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
-        <div class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl max-w-md w-full mx-auto p-8 shadow-[8px_8px_0_0_#1f2937]">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">🎨 Ready to Create More?</h3>
+      <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
+        <div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
+          <!-- Modal Header -->
+          <div class="bg-[#ff6b6b] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
+            <h3 class="text-lg font-black text-white uppercase tracking-wider">🎨 Ready to Create More?</h3>
             <button 
-              class="text-gray-500 hover:text-gray-700"
+              class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors"
               on:click={() => showUpgradePrompt = false}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <span class="font-black">×</span>
             </button>
           </div>
 
-          <p class="text-gray-700 mb-6">You've reached the guest limit. Create a free account to unlock:</p>
-          
-          <ul class="space-y-3 mb-6">
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="font-medium">Unlimited image generations</span>
-            </li>
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              No watermarks
-            </li>
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              API Access
-            </li>
-            <li class="flex items-center gap-2 text-gray-700">
-              <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              Priority support
-            </li>
-          </ul>
+          <div class="p-6">
+            <p class="text-black font-bold mb-4">You've reached the guest limit. Sign up to unlock:</p>
+            
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#ff6b6b]">✓</span>
+                <span class="font-bold text-black text-sm">Unlimited image generations</span>
+              </li>
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#ff6b6b]">✓</span>
+                <span class="font-bold text-black text-sm">No watermarks</span>
+              </li>
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#ff6b6b]">✓</span>
+                <span class="font-bold text-black text-sm">API Access</span>
+              </li>
+              <li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
+                <span class="font-black text-[#ff6b6b]">✓</span>
+                <span class="font-bold text-black text-sm">Priority support</span>
+              </li>
+            </ul>
 
-          <div class="space-y-4">
-            <div class="relative group w-full">
-              <div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
+            <div class="space-y-3">
               <a 
                 href="/signup?redirect=/tools/code-to-image"
-                class="block w-full py-3 px-6 rounded-lg group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative border-[3px] border-gray-900 font-semibold bg-[#ff6b6b] tracking-wide text-center text-white transition-all hover:shadow-lg hover:brightness-105"
+                class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               >
                 Sign Up Free
               </a>
-            </div>
 
-            <button
-              class="w-full py-3 px-6 rounded-lg font-medium text-gray-700 hover:text-[#ff6b6b] transition-colors"
-              on:click={() => showUpgradePrompt = false}
-            >
-              Maybe Later
-            </button>
+              <button
+                class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide"
+                on:click={() => showUpgradePrompt = false}
+              >
+                Maybe Later
+              </button>
+            </div>
           </div>
         </div>
       </div>

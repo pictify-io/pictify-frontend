@@ -31,23 +31,23 @@
 </script>
 
 <div class="space-y-3">
-	<div class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Color Palette</div>
+	<div class="text-xs font-black text-gray-900 uppercase tracking-wider">Color Palette</div>
 	
 	<!-- Canvas Colors -->
 	{#if canvasColors.length}
 		<div>
-			<div class="text-[10px] text-gray-500 mb-2 uppercase font-semibold tracking-wide">
+			<div class="text-[10px] text-gray-500 mb-2 uppercase font-black tracking-widest">
 				Canvas Colors ({canvasColors.length})
 			</div>
 			<div class="flex flex-wrap gap-2">
 				{#each canvasColors as color}
 					<div class="flex flex-col items-center">
 						<div 
-							class="w-12 h-12 rounded-lg shadow-sm border-2 border-white"
+							class="w-12 h-12 rounded border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 							style="background-color: {color}"
 							title={color}
 						/>
-						<div class="text-[9px] text-gray-600 mt-1 text-center font-mono">
+						<div class="text-[9px] text-gray-900 mt-1 text-center font-mono font-bold">
 							{color.substring(0, 7)}
 						</div>
 					</div>
@@ -55,14 +55,14 @@
 			</div>
 		</div>
 	{:else}
-		<div class="text-xs text-gray-400 italic py-2">
+		<div class="text-xs text-gray-500 italic py-2 font-medium">
 			No colors detected. Add elements to see colors.
 		</div>
 	{/if}
 	
 	<!-- Harmony Generators -->
-	<div class="pt-3 border-t border-gray-200">
-		<div class="text-[10px] text-gray-500 mb-2 uppercase font-semibold tracking-wide">
+	<div class="pt-3 border-t-2 border-gray-900">
+		<div class="text-[10px] text-gray-500 mb-2 uppercase font-black tracking-widest">
 			Generate Harmonies {canvasColors.length > 0 ? `(from ${canvasColors[0]})` : ''}
 		</div>
 		<div class="grid grid-cols-2 gap-1.5">
@@ -103,8 +103,8 @@
 	
 	<!-- Generated Palette -->
 	{#if generatedPalette.length}
-		<div class="pt-3 border-t border-gray-200">
-			<div class="text-[10px] text-gray-500 mb-2 uppercase font-semibold tracking-wide">
+		<div class="pt-3 border-t-2 border-gray-900">
+			<div class="text-[10px] text-gray-500 mb-2 uppercase font-black tracking-widest">
 				Generated ({generatedPalette.length})
 			</div>
 			<div class="flex flex-wrap gap-2">
@@ -116,16 +116,16 @@
 						title="Click to copy {color}"
 					>
 						<div 
-							class="w-10 h-10 rounded-lg shadow-sm border-2 border-white hover:scale-110 transition-transform cursor-pointer relative"
+							class="w-10 h-10 rounded border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 transition-all cursor-pointer relative"
 							style="background-color: {color}"
 						>
 							{#if copiedColor === color}
-								<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+								<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded">
 									<i class="fa fa-check text-white text-xs"></i>
 								</div>
 							{/if}
 						</div>
-						<div class="text-[9px] text-gray-600 mt-1 text-center font-mono">
+						<div class="text-[9px] text-gray-900 mt-1 text-center font-mono font-bold">
 							{color.substring(0, 7)}
 						</div>
 					</button>
@@ -139,21 +139,25 @@
 	.btn-harmony {
 		padding: 0.375rem 0.5rem;
 		font-size: 10px;
-		font-weight: 500;
+		font-weight: 800;
+        text-transform: uppercase;
 		background-color: white;
-		border: 1px solid #e5e7eb;
+		border: 2px solid #111827;
 		border-radius: 0.375rem;
 		transition: all 0.2s;
 		cursor: pointer;
+        color: #111827;
 	}
 	
 	.btn-harmony:hover:not(:disabled) {
-		border-color: #3b82f6;
-		background-color: #eff6ff;
+		background-color: #ffc480;
+        box-shadow: 2px 2px 0 0 #1f2937;
+        transform: translate(-1px, -1px);
 	}
 	
 	.btn-harmony:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+        border-color: #d1d5db;
 	}
 </style>

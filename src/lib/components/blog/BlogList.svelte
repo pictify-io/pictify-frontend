@@ -5,28 +5,52 @@
 </script>
 
 <section>
-	<div class="py-2 px-4 bg-[#FFF4DA] w-fit border-[3px] border-black rounded-xl">
-		<h2 class="text-2xl font-bold">{title}</h2>
+	<div class="flex items-center gap-4 mb-12">
+		<div class="py-3 px-6 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1">
+			<h2 class="text-2xl font-black uppercase tracking-tighter text-gray-900">{title}</h2>
+		</div>
+		<div class="h-[3px] flex-grow bg-gray-900 rounded-full opacity-20"></div>
 	</div>
-	<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-10 mt-12">
+	
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
 		{#each blogs as blog}
-			<a href="/blogs/{blog.slug}">
+			<a href="/blogs/{blog.slug}" class="block group h-full">
 				<div
-					class="flex flex-col bg-[#FFFDF8] border-black border-4 pb-4 pt-0 rounded-xl gap-2 cursor-pointer"
+					class="flex flex-col h-full bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
 					role="button"
 				>
-					<div class="h-[200px] border-black border-b-4 rounded-top-xl">
-						<img src={blog.heroImage} class="object-cover w-full h-full" alt={blog.title} />
+					<!-- Image Container -->
+					<div class="aspect-[16/10] border-b-[3px] border-gray-900 bg-gray-100 relative overflow-hidden group-hover:brightness-105 transition-all">
+						<div class="absolute inset-0 opacity-10 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:8px_8px]"></div>
+						<img 
+							src={blog.heroImage} 
+							class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" 
+							alt={blog.title} 
+						/>
 					</div>
-					<div class="font-bold text-xl md:text-xl px-2 md:min-h-[5.5rem]">
-						<h3 class="cursor-pointer">{blog.title}</h3>
-					</div>
-					<div class="flex px-2 pt-2 font-semibold text-gray-700 justify-between">
-						<div>
-							-by {blog.author}
+					
+					<!-- Content -->
+					<div class="flex flex-col flex-grow p-6 relative">
+						<div class="mb-4">
+							<h3 class="font-black text-xl leading-tight group-hover:text-gray-700 transition-colors line-clamp-3">
+								{blog.title}
+							</h3>
 						</div>
-						<div class="">
-							{blog.readingTime} min read
+						
+						<div class="mt-auto pt-4 border-t-2 border-gray-100 flex items-center justify-between">
+							<div class="flex items-center gap-3">
+								<div class="w-8 h-8 rounded-full bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center text-xs font-black shadow-[2px_2px_0_0_#1f2937]">
+									{blog.author.charAt(0)}
+								</div>
+								<div class="flex flex-col">
+									<span class="text-xs font-bold uppercase tracking-wider text-gray-900">{blog.author}</span>
+									<span class="text-[10px] font-bold text-gray-500 uppercase">{blog.readingTime} min read</span>
+								</div>
+							</div>
+							
+							<div class="w-8 h-8 flex items-center justify-center rounded-full border-2 border-transparent group-hover:border-gray-900 group-hover:bg-gray-900 group-hover:text-white transition-all">
+								<i class="fa-solid fa-arrow-right text-sm transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+							</div>
 						</div>
 					</div>
 				</div>

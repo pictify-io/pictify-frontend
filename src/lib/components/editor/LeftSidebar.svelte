@@ -6,7 +6,8 @@
 		{ id: 'elements', icon: 'fa-shapes', label: 'Elements' },
 		{ id: 'uploads', icon: 'fa-cloud-upload', label: 'Uploads' },
 		{ id: 'text', icon: 'fa-font', label: 'Text' },
-		{ id: 'charts', icon: 'fa-chart-pie', label: 'Charts' }
+		{ id: 'charts', icon: 'fa-chart-pie', label: 'Charts' },
+		{ id: 'brand', icon: 'fa-tag', label: 'Brand' }
 	];
 
 	function setActive(id) {
@@ -18,31 +19,30 @@
 	}
 </script>
 
-<div class="w-16 bg-white/90 backdrop-blur-sm border-r-2 border-black flex flex-col items-center py-6 h-full shadow-sm z-10">
+<div class="w-16 bg-[#FFFDF8] border-r-[3px] border-gray-900 flex flex-col items-center py-6 h-full z-10 flex-shrink-0">
 	{#each tabs as tab}
 		<button
-			class="w-12 h-12 flex flex-col items-center justify-center mb-4 rounded-lg transition-all duration-200 group relative
-			{$activeSidebarTab === tab.id ? 'bg-[#ff6b6b]/10 text-[#ff6b6b]' : 'text-gray-500 hover:bg-white hover:text-[#ff6b6b]'}"
+			class="w-10 h-10 flex flex-col items-center justify-center mb-4 rounded-lg transition-all duration-200 group relative border-[2px]
+			{$activeSidebarTab === tab.id 
+                ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#ffc480] translate-x-[1px] translate-y-[1px]' 
+                : 'bg-white text-gray-900 border-gray-900 hover:bg-[#ffc480] shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}"
 			on:click={() => setActive(tab.id)}
+            title={tab.label}
 		>
-			<i class="fa {tab.icon} text-lg mb-0.5 transition-transform group-hover:scale-110"></i>
-			<span class="text-[9px] font-medium">{tab.label}</span>
-			
-			{#if $activeSidebarTab === tab.id}
-				<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#ff6b6b] rounded-r-full"></div>
-			{/if}
+			<i class="fa {tab.icon} text-sm mb-0.5 transition-transform group-hover:scale-110"></i>
+            <!-- Hide label on small sidebar for cleaner look, or show tooltip -->
 		</button>
 	{/each}
 	
 	<!-- Copilot Button (Special) -->
 	{#if import.meta.env.PUBLIC_ENABLE_COPILOT === 'true'}
+        <div class="mt-auto"></div> <!-- Push to bottom if needed, or just keep in flow -->
 		<button
-			class="w-12 h-12 flex flex-col items-center justify-center mb-4 rounded-lg transition-all duration-200 group relative bg-gradient-to-br from-[#ff6b6b]/5 to-[#ffc480]/5 text-[#ff6b6b] hover:from-[#ff6b6b]/10 hover:to-[#ffc480]/10 border border-[#ff6b6b]/20"
+			class="w-10 h-10 flex flex-col items-center justify-center mb-4 rounded-lg transition-all duration-200 group relative border-[2px] border-gray-900 bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] text-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
 			on:click={toggleCopilot}
 			title="Toggle AI Copilot"
 		>
-			<i class="fa fa-robot text-lg mb-0.5 transition-transform group-hover:scale-110"></i>
-			<span class="text-[9px] font-medium">Copilot</span>
+			<i class="fa fa-robot text-sm mb-0.5 transition-transform group-hover:scale-110"></i>
 		</button>
 	{/if}
 </div>

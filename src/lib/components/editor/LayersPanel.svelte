@@ -11,15 +11,23 @@
 	let dragPlaceholder = null;
 	let expandedGroupIds = new Set();
 	
+	// Modal state
+	let showDeleteModal = false;
+	let layerToDelete = null;
+	let showRenameModal = false;
+	let layerToRename = null;
+	let renameInputValue = '';
+	let renameInputRef = null;
+	
 	// Layer types with icons
 	const layerIcons = {
-		'i-text': '📝',
-		'text': '📝',
-		'rect': '▭',
-		'circle': '●',
-		'image': '🖼️',
-		'group': '📁',
-		'path': '✏️'
+		'i-text': 'fa-font',
+		'text': 'fa-font',
+		'rect': 'fa-square',
+		'circle': 'fa-circle',
+		'image': 'fa-image',
+		'group': 'fa-folder',
+		'path': 'fa-pen'
 	};
 	
 	const canvasEvents = ['object:added', 'object:removed', 'object:modified', 'selection:created', 'selection:updated', 'selection:cleared'];
@@ -93,7 +101,13 @@
 					depth: depth,
 					isGroup: isGroup,
 					isExpanded: isExpanded,
-					parentId: parentId
+					parentId: parentId,
+					// Dynamic data indicators
+					isVariable: obj.isVariable || false,
+					hasCondition: !!(obj.showWhen || obj.hideWhen),
+					hasLoop: obj.loopVariable !== null && obj.loopVariable !== undefined,
+					isChart: obj.isChart || false,
+					isTable: obj.isTable || false
 				};
 				
 				result.push(layer);
@@ -154,14 +168,24 @@
 	function deleteLayer(layer, event) {
 		event.stopPropagation();
 		if (!$editor || !layer.object) return;
-		if (confirm(`Delete "${layer.name}"?`)) {
-			if ($selectedComponent === layer.object) {
-				editorActions.clearSelection();
-			}
-			$editor.remove(layer.object);
-			$editor.renderAll();
-			updateLayers();
+		layerToDelete = layer;
+		showDeleteModal = true;
+	}
+	
+	function confirmDelete() {
+		if (!$editor || !layerToDelete?.object) return;
+		if ($selectedComponent === layerToDelete.object) {
+			editorActions.clearSelection();
 		}
+		$editor.remove(layerToDelete.object);
+		$editor.renderAll();
+		updateLayers();
+		closeDeleteModal();
+	}
+	
+	function closeDeleteModal() {
+		showDeleteModal = false;
+		layerToDelete = null;
 	}
 	
 	function duplicateLayer(layer, event) {
@@ -197,10 +221,37 @@
 	}
 	
 	function renameLayer(layer, event) {
-		const newName = prompt('Enter new layer name:', layer.name);
-		if (newName) {
-			layer.object.name = newName;
-			updateLayers();
+		if (event) event.stopPropagation();
+		layerToRename = layer;
+		renameInputValue = layer.name;
+		showRenameModal = true;
+		// Focus input after modal renders
+		setTimeout(() => {
+			if (renameInputRef) {
+				renameInputRef.focus();
+				renameInputRef.select();
+			}
+		}, 50);
+	}
+	
+	function confirmRename() {
+		if (!layerToRename?.object || !renameInputValue.trim()) return;
+		layerToRename.object.name = renameInputValue.trim();
+		updateLayers();
+		closeRenameModal();
+	}
+	
+	function closeRenameModal() {
+		showRenameModal = false;
+		layerToRename = null;
+		renameInputValue = '';
+	}
+	
+	function handleRenameKeydown(event) {
+		if (event.key === 'Enter') {
+			confirmRename();
+		} else if (event.key === 'Escape') {
+			closeRenameModal();
 		}
 	}
 	
@@ -529,7 +580,7 @@
 		{:else}
 			{#each layers as layer (layer.id)}
 				<div 
-					class="layer-item"
+					class="layer-item group"
 					style="padding-left: {12 + layer.depth * 20}px"
 					class:selected={$selectedComponent === layer.object}
 					class:hidden-layer={!layer.visible}
@@ -566,7 +617,9 @@
 								<i class="fa fa-grip-vertical"></i>
 							</span>
 						{/if}
-						<span class="layer-icon">{layerIcons[layer.type] || '📄'}</span>
+						<span class="layer-icon">
+							<i class="fa {layerIcons[layer.type] || 'fa-file'}"></i>
+						</span>
 						<span 
 							class="layer-name" 
 							on:dblclick={(e) => renameLayer(layer, e)}
@@ -576,6 +629,35 @@
 						>
 							{layer.name}
 						</span>
+						
+						<!-- Dynamic Data Badges -->
+						<div class="layer-badges">
+							{#if layer.isVariable}
+								<span class="layer-badge variable" title="Variable">
+									<i class="fa fa-code"></i>
+								</span>
+							{/if}
+							{#if layer.hasCondition}
+								<span class="layer-badge condition" title="Has condition">
+									<i class="fa fa-code-branch"></i>
+								</span>
+							{/if}
+							{#if layer.hasLoop}
+								<span class="layer-badge loop" title="Loop element">
+									<i class="fa fa-redo"></i>
+								</span>
+							{/if}
+							{#if layer.isChart}
+								<span class="layer-badge chart" title="Chart">
+									<i class="fa fa-chart-bar"></i>
+								</span>
+							{/if}
+							{#if layer.isTable}
+								<span class="layer-badge table" title="Table">
+									<i class="fa fa-table"></i>
+								</span>
+							{/if}
+						</div>
 					</div>
 					
 					<div class="layer-controls">
@@ -585,30 +667,22 @@
 							on:click={(e) => toggleVisibility(layer, e)}
 							title={layer.visible ? 'Hide layer' : 'Show layer'}
 						>
-							{#if layer.visible}
-								<i class="fa fa-eye text-gray-400 hover:text-gray-600"></i>
-							{:else}
-								<i class="fa fa-eye-slash text-gray-400 hover:text-gray-600"></i>
-							{/if}
+							<i class="fa {layer.visible ? 'fa-eye' : 'fa-eye-slash'}"></i>
 						</button>
 						
 						<!-- Lock toggle -->
 						<button
-							class="control-btn"
+							class="control-btn {layer.locked ? 'is-locked' : 'is-unlocked'}"
 							on:click={(e) => toggleLock(layer, e)}
 							title={layer.locked ? 'Unlock layer' : 'Lock layer'}
 						>
-							{#if layer.locked}
-								<i class="fa fa-lock text-gray-400 hover:text-gray-600"></i>
-							{:else}
-								<i class="fa fa-unlock text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100"></i>
-							{/if}
+							<i class="fa {layer.locked ? 'fa-lock' : 'fa-unlock'}"></i>
 						</button>
 						
 						<!-- More options -->
 						<div class="dropdown">
 							<button class="control-btn more-btn">
-								<i class="fa fa-ellipsis-v text-gray-400 hover:text-gray-600"></i>
+								<i class="fa fa-ellipsis-v"></i>
 							</button>
 							<div class="dropdown-menu shadow-lg border border-gray-100 rounded-lg overflow-hidden">
 								<button on:click={(e) => duplicateLayer(layer, e)} class="hover:bg-gray-50">
@@ -641,11 +715,67 @@
 	</div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+{#if showDeleteModal}
+	<div class="modal-overlay" on:click={closeDeleteModal} role="dialog" aria-modal="true">
+		<div class="modal-content" on:click|stopPropagation role="document">
+			<div class="modal-icon delete">
+				<i class="fa fa-trash"></i>
+			</div>
+			<h4 class="modal-title">Delete Layer?</h4>
+			<p class="modal-message">
+				Are you sure you want to delete <span class="layer-highlight">"{layerToDelete?.name}"</span>? This action cannot be undone.
+			</p>
+			<div class="modal-actions">
+				<button class="modal-btn cancel" on:click={closeDeleteModal}>
+					Cancel
+				</button>
+				<button class="modal-btn danger" on:click={confirmDelete}>
+					<i class="fa fa-trash mr-1"></i>
+					Delete
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Rename Modal -->
+{#if showRenameModal}
+	<div class="modal-overlay" on:click={closeRenameModal} role="dialog" aria-modal="true">
+		<div class="modal-content" on:click|stopPropagation role="document">
+			<div class="modal-icon rename">
+				<i class="fa fa-edit"></i>
+			</div>
+			<h4 class="modal-title">Rename Layer</h4>
+			<p class="modal-message">
+				Enter a new name for this layer:
+			</p>
+			<input
+				bind:this={renameInputRef}
+				type="text"
+				class="modal-input"
+				bind:value={renameInputValue}
+				on:keydown={handleRenameKeydown}
+				placeholder="Layer name"
+			/>
+			<div class="modal-actions">
+				<button class="modal-btn cancel" on:click={closeRenameModal}>
+					Cancel
+				</button>
+				<button class="modal-btn primary" on:click={confirmRename} disabled={!renameInputValue.trim()}>
+					<i class="fa fa-check mr-1"></i>
+					Rename
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <style>
 	.layers-panel {
 		width: 100%;
 		height: 100%;
-		background: #ffffff;
+		background: #FFFDF8;
 		display: flex;
 		flex-direction: column;
 		font-size: 14px;
@@ -653,36 +783,36 @@
 	
 	.panel-header {
 		padding: 16px 20px;
-		border-bottom: 1px solid #f3f4f6;
+		border-bottom: 3px solid #111827;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		background: white;
+		background: #FFFDF8;
 	}
 	
 	.panel-header h3 {
 		margin: 0;
-		font-size: 14px;
-		font-weight: 700;
+		font-size: 12px;
+		font-weight: 900;
 		color: #111827;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.1em;
 	}
 	
 	.layer-count {
-		background: #f3f4f6;
+		background: #111827;
 		padding: 2px 8px;
-		border-radius: 999px;
-		font-size: 11px;
-		font-weight: 600;
-		color: #6b7280;
+		border-radius: 4px;
+		font-size: 10px;
+		font-weight: 700;
+		color: #ffffff;
 	}
 	
 	.layers-list {
 		flex: 1;
 		overflow-y: auto;
 		padding: 12px;
-		background-color: #f9fafb;
+		background-color: #FFFDF8;
 	}
 	
 	.empty-state {
@@ -699,55 +829,66 @@
 		width: 48px;
 		height: 48px;
 		background: #f3f4f6;
-		border-radius: 50%;
+		border: 2px solid #111827;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		margin-bottom: 4px;
+		box-shadow: 4px 4px 0 0 #111827;
 	}
 	
 	.empty-state i {
 		font-size: 20px;
-		color: #d1d5db;
+		color: #111827;
 	}
 	
 	.empty-state p {
 		margin: 0;
 		font-size: 14px;
-		font-weight: 500;
-		color: #6b7280;
+		font-weight: 700;
+		color: #111827;
+		text-transform: uppercase;
 	}
 	
 	.empty-state .hint {
 		font-size: 12px;
-		color: #9ca3af;
+		color: #6b7280;
 	}
 	
 	.layer-item {
 		position: relative;
 		background: white;
-		border: 1px solid #e5e7eb;
-		border-radius: 8px;
+		border: 2px solid #111827;
+		border-radius: 6px;
 		padding: 8px 12px;
 		margin-bottom: 8px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: all 0.1s ease;
 		user-select: none;
+		box-shadow: 2px 2px 0 0 #111827;
+		z-index: 0;
+	}
+	
+	.layer-item:hover {
+		z-index: 1;
 	}
 	
 	.layer-item:not(.locked):hover {
-		border-color: #d1d5db;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-		transform: translateY(-1px);
+		transform: translate(-1px, -1px);
+		box-shadow: 4px 4px 0 0 #111827;
 	}
 	
 	.layer-item.selected {
-		border-color: #3b82f6;
-		background: #eff6ff;
-		box-shadow: 0 0 0 1px #3b82f6;
+		border-color: #111827;
+		background: #fffdf8;
+		box-shadow: 4px 4px 0 0 #ffc480;
+		transform: translate(-2px, -2px);
+		position: relative;
+		z-index: 1;
 	}
 	
 	.layer-item.dragging {
@@ -764,23 +905,25 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		height: 2px;
-		background: #3b82f6;
+		height: 3px;
+		background: #ff6b6b;
 		z-index: 10;
 		pointer-events: none;
 	}
 	
 	.layer-item.drag-over-before::before {
-		top: -5px;
+		top: -8px;
 	}
 	
 	.layer-item.drag-over-after::after {
-		bottom: -5px;
+		bottom: -8px;
 	}
 	
 	.layer-item.hidden-layer {
 		opacity: 0.6;
 		background: #f9fafb;
+		border-style: dashed;
+		box-shadow: none;
 	}
 	
 	.layer-item.hidden-layer .layer-name {
@@ -789,36 +932,41 @@
 	}
 	
 	.layer-item.locked {
-		background: #f9fafb;
-		border-color: #e5e7eb;
+		background: #f3f4f6;
+		border-color: #d1d5db;
+		box-shadow: none;
 	}
 	
 	.layer-content {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 8px;
 		flex: 1;
 		min-width: 0;
+		overflow: hidden;
 	}
 	
 	.expand-btn {
 		background: none;
-		border: none;
+		border: 2px solid transparent;
 		padding: 4px;
 		cursor: pointer;
-		color: #6b7280;
-		width: 20px;
-		height: 20px;
+		color: #111827;
+		width: 24px;
+		height: 24px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		margin-right: -4px;
+		transition: all 0.1s;
 	}
 	
 	.expand-btn:hover {
-		color: #374151;
-		background-color: #f3f4f6;
+		color: #000;
+		background-color: #fff;
+		border: 2px solid #111827;
 		border-radius: 4px;
+		box-shadow: 2px 2px 0 0 #000;
 	}
 	
 	.expand-btn i {
@@ -831,7 +979,7 @@
 	}
 	
 	.drag-handle {
-		color: #d1d5db;
+		color: #9ca3af;
 		cursor: grab;
 		padding: 4px;
 		margin-left: -4px;
@@ -840,13 +988,19 @@
 	}
 	
 	.layer-item:hover .drag-handle {
-		color: #9ca3af;
+		color: #111827;
 	}
 	
 	.layer-icon {
-		font-size: 14px;
+		font-size: 12px;
 		width: 20px;
 		text-align: center;
+		color: #6b7280;
+		flex-shrink: 0;
+	}
+	
+	.layer-icon i {
+		display: block;
 	}
 	
 	.layer-name {
@@ -854,16 +1008,64 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-size: 13px;
-		font-weight: 500;
-		color: #374151;
+		font-size: 12px;
+		font-weight: 700;
+		color: #111827;
+		min-width: 0;
+		max-width: 100%;
+		font-family: monospace;
+	}
+	
+	.layer-badges {
+		display: flex;
+		gap: 4px;
+		flex-shrink: 0;
+	}
+	
+	.layer-badge {
+		width: 18px;
+		height: 18px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 9px;
+		border: 2px solid #111827;
+		font-weight: bold;
+	}
+	
+	.layer-badge.variable {
+		background: #dbeafe;
+		color: #1e40af;
+	}
+	
+	.layer-badge.condition {
+		background: #fef3c7;
+		color: #92400e;
+	}
+	
+	.layer-badge.loop {
+		background: #dcfce7;
+		color: #166534;
+	}
+	
+	.layer-badge.chart {
+		background: #fce7f3;
+		color: #be185d;
+	}
+	
+	.layer-badge.table {
+		background: #ccfbf1;
+		color: #0f766e;
 	}
 	
 	.layer-controls {
 		display: flex;
-		gap: 2px;
+		gap: 4px;
 		opacity: 0;
 		transition: opacity 0.2s;
+		flex-shrink: 0;
+		margin-left: 8px;
 	}
 	
 	.layer-item:hover .layer-controls,
@@ -871,30 +1073,62 @@
 		opacity: 1;
 	}
 	
+	.layer-item .control-btn.is-unlocked {
+		opacity: 0;
+	}
+	
+	.layer-item:hover .control-btn.is-unlocked,
+	.layer-item.selected .control-btn.is-unlocked {
+		opacity: 1;
+	}
+	
 	.control-btn {
 		width: 24px;
 		height: 24px;
 		padding: 0;
-		background: transparent;
-		border: none;
+		background: white;
+		border: 2px solid #111827;
 		border-radius: 4px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all 0.1s;
+		box-shadow: 2px 2px 0 0 #111827;
 	}
 	
 	.control-btn:hover {
-		background-color: #f3f4f6;
+		background-color: #fff;
+		transform: translate(-1px, -1px);
+		box-shadow: 3px 3px 0 0 #111827;
+	}
+
+	.control-btn:active {
+		transform: translate(1px, 1px);
+		box-shadow: none;
 	}
 	
 	.control-btn i {
-		font-size: 12px;
+		font-size: 10px;
+		color: #6b7280;
+		transition: color 0.1s;
+	}
+	
+	.control-btn:hover i {
+		color: #111827;
+	}
+	
+	.control-btn.is-locked i {
+		color: #111827;
 	}
 	
 	.dropdown {
 		position: relative;
+		z-index: 1;
+	}
+	
+	.dropdown:hover {
+		z-index: 100;
 	}
 	
 	.dropdown:hover .dropdown-menu {
@@ -908,9 +1142,9 @@
 		right: 0;
 		top: 100%;
 		background: white;
-		border: 1px solid #e5e5e5;
+		border: 2px solid #111827;
 		border-radius: 6px;
-		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+		box-shadow: 4px 4px 0 0 #111827;
 		padding: 4px;
 		min-width: 160px;
 		z-index: 1000;
@@ -928,13 +1162,14 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		font-size: 13px;
-		color: #333;
+		font-size: 12px;
+		font-weight: 600;
+		color: #111827;
 		transition: background 0.15s;
 	}
 	
 	.dropdown-menu button:hover {
-		background: #f5f5f5;
+		background: #f3f4f6;
 	}
 	
 	.dropdown-menu button.danger {
@@ -946,8 +1181,8 @@
 	}
 	
 	.divider {
-		height: 1px;
-		background: #e5e5e5;
+		height: 2px;
+		background: #111827;
 		margin: 4px 0;
 	}
 	
@@ -961,12 +1196,196 @@
 	}
 	
 	.layers-list::-webkit-scrollbar-thumb {
-		background: #d0d0d0;
+		background: #111827;
 		border-radius: 3px;
 	}
 	
 	.layers-list::-webkit-scrollbar-thumb:hover {
-		background: #b0b0b0;
+		background: #000;
+	}
+	
+	/* Modal Styles */
+	.modal-overlay {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(4px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 9999;
+		padding: 16px;
+	}
+	
+	.modal-content {
+		background: white;
+		border: 3px solid #111827;
+		border-radius: 12px;
+		box-shadow: 8px 8px 0 0 #111827;
+		padding: 24px;
+		max-width: 380px;
+		width: 100%;
+		text-align: center;
+		animation: modalSlideIn 0.15s ease-out;
+	}
+	
+	@keyframes modalSlideIn {
+		from {
+			opacity: 0;
+			transform: translateY(-10px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+	
+	.modal-icon {
+		width: 48px;
+		height: 48px;
+		margin: 0 auto 16px;
+		border: 2px solid #111827;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 3px 3px 0 0 #111827;
+	}
+	
+	.modal-icon.delete {
+		background: #fee2e2;
+		color: #dc2626;
+	}
+	
+	.modal-icon.rename {
+		background: #dbeafe;
+		color: #2563eb;
+	}
+	
+	.modal-icon i {
+		font-size: 18px;
+	}
+	
+	.modal-title {
+		margin: 0 0 8px;
+		font-size: 18px;
+		font-weight: 900;
+		color: #111827;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+	
+	.modal-message {
+		margin: 0 0 20px;
+		font-size: 14px;
+		color: #6b7280;
+		line-height: 1.5;
+	}
+	
+	.layer-highlight {
+		font-family: monospace;
+		font-weight: 700;
+		color: #111827;
+		background: #f3f4f6;
+		padding: 2px 6px;
+		border-radius: 4px;
+	}
+	
+	.modal-input {
+		width: 100%;
+		padding: 12px 16px;
+		font-size: 14px;
+		font-weight: 600;
+		font-family: monospace;
+		border: 2px solid #111827;
+		border-radius: 8px;
+		margin-bottom: 20px;
+		outline: none;
+		transition: all 0.1s;
+		box-shadow: 2px 2px 0 0 #111827;
+	}
+	
+	.modal-input:focus {
+		box-shadow: 4px 4px 0 0 #ffc480;
+	}
+	
+	.modal-input::placeholder {
+		color: #9ca3af;
+		font-weight: 500;
+	}
+	
+	.modal-actions {
+		display: flex;
+		gap: 12px;
+	}
+	
+	.modal-btn {
+		flex: 1;
+		padding: 12px 16px;
+		font-size: 12px;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border: 2px solid #111827;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.1s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+	}
+	
+	.modal-btn.cancel {
+		background: white;
+		color: #111827;
+		box-shadow: 2px 2px 0 0 #111827;
+	}
+	
+	.modal-btn.cancel:hover {
+		background: #f3f4f6;
+		transform: translate(-1px, -1px);
+		box-shadow: 4px 4px 0 0 #111827;
+	}
+	
+	.modal-btn.danger {
+		background: #dc2626;
+		color: white;
+		box-shadow: 2px 2px 0 0 #111827;
+	}
+	
+	.modal-btn.danger:hover {
+		background: #b91c1c;
+		transform: translate(-1px, -1px);
+		box-shadow: 4px 4px 0 0 #111827;
+	}
+	
+	.modal-btn.primary {
+		background: #111827;
+		color: white;
+		box-shadow: 2px 2px 0 0 #111827;
+	}
+	
+	.modal-btn.primary:hover {
+		background: #000;
+		transform: translate(-1px, -1px);
+		box-shadow: 4px 4px 0 0 #ffc480;
+	}
+	
+	.modal-btn.primary:disabled {
+		background: #9ca3af;
+		cursor: not-allowed;
+		box-shadow: none;
+		transform: none;
+	}
+	
+	.modal-btn:active:not(:disabled) {
+		transform: translate(1px, 1px);
+		box-shadow: none;
+	}
+	
+	.mr-1 {
+		margin-right: 4px;
 	}
 </style>
 

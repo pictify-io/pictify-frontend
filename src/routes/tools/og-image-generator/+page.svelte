@@ -6,12 +6,14 @@
   import { createImagePublic } from '../../../api/image.js';
   import { onMount } from 'svelte';
   import { toast } from '../../../store/toast.store';
+  import { page } from '$app/stores';
   import ColorPicker from 'svelte-awesome-color-picker';
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { user } from '../../../store/user.store';
   import { ogPlatforms, popularSizes as configPopularSizes, platformGuides, platformRecommendedSizes, parseSize } from '$lib/pseo/config.js';
   import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+  import NextSteps from '$lib/components/tools/NextSteps.svelte';
   import Toast from '$lib/components/Toast.svelte';
 
   // Optional platform prop to specialize content (e.g., 'wordpress')
@@ -284,7 +286,15 @@ const combinedFonts = popularFonts.map((font, index) => ({
       return template;
     }));
 
-    selectedTemplate = templates[0];
+    const requestedTemplate = $page?.url?.searchParams?.get?.('template');
+    if (requestedTemplate) {
+      const idx = templateNames.indexOf(requestedTemplate);
+      selectedTemplate = idx >= 0 ? templates[idx] : templates[0];
+      // Deep-linking from template gallery should be frictionless.
+      creationMode = 'direct';
+    } else {
+      selectedTemplate = templates[0];
+    }
     
     if (creationMode === 'direct') {
       createDirectOgImage();
@@ -387,9 +397,38 @@ const combinedFonts = popularFonts.map((font, index) => ({
 
   function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+			toast.set({ message: 'URL copied to clipboard! 🔗', duration: 1500 });
 		});
 	}
+
+  function buildCurlSnippetFromHtml(html, width, height) {
+    const payload = {
+      html: String(html || ''),
+      width: Number(width) || 1200,
+      height: Number(height) || 630
+    };
+    return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(payload, null, 2)}'`;
+  }
+
+  function getCurrentOgHtml() {
+    try {
+      const iframe = ogImageTemplateWrapper?.querySelector?.('iframe');
+      return iframe?.contentWindow?.document?.documentElement?.outerHTML || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  $: nextStepsCurlSnippet = buildCurlSnippetFromHtml(getCurrentOgHtml(), previewWidth, previewHeight);
+  $: nextStepsTemplateDraft = imageUrl ? {
+    version: 1,
+    name: isPlatform ? `OG template (${platformLabel})` : 'OG template',
+    type: 'og-image',
+    width: previewWidth,
+    height: previewHeight,
+    backgroundImageUrl: imageUrl,
+    source: 'og-image-generator'
+  } : null;
 
   const updateFont = (font) => {
     selectedFont = font;
@@ -474,9 +513,6 @@ const combinedFonts = popularFonts.map((font, index) => ({
       isImageGenerating = false;
     }
   };
-
-  // Add function to handle social sharing with rewards
-
 
   let progress = tweened(0, {
     duration: 3000,
@@ -620,398 +656,350 @@ const combinedFonts = popularFonts.map((font, index) => ({
   </script>
 </svelte:head>
 
-
-<section class="min-h-screen bg-[#FFFDF8] font-['Manrope']">
+<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
   <Nav />
-  <main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
-    <!-- Background Elements -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-      <div class="absolute top-0 left-1/4 w-96 h-96 bg-[#ff6b6b]/10 rounded-full blur-[100px] transform -translate-y-1/2"></div>
-      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-[#ffc480]/10 rounded-full blur-[100px] transform translate-y-1/2"></div>
-    </div>
   
-    <!-- Hero Content -->
-    <div class="flex flex-col items-center space-y-8 text-center max-w-4xl mx-auto mb-16 relative">
-      <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1">
-        <svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
-        <span class="font-bold text-gray-900">Create Beautiful OG Images</span>
+  <!-- Background Elements -->
+  <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+
+  <main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
+    
+    <!-- Hero Section -->
+    <div class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10">
+
+      <!-- Badge -->
+      <div class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8">
+        <div class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+          ★ Free Tool
+        </div>
       </div>
 
-      <h1 class="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-gray-900 leading-[1.1] mb-4">
-        OG Image<br/><span class="text-[#ff6b6b] relative inline-block">
-          Generator
-          <svg class="absolute w-full h-4 -bottom-2 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
-            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
-          </svg>
+      <!-- Main Title -->
+      <h1 class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8">
+        <span class="block sm:inline">OG IMAGE</span>
+        <span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
+          <span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
+          <span class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"></span>
         </span>
-        {#if isPlatform}<br/><span class="text-3xl md:text-4xl font-bold text-gray-600 mt-4 block">for {platformLabel}</span>{/if}
-      </h1>
-      
-      <p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium leading-relaxed">
         {#if isPlatform}
-          Generate stunning Open Graph images tailored for {platformLabel}. Choose a template and customize it to match your brand instantly.
-        {:else}
-          Generate stunning Open Graph images for your website or blog. Boost engagement with custom social cards in seconds.
+          <span class="block mt-2 sm:mt-4">
+            <span class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]">
+              for {platformLabel}
+            </span>
+          </span>
         {/if}
-      </p>
+      </h1>
 
-      {#if isPlatform}
-        <div class="flex flex-wrap justify-center gap-3 mt-4">
-          {#each platformSizes as sz}
-            <a href={`/tools/html-to-jpg/${sz}`} class="px-4 py-2 rounded-lg border-[3px] border-gray-900 text-sm font-bold bg-white hover:bg-gray-50 hover:-translate-y-0.5 transition-all shadow-[2px_2px_0_0_#1f2937]">{sz}</a>
-          {/each}
-        </div>
-      {/if}
+      <!-- Description -->
+      <div class="max-w-2xl mx-auto px-2">
+        <p class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]">
+          Create stunning <span class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black">Open Graph images</span> for your website.
+          <span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold">Boost social media engagement with custom social cards</span>
+        </p>
+      </div>
     </div>
 
     <!-- Creation Mode Selector -->
-    <div class="w-full max-w-3xl mx-auto bg-white rounded-3xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937] mb-16">
-      <div class="flex flex-col sm:flex-row gap-4 mb-8">
-        <button
-          class={`flex-1 py-4 px-6 rounded-xl font-black text-lg transition-all border-[3px] ${
-            creationMode === 'website' 
-              ? 'bg-[#ff6b6b] text-white border-gray-900 shadow-[4px_4px_0_0_#1f2937]' 
-              : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937]'
-          }`}
-          on:click={() => {
-            creationMode = 'website';
-            websiteInfo = null;
-          }}
-        >
-          From Website
-        </button>
-        <button
-          class={`flex-1 py-4 px-6 rounded-xl font-black text-lg transition-all border-[3px] ${
-            creationMode === 'direct' 
-              ? 'bg-[#ff6b6b] text-white border-gray-900 shadow-[4px_4px_0_0_#1f2937]' 
-              : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937]'
-          }`}
-          on:click={() => {
-            creationMode = 'direct';
-            createDirectOgImage();
-          }}
-        >
-          Create Directly
-        </button>
-      </div>
+    <div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0">
+      <div class="absolute inset-0 bg-black translate-x-3 translate-y-3 hidden md:block border-[3px] border-black"></div>
+      
+      <div class="relative border-[3px] md:border-[4px] border-black bg-white">
+        <!-- Window Header -->
+        <div class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] md:border-b-[4px] border-black">
+          <h3 class="font-bold font-mono tracking-widest text-xs md:text-sm uppercase flex items-center gap-2">
+            <span class="animate-pulse">_</span> SELECT_MODE
+          </h3>
+          <div class="flex gap-2">
+            <div class="w-3 h-3 bg-[#ff6b6b] border border-black"></div>
+            <div class="w-3 h-3 bg-[#ffc480] border border-black"></div>
+            <div class="w-3 h-3 bg-[#4ade80] border border-black"></div>
+          </div>
+        </div>
 
-      {#if creationMode === 'website'}
-        <!-- Website URL input -->
-        <div class="space-y-6">
-          <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-grow">
-              <input
-                on:input={(e) => {
-                  if (isValidUrl(e.target.value)) {
-                    e.target.classList.remove('border-red-500');
-                  } else {
-                    e.target.classList.add('border-red-500');
-                  }
-                }}
-                bind:value={url}
-                type="text"
-                class="w-full border-[3px] border-gray-900 placeholder-gray-500 text-lg font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] py-4 px-6 rounded-xl transition-all"
-                placeholder="Enter your website URL (e.g., pictify.io)"
-              />
-            </div>
+        <div class="p-6 md:p-8 bg-[#f8f9fa]">
+          <!-- Mode Toggle -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <button
-              on:click={(event) => { event.preventDefault(); submitUrl(url); }}
-              class="relative group md:w-auto w-full"
+              class="group relative w-full"
+              on:click={() => { creationMode = 'website'; websiteInfo = null; }}
             >
-              <div class="w-full rounded-xl bg-gray-900 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-              <button
-                class="py-4 px-8 rounded-xl group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-black bg-[#ffc480] tracking-wide text-lg text-gray-900 transition-all"
+              <div 
+                class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
+                ${creationMode === 'website' 
+                  ? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]' 
+                  : 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]'}`}
               >
-                <span class="relative inline-flex items-center gap-2">
-                  <span>Fetch Info</span>
-                  <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-              </button>
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                <span class="font-black text-lg uppercase tracking-tight">From Website</span>
+                <span class="text-xs font-bold text-gray-500">Extract info automatically</span>
+              </div>
+            </button>
+            <button
+              class="group relative w-full"
+              on:click={() => { creationMode = 'direct'; createDirectOgImage(); }}
+            >
+              <div 
+                class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
+                ${creationMode === 'direct' 
+                  ? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]' 
+                  : 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]'}`}
+              >
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                <span class="font-black text-lg uppercase tracking-tight">Create Directly</span>
+                <span class="text-xs font-bold text-gray-500">Design from scratch</span>
+              </div>
             </button>
           </div>
-          {#if isFetchingWebsiteInfo}
-            <div class="text-lg font-bold text-gray-700">
-              Fetching website info...
-              <div class="mt-4 w-full bg-gray-100 rounded-full h-3 border-2 border-gray-900 overflow-hidden">
-                <div class="bg-[#ff6b6b] h-full w-full origin-left animate-[loading_2s_ease-in-out_infinite]"></div>
+
+          {#if creationMode === 'website'}
+            <!-- Website URL Input -->
+            <div class="border-t-[3px] border-dashed border-gray-300 pt-8">
+              <h4 class="font-black text-lg mb-4 uppercase tracking-tight flex items-center gap-3">
+                <span class="w-8 h-8 bg-black text-white flex items-center justify-center text-sm font-bold border-[2px] border-black shadow-[3px_3px_0_0_#9ca3af]">01</span>
+                Enter Website URL
+              </h4>
+              <div class="flex flex-col md:flex-row gap-4">
+                <input
+                  bind:value={url}
+                  type="text"
+                  class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] py-4 px-5 transition-all bg-white"
+                  placeholder="https://yourwebsite.com"
+                  on:keydown={(e) => e.key === 'Enter' && submitUrl(url)}
+                />
+                <button
+                  on:click={() => submitUrl(url)}
+                  disabled={isFetchingWebsiteInfo}
+                  class="py-4 px-8 bg-[#ffc480] border-[3px] border-black font-black uppercase tracking-wide text-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {#if isFetchingWebsiteInfo}
+                    <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Fetching...
+                  {:else}
+                    Fetch Info
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                  {/if}
+                </button>
+              </div>
+              {#if error}
+                <div class="mt-4 p-4 bg-[#ff6b6b]/10 border-[3px] border-[#ff6b6b] text-[#ff6b6b] font-bold flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {error}
+                </div>
+              {/if}
+            </div>
+          {:else}
+            <div class="border-t-[3px] border-dashed border-gray-300 pt-8">
+              <div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] p-6 text-center">
+                <p class="text-black font-bold text-lg">
+                  ✓ Select a template below to start designing
+                </p>
               </div>
             </div>
           {/if}
-          {#if error}
-            <div class="text-lg font-bold text-[#ff6b6b] bg-red-50 border-[3px] border-[#ff6b6b] p-4 rounded-xl flex items-center gap-2">
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              {error}
-            </div>
-          {/if}
         </div>
-      {:else}
-        <div class="bg-gray-50 border-[3px] border-gray-200 rounded-xl p-6 text-center">
-          <p class="text-gray-700 font-bold text-lg">
-            Select a template below to start designing from scratch.
-          </p>
-        </div>
-      {/if}
+      </div>
     </div>
 
     <!-- Editor Section -->
     {#if websiteInfo && selectedTemplate}
-      <div class="w-full max-w-5xl mx-auto bg-white rounded-3xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937] mb-20" bind:this={ogImageTemplateWrapper}>
-        <div class="flex justify-between items-center mb-8 pb-6 border-b-[3px] border-gray-100">
-          <h2 class="text-3xl font-black text-gray-900">Customize Image</h2>
-        </div>
-
-        <!-- Preview section -->
-        <div class="bg-gray-100 rounded-2xl p-6 md:p-8 mb-10 border-[3px] border-gray-200">
-          <div class="flex justify-center items-center">
-            <div class="rounded-xl overflow-hidden border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]">
-              <OgImageTemplate html={typeof selectedTemplate === 'string' ? selectedTemplate : selectedTemplate.html} width={1200} height={630} scale={0.5} />
+      <div class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0" bind:this={ogImageTemplateWrapper}>
+        <div class="border-[3px] md:border-[4px] border-black bg-white shadow-[8px_8px_0_0_#000]">
+          <!-- Editor Header -->
+          <div class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] md:border-b-[4px] border-black">
+            <h3 class="font-bold font-mono tracking-widest text-xs md:text-sm uppercase">/// CUSTOMIZE_IMAGE</h3>
+            <div class="flex gap-2">
+              <div class="w-3 h-3 bg-[#ff6b6b] border border-white/20"></div>
+              <div class="w-3 h-3 bg-[#ffc480] border border-white/20"></div>
+              <div class="w-3 h-3 bg-[#4ade80] border border-white/20"></div>
             </div>
           </div>
-        </div>
 
-        <!-- Editor controls -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <!-- Logo section -->
-          <div class="space-y-6">
-            <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="bg-[#ffc480] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm shadow-[2px_2px_0_0_#1f2937]">
-                <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              </span>
-              Logo
-            </h3>
-            <div class="flex flex-col gap-4 p-6 bg-gray-50 rounded-2xl border-[3px] border-gray-200">
-              {#if websiteInfo.logo}
-                <div class="bg-white p-4 rounded-xl border-2 border-gray-200 flex justify-center">
-                  {#if websiteInfo.logo.startsWith('<svg')}
-                    <div style="width: 150px;">
-                      {@html websiteInfo.logo}
+          <!-- Preview Section -->
+          <div class="p-6 md:p-8 bg-gray-100 border-b-[3px] border-black">
+            <div class="flex justify-center items-center">
+              <div class="border-[3px] border-black shadow-[6px_6px_0_0_#000] overflow-hidden bg-white">
+                <OgImageTemplate html={typeof selectedTemplate === 'string' ? selectedTemplate : selectedTemplate.html} width={1200} height={630} scale={0.5} />
+              </div>
+            </div>
+          </div>
+
+          <!-- Editor Controls -->
+          <div class="p-6 md:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              <!-- Logo Section -->
+              <div class="space-y-4">
+                <h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
+                  <span class="w-8 h-8 bg-[#ffc480] flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  </span>
+                  Logo
+                </h4>
+                <div class="p-4 bg-gray-50 border-[3px] border-gray-200 space-y-4">
+                  {#if websiteInfo.logo}
+                    <div class="bg-white p-4 border-[2px] border-gray-200 flex justify-center">
+                      {#if websiteInfo.logo.startsWith('<svg')}
+                        <div style="width: 120px;">{@html websiteInfo.logo}</div>
+                      {:else}
+                        <img src={websiteInfo.logo} style="width: 120px;" alt="Logo" class="object-contain"/>
+                      {/if}
                     </div>
-                  {:else}
-                    <img src={websiteInfo.logo} style="width: 150px;" alt="input-logo" class="object-contain"/>
                   {/if}
-                </div>
-              {/if}
-              <div class="flex flex-col gap-4">
-                <div class="flex gap-4">
-                  <input
-                    type="file"
-                    class="hidden"
-                    id="logoInput"
-                    accept="image/*"
-                    on:change={updateLogo}
-                  />
-                  <label
-                    for="logoInput"
-                    class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 font-bold rounded-xl cursor-pointer hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#1f2937] transition-all text-center"
-                  >
+                  <input type="file" class="hidden" id="logoInput" accept="image/*" on:change={updateLogo} />
+                  <label for="logoInput" class="block w-full px-4 py-3 bg-white border-[3px] border-black text-black font-bold cursor-pointer hover:bg-gray-50 hover:shadow-[4px_4px_0_0_#000] transition-all text-center uppercase tracking-wide">
                     Upload Logo
                   </label>
-                </div>
-                <div class="space-y-2">
-                  <span class="text-sm font-bold text-gray-700">Logo Width</span>
-                  <input
-                    type="range"
-                    min="50"
-                    max="400"
-                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ff6b6b]"
-                    value={logoWidth}
-                    on:input={updateLogoWidth}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Text content section -->
-          <div class="space-y-6">
-            <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="bg-[#ff6b6b] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm text-white shadow-[2px_2px_0_0_#1f2937]">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-              </span>
-              Content
-            </h3>
-            <div class="space-y-4">
-              <div>
-                <span class="font-bold text-sm text-gray-700 block mb-2">Heading</span>
-                <input
-                  type="text"
-                  class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-gray-900 focus:shadow-[4px_4px_0_0_#1f2937] py-3 px-4 rounded-xl transition-all"
-                  placeholder="Enter heading"
-                  value={websiteInfo.heading}
-                  on:input={updateHeading}
-                />
-              </div>
-              <div>
-                <span class="font-bold text-sm text-gray-700 block mb-2">Sub-Heading</span>
-                <textarea
-                  class="w-full border-[3px] border-gray-200 text-lg font-medium focus:outline-none focus:border-gray-900 focus:shadow-[4px_4px_0_0_#1f2937] py-3 px-4 rounded-xl transition-all resize-none"
-                  rows="3"
-                  value={websiteInfo.subHeading}
-                  on:input={updateSubHeading}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- Style controls -->
-          <div class="space-y-6">
-            <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
-              <span class="bg-[#4ade80] w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 text-sm shadow-[2px_2px_0_0_#1f2937]">
-                <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-              </span>
-              Style
-            </h3>
-            <div class="p-6 bg-gray-50 rounded-2xl border-[3px] border-gray-200 space-y-6">
-              <div>
-                <span class="text-sm font-bold text-gray-700 block mb-2">Font Family</span>
-                <div class="relative">
-                  <select
-                    class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-gray-900 py-3 px-4 rounded-xl bg-white appearance-none cursor-pointer"
-                    on:change={(e) => updateFont(combinedFonts[e.target.selectedIndex])}
-                  >
-                    {#each combinedFonts as font}
-                      <option value={font.id}>{font.name}</option>
-                    {/each}
-                  </select>
-                  <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                  <div class="space-y-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase">Logo Width: {logoWidth}px</span>
+                    <input type="range" min="50" max="400" class="w-full h-2 bg-gray-200 appearance-none cursor-pointer accent-[#ff6b6b]" value={logoWidth} on:input={updateLogoWidth} />
                   </div>
                 </div>
               </div>
-              
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <span class="text-sm font-bold text-gray-700 block mb-2">Background</span>
-                  <div class="border-[3px] border-gray-200 rounded-xl overflow-hidden">
-                    <ColorPicker
-                      bind:rgb={backgroundColorRgb}
-                      isDialog={true}
-                      on:input={updateBackgroundColor}
-                    />
+
+              <!-- Content Section -->
+              <div class="space-y-4">
+                <h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
+                  <span class="w-8 h-8 bg-[#ff6b6b] text-white flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </span>
+                  Content
+                </h4>
+                <div class="space-y-4">
+                  <div>
+                    <label for="og-heading" class="text-xs font-bold text-gray-500 uppercase block mb-2">Heading</label>
+                    <input id="og-heading" type="text" class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black focus:shadow-[4px_4px_0_0_#ffc480] py-3 px-4 transition-all" placeholder="Enter heading" value={websiteInfo.heading} on:input={updateHeading} />
+                  </div>
+                  <div>
+                    <label for="og-description" class="text-xs font-bold text-gray-500 uppercase block mb-2">Description</label>
+                    <textarea id="og-description" class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black focus:shadow-[4px_4px_0_0_#ffc480] py-3 px-4 transition-all resize-none" rows="3" value={websiteInfo.subHeading} on:input={updateSubHeading}></textarea>
                   </div>
                 </div>
-                <div>
-                  <span class="text-sm font-bold text-gray-700 block mb-2">Text Color</span>
-                  <div class="border-[3px] border-gray-200 rounded-xl overflow-hidden">
-                    <ColorPicker
-                      bind:rgb={headingColorRgb}
-                      isDialog={true}
-                      on:input={updateHeadingColor}
-                    />
+              </div>
+
+              <!-- Style Section -->
+              <div class="space-y-4 lg:col-span-2">
+                <h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
+                  <span class="w-8 h-8 bg-[#4ade80] flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                  </span>
+                  Style
+                </h4>
+                <div class="p-4 bg-gray-50 border-[3px] border-gray-200">
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div>
+                      <label for="og-font" class="text-xs font-bold text-gray-500 uppercase block mb-2">Font</label>
+                      <select id="og-font" class="w-full border-[3px] border-gray-200 text-base font-bold focus:outline-none focus:border-black py-3 px-4 bg-white appearance-none cursor-pointer" on:change={(e) => updateFont(combinedFonts[e.target.selectedIndex])}>
+                        {#each combinedFonts as font}
+                          <option value={font.id}>{font.name}</option>
+                        {/each}
+                      </select>
+                    </div>
+                    <div>
+                      <div class="text-xs font-bold text-gray-500 uppercase block mb-2">Background</div>
+                      <div class="color-picker-wrapper">
+                        <ColorPicker bind:rgb={backgroundColorRgb} isDialog={true} on:input={updateBackgroundColor} />
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-xs font-bold text-gray-500 uppercase block mb-2">Text Color</div>
+                      <div class="color-picker-wrapper">
+                        <ColorPicker bind:rgb={headingColorRgb} isDialog={true} on:input={updateHeadingColor} />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Generate button section -->
-        <div class="mt-12 pt-8 border-t-[3px] border-gray-100">
+          <!-- Generated Image Result -->
           {#if imageUrl}
-            <div class="mb-10 space-y-8 animate-fade-in">
-              <div class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937]">
-                <div class="text-center mb-8">
-                  <h3 class="text-3xl font-black text-gray-900 mb-2">🎉 Ready to Ship!</h3>
-                  <p class="text-gray-600 font-medium">Your image has been generated successfully.</p>
+            <div class="border-t-[3px] border-black bg-[#4ade80] p-6 md:p-8">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                  <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                  <span class="font-black text-black uppercase tracking-wide">Image Generated Successfully!</span>
                 </div>
-
-                <img src={imageUrl} alt="Generated OG Image" class="w-full rounded-xl border-2 border-gray-200 shadow-lg mb-8" />
-
-                <div class="flex flex-col sm:flex-row gap-4">
-                  <div class="flex-1 relative">
-                    <input 
-                      type="text" 
-                      value={imageUrl} 
-                      readonly 
-                      class="w-full px-4 py-3 bg-gray-50 border-[3px] border-gray-200 rounded-xl text-sm font-mono text-gray-600 focus:outline-none"
-                    />
-                  </div>
-                  <div class="flex gap-3">
-                    <button
-                      on:click={() => copyToClipboard(imageUrl)}
-                      class="px-6 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-colors shadow-[4px_4px_0_0_#ff6b6b] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-                    >
-                      Copy URL
-                    </button>
-                    <a 
-                      href={imageUrl} 
-                      download="og-image.jpg" 
-                      class="px-6 py-3 bg-white border-[3px] border-gray-900 text-gray-900 font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-                    >
-                      Download
-                    </a>
-                  </div>
+                <div class="flex gap-3">
+                  <button on:click={() => copyToClipboard(imageUrl)} class="px-4 py-2 bg-black text-white font-bold uppercase text-sm border-[2px] border-black hover:bg-white hover:text-black transition-colors">
+                    Copy URL
+                  </button>
+                  <a href={imageUrl} download="og-image.png" target="_blank" class="px-4 py-2 bg-white text-black font-bold uppercase text-sm border-[2px] border-black hover:bg-black hover:text-white transition-colors">
+                    Download
+                  </a>
                 </div>
               </div>
+              <div class="border-[3px] border-black bg-white p-2">
+                <img src={imageUrl} alt="Generated OG" class="w-full" />
+              </div>
+
+              <NextSteps
+                heading="Next steps"
+                description="Copy the API request, save this as a reusable template background, and batch render variants."
+                curlSnippet={nextStepsCurlSnippet}
+                templateDraft={nextStepsTemplateDraft}
+              />
             </div>
           {/if}
 
-          <button
-            on:click={generateImage}
-            disabled={isImageGenerating}
-            class="relative group w-full"
-          >
-            <div class="w-full rounded-xl bg-gray-900 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2 {isImageGenerating ? 'opacity-50' : ''}" />
+          <!-- Generate Button -->
+          <div class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-[#FFFDF8] to-[#fff5e6]">
             <button
+              on:click={generateImage}
               disabled={isImageGenerating}
-              class="py-5 px-8 rounded-xl group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-black bg-[#ffc480] tracking-wide text-xl text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-[#ff6b6b] border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
-              <span class="relative inline-flex items-center gap-3">
-                <span>{isImageGenerating ? 'Generating Magic...' : 'Generate Final Image'}</span>
-                {#if !isImageGenerating}
-                  <svg class="w-6 h-6" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
+              <div class="flex items-center justify-center gap-3 md:gap-4">
+                {#if isImageGenerating}
+                  <svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  <span class="font-black text-lg md:text-2xl text-white uppercase tracking-tight">Generating...</span>
                 {:else}
-                  <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                  <span class="font-black text-lg md:text-2xl text-white uppercase tracking-tight group-hover:scale-105 transition-transform">Generate Image</span>
+                  <svg class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                 {/if}
-              </span>
+              </div>
             </button>
-          </button>
+          </div>
         </div>
       </div>
     {/if}
 
-    <!-- Featured Templates Grid -->
-    <div class="w-full max-w-7xl mx-auto mb-20">
-      <div class="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
-        <h2 class="text-4xl font-black text-gray-900 tracking-tight">
-          {isPlatform ? `Templates for ${platformLabel}` : 'Featured Templates'}
+    <!-- Templates Grid -->
+    <div class="w-full max-w-5xl mx-auto mb-20">
+      <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 px-2 md:px-0">
+        <h2 class="text-3xl md:text-4xl font-black text-black uppercase tracking-tighter">
+          {isPlatform ? `Templates for ${platformLabel}` : 'Choose Template'}
         </h2>
         {#if !isUserLoggedIn}
-          <a href="/signup" class="group flex items-center gap-2 text-lg font-bold text-gray-900 hover:text-[#ff6b6b] transition-colors">
-            <span>View All Templates</span>
-            <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+          <a href="/signup" class="font-bold text-black hover:text-[#ff6b6b] transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1">
+            View All Templates →
           </a>
         {/if}
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {#each templates.slice(0, 6) as template}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2 md:px-0">
+        {#each templates.slice(0, 6) as template, i}
           <div 
-            class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative cursor-pointer"
+            class="group bg-white border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#000] transition-all duration-200 cursor-pointer"
             on:click={() => selectTemplate(template)}
             on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
             role="button"
             tabindex="0"
           >
-            <div class="p-3 bg-gray-50 border-b-[3px] border-gray-900 flex gap-1.5">
-              <div class="w-2.5 h-2.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
+            <div class="p-2 bg-gray-100 border-b-[3px] border-black flex gap-1.5">
+              <div class="w-2.5 h-2.5 bg-[#ff6b6b] border border-black"></div>
+              <div class="w-2.5 h-2.5 bg-[#ffc480] border border-black"></div>
+              <div class="w-2.5 h-2.5 bg-[#4ade80] border border-black"></div>
             </div>
-            <div class="relative bg-gray-100 overflow-hidden" style="height: 200px;">
-              <OgImageTemplate html={typeof template === 'string' ? template : template.html} width={1200} height={630} scale={0.32} />
+            <div class="relative bg-white overflow-hidden" style="height: 180px;">
+              <OgImageTemplate html={typeof template === 'string' ? template : template.html} width={1200} height={630} scale={0.3} />
               
               <!-- Hover Overlay -->
-              <div class="absolute inset-0 bg-gray-900/70 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center backdrop-blur-[2px]">
-                <span class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b]">
-                  Use Template
+              <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                <span class="px-5 py-2 bg-white text-black font-black uppercase text-sm border-[3px] border-black shadow-[3px_3px_0_0_#ff6b6b]">
+                  Use This
                 </span>
               </div>
             </div>
@@ -1020,121 +1008,130 @@ const combinedFonts = popularFonts.map((font, index) => ({
       </div>
     </div>
 
-    <!-- New SEO-optimized sections -->
-    <ApiPromptSection
-      title={apiCtaDetails.title}
-      description={apiCtaDetails.description}
-      featurePoints={apiCtaDetails.featurePoints}
-      codeSnippet={apiCtaDetails.codeSnippet}
-      codeLanguage="bash"
-      docsUrl={apiCtaDetails.docsUrl}
-      docsLabel={apiCtaDetails.docsLabel}
-      secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
-      secondaryCtaUrl="https://docs.pictify.io/examples"
-      note="Contact us for volume pricing or dedicated rendering regions."
-    />
+    <!-- API Section -->
+    <section class="mb-16 max-w-5xl mx-auto">
+      <ApiPromptSection
+        title={apiCtaDetails.title}
+        description={apiCtaDetails.description}
+        featurePoints={apiCtaDetails.featurePoints}
+        codeSnippet={apiCtaDetails.codeSnippet}
+        codeLanguage="bash"
+        docsUrl={apiCtaDetails.docsUrl}
+        docsLabel={apiCtaDetails.docsLabel}
+        secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
+        secondaryCtaUrl="https://docs.pictify.io/examples"
+        note="Contact us for volume pricing or dedicated rendering regions."
+      />
+    </section>
 
-    <div class="max-w-6xl mx-auto px-4 mt-20">
-      <!-- Separator -->
-      <div class="border-t-[3px] border-gray-900 relative mb-16">
-        <div class="absolute left-1/2 -top-4 -translate-x-1/2 bg-white px-4">
-          <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-      </div>
-
-      <h2 class="text-4xl md:text-6xl font-black mb-16 text-center text-gray-900 tracking-tight">
-        Learn More About <span class="relative inline-block text-[#ff6b6b]">
-          OG Images
-          <svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
-            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
-          </svg>
-        </span>
-      </h2>
+    <!-- Info Sections -->
+    <div class="max-w-5xl mx-auto px-2 md:px-0">
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <section class="bg-white rounded-3xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-transform">
-          <div class="bg-[#ffc480] w-12 h-12 rounded-xl border-2 border-gray-900 flex items-center justify-center mb-6 shadow-[2px_2px_0_0_#1f2937]">
-            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      <!-- What is OG Image -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
+          <div class="w-12 h-12 bg-[#ffc480] border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
           </div>
-          <h3 class="text-2xl font-black mb-4 text-gray-900">What is an OG Image?</h3>
-          <p class="text-lg text-gray-700 leading-relaxed font-medium">
-            An OG (Open Graph) image is the preview that appears when your content is shared on social media. It's your first impression—make it count with professional designs that drive clicks.
+          <h3 class="text-2xl font-black mb-4 text-black uppercase">What is an OG Image?</h3>
+          <p class="text-black font-medium leading-relaxed">
+            An OG (Open Graph) image is the preview that appears when your content is shared on social media. It's your first impression—make it count with professional designs.
           </p>
-        </section>
+        </div>
 
-        <section class="bg-white rounded-3xl border-[3px] border-gray-900 p-8 shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-transform">
-          <div class="bg-[#ff6b6b] w-12 h-12 rounded-xl border-2 border-gray-900 flex items-center justify-center mb-6 shadow-[2px_2px_0_0_#1f2937]">
+        <div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
+          <div class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
-          <h3 class="text-2xl font-black mb-4 text-gray-900">Why Use This Tool?</h3>
+          <h3 class="text-2xl font-black mb-4 text-black uppercase">Why Use This Tool?</h3>
           <ul class="space-y-3">
-            <li class="flex items-center gap-3 font-medium text-gray-700">
-              <div class="w-2 h-2 bg-gray-900 rounded-full"></div>
+            <li class="flex items-center gap-3 font-bold text-black">
+              <div class="w-2 h-2 bg-black"></div>
               Create pro images in minutes
             </li>
-            <li class="flex items-center gap-3 font-medium text-gray-700">
-              <div class="w-2 h-2 bg-gray-900 rounded-full"></div>
-              Customize to match your brand
+            <li class="flex items-center gap-3 font-bold text-black">
+              <div class="w-2 h-2 bg-black"></div>
+              Match your brand perfectly
             </li>
-            <li class="flex items-center gap-3 font-medium text-gray-700">
-              <div class="w-2 h-2 bg-gray-900 rounded-full"></div>
-              Boost click-through rates by 40%
+            <li class="flex items-center gap-3 font-bold text-black">
+              <div class="w-2 h-2 bg-black"></div>
+              Boost CTR by up to 40%
             </li>
           </ul>
-        </section>
+        </div>
       </div>
 
       <!-- FAQ Section -->
-      <section class="mb-20">
-        <h3 class="text-3xl font-black mb-8 text-gray-900">Common Questions</h3>
+      <div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[8px_8px_0_0_#9ca3af] mb-16">
+        <h2 class="text-3xl font-black mb-8 text-black uppercase">FAQ</h2>
         <div class="space-y-4">
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937]">
-            <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-gray-900 select-none">
-              <span>How do I add an OG image to my site?</span>
-              <svg class="w-6 h-6 text-gray-900 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-              </svg>
+          <details class="group">
+            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+              <span class="font-black text-lg text-gray-900 uppercase">How do I add an OG image?</span>
+              <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+                <svg class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+              </span>
             </summary>
-            <div class="px-6 pb-6 pt-0 text-gray-700 font-medium leading-relaxed border-t-2 border-gray-100 mt-4">
-              Include the <code class="bg-gray-100 px-2 py-1 rounded font-mono text-sm">og:image</code> meta tag in your page's &lt;head&gt; section with the absolute URL of your image.
+            <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+              Add the <code class="bg-gray-200 px-2 py-1 font-mono text-sm">og:image</code> meta tag in your page's &lt;head&gt; section with the absolute URL of your image.
             </div>
           </details>
 
-          <details class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transition-all duration-200 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937]">
-            <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-gray-900 select-none">
-              <span>What size should my OG image be?</span>
-              <svg class="w-6 h-6 text-gray-900 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-              </svg>
+          <details class="group">
+            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+              <span class="font-black text-lg text-gray-900 uppercase">What size should it be?</span>
+              <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+                <svg class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+              </span>
             </summary>
-            <div class="px-6 pb-6 pt-0 text-gray-700 font-medium leading-relaxed border-t-2 border-gray-100 mt-4">
-              The recommended size is <strong>1200x630 pixels</strong> (1.91:1 ratio) for Facebook, Twitter, and LinkedIn to ensure optimal display on all devices.
+            <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+              The recommended size is <strong>1200×630 pixels</strong> (1.91:1 ratio) for optimal display on Facebook, Twitter, and LinkedIn.
+            </div>
+          </details>
+
+          <details class="group">
+            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+              <span class="font-black text-lg text-gray-900 uppercase">Is there an API?</span>
+              <span class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors">
+                <svg class="h-4 w-4 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+              </span>
+            </summary>
+            <div class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium">
+              Yes! Use our REST API to generate OG images programmatically. Perfect for blogs, e-commerce, and SaaS platforms.
             </div>
           </details>
         </div>
-      </section>
+      </div>
     </div>
 
-    <Toast />
-    <Footer />
   </main>
+  <Footer />
+  <Toast />
 </section>
 
 <style>
-  :global(body) {
-    background-color: #FFFDF8;
-  }
-  
-  /* Ensure color picker is visible */
-  :global(.color-picker-dialog),
-  :global(.color-picker) {
-    z-index: 9999 !important;
+  .color-picker-wrapper {
+    position: relative;
+    border: 3px solid #e5e7eb;
+    background: white;
   }
 
-  @keyframes loading {
-    0% { width: 0%; }
-    100% { width: 100%; }
+  .color-picker-wrapper :global(.color-picker) {
+    width: 100% !important;
+  }
+
+  .color-picker-wrapper :global(.picker-wrapper) {
+    position: relative !important;
+  }
+
+  :global(.color-picker-dialog),
+  :global(.picker-dialog) {
+    z-index: 9999 !important;
+    position: fixed !important;
+  }
+
+  :global(.color-picker),
+  :global(.picker-indicator) {
+    z-index: 100 !important;
   }
 </style>

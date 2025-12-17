@@ -220,23 +220,30 @@ body {
 </script>
 
 <section class="w-full">
-	<div class="flex flex-col md:flex-row border-black border-4 md:min-h-[400px] xl:h-[500px] max-w-[1200px] mx-auto">
-		<div class="w-full md:w-1/2 flex flex-col">
-			<div class="flex bg-black p-2">
+	<div class="flex flex-col lg:flex-row min-h-[500px] lg:h-[520px] overflow-hidden bg-white">
+		<!-- Code Editor Panel -->
+		<div class="w-full lg:w-1/2 flex flex-col border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-black">
+			<!-- Tab Bar -->
+			<div class="flex bg-[#1a1a2e] px-4 py-3">
 				<button
 					on:click={() => (currentTab = 'html')}
-					class="px-4 py-2 rounded text-sm {currentTab === 'html'
-						? 'bg-white text-black'
-						: 'bg-gray-500 text-white'}">HTML</button
+					class="px-5 py-2 text-sm font-black uppercase tracking-wider transition-all border-[2px] {currentTab === 'html'
+						? 'bg-white text-black border-black shadow-[3px_3px_0_0_#ff6b6b]'
+						: 'bg-transparent text-gray-400 border-transparent hover:text-white hover:border-gray-600'}"
 				>
+					HTML
+				</button>
 				<button
 					on:click={() => (currentTab = 'css')}
-					class="mx-4 px-4 py-2 rounded text-sm {currentTab === 'css'
-						? 'bg-white text-black'
-						: 'bg-gray-500 text-white'}">CSS</button
+					class="ml-2 px-5 py-2 text-sm font-black uppercase tracking-wider transition-all border-[2px] {currentTab === 'css'
+						? 'bg-white text-black border-black shadow-[3px_3px_0_0_#ffc480]'
+						: 'bg-transparent text-gray-400 border-transparent hover:text-white hover:border-gray-600'}"
 				>
+					CSS
+				</button>
 			</div>
-			<div class="flex-1 overflow-auto">
+			<!-- Code Area -->
+			<div class="flex-1 overflow-auto bg-[#fafafa]">
 				{#if currentTab === 'html'}
 					<CodeMirror
 						bind:codeHTML
@@ -251,7 +258,8 @@ body {
 						styles={{
 							'&': {
 								height: '100%',
-								minHeight: '400px'
+								minHeight: '450px',
+								fontSize: '13px'
 							}
 						}}
 					/>
@@ -267,25 +275,31 @@ body {
 						styles={{
 							'&': {
 								height: '100%',
-								minHeight: '400px'
+								minHeight: '450px',
+								fontSize: '13px'
 							}
 						}}
 					/>
 				{/if}
 			</div>
 		</div>
-		<div class="w-full md:w-1/2 flex flex-col border-t-4 md:border-t-0 md:border-l-4 border-black">
-			<div class="flex bg-black p-2 justify-between items-center">
+
+		<!-- Preview Panel -->
+		<div class="w-full lg:w-1/2 flex flex-col bg-white">
+			<!-- Preview Header -->
+			<div class="flex bg-[#1a1a2e] px-4 py-3 justify-between items-center">
 				{#if isPreviewEnabled}
-				<div class="flex items-center gap-4">
+				<div class="flex items-center gap-3">
 					<button
 						on:click={() => (currentResultTab = 'preview')}
-						class="px-4 py-2 rounded text-sm {currentResultTab === 'preview'
-							? 'bg-white text-black'
-							: 'bg-gray-500 text-white'}">Preview</button
+						class="px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all border-[2px] {currentResultTab === 'preview'
+							? 'bg-[#4ade80] text-black border-black'
+							: 'bg-transparent text-gray-400 border-transparent hover:text-white'}"
 					>
+						Preview
+					</button>
 					<div class="relative">
-						<div class="absolute -top-1 -right-1">
+						<div class="absolute -top-1 -right-1 z-10">
 							<span class="flex h-2 w-2">
 								<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b6b] opacity-75"></span>
 								<span class="relative inline-flex rounded-full h-2 w-2 bg-[#ff6b6b]"></span>
@@ -295,12 +309,12 @@ body {
 							on:click={() => {
 								createImage();
 							}}
-							class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors"
+							class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 							</svg>
-							Generate Image
+							Image
 						</button>
 					</div>
 					{#if isGifEnabled}
@@ -308,31 +322,33 @@ body {
 							on:click={() => {
 								createGif();
 							}}
-							class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition-colors flex items-center gap-2">
+							class="bg-[#ffc480] hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+						>
 							<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
 							</svg>
-							Create GIF
+							GIF
 						</button>
 					{/if}
 				</div>
 				{/if}
 				{#if !isPreviewEnabled}
 					<div class="flex items-center gap-4">
-						<div class="py-[1.125rem] px-4">
-						</div>
+						<span class="text-gray-400 text-sm font-bold uppercase tracking-wider">Live Preview</span>
 					</div>
 				{/if}
 			</div>
+
 			{#if currentResultTab === 'preview'}
-				<div class="flex-1 flex flex-col">
+				<div class="flex-1 flex flex-col min-h-[450px]">
+					<!-- Size Controls -->
 					{#if previewFrame}
-						<div class="flex gap-4 justify-center items-center p-2 bg-gray-100 border-b border-gray-200">
-							<div>
-								<label for="scale" class="text-sm text-gray-600">Scale</label>
+						<div class="flex flex-wrap gap-3 justify-between items-center px-3 py-2 bg-gray-50 border-b border-gray-200">
+							<div class="flex items-center gap-2">
+								<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Scale</span>
 								<input
 									type="number"
-									class="w-16 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-sm bg-transparent ml-1 text-center outline-none"
+									class="w-12 px-1.5 py-0.5 border border-gray-300 text-xs font-medium text-center bg-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
 									value="1"
 									min="0.1"
 									max="2"
@@ -342,12 +358,11 @@ body {
 									}}
 								/>
 							</div>
-							<div class="flex-grow" />
-							<div class="flex items-center gap-2">
-								<span class="text-sm text-gray-600">Size</span>
+							<div class="flex items-center gap-1.5">
+								<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Size</span>
 								<input
 									type="number"
-									class="w-20 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-sm bg-transparent text-center outline-none"
+									class="w-14 px-1.5 py-0.5 border border-gray-300 text-xs font-medium text-center bg-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
 									value={previewWidth}
 									min="100"
 									max="800"
@@ -355,10 +370,10 @@ body {
 										previewFrame.style.width = `${e.target.value}px`;
 									}}
 								/>
-								<span class="text-gray-400">×</span>
+								<span class="text-gray-300 text-xs">×</span>
 								<input
 									type="number"
-									class="w-20 border-b-2 border-gray-300 focus:border-[#ff6b6b] text-sm bg-transparent text-center outline-none"
+									class="w-14 px-1.5 py-0.5 border border-gray-300 text-xs font-medium text-center bg-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
 									value={previewHeight}
 									min="100"
 									max="600"
@@ -369,9 +384,10 @@ body {
 							</div>
 						</div>
 					{/if}
-					<div bind:this={iframeContainer} class="flex-1 overflow-auto">
+					<!-- Preview Frame -->
+					<div bind:this={iframeContainer} class="flex-1 overflow-auto bg-white">
 						<iframe
-							class="w-full h-[400px] bg-white"
+							class="w-full h-full min-h-[400px] bg-white"
 							title="code-preview"
 							srcdoc={getSrcDoc()}
 							bind:this={previewFrame}
@@ -380,26 +396,27 @@ body {
 				</div>
 			{:else if currentResultTab === 'image' || currentResultTab === 'gif'}
 				{#if isImageLoading}
-					<div class="flex flex-col justify-center items-center min-h-[400px] bg-gray-50">
+					<div class="flex flex-col justify-center items-center flex-1 min-h-[400px] bg-gray-50">
 						<Loader size="16" show={isImageLoading} />
-						<p class="mt-4 text-sm text-gray-600">Generating your {currentResultTab}...</p>
+						<p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-wider">Generating {currentResultTab}...</p>
 					</div>
 				{:else}
 					<div class="flex flex-col flex-1">
-						<div class="flex flex-col md:flex-row gap-2 justify-between items-center p-3 bg-gray-100 border-b border-gray-200">
+						<!-- Success Bar -->
+						<div class="flex flex-col sm:flex-row gap-2 justify-between items-center px-3 py-2 bg-[#4ade80] border-b border-green-500">
 							<div class="flex items-center gap-2">
-								<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								<svg class="w-4 h-4 text-green-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
 								</svg>
-								<span class="text-sm text-gray-900">Generated successfully!</span>
+								<span class="text-xs font-bold text-green-800 uppercase tracking-wide">Generated!</span>
 							</div>
-							<div class="flex items-center gap-3">
-								<a href={img.url} class="text-xs text-[#ff6b6b] hover:underline" target="_blank">Open in new tab →</a>
+							<div class="flex items-center gap-2">
+								<a href={img.url} class="text-xs font-bold text-green-800 hover:underline" target="_blank">Open in tab →</a>
 								<button
 									on:click={() => {
 										copyToClipboard(img.url);
 									}}
-									class="text-xs bg-black hover:bg-gray-800 text-white py-1.5 px-3 rounded flex items-center gap-2 transition-colors"
+									class="text-xs bg-green-800 text-white py-1 px-2.5 font-bold uppercase flex items-center gap-1.5 hover:bg-green-900 transition-colors rounded-sm"
 								>
 									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -408,7 +425,8 @@ body {
 								</button>
 							</div>
 						</div>
-						<div class="flex-1 overflow-auto">
+						<!-- Image Output -->
+						<div class="flex-1 overflow-auto bg-white">
 							<img src={img.url} alt="Generated output" class="w-full h-auto" />
 						</div>
 					</div>

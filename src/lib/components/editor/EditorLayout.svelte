@@ -1,5 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { onMount } from 'svelte';
 	import TopBar from './TopBar.svelte';
 	import AnimatedBackground from './AnimatedBackground.svelte';
 	
@@ -17,32 +18,51 @@
 
 	export let templateName = '';
 	export let isSaving = false;
+	export let guestMode = false;
 
 	function setRightTab(tab) {
 		editorActions.toggleRightSidebarTab(tab);
 	}
+
+	onMount(() => {
+		// Make the full editor discoverable in guest mode:
+		// keep both sidebars open and land on Variables (API/preview) tab.
+		if (guestMode) {
+			// Left sidebar: only open if currently closed (toggle is not idempotent).
+			if (!$activeSidebarTab) {
+				editorActions.toggleLeftSidebarTab('elements');
+			}
+
+			// Right sidebar: ensure it's open AND points to variables.
+			if ($activeRightSidebarTab !== 'variables') {
+				editorActions.toggleRightSidebarTab('variables');
+			}
+		}
+	});
 </script>
 
-<div class="flex h-full w-full bg-[#FFFDF8] overflow-hidden relative">
+<div class="flex flex-col h-full w-full bg-[#FFFDF8] overflow-hidden relative">
 	<!-- Animated Background -->
 	<AnimatedBackground />
-	
-	<!-- Left Sidebar (Full Height) -->
-	<LeftSidebar />
-	
-	<!-- Asset Panel (Full Height, Collapsible) -->
-	<!-- Asset Panel (Full Height, Collapsible) -->
-	<div class="asset-panel-container h-full flex-shrink-0 z-10 relative bg-white/90 backdrop-blur-sm border-black transition-all duration-300 overflow-hidden"
-		style="width: {$activeSidebarTab ? '288px' : '0px'}; border-right-width: {$activeSidebarTab ? '2px' : '0px'};">
-		<div class="w-72 h-full">
-			<AssetPanel />
-		</div>
-	</div>
 
-	<!-- Central Area (TopBar + Canvas) -->
-	<div class="flex flex-col flex-1 overflow-hidden relative min-w-0">
-		<TopBar bind:templateName {isSaving} on:save={() => { console.log('EditorLayout: save event received'); dispatch('save'); }} />
-		<div class="relative flex-1 overflow-hidden bg-white/90 backdrop-blur-sm">
+	<!-- Top Bar (Full Width) -->
+	<TopBar bind:templateName {isSaving} {guestMode} on:save={() => { console.log('EditorLayout: save event received'); dispatch('save'); }} />
+	
+	<!-- Main Content Area -->
+	<div class="flex flex-1 w-full overflow-hidden relative min-h-0">
+		<!-- Left Sidebar -->
+		<LeftSidebar />
+		
+		<!-- Asset Panel -->
+		<div class="asset-panel-container h-full flex-shrink-0 z-10 relative bg-[#FFFDF8] border-gray-900 transition-all duration-300 overflow-hidden border-r-[3px]"
+			style="width: {$activeSidebarTab ? '288px' : '0px'}; border-right-width: {$activeSidebarTab ? '3px' : '0px'};">
+			<div class="w-72 h-full">
+				<AssetPanel />
+			</div>
+		</div>
+
+		<!-- Canvas Area -->
+		<div class="relative flex-1 overflow-hidden bg-transparent">
 			<AlignmentGuides />
 			<Canvas />
 			
@@ -50,67 +70,67 @@
 				<FloatingCopilot element={$selectedComponent} scale={$canvasZoom / 100} />
 			{/if}
 		</div>
-	</div>
-	
-	<!-- Right Sidebar Container (Full Height) -->
-	<div class="right-sidebar-container flex flex-col h-full bg-white/90 backdrop-blur-sm border-l-2 border-black shadow-lg z-10 transition-all duration-300 flex-shrink-0"
-	style="width: {$activeRightSidebarTab ? '280px' : '48px'};">
 		
-		<!-- Right Sidebar Tabs -->
-		<div class="{$activeRightSidebarTab ? 'flex border-b-2' : 'flex flex-col'} border-black bg-[#FFFDF8]">
-			<button 
-				class="py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/50 hover:text-[#ff6b6b] transition-colors relative
-				{$activeRightSidebarTab ? 'flex-1' : 'w-full'}
-				{$activeRightSidebarTab === 'properties' ? 'bg-white text-[#ff6b6b]' : 'text-gray-500'}"
-				on:click={() => setRightTab('properties')}
-				title="Properties"
-			>
-				<i class="fa fa-sliders-h text-base {$activeRightSidebarTab ? 'mb-1' : ''} block"></i>
-				{#if $activeRightSidebarTab === 'properties'}
-					<div class="absolute {$activeRightSidebarTab ? 'bottom-0 left-0 w-full h-0.5' : 'left-0 top-0 w-0.5 h-full'} bg-[#ff6b6b]"></div>
-				{/if}
-			</button>
-			<button 
-				class="py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/50 hover:text-[#ff6b6b] transition-colors relative
-				{$activeRightSidebarTab ? 'flex-1' : 'w-full'}
-				{$activeRightSidebarTab === 'layers' ? 'bg-white text-[#ff6b6b]' : 'text-gray-500'}"
-				on:click={() => setRightTab('layers')}
-				title="Layers"
-			>
-				<i class="fa fa-layer-group text-base {$activeRightSidebarTab ? 'mb-1' : ''} block"></i>
-				{#if $activeRightSidebarTab === 'layers'}
-					<div class="absolute {$activeRightSidebarTab ? 'bottom-0 left-0 w-full h-0.5' : 'left-0 top-0 w-0.5 h-full'} bg-[#ff6b6b]"></div>
-				{/if}
-			</button>
-			<button 
-				class="py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/50 hover:text-[#ff6b6b] transition-colors relative
-				{$activeRightSidebarTab ? 'flex-1' : 'w-full'}
-				{$activeRightSidebarTab === 'variables' ? 'bg-white text-[#ff6b6b]' : 'text-gray-500'}"
-				on:click={() => setRightTab('variables')}
-				title="Variables"
-			>
-				<i class="fa fa-code text-base {$activeRightSidebarTab ? 'mb-1' : ''} block"></i>
-				{#if $activeRightSidebarTab === 'variables'}
-					<div class="absolute {$activeRightSidebarTab ? 'bottom-0 left-0 w-full h-0.5' : 'left-0 top-0 w-0.5 h-full'} bg-[#ff6b6b]"></div>
-				{/if}
-			</button>
-		</div>
+		<!-- Right Sidebar Container (Full Height) -->
+		<div class="right-sidebar-container flex flex-col h-full bg-[#FFFDF8] border-l-[3px] border-gray-900 z-10 transition-all duration-300 flex-shrink-0"
+		style="width: {$activeRightSidebarTab ? '280px' : '48px'};">
+			
+			<!-- Right Sidebar Tabs -->
+			<div class="{$activeRightSidebarTab ? 'flex border-b-[3px]' : 'flex flex-col'} border-gray-900 bg-[#FFFDF8]">
+				<button 
+					class="py-3 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors relative group
+					{$activeRightSidebarTab ? 'flex-1 border-r-[2px] border-gray-900 last:border-r-0' : 'w-full border-b-[2px] border-gray-900'}
+					{$activeRightSidebarTab === 'properties' ? 'bg-[#ffc480] text-gray-900' : 'text-gray-500'}"
+					on:click={() => setRightTab('properties')}
+					title="Properties"
+				>
+					<i class="fa fa-sliders-h text-sm {$activeRightSidebarTab ? 'mb-1' : ''} block"></i>
+                    {#if !$activeRightSidebarTab}
+                        <span class="sr-only">Properties</span>
+                    {/if}
+				</button>
+				<button 
+					class="py-3 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors relative group
+					{$activeRightSidebarTab ? 'flex-1 border-r-[2px] border-gray-900 last:border-r-0' : 'w-full border-b-[2px] border-gray-900'}
+					{$activeRightSidebarTab === 'layers' ? 'bg-[#ffc480] text-gray-900' : 'text-gray-500'}"
+					on:click={() => setRightTab('layers')}
+					title="Layers"
+				>
+					<i class="fa fa-layer-group text-sm {$activeRightSidebarTab ? 'mb-1' : ''} block"></i>
+                    {#if !$activeRightSidebarTab}
+                        <span class="sr-only">Layers</span>
+                    {/if}
+				</button>
+				<button 
+					class="py-3 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors relative group
+					{$activeRightSidebarTab ? 'flex-1' : 'w-full border-b-[2px] border-gray-900'}
+					{$activeRightSidebarTab === 'variables' ? 'bg-[#ffc480] text-gray-900' : 'text-gray-500'}"
+					on:click={() => setRightTab('variables')}
+					title="Variables & Preview"
+				>
+					<i class="fa fa-code text-sm {$activeRightSidebarTab ? 'mb-1' : ''} block"></i>
+                    {#if !$activeRightSidebarTab}
+                        <span class="sr-only">Variables</span>
+                    {/if}
+				</button>
+			</div>
 
-		<!-- Right Sidebar Content -->
-		<div class="flex-1 overflow-hidden relative">
-			{#if $activeRightSidebarTab === 'properties'}
-				<div class="absolute inset-0 overflow-y-auto custom-scrollbar">
-					<PropertiesPanel />
-				</div>
-			{:else if $activeRightSidebarTab === 'layers'}
-				<div class="absolute inset-0 overflow-y-auto custom-scrollbar">
-					<LayersPanel />
-				</div>
-			{:else if $activeRightSidebarTab === 'variables'}
-				<div class="absolute inset-0 overflow-y-auto custom-scrollbar">
-					<VariablesPanel />
-				</div>
-			{/if}
+			<!-- Right Sidebar Content -->
+			<div class="flex-1 overflow-hidden relative bg-[#FFFDF8]">
+				{#if $activeRightSidebarTab === 'properties'}
+					<div class="absolute inset-0 overflow-y-auto custom-scrollbar">
+						<PropertiesPanel />
+					</div>
+				{:else if $activeRightSidebarTab === 'layers'}
+					<div class="absolute inset-0 overflow-y-auto custom-scrollbar">
+						<LayersPanel />
+					</div>
+				{:else if $activeRightSidebarTab === 'variables'}
+					<div class="absolute inset-0 overflow-hidden">
+						<VariablesPanel {guestMode} />
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 	
@@ -128,7 +148,7 @@
 			left: 64px; /* Width of LeftSidebar */
 			top: 0;
 			bottom: 0;
-			box-shadow: 4px 0 24px -4px rgba(0, 0, 0, 0.1);
+			box-shadow: 8px 0 0 0 rgba(0, 0, 0, 0.1); /* Hard shadow for mobile */
             max-width: calc(100vw - 64px);
 		}
 		
@@ -137,7 +157,7 @@
 			right: 0;
 			top: 0;
 			bottom: 0;
-			box-shadow: -4px 0 24px -4px rgba(0, 0, 0, 0.1);
+			box-shadow: -8px 0 0 0 rgba(0, 0, 0, 0.1); /* Hard shadow for mobile */
 		}
 	}
 </style>

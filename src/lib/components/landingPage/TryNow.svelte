@@ -1,135 +1,105 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import SignUpButton from './SignUpButton.svelte';
-	
-	let email = '';
-	let savings = 1000;
-	let showCalculator = false;
-    let visible = false;
-
-	const features = [
-		{
-			icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-			title: "Affordable Plans",
-			description: "Start free, then choose from our budget-friendly monthly plans"
-		},
-		{
-			icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-			title: "Enterprise Ready",
-			description: "Built for scale with advanced security and support"
-		},
-		{
-			icon: "M13 10V3L4 14h7v7l9-11h-7z",
-			title: "Start Instantly",
-			description: "Get your API key and start converting in under 5 minutes"
-		}
-	];
-
-	function handleSubmit() {
-		goto('/signup?email=' + email);
-	}
-
-	function calculateSavings(value) {
-		savings = Math.floor(value * 20.8);
-	}
-
-	onMount(() => {
-		visible = true;
-		const interval = setInterval(() => {
-			savings = Math.floor(Math.random() * 500) + 800;
-		}, 3000);
-
-		return () => clearInterval(interval);
-	});
 </script>
 
-<section class="py-12 sm:py-16 w-full relative" id="try-now">
-	<div class="absolute inset-0 overflow-hidden pointer-events-none">
-		<div class="absolute top-0 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-[#ff6b6b]/10 to-transparent rounded-full blur-[100px] transform -translate-y-1/2 animate-float"></div>
-		<div class="absolute bottom-0 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-[#ffc480]/10 to-transparent rounded-full blur-[100px] transform translate-y-1/2 animate-float-delayed"></div>
-	</div>
-
-	<div class="container mx-auto px-4 md:px-6 max-w-5xl relative">
-		{#if visible}
-		<div class="text-center space-y-4 md:space-y-6 mb-8 md:mb-12" in:fade={{ duration: 1000, delay: 200 }}>
-			<h2 class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
-				Start Building <span class="text-[#ff6b6b]">Today</span>
-			</h2>
-			<p class="text-lg md:text-xl text-gray-800 max-w-2xl mx-auto font-medium">Join thousands of developers who trust Pictify for their image generation needs</p>
-		</div>
-
-		<!-- Feature Highlights -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-			{#each features as feature}
-				<div class="bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-gray-200 transition-all duration-300 hover:border-[#ff6b6b]/30 hover:shadow-md">
-					<div class="flex items-center gap-3 mb-3 md:mb-4">
-						<div class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-[#ff6b6b]/10 rounded-full flex items-center justify-center">
-							<svg class="w-4 h-4 md:w-5 md:h-5 text-[#ff6b6b]" fill="currentColor" viewBox="0 0 20 20">
-								<path fill-rule="evenodd" d={feature.icon} clip-rule="evenodd"/>
-							</svg>
-						</div>
-						<h3 class="text-base md:text-lg font-semibold text-gray-900">{feature.title}</h3>
-					</div>
-					<p class="text-sm md:text-base text-gray-700">{feature.description}</p>
-				</div>
-			{/each}
-		</div>
-
-		<!-- Promotional Banner -->
-		<div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-xl md:rounded-2xl shadow-lg relative overflow-hidden mb-8 md:mb-12 border border-gray-200" in:fade={{ duration: 1000, delay: 400 }}>
-			<!-- Decorative elements -->
-			<div class="absolute inset-0">
-				<div class="absolute -left-8 -bottom-8 w-40 h-40 bg-[#ff6b6b]/5 rounded-full blur-2xl"></div>
-				<div class="absolute -right-8 -top-8 w-40 h-40 bg-[#ffc480]/5 rounded-full blur-2xl"></div>
-			</div>
+<section class="w-full py-24 md:py-32 bg-[#FFFDF8] border-t-[3px] border-gray-900">
+	<div class="max-w-6xl mx-auto px-4">
+		
+		<!-- The Monolith CTA Card -->
+		<div class="relative group">
+			<!-- Decorative Under-layers for depth -->
+			<div class="absolute top-4 left-4 w-full h-full bg-gray-900 rounded-3xl border-[3px] border-gray-900 opacity-20"></div>
+			<div class="absolute top-2 left-2 w-full h-full bg-[#ffc480] rounded-3xl border-[3px] border-gray-900"></div>
 			
-			<div class="relative flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-				<div class="text-center md:text-left space-y-2 md:space-y-3">
-					<div class="flex items-center justify-center md:justify-start gap-2 mb-1">
-						<div class="w-6 h-6 flex items-center justify-center rounded-full bg-[#ff6b6b]/10">
-							<svg class="w-4 h-4 text-[#ff6b6b]" fill="currentColor" viewBox="0 0 20 20">
-								<path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-							</svg>
+			<!-- Main Container -->
+			<div class="relative bg-white rounded-3xl border-[3px] border-gray-900 overflow-hidden shadow-2xl">
+				
+				<!-- Terminal Header / Window Controls -->
+				<div class="h-12 bg-gray-50 border-b-[3px] border-gray-900 flex items-center justify-between px-6">
+					<div class="flex gap-2">
+						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
+						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900"></div>
+						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900"></div>
+					</div>
+					<div class="font-mono text-xs text-gray-500 font-bold flex items-center gap-2">
+						<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-gray-900"></span>
+						SYSTEM_READY
+					</div>
+				</div>
+
+				<!-- Main Content Area -->
+				<div class="relative p-12 md:p-20 text-center overflow-hidden">
+					
+					<!-- Grid Background inside the card -->
+					<div class="absolute inset-0 opacity-10 pointer-events-none" 
+						style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 30px 30px;">
+					</div>
+
+					<!-- Content -->
+					<div class="relative z-10 flex flex-col items-center">
+						
+						<div class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-[2px_2px_0_0_#000] mb-8 transform -rotate-2">
+							<span class="text-gray-900 text-xs font-mono font-bold uppercase tracking-wider">🚀 Launch_Sequence_Initiated</span>
 						</div>
-						<h3 class="text-lg md:text-xl font-bold text-gray-900">Limited Time Offer</h3>
-					</div>
-					<div class="space-y-1">
-						<p class="text-2xl md:text-3xl font-bold text-gray-900">
-							Double Credits + <span class="text-[#ff6b6b]">Priority Support</span>
+
+						<h2 class="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-tight tracking-tight">
+							Ready to <br class="md:hidden"/> 
+							<span class="text-[#ff6b6b]">Scale?</span>
+						</h2>
+
+						<p class="text-xl text-gray-600 max-w-xl mx-auto mb-12 leading-relaxed font-medium">
+							Join teams building the next generation of dynamic media workflows — designers create templates, developers integrate the API.
 						</p>
-						<p class="text-sm md:text-base text-gray-700">
-							Limited time offer for early adopters. Sign up now!
-						</p>
+
+						<div class="flex flex-col sm:flex-row items-center gap-6 w-full justify-center">
+							<SignUpButton class="w-full sm:w-auto px-8 py-4 bg-[#ffc480] text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide" text="Start Building Now" />
+							
+							<a 
+								href="https://docs.pictify.io" 
+								target="_blank" 
+								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-2 group"
+							>
+								<span>View API Docs</span>
+								<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+							</a>
+						</div>
 					</div>
 				</div>
-				<div class="w-full md:w-auto">
-					<SignUpButton />
+
+				<!-- Status Footer -->
+				<div class="bg-gray-50 border-t-[3px] border-gray-900 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x-[3px] divide-gray-900">
+					<div class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors">
+						<div class="w-10 h-10 rounded-lg bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]">
+							<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+						</div>
+						<div class="text-left">
+							<div class="text-gray-900 font-bold">Instant Access</div>
+							<div class="text-gray-600 text-xs font-medium">Get API Key immediately</div>
+						</div>
+					</div>
+
+					<div class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors">
+						<div class="w-10 h-10 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]">
+							<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+						</div>
+						<div class="text-left">
+							<div class="text-gray-900 font-bold">50 Free Credits</div>
+							<div class="text-gray-600 text-xs font-medium">No credit card required</div>
+						</div>
+					</div>
+
+					<div class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors">
+						<div class="w-10 h-10 rounded-lg bg-[#ff6b6b] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]">
+							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+						</div>
+						<div class="text-left">
+							<div class="text-gray-900 font-bold">Secure Infrastructure</div>
+							<div class="text-gray-600 text-xs font-medium">Enterprise-ready security</div>
+						</div>
+					</div>
 				</div>
+
 			</div>
 		</div>
-
-		{/if}
 	</div>
 </section>
-
-<style>
-	@keyframes float {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-20px); }
-	}
-
-	@keyframes float-delayed {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(20px); }
-	}
-
-	.animate-float {
-		animation: float 6s ease-in-out infinite;
-	}
-
-	.animate-float-delayed {
-		animation: float-delayed 8s ease-in-out infinite;
-	}
-</style>

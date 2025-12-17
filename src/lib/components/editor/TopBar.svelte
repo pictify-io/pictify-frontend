@@ -5,6 +5,8 @@
 	
 	export let templateName = '';
 	export let isSaving = false;
+	export let guestMode = false;
+	export let backHref = '/dashboard/template';
 
 	const dispatch = createEventDispatcher();
 
@@ -51,75 +53,79 @@
 	}
 </script>
 
-<div class="h-16 bg-[#FFFDF8] border-b-2 border-black flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 relative flex-shrink-0">
+<div class="h-16 bg-[#FFFDF8] border-b-[3px] border-gray-900 flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 relative flex-shrink-0">
 	<div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 mr-4">
-		<a href="/dashboard/template" class="text-gray-500 hover:text-[#ff6b6b] transition-colors p-2 hover:bg-white/50 rounded-lg flex-shrink-0 group">
-			<i class="fa fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
+		<a href={guestMode ? '/tools#workflows' : backHref} class="flex items-center justify-center w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0_0_#1f2937] transition-all flex-shrink-0 group">
+			<i class="fa fa-arrow-left text-sm group-hover:-translate-x-0.5 transition-transform"></i>
 		</a>
-		<div class="h-6 w-px bg-black/20 hidden sm:block flex-shrink-0"></div>
+		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block flex-shrink-0 rounded-full"></div>
 		<div class="flex-1 min-w-0 max-w-md relative group">
 			<input
 				type="text"
 				bind:value={templateName}
-				placeholder="Untitled Design"
-				class="w-full text-base sm:text-lg font-semibold text-gray-900 border border-transparent focus:border-[#ff6b6b] focus:ring-2 focus:ring-[#ff6b6b]/20 p-0 bg-transparent rounded px-2 transition-all placeholder-gray-400 hover:bg-white/50 focus:bg-white"
+				placeholder="UNTITLED DESIGN"
+				class="w-full text-sm sm:text-base font-black uppercase tracking-wider text-gray-900 border-2 border-transparent focus:border-gray-900 focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] p-2 bg-transparent rounded-lg transition-all placeholder-gray-400 hover:bg-white hover:border-gray-200"
 			/>
-			<i class="fa fa-pencil absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></i>
+			<i class="fa fa-pencil absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></i>
 		</div>
 	</div>
-	<div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-		<div class="hidden sm:flex items-center gap-1 mr-2 bg-white/50 p-1 rounded-lg border-2 border-black/10">
+	<div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+		<div class="hidden sm:flex items-center gap-2 mr-2">
 			<button 
-				class="p-2 text-gray-500 hover:text-[#ff6b6b] hover:bg-white rounded-md transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm hover:shadow"
+				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
 				on:click={undo}
 				disabled={!$canUndo}
 				title="Undo (Cmd+Z)"
 			>
-				<i class="fa fa-undo text-sm"></i>
+				<i class="fa fa-undo text-xs"></i>
 			</button>
 			<button 
-				class="p-2 text-gray-500 hover:text-[#ff6b6b] hover:bg-white rounded-md transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm hover:shadow"
+				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
 				on:click={redo}
 				disabled={!$canRedo}
 				title="Redo (Cmd+Shift+Z)"
 			>
-				<i class="fa fa-redo text-sm"></i>
+				<i class="fa fa-redo text-xs"></i>
 			</button>
 		</div>
 		
 		{#if $selectedComponent}
-			<div class="h-6 w-px bg-gray-200 hidden sm:block"></div>
+			<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full"></div>
 			<button
-				class="p-2 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+				class="w-9 h-9 flex items-center justify-center bg-[#ff6b6b] border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
 				on:click={deleteSelected}
 				title="Delete selected element"
 			>
-				<i class="fa fa-trash"></i>
+				<i class="fa fa-trash text-xs"></i>
 			</button>
 		{/if}
 		
-		<div class="h-6 w-px bg-gray-200 hidden sm:block"></div>
+		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full"></div>
 		
-		<div class="relative group">
-			{#if $isDirty}
-				<div class="w-full rounded-lg bg-gray-800 translate-y-1 translate-x-1 absolute inset-0 z-10 transition-transform duration-300 ease-out group-hover:translate-y-2 group-hover:translate-x-2" />
-			{/if}
+		<div class="relative">
 			<button
-				class="px-4 sm:px-5 py-2 text-sm font-semibold rounded-lg z-20 relative border-[3px] transition-all flex items-center gap-2
-				{$isDirty 
-					? 'bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] text-white border-gray-900 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 shadow-md hover:shadow-lg' 
-					: 'bg-white text-gray-500 border-gray-200 cursor-default'}"
+				class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
+				{guestMode
+					? 'bg-[#ff6b6b] text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
+					: ($isDirty 
+						? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]' 
+						: 'bg-gray-100 text-gray-400 cursor-default')}"
 				on:click={save}
-				disabled={isSaving}
+				disabled={guestMode ? isSaving : (isSaving || !$isDirty)}
 			>
 				{#if isSaving}
 					<i class="fa fa-spinner fa-spin"></i>
 					<span class="hidden sm:inline">Saving...</span>
+				{:else if guestMode}
+					<i class="fa fa-lock"></i>
+					<span class="hidden sm:inline">Save (free account)</span>
+					<span class="sm:hidden">Save</span>
 				{:else if $isDirty}
-					<span class="hidden sm:inline">Save Changes</span>
+					<i class="fa fa-save"></i>
+					<span class="hidden sm:inline">Save</span>
 					<span class="sm:hidden">Save</span>
 				{:else}
-					<i class="fa fa-check text-green-500"></i>
+					<i class="fa fa-check"></i>
 					<span class="hidden sm:inline">Saved</span>
 					<span class="sm:hidden">Saved</span>
 				{/if}

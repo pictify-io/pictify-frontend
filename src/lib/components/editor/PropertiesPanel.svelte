@@ -2,7 +2,9 @@
 	import { onMount } from 'svelte';
 	import { Gradient, filters, FabricImage, Rect, Path, Circle, Ellipse } from 'fabric';
 	import { selectedComponent, editor, editorActions } from '../../../store/editor.store';
+	import { variableActions, variables as variablesStore, variableNames } from '../../../store/variables.store';
 	import GradientColorPicker from './GradientColorPicker.svelte';
+	import ConditionBuilder from './ConditionBuilder.svelte';
 	import { getRoundedRectPath } from '../../utils/shape-utils';
 	import { BACKGROUND_REMOVER_CONFIG, isBackgroundRemoverAvailable, getModelInfo, SERVER_SIDE_BENEFITS } from '../../config/background-remover.js';
 	import backend from '../../../service/backend';
@@ -76,13 +78,32 @@
 	};
 	let lastSelectedImageId = null; // Track which image we last loaded settings for
 	
-	// Variable state
+	// Variable state - multi-binding
 	let isVariable = false;
-	let variableName = '';
-	let variableDescription = '';
-	let variableProperty = 'text';
-	let variableRequired = false;
-	let showVariablePanel = false;
+	let variableBindings = []; // Array of { variableName, property, description, required }
+	
+	// Conditional logic state
+	let showConditionPanel = false;
+	let conditionType = 'none'; // 'none', 'showWhen', 'hideWhen'
+	let conditionExpression = '';
+	let conditionValid = true;
+	let conditionError = '';
+	
+	// Loop state
+	let showLoopPanel = false;
+	let isLoopElement = false;
+	
+	// Panel mode: 'design' | 'logic'
+	let panelMode = 'design';
+	
+	// Check if element has any logic configured
+	$: hasLogicConfigured = isVariable || conditionType !== 'none' || isLoopElement;
+	let loopVariable = '';
+	let loopItemName = 'item';
+	let loopIndexName = 'index';
+	let loopDirection = 'vertical'; // 'horizontal', 'vertical', 'grid'
+	let loopSpacing = 50;
+	let loopColumns = 3; // for grid layout
 	
 	// Chart/Table state
 	let isChart = false;
@@ -382,7 +403,17 @@
 		if (!$selectedComponent) return;
 		
 		const obj = $selectedComponent;
-		type = obj.type;
+		// Normalize type - FabricJS uses PascalCase for some types
+		// 'ActiveSelection' for multiple selections, 'Group' for groups
+		const rawType = obj.type || '';
+		const lowerType = rawType.toLowerCase();
+		if (lowerType === 'activeselection') {
+			type = 'activeSelection';
+		} else if (lowerType === 'group') {
+			type = 'group';
+		} else {
+			type = rawType;
+		}
 
 		// Handle fill - can be a string (solid color) or Gradient object
 		// For paths (icons), fill might be empty string initially
@@ -493,10 +524,42 @@
 		if (!$selectedComponent) return;
 		
 		isVariable = $selectedComponent.isVariable || false;
-		variableName = $selectedComponent.variableName || '';
-		variableDescription = $selectedComponent.variableDescription || '';
-		variableProperty = $selectedComponent.variableProperty || getDefaultVariableProperty();
-		variableRequired = $selectedComponent.variableValidation?.required || false;
+		
+		// Load multi-binding state
+		if ($selectedComponent.variableBindings && Array.isArray($selectedComponent.variableBindings)) {
+			variableBindings = [...$selectedComponent.variableBindings];
+		} else {
+			variableBindings = [];
+		}
+		
+		// Load conditional logic state
+		// Check if property exists (even if empty string) vs doesn't exist (null/undefined)
+		const hasShowWhen = $selectedComponent.showWhen !== null && $selectedComponent.showWhen !== undefined;
+		const hasHideWhen = $selectedComponent.hideWhen !== null && $selectedComponent.hideWhen !== undefined;
+		
+		if (hasShowWhen) {
+			conditionType = 'showWhen';
+			conditionExpression = $selectedComponent.showWhen || '';
+		} else if (hasHideWhen) {
+			conditionType = 'hideWhen';
+			conditionExpression = $selectedComponent.hideWhen || '';
+		} else {
+			conditionType = 'none';
+			conditionExpression = '';
+		}
+		conditionValid = true;
+		conditionError = '';
+		
+		// Load loop state
+		// Check if loopVariable exists (even if empty string) vs doesn't exist
+		const hasLoopVariable = $selectedComponent.loopVariable !== null && $selectedComponent.loopVariable !== undefined;
+		isLoopElement = hasLoopVariable;
+		loopVariable = $selectedComponent.loopVariable || '';
+		loopItemName = $selectedComponent.loopItemName || 'item';
+		loopIndexName = $selectedComponent.loopIndexName || 'index';
+		loopDirection = $selectedComponent.loopDirection || 'vertical';
+		loopSpacing = $selectedComponent.loopSpacing || 50;
+		loopColumns = $selectedComponent.loopColumns || 3;
 	}
 	
 	function getDefaultVariableProperty() {
@@ -530,59 +593,291 @@
 				console.log('Generated ID for variable object:', uniqueId);
 			}
 			
-			// Generate default variable name from content or type
-			if (!variableName) {
+			// Add initial binding if none exist
+			if (variableBindings.length === 0) {
+				let defaultName = '';
 				if (type === 'i-text' || type === 'text') {
-					// Create a sanitized name from text content
 					const text = $selectedComponent.text || '';
-					variableName = text.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || `${type}_var`;
+					defaultName = text.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || `${type}_var`;
 				} else {
-					variableName = `${type}_${$selectedComponent.id || 'var'}`;
+					defaultName = `${type}_${$selectedComponent.id || 'var'}`;
 				}
+				variableBindings = [{
+					variableName: defaultName,
+					property: getDefaultVariableProperty(),
+					description: '',
+					required: false
+				}];
 			}
-			$selectedComponent.set('variableName', variableName);
-			$selectedComponent.set('variableProperty', variableProperty);
-			$selectedComponent.set('variableDescription', variableDescription);
-			$selectedComponent.set('variableValidation', { required: variableRequired });
+			
+			// Save bindings to component
+			saveVariableBindings();
 		}
 		
 		$editor.renderAll();
 		debouncedPropertyChange($selectedComponent);
+		
+		// Sync with centralized variables store
+		variableActions.syncFromCanvas($editor);
 	}
 	
-	function updateVariableName(name) {
+	// Save all variable bindings to the canvas object
+	function saveVariableBindings() {
 		if (!$selectedComponent || !$editor) return;
 		
-		// Sanitize variable name
-		variableName = name.replace(/[^a-zA-Z0-9_]/g, '');
-		$selectedComponent.set('variableName', variableName);
+		$selectedComponent.set('variableBindings', [...variableBindings]);
+		debouncedPropertyChange($selectedComponent);
+		variableActions.syncFromCanvas($editor);
+	}
+	
+	// Add a new variable binding
+	function addVariableBinding() {
+		if (!$selectedComponent || !$editor) return;
+		
+		const availableProps = getAvailablePropertiesForType();
+		const usedProps = variableBindings.map(b => b.property);
+		const unusedProp = availableProps.find(p => !usedProps.includes(p.value))?.value || availableProps[0]?.value || 'text';
+		
+		const newBinding = {
+			variableName: `${type}_${unusedProp}_${Date.now().toString(36).slice(-4)}`,
+			property: unusedProp,
+			description: '',
+			required: false
+		};
+		
+		variableBindings = [...variableBindings, newBinding];
+		saveVariableBindings();
+	}
+	
+	// Remove a variable binding by index
+	function removeVariableBinding(index) {
+		if (!$selectedComponent || !$editor) return;
+		
+		variableBindings = variableBindings.filter((_, i) => i !== index);
+		
+		// If no bindings left, disable variable mode
+		if (variableBindings.length === 0) {
+			isVariable = false;
+			$selectedComponent.set('isVariable', false);
+			$selectedComponent.set('variableBindings', []);
+		} else {
+			saveVariableBindings();
+		}
+		
+		$editor.renderAll();
+		debouncedPropertyChange($selectedComponent);
+		variableActions.syncFromCanvas($editor);
+	}
+	
+	// Update a specific binding
+	function updateVariableBinding(index, field, value) {
+		if (!$selectedComponent || !$editor) return;
+		
+		if (field === 'variableName') {
+			value = value.replace(/[^a-zA-Z0-9_]/g, '');
+		}
+		
+		variableBindings = variableBindings.map((b, i) => 
+			i === index ? { ...b, [field]: value } : b
+		);
+		
+		saveVariableBindings();
+	}
+	
+	// Get available properties based on element type
+	function getAvailablePropertiesForType() {
+		if (isChart) {
+			return [{ value: 'chartData', label: 'Chart Data' }];
+		}
+		if (isTable) {
+			return [{ value: 'tableData', label: 'Table Data' }];
+		}
+		
+		switch (type) {
+			case 'i-text':
+			case 'text':
+			case 'textbox':
+				return [
+					{ value: 'text', label: 'Text Content' },
+					{ value: 'fill', label: 'Text Color' },
+					{ value: 'fontFamily', label: 'Font Family' },
+					{ value: 'fontSize', label: 'Font Size' },
+					{ value: 'fontWeight', label: 'Font Weight' },
+					{ value: 'opacity', label: 'Opacity' }
+				];
+			case 'image':
+				return [
+					{ value: 'src', label: 'Image URL' },
+					{ value: 'opacity', label: 'Opacity' }
+				];
+			case 'rect':
+			case 'circle':
+			case 'triangle':
+			case 'polygon':
+			case 'path':
+			case 'ellipse':
+				return [
+					{ value: 'fill', label: 'Fill Color' },
+					{ value: 'stroke', label: 'Stroke Color' },
+					{ value: 'strokeWidth', label: 'Stroke Width' },
+					{ value: 'opacity', label: 'Opacity' }
+				];
+			default:
+				return [
+					{ value: 'fill', label: 'Fill Color' },
+					{ value: 'opacity', label: 'Opacity' }
+				];
+		}
+	}
+	
+	// Conditional logic update functions
+	function updateConditionType(type) {
+		if (!$selectedComponent || !$editor) return;
+		
+		conditionType = type;
+		
+		// Clear old condition properties
+		$selectedComponent.set('showWhen', null);
+		$selectedComponent.set('hideWhen', null);
+		
+		// Set new condition - use empty string as placeholder if no expression yet
+		// This ensures the property exists so loadVariableState can detect it
+		if (type === 'showWhen') {
+			$selectedComponent.set('showWhen', conditionExpression || '');
+		} else if (type === 'hideWhen') {
+			$selectedComponent.set('hideWhen', conditionExpression || '');
+		}
+		
+		$editor.renderAll();
+		debouncedPropertyChange($selectedComponent);
+		
+		// Sync with centralized variables store
+		variableActions.syncFromCanvas($editor);
+	}
+	
+	function updateConditionExpression(expression) {
+		if (!$selectedComponent || !$editor) return;
+		
+		conditionExpression = expression;
+		
+		// Basic syntax validation
+		const validation = validateConditionSyntax(expression);
+		conditionValid = validation.valid;
+		conditionError = validation.error || '';
+		
+		if (conditionValid && conditionType !== 'none') {
+			if (conditionType === 'showWhen') {
+				$selectedComponent.set('showWhen', expression);
+				$selectedComponent.set('hideWhen', null);
+			} else if (conditionType === 'hideWhen') {
+				$selectedComponent.set('hideWhen', expression);
+				$selectedComponent.set('showWhen', null);
+			}
+			debouncedPropertyChange($selectedComponent);
+			
+			// Sync with centralized variables store
+			variableActions.syncFromCanvas($editor);
+		}
+	}
+	
+	function validateConditionSyntax(expression) {
+		if (!expression || !expression.trim()) {
+			return { valid: true };
+		}
+		
+		// Check for balanced parentheses
+		let parenCount = 0;
+		for (const char of expression) {
+			if (char === '(') parenCount++;
+			if (char === ')') parenCount--;
+			if (parenCount < 0) {
+				return { valid: false, error: 'Unmatched closing parenthesis' };
+			}
+		}
+		if (parenCount !== 0) {
+			return { valid: false, error: 'Unmatched opening parenthesis' };
+		}
+		
+		// Check for common errors
+		if (/[=!<>]=?$/.test(expression.trim())) {
+			return { valid: false, error: 'Expression ends with incomplete comparison' };
+		}
+		
+		return { valid: true };
+	}
+	
+	// Loop update functions
+	function toggleLoop(enabled) {
+		if (!$selectedComponent || !$editor) return;
+		
+		isLoopElement = enabled;
+		
+		if (enabled) {
+			// Set empty string (not null) to indicate loop is enabled
+			// This distinguishes "loop enabled but no variable yet" from "loop disabled"
+			$selectedComponent.set('loopVariable', loopVariable || '');
+			$selectedComponent.set('loopItemName', loopItemName || 'item');
+			$selectedComponent.set('loopIndexName', loopIndexName || 'index');
+			$selectedComponent.set('loopDirection', loopDirection || 'vertical');
+			$selectedComponent.set('loopSpacing', loopSpacing || 50);
+			$selectedComponent.set('loopColumns', loopColumns || 3);
+		} else {
+			// Set to null to indicate loop is disabled
+			$selectedComponent.set('loopVariable', null);
+			$selectedComponent.set('loopItemName', null);
+			$selectedComponent.set('loopIndexName', null);
+			$selectedComponent.set('loopDirection', null);
+			$selectedComponent.set('loopSpacing', null);
+			$selectedComponent.set('loopColumns', null);
+		}
+		
+		$editor.renderAll();
+		debouncedPropertyChange($selectedComponent);
+		
+		// Sync with centralized variables store
+		variableActions.syncFromCanvas($editor);
+	}
+	
+	function updateLoopVariable(variable) {
+		if (!$selectedComponent || !$editor) return;
+		
+		loopVariable = variable;
+		$selectedComponent.set('loopVariable', variable);
+		debouncedPropertyChange($selectedComponent);
+		
+		// Sync with centralized variables store
+		variableActions.syncFromCanvas($editor);
+	}
+	
+	function updateLoopItemName(name) {
+		if (!$selectedComponent || !$editor) return;
+		
+		loopItemName = name || 'item';
+		$selectedComponent.set('loopItemName', loopItemName);
 		debouncedPropertyChange($selectedComponent);
 	}
 	
-	function updateVariableDescription(description) {
+	function updateLoopDirection(direction) {
 		if (!$selectedComponent || !$editor) return;
 		
-		variableDescription = description;
-		$selectedComponent.set('variableDescription', description);
+		loopDirection = direction;
+		$selectedComponent.set('loopDirection', direction);
 		debouncedPropertyChange($selectedComponent);
 	}
 	
-	function updateVariableProperty(property) {
+	function updateLoopSpacing(spacing) {
 		if (!$selectedComponent || !$editor) return;
 		
-		variableProperty = property;
-		$selectedComponent.set('variableProperty', property);
+		loopSpacing = parseInt(spacing) || 50;
+		$selectedComponent.set('loopSpacing', loopSpacing);
 		debouncedPropertyChange($selectedComponent);
 	}
 	
-	function updateVariableRequired(required) {
+	function updateLoopColumns(cols) {
 		if (!$selectedComponent || !$editor) return;
 		
-		variableRequired = required;
-		$selectedComponent.set('variableValidation', { 
-			...$selectedComponent.variableValidation,
-			required 
-		});
+		loopColumns = parseInt(cols) || 3;
+		$selectedComponent.set('loopColumns', loopColumns);
 		debouncedPropertyChange($selectedComponent);
 	}
 	
@@ -949,10 +1244,7 @@
 			// Preserve variable properties
 			const variableProps = {
 				isVariable: $selectedComponent.isVariable,
-				variableName: $selectedComponent.variableName,
-				variableDescription: $selectedComponent.variableDescription,
-				variableProperty: $selectedComponent.variableProperty,
-				variableValidation: $selectedComponent.variableValidation
+				variableBindings: $selectedComponent.variableBindings || []
 			};
 			
 			// Get current config
@@ -1025,10 +1317,7 @@
 			// Preserve variable properties
 			const variableProps = {
 				isVariable: $selectedComponent.isVariable,
-				variableName: $selectedComponent.variableName,
-				variableDescription: $selectedComponent.variableDescription,
-				variableProperty: $selectedComponent.variableProperty,
-				variableValidation: $selectedComponent.variableValidation
+				variableBindings: $selectedComponent.variableBindings || []
 			};
 			
 			// Get current table config and update style
@@ -1931,6 +2220,29 @@
 		if (!$editor || !target) return;
 		$editor.fire('object:modified', { target });
 	}
+	
+	/**
+	 * Group selected elements together
+	 * Creates a FabricJS Group that can have conditions applied
+	 */
+	function groupSelectedElements() {
+		const group = editorActions.groupSelected($editor);
+		if (group) {
+			// Update local state to reflect the new group selection
+			updateLocalState();
+		}
+	}
+	
+	/**
+	 * Ungroup selected group back into individual elements
+	 */
+	function ungroupSelectedElements() {
+		const success = editorActions.ungroupSelected($editor);
+		if (success) {
+			// Clear selection and update state
+			updateLocalState();
+		}
+	}
 
 	function getTargetDimensions(target) {
 		if (!target) {
@@ -2099,28 +2411,57 @@
 
 </script>
 
-<div class="w-full bg-white border-l border-gray-200 h-full flex flex-col shadow-sm z-10">
-	<div class="px-5 py-4 border-b border-gray-100 flex-shrink-0 bg-white">
-		<h3 class="font-bold text-sm text-gray-900 uppercase tracking-wider">Properties</h3>
-	</div>
-	<div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
+<div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
+	<div class="px-4 py-3 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+		<div class="flex items-center justify-between mb-3">
+			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Properties</h3>
+		</div>
+		
+		<!-- Design/Logic Toggle -->
 		{#if $selectedComponent}
-			<div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+			<div class="flex bg-[#FFFDF8] p-1 border-b-2 border-gray-900">
+				<button 
+					class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-none text-xs font-black uppercase tracking-wide transition-all {panelMode === 'design' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+					on:click={() => panelMode = 'design'}
+				>
+					<i class="fa fa-palette text-[10px]"></i>
+					Design
+				</button>
+				<button 
+					class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-none text-xs font-black uppercase tracking-wide transition-all relative {panelMode === 'logic' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+					on:click={() => panelMode = 'logic'}
+				>
+					<i class="fa fa-code text-[10px]"></i>
+					Logic
+					{#if hasLogicConfigured}
+						<span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full border border-gray-900"></span>
+					{/if}
+				</button>
+			</div>
+		{/if}
+	</div>
+	<div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-5 bg-[#FFFDF8]">
+		{#if $selectedComponent}
+			<!-- Element Type Badge -->
+			<div class="flex items-center gap-3 pb-3 border-b border-gray-900">
 				<span class="px-2.5 py-1 bg-[#ff6b6b]/10 text-[#ff6b6b] text-xs font-bold rounded-md uppercase tracking-wide shadow-sm">
 					{type}
 				</span>
 				<span class="text-xs font-medium text-gray-500">Selected Element</span>
 			</div>
+			
+			<!-- DESIGN MODE -->
+			{#if panelMode === 'design'}
 
 			{#if type === 'i-text' || type === 'text'}
 				<!-- CONTENT SECTION -->
 				<div class="space-y-3">
 					<div class="flex items-center gap-2 mb-2">
 						<i class="fa fa-align-left text-gray-400 text-xs"></i>
-						<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content</span>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Content</span>
 					</div>
 					<textarea
-						class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 						rows="2"
 						placeholder="Enter your text..."
 						value={content}
@@ -2129,17 +2470,17 @@
 				</div>
 				
 				<!-- TYPOGRAPHY SECTION -->
-				<div class="space-y-3 pt-4 border-t border-gray-100">
+				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
 					<div class="flex items-center gap-2 mb-2">
 						<i class="fa fa-font text-gray-400 text-xs"></i>
-						<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Typography</span>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Typography</span>
 					</div>
 					
 					<!-- Font Family -->
 					<div class="relative">
-						<label class="block text-xs font-medium text-gray-700 mb-1">Font Family</label>
+						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Font Family</label>
 						<button
-							class="w-full text-sm border border-gray-300 rounded-md shadow-sm px-3 py-2 text-left bg-white flex items-center justify-between focus:border-black focus:ring-black focus:outline-none focus:ring-1"
+							class="w-full text-sm border border-gray-900 border-[2px] rounded-lg px-3 py-2 text-left bg-white flex items-center justify-between focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 focus:outline-none focus:ring-1"
 							on:click={() => isFontDropdownOpen = !isFontDropdownOpen}
 						>
 							<span style="font-family: {styles.fontFamily}">{styles.fontFamily}</span>
@@ -2147,7 +2488,7 @@
 						</button>
 						
 						{#if isFontDropdownOpen}
-							<div class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-[400px] flex flex-col">
+							<div class="absolute z-50 w-full mt-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-xl max-h-[400px] flex flex-col">
 								<!-- Search & Custom Font -->
 								<div class="p-3 border-b border-gray-100 sticky top-0 bg-white z-10">
 									{#if showCustomFontInput}
@@ -2156,7 +2497,7 @@
 											<input
 												type="text"
 												placeholder="e.g., Crimson Text or fonts.google.com URL"
-												class="w-full text-sm border-gray-300 rounded-md mb-2 p-2 focus:border-black focus:ring-black"
+												class="w-full text-sm border-gray-900 rounded-md mb-2 p-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 												bind:value={customFontUrl}
 											/>
 											{#if addFontError}
@@ -2188,7 +2529,7 @@
 												<input
 													type="text"
 													placeholder="Search any Google Font..."
-													class="w-full text-sm border-gray-300 rounded-md pl-8 pr-8 py-1.5 focus:border-black focus:ring-black"
+													class="w-full text-sm border-gray-900 rounded-md pl-8 pr-8 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 													value={fontSearchQuery}
 													on:input={(e) => handleFontSearch(e.target.value)}
 												/>
@@ -2355,7 +2696,7 @@
 								</div>
 								
 								<!-- Footer -->
-								<div class="px-3 py-2 border-t border-gray-100 bg-gray-50 text-[10px] text-gray-500 flex items-center justify-between">
+								<div class="px-3 py-2 border-t-[2px] border-gray-900 bg-gray-50 text-[10px] text-gray-500 flex items-center justify-between">
 									<span>
 										{filteredFonts.length} of {allFonts.length} fonts
 										{#if extendedSearchResults.length > 0}
@@ -2389,11 +2730,11 @@
 					<!-- Size & Weight Row -->
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="block text-xs font-medium text-gray-700 mb-1">Size</label>
+							<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Size</label>
 							<div class="relative">
 								<input
 									type="number"
-									class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black pr-8"
+									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 pr-8"
 									value={styles.fontSize}
 									on:input={(e) => updateProperty('fontSize', parseInt(e.target.value))}
 								/>
@@ -2401,10 +2742,10 @@
 							</div>
 						</div>
 						<div>
-							<label class="block text-xs font-medium text-gray-700 mb-1">Spacing</label>
+							<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Spacing</label>
 							<input
 								type="number"
-								class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+								class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 								value={styles.charSpacing}
 								step="10"
 								on:input={(e) => updateProperty('charSpacing', parseInt(e.target.value))}
@@ -2414,9 +2755,9 @@
 					
 					<!-- Font Weight -->
 					<div class="relative">
-						<label class="block text-xs font-medium text-gray-700 mb-1">Weight</label>
+						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Weight</label>
 						<button
-							class="w-full text-sm border border-gray-300 rounded-md shadow-sm px-3 py-2 text-left bg-white flex items-center justify-between focus:border-black focus:ring-black focus:outline-none focus:ring-1"
+							class="w-full text-sm border border-gray-900 border-[2px] rounded-lg px-3 py-2 text-left bg-white flex items-center justify-between focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 focus:outline-none focus:ring-1"
 							on:click={() => isWeightDropdownOpen = !isWeightDropdownOpen}
 						>
 							<span style="font-weight: {styles.fontWeight === 'normal' ? 400 : (styles.fontWeight === 'bold' ? 700 : styles.fontWeight)}">
@@ -2426,7 +2767,7 @@
 						</button>
 						
 						{#if isWeightDropdownOpen}
-							<div class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+							<div class="absolute z-50 w-full mt-1 bg-white border-[2px] border-gray-900 rounded-md shadow-lg max-h-60 overflow-y-auto">
 								{#each fontWeights as weight}
 									<button
 										class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between"
@@ -2453,10 +2794,10 @@
 				</div>
 				
 				<!-- COLOR SECTION -->
-				<div class="space-y-3 pt-4 border-t border-gray-100">
+				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
 					<div class="flex items-center gap-2 mb-2">
 						<i class="fa fa-palette text-gray-400 text-xs"></i>
-						<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Color</span>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Color</span>
 					</div>
 					<GradientColorPicker
 						label="Text Color"
@@ -2468,14 +2809,14 @@
 				</div>
 				
 				<!-- EFFECTS SECTION -->
-				<div class="space-y-3 pt-4 border-t border-gray-100">
+				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
 					<button 
 						class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
 						on:click={() => showTextEffectsPanel = !showTextEffectsPanel}
 					>
 						<div class="flex items-center gap-2">
 							<i class="fa fa-magic text-gray-400 text-xs"></i>
-							<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Effects</span>
+							<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Effects</span>
 						</div>
 						<i class="fa fa-chevron-{showTextEffectsPanel ? 'up' : 'down'} text-xs text-gray-400"></i>
 					</button>
@@ -2484,52 +2825,52 @@
 						<div class="space-y-4 pt-2">
 							<!-- Quick Presets -->
 							<div>
-								<label class="block text-xs font-medium text-gray-700 mb-2">Quick Presets</label>
+								<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Quick Presets</label>
 								<div class="grid grid-cols-4 gap-1.5">
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('none')}
 										title="None"
 									>
 										None
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('soft-shadow')}
 										title="Soft Shadow"
 									>
 										Soft
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('hard-shadow')}
 										title="Hard Shadow"
 									>
 										Hard
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('outline')}
 										title="Outline"
 									>
 										Outline
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('glow')}
 										title="Glow"
 									>
 										Glow
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('neon')}
 										title="Neon"
 									>
 										Neon
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-black hover:bg-gray-50 transition-all font-medium col-span-2"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium col-span-2"
 										on:click={() => applyTextEffectPreset('bold-outline')}
 										title="Bold Outline"
 									>
@@ -2539,9 +2880,9 @@
 							</div>
 
 							<!-- Shadow Controls -->
-							<div class="pt-3 border-t border-gray-100">
+							<div class="pt-3 border-t-[2px] border-gray-900">
 								<div class="flex items-center justify-between mb-3">
-									<label class="text-xs font-medium text-gray-700">Shadow</label>
+									<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Shadow</label>
 									<label class="relative inline-flex items-center cursor-pointer">
 										<input 
 											type="checkbox" 
@@ -2549,12 +2890,12 @@
 											checked={textEffects.shadow.enabled}
 											on:change={(e) => applyTextShadow('enabled', e.target.checked)}
 										/>
-										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
 									</label>
 								</div>
 								
 								{#if textEffects.shadow.enabled}
-									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-900">
 										<!-- Shadow Color -->
 										<GradientColorPicker
 											label="Color"
@@ -2619,9 +2960,9 @@
 							</div>
 							
 							<!-- Stroke Controls -->
-							<div class="pt-3 border-t border-gray-100">
+							<div class="pt-3 border-t-[2px] border-gray-900">
 								<div class="flex items-center justify-between mb-3">
-									<label class="text-xs font-medium text-gray-700">Stroke (Outline)</label>
+									<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Stroke (Outline)</label>
 									<label class="relative inline-flex items-center cursor-pointer">
 										<input 
 											type="checkbox" 
@@ -2629,12 +2970,12 @@
 											checked={textEffects.stroke.enabled}
 											on:change={(e) => applyTextStroke('enabled', e.target.checked)}
 										/>
-										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
 									</label>
 								</div>
 								
 								{#if textEffects.stroke.enabled}
-									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-900">
 										<!-- Stroke Color -->
 										<GradientColorPicker
 											label="Color"
@@ -2665,7 +3006,7 @@
 							</div>
 							
 							<!-- Background Button -->
-							<div class="pt-3 border-t border-gray-100">
+							<div class="pt-3 border-t-[2px] border-gray-900">
 								<button 
 									class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium text-xs flex items-center justify-center gap-2"
 									on:click={addTextBackground}
@@ -2677,117 +3018,11 @@
 						</div>
 					{/if}
 				</div>
-				
-				<!-- VARIABLE SECTION (for text elements) -->
-				<div class="space-y-3 pt-4 border-t border-gray-100">
-					<button 
-						class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
-						on:click={() => showVariablePanel = !showVariablePanel}
-					>
-						<div class="flex items-center gap-2">
-							<i class="fa fa-code text-gray-400 text-xs"></i>
-							<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Template Variable</span>
-							{#if isVariable}
-								<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded font-medium">Active</span>
-							{/if}
-						</div>
-						<i class="fa fa-chevron-{showVariablePanel ? 'up' : 'down'} text-xs text-gray-400"></i>
-					</button>
-					
-					{#if showVariablePanel}
-						<div class="space-y-4 pt-2">
-							<div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">
-								<p class="text-xs text-blue-800">
-									<i class="fa fa-info-circle mr-1"></i>
-									Mark this element as a variable to make it customizable when generating images via API.
-								</p>
-							</div>
-							
-							<!-- Enable Variable Toggle -->
-							<div class="flex items-center justify-between">
-								<label class="text-xs font-medium text-gray-700">Enable as Variable</label>
-								<label class="relative inline-flex items-center cursor-pointer">
-									<input 
-										type="checkbox" 
-										class="sr-only peer"
-										checked={isVariable}
-										on:change={(e) => toggleVariable(e.target.checked)}
-									/>
-									<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-								</label>
-							</div>
-							
-							{#if isVariable}
-								<!-- Variable Name -->
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Variable Name</label>
-									<input
-										type="text"
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										placeholder="e.g., heading, title, username"
-										value={variableName}
-										on:input={(e) => updateVariableName(e.target.value)}
-									/>
-									<p class="text-[10px] text-gray-500 mt-1">Use only letters, numbers, and underscores</p>
-								</div>
-								
-								<!-- Variable Description -->
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Description (optional)</label>
-									<input
-										type="text"
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										placeholder="e.g., Main heading text"
-										value={variableDescription}
-										on:input={(e) => updateVariableDescription(e.target.value)}
-									/>
-								</div>
-								
-								<!-- Property to modify -->
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Property</label>
-									<select
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										value={variableProperty}
-										on:change={(e) => updateVariableProperty(e.target.value)}
-									>
-										<option value="text">Text Content</option>
-										<option value="fill">Text Color</option>
-									</select>
-								</div>
-								
-								<!-- Required Toggle -->
-								<div class="flex items-center justify-between">
-									<label class="text-xs font-medium text-gray-700">Required</label>
-									<label class="relative inline-flex items-center cursor-pointer">
-										<input 
-											type="checkbox" 
-											class="sr-only peer"
-											checked={variableRequired}
-											on:change={(e) => updateVariableRequired(e.target.checked)}
-										/>
-										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-									</label>
-								</div>
-								
-								<!-- API Usage Example -->
-								<div class="pt-3 border-t border-gray-100">
-									<label class="block text-xs font-medium text-gray-700 mb-2">API Usage</label>
-									<div class="bg-gray-900 rounded-lg p-3 text-xs">
-										<code class="text-green-400">
-											{`{ "${variableName || 'variable_name'}": "Your value" }`}
-										</code>
-									</div>
-								</div>
-							{/if}
-						</div>
-					{/if}
-				</div>
 			{/if}
 
 			<!-- Universal Stroke & Fill Controls for All Shapes -->
 			{#if type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path'}
-				<div class="space-y-4 pt-4 border-t border-gray-100">
+				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
 					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Appearance</h4>
 					
 					<!-- Fill Color -->
@@ -2809,7 +3044,7 @@
 									checked={styles.fill !== '' && styles.fill !== null}
 									on:change={(e) => updateProperty('fill', e.target.checked ? '#3b82f6' : '')}
 								/>
-								<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+								<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
 							</label>
 						</div>
 					{/if}
@@ -2826,7 +3061,7 @@
 					<!-- Stroke Width -->
 					<div>
 						<div class="flex items-center justify-between mb-2">
-							<label class="text-xs font-medium text-gray-700">Stroke Width</label>
+							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Stroke Width</label>
 							<span class="text-xs text-gray-500">{styles.strokeWidth}px</span>
 						</div>
 						<input
@@ -2850,19 +3085,19 @@
 
 			<div class="grid grid-cols-2 gap-2">
 				<div>
-					<label class="block text-xs font-medium text-gray-700 mb-1">Width</label>
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Width</label>
 					<input
 						type="number"
-						class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 						value={styles.width}
 						on:change={(e) => updateProperty('width', e.target.value)}
 					/>
 				</div>
 				<div>
-					<label class="block text-xs font-medium text-gray-700 mb-1">Height</label>
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Height</label>
 					<input
 						type="number"
-						class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 						value={styles.height}
 						on:change={(e) => updateProperty('height', e.target.value)}
 					/>
@@ -2872,7 +3107,7 @@
 			{#if type === 'rect' || ($selectedComponent && $selectedComponent.isRoundedRect)}
 				<div class="pt-2">
 					<div class="flex items-center justify-between mb-2">
-						<label class="block text-xs font-medium text-gray-700">Corner Radius</label>
+						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest">Corner Radius</label>
 						<button 
 							class="text-gray-500 hover:text-black focus:outline-none"
 							title="Individual Corners"
@@ -2906,7 +3141,7 @@
 							/>
 							<input
 								type="number"
-								class="w-14 text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+								class="w-14 text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 								value={styles.radius}
 								on:input={(e) => {
 									const val = parseInt(e.target.value);
@@ -2925,7 +3160,7 @@
 								<i class="fa fa-border-top-left text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 									placeholder="TL"
 									value={cornerRadii.tl}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tl: parseInt(e.target.value) || 0 })}
@@ -2936,7 +3171,7 @@
 								<i class="fa fa-border-top-right text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 									placeholder="TR"
 									value={cornerRadii.tr}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tr: parseInt(e.target.value) || 0 })}
@@ -2947,7 +3182,7 @@
 								<i class="fa fa-border-bottom-left text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 									placeholder="BL"
 									value={cornerRadii.bl}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, bl: parseInt(e.target.value) || 0 })}
@@ -2958,7 +3193,7 @@
 								<i class="fa fa-border-bottom-right text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
+									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
 									placeholder="BR"
 									value={cornerRadii.br}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, br: parseInt(e.target.value) || 0 })}
@@ -2971,15 +3206,15 @@
 			
 			{#if type === 'image'}
 				<!-- Image Shape Clipping -->
-				<div class="space-y-3 pt-4 border-t border-gray-100">
+				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
 					<div class="flex items-center gap-2 mb-2">
 						<i class="fa fa-crop text-gray-400 text-xs"></i>
-						<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Clip to Shape</span>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Clip to Shape</span>
 					</div>
 					
 					<div class="grid grid-cols-4 gap-2">
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'none' ? 'border-black bg-black text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'none' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
 							on:click={() => applyClipShape('none')}
 							title="No clipping"
 						>
@@ -2989,7 +3224,7 @@
 							<span class="text-[10px] font-medium">None</span>
 						</button>
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'circle' ? 'border-black bg-black text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'circle' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
 							on:click={() => applyClipShape('circle')}
 							title="Circle clip"
 						>
@@ -2999,7 +3234,7 @@
 							<span class="text-[10px] font-medium">Circle</span>
 						</button>
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'ellipse' ? 'border-black bg-black text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'ellipse' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
 							on:click={() => applyClipShape('ellipse')}
 							title="Ellipse clip"
 						>
@@ -3009,7 +3244,7 @@
 							<span class="text-[10px] font-medium">Ellipse</span>
 						</button>
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'rounded-rect' ? 'border-black bg-black text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'rounded-rect' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
 							on:click={() => applyClipShape('rounded-rect')}
 							title="Rounded rectangle clip"
 						>
@@ -3022,9 +3257,9 @@
 					
 					{#if currentClipShape !== 'none'}
 						<!-- Clip Adjustment Controls -->
-						<div class="mt-3 pt-3 border-t border-gray-100 space-y-3">
+						<div class="mt-3 pt-3 border-t-[2px] border-gray-900 space-y-3">
 							<div class="flex items-center justify-between">
-								<span class="text-xs font-medium text-gray-700">Adjust Clip Area</span>
+								<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Adjust Clip Area</span>
 								<button 
 									class="text-[10px] px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded transition-colors"
 									on:click={resetClipPosition}
@@ -3104,8 +3339,8 @@
 				</div>
 				
 				<!-- Background Remover -->
-				<div class="pt-4 border-t border-gray-100">
-					<label class="block text-xs font-medium text-gray-700 mb-2">AI Background Removal</label>
+				<div class="pt-4 border-t-[2px] border-gray-900">
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">AI Background Removal</label>
 					
 					<div class="space-y-2">
 						<button 
@@ -3141,9 +3376,9 @@
 				</div>
 				
 				<!-- Filters & Effects -->
-				<div class="pt-4 border-t border-gray-100">
+				<div class="pt-4 border-t-[2px] border-gray-900">
 					<button 
-						class="w-full flex items-center justify-between text-left text-xs font-medium text-gray-700 mb-3 hover:text-black transition-colors"
+						class="w-full flex items-center justify-between text-left text-[10px] font-black text-gray-900 uppercase tracking-widest mb-3 hover:text-black transition-colors"
 						on:click={() => showFiltersPanel = !showFiltersPanel}
 					>
 						<span class="flex items-center gap-2">
@@ -3160,49 +3395,49 @@
 								<label class="block text-xs font-medium text-gray-600 mb-2">Quick Filters</label>
 								<div class="grid grid-cols-2 gap-2">
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('none')}
 									>
 										Original
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('grayscale')}
 									>
 										B&W
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('sepia')}
 									>
 										Sepia
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('vintage')}
 									>
 										Vintage
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('cool')}
 									>
 										Cool
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('warm')}
 									>
 										Warm
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('dramatic')}
 									>
 										Dramatic
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('fade')}
 									>
 										Fade
@@ -3210,7 +3445,7 @@
 								</div>
 							</div>
 							
-							<div class="pt-3 border-t border-gray-100">
+							<div class="pt-3 border-t-[2px] border-gray-900">
 								<label class="block text-xs font-medium text-gray-600 mb-3">Manual Adjustments</label>
 								
 								<!-- Brightness -->
@@ -3311,118 +3546,14 @@
 					{/if}
 				</div>
 				
-				<!-- VARIABLE SECTION (for image elements) -->
-				<div class="space-y-3 pt-4 border-t border-gray-100">
-					<button 
-						class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
-						on:click={() => showVariablePanel = !showVariablePanel}
-					>
-						<div class="flex items-center gap-2">
-							<i class="fa fa-code text-gray-400 text-xs"></i>
-							<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Template Variable</span>
-							{#if isVariable}
-								<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded font-medium">Active</span>
-							{/if}
-						</div>
-						<i class="fa fa-chevron-{showVariablePanel ? 'up' : 'down'} text-xs text-gray-400"></i>
-					</button>
-					
-					{#if showVariablePanel}
-						<div class="space-y-4 pt-2">
-							<div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">
-								<p class="text-xs text-blue-800">
-									<i class="fa fa-info-circle mr-1"></i>
-									Mark this image as a variable to swap it when generating images via API.
-								</p>
-							</div>
-							
-							<!-- Enable Variable Toggle -->
-							<div class="flex items-center justify-between">
-								<label class="text-xs font-medium text-gray-700">Enable as Variable</label>
-								<label class="relative inline-flex items-center cursor-pointer">
-									<input 
-										type="checkbox" 
-										class="sr-only peer"
-										checked={isVariable}
-										on:change={(e) => toggleVariable(e.target.checked)}
-									/>
-									<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-								</label>
-							</div>
-							
-							{#if isVariable}
-								<!-- Variable Name -->
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Variable Name</label>
-									<input
-										type="text"
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										placeholder="e.g., profile_image, logo, avatar"
-										value={variableName}
-										on:input={(e) => updateVariableName(e.target.value)}
-									/>
-									<p class="text-[10px] text-gray-500 mt-1">Use only letters, numbers, and underscores</p>
-								</div>
-								
-								<!-- Variable Description -->
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Description (optional)</label>
-									<input
-										type="text"
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										placeholder="e.g., User profile picture"
-										value={variableDescription}
-										on:input={(e) => updateVariableDescription(e.target.value)}
-									/>
-								</div>
-								
-								<!-- Property (fixed to src for images) -->
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Property</label>
-									<select
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										value={variableProperty}
-										on:change={(e) => updateVariableProperty(e.target.value)}
-									>
-										<option value="src">Image URL</option>
-									</select>
-								</div>
-								
-								<!-- Required Toggle -->
-								<div class="flex items-center justify-between">
-									<label class="text-xs font-medium text-gray-700">Required</label>
-									<label class="relative inline-flex items-center cursor-pointer">
-										<input 
-											type="checkbox" 
-											class="sr-only peer"
-											checked={variableRequired}
-											on:change={(e) => updateVariableRequired(e.target.checked)}
-										/>
-										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-									</label>
-								</div>
-								
-								<!-- API Usage Example -->
-								<div class="pt-3 border-t border-gray-100">
-									<label class="block text-xs font-medium text-gray-700 mb-2">API Usage</label>
-									<div class="bg-gray-900 rounded-lg p-3 text-xs">
-										<code class="text-green-400">
-											{`{ "${variableName || 'image_url'}": "https://example.com/image.jpg" }`}
-										</code>
-									</div>
-								</div>
-							{/if}
-						</div>
-					{/if}
-				</div>
 			{/if}
 			
 			<!-- CHART PROPERTIES SECTION -->
 			{#if isChart}
-				<div class="space-y-3 pt-4 border-t border-gray-100">
+				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
 					<div class="flex items-center gap-2 mb-2">
 						<i class="fa fa-chart-bar text-gray-400 text-xs"></i>
-						<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Chart Properties</span>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Chart Properties</span>
 					</div>
 					
 					<div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3">
@@ -3438,7 +3569,7 @@
 							class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity mb-2"
 							on:click={() => showChartDataEditor = !showChartDataEditor}
 						>
-							<span class="text-xs font-medium text-gray-700">Edit Chart Data</span>
+							<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Edit Chart Data</span>
 							<i class="fa fa-chevron-{showChartDataEditor ? 'up' : 'down'} text-xs text-gray-400"></i>
 						</button>
 						
@@ -3461,7 +3592,7 @@
 								</div>
 								
 								<textarea
-									class="w-full h-36 text-xs font-mono border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black p-2"
+									class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
 									placeholder={chartDataFormat === 'csv' ? 'label,value\nJan,30\nFeb,45' : '[{"label": "Jan", "value": 30}, ...]'}
 									bind:value={chartDataInput}
 								></textarea>
@@ -3486,7 +3617,7 @@
 								</div>
 								
 								<!-- Format Examples -->
-								<div class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-600">
+								<div class="bg-gray-50 border-[2px] border-gray-900 rounded-lg p-2 text-[10px] text-gray-600">
 									{#if chartDataFormat === 'csv'}
 										<p class="font-medium mb-1">CSV Format:</p>
 										<code class="block text-gray-500">label,value<br/>Jan,30<br/>Feb,45</code>
@@ -3499,52 +3630,15 @@
 						{/if}
 					</div>
 					
-					<!-- Variable Section for Chart -->
-					<div class="pt-3 border-t border-gray-100">
-						<div class="flex items-center justify-between mb-3">
-							<label class="text-xs font-medium text-gray-700">Enable as Variable</label>
-							<label class="relative inline-flex items-center cursor-pointer">
-								<input 
-									type="checkbox" 
-									class="sr-only peer"
-									checked={isVariable}
-									on:change={(e) => toggleVariable(e.target.checked)}
-								/>
-								<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-							</label>
-						</div>
-						
-						{#if isVariable}
-							<div class="space-y-3">
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Variable Name</label>
-									<input
-										type="text"
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										placeholder="e.g., sales_chart_data"
-										value={variableName}
-										on:input={(e) => updateVariableName(e.target.value)}
-									/>
-								</div>
-								
-								<div class="bg-gray-900 rounded-lg p-3 text-xs">
-									<p class="text-gray-400 mb-2">API Usage:</p>
-									<code class="text-green-400 text-[10px] break-all">
-										{`{ "${variableName || 'chart_data'}": [{"label": "Jan", "value": 30}, ...] }`}
-									</code>
-								</div>
-							</div>
-						{/if}
-					</div>
 				</div>
 			{/if}
 			
 			<!-- TABLE PROPERTIES SECTION -->
 			{#if isTable}
-				<div class="space-y-3 pt-4 border-t border-gray-100">
+				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
 					<div class="flex items-center gap-2 mb-2">
 						<i class="fa fa-table text-gray-400 text-xs"></i>
-						<span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Table Properties</span>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Table Properties</span>
 					</div>
 					
 					<div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-3">
@@ -3556,15 +3650,15 @@
 					
 					<!-- Table Style Selector (applies to all table types) -->
 					<div>
-						<label class="block text-xs font-medium text-gray-700 mb-2">Table Style</label>
+						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Table Style</label>
 						<div class="grid grid-cols-5 gap-2">
 							{#each Object.entries(TABLE_STYLES) as [key, style]}
 								<button 
-									class="flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all {tableStyle === key ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-400'}"
+									class="flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all {tableStyle === key ? 'border-black bg-gray-50' : 'border-gray-900 hover:border-gray-400'}"
 									on:click={() => changeTableStyle(key)}
 									title={style.name}
 								>
-									<div class="w-full h-6 rounded overflow-hidden border border-gray-200 flex flex-col">
+									<div class="w-full h-6 rounded overflow-hidden border-[2px] border-gray-900 flex flex-col">
 										<div class="h-2" style="background: {style.headerBg};"></div>
 										<div class="flex-1" style="background: {style.rowBg};"></div>
 										<div class="h-1" style="background: {style.altRowBg};"></div>
@@ -3581,7 +3675,7 @@
 							class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity mb-2"
 							on:click={() => showTableDataEditor = !showTableDataEditor}
 						>
-							<span class="text-xs font-medium text-gray-700">Edit Table Data</span>
+							<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Edit Table Data</span>
 							<i class="fa fa-chevron-{showTableDataEditor ? 'up' : 'down'} text-xs text-gray-400"></i>
 						</button>
 						
@@ -3604,7 +3698,7 @@
 								</div>
 								
 								<textarea
-									class="w-full h-36 text-xs font-mono border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black p-2"
+									class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
 									placeholder={tableDataFormat === 'csv' 
 										? 'Header1,Header2,Header3\nValue1,Value2,Value3' 
 										: '{"headers": ["Col1", "Col2"], "rows": [["A", "B"]]}'
@@ -3632,7 +3726,7 @@
 								</div>
 								
 								<!-- Format Examples - Universal format for all table types -->
-								<div class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-600">
+								<div class="bg-gray-50 border-[2px] border-gray-900 rounded-lg p-2 text-[10px] text-gray-600">
 									<p class="font-medium mb-1">
 										{tableDataFormat === 'csv' ? 'CSV' : 'JSON'} Format (Universal):
 									</p>
@@ -3673,72 +3767,362 @@
 						</div>
 					{/if}
 					
-					<!-- Variable Section for Table -->
-					<div class="pt-3 border-t border-gray-100">
-						<div class="flex items-center justify-between mb-3">
-							<label class="text-xs font-medium text-gray-700">Enable as Variable</label>
-							<label class="relative inline-flex items-center cursor-pointer">
-								<input 
-									type="checkbox" 
-									class="sr-only peer"
-									checked={isVariable}
-									on:change={(e) => toggleVariable(e.target.checked)}
-								/>
-								<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-							</label>
-						</div>
-						
-						{#if isVariable}
-							<div class="space-y-3">
-								<div>
-									<label class="block text-xs font-medium text-gray-700 mb-1">Variable Name</label>
-									<input
-										type="text"
-										class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black"
-										placeholder="e.g., sales_table_data"
-										value={variableName}
-										on:input={(e) => updateVariableName(e.target.value)}
-									/>
-								</div>
-								
-								<div class="bg-gray-900 rounded-lg p-3 text-xs">
-									<p class="text-gray-400 mb-2">API Usage:</p>
-									<code class="text-green-400 text-[10px] break-all">
-										{`{ "${variableName || 'table_data'}": {"headers": [...], "rows": [[...], ...]} }`}
-									</code>
-								</div>
-							</div>
-						{/if}
-					</div>
 				</div>
 			{/if}
+			{/if}
+			<!-- END DESIGN MODE -->
+			
+			<!-- LOGIC MODE -->
+			{#if panelMode === 'logic'}
+				<!-- Logic Mode Header -->
+				<div class="mb-4 pb-3 border-b border-gray-100">
+					<div class="flex items-center gap-2">
+						<i class="fa fa-code text-[#ff6b6b]"></i>
+						<div>
+							<h4 class="text-sm font-bold text-gray-900">Dynamic Behavior</h4>
+							<p class="text-[10px] text-gray-500">Variables, conditions & loops</p>
+						</div>
+					</div>
+				</div>
+				
+				<!-- VARIABLE SECTION - Multi-binding -->
+				<div class="bg-white rounded-lg border-[2px] border-gray-900 p-4 mb-4">
+					<div class="flex items-center justify-between mb-3">
+						<div class="flex items-center gap-2">
+							<span class="w-2 h-2 rounded-full {isVariable && variableBindings.length > 0 ? 'bg-green-500' : 'bg-gray-300'}"></span>
+							<span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Variables</span>
+							{#if isVariable && variableBindings.length > 0}
+								<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded font-medium">{variableBindings.length}</span>
+							{/if}
+						</div>
+						<label class="relative inline-flex items-center cursor-pointer">
+							<input 
+								type="checkbox" 
+								class="sr-only peer"
+								checked={isVariable}
+								on:change={(e) => toggleVariable(e.target.checked)}
+							/>
+							<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+						</label>
+					</div>
+					
+					{#if !isVariable}
+						<p class="text-xs text-gray-500">Make this element customizable via API</p>
+					{:else}
+						<div class="space-y-3">
+							<!-- Variable Bindings List -->
+							{#each variableBindings as binding, index}
+								<div class="bg-gray-50 rounded-lg p-3 border-[2px] border-gray-900 relative group">
+									<div class="flex items-center justify-between mb-2">
+										<span class="text-[10px] font-semibold text-gray-500 uppercase">Binding #{index + 1}</span>
+										<button 
+											class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500 p-1"
+											on:click={() => removeVariableBinding(index)}
+											title="Remove binding"
+										>
+											<i class="fa fa-times text-xs"></i>
+										</button>
+									</div>
+									
+									<!-- Property Selection -->
+									<div class="mb-2">
+										<label class="block text-[10px] font-medium text-gray-600 mb-1">Property</label>
+										{#if isChart || isTable}
+											<div class="text-xs text-gray-700 bg-white rounded px-2 py-1.5 border-[2px] border-gray-900">
+												<i class="fa fa-{isChart ? 'chart-bar' : 'table'} mr-1 text-gray-400"></i>
+												{isChart ? 'Chart Data' : 'Table Data'}
+											</div>
+										{:else}
+											<select
+												class="w-full text-xs border-[2px] border-gray-900 rounded px-2 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none bg-white"
+												value={binding.property}
+												on:change={(e) => updateVariableBinding(index, 'property', e.target.value)}
+											>
+												{#each getAvailablePropertiesForType() as prop}
+													<option value={prop.value} disabled={variableBindings.some((b, i) => i !== index && b.property === prop.value)}>
+														{prop.label} {variableBindings.some((b, i) => i !== index && b.property === prop.value) ? '(in use)' : ''}
+													</option>
+												{/each}
+											</select>
+										{/if}
+									</div>
+									
+									<!-- Variable Name -->
+									<div class="mb-2">
+										<label class="block text-[10px] font-medium text-gray-600 mb-1">Variable Name</label>
+										<input
+											type="text"
+											class="w-full text-xs border-[2px] border-gray-900 rounded px-2 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											placeholder="e.g., my_variable"
+											value={binding.variableName}
+											on:input={(e) => updateVariableBinding(index, 'variableName', e.target.value)}
+										/>
+									</div>
+									
+									<!-- Description -->
+									<div class="mb-2">
+										<label class="block text-[10px] font-medium text-gray-600 mb-1">Description <span class="text-gray-400">(optional)</span></label>
+										<input
+											type="text"
+											class="w-full text-xs border-[2px] border-gray-900 rounded px-2 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											placeholder="Brief description for API docs"
+											value={binding.description}
+											on:input={(e) => updateVariableBinding(index, 'description', e.target.value)}
+										/>
+									</div>
+									
+									<!-- Required Toggle -->
+									<div class="flex items-center justify-between pt-1">
+										<label class="text-[10px] font-medium text-gray-600">Required</label>
+										<label class="relative inline-flex items-center cursor-pointer">
+											<input 
+												type="checkbox" 
+												class="sr-only peer"
+												checked={binding.required}
+												on:change={(e) => updateVariableBinding(index, 'required', e.target.checked)}
+											/>
+											<div class="w-7 h-4 bg-gray-200 rounded-full peer peer-checked:after:translate-x-3 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-black"></div>
+										</label>
+									</div>
+								</div>
+							{/each}
+							
+							<!-- Add Another Binding Button -->
+							{#if getAvailablePropertiesForType().length > variableBindings.length}
+								<button 
+									class="w-full py-2 px-3 border-2 border-dashed border-gray-900 rounded-lg text-xs text-gray-500 hover:text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+									on:click={addVariableBinding}
+								>
+									<i class="fa fa-plus text-[10px]"></i>
+									Add Another Property
+								</button>
+							{:else}
+								<p class="text-[10px] text-gray-400 text-center py-2">All available properties are bound</p>
+							{/if}
+							
+							<!-- API Usage Preview -->
+							<div class="bg-gray-900 rounded-lg p-3 mt-3">
+								<p class="text-[10px] text-gray-400 mb-1">API Usage:</p>
+								<pre class="text-green-400 text-[10px] whitespace-pre-wrap overflow-x-auto"><code>{JSON.stringify(
+									variableBindings.reduce((acc, b) => {
+										if (b.property === 'chartData') {
+											acc[b.variableName || 'chart_data'] = [{"label": "A", "value": 10}];
+										} else if (b.property === 'tableData') {
+											acc[b.variableName || 'table_data'] = {"headers": ["..."], "rows": [["..."]]};
+										} else if (b.property === 'src') {
+											acc[b.variableName || 'image_url'] = "https://...";
+										} else if (b.property === 'fill' || b.property === 'stroke') {
+											acc[b.variableName || 'color'] = "#ff0000";
+										} else if (b.property === 'opacity') {
+											acc[b.variableName || 'opacity'] = 0.8;
+										} else if (b.property === 'fontSize' || b.property === 'strokeWidth') {
+											acc[b.variableName || 'size'] = 24;
+										} else {
+											acc[b.variableName || 'variable'] = "value";
+										}
+										return acc;
+									}, {}),
+									null, 2
+								)}</code></pre>
+							</div>
+						</div>
+					{/if}
+				</div>
+				
+				<!-- CONDITIONAL VISIBILITY -->
+				<div class="bg-white rounded-lg border-[2px] border-gray-900 p-4 mb-4">
+					<div class="flex items-center justify-between mb-3">
+						<div class="flex items-center gap-2">
+							<span class="w-2 h-2 rounded-full {conditionType !== 'none' ? 'bg-[#ff6b6b]' : 'bg-gray-300'}"></span>
+							<span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Condition</span>
+						</div>
+					</div>
+					
+					<div class="flex rounded-lg overflow-hidden border-2 border-gray-900 text-[11px] mb-3">
+						<button 
+							class="flex-1 py-2 px-3 transition-colors {conditionType === 'none' ? 'bg-black text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
+							on:click={() => updateConditionType('none')}
+						>Always</button>
+						<button 
+							class="flex-1 py-2 px-3 border-l-2 border-gray-900 transition-colors {conditionType === 'showWhen' ? 'bg-green-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
+							on:click={() => updateConditionType('showWhen')}
+						>Show if</button>
+						<button 
+							class="flex-1 py-2 px-3 border-l-2 border-gray-900 transition-colors {conditionType === 'hideWhen' ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
+							on:click={() => updateConditionType('hideWhen')}
+						>Hide if</button>
+					</div>
+					
+					{#if conditionType !== 'none'}
+						<ConditionBuilder 
+							condition={conditionExpression}
+							on:change={(e) => updateConditionExpression(e.detail.expression)}
+						/>
+						
+						{#if !conditionValid && conditionError}
+							<p class="text-[10px] text-red-500 mt-2">{conditionError}</p>
+						{/if}
+					{:else}
+						<p class="text-xs text-gray-500">Control when this element is visible</p>
+					{/if}
+				</div>
+				
+				<!-- LOOP/REPEAT SECTION -->
+				<div class="bg-white rounded-lg border-[2px] border-gray-900 p-4 mb-4">
+					<div class="flex items-center justify-between mb-3">
+						<div class="flex items-center gap-2">
+							<span class="w-2 h-2 rounded-full {isLoopElement ? 'bg-[#ff6b6b]' : 'bg-gray-300'}"></span>
+							<span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Loop</span>
+						</div>
+						<label class="relative inline-flex items-center cursor-pointer">
+							<input 
+								type="checkbox" 
+								class="sr-only peer"
+								checked={isLoopElement}
+								on:change={(e) => toggleLoop(e.target.checked)}
+							/>
+							<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+						</label>
+					</div>
+					
+					{#if !isLoopElement}
+						<p class="text-xs text-gray-500">Repeat this element for each item in an array</p>
+					{:else}
+						<div class="space-y-3">
+							<div class="grid grid-cols-2 gap-2">
+								<div>
+									<label class="block text-[10px] text-gray-500 mb-1">Array Variable</label>
+									<input
+										type="text"
+										class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+										placeholder="items"
+										value={loopVariable}
+										on:input={(e) => updateLoopVariable(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label class="block text-[10px] text-gray-500 mb-1">Item Alias</label>
+									<input
+										type="text"
+										class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+										placeholder="item"
+										value={loopItemName}
+										on:input={(e) => updateLoopItemName(e.target.value)}
+									/>
+								</div>
+							</div>
+							
+							<div class="grid grid-cols-2 gap-2">
+								<div>
+									<label class="block text-[10px] text-gray-500 mb-1">Layout</label>
+									<select
+										class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 bg-white focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+										value={loopDirection}
+										on:change={(e) => updateLoopDirection(e.target.value)}
+									>
+										<option value="vertical">Vertical</option>
+										<option value="horizontal">Horizontal</option>
+										<option value="grid">Grid</option>
+									</select>
+								</div>
+								<div>
+									<label class="block text-[10px] text-gray-500 mb-1">{loopDirection === 'grid' ? 'Columns' : 'Gap (px)'}</label>
+									{#if loopDirection === 'grid'}
+										<input
+											type="number"
+											class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											min="1"
+											max="10"
+											value={loopColumns}
+											on:input={(e) => updateLoopColumns(e.target.value)}
+										/>
+									{:else}
+										<input
+											type="number"
+											class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											min="0"
+											value={loopSpacing}
+											on:input={(e) => updateLoopSpacing(e.target.value)}
+										/>
+									{/if}
+								</div>
+							</div>
+							
+							<div class="bg-gray-100 rounded-lg p-2 border-[2px] border-gray-900">
+								<p class="text-[10px] text-gray-600">
+									<i class="fa fa-info-circle mr-1 text-gray-400"></i>
+									Use <code class="bg-gray-200 px-1 rounded text-gray-700">{"{{" + (loopItemName || 'item') + ".field}}"}</code> in text elements
+								</p>
+							</div>
+						</div>
+					{/if}
+				</div>
+				
+				<!-- Variables Panel Link -->
+				<div class="bg-gray-100 rounded-lg border-[2px] border-gray-900 p-4">
+					<button 
+						class="w-full flex items-center justify-center gap-2 text-sm text-gray-700 hover:text-black font-medium"
+						on:click={() => editorActions.toggleRightSidebarTab('variables')}
+					>
+						<i class="fa fa-list-ul"></i>
+						View All Variables
+						<i class="fa fa-arrow-right text-xs"></i>
+					</button>
+					<p class="text-[10px] text-gray-500 text-center mt-2">Manage all template variables in one place</p>
+				</div>
+			{/if}
+			<!-- END LOGIC MODE -->
 
-			<div class="pt-4 border-t border-gray-100">
-				<label class="block text-xs font-medium text-gray-700 mb-2">Layer Arrangement</label>
+			<!-- GROUP/UNGROUP SECTION (always visible) -->
+			<div class="pt-4 border-t-[2px] border-gray-900">
+				<div class="flex items-center justify-between">
+					<span class="text-xs font-medium text-gray-600">Grouping</span>
+					{#if type === 'activeSelection'}
+						<button 
+							class="py-1.5 px-3 text-[11px] bg-gray-800 hover:bg-black text-white rounded transition-colors font-medium"
+							on:click={groupSelectedElements}
+						>
+							Group
+						</button>
+					{:else if type === 'group'}
+						<button 
+							class="py-1.5 px-3 text-[11px] bg-rose-500 hover:bg-rose-600 text-white rounded transition-colors font-medium"
+							on:click={ungroupSelectedElements}
+						>
+							Ungroup
+						</button>
+					{:else}
+						<span class="text-[10px] text-gray-400">Shift+click to multi-select</span>
+					{/if}
+				</div>
+			</div>
+
+			<div class="pt-4 border-t-[2px] border-gray-900">
+				<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Layer Arrangement</label>
 				<div class="flex items-center justify-between gap-2">
 					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border border-gray-200 flex-1"
+						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
 						title="Bring to Front"
 						on:click={bringToFront}
 					>
 						<i class="fa fa-angle-double-up"></i>
 					</button>
 					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border border-gray-200 flex-1"
+						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
 						title="Bring Forward"
 						on:click={bringForward}
 					>
 						<i class="fa fa-angle-up"></i>
 					</button>
 					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border border-gray-200 flex-1"
+						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
 						title="Send Backward"
 						on:click={sendBackwards}
 					>
 						<i class="fa fa-angle-down"></i>
 					</button>
 					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border border-gray-200 flex-1"
+						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
 						title="Send to Back"
 						on:click={sendToBack}
 					>
@@ -3756,10 +4140,10 @@
 			</div>
 
 			<div>
-				<label class="block text-xs font-medium text-gray-700 mb-1">
+				<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
 					Presets
 					<select 
-						class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black mt-1"
+						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 mt-1"
 						on:change={(e) => {
 							const [w, h] = e.target.value.split('x');
 							if (w && h && $editor) {
@@ -3781,11 +4165,11 @@
 
 			<div class="grid grid-cols-2 gap-2">
 				<div>
-					<label class="block text-xs font-medium text-gray-700 mb-1">
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
 						Width
 						<input
 							type="number"
-							class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black mt-1"
+							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 mt-1"
 							value={$editor ? $editor.width : 0}
 							on:change={(e) => {
 								if ($editor) {
@@ -3796,11 +4180,11 @@
 					</label>
 				</div>
 				<div>
-					<label class="block text-xs font-medium text-gray-700 mb-1">
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
 						Height
 						<input
 							type="number"
-							class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black mt-1"
+							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 mt-1"
 							value={$editor ? $editor.height : 0}
 							on:change={(e) => {
 								if ($editor) {
