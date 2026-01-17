@@ -34,6 +34,7 @@
 		"@codemirror/lang-html": "^6.4.9",
 		"@codemirror/theme-one-dark": "^6.1.2",
 		"@codemirror/view": "^6.36.2",
+		"dompurify": "^3.3.1",
 		"fabric": "^6.9.0",
 		"github-markdown-css": "^5.6.1",
 		"hast-util-to-html": "^9.0.1",

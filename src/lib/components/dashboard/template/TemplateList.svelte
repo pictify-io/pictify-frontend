@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { createEventDispatcher } from 'svelte';
+	import DOMPurify from 'dompurify';
 	
 	export let templates;
 	export let pagination = { page: 1, limit: 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false };
@@ -118,10 +119,19 @@
 		
 		const bgColor = fabricData.background || '#ffffff';
 		
-		return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + 
+		return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height +
 			'" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">' +
 			'<rect width="' + width + '" height="' + height + '" fill="' + bgColor + '"/>' +
 			svgElements.join('') + '</svg>';
+	};
+
+	// Sanitize SVG preview to prevent XSS attacks
+	const sanitizedPreview = (template) => {
+		const svg = generateSvgPreview(template);
+		if (!svg) return null;
+		return DOMPurify.sanitize(svg, {
+			USE_PROFILES: { svg: true }
+		});
 	};
 
 	// Get dimension label
@@ -260,9 +270,9 @@
 								class="w-full h-full object-contain drop-shadow-lg"
 								loading="lazy"
 							/>
-						{:else if generateSvgPreview(template)}
+						{:else if sanitizedPreview(template)}
 							<div class="w-full h-full drop-shadow-lg">
-								{@html generateSvgPreview(template)}
+								{@html sanitizedPreview(template)}
 							</div>
 						{:else}
 							<div class="flex flex-col items-center justify-center w-full h-full text-gray-300">
@@ -276,9 +286,30 @@
 
 				<!-- Hover Overlay Actions -->
 				<div class="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/10 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-					<button class="bg-[#ffc480] text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_#000] transition-all transform translate-y-4 group-hover:translate-y-0">
-						Edit Template
-					</button>
+					<div class="flex flex-col gap-2">
+						<button
+							class="bg-[#ffc480] text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] transition-all transform translate-y-4 group-hover:translate-y-0"
+							on:click|stopPropagation={() => handleTemplateClick(template)}
+						>
+							Edit
+						</button>
+						<div class="flex gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all delay-75">
+							<button
+								class="bg-[#4ecdc4] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
+								on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
+								title="Render with variables"
+							>
+								Render
+							</button>
+							<button
+								class="bg-[#a855f7] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
+								on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
+								title="Deploy as dynamic asset"
+							>
+								Dynamic
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 			
