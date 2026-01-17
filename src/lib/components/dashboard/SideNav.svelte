@@ -10,27 +10,26 @@
 
 	let isMediaListExpanded = false;
 	let isPaidPlan = false;
-	let currentPath = '';
 
 	function toggleMediaList() {
 		isMediaListExpanded = !isMediaListExpanded;
 	}
 
 	let unsubscribe = () => {};
-	let unsubscribePage = () => {};
+
+	// Reactive statement to auto-expand media list when on a media sub-route
+	$: if ($page.url.pathname.startsWith('/dashboard/media/')) {
+		isMediaListExpanded = true;
+	}
 
 	onMount(async () => {
 		unsubscribe = user.subscribe((u) => {
 			isPaidPlan = u.currentPlan !== 'starter' && u.currentPlan !== 'free';
 		});
-		unsubscribePage = page.subscribe((p) => {
-			currentPath = p.url.pathname;
-		});
 	});
 
 	onDestroy(() => {
 		unsubscribe();
-		unsubscribePage();
 	});
 
 	async function gotoPaymentPortal() {
@@ -45,97 +44,103 @@
 		logoutAction();
 		goto('/');
 	}
-
-	function isActive(path) {
-		return currentPath === path || currentPath.startsWith(path + '/');
-	}
 </script>
 
-<div class="flex flex-col h-full bg-[#FFFDF8] w-64 border-r-[3px] border-gray-900 relative overflow-hidden">
-	
+<div class="flex flex-col h-full bg-[#FFFDF8] w-full border-r-[3px] border-gray-900 relative overflow-hidden">
+
 	<!-- Navigation -->
 	<div class="flex-1 overflow-y-auto py-6 px-3 relative z-10 scrollbar-hide">
-		
+
 		<nav class="space-y-2">
 			<!-- Templates -->
 			<a
 				href="/dashboard/template"
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive('/dashboard/template') 
-						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]' 
+					{$page.url.pathname === '/dashboard/template' || $page.url.pathname.startsWith('/dashboard/template/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
-				<svg class="w-5 h-5 mr-3 {isActive('/dashboard/template') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/template' || $page.url.pathname.startsWith('/dashboard/template/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
 				</svg>
-				Templates
+				<span>Templates</span>
 			</a>
 
 			<!-- Brand Assets -->
 			<a
 				href="/dashboard/brand-assets"
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive('/dashboard/brand-assets') 
-						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]' 
+					{$page.url.pathname === '/dashboard/brand-assets' || $page.url.pathname.startsWith('/dashboard/brand-assets/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
-				<svg class="w-5 h-5 mr-3 {isActive('/dashboard/brand-assets') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/brand-assets' || $page.url.pathname.startsWith('/dashboard/brand-assets/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
 				</svg>
-				Brand Assets
+				<span>Brand Assets</span>
 			</a>
 
 			<!-- Created Media Section -->
-			<div class="relative">
-				<button
-					on:click={toggleMediaList}
-					class="w-full group relative flex items-center justify-between px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-						{isActive('/dashboard/media') 
-							? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]' 
-							: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-				>
-					<div class="flex items-center">
-						<svg class="w-5 h-5 mr-3 {isActive('/dashboard/media') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-						</svg>
-						Generated Media
-					</div>
-					<div class="rounded p-0.5 transition-colors">
-						<svg
-							class="w-4 h-4 transform transition-transform duration-200 text-gray-500 group-hover:text-gray-900"
-							class:rotate-180={isMediaListExpanded}
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-						</svg>
-					</div>
-				</button>
+				<!-- Expanded state: Dropdown -->
+				<div class="relative">
+					<button
+						on:click={toggleMediaList}
+						class="w-full group relative flex items-center justify-between px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+							{$page.url.pathname.startsWith('/dashboard/media')
+								? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+								: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+					>
+						<div class="flex items-center">
+							<svg class="w-5 h-5 mr-3 {$page.url.pathname.startsWith('/dashboard/media') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+							</svg>
+							<span>Generated Media</span>
+						</div>
+						<div class="rounded p-0.5 transition-colors">
+							<svg
+								class="w-4 h-4 transform transition-transform duration-200 {$page.url.pathname.startsWith('/dashboard/media') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}"
+								class:rotate-180={isMediaListExpanded}
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+							</svg>
+						</div>
+					</button>
 
-				{#if isMediaListExpanded}
-					<div class="mt-1 ml-4 space-y-1 pl-4 border-l-2 border-gray-200">
-						<a
-							href="/dashboard/media/images"
-							class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
-								{isActive('/dashboard/media/images') 
-									? 'text-gray-900 bg-gray-100' 
-									: 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}"
-						>
-							Images
-						</a>
-						<a
-							href="/dashboard/media/gifs"
-							class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
-								{isActive('/dashboard/media/gifs') 
-									? 'text-gray-900 bg-gray-100' 
-									: 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}"
-						>
-							GIFs
-						</a>
-					</div>
-				{/if}
-			</div>
+					{#if isMediaListExpanded}
+						<div class="mt-1 ml-4 space-y-1 pl-4 border-l-2 border-gray-200">
+							<a
+								href="/dashboard/media/images"
+								class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
+									{$page.url.pathname === '/dashboard/media/images'
+										? 'text-gray-900 bg-gray-100'
+										: 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}"
+							>
+								Images
+							</a>
+							<a
+								href="/dashboard/media/gifs"
+								class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
+									{$page.url.pathname === '/dashboard/media/gifs'
+										? 'text-gray-900 bg-gray-100'
+										: 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}"
+							>
+								GIFs
+							</a>
+							<a
+								href="/dashboard/media/pdfs"
+								class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
+									{$page.url.pathname === '/dashboard/media/pdfs'
+										? 'text-gray-900 bg-gray-100'
+										: 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}"
+							>
+								PDFs
+							</a>
+						</div>
+					{/if}
+				</div>
 
 			<!-- Divider -->
 			<div class="h-[2px] bg-gray-200 my-4 mx-4"></div>
@@ -144,68 +149,68 @@
 			<a
 				href="/dashboard/api-playground"
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive('/dashboard/api-playground') 
-						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]' 
+					{$page.url.pathname === '/dashboard/api-playground' || $page.url.pathname.startsWith('/dashboard/api-playground/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
-				<svg class="w-5 h-5 mr-3 {isActive('/dashboard/api-playground') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/api-playground' || $page.url.pathname.startsWith('/dashboard/api-playground/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
 				</svg>
-				API Playground
+				<span>API Playground</span>
 			</a>
 
 			<!-- API Usage -->
 			<a
 				href="/dashboard/api-token"
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive('/dashboard/api-token') 
-						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]' 
+					{$page.url.pathname === '/dashboard/api-token' || $page.url.pathname.startsWith('/dashboard/api-token/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
-				<svg class="w-5 h-5 mr-3 {isActive('/dashboard/api-token') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/api-token' || $page.url.pathname.startsWith('/dashboard/api-token/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
 				</svg>
-				API Usage
+				<span>API Usage</span>
 			</a>
 
 			<!-- Activity Logs -->
 			<a
 				href="/dashboard/activity-logs"
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive('/dashboard/activity-logs') 
-						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]' 
+					{$page.url.pathname === '/dashboard/activity-logs' || $page.url.pathname.startsWith('/dashboard/activity-logs/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
-				<svg class="w-5 h-5 mr-3 {isActive('/dashboard/activity-logs') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/activity-logs' || $page.url.pathname.startsWith('/dashboard/activity-logs/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
 				</svg>
-				Activity Logs
+				<span>Activity Logs</span>
 			</a>
 		</nav>
 
 		<!-- Support Section -->
-		<div class="mt-8 space-y-1 px-2">
-			<a
-				href={PUBLIC_DOCS_URL}
-				target="_blank"
-				class="flex items-center px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wide hover:text-gray-900 transition-colors"
-			>
-				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-				</svg>
-				Documentation
-			</a>
-			<a
-				href="https://status.pictify.io"
-				target="_blank"
-				class="flex items-center px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wide hover:text-gray-900 transition-colors"
-			>
-				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"/>
-				</svg>
-				System Status
-			</a>
-		</div>
+			<div class="mt-8 space-y-1 px-2">
+				<a
+					href={PUBLIC_DOCS_URL}
+					target="_blank"
+					class="flex items-center px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wide hover:text-gray-900 transition-colors"
+				>
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+					</svg>
+					Documentation
+				</a>
+				<a
+					href="https://status.pictify.io"
+					target="_blank"
+					class="flex items-center px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wide hover:text-gray-900 transition-colors"
+				>
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"/>
+					</svg>
+					System Status
+				</a>
+			</div>
 
 	</div>
 
@@ -233,7 +238,7 @@
 			<svg class="w-4 h-4 mr-2 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
 			</svg>
-			Disconnect
+			<span>Disconnect</span>
 		</button>
 	</div>
 </div>

@@ -202,13 +202,17 @@ export const ALLOWED_FILE_TYPES = {
 	logo: ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
 	image: ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif'],
 	icon: ['.png', '.svg', '.webp'],
-	font: ['.ttf', '.otf', '.woff', '.woff2']
+	font: ['.ttf', '.otf', '.woff', '.woff2', '.eot']
 };
 
 /**
  * Get accept string for file input
  */
 export function getAcceptString(assetType) {
+	// For fonts, include both extensions and MIME types for better browser support
+	if (assetType === 'font') {
+		return '.ttf,.otf,.woff,.woff2,.eot,font/*,application/x-font-*,application/font-*,application/octet-stream';
+	}
 	return ALLOWED_FILE_TYPES[assetType]?.join(',') || 'image/*';
 }
 

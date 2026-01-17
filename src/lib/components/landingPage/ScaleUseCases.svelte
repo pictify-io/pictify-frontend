@@ -123,9 +123,9 @@
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template. <br />
-				<span class="relative inline-block text-gray-900">
+				<span class="relative inline-block text-[#ff6b6b]">
 					Million Variations.
-					<svg class="absolute w-full h-3 -bottom-1 left-0 text-[#ff6b6b]" viewBox="0 0 100 10" preserveAspectRatio="none">
+					<svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
 					</svg>
 				</span>
@@ -148,7 +148,7 @@
 						tabindex="0"
 					>
 						<div class="absolute inset-0 bg-gray-900 rounded-xl translate-x-1.5 translate-y-1.5 transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
-						<div class="relative p-6 rounded-xl border-[3px] border-gray-900 transition-all duration-200 flex items-start gap-4
+						<div class="relative p-6 rounded-xl border-[3px] border-gray-900 transition-all duration-200 flex items-start gap-4 shadow-[4px_4px_0_0_#000]
 							{activeUseCase === i ? `${useCase.color} -translate-y-1 -translate-x-1` : 'bg-white hover:-translate-y-0.5 hover:-translate-x-0.5'}">
 							
 							<div class="w-6 h-6 mt-1">{@html useCase.icon}</div>
@@ -170,7 +170,7 @@
 
 			<!-- Right: Dynamic Gallery -->
 			<div class="lg:col-span-8 relative perspective-1000 order-1 lg:order-2 mb-12 lg:mb-0 h-full flex items-center">
-				<div class="relative h-[500px] w-full flex items-center justify-center">
+				<div class="relative h-[400px] md:h-[500px] w-full flex items-center justify-center">
 					
 					<!-- The "Master" Template Card -->
 					{#key activeUseCase}
@@ -178,7 +178,7 @@
 							in:fly={{ y: 20, duration: 500 }}
 							class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-20"
 						>
-							<div class="bg-white rounded-2xl border-[4px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] overflow-hidden relative group">
+							<div class="bg-white rounded-2xl border-[4px] border-gray-900 shadow-[16px_16px_0_0_#1f2937] overflow-hidden relative group transform transition-transform duration-500 hover:scale-[1.02]">
 								<!-- Browser Header -->
 								<div class="h-8 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-3 gap-2 justify-between">
 									<div class="flex gap-2">

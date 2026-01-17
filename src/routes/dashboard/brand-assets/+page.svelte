@@ -216,100 +216,89 @@
 	});
 </script>
 
-<div class="min-h-full p-6 md:p-10 bg-[#FFFDF8] relative overflow-hidden">
-	<!-- Background Grid -->
-	<div class="absolute inset-0 opacity-5 pointer-events-none" 
-		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
-	</div>
-
-	<div class="max-w-7xl mx-auto relative z-10">
+<section class="min-h-full">
+	<div>
 		<!-- Page Header -->
-		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
 			<div>
 				<div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3">
 					<span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse"></span>
 					Asset Vault
 				</div>
-				<h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
 					Brand <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Assets</span>
 				</h1>
 			</div>
 			
 			<!-- Stats / Plan -->
-			<div class="flex items-center gap-8">
-				<div class="text-right hidden md:block">
-					<div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Assets</div>
-					<div class="text-xl font-black text-gray-900 tabular-nums">{pagination.total || 0}</div>
+			<div class="flex items-center gap-4 sm:gap-6 md:gap-8">
+				<div class="text-right">
+					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Total Assets</div>
+					<div class="text-lg sm:text-xl font-black text-gray-900 tabular-nums">{pagination.total || 0}</div>
 				</div>
-				<div class="text-right hidden md:block border-l-2 border-gray-200 pl-8">
-					<div class="text-xs font-bold text-gray-500 uppercase tracking-wider">Current Plan</div>
-					<div class="text-xl font-black text-gray-900 uppercase">{currentPlan || 'Starter'}</div>
+				<div class="text-right border-l-2 border-gray-200 pl-4 sm:pl-6 md:pl-8">
+					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Current Plan</div>
+					<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">{currentPlan || 'Starter'}</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- Action Bar -->
-		<div class="bg-white rounded-2xl border-[3px] border-gray-900 p-4 mb-8 shadow-[8px_8px_0_0_#1f2937] flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-			<!-- Filter Tabs -->
-			<div class="flex flex-wrap gap-2">
+		<!-- Filter Tabs and Actions -->
+		<div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
+			<button
+				on:click={() => loadAssets(null)}
+				class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all
+				{selectedType === null
+					? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
+					: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+			>
+				All
+			</button>
+			{#each ASSET_TYPES as type}
 				<button
-					on:click={() => loadAssets(null)}
-					class="px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wide border-2 transition-all
-					{selectedType === null 
-						? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#1f2937]' 
-						: 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
+					on:click={() => loadAssets(type)}
+					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
+					{selectedType === type
+						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
 				>
-					All
+					{ASSET_TYPE_LABELS[type]}s
+					<span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold ml-1">
+						{counts[type] || 0}
+					</span>
 				</button>
-				{#each ASSET_TYPES as type}
-					<button
-						on:click={() => loadAssets(type)}
-						class="px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wide border-2 transition-all flex items-center gap-2
-						{selectedType === type 
-							? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#1f2937]' 
-							: 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
-					>
-						{ASSET_TYPE_LABELS[type]}s 
-						<span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold ml-1 border border-gray-200">
-							{counts[type] || 0}
-						</span>
-					</button>
-				{/each}
-			</div>
+			{/each}
 
-			<!-- Upload Actions -->
-			<div class="flex flex-wrap gap-3 w-full lg:w-auto">
-				<div class="h-8 w-px bg-gray-200 hidden lg:block"></div>
-				
-				<button
-					on:click={() => openUploadModal('logo')}
-					class="flex-1 lg:flex-none px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all flex items-center justify-center gap-2"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-					Logo
-				</button>
-				<button
-					on:click={openColorModal}
-					class="flex-1 lg:flex-none px-4 py-2 bg-[#4ade80] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all flex items-center justify-center gap-2"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-					Color
-				</button>
-				<button
-					on:click={() => openUploadModal('font')}
-					class="flex-1 lg:flex-none px-4 py-2 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all flex items-center justify-center gap-2"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
-					Font
-				</button>
-				<button
-					on:click={() => openUploadModal('image')}
-					class="flex-1 lg:flex-none px-4 py-2 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all flex items-center justify-center gap-2"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-					Image
-				</button>
-			</div>
+			<div class="flex-grow"></div>
+
+			<button
+				on:click={() => openUploadModal('logo')}
+				class="px-4 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+				Logo
+			</button>
+			<button
+				on:click={openColorModal}
+				class="px-4 py-2.5 bg-[#4ade80] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+				Color
+			</button>
+			<button
+				on:click={() => openUploadModal('font')}
+				class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+				Font
+			</button>
+			<button
+				on:click={() => openUploadModal('image')}
+				class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+				Image
+			</button>
 		</div>
 
 		<!-- Bulk Actions (Conditional) -->
@@ -451,7 +440,7 @@
 			{/if}
 		</div>
 	</div>
-</div>
+</section>
 
 <!-- Modals share the same design language -->
 {#if showUploadModal}
@@ -505,7 +494,7 @@
 								<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Drop file or click</p>
 								<p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wider">
 									{#if uploadType === 'font'}
-										TTF, OTF, WOFF (Max 5MB)
+										TTF, OTF, WOFF, WOFF2, EOT (Max 5MB)
 									{:else}
 										PNG, JPG, SVG (Max 10MB)
 									{/if}

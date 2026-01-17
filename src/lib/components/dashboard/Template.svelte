@@ -11,6 +11,7 @@
 	} from '../../../store/template.store';
 	import TemplateList from '$lib/components/dashboard/template/TemplateList.svelte';
 	import EmptyTemplate from '$lib/components/dashboard/template/EmptyTemplate.svelte';
+	import TemplateTypeSelector from '$lib/components/editor/TemplateTypeSelector.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 
 	let unsubscribeTemplates = () => {};
@@ -23,6 +24,8 @@
 	let searchQuery = '';
 	let searchTimeout;
 	let currentPlan = '';
+	let formatFilter = 'all'; // Backend-driven filter: 'all', 'image', 'pdf'
+	let showTemplateTypeSelector = false;
 
 	// Search Logic
 	const handleSearchInput = (event) => {
@@ -35,19 +38,46 @@
 			if (query) {
 				await searchTemplatesAction(query, { page: 1, limit: 12 });
 			} else {
-				await getTemplatesAction({ page: 1, limit: 12 });
+				await getTemplatesAction({ page: 1, limit: 12, outputFormat: formatFilter });
 			}
 			isLoading = false;
 		}, 300);
 	};
 
-	const openTemplateCreator = () => {
-		const url = '/template-workspace/create';
-		if (browser) {
-			window.open(url, '_blank', 'noopener,noreferrer');
+	// Handle format filter change from TemplateList
+	const handleFilterChange = async (event) => {
+		const newFilter = event.detail;
+		formatFilter = newFilter;
+		isLoading = true;
+		
+		// Reset to page 1 when filter changes
+		if (searchQuery) {
+			// For now, search doesn't support outputFormat - just refetch
+			await searchTemplatesAction(searchQuery, { page: 1, limit: 12 });
 		} else {
-			goto(url);
+			await getTemplatesAction({ page: 1, limit: 12, outputFormat: newFilter });
 		}
+		
+		isLoading = false;
+	};
+
+	const openTemplateCreator = () => {
+		showTemplateTypeSelector = true;
+	};
+
+	const handleFormatSelect = (event) => {
+		const { outputFormat } = event.detail;
+		showTemplateTypeSelector = false;
+		
+		if (outputFormat === 'pdf') {
+			goto('/template-workspace/pdf/create');
+		} else {
+			goto('/template-workspace/image/create');
+		}
+	};
+
+	const handleCloseSelector = () => {
+		showTemplateTypeSelector = false;
 	};
 
 	const handlePageChange = async (event) => {
@@ -57,7 +87,7 @@
 		if (searchQuery) {
 			await searchTemplatesAction(searchQuery, { page: newPage, limit: 12 });
 		} else {
-			await getTemplatesAction({ page: newPage, limit: 12 });
+			await getTemplatesAction({ page: newPage, limit: 12, outputFormat: formatFilter });
 		}
 		
 		isLoading = false;
@@ -88,19 +118,14 @@
 	});
 </script>
 
-<section class="min-h-full p-4 sm:p-6 md:p-10 bg-[#FFFDF8] relative overflow-hidden">
-	<!-- Background Grid -->
-	<div class="absolute inset-0 opacity-5 pointer-events-none" 
-		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
-	</div>
-
-	<div class="max-w-7xl mx-auto relative z-10">
+<section class="min-h-full">
+	<div>
 		
 		<!-- Page Header -->
-		<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
+		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
 			<div>
-				<div class="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3">
-					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse"></span>
+				<div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3">
+					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse"></span>
 					Design Studio
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -183,10 +208,20 @@
 			{:else if templateList.length > 0}
 				<TemplateList 
 					templates={templateList} 
-					{pagination} 
-					on:pageChange={handlePageChange} 
+					{pagination}
+					{formatFilter}
+					on:pageChange={handlePageChange}
+					on:filterChange={handleFilterChange}
 				/>
 			{/if}
 		</div>
 	</div>
+
+	{#if showTemplateTypeSelector}
+		<TemplateTypeSelector 
+			on:select={handleFormatSelect} 
+			on:close={handleCloseSelector} 
+		/>
+	{/if}
 </section>
+```

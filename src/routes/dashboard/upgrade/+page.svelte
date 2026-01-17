@@ -83,17 +83,18 @@
 	<title>Upgrade Plan - Pictify.io</title>
 </svelte:head>
 
-<div class="w-full bg-[#FFFDF8]">
-	<div class="max-w-5xl mx-auto px-4 py-6">
+<div>
+	<div>
 		<!-- Header -->
-		<div class="text-center mb-6">
-			<div class="inline-flex items-center justify-center w-12 h-12 bg-[#ffc480] rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] mb-3">
-				<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-				</svg>
+		<div class="mb-8 sm:mb-12">
+			<div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3">
+				<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse"></span>
+				Pricing Plans
 			</div>
-			<h1 class="text-2xl font-bold text-gray-900 mb-1">Upgrade Your Plan</h1>
-			<p class="text-sm text-gray-600">Unlock more renders, AI generations, and features</p>
+			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-2">
+				Upgrade Your <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Plan</span>
+			</h1>
+			<p class="text-gray-600 font-medium">Unlock more renders, AI generations, and features</p>
 		</div>
 
 		{#if isLoading}

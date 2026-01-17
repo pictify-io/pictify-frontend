@@ -175,6 +175,35 @@ export const useCaseDetails = {
 	'html-email': {
 		label: 'HTML Email to Image',
 		description: 'Capture pixel-perfect email previews and share or archive them as static images.',
+		seoKeywords: [
+			'HTML email to image',
+			'email screenshot generator',
+			'convert email to image',
+			'email preview image',
+			'email template screenshot',
+			'email campaign preview',
+			'email design preview tool',
+			'email HTML renderer',
+			'email to PNG converter',
+			'email marketing preview'
+		],
+		longDescription: `Converting HTML emails to images is essential for email marketing teams who need to share 
+			campaign previews with stakeholders, archive email designs, or showcase their work on social media. 
+			Traditional screenshot methods produce inconsistent results across different devices, browsers, and 
+			operating systems. Web fonts may not render correctly, and responsive layouts often break. With Pictify's 
+			HTML email to image converter, you render your email HTML exactly as it will appear in the inbox, 
+			producing a high-fidelity PNG or JPG image. This is invaluable for client approvals, design portfolios, 
+			A/B testing documentation, and compliance archives. The API integration allows you to automate email 
+			preview generation as part of your campaign workflow, generating images programmatically whenever 
+			a new email is ready for review.`,
+		useCaseScenarios: [
+			'Marketing teams sharing campaign previews with clients before launch',
+			'Agencies building email design portfolios for prospective clients',
+			'Compliance teams archiving marketing communications for audits',
+			'QA engineers documenting email rendering across different scenarios',
+			'Product teams creating email template galleries for internal documentation',
+			'Designers showcasing email work on Dribbble, Behance, or LinkedIn'
+		],
 		recommendedFormats: ['png', 'jpg'],
 		recommendedSizes: ['1200x630', '1080x1920'],
 		templateHtml: `<html>
@@ -232,13 +261,43 @@ export const useCaseDetails = {
 		],
 		faqs: [
 			{ q: 'Can I show both desktop and mobile previews?', a: 'Yes. Render once at 1200×630 for desktop, then switch to 1080×1920 for mobile. Each conversion produces a CDN-hosted image you can share immediately.' },
-			{ q: 'Will custom fonts and background images render?', a: 'As long as the HTML references publicly accessible assets, Pictify reproduces them. For best results, host fonts and images on a CDN.' }
+			{ q: 'Will custom fonts and background images render?', a: 'As long as the HTML references publicly accessible assets, Pictify reproduces them. For best results, host fonts and images on a CDN.' },
+			{ q: 'Can I automate email previews with the API?', a: 'Absolutely. Use the Pictify API to generate email preview images programmatically whenever a campaign is ready for review. Integrate with your email platform webhooks for fully automated workflows.' },
+			{ q: 'What email service providers are supported?', a: 'Any ESP that exports HTML works — Mailchimp, Klaviyo, Braze, HubSpot, SendGrid, Campaign Monitor, and more. Simply export the email HTML and paste it into Pictify.' }
 		],
 		related: ['table', 'markdown']
 	},
 	'table': {
 		label: 'HTML Table to Image',
 		description: 'Turn dashboards and reports into shareable images without screenshot tools.',
+		seoKeywords: [
+			'HTML table to image',
+			'table screenshot generator',
+			'convert table to image',
+			'dashboard to image',
+			'data table image generator',
+			'report screenshot tool',
+			'table to PNG converter',
+			'spreadsheet to image',
+			'KPI dashboard image',
+			'data visualization image'
+		],
+		longDescription: `Business intelligence and analytics teams constantly need to share data tables and 
+			dashboards outside their analytics tools. Traditional methods like screenshots produce blurry images, 
+			especially with small fonts. Exporting to PDF often strips custom styling and breaks layouts. 
+			Pictify's HTML table to image converter renders your styled tables exactly as designed, producing 
+			crisp, professional images perfect for slide decks, Notion wikis, Slack updates, and executive reports. 
+			Tables with alternating row colors, custom fonts, and complex layouts all render perfectly. Use our 
+			API to automate weekly report generation, creating fresh dashboard snapshots every Monday for 
+			stakeholder distribution.`,
+		useCaseScenarios: [
+			'Data teams generating weekly KPI snapshots for executive updates',
+			'BI analysts embedding dashboard views in Confluence or Notion',
+			'Sales ops sharing pipeline reports without granting CRM access',
+			'Finance teams creating audit-ready financial statement images',
+			'Product managers distributing usage metrics in slide decks',
+			'Marketing teams visualizing campaign performance for stakeholders'
+		],
 		recommendedFormats: ['png', 'webp'],
 		recommendedSizes: ['1200x630', '1920x1080'],
 		templateHtml: `<html>
@@ -320,13 +379,41 @@ export const useCaseDetails = {
 		],
 		faqs: [
 			{ q: 'Can I render tables wider than 1920px?', a: 'Yes. Increase the custom canvas size before generating the image. Pictify supports up to 4000×4000 pixels.' },
-			{ q: 'Do sticky headers or alternating row colors work?', a: 'Any CSS that is supported by Chromium will display. Inline the relevant CSS to ensure consistent output.' }
+			{ q: 'Do sticky headers or alternating row colors work?', a: 'Any CSS that is supported by Chromium will display. Inline the relevant CSS to ensure consistent output.' },
+			{ q: 'Can I automate weekly dashboard images?', a: 'Absolutely. Use the Pictify API to render table snapshots on a schedule. Combine with your BI tool exports for fully automated reporting.' },
+			{ q: 'What about charts and graphs?', a: 'If your charts render as HTML/SVG, Pictify will capture them. For canvas-based charts, export as SVG first or use our chart element in the editor.' }
 		],
 		related: ['html-email', 'code']
 	},
 	'markdown': {
 		label: 'Markdown to Image',
 		description: 'Render Markdown content as polished images for social posts or documentation.',
+		seoKeywords: [
+			'Markdown to image',
+			'convert Markdown to image',
+			'Markdown screenshot generator',
+			'README to image',
+			'Markdown social image',
+			'code snippet to image',
+			'release notes image',
+			'documentation to image',
+			'Markdown PNG converter',
+			'developer social images'
+		],
+		longDescription: `Developers and technical writers regularly need to share Markdown content on platforms 
+			that require or prefer images—Twitter, LinkedIn, Instagram, and internal wikis. Traditional screenshots 
+			capture browser chrome and create inconsistent visuals. With Pictify's Markdown to image converter, 
+			you render your Markdown as beautifully styled HTML and convert it directly to a crisp, shareable image. 
+			Perfect for changelogs, README highlights, code tutorials, and release announcements. Use dark mode 
+			themes, syntax highlighting, and custom fonts to match your brand.`,
+		useCaseScenarios: [
+			'Developer advocates sharing code snippets on Twitter/X',
+			'Open source maintainers creating README preview images',
+			'DevRel teams generating release notes social cards',
+			'Technical writers creating documentation thumbnails',
+			'Engineering teams sharing changelog updates internally',
+			'Indie hackers promoting their projects on social media'
+		],
 		recommendedFormats: ['png', 'jpg'],
 		recommendedSizes: ['1200x630', '1080x1080'],
 		templateHtml: `<html>
@@ -389,6 +476,32 @@ await createImage({
 	'certificate': {
 		label: 'Certificate from HTML',
 		description: 'Generate personalized certificates as downloadable images for events and courses.',
+		seoKeywords: [
+			'certificate generator',
+			'create certificates online',
+			'HTML to certificate',
+			'automated certificate generation',
+			'bulk certificate maker',
+			'certificate template generator',
+			'online certificate creator',
+			'certificate of completion generator',
+			'certificate image generator',
+			'custom certificate maker'
+		],
+		longDescription: `Creating professional certificates at scale is a common challenge for educational platforms, 
+			HR teams, and event organizers. Traditional design tools require manual effort for each certificate, 
+			making it impractical when you need to generate hundreds or thousands of certificates. With Pictify's 
+			certificate generator, you design your certificate template once using HTML/CSS, bind dynamic variables 
+			like recipient name, course name, and completion date, then generate certificates programmatically via 
+			API. This automation saves hours of manual work and ensures consistent branding across all certificates.`,
+		useCaseScenarios: [
+			'Online courses issuing completion certificates to students',
+			'HR departments creating employee recognition certificates',
+			'Conference organizers generating attendee certificates',
+			'Training platforms automating certification upon assessment completion',
+			'Professional associations issuing membership certificates',
+			'Webinar hosts providing attendance certificates'
+		],
 		recommendedFormats: ['jpg', 'png'],
 		recommendedSizes: ['1920x1080'],
 		templateHtml: `<html>
@@ -454,6 +567,32 @@ await createImage({
 	'code': {
 		label: 'Code to Image',
 		description: 'Share beautiful code snippets with syntax highlighting in seconds.',
+		seoKeywords: [
+			'code to image',
+			'code screenshot generator',
+			'code snippet image',
+			'syntax highlighting image',
+			'carbon alternative',
+			'code to PNG',
+			'beautiful code screenshots',
+			'code image generator',
+			'share code on Twitter',
+			'developer code snippets'
+		],
+		longDescription: `Sharing code on social media, documentation, and presentations requires beautiful, readable 
+			images with proper syntax highlighting. Screenshots of editors look unprofessional with interface elements. 
+			Pictify's code to image converter renders your code with beautiful themes, proper syntax highlighting, 
+			and custom styling—perfect for Twitter threads, blog posts, slide decks, and tutorials. Choose from multiple 
+			color schemes, customize window frames, and generate consistent code images via API for your documentation 
+			workflow.`,
+		useCaseScenarios: [
+			'Developers sharing code tips on Twitter/X and LinkedIn',
+			'Technical bloggers creating code illustrations for articles',
+			'Educators preparing slides with code examples',
+			'Open source maintainers showcasing code in READMEs',
+			'DevRel teams creating tutorial graphics',
+			'Documentation authors embedding code visuals'
+		],
 		recommendedFormats: ['png', 'jpg'],
 		recommendedSizes: ['1200x630', '1080x1080'],
 		templateHtml: `<html>
@@ -520,6 +659,31 @@ await createImage({
 	'receipt': {
 		label: 'Receipt Generator',
 		description: 'Generate branded receipts as images for emails, downloads, and customer portals.',
+		seoKeywords: [
+			'receipt generator',
+			'create receipts online',
+			'receipt image generator',
+			'digital receipt maker',
+			'branded receipt template',
+			'automated receipt generation',
+			'e-receipt generator',
+			'order receipt image',
+			'invoice image generator',
+			'payment receipt maker'
+		],
+		longDescription: `E-commerce platforms, subscription services, and marketplaces need to send professional 
+			receipts to customers. PDF receipts can be heavy and inconsistent across email clients. Image receipts 
+			are lightweight, display perfectly in any email, and can be easily saved or shared. With Pictify's 
+			receipt generator, you design your receipt template with your brand styling, bind order data like 
+			items, prices, and totals, then generate receipt images via API whenever an order completes.`,
+		useCaseScenarios: [
+			'E-commerce stores sending order confirmation emails',
+			'Subscription services providing payment receipts',
+			'Payment processors generating transaction records',
+			'Marketplaces issuing receipts to buyers and sellers',
+			'Event ticketing platforms confirming purchases',
+			'SaaS companies providing invoice images for customers'
+		],
 		recommendedFormats: ['png', 'jpg'],
 		recommendedSizes: ['800x1200', '1080x1350'],
 		templateHtml: simpleCardTemplate({
@@ -548,6 +712,31 @@ await createImage({
 	'badge': {
 		label: 'Badge Generator',
 		description: 'Generate achievement badges, labels, and milestones as shareable images.',
+		seoKeywords: [
+			'badge generator',
+			'achievement badge maker',
+			'digital badge creator',
+			'gamification badges',
+			'milestone badge image',
+			'skill badge generator',
+			'credly alternative',
+			'badge image creator',
+			'certification badge maker',
+			'custom badge generator'
+		],
+		longDescription: `Gamification and recognition programs use badges to celebrate achievements, skills, and 
+			milestones. Users love sharing their badges on LinkedIn and social media. With Pictify's badge 
+			generator, you design beautiful badge templates with your brand styling, bind achievement data like 
+			badge name, user name, and date earned, then generate shareable badge images via API. Perfect for 
+			learning platforms, fitness apps, developer communities, and any product with achievement systems.`,
+		useCaseScenarios: [
+			'Learning platforms issuing skill completion badges',
+			'Developer communities awarding contribution badges',
+			'Fitness apps celebrating milestone achievements',
+			'Employee recognition programs creating award badges',
+			'Gaming platforms generating achievement unlocks',
+			'Professional certification bodies issuing digital credentials'
+		],
 		recommendedFormats: ['png', 'webp'],
 		recommendedSizes: ['1080x1080', '1200x630'],
 		templateHtml: simpleCardTemplate({
@@ -803,6 +992,31 @@ await createImage({
 	'leaderboard': {
 		label: 'Leaderboard Card',
 		description: 'Generate leaderboard snapshots for communities, contests, and gamification.',
+		seoKeywords: [
+			'leaderboard generator',
+			'leaderboard image maker',
+			'ranking card generator',
+			'gamification leaderboard',
+			'competition leaderboard image',
+			'contest ranking image',
+			'top players image',
+			'leaderboard snapshot',
+			'community ranking card',
+			'gaming leaderboard maker'
+		],
+		longDescription: `Gaming platforms, developer communities, and gamified products need to share leaderboards 
+			on social media and in-app notifications. Static leaderboard images are more engaging than text lists 
+			and can be easily shared across platforms. With Pictify's leaderboard card generator, you design your 
+			ranking template, bind dynamic data like player names, scores, and positions, then generate fresh 
+			leaderboard images via API whenever rankings update.`,
+		useCaseScenarios: [
+			'Gaming platforms sharing daily/weekly top players',
+			'Developer communities ranking top contributors',
+			'Fitness apps displaying workout leaderboards',
+			'Sales teams celebrating top performers',
+			'Contest platforms announcing competition standings',
+			'Community platforms highlighting active members'
+		],
 		recommendedFormats: ['png', 'webp'],
 		recommendedSizes: ['1200x630', '1600x900'],
 		templateHtml: simpleCardTemplate({
@@ -852,7 +1066,32 @@ await createImage({
 	},
 	'testimonial': {
 		label: 'Testimonial Card',
-		description: 'Generate testimonial cards for social proof and marketing pages.',
+		description: 'Turn customer reviews into shareable social proof images for marketing.',
+		seoKeywords: [
+			'testimonial image generator',
+			'review card maker',
+			'customer testimonial image',
+			'social proof image generator',
+			'review to image',
+			'testimonial card creator',
+			'customer review graphics',
+			'quote card generator',
+			'feedback image maker',
+			'review screenshot alternative'
+		],
+		longDescription: `Customer testimonials are powerful social proof for marketing, but they're hard to share 
+			visually. Screenshots of reviews look messy and inconsistent. With Pictify's testimonial card generator, 
+			you design beautiful testimonial templates featuring customer photos, quotes, and ratings, then generate 
+			branded testimonial images via API. Perfect for sharing on social media, embedding in email campaigns, 
+			and displaying on landing pages.`,
+		useCaseScenarios: [
+			'Marketing teams creating testimonial graphics for social media',
+			'Sales teams sharing customer success stories',
+			'Product teams highlighting user feedback in presentations',
+			'E-commerce stores displaying customer reviews on product pages',
+			'SaaS companies featuring case study quotes',
+			'Agencies showcasing client testimonials in proposals'
+		],
 		recommendedFormats: ['png', 'webp'],
 		recommendedSizes: ['1200x630', '1080x1080', '1080x1350'],
 		templateHtml: simpleCardTemplate({

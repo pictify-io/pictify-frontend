@@ -67,6 +67,40 @@ const createAgentScreenshot = async ({ prompt, apiKey }) => {
 	return response;
 };
 
+const createCanvasImage = async ({ fabricJSData, variables, variableDefinitions, width, height, fileExtension, apiKey }) => {
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const response = await backend.post('/image/canvas', {
+		fabricJSData,
+		variables,
+		variableDefinitions,
+		width,
+		height,
+		fileExtension
+	}, { headers });
+	return response;
+};
+
+const captureGif = async ({ url, width, height, frameDurationSeconds, quality, apiKey }) => {
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const response = await backend.post('/gif/capture', {
+		url,
+		width,
+		height,
+		frameDurationSeconds,
+		quality
+	}, { headers });
+	return response;
+};
+
+const renderTemplate = async ({ templateUid, variables, outputFormat, apiKey }) => {
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const response = await backend.post(`/templates/${templateUid}/render`, {
+		variables,
+		outputFormat
+	}, { headers });
+	return response;
+};
+
 const getOgImageTemplates = async (apiKey) => {
 	const config = apiKey ? { headers: { Authorization: `Bearer ${apiKey}` } } : {};
 	const response = await backend.get('/templates/type/og-image', config);
@@ -188,5 +222,8 @@ export {
 	createAgentScreenshotStream,
 	createImage,
 	createGif,
-	createAgentScreenshot
+	createAgentScreenshot,
+	createCanvasImage,
+	captureGif,
+	renderTemplate
 };

@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
 	let activeTool = 0;
 	let isDragging = false;
@@ -12,6 +13,7 @@
 	let cursorX = 50;
 	let cursorY = 50;
 	let isClicking = false;
+	let isHovering = false;
 
 	// Simulate cursor movement and interaction
 	onMount(() => {
@@ -117,7 +119,9 @@
 
 		<div class="relative mx-auto max-w-5xl perspective-1000">
 			<!-- Browser Frame -->
-			<div class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] overflow-hidden relative z-10 transform transition-transform duration-500 hover:rotate-1">
+			<div class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] overflow-hidden relative z-10 transform transition-transform duration-500 hover:rotate-1"
+				on:mouseenter={() => isHovering = true}
+				on:mouseleave={() => isHovering = false}>
 				<!-- Toolbar -->
 				<div class="h-12 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 gap-3 select-none">
 					<div class="flex gap-2">
@@ -134,7 +138,33 @@
 				
 				<!-- Canvas Interface Mockup -->
 				<div class="flex h-[500px] md:h-[600px] bg-gray-50 overflow-hidden relative">
-					
+
+					<!-- Try Canvas Editor CTA Overlay -->
+					{#if isHovering}
+						<div
+							class="absolute inset-0 z-40 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300"
+							in:fade={{ duration: 200 }}
+						>
+							<button
+								on:click={() => goto('/canvas/try')}
+								class="group relative px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg md:text-xl rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
+							>
+								<div class="flex items-center gap-3">
+									<span>Try Canvas Editor</span>
+									<svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+									</svg>
+								</div>
+								<div class="absolute -top-2 -right-2 px-2 py-1 bg-[#4ade80] text-[10px] font-bold text-gray-900 border-[2px] border-gray-900 rounded animate-pulse">
+									NEW
+								</div>
+							</button>
+							<div class="absolute bottom-8 text-white text-sm font-medium opacity-80">
+								Click to start designing with our visual editor
+							</div>
+						</div>
+					{/if}
+
 					<!-- Simulated Cursor -->
 					<div 
 						class="absolute w-6 h-6 z-50 pointer-events-none transition-all duration-300 ease-out"

@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import TopBar from './TopBar.svelte';
 	import AnimatedBackground from './AnimatedBackground.svelte';
+	import PageNavigator from './PageNavigator.svelte';
 	
 	const dispatch = createEventDispatcher();
 	import LeftSidebar from './LeftSidebar.svelte';
@@ -12,9 +13,9 @@
 	import LayersPanel from './LayersPanel.svelte';
 	import VariablesPanel from './VariablesPanel.svelte';
 	import AlignmentGuides from './AlignmentGuides.svelte';
-	import CopilotDrawer from './CopilotDrawer.svelte';
 	import { selectedComponent, canvasZoom, activeSidebarTab, activeRightSidebarTab, editorActions } from '../../../store/editor.store';
 	import FloatingCopilot from './FloatingCopilot.svelte';
+	import { outputFormat } from '../../../store/pages.store';
 
 	export let templateName = '';
 	export let isSaving = false;
@@ -22,6 +23,11 @@
 
 	function setRightTab(tab) {
 		editorActions.toggleRightSidebarTab(tab);
+	}
+	
+	function handlePageSwitch(event) {
+		// Dispatch event for parent components to save current canvas state
+		dispatch('pageSwitch', event.detail);
 	}
 
 	onMount(() => {
@@ -47,6 +53,14 @@
 
 	<!-- Top Bar (Full Width) -->
 	<TopBar bind:templateName {isSaving} {guestMode} on:save={() => { console.log('EditorLayout: save event received'); dispatch('save'); }} />
+	
+	<!-- Page Navigator (for PDF templates) -->
+	<PageNavigator 
+		on:beforeSwitch={handlePageSwitch}
+		on:afterSwitch
+		on:pageAdded
+		on:pageDeleted
+	/>
 	
 	<!-- Main Content Area -->
 	<div class="flex flex-1 w-full overflow-hidden relative min-h-0">
@@ -134,10 +148,8 @@
 		</div>
 	</div>
 	
-	<!-- Copilot Drawer (Bottom) -->
-	{#if import.meta.env.PUBLIC_ENABLE_COPILOT === 'true'}
-		<CopilotDrawer />
-	{/if}
+	
+
 </div>
 
 <style>

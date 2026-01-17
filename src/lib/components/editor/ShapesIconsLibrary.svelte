@@ -480,17 +480,17 @@
 	
 	.tabs button {
 		flex: 1;
-		padding: 12px;
+		padding: 10px 4px;
 		background: none;
 		border: none;
 		cursor: pointer;
-		font-size: 13px;
+		font-size: 11px;
 		font-weight: 700;
 		color: #111827;
 		transition: all 0.15s;
 		border-bottom: 3px solid transparent;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.02em;
 	}
 	
 	.tabs button:hover {

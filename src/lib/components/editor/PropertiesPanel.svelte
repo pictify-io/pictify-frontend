@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { Gradient, filters, FabricImage, Rect, Path, Circle, Ellipse } from 'fabric';
 	import { selectedComponent, editor, editorActions } from '../../../store/editor.store';
 	import { variableActions, variables as variablesStore, variableNames } from '../../../store/variables.store';
@@ -9,6 +9,23 @@
 	import { BACKGROUND_REMOVER_CONFIG, isBackgroundRemoverAvailable, getModelInfo, SERVER_SIDE_BENEFITS } from '../../config/background-remover.js';
 	import backend from '../../../service/backend';
 	import { getAllFonts, preloadFonts, searchFonts, addGoogleFont, CATEGORY_LABELS, CATEGORY_ICONS } from '../../../api/fonts';
+	import { outputFormat, pdfPreset, pageActions } from '../../../store/pages.store';
+	import { loadBrandFonts, getBrandFontFamilies } from '../../utils/brand-fonts-loader';
+	import {
+		createQRCode,
+		updateQRCode,
+		formatQRData,
+		QR_CONTENT_TYPES,
+		PATTERN_STYLES,
+		ERROR_CORRECTION_OPTIONS
+	} from '../../utils/fabric-qr';
+
+	// Neo-brutalist input styling constants
+	const inputBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+	const inputNumberClass = inputBaseClass;
+	const buttonBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white hover:bg-gray-50 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] transition-all";
+	const selectClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+	const rangeInputClass = "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ffc480] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-gray-900 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-900 hover:[&::-webkit-slider-thumb]:bg-[#ffc480] [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-gray-900 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-900 hover:[&::-moz-range-thumb]:bg-[#ffc480]";
 
 	let styles = {};
 	let content = '';
@@ -123,6 +140,12 @@
 	let tableDataFormat = 'json'; // 'json' or 'csv'
 	let tableDataError = '';
 	let chartDataError = '';
+	
+	// QR Code state
+	let isQRCode = false;
+	let qrData = '';
+	let qrConfig = {};
+	let showQRDataEditor = false;
 	
 	// Table styles for the style picker
 	const TABLE_STYLES = {
@@ -265,7 +288,36 @@
 			const response = await getAllFonts();
 			allFonts = response.fonts || [];
 			fontCategories = response.categories || [];
-			
+
+			// Load brand fonts and add them to the font list
+			try {
+				const brandFonts = await loadBrandFonts();
+				if (brandFonts.length > 0) {
+					// Add brand fonts category
+					if (!fontCategories.includes('brand')) {
+						fontCategories.unshift('brand'); // Add at the beginning
+					}
+
+					// Add brand fonts to the font list
+					const brandFontObjects = brandFonts.map(family => ({
+						family: family,
+						display: family,
+						weights: [400, 700], // Default weights
+						popular: false,
+						category: 'brand',
+						google: false,
+						isBrandFont: true
+					}));
+
+					// Prepend brand fonts to show them first
+					allFonts = [...brandFontObjects, ...allFonts];
+
+					console.log('📝 Added brand fonts to font list:', brandFonts);
+				}
+			} catch (error) {
+				console.warn('Failed to load brand fonts:', error);
+			}
+
 			// Preload popular fonts for preview
 			const popularFonts = allFonts.filter(f => f.popular).slice(0, 20);
 			preloadFonts(popularFonts);
@@ -306,7 +358,13 @@
 	// Debounce timer for property changes to prevent saving intermediate states
 	let propertyChangeTimer = null;
 	
+	// Debounce timer for property changes to prevent saving intermediate states
+	let pendingTarget = null;
+	
 	function debouncedPropertyChange(target) {
+		// Store target for potential cleanup execution
+		pendingTarget = target;
+		
 		// Clear existing timer
 		if (propertyChangeTimer) {
 			clearTimeout(propertyChangeTimer);
@@ -315,11 +373,26 @@
 		// Set new timer - fire event after 300ms of no changes
 		propertyChangeTimer = setTimeout(() => {
 			if ($editor && target) {
+				console.log('🔥 Firing object:modified for', target.type);
 				$editor.fire('object:modified', { target });
 			}
 			propertyChangeTimer = null;
+			pendingTarget = null;
 		}, 300);
 	}
+	
+	
+	onDestroy(() => {
+		if (propertyChangeTimer) {
+			clearTimeout(propertyChangeTimer);
+			// If there's a pending change when panel closes, fire it immediately
+			// This ensures we catch the last change before user navigates away or switches selection
+			if ($editor && pendingTarget) {
+				console.log('🔥 Firing pending object:modified on destroy');
+				$editor.fire('object:modified', { target: pendingTarget });
+			}
+		}
+	});
 
 	async function addCustomFont() {
 		if (!customFontUrl) return;
@@ -516,6 +589,20 @@
 			loadSampleTableData();
 		}
 		
+		// Load QR code state
+		isQRCode = obj.isQRCode || false;
+		if (isQRCode) {
+			qrData = obj.qrData || '';
+			qrConfig = obj.qrConfig || {
+				contentType: 'url',
+				fgColor: '#000000',
+				bgColor: '#ffffff',
+				errorCorrectionLevel: 'M',
+				patternStyle: 'squares',
+				cornerStyle: 'squares'
+			};
+		}
+		
 		// Load variable state
 		loadVariableState();
 	}
@@ -596,15 +683,32 @@
 			// Add initial binding if none exist
 			if (variableBindings.length === 0) {
 				let defaultName = '';
+				const defaultProp = getDefaultVariableProperty();
+
 				if (type === 'i-text' || type === 'text') {
 					const text = $selectedComponent.text || '';
-					defaultName = text.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || `${type}_var`;
+					defaultName = text.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || 'text_content';
+				} else if (defaultProp === 'fill') {
+					defaultName = 'fill_color';
+				} else if (defaultProp === 'stroke') {
+					defaultName = 'stroke_color';
+				} else if (defaultProp === 'src') {
+					defaultName = 'image_url';
+				} else if (defaultProp === 'opacity') {
+					defaultName = 'opacity_value';
+				} else if (defaultProp === 'chartData') {
+					defaultName = 'chart_data';
+				} else if (defaultProp === 'tableData') {
+					defaultName = 'table_data';
+				} else if (defaultProp === 'qrData') {
+					defaultName = 'qr_content';
 				} else {
-					defaultName = `${type}_${$selectedComponent.id || 'var'}`;
+					defaultName = `${type}_${defaultProp}`;
 				}
+
 				variableBindings = [{
 					variableName: defaultName,
-					property: getDefaultVariableProperty(),
+					property: defaultProp,
 					description: '',
 					required: false
 				}];
@@ -633,18 +737,42 @@
 	// Add a new variable binding
 	function addVariableBinding() {
 		if (!$selectedComponent || !$editor) return;
-		
+
 		const availableProps = getAvailablePropertiesForType();
 		const usedProps = variableBindings.map(b => b.property);
 		const unusedProp = availableProps.find(p => !usedProps.includes(p.value))?.value || availableProps[0]?.value || 'text';
-		
+
+		// Generate a meaningful variable name based on the property
+		let varName = '';
+		if (unusedProp === 'fill') {
+			varName = `fill_color_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'stroke') {
+			varName = `stroke_color_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'text') {
+			varName = `text_content_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'src') {
+			varName = `image_url_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'opacity') {
+			varName = `opacity_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'fontSize') {
+			varName = `font_size_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'fontFamily') {
+			varName = `font_family_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'fontWeight') {
+			varName = `font_weight_${variableBindings.length + 1}`;
+		} else if (unusedProp === 'strokeWidth') {
+			varName = `stroke_width_${variableBindings.length + 1}`;
+		} else {
+			varName = `${unusedProp}_${variableBindings.length + 1}`;
+		}
+
 		const newBinding = {
-			variableName: `${type}_${unusedProp}_${Date.now().toString(36).slice(-4)}`,
+			variableName: varName,
 			property: unusedProp,
 			description: '',
 			required: false
 		};
-		
+
 		variableBindings = [...variableBindings, newBinding];
 		saveVariableBindings();
 	}
@@ -1360,6 +1488,57 @@
 			
 		} catch (error) {
 			console.error('Failed to change table style:', error);
+		}
+	}
+	
+	// QR Code update functions
+	async function updateQRCodeContent(newContent) {
+		if (!$selectedComponent || !$editor || !isQRCode) return;
+
+		try {
+			const formattedData = formatQRData(qrConfig.contentType || 'url', newContent);
+
+			// Create updated QR code
+			const newQR = await updateQRCode($selectedComponent, {
+				data: formattedData,
+				...qrConfig
+			});
+
+			// Replace on canvas
+			$editor.remove($selectedComponent);
+			$editor.add(newQR);
+			$editor.setActiveObject(newQR);
+			$editor.renderAll();
+
+			qrData = formattedData;
+			debouncedPropertyChange(newQR);
+		} catch (error) {
+			console.error('Failed to update QR code:', error);
+		}
+	}
+	
+	async function updateQRCodeConfig(configKey, value) {
+		if (!$selectedComponent || !$editor || !isQRCode) return;
+
+		try {
+			const newConfig = { ...qrConfig, [configKey]: value };
+
+			// Create updated QR code
+			const newQR = await updateQRCode($selectedComponent, {
+				data: qrData,
+				...newConfig
+			});
+
+			// Replace on canvas
+			$editor.remove($selectedComponent);
+			$editor.add(newQR);
+			$editor.setActiveObject(newQR);
+			$editor.renderAll();
+
+			qrConfig = newConfig;
+			debouncedPropertyChange(newQR);
+		} catch (error) {
+			console.error('Failed to update QR code config:', error);
 		}
 	}
 	
@@ -2456,12 +2635,8 @@
 			{#if type === 'i-text' || type === 'text'}
 				<!-- CONTENT SECTION -->
 				<div class="space-y-3">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-align-left text-gray-400 text-xs"></i>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Content</span>
-					</div>
 					<textarea
-						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+						class={inputNumberClass}
 						rows="2"
 						placeholder="Enter your text..."
 						value={content}
@@ -2470,11 +2645,7 @@
 				</div>
 				
 				<!-- TYPOGRAPHY SECTION -->
-				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-font text-gray-400 text-xs"></i>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Typography</span>
-					</div>
+				<div class="space-y-3 pt-4 border-t border-gray-200">
 					
 					<!-- Font Family -->
 					<div class="relative">
@@ -2734,7 +2905,7 @@
 							<div class="relative">
 								<input
 									type="number"
-									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 pr-8"
+									class={inputNumberClass + " pr-8"}
 									value={styles.fontSize}
 									on:input={(e) => updateProperty('fontSize', parseInt(e.target.value))}
 								/>
@@ -2745,7 +2916,7 @@
 							<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Spacing</label>
 							<input
 								type="number"
-								class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+								class={inputNumberClass}
 								value={styles.charSpacing}
 								step="10"
 								on:input={(e) => updateProperty('charSpacing', parseInt(e.target.value))}
@@ -2757,7 +2928,7 @@
 					<div class="relative">
 						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Weight</label>
 						<button
-							class="w-full text-sm border border-gray-900 border-[2px] rounded-lg px-3 py-2 text-left bg-white flex items-center justify-between focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 focus:outline-none focus:ring-1"
+							class={buttonBaseClass + " text-left flex items-center justify-between"}
 							on:click={() => isWeightDropdownOpen = !isWeightDropdownOpen}
 						>
 							<span style="font-weight: {styles.fontWeight === 'normal' ? 400 : (styles.fontWeight === 'bold' ? 700 : styles.fontWeight)}">
@@ -2794,11 +2965,7 @@
 				</div>
 				
 				<!-- COLOR SECTION -->
-				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-palette text-gray-400 text-xs"></i>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Color</span>
-					</div>
+				<div class="space-y-3 pt-4 border-t border-gray-200">
 					<GradientColorPicker
 						label="Text Color"
 						value={styles.fill}
@@ -2809,15 +2976,12 @@
 				</div>
 				
 				<!-- EFFECTS SECTION -->
-				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<button 
+				<div class="space-y-3 pt-4 border-t border-gray-200">
+					<button
 						class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
 						on:click={() => showTextEffectsPanel = !showTextEffectsPanel}
 					>
-						<div class="flex items-center gap-2">
-							<i class="fa fa-magic text-gray-400 text-xs"></i>
-							<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Effects</span>
-						</div>
+						<span class="text-[10px] font-black text-gray-900 uppercase tracking-wide">Effects</span>
 						<i class="fa fa-chevron-{showTextEffectsPanel ? 'up' : 'down'} text-xs text-gray-400"></i>
 					</button>
 					
@@ -2825,7 +2989,7 @@
 						<div class="space-y-4 pt-2">
 							<!-- Quick Presets -->
 							<div>
-								<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Quick Presets</label>
+								<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Presets</label>
 								<div class="grid grid-cols-4 gap-1.5">
 									<button 
 										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
@@ -2917,7 +3081,7 @@
 												max="30"
 												step="1"
 												value={textEffects.shadow.blur}
-												class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+												class={rangeInputClass}
 												on:input={(e) => applyTextShadow('blur', parseInt(e.target.value))}
 											/>
 										</div>
@@ -2934,7 +3098,7 @@
 												max="30"
 												step="1"
 												value={textEffects.shadow.offsetX}
-												class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+												class={rangeInputClass}
 												on:input={(e) => applyTextShadow('offsetX', parseInt(e.target.value))}
 											/>
 										</div>
@@ -2951,7 +3115,7 @@
 												max="30"
 												step="1"
 												value={textEffects.shadow.offsetY}
-												class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+												class={rangeInputClass}
 												on:input={(e) => applyTextShadow('offsetY', parseInt(e.target.value))}
 											/>
 										</div>
@@ -2997,7 +3161,7 @@
 												max="20"
 												step="0.5"
 												value={textEffects.stroke.width}
-												class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+												class={rangeInputClass}
 												on:input={(e) => applyTextStroke('width', parseFloat(e.target.value))}
 											/>
 										</div>
@@ -3070,7 +3234,7 @@
 							max="20"
 							step="0.5"
 							value={styles.strokeWidth}
-							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+							class={rangeInputClass}
 							on:input={(e) => updateProperty('strokeWidth', parseFloat(e.target.value))}
 						/>
 					</div>
@@ -3088,7 +3252,7 @@
 					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Width</label>
 					<input
 						type="number"
-						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+						class={inputNumberClass}
 						value={styles.width}
 						on:change={(e) => updateProperty('width', e.target.value)}
 					/>
@@ -3097,7 +3261,7 @@
 					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Height</label>
 					<input
 						type="number"
-						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+						class={inputNumberClass}
 						value={styles.height}
 						on:change={(e) => updateProperty('height', e.target.value)}
 					/>
@@ -3160,7 +3324,7 @@
 								<i class="fa fa-border-top-left text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+									class={inputNumberClass}
 									placeholder="TL"
 									value={cornerRadii.tl}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tl: parseInt(e.target.value) || 0 })}
@@ -3171,7 +3335,7 @@
 								<i class="fa fa-border-top-right text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+									class={inputNumberClass}
 									placeholder="TR"
 									value={cornerRadii.tr}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tr: parseInt(e.target.value) || 0 })}
@@ -3182,7 +3346,7 @@
 								<i class="fa fa-border-bottom-left text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+									class={inputNumberClass}
 									placeholder="BL"
 									value={cornerRadii.bl}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, bl: parseInt(e.target.value) || 0 })}
@@ -3193,7 +3357,7 @@
 								<i class="fa fa-border-bottom-right text-gray-400 text-xs"></i>
 								<input
 									type="number"
-									class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+									class={inputNumberClass}
 									placeholder="BR"
 									value={cornerRadii.br}
 									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, br: parseInt(e.target.value) || 0 })}
@@ -3207,10 +3371,7 @@
 			{#if type === 'image'}
 				<!-- Image Shape Clipping -->
 				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-crop text-gray-400 text-xs"></i>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Clip to Shape</span>
-					</div>
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-wide mb-2">Clip Shape</label>
 					
 					<div class="grid grid-cols-4 gap-2">
 						<button 
@@ -3280,7 +3441,7 @@
 									min="20"
 									max="150"
 									value={clipSettings.scale}
-									class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+									class={rangeInputClass}
 									on:input={(e) => updateClipScale(parseInt(e.target.value))}
 								/>
 							</div>
@@ -3296,7 +3457,7 @@
 									min="-50"
 									max="50"
 									value={clipSettings.offsetX}
-									class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+									class={rangeInputClass}
 									on:input={(e) => updateClipOffset('offsetX', parseInt(e.target.value))}
 								/>
 							</div>
@@ -3312,7 +3473,7 @@
 									min="-50"
 									max="50"
 									value={clipSettings.offsetY}
-									class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+									class={rangeInputClass}
 									on:input={(e) => updateClipOffset('offsetY', parseInt(e.target.value))}
 								/>
 							</div>
@@ -3329,7 +3490,7 @@
 										min="0"
 										max="100"
 										value={clipCornerRadius}
-										class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+										class={rangeInputClass}
 										on:input={(e) => updateClipCornerRadius(parseInt(e.target.value))}
 									/>
 								</div>
@@ -3340,7 +3501,7 @@
 				
 				<!-- Background Remover -->
 				<div class="pt-4 border-t-[2px] border-gray-900">
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">AI Background Removal</label>
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Remove Background</label>
 					
 					<div class="space-y-2">
 						<button 
@@ -3446,7 +3607,7 @@
 							</div>
 							
 							<div class="pt-3 border-t-[2px] border-gray-900">
-								<label class="block text-xs font-medium text-gray-600 mb-3">Manual Adjustments</label>
+								<label class="block text-xs font-medium text-gray-600 mb-3">Adjust</label>
 								
 								<!-- Brightness -->
 								<div class="mb-4">
@@ -3460,7 +3621,7 @@
 										max="1"
 										step="0.01"
 										value={imageFilters.brightness}
-										class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+										class={rangeInputClass}
 										on:input={(e) => applyImageFilter('brightness', parseFloat(e.target.value))}
 									/>
 								</div>
@@ -3477,7 +3638,7 @@
 										max="1"
 										step="0.01"
 										value={imageFilters.contrast}
-										class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+										class={rangeInputClass}
 										on:input={(e) => applyImageFilter('contrast', parseFloat(e.target.value))}
 									/>
 								</div>
@@ -3494,7 +3655,7 @@
 										max="1"
 										step="0.01"
 										value={imageFilters.saturation}
-										class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+										class={rangeInputClass}
 										on:input={(e) => applyImageFilter('saturation', parseFloat(e.target.value))}
 									/>
 								</div>
@@ -3511,7 +3672,7 @@
 										max="1"
 										step="0.01"
 										value={imageFilters.blur}
-										class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+										class={rangeInputClass}
 										on:input={(e) => applyImageFilter('blur', parseFloat(e.target.value))}
 									/>
 								</div>
@@ -3551,10 +3712,7 @@
 			<!-- CHART PROPERTIES SECTION -->
 			{#if isChart}
 				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-chart-bar text-gray-400 text-xs"></i>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Chart Properties</span>
-					</div>
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-wide mb-2">Chart</label>
 					
 					<div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3">
 						<p class="text-xs text-purple-800">
@@ -3636,10 +3794,7 @@
 			<!-- TABLE PROPERTIES SECTION -->
 			{#if isTable}
 				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-table text-gray-400 text-xs"></i>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Table Properties</span>
-					</div>
+					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-wide mb-2">Table</label>
 					
 					<div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-3">
 						<p class="text-xs text-teal-800">
@@ -3769,6 +3924,112 @@
 					
 				</div>
 			{/if}
+			
+			<!-- QR CODE PROPERTIES SECTION -->
+			{#if isQRCode}
+				<!-- Appearance Section - matching shape styling -->
+				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
+					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Appearance</h4>
+					
+					<!-- Foreground Color -->
+					<GradientColorPicker
+						label="Foreground Color"
+						value={qrConfig.fgColor || '#000000'}
+						defaultColor="#000000"
+						supportsGradient={false}
+						onSolidChange={(color) => updateQRCodeConfig('fgColor', color)}
+					/>
+					
+					<!-- Background Color -->
+					<GradientColorPicker
+						label="Background Color"
+						value={qrConfig.bgColor || '#ffffff'}
+						defaultColor="#ffffff"
+						supportsGradient={false}
+						onSolidChange={(color) => updateQRCodeConfig('bgColor', color)}
+					/>
+				</div>
+				
+				<!-- QR Content Section -->
+				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
+					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">QR Content</h4>
+					
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">URL or Text</label>
+						</div>
+						<input 
+							type="text"
+							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
+							placeholder="https://example.com"
+							value={qrData}
+							on:change={(e) => updateQRCodeContent(e.target.value)}
+						/>
+					</div>
+				</div>
+				
+				<!-- Style Section -->
+				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
+					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Style</h4>
+					
+					<!-- Data Pattern -->
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Data Pattern</label>
+						</div>
+						<div class="grid grid-cols-3 gap-2">
+							{#each PATTERN_STYLES as style}
+								<button 
+									class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {qrConfig.patternStyle === style.type ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
+									on:click={() => updateQRCodeConfig('patternStyle', style.type)}
+								>
+									<span class="text-base">{style.preview}</span>
+									<span class="text-[9px]">{style.label}</span>
+								</button>
+							{/each}
+						</div>
+					</div>
+					
+					<!-- Corner Pattern -->
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Corner Pattern</label>
+						</div>
+						<div class="grid grid-cols-3 gap-2">
+							{#each PATTERN_STYLES as style}
+								<button 
+									class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {qrConfig.cornerStyle === style.type ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
+									on:click={() => updateQRCodeConfig('cornerStyle', style.type)}
+								>
+									<span class="text-base">{style.preview}</span>
+									<span class="text-[9px]">{style.label}</span>
+								</button>
+							{/each}
+						</div>
+					</div>
+				</div>
+				
+				<!-- Error Correction Section -->
+				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
+					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Error Correction</h4>
+					
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Level</label>
+							<span class="text-xs text-gray-500">{qrConfig.errorCorrectionLevel || 'M'}</span>
+						</div>
+						<select 
+							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
+							value={qrConfig.errorCorrectionLevel || 'M'}
+							on:change={(e) => updateQRCodeConfig('errorCorrectionLevel', e.target.value)}
+						>
+							{#each ERROR_CORRECTION_OPTIONS as option}
+								<option value={option.level}>{option.label} - {option.description}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+			{/if}
 			{/if}
 			<!-- END DESIGN MODE -->
 			
@@ -3849,11 +4110,15 @@
 									
 									<!-- Variable Name -->
 									<div class="mb-2">
-										<label class="block text-[10px] font-medium text-gray-600 mb-1">Variable Name</label>
+										<label class="block text-[10px] font-medium text-gray-600 mb-1">
+											Variable Name
+											<span class="text-[#ff6b6b]">*</span>
+											<span class="text-[9px] text-gray-400">(customize for API)</span>
+										</label>
 										<input
 											type="text"
-											class="w-full text-xs border-[2px] border-gray-900 rounded px-2 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
-											placeholder="e.g., my_variable"
+											class={inputBaseClass + " bg-yellow-50"}
+											placeholder="e.g., backgroundColor, primaryColor"
 											value={binding.variableName}
 											on:input={(e) => updateVariableBinding(index, 'variableName', e.target.value)}
 										/>
@@ -3864,7 +4129,7 @@
 										<label class="block text-[10px] font-medium text-gray-600 mb-1">Description <span class="text-gray-400">(optional)</span></label>
 										<input
 											type="text"
-											class="w-full text-xs border-[2px] border-gray-900 rounded px-2 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											class={inputBaseClass}
 											placeholder="Brief description for API docs"
 											value={binding.description}
 											on:input={(e) => updateVariableBinding(index, 'description', e.target.value)}
@@ -3994,7 +4259,7 @@
 									<label class="block text-[10px] text-gray-500 mb-1">Array Variable</label>
 									<input
 										type="text"
-										class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+										class={inputBaseClass}
 										placeholder="items"
 										value={loopVariable}
 										on:input={(e) => updateLoopVariable(e.target.value)}
@@ -4004,7 +4269,7 @@
 									<label class="block text-[10px] text-gray-500 mb-1">Item Alias</label>
 									<input
 										type="text"
-										class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+										class={inputBaseClass}
 										placeholder="item"
 										value={loopItemName}
 										on:input={(e) => updateLoopItemName(e.target.value)}
@@ -4030,7 +4295,7 @@
 									{#if loopDirection === 'grid'}
 										<input
 											type="number"
-											class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											class={inputBaseClass}
 											min="1"
 											max="10"
 											value={loopColumns}
@@ -4039,7 +4304,7 @@
 									{:else}
 										<input
 											type="number"
-											class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+											class={inputBaseClass}
 											min="0"
 											value={loopSpacing}
 											on:input={(e) => updateLoopSpacing(e.target.value)}
@@ -4084,13 +4349,15 @@
 						>
 							Group
 						</button>
-					{:else if type === 'group'}
-						<button 
+					{:else if type === 'group' && !$selectedComponent?.isQRCode && !$selectedComponent?.isChart && !$selectedComponent?.isTable}
+						<button
 							class="py-1.5 px-3 text-[11px] bg-rose-500 hover:bg-rose-600 text-white rounded transition-colors font-medium"
 							on:click={ungroupSelectedElements}
 						>
 							Ungroup
 						</button>
+					{:else if type === 'group'}
+						<span class="text-[10px] text-gray-400">Protected element</span>
 					{:else}
 						<span class="text-[10px] text-gray-400">Shift+click to multi-select</span>
 					{/if}
@@ -4141,9 +4408,52 @@
 
 			<div>
 				<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
-					Presets
-					<select 
-						class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 mt-1"
+					{#if $outputFormat === 'pdf'}
+						Page Size
+					{:else}
+						Presets
+					{/if}
+				</label>
+				
+				{#if $outputFormat === 'pdf'}
+					<select
+						class={selectClass + " mt-1"}
+						value={$pdfPreset}
+						on:change={(e) => {
+							const val = e.target.value;
+							pageActions.setPdfPreset(val);
+							
+							// Also update canvas dimensions based on preset
+							let width = 595;
+							let height = 842;
+							
+							switch(val) {
+								case 'A4': width = 595; height = 842; break;
+								case 'A4_LANDSCAPE': width = 842; height = 595; break;
+								case 'LETTER': width = 612; height = 792; break;
+								case 'LETTER_LANDSCAPE': width = 792; height = 612; break;
+								case 'LEGAL': width = 612; height = 1008; break;
+								case 'A3': width = 842; height = 1191; break;
+								case 'TABLOID': width = 792; height = 1224; break;
+							}
+							
+							if ($editor) {
+								$editor.setDimensions({ width, height });
+								$editor.renderAll();
+							}
+						}}
+					>
+						<option value="A4">A4</option>
+						<option value="A4_LANDSCAPE">A4 Landscape</option>
+						<option value="LETTER">Letter</option>
+						<option value="LETTER_LANDSCAPE">Letter Landscape</option>
+						<option value="LEGAL">Legal</option>
+						<option value="A3">A3</option>
+						<option value="TABLOID">Tabloid</option>
+					</select>
+				{:else}
+					<select
+						class={selectClass + " mt-1"}
 						on:change={(e) => {
 							const [w, h] = e.target.value.split('x');
 							if (w && h && $editor) {
@@ -4160,7 +4470,7 @@
 						<option value="794x1123">Certificate Portrait (A4)</option>
 						<option value="1050x600">Business Card (1050x600)</option>
 					</select>
-				</label>
+				{/if}
 			</div>
 
 			<div class="grid grid-cols-2 gap-2">
@@ -4169,7 +4479,7 @@
 						Width
 						<input
 							type="number"
-							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 mt-1"
+							class={inputNumberClass + " mt-1"}
 							value={$editor ? $editor.width : 0}
 							on:change={(e) => {
 								if ($editor) {
@@ -4184,7 +4494,7 @@
 						Height
 						<input
 							type="number"
-							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 mt-1"
+							class={inputNumberClass + " mt-1"}
 							value={$editor ? $editor.height : 0}
 							on:change={(e) => {
 								if ($editor) {

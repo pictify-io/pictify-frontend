@@ -47,13 +47,8 @@
 	$: usageColor = usagePercent >= 90 ? '#ff6b6b' : usagePercent >= 75 ? '#ffc480' : '#4ade80';
 </script>
 
-<section class="min-h-full p-4 sm:p-6 md:p-10 bg-[#FFFDF8] relative overflow-hidden">
-	<!-- Background Grid -->
-	<div class="absolute inset-0 opacity-5 pointer-events-none" 
-		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
-	</div>
-
-	<div class="max-w-7xl mx-auto relative z-10">
+<section class="min-h-full">
+	<div>
 		
 		<!-- Page Header -->
 		<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">

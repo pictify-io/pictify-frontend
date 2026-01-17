@@ -4,7 +4,9 @@
 	import ShapesIconsLibrary from './ShapesIconsLibrary.svelte';
 	import TextPresetLibrary from './TextPresetLibrary.svelte';
 	import ChartTableLibrary from './ChartTableLibrary.svelte';
+	import QRCodeLibrary from './QRCodeLibrary.svelte';
 	import BrandAssetsLibrary from './BrandAssetsLibrary.svelte';
+	import CopilotPanel from './CopilotPanel.svelte';
 
 	let fileInput;
 	let imageUrlInput = '';
@@ -134,9 +136,11 @@
 </script>
 
 <div class="w-full bg-[#FFFDF8] h-full flex flex-col transition-all duration-300 z-0 overflow-hidden">
+	{#if displayTab === 'copilot'}
+		<CopilotPanel />
+	{:else}
 	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
 		<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">{displayTab}</h3>
-		<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">Drag and drop to add</p>
 	</div>
 	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-[#FFFDF8]">
 		{#if displayTab === 'elements'}
@@ -215,6 +219,8 @@
 			</div>
 		{:else if displayTab === 'charts'}
 			<ChartTableLibrary />
+		{:else if displayTab === 'qrcodes'}
+			<QRCodeLibrary />
 		{:else if displayTab === 'brand'}
 			<BrandAssetsLibrary />
 		{:else if displayTab === 'layers'}
@@ -226,4 +232,5 @@
 			</div>
 		{/if}
 	</div>
+	{/if}
 </div>

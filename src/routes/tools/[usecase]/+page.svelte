@@ -10,6 +10,7 @@ import { goto } from '$app/navigation';
 import { onMount } from 'svelte';
 import { user } from '../../../store/user.store';
 import { toast } from '../../../store/toast.store';
+import { pageActions } from '../../../store/pages.store';
 import backend from '../../../service/backend';
 
 $: useCaseId = $page.params.usecase;
@@ -24,8 +25,6 @@ $: canonical = validCase
   ? `https://pictify.io/tools/${useCaseId}`
   : 'https://pictify.io/tools';
 
-const DRAFT_KEY = 'pictify_template_draft_v1';
-
 // Generation state
 let isGenerating = false;
 let generatedImageUrl = '';
@@ -34,17 +33,33 @@ let generationError = '';
 function openInCanvasEditor() {
   if (!validCase) return;
   const label = config?.label || useCase?.label || useCaseId;
-  const draft = getTemplateForUseCase(useCaseId, label);
+  const templateData = getTemplateForUseCase(useCaseId, label);
+  
+  // Ensure template is set to image format (not PDF)
+  const template = {
+    ...templateData,
+    outputFormat: 'image'
+  };
+  
+  // Initialize the pages store with template data
+  pageActions.initFromTemplate(template);
+  
+  // Also save to localStorage for CreateTemplate compatibility
   try {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-  } catch (e) {}
+    const DRAFT_KEY = 'pictify_template_draft_v1';
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(template));
+  } catch (e) {
+    console.warn('Could not save draft to localStorage:', e);
+  }
 
   if ($user?.email) {
-    goto('/template-workspace/create');
+    // Logged in users go directly to image editor
+    goto('/template-workspace/image/create');
   } else {
     goto(`/canvas/try?usecase=${useCaseId}`);
   }
 }
+
 
 // Quick generate from template
 // Uses public endpoint (no auth required, rate limited)
@@ -229,7 +244,7 @@ $: templateDraft = template ? {
   <title>{title}</title>
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
-  <meta name="keywords" content="{config?.label || 'HTML to Image'}, image generator, automation, Pictify, API">
+  <meta name="keywords" content="{config?.seoKeywords?.join(', ') || config?.label || 'HTML to Image'}, image generator, automation, Pictify, API">
   
   <!-- Open Graph -->
   <meta property="og:title" content={title}>
@@ -262,247 +277,250 @@ $: templateDraft = template ? {
   <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10">
     {#if validCase}
       <!-- Hero Section -->
-      <div class="relative flex flex-col items-center justify-center text-center mb-12 sm:mb-16 lg:mb-20 pt-4 sm:pt-8">
+      <div class="relative flex flex-col items-center justify-center text-center mb-16 pt-4 sm:pt-8">
 
         <!-- Badge -->
-        <div class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-6">
-          <div class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6">
+          <div class="px-6 py-2 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg">
             ★ Workflow
           </div>
         </div>
 
         <!-- Main Title -->
-        <h1 class="relative z-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-6">
-          <span class="relative inline-block text-white">
-            <span class="relative z-10 px-2 sm:px-3 md:px-4">{config.label}</span>
-            <span class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"></span>
+        <h1 class="relative z-10 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-6">
+            Generate
+          <br class="hidden sm:block" />
+          <span class="relative inline-block text-[#ff6b6b] px-2">
+            {config.label}
           </span>
         </h1>
 
         <!-- Description -->
-        <div class="max-w-3xl mx-auto px-2">
-          <p class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]">
+        <div class="max-w-2xl mx-auto px-2">
+          <p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed mb-8">
             {config.description}
-            <span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold">Design once, render variants via API — the infrastructure layer for programmatic media.</span>
+            <span class="inline-block w-full h-px bg-gray-200 my-4"></span>
+             Design once, render variants via API — the infrastructure layer for programmatic media.
           </p>
         </div>
       </div>
 
-      <!-- Template Preview Section -->
-      <div class="max-w-4xl mx-auto px-4 mb-12 sm:mb-16">
-        <div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
-          <!-- Preview Header -->
-          <div class="bg-[#ffc480] border-b-[3px] border-gray-900 px-4 sm:px-6 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="flex gap-2">
-                <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-gray-900/20"></div>
-                <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-gray-900/20"></div>
-                <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-gray-900/20"></div>
+      <!-- Template Preview Section (Window Style) -->
+      <div class="max-w-5xl mx-auto px-4 mb-20">
+         <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group">
+              <!-- Window Header -->
+              <div class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between">
+                   <div class="flex items-center gap-2">
+                      <div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900"></div>
+                      <div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900"></div>
+                      <div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900"></div>
+                   </div>
+                   <div class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2">
+                      <span class="px-2 py-0.5 bg-gray-200 rounded text-gray-700">Canva Mode</span>
+                      {templateWidth} x {templateHeight}px
+                   </div>
               </div>
-              <span class="font-black text-sm uppercase tracking-widest text-gray-900">Template Preview</span>
-            </div>
-            <div class="text-xs font-bold text-gray-700 bg-white/50 px-3 py-1 rounded-full border border-gray-900/20">
-              {templateWidth} × {templateHeight}
-            </div>
-          </div>
-          
-          <!-- Preview Content -->
-          <div class="p-4 sm:p-6 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-            <div class="relative mx-auto flex items-center justify-center" style="max-width: 100%;">
-              <!-- FabricJS Canvas Preview -->
-              {#if template?.fabricJSData}
-                <div class="relative rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden bg-white">
-                  <!-- Loading overlay -->
-                  {#if previewLoading}
-                    <div class="absolute inset-0 flex items-center justify-center bg-[#FFFDF8] z-10">
-                      <div class="flex flex-col items-center gap-3">
-                        <div class="w-8 h-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-sm font-bold text-gray-600">Loading preview...</span>
-                      </div>
+
+              <!-- Main Preview Canvas Area -->
+              <div class="p-8 bg-gray-100 flex flex-col items-center justify-center relative min-h-[400px]">
+                 <!-- Checkerboard -->
+                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+                 
+                 <div class="relative z-10 flex flex-col items-center gap-8 w-full">
+                     
+                     <!-- FabricJS Canvas Preview -->
+                    <div class="relative rounded-xl border-[2px] border-gray-200 shadow-xl overflow-hidden bg-white hover:scale-[1.01] transition-transform duration-300">
+                      {#if template?.fabricJSData}
+                          {#if previewLoading}
+                            <div class="absolute inset-0 flex items-center justify-center bg-white z-20">
+                              <div class="w-8 h-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          {/if}
+                          <canvas bind:this={previewCanvasEl}></canvas>
+                      {:else}
+                         <div class="w-[600px] h-[315px] flex items-center justify-center bg-gray-50">
+                             <p class="font-bold text-gray-400">Preview not available</p>
+                         </div>
+                      {/if}
                     </div>
-                  {/if}
-                  <canvas bind:this={previewCanvasEl}></canvas>
-                </div>
-              {:else}
-                <!-- Fallback preview -->
-                <div class="w-full h-full min-h-[200px] rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] bg-[#FFFDF8] flex items-center justify-center">
-                  <div class="text-center p-6">
-                    <div class="w-16 h-16 bg-[#ffc480] rounded-xl border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-4 shadow-[4px_4px_0_0_#1f2937]">
-                      <svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+
+                    <!-- Action Bar -->
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
+                        <button
+                            type="button"
+                            on:click={handleQuickGenerate}
+                            disabled={isGenerating}
+                            class="flex-1 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+                        >
+                            {#if isGenerating}
+                            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Working...
+                            {:else}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            Run Test
+                            {/if}
+                        </button>
+                        <button
+                            type="button"
+                            on:click={openInCanvasEditor}
+                            class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            Edit Design
+                        </button>
                     </div>
-                    <p class="text-lg font-black text-gray-900 uppercase">{config.label}</p>
-                    <p class="text-sm text-gray-500 font-medium mt-1">Click below to customize</p>
-                  </div>
-                </div>
-              {/if}
-            </div>
-          </div>
-          
-          <!-- CTA Section -->
-          <div class="bg-[#FFFDF8] border-t-[3px] border-gray-900 px-4 sm:px-6 py-4 sm:py-6">
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                type="button"
-                on:click={handleQuickGenerate}
-                disabled={isGenerating}
-                class="w-full sm:w-auto px-8 py-4 bg-[#4ade80] text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {#if isGenerating}
-                  <svg class="w-6 h-6 animate-spin" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Generating...
-                {:else}
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Quick Generate
-                {/if}
-              </button>
-              <button
-                type="button"
-                on:click={openInCanvasEditor}
-                class="w-full sm:w-auto px-8 py-4 bg-[#ff6b6b] text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex items-center justify-center gap-3"
-              >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Customize in Editor
-              </button>
-            </div>
-          </div>
-        </div>
+
+                 </div>
+              </div>
+         </div>
       </div>
 
       <!-- Generated Result + NextSteps -->
       {#if generatedImageUrl}
-        <div class="max-w-4xl mx-auto px-4 mb-12 sm:mb-16">
-          <!-- Generated Image Display -->
-          <div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-8">
-            <div class="bg-[#4ade80] border-b-[3px] border-gray-900 px-4 sm:px-6 py-3 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="font-black text-sm uppercase tracking-widest text-gray-900">Generated Result</span>
-              </div>
-              <div class="text-xs font-bold text-gray-700 bg-white/50 px-3 py-1 rounded-full border border-gray-900/20">
-                {templateWidth} × {templateHeight}
-              </div>
-            </div>
-            
-            <div class="p-4 sm:p-6 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-              <div class="relative mx-auto flex items-center justify-center" style="max-width: 100%;">
-                <div class="rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden bg-white">
-                  <img 
-                    src={generatedImageUrl} 
-                    alt="Generated {config?.label || 'image'}"
-                    class="max-w-full h-auto"
-                    style="max-height: 500px;"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="bg-[#FFFDF8] border-t-[3px] border-gray-900 px-4 sm:px-6 py-4 flex flex-wrap justify-center gap-3">
-              <a
-                href={generatedImageUrl}
-                download="pictify-{useCaseId}.png"
-                class="px-4 py-2 bg-white border-[3px] border-gray-900 font-bold text-sm uppercase shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download
-              </a>
-              <button
-                type="button"
-                on:click={handleQuickGenerate}
-                disabled={isGenerating}
-                class="px-4 py-2 bg-white border-[3px] border-gray-900 font-bold text-sm uppercase shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 disabled:opacity-50"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Regenerate
-              </button>
-            </div>
-          </div>
+        <div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
+           <div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden">
+               <div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl"></div>
+               
+               <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">Success! Here is your image</h3>
+               
+               <div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8">
+                   <img src={generatedImageUrl} alt="Generated result" class="max-w-full h-auto max-h-[400px]" />
+               </div>
 
-          <!-- NextSteps Component -->
-          <NextSteps
-            heading="What's next?"
-            description="Share this result, save as template for customization, or automate via API."
-            curlSnippet={apiSnippet}
-            {templateDraft}
-            generatedUrl={generatedImageUrl}
-            generatedWidth={templateWidth}
-            generatedHeight={templateHeight}
-            generatedFormat="png"
-            toolName={config?.label || useCaseId}
-          />
+               <div class="flex flex-wrap justify-center gap-4">
+                  <a
+                    href={generatedImageUrl}
+                    download="pictify-result.png"
+                    class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Download PNG
+                  </a>
+               </div>
+           </div>
+           
+           <div class="mt-12">
+               <NextSteps
+                heading="Now Automate It"
+                description="You've proved it works. Now integrate this into your app."
+                curlSnippet={apiSnippet}
+                {templateDraft}
+                generatedUrl={generatedImageUrl}
+                generatedWidth={templateWidth}
+                generatedHeight={templateHeight}
+                generatedFormat="png"
+                toolName={config?.label || useCaseId}
+               />
+           </div>
         </div>
       {:else if generationError}
-        <div class="max-w-4xl mx-auto px-4 mb-12">
-          <div class="bg-red-50 border-[3px] border-red-400 p-6 rounded-xl text-center">
-            <p class="font-bold text-red-700">{generationError}</p>
-            <button
-              type="button"
-              on:click={handleQuickGenerate}
-              class="mt-4 px-6 py-2 bg-red-500 text-white font-bold border-[2px] border-red-700 hover:bg-red-600 transition-colors"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
+         <div class="max-w-3xl mx-auto px-4 mb-12">
+            <div class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500">
+                    !
+                </div>
+                <div>
+                    <h4 class="font-black text-red-900 uppercase">Generation Failed</h4>
+                    <p class="text-red-700 font-medium">{generationError}</p>
+                </div>
+                <button on:click={handleQuickGenerate} class="ml-auto underline font-bold text-red-900">Retry</button>
+            </div>
+         </div>
       {/if}
 
-      <SectionSeparator icon="star" />
-
-      <!-- Why Teams Choose This Section -->
-      <section class="py-16">
-        <div class="text-center mb-12">
-          <div class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform rotate-1">
+      <!-- Why Teams Choose This Section (Three Pillars Style) -->
+      <section class="py-20 relative">
+        <div class="text-center mb-16 px-4">
+          <div class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform rotate-1 rounded-lg">
             <span class="font-black uppercase tracking-widest text-sm">Overview</span>
           </div>
-          <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter">
+          <h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
             Why teams <span class="text-[#ff6b6b]">choose</span> this workflow
           </h2>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6">
           {#each config.overview as paragraph, i}
-            <div class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all">
-              <div class="w-12 h-12 bg-[#ffc480] border-[3px] border-gray-900 rounded-lg flex items-center justify-center text-xl font-black mb-4 shadow-[3px_3px_0_0_#1f2937]">
+            <div class="bg-white border-[3px] border-gray-900 p-8 rounded-3xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-1 transition-all relative overflow-hidden group">
+               <div class="absolute top-0 right-0 w-32 h-32 bg-[#ffc480]/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+              <div class="w-12 h-12 bg-[#ffc480] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-xl font-black mb-6 shadow-[3px_3px_0_0_#1f2937] relative z-10">
                 {i + 1}
               </div>
-              <p class="text-gray-700 font-medium leading-relaxed">{paragraph}</p>
+              <p class="text-gray-700 font-bold leading-relaxed text-lg relative z-10">{paragraph}</p>
             </div>
           {/each}
         </div>
       </section>
 
-      <!-- Pain Points Section -->
-      <section class="py-16 bg-[#ffc480] border-y-[3px] border-gray-900 pattern-grid -mx-4 sm:-mx-6 px-4 sm:px-6">
-        <div class="max-w-4xl mx-auto">
-          <div class="text-center mb-12">
-            <div class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform -rotate-1">
-              <span class="font-black uppercase tracking-widest text-sm">Problems Solved</span>
+      <!-- Deep Dive & Scenarios Section -->
+      {#if config.longDescription || (config.useCaseScenarios && config.useCaseScenarios.length)}
+      <section class="py-20 px-4 bg-white border-y-[3px] border-gray-900 relative overflow-hidden">
+         <!-- Background Pattern -->
+         <div class="absolute inset-0 opacity-40 mix-blend-multiply" style="background-image: radial-gradient(#e5e7eb 2px, transparent 2px); background-size: 32px 32px;"></div>
+
+         <div class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 relative z-10">
+            
+            <!-- Long Description Column -->
+            {#if config.longDescription}
+            <div class="{config.useCaseScenarios && config.useCaseScenarios.length ? 'lg:col-span-7' : 'lg:col-span-12'}">
+                <div class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[12px_12px_0_0_#1f2937] h-full">
+                    <span class="inline-block px-4 py-1.5 bg-[#ff6b6b] text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6">Deep Dive</span>
+                    
+                    <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-6 leading-tight uppercase tracking-tight">The Context</h3>
+                    
+                    <div class="prose prose-lg prose-gray font-medium text-gray-700 leading-loose">
+                        {@html config.longDescription.replace(/\n/g, '<br/>')}
+                    </div>
+                </div>
             </div>
-            <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter">
-              Common <span class="bg-white px-2 border-[3px] border-black shadow-[3px_3px_0_0_#000]">pain points</span>
+            {/if}
+
+            <!-- Use Case Scenarios Column -->
+            {#if config.useCaseScenarios && config.useCaseScenarios.length}
+            <div class="{config.longDescription ? 'lg:col-span-5' : 'lg:col-span-12'}">
+                <div class="bg-[#4ade80] border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[12px_12px_0_0_#1f2937] h-full relative overflow-hidden">
+                    <!-- Decorative Circle -->
+                    <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-white/20 rounded-full blur-xl pointer-events-none"></div>
+
+                    <span class="inline-block px-4 py-1.5 bg-white text-gray-900 border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6">Perfect For</span>
+                    
+                    <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-8 leading-tight uppercase tracking-tight">Who uses this?</h3>
+                    
+                    <ul class="space-y-4">
+                        {#each config.useCaseScenarios as scenario}
+                        <li class="flex items-start gap-4 p-4 bg-white/90 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center mt-1">
+                                <svg class="w-3.5 h-3.5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <span class="text-gray-900 font-bold leading-snug">{scenario}</span>
+                        </li>
+                        {/each}
+                    </ul>
+                </div>
+            </div>
+            {/if}
+         </div>
+      </section>
+      {/if}
+      
+      <SectionSeparator icon="bolt" />
+
+      <!-- Pain Points Section -->
+      <section class="py-20 bg-[#FFFDF8]">
+        <div class="max-w-5xl mx-auto px-6">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
+              Problems <span class="bg-[#ff6b6b] text-white px-2 transform -skew-x-6 inline-block">Solved</span>
             </h2>
           </div>
 
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {#each config.painPoints as point}
-              <div class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all">
-                <div class="flex items-start gap-3">
-                  <span class="text-[#ff6b6b] text-xl font-black">✗</span>
+              <div class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[5px_5px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all">
+                <div class="flex items-start gap-4">
+                  <span class="text-[#ff6b6b] text-2xl font-black">✗</span>
                   <p class="text-gray-800 font-bold">{point}</p>
                 </div>
               </div>
@@ -512,190 +530,84 @@ $: templateDraft = template ? {
       </section>
 
       <!-- Step by Step Section -->
-      <section class="py-16">
-        <div class="text-center mb-12">
-          <div class="inline-block bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform rotate-1">
-            <span class="font-black uppercase tracking-widest text-sm">How It Works</span>
-          </div>
-          <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter">
-            Step-by-step <span class="text-[#ff6b6b]">workflow</span>
+      <section class="py-20">
+        <div class="text-center mb-16 px-4">
+          <h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
+            Step-by-step <span class="text-[#4ade80]">workflow</span>
           </h2>
         </div>
 
-        <div class="max-w-3xl mx-auto space-y-6">
+        <div class="max-w-4xl mx-auto px-6 space-y-8">
           {#each config.workflow as step, i}
-            <div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all">
-              <div class="flex items-stretch">
-                <div class="bg-black text-white px-6 py-4 flex items-center justify-center border-r-[3px] border-gray-900">
-                  <span class="font-black text-2xl">{i + 1}</span>
+            <div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden hover:-translate-y-1 transition-all group">
+              <div class="flex flex-col md:flex-row items-stretch">
+                <div class="bg-gray-900 text-white px-8 py-6 flex items-center justify-center border-b-[3px] md:border-b-0 md:border-r-[3px] border-gray-900 min-w-[100px]">
+                  <span class="font-black text-4xl text-[#4ade80]">{i + 1}</span>
                 </div>
-                <div class="p-6 flex-1">
-                  <h3 class="font-black text-xl uppercase tracking-wide mb-2">{step.title}</h3>
-                  <p class="text-gray-600 font-medium">{step.detail}</p>
+                <div class="p-8 flex-1 group-hover:bg-gray-50 transition-colors">
+                  <h3 class="font-black text-2xl text-gray-900 uppercase tracking-wide mb-3">{step.title}</h3>
+                  <p class="text-gray-600 font-medium text-lg">{step.detail}</p>
                 </div>
               </div>
             </div>
           {/each}
         </div>
 
-        <!-- CTA after steps -->
-        <div class="text-center mt-10">
+        <div class="text-center mt-16 px-4">
           <button
             type="button"
             on:click={openInCanvasEditor}
-            class="px-8 py-4 bg-[#ff6b6b] text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all inline-flex items-center gap-3"
+            class="px-10 py-5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
             Start Creating Now
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
           </button>
         </div>
       </section>
 
-      <SectionSeparator icon="arrow" />
+      <SectionSeparator icon="hash" />
 
-      <!-- Recommended Formats & Sizes -->
-      <section class="py-16">
-        <div class="max-w-4xl mx-auto">
-          <div class="grid md:grid-cols-2 gap-8">
-            <!-- Formats -->
-            <div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] p-6">
-              <h3 class="font-black text-xl uppercase tracking-wide mb-4 flex items-center gap-2">
-                <span class="w-8 h-8 bg-[#ffc480] border-[2px] border-black flex items-center justify-center text-sm">📷</span>
-                Recommended Formats
-              </h3>
-              <div class="flex flex-wrap gap-3">
-                {#each formatOptions as fmt}
-                  <a 
-                    href={baseFormatUrl(fmt)} 
-                    class="px-4 py-2 bg-[#FFFDF8] border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                  >
-                    {fmt.toUpperCase()}
-                  </a>
-                {/each}
-              </div>
-            </div>
-
-            <!-- Sizes -->
-            <div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] p-6">
-              <h3 class="font-black text-xl uppercase tracking-wide mb-4 flex items-center gap-2">
-                <span class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-sm">📐</span>
-                Recommended Sizes
-              </h3>
-              <div class="flex flex-wrap gap-3">
-                {#each sizeOptions as size}
-                  <a 
-                    href={sizeUrl(primarySizeFormat, size)} 
-                    class="px-3 py-2 bg-[#FFFDF8] border-[3px] border-gray-900 font-bold text-sm shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                  >
-                    {size}
-                  </a>
-                {/each}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- API Section -->
-      <section class="py-16">
-        <div class="max-w-5xl mx-auto px-4">
-          <div class="rounded-3xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937] overflow-hidden transform transition-transform hover:-translate-y-1">
-            <div class="grid gap-8 lg:grid-cols-[1.1fr,1fr] p-6 sm:p-8 md:p-12 items-center">
+      <!-- API Section (Dark Mac Window) -->
+      <section class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+          <div class="rounded-[2.5rem] border-[3px] border-gray-900 bg-white shadow-[12px_12px_0_0_#1f2937] overflow-hidden">
+            <div class="grid gap-10 lg:grid-cols-[1fr,1.2fr] p-8 md:p-16 items-center">
               
-              <!-- Left Column: Content -->
-              <div class="flex flex-col justify-between gap-6">
-                <div class="space-y-5">
-                  <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-900 bg-[#ffc480] px-4 py-1.5 rounded-full border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    API Ready
-                  </span>
-                  
-                  <div class="space-y-3">
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight text-gray-900 tracking-tight">
-                      Automate with <span class="text-[#ff6b6b]">Pictify API</span>
+              <!-- Left: Pitch -->
+              <div class="flex flex-col gap-8">
+                 <div>
+                    <span class="px-4 py-2 bg-[#ffc480] border-2 border-gray-900 rounded-lg text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937]">Developer Friendly</span>
+                    <h2 class="mt-6 text-3xl md:text-5xl font-black text-gray-900 leading-[1.1]">
+                        Automate with <span class="text-[#ff6b6b]">API</span>
                     </h2>
-                    <p class="text-base sm:text-lg text-gray-700 leading-relaxed font-medium">
-                      Trigger this workflow programmatically to create personalized, on-brand images right inside your product or campaigns.
+                    <p class="mt-6 text-xl text-gray-600 font-medium leading-relaxed">
+                        Trigger this workflow programmatically. Personalized images, generated instantly at scale.
                     </p>
-                  </div>
-
-                  <ul class="space-y-3">
-                    <li class="flex items-start gap-3 group">
-                      <span class="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff6b6b] text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] group-hover:translate-y-px group-hover:translate-x-px group-hover:shadow-none transition-all flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                      <span class="text-gray-800 font-bold text-sm sm:text-base leading-snug">Render images at scale without managing headless browsers</span>
-                    </li>
-                    <li class="flex items-start gap-3 group">
-                      <span class="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff6b6b] text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] group-hover:translate-y-px group-hover:translate-x-px group-hover:shadow-none transition-all flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                      <span class="text-gray-800 font-bold text-sm sm:text-base leading-snug">Serve media instantly from our global CDN</span>
-                    </li>
-                    <li class="flex items-start gap-3 group">
-                      <span class="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff6b6b] text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] group-hover:translate-y-px group-hover:translate-x-px group-hover:shadow-none transition-all flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                      <span class="text-gray-800 font-bold text-sm sm:text-base leading-snug">Track usage and rotate keys from the dashboard</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="flex flex-wrap gap-3 pt-2">
-                  <a
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm sm:text-base font-bold text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#ff6b6b] hover:bg-gray-800"
-                    href="/signup?redirect=/dashboard/api-token"
-                  >
-                    Get free API key
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </a>
-
-                  <a
-                    class="inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-gray-900 px-5 py-3 text-sm sm:text-base font-bold text-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] hover:bg-gray-50"
-                    href="https://docs.pictify.io/"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    Read API docs
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </a>
-                </div>
+                 </div>
+                 
+                 <div class="flex flex-wrap gap-4">
+                    <a href="/signup" class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-[#ff6b6b] hover:text-gray-900 transition-colors">
+                        Get API Key
+                    </a>
+                    <a href="https://docs.pictify.io" target="_blank" class="px-6 py-3 bg-white text-gray-900 font-bold border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors">
+                        Read Docs
+                    </a>
+                 </div>
               </div>
 
-              <!-- Right Column: Code Block -->
-              <div class="relative">
-                <!-- Decorative dots -->
-                <div class="absolute -top-4 -right-4 w-20 h-20 bg-[#ffc480] rounded-full blur-2xl opacity-20"></div>
-                <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-[#ff6b6b] rounded-full blur-2xl opacity-20"></div>
-
-                <div class="relative w-full rounded-xl border-[3px] border-gray-900 bg-[#1e1e1e] p-0 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
-                  <!-- Mac-style Window Header -->
-                  <div class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center justify-between">
-                    <div class="flex gap-2">
-                      <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                      <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                      <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+              <!-- Right: Code Window -->
+              <div class="relative group">
+                 <div class="absolute -inset-4 bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] rounded-[2rem] opacity-20 blur-xl group-hover:opacity-30 transition-opacity"></div>
+                 <div class="relative rounded-2xl border-[3px] border-gray-900 bg-[#1e1e1e] shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+                    <div class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
                     </div>
-                    <span class="text-xs font-mono font-bold text-gray-500 uppercase tracking-wider">BASH</span>
-                  </div>
-                  
-                  <!-- Code Content -->
-                  <div class="p-4 sm:p-6 overflow-x-auto custom-scrollbar">
-                    <pre class="font-mono text-xs sm:text-sm leading-relaxed text-gray-300 whitespace-pre-wrap"><code>{@html renderedApiCode}</code></pre>
-                  </div>
-                </div>
+                    <div class="p-6 overflow-x-auto custom-scrollbar">
+                        <pre class="font-mono text-sm leading-relaxed text-gray-300"><code>{@html renderedApiCode}</code></pre>
+                    </div>
+                 </div>
               </div>
 
             </div>
@@ -704,77 +616,63 @@ $: templateDraft = template ? {
       </section>
 
       <!-- FAQs Section -->
-      <section class="py-16">
+      <section class="py-20 px-4">
         <div class="max-w-4xl mx-auto">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter bg-white px-6 py-2 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] transform -rotate-1 inline-block">
-              Frequently Asked Questions
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter inline-block relative">
+              <span class="relative z-10">Frequently Asked Questions</span>
+              <span class="absolute bottom-1 left-0 w-full h-3 bg-[#ffc480] -z-0 transform -rotate-1"></span>
             </h2>
           </div>
 
           <div class="space-y-4">
             {#each config.faqs as faq}
-              <details class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1">
-                <summary class="flex items-center justify-between p-6 cursor-pointer list-none bg-[#FFFDF8] hover:bg-gray-50 transition-colors">
-                  <span class="font-black text-lg uppercase tracking-wide pr-4">{faq.q}</span>
-                  <span class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-[#ffc480] group-hover:text-black flex-shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+              <details class="group bg-white rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1">
+                <summary class="flex items-center justify-between p-6 cursor-pointer list-none bg-white hover:bg-gray-50 transition-colors">
+                  <span class="font-black text-lg text-gray-900 pr-8">{faq.q}</span>
+                  <span class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-100 text-gray-900 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
                   </span>
                 </summary>
-                <div class="p-6 pt-0 border-t-[3px] border-gray-900 bg-white">
-                  <p class="text-lg font-medium text-gray-700 leading-relaxed mt-4">{faq.a}</p>
+                <div class="p-6 pt-0 text-gray-700 font-medium leading-relaxed">
+                  {faq.a}
                 </div>
               </details>
             {/each}
           </div>
         </div>
       </section>
-
+      
       <!-- Related Workflows -->
-      <section class="py-16">
-        <div class="max-w-4xl mx-auto">
-          <div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] p-8">
-            <h2 class="text-2xl font-black uppercase tracking-tighter mb-6">Related Workflows</h2>
-            <div class="flex flex-wrap gap-3">
-              {#each config.related as relatedId}
-                <a 
-                  href={`/tools/${relatedId}`} 
-                  class="px-5 py-3 bg-[#FFFDF8] border-[3px] border-gray-900 font-bold shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffc480] transition-all"
-                >
-                  {useCaseDetails[relatedId]?.label || relatedId}
-                </a>
-              {/each}
-            </div>
-
-            <div class="border-t-[3px] border-dashed border-gray-300 mt-8 pt-8">
-              <div class="flex flex-wrap gap-3">
-                <a href="/tools/html-to-jpg" class="px-5 py-3 bg-[#ffc480] border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                  HTML to Image Converter
-                </a>
-                <a href="/tools" class="px-5 py-3 bg-white border-[3px] border-gray-900 font-bold shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                  Explore All Tools →
-                </a>
+      <section class="py-20 px-4 border-t-[3px] border-gray-900 bg-white">
+          <div class="max-w-6xl mx-auto">
+              <h3 class="text-2xl font-black uppercase tracking-widest text-gray-400 mb-8">Related Workflows</h3>
+              <div class="flex flex-wrap gap-4">
+                   {#each config.related as relatedId}
+                    <a 
+                      href={`/tools/${relatedId}`} 
+                      class="px-6 py-3 bg-[#FFFDF8] border-[3px] border-gray-900 font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all rounded-xl"
+                    >
+                      {useCaseDetails[relatedId]?.label || relatedId}
+                    </a>
+                  {/each}
+                  <a href="/tools" class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.3)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl">
+                      View All Tools →
+                  </a>
               </div>
-            </div>
           </div>
-        </div>
       </section>
 
     {:else}
       <!-- Not Found State -->
-      <div class="text-center space-y-6 py-20">
-        <div class="inline-block bg-[#ff6b6b] border-[4px] border-black px-6 py-3 shadow-[6px_6px_0_0_#000] transform -rotate-1">
-          <span class="font-black text-white text-xl uppercase">404</span>
-        </div>
-        <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tighter">Workflow not found</h1>
-        <p class="text-xl text-gray-700 font-bold">Explore all tools and workflows at Pictify.io.</p>
+      <div class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4">
+        <div class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]">?</div>
+        <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-gray-900">Workflow not found</h1>
         <a 
           href="/tools" 
-          class="inline-block py-4 px-8 bg-[#ffc480] border-[4px] border-gray-900 text-gray-900 font-black uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+          class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
         >
-          View All Tools
+          Explore All Tools
         </a>
       </div>
     {/if}
@@ -784,11 +682,6 @@ $: templateDraft = template ? {
 </section>
 
 <style>
-  .pattern-grid {
-    background-image: radial-gradient(#1f2937 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
-  
   :global(.token-command) {
     color: #ff79c6;
     font-weight: 700;

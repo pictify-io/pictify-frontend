@@ -579,9 +579,9 @@
 			</div>
 		{:else}
 			{#each layers as layer (layer.id)}
-				<div 
+				<div
 					class="layer-item group"
-					style="padding-left: {12 + layer.depth * 20}px"
+					style="padding-left: {8 + layer.depth * 12}px"
 					class:selected={$selectedComponent === layer.object}
 					class:hidden-layer={!layer.visible}
 					class:locked={layer.locked}
@@ -782,8 +782,8 @@
 	}
 	
 	.panel-header {
-		padding: 16px 20px;
-		border-bottom: 3px solid #111827;
+		padding: 12px 16px;
+		border-bottom: 2px solid #111827;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -811,7 +811,7 @@
 	.layers-list {
 		flex: 1;
 		overflow-y: auto;
-		padding: 12px;
+		padding: 8px;
 		background-color: #FFFDF8;
 	}
 	
@@ -861,8 +861,8 @@
 		background: white;
 		border: 2px solid #111827;
 		border-radius: 6px;
-		padding: 8px 12px;
-		margin-bottom: 8px;
+		padding: 6px 10px;
+		margin-bottom: 4px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -940,7 +940,7 @@
 	.layer-content {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
 		flex: 1;
 		min-width: 0;
 		overflow: hidden;

@@ -20,4 +20,14 @@ const getGifs = async ({ limit = 12, offset = 0 } = {}) => {
 	}
 };
 
-export { getImages, getGifs };
+const getPdfs = async ({ limit = 12, offset = 0 } = {}) => {
+	try {
+		const response = await backend.get(`/pdf?limit=${limit}&offset=${offset}`);
+		return response;
+	} catch (error) {
+		console.error('Error fetching pdfs:', error);
+		return { pdfs: [], pagination: { total: 0, limit, offset, hasMore: false } };
+	}
+};
+
+export { getImages, getGifs, getPdfs };

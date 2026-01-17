@@ -136,6 +136,7 @@ export const editorActions = {
 	/**
 	 * Ungroup a selected group
 	 * Uses FabricJS's built-in _restoreObjectsState method
+	 * Protected elements (QR codes, charts, tables) cannot be ungrouped
 	 */
 	ungroupSelected: (canvas) => {
 		if (!canvas) return false;
@@ -145,6 +146,12 @@ export const editorActions = {
 		const objectType = group?.type?.toLowerCase();
 		if (!group || objectType !== 'group') {
 			console.warn('Selected object is not a group. Type:', group?.type);
+			return false;
+		}
+
+		// Check if this is a protected element (QR code, chart, or table)
+		if (group.isQRCode || group.isChart || group.isTable) {
+			console.warn('Cannot ungroup protected elements (QR codes, charts, tables)');
 			return false;
 		}
 
