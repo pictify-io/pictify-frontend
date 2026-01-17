@@ -166,21 +166,16 @@
 	$: totalPages = Math.ceil(total / limit);
 </script>
 
-<div class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden">
-	<!-- Background Grid -->
-	<div class="absolute inset-0 opacity-5 pointer-events-none" 
-		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
-	</div>
-
-	<div class="max-w-7xl mx-auto p-6 relative z-10">
+<div class="min-h-full">
+	<div>
 		<!-- Header -->
-		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
 			<div>
 				<div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3">
 					<span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse"></span>
 					System Monitor
 				</div>
-				<h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
 					Activity <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Logs</span>
 				</h1>
 			</div>

@@ -118,178 +118,202 @@
   {/if}
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col">
+<div class="bg-[#FFFDF8] min-h-screen flex flex-col relative overflow-hidden font-sans">
+  
+  <!-- Background Elements -->
+  <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
+  <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+
   <Nav />
 
-  <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20 relative z-10">
     {#if loading}
       <!-- Loading state -->
-      <div class="text-center py-16">
-        <div class="inline-block animate-spin h-12 w-12 border-4 border-gray-900 border-t-transparent rounded-full mb-4"></div>
-        <p class="font-bold text-gray-600">Loading...</p>
+      <div class="flex flex-col items-center justify-center min-h-[400px]">
+        <div class="w-16 h-16 border-[4px] border-gray-900 border-t-[#ff6b6b] rounded-full animate-spin"></div>
+        <p class="mt-6 text-xl font-black text-gray-900 uppercase tracking-widest animate-pulse">Loading Asset...</p>
       </div>
     {:else if error}
       <!-- Error state -->
-      <div class="text-center py-16">
-        <div class="inline-block p-6 bg-red-100 border-[3px] border-red-400 rounded-full mb-6">
-          <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl p-12 relative overflow-hidden">
+        <div class="absolute inset-0 bg-red-50/50 -z-10"></div>
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-[#ff6b6b]/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-[#ff6b6b]">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
-        <h2 class="text-2xl font-black text-gray-900 mb-2">Result not found</h2>
-        <p class="text-gray-600 font-medium mb-6">{error}</p>
+        <h2 class="text-3xl font-black text-gray-900 mb-4 uppercase tracking-wide">Result not found</h2>
+        <p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
         <a
           href="/tools"
-          class="inline-block px-6 py-3 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          class="inline-block px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
         >
           Create your own
         </a>
       </div>
     {:else if result}
       <!-- Result content -->
-      <div class="space-y-8">
-        <!-- Header -->
-        <div class="text-center">
-          <div class="inline-block bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform rotate-1">
-            <span class="font-black uppercase tracking-widest text-sm">Shared Result</span>
-          </div>
-          {#if result.title}
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900">{result.title}</h1>
-          {/if}
-        </div>
-
-        <!-- Image display -->
-        <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
-          {#if result.contentType === 'gif'}
-            <img
-              src={result.assetUrl}
-              alt={result.title || 'Generated GIF'}
-              class="w-full h-auto"
-            />
-          {:else}
-            <img
-              src={result.assetUrl}
-              alt={result.title || 'Generated image'}
-              class="w-full h-auto"
-            />
-          {/if}
-        </div>
-
-        <!-- Meta info -->
-        <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-bold text-gray-600">
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-            {result.width || '?'} × {result.height || '?'}px
-          </span>
-          {#if result.format}
-            <span class="px-2 py-0.5 bg-gray-100 border border-gray-300 rounded uppercase">
-              {result.format}
-            </span>
-          {/if}
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            {result.viewCount || 0} views
-          </span>
-          <span>Created {formatDate(result.createdAt)}</span>
-          <span class="px-2 py-0.5 bg-[#ffc480] border border-gray-900 rounded">
-            via {formatSource(result.source)}
-          </span>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="flex flex-wrap justify-center gap-4">
-          <button
-            on:click={copyShareUrl}
-            class="px-6 py-3 bg-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            </svg>
-            Copy link
-          </button>
-
-          <button
-            on:click={copyAssetUrl}
-            class="px-6 py-3 bg-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
-            Copy image URL
-          </button>
-
-          <button
-            on:click={downloadAsset}
-            class="px-6 py-3 bg-[#4ade80] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Download
-          </button>
-        </div>
-
-        <!-- Template info if applicable -->
-        {#if template && template.isPublic}
-          <div class="bg-[#f0f9ff] border-[3px] border-gray-900 p-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <p class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Created from template</p>
-                <p class="text-xl font-black text-gray-900">{template.name}</p>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- Left Column: Asset Viewer -->
+        <div class="lg:col-span-8 flex flex-col gap-8">
+           <!-- "Window" Card -->
+           <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group">
+              <!-- Window Header -->
+              <div class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between">
+                   <div class="flex items-center gap-2">
+                      <div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900"></div>
+                      <div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900"></div>
+                      <div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900"></div>
+                   </div>
+                   <div class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      {result.width} x {result.height}px
+                   </div>
               </div>
-              <a
-                href={`/templates/${template.uid}`}
-                class="px-6 py-3 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-              >
-                🔄 Remix this template
-              </a>
-            </div>
-          </div>
-        {/if}
-
-        <!-- CTA section -->
-        <div class="bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 text-center">
-          <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-4">
-            Create your own
-          </h2>
-          <p class="text-lg font-bold text-gray-600 max-w-2xl mx-auto mb-6">
-            Use our free tools to generate images instantly, or build templates and automate variants via API.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/tools"
-              class="px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-            >
-              Try free tools
-            </a>
-            <a
-              href="/templates"
-              class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-            >
-              Browse templates
-            </a>
-            <a
-              href="/signup"
-              class="px-8 py-4 bg-[#ffc480] text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-            >
-              Get API key
-            </a>
-          </div>
+              
+              <!-- Image Container -->
+              <div class="bg-gray-100 relative p-4 sm:p-8 flex items-center justify-center min-h-[400px]">
+                  <!-- Checkerboard Pattern for transparency -->
+                  <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+                  
+                  {#if result.contentType === 'gif'}
+                    <img
+                      src={result.assetUrl}
+                      alt={result.title || 'Generated GIF'}
+                      class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
+                    />
+                  {:else}
+                    <img
+                      src={result.assetUrl}
+                      alt={result.title || 'Generated image'}
+                      class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
+                    />
+                  {/if}
+              </div>
+           </div>
         </div>
 
-        <!-- Pictify branding -->
-        <div class="text-center">
-          <a href="/" class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors">
-            <span class="font-black text-sm">Made with</span>
-            <span class="font-black text-lg text-[#ff6b6b]">Pictify</span>
-          </a>
+        <!-- Right Column: Details & Actions -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Header Info -->
+            <div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-[2px_2px_0_0_#000]">
+                    Shared Link
+                  </div>
+                  {#if result.format}
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-500">
+                      {result.format}
+                    </div>
+                  {/if}
+                </div>
+                
+                <h1 class="text-3xl font-black text-gray-900 leading-tight mb-3">
+                    {result.title || 'Untitled Creation'}
+                </h1>
+                
+                <div class="flex flex-col gap-2 text-sm font-medium text-gray-600 border-t-2 border-dashed border-gray-200 pt-4">
+                   <div class="flex items-center gap-2">
+                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                       <span>Created <span class="text-gray-900 font-bold">{formatDate(result.createdAt)}</span></span>
+                   </div>
+                   <div class="flex items-center gap-2">
+                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                       <span>Source: <span class="text-gray-900 font-bold">{formatSource(result.source)}</span></span>
+                   </div>
+                   <div class="flex items-center gap-2">
+                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                       <span><span class="text-gray-900 font-bold">{result.viewCount || 0}</span> views</span>
+                   </div>
+                </div>
+            </div>
+
+            <!-- Primary Actions -->
+            <div class="flex flex-col gap-4">
+                 <button
+                    on:click={copyShareUrl}
+                    class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
+                  >
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    Copy Link
+                 </button>
+
+                 <div class="grid grid-cols-2 gap-4">
+                    <button
+                        on:click={copyAssetUrl}
+                        class="w-full py-3 bg-white text-gray-900 font-bold uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
+                    >
+                        Copy URL
+                    </button>
+                    <button
+                        on:click={downloadAsset}
+                        class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download
+                    </button>
+                 </div>
+            </div>
+
+            <!-- Template Callout -->
+            {#if template && template.isPublic}
+              <div class="mt-4 bg-[#f0f9ff] border-[3px] border-gray-900 rounded-2xl p-5 relative overflow-hidden group hover:shadow-[4px_4px_0_0_#1f2937] transition-all">
+                <div class="absolute top-0 right-0 p-2 opacity-10">
+                   <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                </div>
+                
+                <p class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Original Template</p>
+                <h3 class="font-black text-gray-900 text-lg mb-4 truncate relative z-10">{template.name}</h3>
+                
+                <a
+                    href={`/templates/${template.uid}`}
+                    class="inline-block w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10"
+                >
+                    Remix Template
+                </a>
+              </div>
+            {/if}
+
+        </div>
+
+      </div>
+
+      <!-- CTA Footer for this page -->
+      <div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
+        <div class="bg-[#ff6b6b] rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden">
+             <div class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
+             <div class="relative z-10">
+                 <h2 class="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight text-shadow-sm">
+                    Automate this image?
+                 </h2>
+                 <p class="text-white/90 font-bold text-lg max-w-2xl mx-auto mb-8">
+                    Stop taking screenshots. Use the Pictify API to generate images, GIFs, and PDFs programmatically.
+                 </p>
+                 <div class="flex flex-wrap justify-center gap-4">
+                    <a
+                      href="/signup"
+                      class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+                    >
+                      Get API Key
+                    </a>
+                    <a
+                      href="/templates"
+                      class="px-8 py-4 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:bg-gray-800 transition-all rounded-xl"
+                    >
+                      Browse Templates
+                    </a>
+                 </div>
+             </div>
         </div>
       </div>
+
     {/if}
   </main>
 

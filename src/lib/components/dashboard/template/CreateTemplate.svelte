@@ -13,22 +13,30 @@
 	import { get } from 'svelte/store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
+	import { user, getUser } from '../../../../store/user.store';
 	import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 	import { goto } from '$app/navigation';
+	import { pages, currentPageIndex, outputFormat, pdfPreset, pageActions } from '../../../../store/pages.store';
+	import AuthModal from '../../editor/AuthModal.svelte';
 
 	let fabricCanvas;
 
 	let templateName = '';
-	let templateType = 'og-image'; // Default type
+	export let templateType = 'og-image'; // Default type
+    export let formatType = 'image'; // 'image' or 'pdf' (passed from parent route)
 	export let isEdit = false;
 	export let guestMode = false;
+	export let initialConfig = null; // { outputFormat, pdfPreset, width, height }
 
 	let editorTemplate = null;
 	let hasLoadedTemplate = false; // Track if we've already loaded the template
 
 	let unsubscribe = () => {};
 	let templateUnsubscribe = () => {};
+	let pagesUnsubscribe = () => {};
 	let isSaving = false;
+	let showAuthModal = false;
+	let shouldGenerateAfterSave = false;
 
 	const DRAFT_KEY = 'pictify_template_draft_v1';
 	let pendingDraft = null;
@@ -228,6 +236,8 @@
 			'isChart', 'chartType', 'chartData', 'chartConfig',
 			// Table properties
 			'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
+			// QR Code properties
+			'isQRCode', 'qrData', 'qrConfig',
 			// Conditional logic properties
 			'showWhen', 'hideWhen',
 			// Loop/repeat properties
@@ -281,6 +291,13 @@
 					result.tableStyle = canvasObj.tableStyle || 'modern';
 				}
 				
+				// QR Code properties
+				if (canvasObj.isQRCode) {
+					result.isQRCode = true;
+					result.qrData = canvasObj.qrData || '';
+					result.qrConfig = canvasObj.qrConfig || {};
+				}
+				
 				return result;
 			});
 		}
@@ -298,30 +315,34 @@
 		try {
 			// Ensure all objects have IDs before serialization
 			ensureAllObjectsHaveIds();
-			
-			const svg = fabricCanvas.toSVG();
-			const html = await getHTMLandCSS(svg, '');
-			
+
 			// Serialize with custom properties
 			const fabricJSData = serializeCanvasWithCustomProps();
-			
+
 			// Debug: Log what we're saving
 			console.log('Saving fabricJSData:', fabricJSData);
 			console.log('Objects with IDs:', fabricJSData?.objects?.map(o => ({ type: o.type, id: o.id, isVariable: o.isVariable })));
-			
+
 			const width = fabricCanvas.width;
 			const height = fabricCanvas.height;
 			const variableDefinitions = extractVariableDefinitions();
 
+			// Prepare multi-page data
+			const currentPages = get(pages);
+			const currentIndex = get(currentPageIndex);
+			const updatedPages = currentPages.map((p, i) => i === currentIndex ? { ...p, fabricJSData } : p);
+
 			const templateData = {
 				...editorTemplate,
-				html,
 				name: templateName,
 				fabricJSData,
 				width,
 				height,
 				type: templateType,
-				variableDefinitions
+				variableDefinitions,
+				outputFormat: get(outputFormat),
+				pdfPreset: get(pdfPreset),
+				pages: updatedPages
 			};
 
 			const result = await updateTemplateAction(templateData);
@@ -361,24 +382,28 @@
 		try {
 			// Ensure all objects have IDs before serialization
 			ensureAllObjectsHaveIds();
-			
-			const svg = fabricCanvas.toSVG();
-			const html = await getHTMLandCSS(svg, '');
-			
+
 			// Serialize with custom properties
 			const fabricJSData = serializeCanvasWithCustomProps();
 			const width = fabricCanvas.width;
 			const height = fabricCanvas.height;
 			const variableDefinitions = extractVariableDefinitions();
 
+			// Prepare multi-page data
+			const currentPages = get(pages);
+			const currentIndex = get(currentPageIndex);
+			const updatedPages = currentPages.map((p, i) => i === currentIndex ? { ...p, fabricJSData } : p);
+
 			const templateData = {
-				html,
 				name: templateName,
 				fabricJSData,
 				width,
 				height,
 				type: templateType,
-				variableDefinitions
+				variableDefinitions,
+				outputFormat: get(outputFormat),
+				pdfPreset: get(pdfPreset),
+				pages: updatedPages
 			};
 
 			const result = await createTemplateAction(templateData);
@@ -400,8 +425,10 @@
 				toast.set({ message, duration: 2500 });
 				
 				// Redirect to the edit view for this template
-				// This ensures subsequent saves are updates, not new creations
-				goto(`/template-workspace/${result.uid}`, { replaceState: true });
+				// Use format-specific URL to ensure correct mode is preserved
+				const currentFormat = get(outputFormat);
+				const formatPath = currentFormat === 'pdf' ? 'pdf' : 'image';
+				goto(`/template-workspace/${formatPath}/${result.uid}`, { replaceState: true });
 			} else {
 				toast.set({ message: 'Failed to create template', duration: 1500 });
 			}
@@ -433,7 +460,7 @@
 			} catch (e) {}
 
 			toast.set({ message: 'Create a free account to save templates and use the API.', duration: 2500 });
-			goto('/signup?redirect=/template-workspace/create');
+			showAuthModal = true;
 			return;
 		}
 		if (isEdit) {
@@ -552,6 +579,16 @@
 								tableStyle: objData.tableStyle || 'modern'
 							});
 							console.log('Restored table properties to object:', obj.id, objData.tableType);
+						}
+						
+						// QR Code properties
+						if (objData.isQRCode) {
+							obj.set({
+								isQRCode: true,
+								qrData: objData.qrData || '',
+								qrConfig: objData.qrConfig || {}
+							});
+							console.log('Restored QR code properties to object:', obj.id, objData.qrData);
 						}
 					}
 				});
@@ -755,8 +792,53 @@
 		// and guest mode uses it to carry state across signup.
 	}
 
+	// Handle auth success
+	async function handleAuthSuccess() {
+		// User is now logged in - reload user state
+		await getUser();
+
+		// Check if we're still in guest mode
+		if (!$user?.email) {
+			return;
+		}
+
+		// Update guestMode
+		guestMode = false;
+
+		toast.set({
+			message: 'Welcome! You can now save your template.',
+			duration: 2000
+		});
+
+		// Small delay to ensure state updates
+		setTimeout(async () => {
+			// Save the template
+			await saveTemplate();
+
+			// If we should generate after save, trigger it
+			if (shouldGenerateAfterSave) {
+				// Dispatch event to trigger generation
+				setTimeout(() => {
+					const event = new CustomEvent('trigger-generate-after-login');
+					window.dispatchEvent(event);
+				}, 1000);
+			}
+		}, 500);
+	}
+
+	// Listen for save-and-generate event from VariablesPanel
+	function handleSaveAndGenerate(event) {
+		if (event.detail?.generateAfterSave) {
+			shouldGenerateAfterSave = true;
+			saveTemplate();
+		}
+	}
+
 	onMount(() => {
 		console.log('CreateTemplate onMount, isEdit:', isEdit);
+
+		// Listen for save-and-generate events
+		window.addEventListener('save-template-and-generate', handleSaveAndGenerate);
 
 		// Read draft from tools (if any). Only used for create flow.
 		if (!isEdit) {
@@ -781,7 +863,8 @@
 				uid: t?.uid,
 				name: t?.name,
 				hasFabricJSData: !!t?.fabricJSData,
-				objectCount: t?.fabricJSData?.objects?.length
+				objectCount: t?.fabricJSData?.objects?.length,
+				outputFormat: t?.outputFormat
 			});
 			
 			// Debug: Check if objects have isVariable property
@@ -795,6 +878,20 @@
 				templateName = editorTemplate.name || templateName;
 				templateType = editorTemplate.type || 'og-image';
 				
+				// Initialize pages from template data (handles multi-page PDF)
+				pageActions.initFromTemplate(editorTemplate);
+				
+				// Restore output format and PDF preset from template data
+				// This ensures PDF templates open in PDF mode when refreshed
+				if (editorTemplate.outputFormat) {
+					pageActions.setOutputFormat(editorTemplate.outputFormat);
+					console.log('Restored outputFormat:', editorTemplate.outputFormat);
+				}
+				if (editorTemplate.pdfPreset) {
+					pageActions.setPdfPreset(editorTemplate.pdfPreset);
+					console.log('Restored pdfPreset:', editorTemplate.pdfPreset);
+				}
+				
 				// Try to load template when template data becomes available
 				attemptTemplateLoad();
 			}
@@ -804,7 +901,11 @@
 	onDestroy(() => {
 		unsubscribe();
 		templateUnsubscribe();
-		template.set(null);
+		// Remove event listener
+		window.removeEventListener('save-template-and-generate', handleSaveAndGenerate);
+		// Note: Don't reset template store here - it causes the VariablesPanel
+		// to briefly show "Template Not Saved" during navigation.
+		// The template store will be properly set by the next page that loads.
 		hasLoadedTemplate = false;
 	});
 </script>
@@ -817,3 +918,9 @@
 />
 
 <Toast />
+
+<!-- Auth Modal -->
+<AuthModal
+	bind:isOpen={showAuthModal}
+	onSuccess={handleAuthSuccess}
+/>

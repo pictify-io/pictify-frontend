@@ -5,11 +5,19 @@
 	
 	export let templates;
 	export let pagination = { page: 1, limit: 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false };
+	export let formatFilter = 'all'; // Controlled by parent, synced with API
 	
 	const dispatch = createEventDispatcher();
 
+	// Handle format filter change - dispatch to parent to refetch from API
+	const handleFilterChange = (filter) => {
+		dispatch('filterChange', filter);
+	};
+
 	const handleTemplateClick = (template) => {
-		const url = `/template-workspace/${template.uid}`;
+		// Route to format-specific editor based on outputFormat
+		const formatPath = template.outputFormat === 'pdf' ? 'pdf' : 'image';
+		const url = `/template-workspace/${formatPath}/${template.uid}`;
 		if (browser) {
 			window.open(url, '_blank', 'noopener,noreferrer');
 		} else {
@@ -173,6 +181,40 @@
 </script>
 
 <section>
+	<!-- Format Filter -->
+	<div class="flex items-center gap-2 mb-4">
+		<span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Filter:</span>
+		<div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
+			<button
+				on:click={() => handleFilterChange('all')}
+				class="px-3 py-1 text-xs font-bold rounded-md transition-all duration-200
+					{formatFilter === 'all' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-white hover:text-gray-900'}"
+			>
+				All
+			</button>
+			<button
+				on:click={() => handleFilterChange('image')}
+				class="px-3 py-1 text-xs font-bold rounded-md transition-all duration-200
+					{formatFilter === 'image' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-white hover:text-gray-900'}"
+			>
+				<span class="flex items-center gap-1">
+					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+					Image
+				</span>
+			</button>
+			<button
+				on:click={() => handleFilterChange('pdf')}
+				class="px-3 py-1 text-xs font-bold rounded-md transition-all duration-200
+					{formatFilter === 'pdf' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-white hover:text-gray-900'}"
+			>
+				<span class="flex items-center gap-1">
+					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+					PDF
+				</span>
+			</button>
+		</div>
+	</div>
+
 	<!-- Template Grid -->
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8">
 		{#each templates as template (template.uid)}
@@ -192,8 +234,19 @@
 						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
 						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
 					</div>
-					<div class="text-[9px] sm:text-[10px] font-bold font-mono text-gray-500 uppercase tracking-wider">
-						{getDimensionLabel(template)}
+					<div class="flex items-center gap-2">
+						{#if template.outputFormat === 'pdf'}
+							<span class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-[#ff6b6b] text-white uppercase tracking-wider rounded border border-gray-900">
+								PDF
+							</span>
+						{:else}
+							<span class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-[#4facfe] text-white uppercase tracking-wider rounded border border-gray-900">
+								IMAGE
+							</span>
+						{/if}
+						<span class="text-[9px] sm:text-[10px] font-bold font-mono text-gray-500 uppercase tracking-wider">
+							{getDimensionLabel(template)}
+						</span>
 					</div>
 				</div>
 

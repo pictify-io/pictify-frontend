@@ -3,12 +3,18 @@
 	import { Canvas, ActiveSelection } from 'fabric'; // v6 import
 	import { editor, editorActions } from '../../../store/editor.store';
 	import { canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved } from '../../../store/history.store';
+	import { currentPageIndex, pages, pageActions, outputFormat, pdfPreset } from '../../../store/pages.store';
+	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
 
 	let scale = 1;
 	let containerWidth = 0;
 	let containerHeight = 0;
 	let canvasContainer;
 	let fabricCanvas;
+	
+	// Page switching for multi-page PDF
+	let previousPageIndex = -1;
+	let pagesUnsubscribe;
 
 	// Undo/Redo History Management
 	let historyStack = [];
@@ -20,7 +26,13 @@
 	const MAX_HISTORY = 50;
 
 	function saveState() {
-		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingOperations) return;
+		// Only log if blocked to reduce noise, or if successful
+		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingOperations) {
+			if (isPerformingUndoRedo) console.log('🚫 saveState blocked: performing undo/redo');
+			if (isLoadingCanvas) console.log('🚫 saveState blocked: loading canvas');
+			if (isBatchingOperations) console.log('🚫 saveState blocked: batching operations');
+			return;
+		}
 		
 		// Remove all states after current index (if we've undone and then made a new change)
 		historyStack = historyStack.slice(0, historyIndex + 1);
@@ -32,11 +44,13 @@
 		// Limit history size
 		if (historyStack.length > MAX_HISTORY) {
 			historyStack.shift();
+			// If we shifted the stack, the saved index moves down by 1
+			savedHistoryIndex--;
 		} else {
 			historyIndex++;
 		}
 		
-		console.log('📝 State saved. Index:', historyIndex, 'Stack length:', historyStack.length);
+		console.log('📝 State saved. Index:', historyIndex, 'SavedIndex:', savedHistoryIndex, 'Stack length:', historyStack.length);
 		
 		// Update can undo/redo flags
 		updateHistoryFlags();
@@ -134,10 +148,42 @@
 		scale = Math.min(scaleX, scaleY, 1) * 0.95; // 0.95 for a little extra breathing room
 	}
 
-	function initCanvas() {
-		// Default to a standard size if no template is loaded
-		const width = 1080;
-		const height = 1080;
+	async function initCanvas() {
+		// Load brand fonts before initializing canvas
+		try {
+			const brandFonts = await loadBrandFonts();
+			if (brandFonts.length > 0) {
+				console.log('🎨 Loaded brand fonts:', brandFonts);
+			}
+		} catch (error) {
+			console.warn('Failed to load brand fonts:', error);
+		}
+
+		// Get dimensions based on output format
+		let width = 1080;
+		let height = 1080;
+		
+		// For PDF templates, use the preset dimensions at 72 DPI (standard PDF points)
+		// The backend will scale these to the correct PDF page size (96 DPI for Puppeteer)
+		if ($outputFormat === 'pdf') {
+			const preset = $pdfPreset || 'A4';
+			const pdfDimensions = {
+				'A4': { width: 595, height: 842 },
+				'A4_LANDSCAPE': { width: 842, height: 595 },
+				'LETTER': { width: 612, height: 792 },
+				'LETTER_LANDSCAPE': { width: 792, height: 612 },
+				'LEGAL': { width: 612, height: 1008 },
+				'LEGAL_LANDSCAPE': { width: 1008, height: 612 },
+				'A3': { width: 842, height: 1191 },
+				'A3_LANDSCAPE': { width: 1191, height: 842 },
+				'TABLOID': { width: 792, height: 1224 },
+				'TABLOID_LANDSCAPE': { width: 1224, height: 792 },
+			};
+			const dims = pdfDimensions[preset] || pdfDimensions['A4'];
+			width = dims.width;
+			height = dims.height;
+			console.log(`📄 PDF Canvas initialized with ${preset}: ${width}x${height}`);
+		}
 
 		const canvasElement = document.createElement('canvas');
 		canvasContainer.appendChild(canvasElement);
@@ -185,9 +231,15 @@
 		
 		// Track if we're in drawing mode
 		let isDrawing = false;
-		
+
 		// Detect when free drawing starts
 		fabricCanvas.on('mouse:down', () => {
+			// Safety: If user interacts, we are definitely done loading
+			if (isLoadingCanvas) {
+				console.warn('⚠️ User interaction detected while isLoadingCanvas=true. Forcing false.');
+				isLoadingCanvas = false;
+			}
+			
 			if (fabricCanvas.isDrawingMode) {
 				isDrawing = true;
 			}
@@ -205,7 +257,14 @@
 			console.log('🔧 Object modified:', e.target?.type);
 			
 			// Don't save during undo/redo operations
-			if (isPerformingUndoRedo || isLoadingCanvas) return;
+			if (isPerformingUndoRedo) {
+				console.log('🚫 object:modified ignored during undo/redo');
+				return;
+			}
+			if (isLoadingCanvas) {
+				console.log('🚫 object:modified ignored during loading');
+				return;
+			}
 			
 			if (fabricCanvas.getActiveObject()) {
 				editorActions.selectComponent(fabricCanvas.getActiveObject());
@@ -400,7 +459,86 @@
 			});
 			resizeObserver.observe(canvasContainer.parentElement.parentElement);
 			
-			return () => resizeObserver.disconnect();
+			// Subscribe to page changes for multi-page PDF
+			pagesUnsubscribe = currentPageIndex.subscribe((newIndex) => {
+				if (fabricCanvas && previousPageIndex !== newIndex) {
+					console.log(`📄 Switching from page ${previousPageIndex + 1} to page ${newIndex + 1}`);
+					
+					// Save current page data before switching
+					const currentData = fabricCanvas.toJSON([
+						'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
+						'isChart', 'chartType', 'chartData', 'chartConfig',
+						'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
+						'isQRCode', 'qrData', 'qrConfig',
+						'showWhen', 'hideWhen',
+						'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns'
+					]);
+					// Pass previousPageIndex to ensure we save to the page we are LEAVING
+					pageActions.updateCurrentPageData(currentData, previousPageIndex);
+					
+					// Load new page data
+					const newPageData = $pages[newIndex]?.fabricJSData;
+					if (newPageData) {
+						isLoadingCanvas = true;
+						// Fabric v6 uses Promises for loadFromJSON
+						const loadPromise = fabricCanvas.loadFromJSON(newPageData);
+						
+						if (loadPromise && typeof loadPromise.then === 'function') {
+							loadPromise.then(() => {
+								fabricCanvas.renderAll();
+								fabricCanvas.requestRenderAll();
+								editorActions.clearSelection();
+								// Reset history for new page
+								historyStack = [fabricCanvas.toJSON()];
+								historyIndex = 0;
+								savedHistoryIndex = 0;
+								updateHistoryFlags();
+								isLoadingCanvas = false;
+								console.log('✅ Page loaded via Promise');
+								
+								// Force another render after a short delay
+								setTimeout(() => {
+									fabricCanvas.requestRenderAll();
+								}, 50);
+							}).catch(err => {
+								console.error('Error loading page:', err);
+								isLoadingCanvas = false;
+							});
+						} else {
+							// Fallback for older Fabric.js behavior
+							fabricCanvas.renderAll();
+							fabricCanvas.requestRenderAll();
+							editorActions.clearSelection();
+							historyStack = [fabricCanvas.toJSON()];
+							historyIndex = 0;
+							savedHistoryIndex = 0;
+							updateHistoryFlags();
+							isLoadingCanvas = false;
+							console.log('✅ Page loaded (sync)');
+						}
+					} else {
+						// New blank page - clear canvas
+						fabricCanvas.clear();
+						fabricCanvas.backgroundColor = '#ffffff';
+						fabricCanvas.renderAll();
+						fabricCanvas.requestRenderAll();
+						editorActions.clearSelection();
+						// Reset history
+						historyStack = [fabricCanvas.toJSON()];
+						historyIndex = 0;
+						savedHistoryIndex = 0;
+						updateHistoryFlags();
+						console.log('📄 Blank page created');
+					}
+					
+					previousPageIndex = newIndex;
+				}
+			});
+			
+			return () => {
+				resizeObserver.disconnect();
+				if (pagesUnsubscribe) pagesUnsubscribe();
+			};
 		}
 	});
 	

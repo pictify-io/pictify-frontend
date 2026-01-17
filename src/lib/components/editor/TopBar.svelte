@@ -2,6 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { selectedComponent, editor, editorActions } from '../../../store/editor.store';
 	import { canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved } from '../../../store/history.store';
+	import { outputFormat, pdfPreset, pageActions } from '../../../store/pages.store';
 	
 	export let templateName = '';
 	export let isSaving = false;
@@ -9,6 +10,17 @@
 	export let backHref = '/dashboard/template';
 
 	const dispatch = createEventDispatcher();
+	
+	// PDF presets for dropdown
+	const pdfPresets = [
+		{ value: 'A4', label: 'A4' },
+		{ value: 'A4_LANDSCAPE', label: 'A4 Landscape' },
+		{ value: 'LETTER', label: 'Letter' },
+		{ value: 'LETTER_LANDSCAPE', label: 'Letter Landscape' },
+		{ value: 'LEGAL', label: 'Legal' },
+		{ value: 'A3', label: 'A3' },
+		{ value: 'TABLOID', label: 'Tabloid' }
+	];
 
 	function save() {
 		console.log('TopBar: Save clicked');
@@ -30,6 +42,15 @@
 
 	function redo() {
 		triggerRedo.update(n => n + 1);
+	}
+	
+	function toggleOutputFormat() {
+		const newFormat = $outputFormat === 'image' ? 'pdf' : 'image';
+		pageActions.setOutputFormat(newFormat);
+	}
+	
+	function handlePresetChange(event) {
+		pageActions.setPdfPreset(event.target.value);
 	}
 
 	// Watch for save completion to mark as clean
@@ -68,8 +89,10 @@
 			/>
 			<i class="fa fa-pencil absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></i>
 		</div>
+		
+		<!-- Output Format Toggle Removed (Moved to separate routes) -->
 	</div>
-	<div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+<div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
 		<div class="hidden sm:flex items-center gap-2 mr-2">
 			<button 
 				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"

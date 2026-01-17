@@ -11,8 +11,8 @@
 	import HowItWorks from '$lib/components/landingPage/HowItWorks.svelte';
 	import CanvasShowcase from '$lib/components/landingPage/CanvasShowcase.svelte';
 	import CollaborationWorkflow from '$lib/components/landingPage/CollaborationWorkflow.svelte';
-	import RoiEngine from '$lib/components/landingPage/RoiEngine.svelte';
-	import WhyPictify from '$lib/components/landingPage/WhyPictify.svelte';
+	import PictifyAdvantage from '$lib/components/landingPage/PictifyAdvantage.svelte';
+	import WhatYouCanDo from '$lib/components/landingPage/WhatYouCanDo.svelte';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
 </script>
 
@@ -81,28 +81,28 @@
 	<SectionSeparator icon="bolt" />
 
 	<!-- Collaboration Workflow -->
-	<CollaborationWorkflow />
-	<SectionSeparator icon="hash" />
+	<!-- <CollaborationWorkflow />
+	<SectionSeparator icon="hash" /> -->
 
 	<!-- How It Works Pipeline -->
 	<HowItWorks />
 	<SectionSeparator icon="star" />
 
+	<!-- What You Can Do -->
+	<WhatYouCanDo />
+	<SectionSeparator icon="hash" />
+
 	<!-- Three Pillars -->
-	<ThreePillars />
-	<SectionSeparator icon="bolt" />
+	<!-- <ThreePillars />
+	<SectionSeparator icon="bolt" /> -->
 
 	<!-- API Showcase -->
-	<ApiShowcase />
-	<SectionSeparator icon="arrow" />
+	<!-- <ApiShowcase />
+	<SectionSeparator icon="arrow" /> -->
 
-	<!-- Why Pictify (vs Headless) -->
-	<WhyPictify />
+	<!-- Pictify Advantage (Merged ROI & Why) -->
+	<PictifyAdvantage />
 	<SectionSeparator icon="bolt" />
-
-	<!-- ROI Engine -->
-	<RoiEngine />
-	<SectionSeparator icon="star" />
 
 	<!-- Scale-Focused Use Cases -->
 	<ScaleUseCases />

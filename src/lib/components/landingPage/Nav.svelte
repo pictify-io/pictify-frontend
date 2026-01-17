@@ -17,9 +17,11 @@
 		isLoggedIn = false;
 		unsubscribe();
 	});
+	import { fly } from 'svelte/transition';
 </script>
 
 <header
+    in:fly={{ y: -20, duration: 800, delay: 0 }}
 	class="w-full h-20 z-50 border-b-[3px] border-gray-900 bg-[#FFFDF8] sticky top-0 flex justify-between items-stretch"
 >
 	<!-- Brand Logo -->

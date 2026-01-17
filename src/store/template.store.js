@@ -18,7 +18,11 @@ export const template = writable({
 	height: null,
 	variables: null,
 	createdAt: null,
-	type: null
+	type: null,
+	// PDF support
+	outputFormat: 'image',
+	pdfPreset: 'A4',
+	pages: []
 });
 
 export const templates = writable([]);
@@ -35,9 +39,9 @@ export const templatesPagination = writable({
 });
 
 // Actions
-export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest' } = {}) => {
+export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all' } = {}) => {
 	try {
-		const response = await getTemplates({ page, limit, sort });
+		const response = await getTemplates({ page, limit, sort, outputFormat });
 		if (!response?.templates) {
 			templates.set([]);
 			templatesPagination.set({
@@ -68,20 +72,41 @@ export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest'
 
 export const getTemplateAction = async (uid) => {
 	try {
+		// Preserve the UID during loading to prevent UI flickering
+		// (e.g., VariablesPanel showing "Template Not Saved" briefly)
 		template.set({
-			uid: null,
+			uid: uid, // Keep the UID so dependent UI doesn't flicker
 			name: null,
 			html: null,
 			variables: null,
 			createdAt: null,
-    fabricJSData: null,
+			fabricJSData: null,
 			width: null,
 			height: null,
-			type: null
+			type: null,
+			outputFormat: 'image',
+			pdfPreset: 'A4',
+			pages: [],
+			_loading: true // Optional flag to indicate loading state
 		});
 
 		const response = await getTemplateById(uid);
 		if (!response?.template) {
+			// Reset to null if template not found
+			template.set({
+				uid: null,
+				name: null,
+				html: null,
+				variables: null,
+				createdAt: null,
+				fabricJSData: null,
+				width: null,
+				height: null,
+				type: null,
+				outputFormat: 'image',
+				pdfPreset: 'A4',
+				pages: []
+			});
 			return null;
 		}
 

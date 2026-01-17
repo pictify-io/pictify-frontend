@@ -294,7 +294,6 @@
 		try {
 			const { template, settings } = event.detail;
 			const templateData = {
-				html: template,
 				type: 'og-image',
 				name: settings.heading || 'Untitled Template',
 				width: settings.width || 1200,
@@ -321,7 +320,6 @@
 			const { template, settings } = event.detail;
 			const templateData = {
 				uid: selectedTemplate.uid,
-				html: template,
 				type: 'og-image',
 				name: settings.heading || 'Untitled Template',
 				width: settings.width || 1200,

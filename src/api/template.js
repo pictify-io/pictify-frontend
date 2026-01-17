@@ -6,9 +6,9 @@ const getTemplate = async ({ type, variables }) => {
 	return response;
 };
 
-const getTemplates = async ({ page = 1, limit = 12, sort = 'newest' } = {}) => {
+const getTemplates = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all' } = {}) => {
 	try {
-		const response = await backend.get(`/templates?page=${page}&limit=${limit}&sort=${sort}`);
+		const response = await backend.get(`/templates?page=${page}&limit=${limit}&sort=${sort}&outputFormat=${outputFormat}`);
 		return response;
 	} catch (error) {
 		return null;
@@ -107,6 +107,203 @@ const getTemplateVariables = async (uid) => {
 	}
 };
 
+/**
+ * Batch render a template with multiple variable sets
+ * @param {string} uid - Template UID
+ * @param {Array} variableSets - Array of variable objects
+ * @param {Object} options - Render options
+ * @returns {Promise<Object>} - { batchId, status, totalItems }
+ */
+const batchRenderTemplate = async (uid, variableSets, options = {}) => {
+	try {
+		const response = await backend.post(`/templates/${uid}/batch-render`, {
+			variableSets,
+			format: options.format || 'png',
+			quality: options.quality || 0.9,
+			concurrency: options.concurrency || 5
+		}, {
+			headers: options.headers || {}
+		});
+		return response;
+	} catch (error) {
+		console.error('Error batch rendering template:', error);
+		throw error;
+	}
+};
+
+/**
+ * Get batch job results
+ * @param {string} batchId - Batch job ID
+ * @returns {Promise<Object>} - { batchId, status, progress, results, errors }
+ */
+const getBatchJobResults = async (batchId) => {
+	try {
+		const response = await backend.get(`/templates/batch/${batchId}/results`);
+		return response;
+	} catch (error) {
+		console.error('Error fetching batch results:', error);
+		return null;
+	}
+};
+
+/**
+ * Cancel a batch job
+ * @param {string} batchId - Batch job ID
+ * @returns {Promise<Object>} - { batchId, status, message }
+ */
+const cancelBatchJob = async (batchId) => {
+	try {
+		const response = await backend.post(`/templates/batch/${batchId}/cancel`, {});
+		return response;
+	} catch (error) {
+		console.error('Error cancelling batch job:', error);
+		return null;
+	}
+};
+
+/**
+ * Regenerate template thumbnail
+ * @param {string} uid - Template UID
+ * @returns {Promise<Object>} - { message, thumbnail }
+ */
+const regenerateThumbnail = async (uid) => {
+	try {
+		const response = await backend.post(`/templates/${uid}/regenerate-thumbnail`, {});
+		return response;
+	} catch (error) {
+		console.error('Error regenerating thumbnail:', error);
+		return null;
+	}
+};
+
+/**
+ * Regenerate all thumbnails
+ * @returns {Promise<Object>} - { message, success, failed, skipped }
+ */
+const regenerateAllThumbnails = async () => {
+	try {
+		const response = await backend.post('/templates/regenerate-thumbnails', {});
+		return response;
+	} catch (error) {
+		console.error('Error regenerating all thumbnails:', error);
+		return null;
+	}
+};
+
+// Expression Engine APIs
+const validateExpression = async (expression) => {
+	try {
+		const response = await backend.post('/templates/expression/validate', { expression });
+		return response;
+	} catch (error) {
+		console.error('Error validating expression:', error);
+		return null;
+	}
+};
+
+const testExpression = async (expression, variables = {}) => {
+	try {
+		const response = await backend.post('/templates/expression/test', { expression, variables });
+		return response;
+	} catch (error) {
+		console.error('Error testing expression:', error);
+		return null;
+	}
+};
+
+const interpolateText = async (text, variables = {}) => {
+	try {
+		const response = await backend.post('/templates/expression/interpolate', { text, variables });
+		return response;
+	} catch (error) {
+		console.error('Error interpolating text:', error);
+		return null;
+	}
+};
+
+const getExpressionFunctions = async () => {
+	try {
+		const response = await backend.get('/templates/expression/functions');
+		return response;
+	} catch (error) {
+		console.error('Error fetching expression functions:', error);
+		return null;
+	}
+};
+
+// Public Templates APIs
+const getPublicTemplates = async (params = {}) => {
+	try {
+		const queryParams = new URLSearchParams();
+		if (params.category) queryParams.append('category', params.category);
+		if (params.type) queryParams.append('type', params.type);
+		if (params.tag) queryParams.append('tag', params.tag);
+		if (params.search) queryParams.append('search', params.search);
+		if (params.sort) queryParams.append('sort', params.sort);
+		if (params.page) queryParams.append('page', params.page);
+		if (params.limit) queryParams.append('limit', params.limit);
+
+		const response = await backend.get(`/public/templates?${queryParams}`);
+		return response;
+	} catch (error) {
+		console.error('Error fetching public templates:', error);
+		return null;
+	}
+};
+
+const getPublicTemplate = async (uid) => {
+	try {
+		const response = await backend.get(`/public/templates/${uid}`);
+		return response;
+	} catch (error) {
+		console.error('Error fetching public template:', error);
+		return null;
+	}
+};
+
+const forkTemplate = async (uid) => {
+	try {
+		const response = await backend.post(`/public/templates/${uid}/fork`, {});
+		return response;
+	} catch (error) {
+		console.error('Error forking template:', error);
+		return null;
+	}
+};
+
+// PDF Operations
+const renderPdf = async (templateUid, variables = {}, options = {}) => {
+	try {
+		const response = await backend.post('/pdf/render', {
+			templateUid,
+			variables,
+			options
+		}, {
+			headers: options.headers || {}
+		});
+		return response;
+	} catch (error) {
+		console.error('Error rendering PDF:', error);
+		throw error;
+	}
+};
+
+const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) => {
+	try {
+		const response = await backend.post('/pdf/multi-page', {
+			templateUid,
+			variableSets,
+			options
+		}, {
+			headers: options.headers || {}
+		});
+		return response;
+	} catch (error) {
+		console.error('Error rendering multi-page PDF:', error);
+		throw error;
+	}
+};
+
 export {
 	getTemplate,
 	getTemplates,
@@ -117,5 +314,20 @@ export {
 	searchTemplates,
 	getTemplatesForType,
 	renderTemplate,
-	getTemplateVariables
+	getTemplateVariables,
+	// New exports
+	batchRenderTemplate,
+	getBatchJobResults,
+	cancelBatchJob,
+	regenerateThumbnail,
+	regenerateAllThumbnails,
+	validateExpression,
+	testExpression,
+	interpolateText,
+	getExpressionFunctions,
+	getPublicTemplates,
+	getPublicTemplate,
+	forkTemplate,
+	renderPdf,
+	renderMultiPagePdf
 };

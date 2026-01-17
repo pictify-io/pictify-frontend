@@ -1,6 +1,6 @@
 <script>
 	import CreateTemplate from '$lib/components/dashboard/template/CreateTemplate.svelte';
-	import { getTemplateAction } from '../../../store/template.store';
+	import { getTemplateAction, template } from '../../../store/template.store';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -14,7 +14,19 @@
 			return;
 		}
 
-		await getTemplateAction($page.params.uid);
+		const loadedTemplate = await getTemplateAction($page.params.uid);
+		
+		// Redirect to format-specific route based on template's output format
+		// This ensures PDF templates open in PDF mode
+		if (loadedTemplate?.outputFormat === 'pdf') {
+			goto(`/template-workspace/pdf/${$page.params.uid}`, { replaceState: true });
+			return;
+		} else if (loadedTemplate?.outputFormat === 'image' || loadedTemplate) {
+			goto(`/template-workspace/image/${$page.params.uid}`, { replaceState: true });
+			return;
+		}
+		
+		// Fallback: show editor if redirect didn't happen
 		isLoading = false;
 	});
 </script>
@@ -28,4 +40,3 @@
 		<CreateTemplate isEdit={true} />
 	{/if}
 </div>
-

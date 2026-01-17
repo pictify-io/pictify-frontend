@@ -3,27 +3,35 @@
 	import { editor, selectedComponent, editorActions } from '../../../store/editor.store';
 	import { user, getAPITokenAction } from '../../../store/user.store';
 	import { template } from '../../../store/template.store';
-	import { 
-		variables, 
-		variableStats, 
+	import {
+		variables,
+		variableStats,
 		variablesBySource,
-		variableActions, 
-		VARIABLE_TYPES, 
-		VARIABLE_SOURCES 
+		variableActions,
+		VARIABLE_TYPES,
+		VARIABLE_SOURCES
 	} from '../../../store/variables.store';
+	import { outputFormat, pdfPreset, pages, currentPageIndex } from '../../../store/pages.store';
 	import { renderTemplate } from '../../../api/template';
 	import { toast } from '../../../store/toast.store';
-	import { 
-		applyPreview, 
-		clearPreview, 
-		isPreviewModeActive, 
+	import {
+		applyPreview,
+		clearPreview,
+		isPreviewModeActive,
 		getPreviewStats,
-		validateTestValues 
+		validateTestValues
 	} from '../../utils/canvas-preview-engine';
 	import ShareResultButton from '../tools/ShareResultButton.svelte';
 	import backend from '../../../service/backend';
 	import { goto } from '$app/navigation';
-	
+	import AuthModal from './AuthModal.svelte';
+
+	// Neo-brutalist input styling constants
+	const inputBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+	const inputNumberClass = inputBaseClass;
+	const buttonBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white hover:bg-gray-50 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] transition-all";
+	const selectClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+
 	// UI State
 	let activeTab = 'list'; // 'list' | 'create' | 'test' | 'preview'
 	let showApiExample = false;
@@ -31,6 +39,7 @@
 	let editingVariable = null;
 	let showDeleteConfirm = false;
 	let variableToDelete = null;
+	let showAuthModal = false;
 	
 	// Create/Edit form state
 	let formName = '';
@@ -44,6 +53,7 @@
 	let testValues = {};
 	let isRendering = false;
 	let renderedImageUrl = null;
+	let renderedPdfUrl = null;  // PDF output URL
 	let renderError = null;
 	let lastRenderTime = null;
 	let showRequestDetails = false;
@@ -59,6 +69,14 @@
 	export let guestMode = false;
 
 	onMount(() => {
+		// Listen for trigger generate after login
+		const handleTriggerGenerate = () => {
+			if ($user?.email && !guestMode) {
+				handleGenerate();
+			}
+		};
+		window.addEventListener('trigger-generate-after-login', handleTriggerGenerate);
+
 		// In guest mode, we still show the whole panel, but avoid calling auth-only endpoints.
 		if (!guestMode) {
 			getAPITokenAction().catch(() => {
@@ -116,9 +134,11 @@
 		$editor.on('object:modified', handleChange);
 		
 		canvasEventCleanup = () => {
-			$editor.off('object:added', handleChange);
-			$editor.off('object:removed', handleChange);
-			$editor.off('object:modified', handleChange);
+			if ($editor) {
+				$editor.off('object:added', handleChange);
+				$editor.off('object:removed', handleChange);
+				$editor.off('object:modified', handleChange);
+			}
 		};
 	}
 	
@@ -409,22 +429,32 @@
 		isRendering = true;
 		renderError = null;
 		renderedImageUrl = null;
+		renderedPdfUrl = null;
 		const startTime = Date.now();
 		
 		try {
+			const isPdf = $outputFormat === 'pdf';
 			const result = await renderTemplate($template.uid, testValues, {
-				format: 'png',
+				format: isPdf ? 'pdf' : 'png',
 				quality: 0.9,
 				headers: selectedToken ? { 'Authorization': `Bearer ${selectedToken}` } : {}
 			});
 			
 			lastRenderTime = Date.now() - startTime;
-			renderedImageUrl = result.url;
 			
-			toast.set({ 
-				message: `Image rendered in ${lastRenderTime}ms!`, 
-				duration: 2000 
-			});
+			if (isPdf) {
+				renderedPdfUrl = result.url;
+				toast.set({ 
+					message: `PDF rendered in ${lastRenderTime}ms!`, 
+					duration: 2000 
+				});
+			} else {
+				renderedImageUrl = result.url;
+				toast.set({ 
+					message: `Image rendered in ${lastRenderTime}ms!`, 
+					duration: 2000 
+				});
+			}
 		} catch (error) {
 			renderError = error.message || 'Failed to render template';
 			toast.set({ 
@@ -486,6 +516,7 @@
 				'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
 				'isChart', 'chartType', 'chartData', 'chartConfig',
 				'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
+				'isQRCode', 'qrData', 'qrConfig',
 				'showWhen', 'hideWhen',
 				'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns'
 			]);
@@ -507,27 +538,95 @@
 			// Debug: log what we're sending
 			console.log('[generateFromCanvas] testValues:', JSON.stringify(testValues));
 			console.log('[generateFromCanvas] variableDefinitions:', variableDefinitions.length);
+			console.log('[generateFromCanvas] outputFormat:', $outputFormat);
 
-			// Use public endpoint with variables for substitution
-			const result = await backend.post('/image/public/canvas', {
-				fabricJSData,
-				variables: testValues, // Pass test values for variable substitution
-				variableDefinitions, // Pass definitions so backend knows which objects to update
-				width,
-				height,
-				fileExtension: 'png'
-			});
+			// Use appropriate endpoint based on output format
+			const isPdf = $outputFormat === 'pdf';
+			let result;
+			
+			if (isPdf) {
+				// Inject dimensions into fabric data so backend knows the correct viewBox
+				// This is critical because fabric.toJSON() doesn't include canvas dimensions
+				
+				let pdfFabricData;
+				
+				// Handle multi-page PDF
+				if ($pages.length > 1) {
+					// Map all pages to fabric data
+					// Use current editor state for current page, stored state for others
+					pdfFabricData = $pages.map((page, index) => {
+						let pageData;
+						if (index === $currentPageIndex && $editor) {
+							// For current page, use live editor state
+							pageData = fabricJSData;
+						} else {
+							// For other pages, use stored data
+							// Fallback to empty/default if null
+							pageData = page.fabricJSData || { 
+								version: "5.3.0", 
+								objects: [], 
+								background: "#ffffff" 
+							};
+						}
+						
+						// Inject dimensions into EACH page
+						return {
+							...pageData,
+							width: width,
+							height: height
+						};
+					});
+				} else {
+					// Single page case
+					pdfFabricData = {
+						...fabricJSData,
+						width: width,
+						height: height
+					};
+				}
+				
+				// Use PDF endpoint
+				result = await backend.post('/pdf/from-fabric', {
+					fabricData: pdfFabricData,
+					variables: testValues,
+					options: {
+						preset: $pdfPreset || 'A4',
+						title: 'Canvas PDF',
+						uploadToStorage: true
+					}
+				});
+			} else {
+				// Use image endpoint
+				result = await backend.post('/image/public/canvas', {
+					fabricJSData,
+					variables: testValues,
+					variableDefinitions,
+					width,
+					height,
+					fileExtension: 'png'
+				});
+			}
 
 			lastRenderTime = Date.now() - startTime;
 			
 			if (result?.url) {
-				renderedImageUrl = result.url;
-				toast.set({ 
-					message: `Image generated in ${lastRenderTime}ms!`, 
-					duration: 2000 
-				});
+				if (isPdf) {
+					renderedPdfUrl = result.url;
+					renderedImageUrl = null;
+					toast.set({ 
+						message: `PDF generated in ${lastRenderTime}ms!`, 
+						duration: 2000 
+					});
+				} else {
+					renderedImageUrl = result.url;
+					renderedPdfUrl = null;
+					toast.set({ 
+						message: `Image generated in ${lastRenderTime}ms!`, 
+						duration: 2000 
+					});
+				}
 			} else {
-				throw new Error('No image URL in response');
+				throw new Error(`No ${isPdf ? 'PDF' : 'image'} URL in response`);
 			}
 		} catch (error) {
 			// Handle rate limit error
@@ -547,6 +646,13 @@
 
 	// Generate function - use appropriate method based on context
 	function handleGenerate() {
+		// Check if in guest mode and user is not logged in
+		if (guestMode && !$user?.email) {
+			// Show auth modal instead of redirecting
+			showAuthModal = true;
+			return;
+		}
+
 		if (guestMode || !$template?.uid) {
 			generateFromCanvas();
 		} else {
@@ -554,13 +660,57 @@
 		}
 	}
 
-	// Save draft and go to signup
-	function saveAndSignup() {
+	// Handle successful authentication from modal
+	async function handleAuthSuccess() {
+		// User is now logged in
+		toast.set({
+			message: 'Welcome! Saving your template...',
+			duration: 2000
+		});
+
+		// Ensure we have the latest user state
+		await getAPITokenAction();
+
+		// Small delay to let everything update
+		setTimeout(async () => {
+			if ($user?.email) {
+				// Now the user can save templates and generate images
+				// First, we need to trigger template save if we have a draft
+				const DRAFT_KEY = 'pictify_template_draft_v1';
+				const hasDraft = localStorage.getItem(DRAFT_KEY);
+
+				if (hasDraft && !$template?.uid) {
+					// We have a draft but no saved template yet
+					// We need to trigger the save through the parent component
+					// For now, just generate - the parent should handle saving
+					toast.set({
+						message: 'Please save your template to continue',
+						duration: 3000
+					});
+
+					// Dispatch event to parent to trigger save
+					const event = new CustomEvent('save-template-and-generate', {
+						detail: { generateAfterSave: true }
+					});
+					window.dispatchEvent(event);
+				} else {
+					// Template already saved or no draft, just generate
+					handleGenerate();
+				}
+			}
+		}, 500);
+	}
+
+	// Save draft and show auth modal
+	function saveAndShowAuth() {
 		const DRAFT_KEY = 'pictify_template_draft_v1';
 		try {
 			if ($editor) {
-				const fabricJSData = $editor.toJSON([
-					'id', 'isVariable', 'variableBindings',
+			const fabricJSData = $editor.toJSON([
+					'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
+					'isChart', 'chartType', 'chartData', 'chartConfig',
+					'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
+					'isQRCode', 'qrData', 'qrConfig',
 					'showWhen', 'hideWhen',
 					'loopVariable', 'loopItemName', 'loopDirection', 'loopSpacing'
 				]);
@@ -575,8 +725,9 @@
 				localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 			}
 		} catch (e) {}
-		
-		goto('/signup?redirect=/template-workspace/create');
+
+		// Show auth modal instead of redirecting
+		showAuthModal = true;
 	}
 </script>
 
@@ -648,7 +799,7 @@
 					<input
 						id="variable-name"
 						type="text"
-						class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+						class={inputBaseClass + " font-medium"}
 						placeholder="e.g., title, userName, price"
 						bind:value={formName}
 					/>
@@ -660,7 +811,7 @@
 					<label for="variable-type" class="block text-xs font-bold text-gray-900 uppercase mb-1">Type</label>
 					<select
 						id="variable-type"
-						class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium bg-white"
+						class={selectClass + " font-medium"}
 						bind:value={formType}
 					>
 						<option value={VARIABLE_TYPES.TEXT}>Text</option>
@@ -680,7 +831,7 @@
 					<label for="variable-description" class="block text-xs font-bold text-gray-900 uppercase mb-1">Description</label>
 					<textarea
 						id="variable-description"
-						class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+						class={inputBaseClass + " font-medium"}
 						rows="2"
 						placeholder="What is this variable used for?"
 						bind:value={formDescription}
@@ -693,7 +844,7 @@
 					{#if formType === VARIABLE_TYPES.BOOLEAN}
 						<select
 							id="variable-default-value"
-							class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium bg-white"
+							class={selectClass + " font-medium"}
 							bind:value={formDefaultValue}
 						>
 							<option value="true">true</option>
@@ -709,7 +860,7 @@
 							<input
 								id="variable-default-value"
 								type="text"
-								class="flex-1 text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 font-mono focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all"
+								class={inputBaseClass + " flex-1 font-mono"}
 								placeholder="#000000"
 								bind:value={formDefaultValue}
 							/>
@@ -717,7 +868,7 @@
 				{:else if [VARIABLE_TYPES.ARRAY, VARIABLE_TYPES.OBJECT, VARIABLE_TYPES.CHART, VARIABLE_TYPES.TABLE].includes(formType)}
 					<textarea
 						id="variable-default-value"
-						class="w-full h-32 text-xs font-mono border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all"
+						class={inputBaseClass + " h-32 text-xs font-mono"}
 						placeholder="Enter valid JSON..."
 						bind:value={formDefaultValue}
 					></textarea>
@@ -725,7 +876,7 @@
 					<input
 						id="variable-default-value"
 						type="number"
-						class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+						class={inputBaseClass + " font-medium"}
 						placeholder="Default value..."
 						bind:value={formDefaultValue}
 					/>
@@ -733,7 +884,7 @@
 					<input
 						id="variable-default-value"
 						type="text"
-						class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+						class={inputBaseClass + " font-medium"}
 						placeholder="Default value..."
 						bind:value={formDefaultValue}
 					/>
@@ -903,32 +1054,6 @@
 						</div>
 					{/if}
 				</div>
-				
-				<!-- Stats -->
-				<div class="pt-4 border-t-2 border-gray-900">
-					<div class="grid grid-cols-5 gap-2">
-						<div class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-2 text-center">
-							<div class="text-base font-black text-gray-900">{$variableStats.total}</div>
-							<div class="text-[9px] font-bold text-gray-500 uppercase">Total</div>
-						</div>
-						<div class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-2 text-center">
-							<div class="text-base font-black text-blue-600">{$variableStats.byType?.text || 0}</div>
-							<div class="text-[9px] font-bold text-gray-500 uppercase">Text</div>
-						</div>
-						<div class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-2 text-center">
-							<div class="text-base font-black text-purple-600">{$variableStats.byType?.image || 0}</div>
-							<div class="text-[9px] font-bold text-gray-500 uppercase">Images</div>
-						</div>
-						<div class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-2 text-center">
-							<div class="text-base font-black text-amber-600">{$variableStats.byType?.array || 0}</div>
-							<div class="text-[9px] font-bold text-gray-500 uppercase">Arrays</div>
-						</div>
-						<div class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-2 text-center">
-							<div class="text-base font-black text-green-600">{$variableStats.byType?.boolean || 0}</div>
-							<div class="text-[9px] font-bold text-gray-500 uppercase">Bool</div>
-						</div>
-					</div>
-				</div>
 			{/if}
 		
 		<!-- Preview Tab -->
@@ -1053,7 +1178,7 @@
 								{#if variable.type === 'text'}
 									<input
 										type="text"
-										class="w-full text-xs border-2 border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+										class={inputBaseClass + " text-xs font-medium"}
 										placeholder={variable.defaultValue || 'Enter text...'}
 										value={testValues[variable.name] || ''}
 										on:input={(e) => updateTestValue(variable.name, e.target.value)}
@@ -1061,7 +1186,7 @@
 								{:else if variable.type === 'image'}
 									<input
 										type="url"
-										class="w-full text-xs border-2 border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+										class={inputBaseClass + " text-xs font-medium"}
 										placeholder="https://example.com/image.jpg"
 										value={testValues[variable.name] || ''}
 										on:input={(e) => updateTestValue(variable.name, e.target.value)}
@@ -1101,7 +1226,7 @@
 								{:else if variable.type === 'number'}
 									<input
 										type="number"
-										class="w-full text-xs border-2 border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+										class={inputBaseClass + " text-xs font-medium"}
 										placeholder={variable.defaultValue?.toString() || '0'}
 										value={testValues[variable.name] ?? variable.defaultValue ?? ''}
 										on:input={(e) => updateTestValue(variable.name, parseFloat(e.target.value) || 0)}
@@ -1159,9 +1284,12 @@
 										<p class="text-[10px] font-medium text-gray-700">
 											You can design and preview variables here. Create a free account to save the template and test the Render API.
 										</p>
-										<a href="/signup?redirect=/template-workspace/create" class="inline-flex mt-2 text-[10px] font-black uppercase tracking-wide text-blue-700 hover:text-black hover:underline">
+										<button
+											on:click={saveAndShowAuth}
+											class="inline-flex mt-2 text-[10px] font-black uppercase tracking-wide text-blue-700 hover:text-black hover:underline"
+										>
 											Create free account →
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -1193,9 +1321,18 @@
 						<div class="space-y-1">
 							<div class="flex items-center justify-between">
 								<label for="api-token-select" class="text-xs font-bold text-gray-900 uppercase">API Token</label>
-								<a href={guestMode ? "/signup?redirect=/dashboard/api-token" : "/dashboard/api-token"} target={guestMode ? undefined : "_blank"} class="text-[10px] font-bold text-blue-600 hover:underline hover:text-black">
-									Manage Tokens
-								</a>
+								{#if guestMode}
+									<button
+										on:click={saveAndShowAuth}
+										class="text-[10px] font-bold text-blue-600 hover:underline hover:text-black"
+									>
+										Manage Tokens
+									</button>
+								{:else}
+									<a href="/dashboard/api-token" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline hover:text-black">
+										Manage Tokens
+									</a>
+								{/if}
 							</div>
 							
 							{#if apiTokens.length > 0}
@@ -1211,9 +1348,18 @@
 							{:else}
 								<div class="bg-gray-50 border-2 border-gray-900 rounded-lg px-3 py-2 text-center border-dashed">
 									<p class="text-[10px] font-bold text-gray-500 mb-1 uppercase">No API tokens found</p>
-									<a href={guestMode ? "/signup?redirect=/dashboard/api-token" : "/dashboard/api-token"} target={guestMode ? undefined : "_blank"} class="text-[10px] font-black text-blue-600 hover:underline uppercase tracking-wide">
-										{guestMode ? 'Sign up to create a token' : 'Create a token'}
-									</a>
+									{#if guestMode}
+										<button
+											on:click={saveAndShowAuth}
+											class="text-[10px] font-black text-blue-600 hover:underline uppercase tracking-wide"
+										>
+											Sign up to create a token
+										</button>
+									{:else}
+										<a href="/dashboard/api-token" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline uppercase tracking-wide">
+											Create a token
+										</a>
+									{/if}
 								</div>
 							{/if}
 						</div>
@@ -1324,16 +1470,33 @@
 						<p class="text-xs font-bold text-gray-500 uppercase">No variables to test</p>
 					</div>
 				{/if}
-						
+
+						<!-- Guest Mode Message -->
+						{#if guestMode && !$user?.email}
+							<div class="bg-[#fff7ed] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#1f2937]">
+								<div class="flex items-center gap-2">
+									<i class="fa fa-info-circle text-[#ffc480]"></i>
+									<p class="text-[10px] font-bold text-gray-900 uppercase">Free account required</p>
+								</div>
+								<p class="text-[10px] font-medium text-gray-700 mt-1">
+									Sign up to generate images from your designs. Your work will be saved!
+								</p>
+							</div>
+						{/if}
+
 						<!-- Render Button -->
-						<button 
-							class="w-full py-2.5 px-3 {guestMode ? 'bg-[#4ade80]' : 'bg-gray-900'} hover:opacity-90 text-white rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 font-black uppercase tracking-wider border-2 border-gray-900"
+						<button
+							class="w-full py-2.5 px-3 {guestMode && !$user?.email ? 'bg-[#ffc480]' : guestMode ? 'bg-[#4ade80]' : 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email ? 'gray-900' : 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_{guestMode && !$user?.email ? '#ff6b6b' : '#ffc480'}] hover:-translate-y-0.5 font-black uppercase tracking-wider border-2 border-gray-900"
 							on:click={handleGenerate}
 							disabled={isRendering}
+							title={guestMode && !$user?.email ? 'Sign up to generate images' : ''}
 						>
 							{#if isRendering}
 								<i class="fa fa-spinner fa-spin"></i>
 								Generating...
+							{:else if guestMode && !$user?.email}
+								<i class="fa fa-lock"></i>
+								Sign Up to Generate
 							{:else if guestMode}
 								<i class="fa fa-image"></i>
 								Generate Image
@@ -1423,14 +1586,77 @@
 							</div>
 						{/if}
 						
-						{#if renderError}
-							<div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]">
-								<p class="text-xs font-bold text-red-800 uppercase">
-									<i class="fa fa-exclamation-circle mr-1"></i>
-									{renderError}
-								</p>
+						{#if renderedPdfUrl}
+						<div class="space-y-3">
+							<div class="flex items-center justify-between">
+								<span class="text-xs font-black text-gray-900 uppercase tracking-wide">PDF Result</span>
+								{#if lastRenderTime}
+									<span class="text-[10px] font-bold text-green-600 uppercase">
+										<i class="fa fa-clock mr-1"></i>{lastRenderTime}ms
+									</span>
+								{/if}
 							</div>
-						{/if}
+							
+							<div class="bg-green-50 border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#22c55e]">
+								<div class="flex items-center gap-2 mb-2">
+									<i class="fa fa-file-pdf text-red-500 text-lg"></i>
+									<span class="text-xs font-bold text-gray-900">PDF Generated Successfully!</span>
+								</div>
+								
+								<!-- URL Display -->
+								<div class="bg-white border-2 border-gray-300 rounded-lg p-2 mb-3">
+									<p class="text-[10px] font-bold text-gray-500 uppercase mb-1">PDF URL</p>
+									<p class="text-xs font-mono text-gray-700 break-all select-all">{renderedPdfUrl}</p>
+								</div>
+								
+								<!-- Action Buttons -->
+								<div class="flex gap-2">
+									<button 
+										class="flex-1 py-2 bg-white border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1.5"
+										on:click={() => {
+											navigator.clipboard.writeText(renderedPdfUrl);
+											toast.set({ message: 'PDF URL copied!', duration: 1500 });
+										}}
+									>
+										<i class="fa fa-copy"></i>
+										Copy URL
+									</button>
+									<button 
+										class="flex-1 py-2 bg-[#ffc480] border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1.5"
+										on:click={() => window.open(renderedPdfUrl, '_blank')}
+									>
+										<i class="fa fa-external-link-alt"></i>
+										Open PDF
+									</button>
+								</div>
+							</div>
+							
+							<!-- Guest mode signup CTA for PDF -->
+							{#if guestMode}
+								<div class="bg-[#f0fdf4] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#4ade80]">
+									<p class="text-xs font-bold text-gray-700 mb-2">
+										<i class="fa fa-star text-[#ffc480] mr-1"></i>
+										Sign up to save your template and automate PDF generation via API.
+									</p>
+									<button
+										class="w-full py-2 bg-[#ff6b6b] text-white border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										on:click={saveAndSignup}
+									>
+										Create free account
+									</button>
+								</div>
+							{/if}
+						</div>
+					{/if}
+					
+					{#if renderError}
+						<div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]">
+							<p class="text-xs font-bold text-red-800 uppercase">
+								<i class="fa fa-exclamation-circle mr-1"></i>
+								{renderError}
+							</p>
+						</div>
+					{/if}
 						
 						<!-- Request Details -->
 						<div class="pt-3 border-t-2 border-gray-900">
@@ -1527,3 +1753,9 @@
 		overflow: hidden;
 	}
 </style>
+
+<!-- Auth Modal -->
+<AuthModal
+	bind:isOpen={showAuthModal}
+	onSuccess={handleAuthSuccess}
+/>

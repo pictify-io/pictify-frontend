@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { gifs, images, fetchGifs, fetchImages } from '../../../../store/media.store';
+	import { gifs, images, pdfs, fetchGifs, fetchImages, fetchPdfs } from '../../../../store/media.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
@@ -71,6 +71,8 @@
 				await fetchImages({ limit: itemsPerPage, offset });
 			} else if (mediaType === 'gifs') {
 				await fetchGifs({ limit: itemsPerPage, offset });
+			} else if (mediaType === 'pdfs') {
+				await fetchPdfs({ limit: itemsPerPage, offset });
 			}
 		} finally {
 			isLoadingMore = false;
@@ -135,6 +137,12 @@
 				pagination = data.pagination || { total: 0, limit: 12, offset: 0, hasMore: false };
 			});
 			await fetchGifs({ limit: itemsPerPage, offset: 0 });
+		} else if (mediaType === 'pdfs') {
+			unsubscribe = pdfs.subscribe((data) => {
+				mediaList = data.pdfs || [];
+				pagination = data.pagination || { total: 0, limit: 12, offset: 0, hasMore: false };
+			});
+			await fetchPdfs({ limit: itemsPerPage, offset: 0 });
 		}
 		isLoading = false;
 	});
@@ -150,46 +158,31 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden">
-	<!-- Background Grid -->
-	<div class="absolute inset-0 opacity-5 pointer-events-none" 
-		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
-	</div>
-
-	<div class="max-w-7xl mx-auto p-6 relative z-10">
+<section class="min-h-full">
+	<div>
 		<!-- Header -->
-		<div class="flex items-center justify-between mb-10">
-			<div class="flex items-center gap-4">
-				<div class="w-12 h-12 bg-gray-900 rounded-xl border-[3px] border-gray-900 flex items-center justify-center shadow-[4px_4px_0_0_#ffc480]">
-					{#if mediaType === 'images'}
-						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-						</svg>
-					{:else}
-						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-						</svg>
-					{/if}
+		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
+			<div>
+				<div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3">
+					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse"></span>
+					Media Library
 				</div>
-				<div>
-					<h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter leading-none">
-						{mediaType === 'images' ? 'Image' : 'GIF'} <span class="text-[#ff6b6b]">Gallery</span>
-					</h1>
-					<div class="flex items-center gap-2 mt-1">
-						<div class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse"></div>
-						<p class="text-xs font-bold text-gray-500 uppercase tracking-wider">
-							System Status: Active
-						</p>
-					</div>
-				</div>
+				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+					{mediaType === 'images' ? 'Image' : mediaType === 'gifs' ? 'GIF' : 'PDF'} <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Gallery</span>
+				</h1>
 			</div>
 
-			{#if !isLoading && pagination.total > 0}
-				<div class="bg-white border-[3px] border-gray-900 px-4 py-2 rounded-xl shadow-[4px_4px_0_0_#1f2937] flex items-center gap-3">
-					<span class="text-xs font-black text-gray-400 uppercase tracking-wide">Total Items</span>
-					<span class="text-xl font-black text-gray-900 tabular-nums">{pagination.total}</span>
+			<!-- Stats -->
+			<div class="flex items-center gap-4 sm:gap-6 md:gap-8">
+				<div class="text-right">
+					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Items</div>
+					<div class="text-lg sm:text-xl font-black text-gray-900 tabular-nums">{pagination.total || 0}</div>
 				</div>
-			{/if}
+				<div class="text-right border-l-2 border-gray-200 pl-4 sm:pl-6 md:pl-8">
+					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Type</div>
+					<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">{mediaType === 'images' ? 'PNG' : mediaType === 'gifs' ? 'GIF' : 'PDF'}</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- Content -->
@@ -205,15 +198,19 @@
 						<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 						</svg>
-					{:else}
+					{:else if mediaType === 'gifs'}
 						<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+						</svg>
+					{:else}
+						<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 						</svg>
 					{/if}
 				</div>
 				<h2 class="text-2xl font-black text-gray-900 uppercase tracking-wide mb-2">No {mediaType} Generated</h2>
 				<p class="text-gray-500 font-bold max-w-md text-center">
-					Start generating {mediaType === 'images' ? 'images' : 'GIFs'} from your templates to see them appear here.
+					Start generating {mediaType === 'images' ? 'images' : mediaType === 'gifs' ? 'GIFs' : 'PDFs'} from your templates to see them appear here.
 				</p>
 			</div>
 		{:else}
@@ -229,15 +226,39 @@
 					>
 						<!-- Preview Container -->
 						<div class="relative bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-b-[3px] border-gray-900 overflow-hidden h-[220px] group-hover:bg-gray-50 transition-colors">
-							<img 
-								src={media.url} 
-								alt="Media item"
-								class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
-								loading="lazy"
-							/>
+							{#if mediaType === 'pdfs'}
+								<div class="relative w-full h-full bg-white flex items-center justify-center">
+									<!-- PDF Icon as preview (since iframe may have CORS issues) -->
+									<div class="p-8">
+										<svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17h6M9 13h6M13 3v5a1 1 0 001 1h5"/>
+										</svg>
+									</div>
+									<!-- PDF Badge -->
+									<div class="absolute top-3 left-3 z-20">
+										<span class="text-[10px] font-black text-gray-900 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md border-[2px] border-gray-900 uppercase tracking-wide shadow-sm">
+											PDF
+										</span>
+									</div>
+								</div>
+							{:else}
+								<img
+									src={media.url}
+									alt="Media item"
+									class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
+									loading="lazy"
+								/>
+							{/if}
 							
-							<!-- Dimension badge -->
-							{#if media.width && media.height}
+							<!-- Dimension/Page badge -->
+							{#if mediaType === 'pdfs' && media.pageCount}
+								<div class="absolute bottom-3 left-3 z-20">
+									<span class="text-[10px] font-black text-gray-900 bg-white px-2 py-1 rounded border-[2px] border-gray-900 uppercase tracking-wide shadow-sm">
+										{media.pageCount} {media.pageCount === 1 ? 'PAGE' : 'PAGES'}
+									</span>
+								</div>
+							{:else if media.width && media.height}
 								<div class="absolute bottom-3 left-3 z-20">
 									<span class="text-[10px] font-black text-gray-900 bg-white px-2 py-1 rounded border-[2px] border-gray-900 uppercase tracking-wide shadow-sm">
 										{media.width} × {media.height}
@@ -279,7 +300,7 @@
 									<span class="text-xs text-gray-500 font-bold uppercase tracking-wide">{formatDate(media.createdAt)}</span>
 								</div>
 								<span class="text-[9px] font-black text-gray-900 bg-[#ffc480]/30 px-2 py-0.5 rounded border border-[#ffc480] uppercase tracking-wider">
-									{mediaType === 'images' ? 'PNG' : 'GIF'}
+									{mediaType === 'images' ? 'PNG' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
 								</span>
 							</div>
 						</div>
@@ -350,7 +371,7 @@
 			{/if}
 		{/if}
 	</div>
-</div>
+</section>
 
 <!-- Lightbox Modal -->
 {#if showLightbox && selectedMedia}
@@ -384,18 +405,37 @@
 				<div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50 pointer-events-none"></div>
 				
 				<div class="relative z-10 bg-white/50 rounded-xl overflow-hidden flex items-center justify-center min-h-[400px]">
-					<img 
-						src={selectedMedia.url} 
-						alt="Full size media" 
-						class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"
-					/>
+					{#if mediaType === 'pdfs'}
+						<!-- PDF Viewer styled like an image viewer -->
+						<div class="w-full max-w-6xl h-[calc(85vh-100px)] bg-white rounded-lg shadow-2xl overflow-hidden border-[3px] border-gray-900">
+							<iframe
+								src={selectedMedia.url + '#view=FitH'}
+								class="w-full h-full border-0"
+								title="PDF Document"
+								style="background: white;"
+							/>
+						</div>
+					{:else}
+						<img
+							src={selectedMedia.url}
+							alt="Full size media"
+							class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"
+						/>
+					{/if}
 				</div>
 			</div>
 			
 			<!-- Toolbar -->
 			<div class="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4 px-2">
 				<div class="flex items-center gap-3">
-					{#if selectedMedia.width && selectedMedia.height}
+					{#if mediaType === 'pdfs' && selectedMedia.pageCount}
+						<div class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20">
+							<svg class="w-4 h-4 text-[#ffc480]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+							</svg>
+							<span class="text-xs font-bold text-white uppercase">{selectedMedia.pageCount} {selectedMedia.pageCount === 1 ? 'Page' : 'Pages'}</span>
+						</div>
+					{:else if selectedMedia.width && selectedMedia.height}
 						<div class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20">
 							<svg class="w-4 h-4 text-[#ffc480]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
 							<span class="text-xs font-bold text-white font-mono">{selectedMedia.width} × {selectedMedia.height}</span>
@@ -439,5 +479,43 @@
 <style>
 	.media-card {
 		will-change: transform;
+	}
+
+	/* Hide PDF scrollbars and toolbars in preview mode */
+	iframe {
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	iframe::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Style PDF preview to look like an image */
+	iframe[title="PDF Preview"] {
+		background: white;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		transition: transform 0.3s ease;
+	}
+
+	/* Add subtle loading background pattern */
+	iframe[title="PDF Preview"]:not([src]) {
+		background: white;
+		background-image: linear-gradient(45deg, #f9f9f9 25%, transparent 25%),
+						  linear-gradient(-45deg, #f9f9f9 25%, transparent 25%),
+						  linear-gradient(45deg, transparent 75%, #f9f9f9 75%),
+						  linear-gradient(-45deg, transparent 75%, #f9f9f9 75%);
+		background-size: 20px 20px;
+		background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+	}
+
+	/* Full PDF viewer in lightbox */
+	iframe[title="PDF Document"] {
+		background: white;
+	}
+
+	/* Add hover effect for PDF preview */
+	.group:hover iframe[title="PDF Preview"] {
+		transform: scale(1.02);
 	}
 </style>
