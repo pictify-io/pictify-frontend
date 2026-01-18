@@ -8,6 +8,10 @@
 
 	const dispatch = createEventDispatcher();
 
+	// Track which dropdown is open
+	let openDropdown = null;
+	let searchFilter = {};
+
 	// Extract suggested paths from sample data
 	$: suggestedPaths = sampleData ? extractPaths(sampleData) : [];
 
@@ -20,21 +24,49 @@
 			if (typeof current === 'object' && !Array.isArray(current)) {
 				for (const key of Object.keys(current)) {
 					const newPath = `${currentPath}.${key}`;
-					paths.push({ path: newPath, value: current[key] });
-					traverse(current[key], newPath, depth + 1);
+					const val = current[key];
+					// Only add leaf nodes (primitives) or objects with a preview
+					const isLeaf = val === null || typeof val !== 'object';
+					paths.push({
+						path: newPath,
+						value: val,
+						type: val === null ? 'null' : Array.isArray(val) ? 'array' : typeof val,
+						isLeaf
+					});
+					traverse(val, newPath, depth + 1);
 				}
 			} else if (Array.isArray(current) && current.length > 0) {
 				const newPath = `${currentPath}[0]`;
-				paths.push({ path: newPath, value: current[0] });
-				traverse(current[0], newPath, depth + 1);
+				const val = current[0];
+				const isLeaf = val === null || typeof val !== 'object';
+				paths.push({
+					path: newPath,
+					value: val,
+					type: val === null ? 'null' : Array.isArray(val) ? 'array' : typeof val,
+					isLeaf
+				});
+				traverse(val, newPath, depth + 1);
 			}
 		};
 		traverse(obj, prefix, 0);
-		return paths.slice(0, 50); // Limit suggestions
+		return paths.slice(0, 100); // Limit suggestions
+	};
+
+	// Filter paths based on search input
+	const getFilteredPaths = (variableName) => {
+		const filter = (searchFilter[variableName] || '').toLowerCase();
+		if (!filter) return suggestedPaths;
+		return suggestedPaths.filter(p => p.path.toLowerCase().includes(filter));
 	};
 
 	const handleMappingChange = (variableName, path) => {
+		searchFilter[variableName] = path;
 		dispatch('change', { name: variableName, path });
+	};
+
+	const handleSelectPath = (variableName, path) => {
+		handleMappingChange(variableName, path);
+		openDropdown = null;
 	};
 
 	const handleDefaultChange = (variableName, value) => {
@@ -47,6 +79,19 @@
 
 	const handleNext = () => {
 		dispatch('next');
+	};
+
+	const handleFocus = (variableName) => {
+		if (suggestedPaths.length > 0) {
+			openDropdown = variableName;
+		}
+	};
+
+	const handleBlur = (e) => {
+		// Delay closing to allow click on dropdown item
+		setTimeout(() => {
+			openDropdown = null;
+		}, 200);
 	};
 
 	const getPreviewValue = (path) => {
@@ -62,6 +107,25 @@
 			return result;
 		} catch {
 			return null;
+		}
+	};
+
+	const formatPreviewValue = (value) => {
+		if (value === null) return 'null';
+		if (value === undefined) return 'undefined';
+		if (typeof value === 'string') return `"${value.length > 30 ? value.slice(0, 30) + '...' : value}"`;
+		if (typeof value === 'object') return Array.isArray(value) ? `[${value.length} items]` : '{...}';
+		return String(value);
+	};
+
+	const getTypeColor = (type) => {
+		switch (type) {
+			case 'string': return 'text-green-600';
+			case 'number': return 'text-blue-600';
+			case 'boolean': return 'text-purple-600';
+			case 'array': return 'text-orange-600';
+			case 'object': return 'text-gray-500';
+			default: return 'text-gray-400';
 		}
 	};
 </script>
@@ -104,34 +168,88 @@
 							{/if}
 						</div>
 
-						<!-- JSONPath Input -->
+						<!-- JSONPath Input with Dropdown -->
 						<div>
 							<label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">JSONPath</label>
 							<div class="relative">
 								<input
 									type="text"
-									class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:border-[#a855f7] transition-colors"
-									placeholder="$.data.field"
+									class="w-full px-3 py-2 pr-8 border-2 border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:border-[#a855f7] transition-colors"
+									placeholder={suggestedPaths.length > 0 ? "Type or select from dropdown..." : "$.data.field"}
 									value={mapping[variable.name] || ''}
 									on:input={(e) => handleMappingChange(variable.name, e.target.value)}
-									list="paths-{variable.name}"
+									on:focus={() => handleFocus(variable.name)}
+									on:blur={handleBlur}
 								/>
 								{#if suggestedPaths.length > 0}
-									<datalist id="paths-{variable.name}">
-										{#each suggestedPaths as { path }}
-											<option value={path}>{path}</option>
+									<button
+										type="button"
+										class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+										on:click={() => openDropdown = openDropdown === variable.name ? null : variable.name}
+									>
+										<svg class="w-4 h-4 transition-transform {openDropdown === variable.name ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+										</svg>
+									</button>
+								{/if}
+
+								<!-- Dropdown suggestions -->
+								{#if openDropdown === variable.name && suggestedPaths.length > 0}
+									<div class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border-2 border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] max-h-64 overflow-y-auto">
+										<div class="sticky top-0 bg-gray-100 px-3 py-2 border-b border-gray-200">
+											<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+												{getFilteredPaths(variable.name).length} paths available
+											</p>
+										</div>
+										{#each getFilteredPaths(variable.name) as { path, value, type, isLeaf }}
+											<button
+												type="button"
+												class="w-full px-3 py-2 text-left hover:bg-purple-50 border-b border-gray-100 last:border-b-0 transition-colors flex items-center justify-between gap-2"
+												on:mousedown|preventDefault={() => handleSelectPath(variable.name, path)}
+											>
+												<div class="flex-1 min-w-0">
+													<span class="font-mono text-sm text-gray-900 block truncate">{path}</span>
+													{#if isLeaf}
+														<span class="text-[10px] {getTypeColor(type)} truncate block">
+															{formatPreviewValue(value)}
+														</span>
+													{/if}
+												</div>
+												<span class="flex-shrink-0 px-1.5 py-0.5 text-[9px] font-bold uppercase rounded {
+													type === 'string' ? 'bg-green-100 text-green-700' :
+													type === 'number' ? 'bg-blue-100 text-blue-700' :
+													type === 'boolean' ? 'bg-purple-100 text-purple-700' :
+													type === 'array' ? 'bg-orange-100 text-orange-700' :
+													'bg-gray-100 text-gray-600'
+												}">
+													{type}
+												</span>
+											</button>
 										{/each}
-									</datalist>
+										{#if getFilteredPaths(variable.name).length === 0}
+											<div class="px-3 py-4 text-center text-gray-500 text-sm">
+												No matching paths found
+											</div>
+										{/if}
+									</div>
 								{/if}
 							</div>
 							{#if mapping[variable.name] && sampleData}
 								{@const preview = getPreviewValue(mapping[variable.name])}
 								{#if preview !== null && preview !== undefined}
-									<p class="text-xs text-green-600 mt-1 font-mono">
+									<p class="text-xs text-green-600 mt-1 font-mono flex items-center gap-1">
+										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+										</svg>
 										Preview: {typeof preview === 'object' ? JSON.stringify(preview) : String(preview)}
 									</p>
 								{:else}
-									<p class="text-xs text-orange-600 mt-1">Path not found in sample data</p>
+									<p class="text-xs text-orange-600 mt-1 flex items-center gap-1">
+										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+										</svg>
+										Path not found in sample data
+									</p>
 								{/if}
 							{/if}
 						</div>
@@ -170,18 +288,34 @@
 
 				{#if suggestedPaths.length > 0}
 					<div class="space-y-2">
-						<h4 class="text-xs font-bold text-gray-600 uppercase tracking-wide">Available Paths</h4>
-						<div class="flex flex-wrap gap-1">
-							{#each suggestedPaths.slice(0, 20) as { path, value }}
+						<div class="flex items-center justify-between">
+							<h4 class="text-xs font-bold text-gray-600 uppercase tracking-wide">Available Paths</h4>
+							<span class="text-[10px] text-gray-400">{suggestedPaths.length} total</span>
+						</div>
+						<div class="flex flex-wrap gap-1.5">
+							{#each suggestedPaths.filter(p => p.isLeaf).slice(0, 24) as { path, value, type }}
 								<button
-									class="px-2 py-1 text-[10px] font-mono bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-200 transition-colors"
-									title={typeof value === 'object' ? JSON.stringify(value) : String(value)}
+									class="group px-2 py-1 text-[10px] font-mono rounded border transition-all flex items-center gap-1.5 {
+										type === 'string' ? 'bg-green-50 hover:bg-green-100 text-green-800 border-green-200' :
+										type === 'number' ? 'bg-blue-50 hover:bg-blue-100 text-blue-800 border-blue-200' :
+										type === 'boolean' ? 'bg-purple-50 hover:bg-purple-100 text-purple-800 border-purple-200' :
+										'bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-200'
+									}"
+									title="Click to copy: {path}&#10;Value: {formatPreviewValue(value)}"
 									on:click={() => navigator.clipboard.writeText(path)}
 								>
-									{path}
+									<span class="truncate max-w-[150px]">{path}</span>
+									<svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+									</svg>
 								</button>
 							{/each}
 						</div>
+						{#if suggestedPaths.filter(p => p.isLeaf).length > 24}
+							<p class="text-[10px] text-gray-400 italic">
+								+{suggestedPaths.filter(p => p.isLeaf).length - 24} more paths (use dropdown to see all)
+							</p>
+						{/if}
 					</div>
 				{/if}
 			</div>

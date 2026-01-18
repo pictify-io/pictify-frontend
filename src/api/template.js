@@ -78,12 +78,19 @@ const getTemplatesForType = async (type) => {
  */
 const renderTemplate = async (uid, variables = {}, options = {}) => {
 	try {
+		const headers = { ...(options.headers || {}) };
+
+		// Add API key authorization if provided
+		if (options.apiKey) {
+			headers['Authorization'] = `Bearer ${options.apiKey}`;
+		}
+
 		const response = await backend.post(`/templates/${uid}/render`, {
 			variables,
 			format: options.format || 'png',
 			quality: options.quality || 0.9
 		}, {
-			headers: options.headers || {}
+			headers
 		});
 		return response;
 	} catch (error) {

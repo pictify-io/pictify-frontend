@@ -212,27 +212,44 @@
 
 		try {
 			// Create or save data source if it's new
-			let dataSourceId = selectedDataSource?.uid;
+			let dataSourceToUse = selectedDataSource;
 
-			if (!dataSourceId && newDataSource.name && newDataSource.url) {
+			if (!dataSourceToUse && newDataSource.name && newDataSource.url) {
 				const created = await createDataSource(newDataSource);
 
 				// Check if component is still mounted before setting state
 				if (!mounted) return;
 
-				dataSourceId = created.uid;
-				dataSources = [...dataSources, created];
-				selectedDataSource = created;
+				dataSources = [...dataSources, created.dataSource || created];
+				dataSourceToUse = created.dataSource || created;
+				selectedDataSource = dataSourceToUse;
 			}
 
-			// Create binding
+			// Build dataSource object for the binding
+			const dataSourceForBinding = dataSourceToUse ? {
+				type: dataSourceToUse.type || 'http',
+				url: dataSourceToUse.url,
+				method: dataSourceToUse.method || 'GET',
+				headers: dataSourceToUse.headers || {}
+			} : {
+				type: 'static'
+			};
+
+			// Create binding with camelCase keys (matching backend API convention)
 			const bindingData = {
 				templateId: uid,
-				dataSourceId: dataSourceId || null,
+				dataSource: dataSourceForBinding,
 				mapping,
 				defaults,
-				refreshPolicy,
-				outputConfig
+				refreshPolicy: {
+					type: 'ttl',
+					ttlSeconds: refreshPolicy.ttlSeconds || 300,
+					onError: refreshPolicy.onError || 'serve_stale'
+				},
+				outputConfig: {
+					format: outputConfig.format || 'png',
+					quality: outputConfig.quality || 90
+				}
 			};
 
 			const result = await createBinding(bindingData);
@@ -240,7 +257,7 @@
 			// Check if component is still mounted before setting state
 			if (!mounted) return;
 
-			publishedBinding = result;
+			publishedBinding = result.binding || result;
 			activeTab = 'publish';
 			toast.set({ message: 'Dynamic asset published!', type: 'success', duration: 3000 });
 		} catch (error) {

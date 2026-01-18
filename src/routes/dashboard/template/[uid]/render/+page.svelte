@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { getTemplateById, getTemplateVariables, renderTemplate } from '../../../../../api/template';
+	import { getApiToken, createApiToken } from '../../../../../api/user';
 	import { toast } from '../../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
 	import RenderForm from '$lib/components/render/RenderForm.svelte';
@@ -16,6 +17,11 @@
 	let renderResult = null;
 	let renderError = null;
 
+	// API Key state
+	let apiTokens = [];
+	let selectedApiKey = '';
+	let isCreatingToken = false;
+
 	// Race condition prevention
 	let renderInProgress = false;
 	let currentRenderVersion = 0;
@@ -28,9 +34,10 @@
 		isLoading = true;
 
 		try {
-			const [templateRes, variablesRes] = await Promise.all([
+			const [templateRes, variablesRes, tokensRes] = await Promise.all([
 				getTemplateById(uid),
-				getTemplateVariables(uid)
+				getTemplateVariables(uid),
+				getApiToken()
 			]);
 
 			// Check if this load is still current
@@ -44,6 +51,12 @@
 
 			template = templateRes.template;
 			variables = variablesRes?.variables || [];
+			apiTokens = tokensRes?.apiTokens || [];
+
+			// Auto-select the first token if available
+			if (apiTokens.length > 0 && !selectedApiKey) {
+				selectedApiKey = apiTokens[0].token;
+			}
 
 			// Initialize variable values with defaults
 			variableValues = {};
@@ -64,6 +77,12 @@
 	};
 
 	const handleRender = async () => {
+		// Require API key
+		if (!selectedApiKey) {
+			toast.set({ message: 'Please select an API key to render', type: 'error', duration: 3000 });
+			return;
+		}
+
 		// Double-click protection
 		if (renderInProgress) return;
 		renderInProgress = true;
@@ -75,7 +94,8 @@
 		try {
 			const result = await renderTemplate(uid, variableValues, {
 				format: template?.outputFormat === 'pdf' ? 'pdf' : 'png',
-				quality: 0.9
+				quality: 0.9,
+				apiKey: selectedApiKey
 			});
 
 			// Check if this render is still current
@@ -94,6 +114,22 @@
 				isRendering = false;
 				renderInProgress = false;
 			}
+		}
+	};
+
+	const handleCreateToken = async () => {
+		isCreatingToken = true;
+		try {
+			const result = await createApiToken();
+			if (result?.apiToken) {
+				apiTokens = [...apiTokens, result.apiToken];
+				selectedApiKey = result.apiToken.token;
+				toast.set({ message: 'API key created', type: 'success', duration: 2000 });
+			}
+		} catch (error) {
+			toast.set({ message: 'Failed to create API key', type: 'error', duration: 3000 });
+		} finally {
+			isCreatingToken = false;
 		}
 	};
 
@@ -231,11 +267,79 @@ console.log(result.url); // CDN URL of rendered image`;
 					on:jsonImport={handleJsonImport}
 				/>
 
+				<!-- API Key Selection -->
+				<div class="mt-6 pt-6 border-t-2 border-gray-200">
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+						</svg>
+						API Key
+					</h3>
+
+					{#if apiTokens.length > 0}
+						<div class="flex gap-2">
+							<select
+								bind:value={selectedApiKey}
+								class="flex-1 px-3 py-2 bg-white border-2 border-gray-300 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none transition-colors"
+							>
+								{#each apiTokens as token}
+									<option value={token.token}>
+										{token.name || 'API Key'} - ...{token.token.slice(-8)}
+									</option>
+								{/each}
+							</select>
+							<button
+								type="button"
+								class="px-3 py-2 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
+								on:click={handleCreateToken}
+								disabled={isCreatingToken}
+								title="Create new API key"
+							>
+								{#if isCreatingToken}
+									<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+								{:else}
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+									</svg>
+								{/if}
+							</button>
+						</div>
+					{:else}
+						<div class="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
+							<p class="text-sm text-amber-800 mb-3">
+								You need an API key to render templates. Create one to continue.
+							</p>
+							<button
+								type="button"
+								class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg border-2 border-amber-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+								on:click={handleCreateToken}
+								disabled={isCreatingToken}
+							>
+								{#if isCreatingToken}
+									<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+									Creating...
+								{:else}
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+									</svg>
+									Create API Key
+								{/if}
+							</button>
+						</div>
+					{/if}
+				</div>
+
 				<div class="flex flex-col sm:flex-row gap-3 mt-6">
 					<button
 						class="flex-1 bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-black py-3 px-6 rounded-xl border-3 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 uppercase tracking-wider text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 						on:click={handleRender}
-						disabled={isRendering}
+						disabled={isRendering || !selectedApiKey}
 					>
 						{#if isRendering}
 							<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

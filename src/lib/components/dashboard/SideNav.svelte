@@ -186,6 +186,20 @@
 				</svg>
 				<span>Activity Logs</span>
 			</a>
+
+			<!-- Integrations -->
+			<a
+				href="/dashboard/integrations"
+				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+					{$page.url.pathname === '/dashboard/integrations' || $page.url.pathname.startsWith('/dashboard/integrations/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+			>
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/integrations' || $page.url.pathname.startsWith('/dashboard/integrations/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+				</svg>
+				<span>Integrations</span>
+			</a>
 		</nav>
 
 		<!-- Support Section -->
