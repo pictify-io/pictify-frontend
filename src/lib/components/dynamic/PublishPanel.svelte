@@ -12,10 +12,11 @@
 
 	const dispatch = createEventDispatcher();
 
-	$: dynamicUrl = publishedBinding?.dynamicUrl || null;
+	$: dynamicUrl = publishedBinding?.renderUrl || null;
 	$: bindingId = publishedBinding?.uid || null;
 	$: lastRenderAt = publishedBinding?.lastRenderAt ? new Date(publishedBinding.lastRenderAt) : null;
 	$: lastError = publishedBinding?.lastError || null;
+	$: bindingStatus = publishedBinding?.status || 'active';
 
 	const copyToClipboard = (text) => {
 		navigator.clipboard.writeText(text);
