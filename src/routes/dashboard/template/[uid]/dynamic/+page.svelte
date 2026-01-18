@@ -67,6 +67,22 @@
 
 	$: uid = $page.params.uid;
 
+	// Re-load when UID changes (handles SvelteKit component reuse on route param change)
+	$: if (uid && mounted) {
+		// Reset state for new template to prevent showing stale data
+		template = null;
+		variables = [];
+		existingBindings = [];
+		selectedDataSource = null;
+		testResult = null;
+		mapping = {};
+		defaults = {};
+		publishedBinding = null;
+		activeTab = 'datasource';
+		// Load fresh data
+		loadData();
+	}
+
 	// Check if can proceed to next step
 	$: canProceedToMapping = selectedDataSource || (newDataSource.name && newDataSource.url);
 	$: canProceedToRefresh = Object.keys(mapping).length > 0 || variables.length === 0;
@@ -162,12 +178,19 @@
 		}
 	};
 
+	// Track data source creation state for double-click prevention
+	let isCreatingDataSource = false;
+
 	const handleCreateDataSource = async () => {
+		// Early guard to prevent double-clicks
+		if (isCreatingDataSource) return;
+
 		if (!newDataSource.name || !newDataSource.url) {
 			toast.set({ message: 'Name and URL are required', type: 'error', duration: 2000 });
 			return;
 		}
 
+		isCreatingDataSource = true;
 		try {
 			const created = await createDataSource(newDataSource);
 
@@ -182,6 +205,10 @@
 			// Check if component is still mounted before setting error state
 			if (!mounted) return;
 			toast.set({ message: `Failed to create: ${error.message}`, type: 'error', duration: 3000 });
+		} finally {
+			if (mounted) {
+				isCreatingDataSource = false;
+			}
 		}
 	};
 
@@ -275,9 +302,8 @@
 		activeTab = tab;
 	};
 
-	onMount(() => {
-		loadData();
-	});
+	// Note: loadData is called reactively when uid changes (see reactive statement above)
+	// onMount is no longer needed for initial load since the reactive $: if (uid && mounted) handles it
 </script>
 
 <section class="min-h-full">
