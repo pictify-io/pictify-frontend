@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 
 	export let variables = [];
 	export let mapping = {};
@@ -12,8 +12,18 @@
 	let openDropdown = null;
 	let searchFilter = {};
 
-	// Extract suggested paths from sample data
-	$: suggestedPaths = sampleData ? extractPaths(sampleData) : [];
+	// Memoize extracted paths to prevent recalculation on every render
+	let cachedSampleData = null;
+	let cachedPaths = [];
+
+	// Only re-extract paths when sampleData reference actually changes
+	$: {
+		if (sampleData !== cachedSampleData) {
+			cachedSampleData = sampleData;
+			cachedPaths = sampleData ? extractPaths(sampleData) : [];
+		}
+	}
+	$: suggestedPaths = cachedPaths;
 
 	const extractPaths = (obj, prefix = '$', maxDepth = 10) => {
 		const paths = [];
@@ -87,12 +97,22 @@
 		}
 	};
 
+	// Track blur timeout for cleanup
+	let blurTimeout = null;
+
 	const handleBlur = (e) => {
 		// Delay closing to allow click on dropdown item
-		setTimeout(() => {
+		blurTimeout = setTimeout(() => {
 			openDropdown = null;
 		}, 200);
 	};
+
+	// Clean up timeout on component destroy
+	onDestroy(() => {
+		if (blurTimeout) {
+			clearTimeout(blurTimeout);
+		}
+	});
 
 	const getPreviewValue = (path) => {
 		if (!sampleData || !path) return null;

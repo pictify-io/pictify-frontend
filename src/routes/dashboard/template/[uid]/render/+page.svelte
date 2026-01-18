@@ -29,6 +29,18 @@
 
 	$: uid = $page.params.uid;
 
+	// Re-load when UID changes (handles SvelteKit component reuse on route param change)
+	$: if (uid) {
+		// Reset state for new template to prevent showing stale data
+		template = null;
+		variables = [];
+		variableValues = {};
+		renderResult = null;
+		renderError = null;
+		// Load fresh data
+		loadTemplate();
+	}
+
 	const loadTemplate = async () => {
 		const thisLoadVersion = ++currentLoadVersion;
 		isLoading = true;
@@ -118,6 +130,8 @@
 	};
 
 	const handleCreateToken = async () => {
+		// Early guard to prevent double-clicks
+		if (isCreatingToken) return;
 		isCreatingToken = true;
 		try {
 			const result = await createApiToken();
@@ -183,9 +197,8 @@ console.log(result.url); // CDN URL of rendered image`;
 		toast.set({ message: 'API code copied to clipboard', type: 'success', duration: 2000 });
 	};
 
-	onMount(() => {
-		loadTemplate();
-	});
+	// Note: loadTemplate is called reactively when uid changes (see reactive statement above)
+	// onMount is no longer needed for initial load since the reactive $: if (uid) handles it
 
 	onDestroy(() => {
 		// Invalidate any in-flight loads and renders
