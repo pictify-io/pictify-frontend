@@ -16,11 +16,21 @@
   // Social proof counter
   let totalBannersCreated = 23847;
 
-  // User state
-  let isUserLoggedIn = false;
-  user.subscribe(userData => {
-    isUserLoggedIn = !!userData.email;
-  });
+  // User state - using reactive declaration
+  $: isUserLoggedIn = !!$user?.email;
+
+  // Debounce utility
+  function debounce(fn, delay = 150) {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  // File upload limits
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_IMAGE_DIMENSION = 4000;
 
   // Fonts
   const popularFontsLinks = [
@@ -50,7 +60,6 @@
 
   // State
   let selectedCategory = 'all';
-  let templates = [];
   let selectedTemplate = null;
   let selectedFont = combinedFonts[0];
   let imageUrl = '';
@@ -59,7 +68,6 @@
   // Editable content
   let heading = '';
   let subheading = '';
-  let logoFile = null;
   let logoDataUrl = null;
 
   // Colors
@@ -90,9 +98,8 @@
 
   // Initialize
   onMount(() => {
-    templates = allTemplates;
-    if (templates.length > 0) {
-      selectTemplate(getPopularTemplates()[0] || templates[0]);
+    if (allTemplates.length > 0) {
+      selectTemplate(getPopularTemplates()[0] || allTemplates[0]);
     }
   });
 
@@ -202,35 +209,63 @@
     doc.documentElement.style.setProperty('--secondary-color', `rgb(${headingColorRgb.r}, ${headingColorRgb.g}, ${headingColorRgb.b})`);
     doc.documentElement.style.setProperty('--tertiary-color', `rgb(${subHeadingColorRgb.r}, ${subHeadingColorRgb.g}, ${subHeadingColorRgb.b})`);
 
-    // Update font
-    const fontLink = doc.createElement('link');
-    fontLink.rel = 'stylesheet';
+    // Update font - reuse existing link element to prevent accumulation
+    let fontLink = doc.querySelector('link[data-font-link]');
+    if (!fontLink) {
+      fontLink = doc.createElement('link');
+      fontLink.rel = 'stylesheet';
+      fontLink.dataset.fontLink = 'true';
+      doc.head.appendChild(fontLink);
+    }
     fontLink.href = selectedFont.link;
-    doc.head.appendChild(fontLink);
     doc.documentElement.style.fontFamily = selectedFont.id;
   }
 
-  // Handle input changes
+  // Debounced HTML update for text inputs
+  const debouncedUpdateHTML = debounce(() => updateHTML(), 150);
+
+  // Handle input changes with debouncing
   function handleHeadingChange(event) {
     heading = event.target.value;
-    updateHTML();
+    debouncedUpdateHTML();
   }
 
   function handleSubheadingChange(event) {
     subheading = event.target.value;
-    updateHTML();
+    debouncedUpdateHTML();
   }
 
   function handleLogoUpload(event) {
     const file = event.target.files[0];
-    if (file) {
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.set({ message: 'File too large. Maximum size is 5MB.', duration: 3000 });
+      return;
+    }
+
+    // Validate image dimensions
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(img.src);
+      if (img.width > MAX_IMAGE_DIMENSION || img.height > MAX_IMAGE_DIMENSION) {
+        toast.set({ message: 'Image dimensions too large. Maximum is 4000x4000 pixels.', duration: 3000 });
+        return;
+      }
+      // Valid image, proceed with loading
       const reader = new FileReader();
       reader.onload = (e) => {
         logoDataUrl = e.target.result;
         updateHTML();
       };
       reader.readAsDataURL(file);
-    }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(img.src);
+      toast.set({ message: 'Invalid image file.', duration: 3000 });
+    };
+    img.src = URL.createObjectURL(file);
   }
 
   function updateBackgroundColor(event) {
@@ -320,14 +355,15 @@
     progress.set(0);
   }
 
-  // API example code
-  const apiExampleCode = `curl -X POST https://api.pictify.io/image/linkedin-banner \\
+  // API example code - uses the generic /image endpoint with HTML
+  const apiExampleCode = `curl -X POST https://api.pictify.io/image \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -d '{
-    "template": "dev-dark-terminal",
-    "heading": "John Developer",
-    "subheading": "Senior Software Engineer | React | Node.js"
+    "html": "<html>...your banner HTML...</html>",
+    "width": 1584,
+    "height": 396,
+    "fileExtension": "png"
   }'`;
 
   const apiCtaDetails = {
