@@ -118,6 +118,12 @@ export async function GET() {
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
+         <url>
+            <loc>https://pictify.io/tools/linkedin-banner-generator</loc>
+            <lastmod>2026-01-24</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.8</priority>
+         </url>
 	   		${variantUrls.join('')}
 	   		${ogPlatformUrls.join('')}
 	   		${useCaseUrls.join('')}
