@@ -15,6 +15,10 @@
   import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
   import NextSteps from '$lib/components/tools/NextSteps.svelte';
   import Toast from '$lib/components/Toast.svelte';
+  import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
+  import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
+  import { generationLimits } from '../../../store/generationLimits.store';
+  import { analytics } from '$lib/analytics.js';
 
   // Optional platform prop to specialize content (e.g., 'wordpress')
   export let platform = null;
@@ -281,6 +285,9 @@ const combinedFonts = popularFonts.map((font, index) => ({
 
   // Initialize editor with default template
   onMount(async () => {
+    // Track tool opened
+    analytics.trackToolOpened({ tool_name: 'og_image_generator' });
+
     templates = await Promise.all(templateNames.map(async(name) => {
       const template = await getTemplate(name);
       return template;
@@ -295,7 +302,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
     } else {
       selectedTemplate = templates[0];
     }
-    
+
     if (creationMode === 'direct') {
       createDirectOgImage();
     }
@@ -397,7 +404,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
 
   function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'URL copied to clipboard! 🔗', duration: 1500 });
+			toast.set({ message: 'URL copied to clipboard! 🔗', type: 'success', duration: 1500 });
 		});
 	}
 
@@ -470,27 +477,29 @@ const combinedFonts = popularFonts.map((font, index) => ({
 
   // Modify the generateImage function
   const generateImage = async () => {
+    // Track generation in the limits store
+    generationLimits.increment();
     generationCount++;
-    
+
     isImageGenerating = true;
     const iframe = ogImageTemplateWrapper.querySelector('iframe');
     const document = iframe.contentWindow.document;
     let html = document.documentElement.outerHTML;
-    
-    // Add watermark for non-logged in users after 2 generations
-    if (!isUserLoggedIn && generationCount > 2) {
+
+    // Add watermark for ALL non-logged in users (not just after 2 generations)
+    if (!isUserLoggedIn) {
       const watermarkDiv = `
-        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); 
+        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9);
                     padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 9999;
-                    font-family: system-ui, -apple-system, sans-serif;">
-          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none;">pictify.io</a>
+                    font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">pictify.io</a>
         </div>
       `;
-      
+
       // Insert watermark before closing body tag
       html = html.replace('</body>', `${watermarkDiv}</body>`);
     }
-    
+
     try {
       const {image} = await createImagePublic({
         html,
@@ -498,17 +507,24 @@ const combinedFonts = popularFonts.map((font, index) => ({
         height: previewHeight
       });
       imageUrl = image.url;
-      
+
+      // Track image generation
+      analytics.trackImageGenerated({
+        tool_name: 'og_image_generator',
+        format: 'png',
+        with_watermark: !isUserLoggedIn,
+      });
+
       // Increment total images counter
       totalImagesGenerated++;
-      
+
       // Show upgrade prompt after 2 generations
-      if (!isUserLoggedIn && generationCount > 2) {
+      if (!isUserLoggedIn && generationCount >= 2) {
         showUpgradePrompt = true;
       }
-      
+
     } catch (error) {
-      toast.set({ message: 'Failed to generate image. Please try again.', duration: 3000 });
+      toast.set({ message: 'Failed to generate image. Please try again.', type: 'error', duration: 3000 });
     } finally {
       isImageGenerating = false;
     }
@@ -535,7 +551,7 @@ const combinedFonts = popularFonts.map((font, index) => ({
       showSignupPrompt = true;
       return;
     }
-    toast.set({ message: 'Template saved successfully!', duration: 1500 });
+    toast.set({ message: 'Template saved successfully!', type: 'success', duration: 1500 });
   };
 
   // Increment stats
@@ -802,6 +818,9 @@ const combinedFonts = popularFonts.map((font, index) => ({
       </div>
     </div>
 
+    <!-- Generation Limit Banner -->
+    <GenerationLimitBanner />
+
     <!-- Editor Section -->
     {#if websiteInfo && selectedTemplate}
       <div class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0" bind:this={ogImageTemplateWrapper}>
@@ -940,6 +959,8 @@ const combinedFonts = popularFonts.map((font, index) => ({
                 description="Copy the API request, save this as a reusable template background, and batch render variants."
                 curlSnippet={nextStepsCurlSnippet}
                 templateDraft={nextStepsTemplateDraft}
+                generatedUrl={imageUrl}
+                toolName="OG Image Generator"
               />
             </div>
           {/if}
@@ -1107,6 +1128,9 @@ const combinedFonts = popularFonts.map((font, index) => ({
   </main>
   <Footer />
   <Toast />
+
+  <!-- Exit Intent Popup for lead capture -->
+  <ExitIntentPopup toolName="OG Image Generator" generatedImageUrl={imageUrl} />
 </section>
 
 <style>

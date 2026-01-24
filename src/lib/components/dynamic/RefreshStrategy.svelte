@@ -33,109 +33,124 @@
 	};
 </script>
 
-<div class="space-y-6">
+<div class="space-y-8">
 	<div class="flex items-center justify-between">
-		<h2 class="text-lg font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
-			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-			</svg>
+		<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide flex items-center gap-3">
+			<span class="w-8 h-8 bg-gray-900 border-2 border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_#9ca3af]">
+				<span class="text-white text-lg font-black">3</span>
+			</span>
 			Refresh Strategy
 		</h2>
 	</div>
 
-	<p class="text-sm text-gray-500 font-medium">
-		Configure how often the dynamic asset refreshes and how to handle errors
-	</p>
-
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 		<!-- TTL Configuration -->
-		<div class="space-y-4 p-4 bg-gray-50 border-2 border-gray-200 rounded-xl">
-			<h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Cache Duration (TTL)</h3>
-			<p class="text-xs text-gray-500">How long before the asset refreshes from the data source</p>
-
-			<!-- Presets -->
-			<div class="flex flex-wrap gap-2">
-				{#each ttlPresets as preset}
-					<button
-						class="px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-lg border-2 transition-all
-							{refreshPolicy.ttlSeconds === preset.value
-								? 'bg-[#a855f7] text-white border-[#a855f7]'
-								: 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}"
-						on:click={() => handleRefreshChange({ ttlSeconds: preset.value })}
-					>
-						{preset.label}
-					</button>
-				{/each}
+		<div class="space-y-6">
+			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
+				<span class="w-3 h-3 bg-[#ffe66d] rounded-full border-2 border-black"></span>
+				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Cache Duration (TTL)</h3>
 			</div>
+			
+			<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
+				<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-4">Select Duration</p>
 
-			<!-- Custom Input -->
-			<div>
-				<label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Custom (seconds)</label>
-				<div class="flex items-center gap-2">
-					<input
-						type="number"
-						min="30"
-						max="604800"
-						class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:border-[#a855f7] transition-colors"
-						value={refreshPolicy.ttlSeconds}
-						on:input={(e) => handleRefreshChange({ ttlSeconds: parseInt(e.target.value) || 300 })}
-					/>
-					<span class="text-sm text-gray-500 font-medium">= {formatTtl(refreshPolicy.ttlSeconds)}</span>
+				<!-- Presets -->
+				<div class="flex flex-wrap gap-3 mb-6">
+					{#each ttlPresets as preset}
+						<button
+							class="px-3 py-2 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] transition-all hover:-translate-y-0.5 active:translate-y-0
+								{refreshPolicy.ttlSeconds === preset.value
+									? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
+									: 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
+							on:click={() => handleRefreshChange({ ttlSeconds: preset.value })}
+						>
+							{preset.label}
+						</button>
+					{/each}
+				</div>
+
+				<!-- Custom Input -->
+				<div>
+					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Custom Duration (seconds)</label>
+					<div class="flex items-center gap-3">
+						<input
+							type="number"
+							min="30"
+							max="604800"
+							class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-black font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#9ca3af] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all"
+							value={refreshPolicy.ttlSeconds}
+							on:input={(e) => handleRefreshChange({ ttlSeconds: parseInt(e.target.value) || 300 })}
+						/>
+						<div class="px-4 py-3 bg-gray-100 border-[3px] border-gray-200 rounded-lg">
+							<span class="text-sm font-bold text-gray-600 font-mono">= {formatTtl(refreshPolicy.ttlSeconds)}</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Error Policy -->
-		<div class="space-y-4 p-4 bg-gray-50 border-2 border-gray-200 rounded-xl">
-			<h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">On Fetch Error</h3>
-			<p class="text-xs text-gray-500">What to do if data fetching fails</p>
+		<div class="space-y-6">
+			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
+				<span class="w-3 h-3 bg-red-400 rounded-full border-2 border-black"></span>
+				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Error Handling</h3>
+			</div>
 
-			<div class="space-y-2">
-				<label class="flex items-start gap-3 p-3 bg-white border-2 rounded-lg cursor-pointer transition-all
-					{refreshPolicy.onError === 'serve_stale' ? 'border-[#a855f7] ring-2 ring-purple-100' : 'border-gray-200 hover:border-gray-300'}">
-					<input
-						type="radio"
-						name="errorPolicy"
-						value="serve_stale"
-						checked={refreshPolicy.onError === 'serve_stale'}
-						on:change={() => handleRefreshChange({ onError: 'serve_stale' })}
-						class="mt-0.5 accent-[#a855f7]"
-					/>
+			<div class="space-y-3">
+				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
+					{refreshPolicy.onError === 'serve_stale' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-purple-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+					<div class="relative flex items-center justify-center">
+						<input
+							type="radio"
+							name="errorPolicy"
+							value="serve_stale"
+							checked={refreshPolicy.onError === 'serve_stale'}
+							on:change={() => handleRefreshChange({ onError: 'serve_stale' })}
+							class="appearance-none w-6 h-6 border-[3px] border-gray-900 rounded-full checked:bg-gray-900 transition-colors cursor-pointer"
+						/>
+						<div class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError === 'serve_stale' ? 'opacity-100' : ''}"></div>
+					</div>
 					<div>
-						<p class="font-bold text-gray-900 text-sm">Serve Stale (Recommended)</p>
-						<p class="text-xs text-gray-500">Show last successful render if fetch fails</p>
+						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Serve Stale Content</p>
+						<p class="text-xs font-medium text-gray-500 mt-1">If refresh fails, show the last successful image (Recommended)</p>
 					</div>
 				</label>
 
-				<label class="flex items-start gap-3 p-3 bg-white border-2 rounded-lg cursor-pointer transition-all
-					{refreshPolicy.onError === 'serve_default' ? 'border-[#a855f7] ring-2 ring-purple-100' : 'border-gray-200 hover:border-gray-300'}">
-					<input
-						type="radio"
-						name="errorPolicy"
-						value="serve_default"
-						checked={refreshPolicy.onError === 'serve_default'}
-						on:change={() => handleRefreshChange({ onError: 'serve_default' })}
-						class="mt-0.5 accent-[#a855f7]"
-					/>
+				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
+					{refreshPolicy.onError === 'serve_default' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-purple-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+					<div class="relative flex items-center justify-center">
+						<input
+							type="radio"
+							name="errorPolicy"
+							value="serve_default"
+							checked={refreshPolicy.onError === 'serve_default'}
+							on:change={() => handleRefreshChange({ onError: 'serve_default' })}
+							class="appearance-none w-6 h-6 border-[3px] border-gray-900 rounded-full checked:bg-gray-900 transition-colors cursor-pointer"
+						/>
+						<div class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError === 'serve_default' ? 'opacity-100' : ''}"></div>
+					</div>
 					<div>
-						<p class="font-bold text-gray-900 text-sm">Serve Default</p>
-						<p class="text-xs text-gray-500">Show template with default values</p>
+						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Serve Default Template</p>
+						<p class="text-xs font-medium text-gray-500 mt-1">Render with fallback/default values defined in mapping</p>
 					</div>
 				</label>
 
-				<label class="flex items-start gap-3 p-3 bg-white border-2 rounded-lg cursor-pointer transition-all
-					{refreshPolicy.onError === 'error' ? 'border-[#a855f7] ring-2 ring-purple-100' : 'border-gray-200 hover:border-gray-300'}">
-					<input
-						type="radio"
-						name="errorPolicy"
-						value="error"
-						checked={refreshPolicy.onError === 'error'}
-						on:change={() => handleRefreshChange({ onError: 'error' })}
-						class="mt-0.5 accent-[#a855f7]"
-					/>
+				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
+					{refreshPolicy.onError === 'error' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-purple-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+					<div class="relative flex items-center justify-center">
+						<input
+							type="radio"
+							name="errorPolicy"
+							value="error"
+							checked={refreshPolicy.onError === 'error'}
+							on:change={() => handleRefreshChange({ onError: 'error' })}
+							class="appearance-none w-6 h-6 border-[3px] border-gray-900 rounded-full checked:bg-gray-900 transition-colors cursor-pointer"
+						/>
+						<div class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError === 'error' ? 'opacity-100' : ''}"></div>
+					</div>
 					<div>
-						<p class="font-bold text-gray-900 text-sm">Return Error</p>
-						<p class="text-xs text-gray-500">Return HTTP 500 error</p>
+						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Return Error</p>
+						<p class="text-xs font-medium text-gray-500 mt-1">Fail the request with a 500 status code</p>
 					</div>
 				</label>
 			</div>
@@ -143,51 +158,69 @@
 	</div>
 
 	<!-- Output Configuration -->
-	<div class="space-y-4 p-4 bg-gray-50 border-2 border-gray-200 rounded-xl">
-		<h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Output Format</h3>
+	<div class="mt-8 pt-8 border-t-[3px] border-gray-200 border-dashed">
+		<div class="flex items-center gap-2 pb-4">
+			<span class="w-3 h-3 bg-blue-400 rounded-full border-2 border-black"></span>
+			<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Output Format</h3>
+		</div>
 
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<div>
-				<label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Format</label>
-				<select
-					class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#a855f7] transition-colors bg-white"
-					value={outputConfig.format}
-					on:change={(e) => handleOutputChange({ format: e.target.value })}
-				>
-					<option value="png">PNG</option>
-					<option value="jpeg">JPEG</option>
-					<option value="webp">WebP</option>
-					<option value="pdf">PDF</option>
-				</select>
-			</div>
-			<div>
-				<label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Quality ({outputConfig.quality}%)</label>
-				<input
-					type="range"
-					min="50"
-					max="100"
-					step="5"
-					class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#a855f7]"
-					value={outputConfig.quality}
-					on:input={(e) => handleOutputChange({ quality: parseInt(e.target.value) })}
-				/>
+		<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+				<div>
+					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Image Format</label>
+					<div class="relative">
+						<select
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffe66d] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all bg-white appearance-none"
+							value={outputConfig.format}
+							on:change={(e) => handleOutputChange({ format: e.target.value })}
+						>
+							<option value="png">PNG (Lossless)</option>
+							<option value="jpeg">JPEG (Compressed)</option>
+							<option value="webp">WebP (Optimized)</option>
+							<option value="pdf">PDF (Document)</option>
+						</select>
+						<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+							<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="flex justify-between mb-2">
+						<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Quality</label>
+						<span class="text-xs font-black text-[#a855f7] bg-purple-50 px-2 rounded border border-purple-100">{outputConfig.quality}%</span>
+					</div>
+					<input
+						type="range"
+						min="50"
+						max="100"
+						step="5"
+						class="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#a855f7] border-2 border-gray-300"
+						value={outputConfig.quality}
+						on:input={(e) => handleOutputChange({ quality: parseInt(e.target.value) })}
+					/>
+					<div class="flex justify-between mt-2 text-[10px] font-black uppercase text-gray-400">
+						<span>Small File</span>
+						<span>High Quality</span>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<!-- Actions -->
-	<div class="flex justify-between gap-3 pt-4 border-t-2 border-gray-200">
+	<div class="flex justify-between gap-3 pt-6 mt-6 border-t-[3px] border-gray-900">
 		<button
-			class="px-6 py-3 bg-white hover:bg-gray-100 text-gray-900 font-bold text-sm uppercase tracking-wide rounded-xl border-2 border-gray-300 transition-all"
+			class="px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#9ca3af] hover:shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 			on:click={handleBack}
 		>
 			Back
 		</button>
 		<button
-			class="px-6 py-3 bg-[#a855f7] hover:bg-[#9333ea] text-white font-bold text-sm uppercase tracking-wide rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+			class="px-8 py-4 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Publish
+			<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
 		</button>
 	</div>
 </div>

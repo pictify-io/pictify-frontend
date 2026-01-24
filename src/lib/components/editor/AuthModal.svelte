@@ -72,6 +72,7 @@
 			// Show success message
 			toast.set({
 				message: successMessage,
+				type: 'success',
 				duration: 2000
 			});
 
@@ -112,6 +113,7 @@
 					successMessage = 'Login successful!';
 					toast.set({
 						message: 'Successfully logged in with Google!',
+						type: 'success',
 						duration: 2000
 					});
 

@@ -2,16 +2,13 @@
 	import '../app.css';
 	import { getUser } from '../store/user.store';
 	import { onMount } from 'svelte';
-	import posthog from 'posthog-js';
 	import { browser } from '$app/environment';
+	import { analytics } from '$lib/analytics.js';
 
-	const isProd = import.meta.env.MODE === 'production';
-
-	if (browser && isProd) {
-		posthog.init('phc_3ecva80rtrdIJiDyYVwsqjy2YI7CbhbAydPApERhNtU', {
-			api_host: 'https://api.pictify.io/posthog',
-			disable_compression: true
-		});
+	// Initialize analytics
+	if (browser) {
+		analytics.init();
+		analytics.captureUTM();
 	}
 
 	onMount(async () => {

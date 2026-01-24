@@ -267,8 +267,10 @@ export const designerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      justify-content: center;
+      padding: 48px 200px;
       position: relative;
+      text-align: center;
     }
     .shapes {
       position: absolute;
@@ -403,7 +405,9 @@ export const designerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .gradient-blur {
@@ -466,7 +470,9 @@ export const marketerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .chart {
@@ -554,8 +560,10 @@ export const marketerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      justify-content: center;
+      padding: 48px 200px;
       position: relative;
+      text-align: center;
     }
     .decorative {
       position: absolute;
@@ -589,6 +597,7 @@ export const marketerTemplates = [
       display: flex;
       gap: 12px;
       margin-top: 20px;
+      justify-content: center;
     }
     .skill {
       padding: 8px 16px;
@@ -640,8 +649,10 @@ export const marketerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      justify-content: center;
+      padding: 48px 200px;
       position: relative;
+      text-align: center;
     }
     .grid-bg {
       position: absolute;
@@ -653,10 +664,10 @@ export const marketerTemplates = [
     }
     .content { position: relative; z-index: 1; }
     h1 {
-      font-size: 68px;
+      font-size: 64px;
       font-weight: 800;
       color: var(--secondary-color);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       letter-spacing: -2px;
     }
     p {
@@ -666,11 +677,12 @@ export const marketerTemplates = [
     }
     .stats {
       display: flex;
-      gap: 32px;
-      margin-top: 24px;
+      gap: 40px;
+      margin-top: 20px;
+      justify-content: center;
     }
     .stat {
-      text-align: left;
+      text-align: center;
     }
     .stat-value {
       font-size: 32px;
@@ -733,7 +745,9 @@ export const recruiterTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .pattern {
@@ -799,7 +813,9 @@ export const recruiterTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .accent {
@@ -879,7 +895,9 @@ export const recruiterTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .glow {
@@ -951,7 +969,9 @@ export const freelancerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .gradient-line {
@@ -1032,7 +1052,9 @@ export const freelancerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .squiggle {
@@ -1105,7 +1127,9 @@ export const freelancerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .corner-accent {
@@ -1177,7 +1201,9 @@ export const corporateTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .gold-accent {
@@ -1246,7 +1272,9 @@ export const corporateTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .line-pattern {
@@ -1308,7 +1336,9 @@ export const corporateTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .wave {
@@ -1369,7 +1399,9 @@ export const personalBrandTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .sparkles {
@@ -1433,7 +1465,9 @@ export const personalBrandTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .spotlight {
@@ -1501,7 +1535,9 @@ export const personalBrandTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 80px;
+      padding: 48px 200px;
+      justify-content: center;
+      text-align: center;
       position: relative;
     }
     .quote-mark {

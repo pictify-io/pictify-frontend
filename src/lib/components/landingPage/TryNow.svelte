@@ -1,5 +1,6 @@
 <script>
 	import SignUpButton from './SignUpButton.svelte';
+	import { analytics } from '$lib/analytics.js';
 </script>
 
 <section class="w-full py-24 md:py-32 bg-[#FFFDF8] border-t-[3px] border-gray-900">
@@ -47,32 +48,33 @@
 							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-[2px_2px_0_0_#000] mb-8 transform -rotate-2"
 						>
 							<span class="text-gray-900 text-xs font-mono font-bold uppercase tracking-wider"
-								>🚀 Launch_Sequence_Initiated</span
+								>🚀 Free Tier Available</span
 							>
 						</div>
 
 						<h2
 							class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight"
 						>
-							Ready to <br class="md:hidden" />
-							<span class="text-[#ff6b6b]">Scale?</span>
+							Start Generating <br class="md:hidden" />
+							<span class="text-[#ff6b6b]">Images Today</span>
 						</h2>
 
-						<p class="text-xl text-gray-600 max-w-xl mx-auto mb-12 leading-relaxed font-medium">
-							Join teams building the next generation of dynamic media workflows — designers create
-							templates, developers integrate the API.
+						<p class="text-xl text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed font-medium">
+							Sign up, get your API key, and generate your first image—all in under 2 minutes.
 						</p>
 
-						<div class="flex flex-col sm:flex-row items-center gap-6 w-full justify-center">
+						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
 							<SignUpButton
 								class="w-full sm:w-auto px-8 py-4 bg-[#ffc480] text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
-								text="Start Building Now"
+								text="Get Your Free API Key"
+								location="cta_section"
 							/>
 
 							<a
 								href="https://docs.pictify.io"
 								target="_blank"
 								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-2 group"
+								on:click={() => analytics.trackOutboundLink({ url: 'https://docs.pictify.io', link_text: 'View API Docs', location: 'cta_section' })}
 							>
 								<span>View API Docs</span>
 								<svg
@@ -88,6 +90,27 @@
 									/></svg
 								>
 							</a>
+						</div>
+
+						<!-- Pricing hint -->
+						<p class="text-sm text-gray-500 mb-12">
+							Plans start at <span class="font-bold text-gray-700">$49/mo</span> after free tier
+						</p>
+
+						<!-- Mini FAQ -->
+						<div class="grid sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
+							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+								<h4 class="font-bold text-gray-900 text-sm mb-1">How long to integrate?</h4>
+								<p class="text-xs text-gray-600">Most teams integrate in under 2 hours. It's just REST + JSON.</p>
+							</div>
+							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+								<h4 class="font-bold text-gray-900 text-sm mb-1">What about my data?</h4>
+								<p class="text-xs text-gray-600">Your data is never stored. We render and return—that's it.</p>
+							</div>
+							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+								<h4 class="font-bold text-gray-900 text-sm mb-1">Can I cancel anytime?</h4>
+								<p class="text-xs text-gray-600">Yes. No contracts, no commitments. Cancel with one click.</p>
+							</div>
 						</div>
 					</div>
 				</div>

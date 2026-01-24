@@ -36,9 +36,9 @@
   async function copyShareUrl() {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.set({ message: 'Link copied!', duration: 1500 });
+      toast.set({ message: 'Link copied!', type: 'success', duration: 1500 });
     } catch (e) {
-      toast.set({ message: 'Failed to copy', duration: 2000 });
+      toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
     }
   }
 
@@ -47,9 +47,9 @@
     if (!result?.assetUrl) return;
     try {
       await navigator.clipboard.writeText(result.assetUrl);
-      toast.set({ message: 'Image URL copied!', duration: 1500 });
+      toast.set({ message: 'Image URL copied!', type: 'success', duration: 1500 });
     } catch (e) {
-      toast.set({ message: 'Failed to copy', duration: 2000 });
+      toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
     }
   }
 

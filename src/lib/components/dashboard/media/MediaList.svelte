@@ -25,7 +25,7 @@
 	function copyToClipboard(text, event) {
 		event?.stopPropagation();
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'URL copied to clipboard!', duration: 2000 });
+			toast.set({ message: 'URL copied to clipboard!', type: 'success', duration: 2000 });
 		});
 	}
 
@@ -38,7 +38,7 @@
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
-		toast.set({ message: 'Download started!', duration: 2000 });
+		toast.set({ message: 'Download started!', type: 'success', duration: 2000 });
 	}
 
 	function openLightbox(media) {

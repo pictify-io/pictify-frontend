@@ -43,10 +43,14 @@
 		{ value: '', label: 'All Categories' },
 		{ value: 'image', label: 'Images' },
 		{ value: 'gif', label: 'GIFs' },
+		{ value: 'pdf', label: 'PDFs' },
 		{ value: 'template', label: 'Templates' },
 		{ value: 'batch', label: 'Batch Jobs' },
 		{ value: 'auth', label: 'Authentication' },
-		{ value: 'api', label: 'API' }
+		{ value: 'api', label: 'API' },
+		{ value: 'connector', label: 'Connectors' },
+		{ value: 'webhook', label: 'Webhooks' },
+		{ value: 'other', label: 'Other' }
 	];
 
 	// Status options
@@ -87,6 +91,21 @@
 			iconPath:
 				'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z',
 			color: 'bg-yellow-100 text-yellow-800 border-2 border-yellow-800'
+		},
+		pdf: {
+			iconPath:
+				'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z',
+			color: 'bg-red-100 text-red-800 border-2 border-red-800'
+		},
+		connector: {
+			iconPath:
+				'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
+			color: 'bg-indigo-100 text-indigo-800 border-2 border-indigo-800'
+		},
+		webhook: {
+			iconPath:
+				'M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0',
+			color: 'bg-teal-100 text-teal-800 border-2 border-teal-800'
 		},
 		other: {
 			iconPath:
@@ -166,9 +185,9 @@
 				document.body.removeChild(a);
 			}
 
-			toast.set({ message: `Audit logs exported as ${format.toUpperCase()}`, duration: 2000 });
+			toast.set({ message: `Audit logs exported as ${format.toUpperCase()}`, type: 'success', duration: 2000 });
 		} catch (err) {
-			toast.set({ message: 'Failed to export logs', duration: 2000 });
+			toast.set({ message: 'Failed to export logs', type: 'error', duration: 2000 });
 		}
 	}
 

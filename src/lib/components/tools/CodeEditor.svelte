@@ -214,7 +214,7 @@ body {
 
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
 		});
 	}
 </script>

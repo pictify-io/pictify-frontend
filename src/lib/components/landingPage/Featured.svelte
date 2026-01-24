@@ -15,7 +15,7 @@
 			Featured on <span class="text-[#ff6b6b]">Leading Platforms</span>
 		</h2>
 		<p class="text-lg text-gray-600 max-w-xl mx-auto">
-			Recognized for exceptional performance and developer experience
+			Trusted by 10K+ teams to generate 50M+ images
 		</p>
 	</div>
 

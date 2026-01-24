@@ -65,16 +65,16 @@
 	};
 </script>
 
-<div class="space-y-6">
+<div class="space-y-8">
 	<div class="flex items-center justify-between">
-		<h2 class="text-lg font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
-			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
-			</svg>
-			Data Source
+		<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide flex items-center gap-3">
+			<span class="w-8 h-8 bg-gray-900 border-2 border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_#9ca3af]">
+				<span class="text-white text-lg font-black">1</span>
+			</span>
+			Configure Data Source
 		</h2>
 		<button
-			class="text-xs font-bold text-[#a855f7] hover:text-[#9333ea] uppercase tracking-wide"
+			class="px-4 py-2 text-xs font-black bg-white hover:bg-gray-50 text-gray-900 border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 			on:click={() => { showNewForm = true; dispatch('select', null); }}
 		>
 			+ Create New
@@ -83,23 +83,23 @@
 
 	{#if !showNewForm && dataSources.length > 0}
 		<!-- Existing Data Sources -->
-		<div class="space-y-3">
-			<p class="text-sm text-gray-500 font-medium">Select an existing data source or create a new one</p>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+		<div class="space-y-4">
+			<p class="text-sm text-gray-600 font-bold uppercase tracking-wide">Select Available Source</p>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				{#each dataSources as ds (ds.uid)}
 					<button
-						class="text-left p-4 border-2 rounded-xl transition-all
+						class="text-left p-5 border-[3px] rounded-xl transition-all relative group overflow-hidden
 							{selectedDataSource?.uid === ds.uid
-								? 'border-[#a855f7] bg-purple-50 shadow-[3px_3px_0_0_#a855f7]'
-								: 'border-gray-200 hover:border-gray-400 bg-white'}"
+								? 'border-gray-900 bg-gray-50 shadow-[4px_4px_0_0_#9ca3af]'
+								: 'border-gray-200 hover:border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937]'}"
 						on:click={() => selectDataSource(ds)}
 					>
-						<div class="flex items-start justify-between">
+						<div class="flex items-start justify-between relative z-10">
 							<div>
-								<p class="font-bold text-gray-900">{ds.name}</p>
-								<p class="text-xs text-gray-500 font-mono mt-1 truncate max-w-[200px]">{ds.url}</p>
+								<p class="font-black text-gray-900 uppercase tracking-wide text-sm">{ds.name}</p>
+								<p class="text-xs text-gray-500 font-mono mt-1 truncate max-w-[200px] border-b-2 border-transparent group-hover:border-gray-200 transition-colors inline-block">{ds.url}</p>
 							</div>
-							<span class="px-2 py-0.5 text-[9px] font-bold uppercase bg-gray-100 text-gray-600 rounded">
+							<span class="px-2 py-1 text-[10px] font-black uppercase bg-gray-900 text-white rounded border border-gray-900">
 								{ds.type}
 							</span>
 						</div>
@@ -111,107 +111,123 @@
 
 	{#if showNewForm || dataSources.length === 0}
 		<!-- New Data Source Form -->
-		<div class="space-y-4 p-4 bg-gray-50 border-2 border-gray-200 rounded-xl">
-			<h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">New Data Source</h3>
+		<div class="space-y-6 p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937]">
+			<div class="flex items-center gap-3 pb-4 border-b-[3px] border-gray-100 border-dashed">
+				<div class="w-3 h-3 rounded-full bg-gray-900 border-2 border-gray-900"></div>
+				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">New Connection Details</h3>
+			</div>
 
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 				<div>
-					<label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Name</label>
+					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Internal Name</label>
 					<input
 						type="text"
-						class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-						placeholder="My API"
+						class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#9ca3af] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all"
+						placeholder="MY API CONNECTION"
 						value={newDataSource.name}
 						on:input={(e) => updateNewDataSource({ name: e.target.value })}
 					/>
 				</div>
 				<div>
-					<label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Type</label>
-					<select
-						class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors bg-white"
-						value={newDataSource.type}
-						on:change={(e) => updateNewDataSource({ type: e.target.value })}
-					>
-						<option value="http">HTTP API</option>
-						<option value="webhook">Webhook</option>
-						<option value="static">Static Data</option>
-					</select>
+					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Connection Type</label>
+					<div class="relative">
+						<select
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#9ca3af] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all bg-white appearance-none"
+							value={newDataSource.type}
+							on:change={(e) => updateNewDataSource({ type: e.target.value })}
+						>
+							<option value="http">HTTP Request (REST)</option>
+							<option value="webhook">Webhook Receiver</option>
+							<option value="static">Static JSON Data</option>
+						</select>
+						<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+							<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+						</div>
+					</div>
 				</div>
 			</div>
 
 			{#if newDataSource.type === 'http'}
 				<div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
 					<div class="sm:col-span-3">
-						<label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">URL</label>
+						<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Endpoint URL</label>
 						<input
 							type="url"
-							class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:border-gray-900 transition-colors"
-							placeholder="https://api.example.com/data"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#9ca3af] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all"
+							placeholder="https://api.example.com/v1/data"
 							value={newDataSource.url}
 							on:input={(e) => updateNewDataSource({ url: e.target.value })}
 						/>
 					</div>
 					<div>
-						<label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Method</label>
-						<select
-							class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors bg-white"
-							value={newDataSource.method}
-							on:change={(e) => updateNewDataSource({ method: e.target.value })}
-						>
-							<option value="GET">GET</option>
-							<option value="POST">POST</option>
-						</select>
+						<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Method</label>
+						<div class="relative">
+							<select
+								class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#9ca3af] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all bg-white appearance-none"
+								value={newDataSource.method}
+								on:change={(e) => updateNewDataSource({ method: e.target.value })}
+							>
+								<option value="GET">GET</option>
+								<option value="POST">POST</option>
+							</select>
+							<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+								<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+							</div>
+						</div>
 					</div>
 				</div>
 
 				<!-- Headers -->
-				<div>
-					<label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Headers (Optional)</label>
+				<div class="bg-gray-50 border-[3px] border-gray-200 rounded-xl p-4">
+					<label class="block text-xs font-black text-gray-500 uppercase tracking-wide mb-3">Authentication & Headers</label>
 					{#if Object.keys(newDataSource.headers).length > 0}
-						<div class="space-y-2 mb-3">
+						<div class="space-y-2 mb-4">
 							{#each Object.entries(newDataSource.headers) as [key, value]}
-								<div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200">
-									<span class="text-xs font-mono font-bold text-gray-700">{key}:</span>
-									<span class="text-xs font-mono text-gray-500 flex-1 truncate">{getMaskedValue(key, value)}</span>
+								<div class="flex items-center gap-3 bg-white p-3 rounded-lg border-[2px] border-gray-200 shadow-sm">
+									<div class="flex-1 min-w-0 flex items-center gap-2">
+										<span class="text-xs font-bold font-mono text-gray-900 bg-gray-100 px-2 py-1 rounded border border-gray-200">{key}</span>
+										<span class="text-gray-400">→</span>
+										<span class="text-xs font-mono text-gray-500 truncate">{getMaskedValue(key, value)}</span>
+									</div>
 									<button
-										class="text-gray-400 hover:text-[#ff6b6b] transition-colors"
+										class="text-gray-400 hover:text-[#ff6b6b] transition-colors p-1 hover:bg-red-50 rounded"
 										on:click={() => removeHeader(key)}
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
 										</svg>
 									</button>
 								</div>
 							{/each}
 						</div>
 					{/if}
-					<div class="flex gap-2">
+					<div class="flex flex-col sm:flex-row gap-2">
 						<input
 							type="text"
-							class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-gray-900 transition-colors"
+							class="flex-1 px-3 py-2 border-[3px] border-gray-200 rounded-lg text-xs font-bold font-mono focus:outline-none focus:border-gray-900 transition-colors"
 							placeholder="Header-Name"
 							bind:value={newHeaderKey}
 						/>
 						{#if isSensitiveHeader(newHeaderKey)}
 						<input
 							type="password"
-							class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-gray-900 transition-colors"
+							class="flex-1 px-3 py-2 border-[3px] border-gray-200 rounded-lg text-xs font-bold font-mono focus:outline-none focus:border-gray-900 transition-colors"
 							placeholder="Value"
 							bind:value={newHeaderValue}
 						/>
 					{:else}
 						<input
 							type="text"
-							class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-gray-900 transition-colors"
+							class="flex-1 px-3 py-2 border-[3px] border-gray-200 rounded-lg text-xs font-bold font-mono focus:outline-none focus:border-gray-900 transition-colors"
 							placeholder="Value"
 							bind:value={newHeaderValue}
 						/>
 					{/if}
 						<button
-							class="px-3 py-2 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg text-xs font-bold transition-colors"
+							class="px-4 py-2 bg-gray-900 hover:bg-black text-white border-[3px] border-black rounded-lg text-xs font-black transition-colors uppercase tracking-wide"
 							on:click={addHeader}
 						>
-							Add
+							Add Header
 						</button>
 					</div>
 				</div>
@@ -221,11 +237,14 @@
 
 	<!-- Test Section -->
 	{#if selectedDataSource || (newDataSource.url && newDataSource.type === 'http')}
-		<div class="border-t-2 border-gray-200 pt-4">
-			<div class="flex items-center justify-between mb-3">
-				<h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Test Connection</h3>
+		<div class="border-t-[3px] border-gray-100 border-dashed pt-6">
+			<div class="flex items-center justify-between mb-4">
+				<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
+					<span class="w-2 h-2 bg-gray-900 rounded-full"></span>
+					Verification
+				</h3>
 				<button
-					class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold text-xs uppercase tracking-wide rounded-lg border-2 border-gray-300 transition-all disabled:opacity-50"
+					class="px-5 py-2 bg-white hover:bg-gray-50 text-gray-900 font-black text-xs uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 					on:click={handleTest}
 					disabled={isTesting}
 				>
@@ -235,35 +254,44 @@
 								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 							</svg>
-							Testing...
+							Testing Connection...
 						</span>
 					{:else}
-						Test Fetch
+						Test Connection
 					{/if}
 				</button>
 			</div>
 
 			{#if testResult}
-				<div class="p-4 rounded-xl border-2 {testResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
+				<div class="p-6 rounded-xl border-[3px] {testResult.success ? 'bg-[#f0fdf4] border-[#4ade80] shadow-[4px_4px_0_0_#166534]' : 'bg-red-50 border-[#ff6b6b] shadow-[4px_4px_0_0_#991b1b]'} transition-all">
 					{#if testResult.success}
-						<div class="flex items-center gap-2 mb-2">
-							<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-							</svg>
-							<span class="font-bold text-green-800 text-sm">Success</span>
-							{#if testResult.duration}
-								<span class="text-xs text-green-600">({testResult.duration}ms)</span>
-							{/if}
+						<div class="flex items-center gap-3 mb-3 pb-3 border-b-2 border-green-200/50">
+							<div class="w-8 h-8 rounded-full bg-[#4ade80] flex items-center justify-center border-2 border-[#166534]">
+								<svg class="w-5 h-5 text-[#166534]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+								</svg>
+							</div>
+							<div>
+								<p class="font-black text-green-900 text-sm uppercase tracking-wide">Connection Successful</p>
+								{#if testResult.duration}
+									<p class="text-xs font-bold text-green-700">Response time: {testResult.duration}ms</p>
+								{/if}
+							</div>
 						</div>
-						<div class="bg-white rounded-lg p-3 border border-green-200 max-h-48 overflow-auto">
-							<pre class="text-xs font-mono text-gray-700 whitespace-pre-wrap">{JSON.stringify(testResult.data, null, 2)}</pre>
+						<div class="bg-black rounded-lg p-4 max-h-48 overflow-auto border-2 border-gray-800">
+							<pre class="text-xs font-mono text-[#4ade80] whitespace-pre-wrap">{JSON.stringify(testResult.data, null, 2)}</pre>
 						</div>
 					{:else}
-						<div class="flex items-center gap-2">
-							<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-							</svg>
-							<span class="font-bold text-red-800 text-sm">Failed: {testResult.error}</span>
+						<div class="flex items-start gap-3">
+							<div class="w-8 h-8 rounded-full bg-[#ff6b6b] flex items-center justify-center border-2 border-[#991b1b] flex-shrink-0">
+								<svg class="w-5 h-5 text-[#7f1d1d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+								</svg>
+							</div>
+							<div>
+								<p class="font-black text-red-900 text-sm uppercase tracking-wide mb-1">Connection Failed</p>
+								<p class="text-xs font-bold text-red-700 bg-red-100 px-2 py-1 rounded inline-block border border-red-200">{testResult.error}</p>
+							</div>
 						</div>
 					{/if}
 				</div>
@@ -272,10 +300,10 @@
 	{/if}
 
 	<!-- Actions -->
-	<div class="flex justify-end gap-3 pt-4 border-t-2 border-gray-200">
+	<div class="flex justify-end gap-4 pt-6 mt-6 border-t-[3px] border-gray-900">
 		{#if showNewForm && !selectedDataSource}
 			<button
-				class="px-6 py-3 bg-[#a855f7] hover:bg-[#9333ea] text-white font-bold text-sm uppercase tracking-wide rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+				class="px-8 py-4 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				on:click={handleCreate}
 				disabled={!newDataSource.name || !newDataSource.url}
 			>
@@ -283,11 +311,12 @@
 			</button>
 		{:else}
 			<button
-				class="px-6 py-3 bg-[#a855f7] hover:bg-[#9333ea] text-white font-bold text-sm uppercase tracking-wide rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+				class="px-8 py-4 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
 				on:click={handleNext}
 				disabled={!selectedDataSource}
 			>
-				Next: Mapping
+				Next Step
+				<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
 			</button>
 		{/if}
 	</div>

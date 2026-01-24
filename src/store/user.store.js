@@ -9,6 +9,7 @@ import {
 	getPlanDetails
 } from '../api/user';
 import validateEmail from '../util/validateEmail';
+import { analytics } from '$lib/analytics.js';
 
 const createDefaultUserState = () => ({
 	email: null,
@@ -120,6 +121,15 @@ export const loginAction = async (email, password) => {
 			return null;
 		}
 		setUser(userData);
+
+		// Track login and identify user
+		analytics.identify(userData.email, {
+			email: userData.email,
+			plan: userData.currentPlan || 'starter',
+			is_email_verified: userData.isEmailVerified,
+		});
+		analytics.trackLoginCompleted({ method: 'email' });
+
 		return response;
 	} catch (error) {
 		clearUser();
@@ -130,6 +140,7 @@ export const loginAction = async (email, password) => {
 export const logoutAction = async () => {
 	await logout();
 	clearUser();
+	analytics.reset();
 };
 
 export const signupAction = async (email, password) => {
@@ -144,6 +155,15 @@ export const signupAction = async (email, password) => {
 		const userData = extractUser(apiResponse);
 		if (userData) {
 			setUser(userData);
+
+			// Track signup and identify user
+			analytics.identify(userData.email, {
+				email: userData.email,
+				plan: 'starter',
+				signup_date: new Date().toISOString(),
+				is_email_verified: false,
+			});
+			analytics.trackSignupCompleted({ method: 'email', plan: 'starter' });
 		}
 		return response;
 	} catch (error) {
@@ -189,6 +209,7 @@ export const createAPITokenAction = async () => {
 	await createApiToken();
 	const response = await getApiToken();
 	setApiTokens(response.apiTokens);
+	analytics.trackAPIKeyCreated();
 	return response;
 };
 

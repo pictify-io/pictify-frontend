@@ -13,6 +13,7 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../store/toast.store';
+	import { analytics } from '$lib/analytics.js';
 
 	let logs = [];
 	let summary = {};
@@ -43,10 +44,14 @@
 		{ value: '', label: 'All Categories' },
 		{ value: 'image', label: 'Images' },
 		{ value: 'gif', label: 'GIFs' },
+		{ value: 'pdf', label: 'PDFs' },
 		{ value: 'template', label: 'Templates' },
 		{ value: 'batch', label: 'Batch Jobs' },
 		{ value: 'auth', label: 'Authentication' },
-		{ value: 'api', label: 'API' }
+		{ value: 'api', label: 'API' },
+		{ value: 'connector', label: 'Connectors' },
+		{ value: 'webhook', label: 'Webhooks' },
+		{ value: 'other', label: 'Other' }
 	];
 
 	// Status options
@@ -83,6 +88,18 @@
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />',
 			color: 'bg-yellow-100 text-yellow-800 border-yellow-800'
 		},
+		pdf: {
+			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />',
+			color: 'bg-red-100 text-red-800 border-red-800'
+		},
+		connector: {
+			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />',
+			color: 'bg-indigo-100 text-indigo-800 border-indigo-800'
+		},
+		webhook: {
+			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />',
+			color: 'bg-teal-100 text-teal-800 border-teal-800'
+		},
 		other: {
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />',
 			color: 'bg-gray-100 text-gray-800 border-gray-800'
@@ -96,6 +113,9 @@
 	};
 
 	onMount(async () => {
+		// Track page view
+		analytics.trackDashboardPage({ page_name: 'activity_logs' });
+
 		unsubscribeLogs = auditLogs.subscribe((state) => {
 			logs = state.logs || [];
 			total = state.total || 0;
@@ -145,9 +165,9 @@
 			a.click();
 			window.URL.revokeObjectURL(url);
 			document.body.removeChild(a);
-			toast.set({ message: `Exported as ${format.toUpperCase()}`, duration: 2000 });
+			toast.set({ message: `Exported as ${format.toUpperCase()}`, type: 'success', duration: 2000 });
 		} catch (err) {
-			toast.set({ message: 'Export failed', duration: 2000 });
+			toast.set({ message: 'Export failed', type: 'error', duration: 2000 });
 		}
 	}
 
@@ -218,18 +238,18 @@
 
 				<div class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
 					<div class="flex items-center justify-between mb-2">
-						<span class="text-xs font-black text-gray-500 uppercase tracking-widest">API Calls</span>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+						<span class="text-xs font-black text-gray-500 uppercase tracking-widest">Total Renders</span>
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 					</div>
-					<div class="text-3xl font-black text-gray-900">{summary.byCategory?.api || 0}</div>
+					<div class="text-3xl font-black text-gray-900">{summary.totalRenders || 0}</div>
 				</div>
 
 				<div class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
 					<div class="flex items-center justify-between mb-2">
-						<span class="text-xs font-black text-gray-500 uppercase tracking-widest">Media Gen</span>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+						<span class="text-xs font-black text-gray-500 uppercase tracking-widest">Integrations</span>
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
 					</div>
-					<div class="text-3xl font-black text-gray-900">{(summary.byCategory?.image || 0) + (summary.byCategory?.gif || 0)}</div>
+					<div class="text-3xl font-black text-gray-900">{summary.totalIntegrations || 0}</div>
 				</div>
 			</div>
 		{/if}

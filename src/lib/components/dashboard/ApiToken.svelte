@@ -35,7 +35,7 @@
 
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
 		});
 	}
 	
@@ -186,8 +186,8 @@
 
 											<!-- Middle: Token -->
 											<div class="flex-1 bg-gray-50 rounded-lg border-2 border-gray-200 p-2 sm:p-3 flex items-center justify-between group-hover:border-gray-400 transition-colors min-w-0">
-												<code class="font-mono text-xs sm:text-sm font-bold text-gray-800 truncate mr-2 sm:mr-4 select-all">
-													{token.token}
+												<code class="font-mono text-xs sm:text-sm font-bold text-gray-800 truncate mr-2 sm:mr-4" title={token.token}>
+													{token.token.slice(0, 12)}...{token.token.slice(-4)}
 												</code>
 												<button 
 													class="p-1.5 sm:p-2 hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"

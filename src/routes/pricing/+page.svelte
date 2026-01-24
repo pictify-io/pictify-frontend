@@ -5,6 +5,7 @@
 import { onMount, onDestroy } from 'svelte';
 import { user } from '../../store/user.store';
 import { goto } from '$app/navigation';
+import { analytics } from '$lib/analytics.js';
 
 let plans = [];
 let selectedPlanIndex = 0;
@@ -55,6 +56,9 @@ let isLoggedIn = false;
 let unsubscribe = () => {};
 
 onMount(async () => {
+	// Track pricing page view
+	analytics.trackPricingViewed({ source: 'public_pricing' });
+
 	const response = await getProducts();
 	plans = (response?.data ?? [])
 		.filter((plan) => plan && typeof plan.request_per_month === 'number')
@@ -123,6 +127,15 @@ const formatRequestsShort = (value) => {
 const selectPlanHandler = (planIndex = selectedPlanIndex) => {
 	const plan = plans[planIndex];
 	if (!plan) return;
+
+	// Track upgrade started
+	analytics.trackUpgradeStarted({
+		plan: plan.name,
+		source: 'pricing_page',
+		price: plan.price,
+		requests: plan.request_per_month
+	});
+
 	if (!isLoggedIn) {
 		goto(`/signup?redirect=${plan.purchase_url ?? '/dashboard/api-token'}`);
 		return;

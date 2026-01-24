@@ -38,7 +38,7 @@
 	// Generate screenshot function
 	const generateScreenshot = async () => {
 		if (!prompt.trim()) {
-			toast.set({ message: 'Please enter a prompt', duration: 1500 });
+			toast.set({ message: 'Please enter a prompt', type: 'warning', duration: 1500 });
 			return;
 		}
 
@@ -54,14 +54,14 @@
 				await getAPITokenAction();
 			} catch (error) {
 				console.error('Failed to get API token:', error);
-				toast.set({ message: 'Failed to get API token', duration: 1500 });
+				toast.set({ message: 'Failed to get API token', type: 'error', duration: 1500 });
 				return;
 			}
 		}
 
 		if (!currentApiToken) {
 			console.error('No API token available after fetch attempt');
-			toast.set({ message: 'No API token available', duration: 1500 });
+			toast.set({ message: 'No API token available', type: 'error', duration: 1500 });
 			return;
 		}
 
@@ -81,10 +81,10 @@
 				}
 			}, currentApiToken.token);
 
-			toast.set({ message: 'Screenshot generated successfully!', duration: 1500 });
+			toast.set({ message: 'Screenshot generated successfully!', type: 'success', duration: 1500 });
 		} catch (error) {
 			console.error('Error generating screenshot:', error);
-			toast.set({ message: 'Failed to generate screenshot', duration: 1500 });
+			toast.set({ message: 'Failed to generate screenshot', type: 'error', duration: 1500 });
 			streamingLogs = [...streamingLogs, {
 				type: 'error',
 				data: {
@@ -345,7 +345,7 @@
 										class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
 										on:click={() => {
 											navigator.clipboard.writeText(finalResult.url);
-											toast.set({ message: 'URL copied to clipboard', duration: 1500 });
+											toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 1500 });
 										}}
 									>
 										Copy URL

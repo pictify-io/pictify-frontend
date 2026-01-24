@@ -143,12 +143,11 @@ $image = json_decode($response);
 	<div class="">
 		<div>
 			<div class="text-4xl sm:text-5xl font-bold text-left md:text-center">
-				<p>Easy To Use API</p>
+				<p>A Clean API</p>
 			</div>
 			<div class="text-lg opacity-70 max-w-3xl text-left md:text-center my-8">
 				<p class="">
-					Pictify's API is easy to use and can be integrated into your existing workflow in minutes.
-					Create Image's and GIF's from HTML with a simple POST request.
+					5-minute integration. Generate images and GIFs with a single POST request.
 				</p>
 			</div>
 		</div>

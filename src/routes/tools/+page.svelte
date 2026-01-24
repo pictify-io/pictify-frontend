@@ -41,6 +41,12 @@
       description: 'Generate images from any URL with our free online tool.',
       url: '/tools/url-to-image-generator',
       icon: 'fa-solid fa-camera'
+    },
+    {
+      name: 'LinkedIn Banner Generator',
+      description: 'Create professional LinkedIn banners with 20+ templates for developers, marketers, and more.',
+      url: '/tools/linkedin-banner-generator',
+      icon: 'fa-brands fa-linkedin'
     }
   ];
 

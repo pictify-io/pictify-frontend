@@ -5,11 +5,12 @@ export const LINKEDIN_BANNER_WIDTH = 1584;
 export const LINKEDIN_BANNER_HEIGHT = 396;
 
 // Profile photo safe zone (bottom-left area that gets covered by profile photo)
+// Based on actual LinkedIn layout: profile photo is ~152px diameter, positioned at bottom-left
 export const SAFE_ZONE = {
   left: 0,
-  top: 196, // 396 - 200
-  width: 250,
-  height: 200
+  top: 276, // 396 - 120
+  width: 170,
+  height: 120
 };
 
 // Template categories for the LinkedIn Banner Generator

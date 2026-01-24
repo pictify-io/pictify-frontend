@@ -10,7 +10,8 @@
 		"wrangler-preview": "wrangler pages dev .svelte-kit/cloudflare/",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"deploy": "vite build && wrangler pages deploy .svelte-kit/cloudflare/"
+		"deploy": "vite build && wrangler pages deploy .svelte-kit/cloudflare/",
+		"seed:templates": "node scripts/seed-templates.js"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",

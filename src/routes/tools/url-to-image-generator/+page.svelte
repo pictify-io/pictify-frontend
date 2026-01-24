@@ -4,10 +4,26 @@
   import Toast from '$lib/components/Toast.svelte';
   import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
   import NextSteps from '$lib/components/tools/NextSteps.svelte';
+  import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
+  import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
   import { onMount } from 'svelte';
   import { toast } from '../../../store/toast.store';
+  import { user } from '../../../store/user.store';
+  import { generationLimits } from '../../../store/generationLimits.store';
   import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
   import { createImagePublic } from '../../../api/image.js';
+  import { analytics } from '$lib/analytics.js';
+
+  // Track tool opened on mount
+  onMount(() => {
+    analytics.trackToolOpened({ tool_name: 'url_to_image_generator' });
+  });
+
+  // User login state
+  let isUserLoggedIn = false;
+  user.subscribe(userData => {
+    isUserLoggedIn = !!userData?.email;
+  });
 
 let url = '';
 let selector = '';
@@ -84,7 +100,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
 
   async function loadPreview() {
     if (!isValidUrl(url)) {
-      toast.set({ message: 'Please enter a valid URL', duration: 3000 });
+      toast.set({ message: 'Please enter a valid URL', type: 'error', duration: 3000 });
       return;
     }
     isPreviewLoaded = false;
@@ -92,7 +108,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
     try {
       const {content: html} = await getWebsiteHTML(url);
       if(!html) {
-        toast.set({ message: 'Error fetching website content', duration: 3000 });
+        toast.set({ message: 'Error fetching website content', type: 'error', duration: 3000 });
         return;
       }
 
@@ -102,7 +118,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
         // Update UI to show hovered selector (optional)
       } else if (event.data.type === 'elementSelected') {
         selector = event.data.selector;
-        toast.set({ message: 'Selector updated', duration: 1500 });
+        toast.set({ message: 'Selector updated', type: 'success', duration: 1500 });
       } else if (event.data.type === 'iframeReady') {
         console.log('iframeReady');
         // The iframe is ready, send the selection script
@@ -136,7 +152,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
         iframeElement.contentWindow.postMessage({ type: 'checkReady' }, '*');
       }
     } catch (error) {
-      toast.set({ message: 'Error fetching website content', duration: 3000 });
+      toast.set({ message: 'Error fetching website content', type: 'error', duration: 3000 });
     } finally {
       isLoading = false;
     }
@@ -209,32 +225,52 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
 
   async function generateImage() {
     if (!isPreviewLoaded) {
-      toast.set({ message: 'Please load a preview first', duration: 3000 });
+      toast.set({ message: 'Please load a preview first', type: 'warning', duration: 3000 });
       return;
     }
 
+    // Track generation in global limits store
+    generationLimits.increment();
     isImageGenerating = true;
+
     try {
+      // Note: URL screenshots capture external pages, so watermark is added server-side
+      // for non-authenticated requests via the public API
       const { image } = await createImagePublic({
         url: url,
         selector: selector,
         width: 1200,
-        height: 630
+        height: 630,
+        watermark: !isUserLoggedIn // Request watermark for guests
       });
       imageUrl = image.url;
+
+      // Track successful image generation
+      analytics.trackImageGenerated({
+        tool_name: 'url_to_image_generator',
+        format: 'jpg',
+        with_watermark: !isUserLoggedIn
+      });
     } catch (error) {
-      toast.set({ message: 'Error generating image', duration: 3000 });
+      toast.set({ message: 'Error generating image', type: 'error', duration: 3000 });
     }
     isImageGenerating = false;
   }
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-      toast.set({ message: 'Copied to clipboard!', duration: 1500 });
+      toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
     });
   }
 
   function sharePage(platform) {
+    // Track social share
+    analytics.trackSocialShare({
+      platform: platform,
+      content_type: 'tool_page',
+      tool_name: 'url_to_image_generator'
+    });
+
     const shareUrl = encodeURIComponent(window.location.href);
     const text = encodeURIComponent('Check out this awesome URL to Image Generator!');
     if (platform === 'twitter') {
@@ -246,7 +282,7 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
 
   function clearSelector() {
     selector = '';
-    toast.set({ message: 'Selector cleared', duration: 1500 });
+    toast.set({ message: 'Selector cleared', type: 'success', duration: 1500 });
   }
 </script>
 
@@ -304,6 +340,9 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
             </p>
         </div>
     </div>
+
+    <!-- Generation Limit Banner -->
+    <GenerationLimitBanner />
 
   <div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
       <!-- Control Board -->
@@ -480,6 +519,8 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
                    description="Copy the API request, turn this capture into a reusable template, and batch render variants."
                    curlSnippet={nextStepsCurlSnippet}
                    templateDraft={nextStepsTemplateDraft}
+                   generatedUrl={imageUrl}
+                   toolName="URL to Image"
                  />
              </div>
          </div>
@@ -638,6 +679,9 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
   <Toast />
   <Footer />
   </main>
+
+  <!-- Exit Intent Popup for lead capture -->
+  <ExitIntentPopup toolName="URL to Image" generatedImageUrl={imageUrl} />
 </div>
 
 <style>

@@ -1,10 +1,12 @@
 <script>
 import Nav from '$lib/components/landingPage/Nav.svelte';
-import { popularSizes as configPopularSizes, useCases, useCaseDetails, ogPlatforms } from '$lib/pseo/config.js';
+import { popularSizes as configPopularSizes, useCases, useCaseDetails, ogPlatforms, dimensionContexts } from '$lib/pseo/config.js';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
+	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
+	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -12,6 +14,8 @@ import { popularSizes as configPopularSizes, useCases, useCaseDetails, ogPlatfor
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
+	import { generationLimits } from '../../../store/generationLimits.store';
+	import { analytics } from '$lib/analytics.js';
 	$: format = $page.params.format;
 
 	// Support optional size parameter from nested route: /tools/html-to-[format]/[dimensions]
@@ -30,6 +34,7 @@ import { popularSizes as configPopularSizes, useCases, useCaseDetails, ogPlatfor
 	$: ({ width: dimWidth, height: dimHeight } = parseDimensions(rawDimensions));
 	$: hasSize = !!(dimWidth && dimHeight);
 	$: sizeString = hasSize ? `${dimWidth}x${dimHeight}` : '';
+	$: dimensionContext = hasSize && sizeString ? dimensionContexts[sizeString] : null;
 
 	// SEO head computed values (dimension-aware)
 	$: headTitle = hasSize
@@ -48,9 +53,9 @@ import { popularSizes as configPopularSizes, useCases, useCaseDetails, ogPlatfor
 	// Add copyToClipboard function
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'URL copied to clipboard! 🔗', duration: 2000 });
+			toast.set({ message: 'URL copied to clipboard! 🔗', type: 'success', duration: 2000 });
 		}).catch(() => {
-			toast.set({ message: 'Failed to copy URL', duration: 2000 });
+			toast.set({ message: 'Failed to copy URL', type: 'error', duration: 2000 });
 		});
 	}
 
@@ -89,6 +94,9 @@ const featuredPlatforms = ogPlatforms.slice(0, 3);
 
 	onMount(() => {
 		if (browser) {
+			// Track tool opened
+			analytics.trackToolOpened({ tool_name: `html_to_${format}` });
+
 			// Load usage from local storage
 			const usage = localStorage.getItem(usageKey);
 			if (usage) {
@@ -228,26 +236,28 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 
 	async function generateImage() {
 		if (isImageGenerating) return;
-		
+
 		if (!isUserLoggedIn && freeGenerationsUsed >= effectiveMaxFreeGenerations) {
 			showUpgradePrompt = true;
 			return;
 		}
 
+		// Track generation in global limits store
+		generationLimits.increment();
 		isImageGenerating = true;
-		
+
 		try {
-			// Add watermark for non-logged in users after first generation
+			// Add watermark for ALL non-logged in users
 			let html = previewHtml;
-			if (!isUserLoggedIn && freeGenerationsUsed >= 1) {
+			if (!isUserLoggedIn) {
 				const watermarkDiv = `
-					<div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); 
+					<div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9);
 											padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 9999;
-											font-family: system-ui, -apple-system, sans-serif;">
-						Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none;">pictify.io</a>
+											font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+						Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">pictify.io</a>
 					</div>
 				`;
-				
+
 				html = html.replace('</body>', `${watermarkDiv}</body>`);
 			}
 			
@@ -259,9 +269,16 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 				height: heightToUse,
 				fileExtension: fileExtension
 			});
-			
+
 			imageUrl = image.url;
 			totalImagesGenerated++;
+
+			// Track image generation
+			analytics.trackImageGenerated({
+				tool_name: `html_to_${format}`,
+				format: fileExtension || format,
+				with_watermark: !isUserLoggedIn,
+			});
 
 			// Update usage tracking for non-logged in users
 			if (!isUserLoggedIn) {
@@ -280,7 +297,12 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 			}
 			
 		} catch (error) {
-			toast.set({ message: 'Failed to generate image. Please try again.', duration: 3000 });
+			toast.set({ message: 'Failed to generate image. Please try again.', type: 'error', duration: 3000 });
+			// Track render error
+			analytics.trackRenderError({
+				tool_name: `html_to_${format}`,
+				error_message: error?.message || 'Unknown error',
+			});
 		} finally {
 			isImageGenerating = false;
 		}
@@ -306,7 +328,7 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 			} catch (e) {}
 		}
 		showSharePrompt = false;
-		toast.set({ message: 'Thanks for sharing! +1 extra guest generation unlocked for today.', duration: 3000 });
+		toast.set({ message: 'Thanks for sharing! +1 extra guest generation unlocked for today.', type: 'success', duration: 3000 });
 	}
 
     // Add format-specific information
@@ -560,8 +582,8 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 								{#each popularSizes as sz}
 									<a href={`/tools/html-to-${format}/${sz}`} class="group block">
 										<div class={`px-2 py-3 border-[2px] border-black text-sm font-bold text-center transition-all duration-200
-											${sizeString === sz 
-												? 'bg-black text-white shadow-[3px_3px_0_0_#ff6b6b]' 
+											${sizeString === sz
+												? 'bg-black text-white shadow-[3px_3px_0_0_#ff6b6b]'
 												: 'bg-white text-black hover:bg-gray-50 shadow-[3px_3px_0_0_#ccc] hover:shadow-[3px_3px_0_0_#000]'}`}>
 											{sz}
 										</div>
@@ -569,6 +591,42 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 								{/each}
 							</div>
 					   </div>
+
+					   <!-- Dimension Context Info -->
+					   {#if dimensionContext}
+					   <div class="border-t-[3px] border-dashed border-gray-300 my-8"></div>
+					   <div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-xl p-6">
+							<div class="flex flex-wrap items-center gap-3 mb-4">
+								<span class="px-3 py-1 bg-[#4ade80] text-black font-black text-sm uppercase rounded-full border-2 border-black">
+									{dimensionContext.label}
+								</span>
+								<span class="text-sm font-bold text-gray-600">
+									Aspect Ratio: {dimensionContext.aspectRatio}
+								</span>
+							</div>
+							<p class="text-gray-800 font-medium mb-4">{dimensionContext.description}</p>
+
+							<div class="flex flex-wrap gap-2 mb-4">
+								<span class="text-xs font-bold uppercase tracking-wide text-gray-500">Works with:</span>
+								{#each dimensionContext.platforms as platform}
+									<span class="px-2 py-1 bg-white border-2 border-gray-300 rounded text-xs font-bold text-gray-700">
+										{platform}
+									</span>
+								{/each}
+							</div>
+
+							{#if dimensionContext.useCases?.length}
+							<div class="flex flex-wrap gap-2">
+								<span class="text-xs font-bold uppercase tracking-wide text-gray-500">Best for:</span>
+								{#each dimensionContext.useCases as useCase}
+									<span class="px-2 py-1 bg-gray-100 rounded text-xs font-medium text-gray-600">
+										{useCase}
+									</span>
+								{/each}
+							</div>
+							{/if}
+					   </div>
+					   {/if}
 				   {/if}
 				</div>
 			</div>
@@ -1250,6 +1308,9 @@ const apiSnippetTemplate = `curl -X POST https://api.pictify.io/image \\
 		</div>
 	</main>
 	<Footer />
+
+	<!-- Exit Intent Popup for lead capture -->
+	<ExitIntentPopup toolName={`HTML to ${format?.toUpperCase() || 'Image'}`} generatedImageUrl={imageUrl} />
 </section>
 
 <style>

@@ -3,12 +3,23 @@
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import InvoiceTemplate from '$lib/components/tools/InvoiceTemplate.svelte';
   import NextSteps from '$lib/components/tools/NextSteps.svelte';
+  import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
+  import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
   import Toast from '$lib/components/Toast.svelte';
   import { getTemplates, getTemplate } from '../../../api/tools/invoice.js';
   import { onMount } from 'svelte';
   import { toast } from '../../../store/toast.store';
+  import { user } from '../../../store/user.store';
+  import { generationLimits } from '../../../store/generationLimits.store';
   import { createImagePublic } from '../../../api/image.js';
   import { page } from '$app/stores';
+  import { analytics } from '$lib/analytics.js';
+
+  // User login state
+  let isUserLoggedIn = false;
+  user.subscribe(userData => {
+    isUserLoggedIn = !!userData?.email;
+  });
 
   let templates = [];
   let templateNames = [];
@@ -102,13 +113,16 @@ const structuredDataJson = JSON.stringify({
 
   function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
 		});
 	}
 
   $: iframeScale = calculateScale(previewContainerWidth);
 
   onMount(async () => {
+    // Track tool opened
+    analytics.trackToolOpened({ tool_name: 'online_invoice_generator' });
+
     templateNames = await getTemplates();
     for (const template of templateNames) {
       const html = await getTemplate(template);
@@ -151,18 +165,42 @@ const structuredDataJson = JSON.stringify({
 
 
   async function generateInvoice() {
-    console.log('generateInvoice');
+    // Track generation in global limits store
+    generationLimits.increment();
     isImageGenerating = true;
-    // This function would generate the invoice based on the selected template and invoice data
-    // For now, we'll just show a toast message
-    const iframe = invoiceTemplateWrapper.querySelector('iframe');
 
-    const document = iframe.contentWindow.document;
-    const {image} = await createImagePublic({
-      html: document.documentElement.outerHTML,
-      width: 800,
-    });
-    imageUrl = image.url;
+    const iframe = invoiceTemplateWrapper.querySelector('iframe');
+    const doc = iframe.contentWindow.document;
+    let html = doc.documentElement.outerHTML;
+
+    // Add watermark for ALL non-logged in users
+    if (!isUserLoggedIn) {
+      const watermarkDiv = `
+        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9);
+                    padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 9999;
+                    font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">pictify.io</a>
+        </div>
+      `;
+      html = html.replace('</body>', `${watermarkDiv}</body>`);
+    }
+
+    try {
+      const {image} = await createImagePublic({
+        html,
+        width: 800,
+      });
+      imageUrl = image.url;
+
+      // Track successful invoice generation
+      analytics.trackImageGenerated({
+        tool_name: 'online_invoice_generator',
+        format: 'png',
+        with_watermark: !isUserLoggedIn
+      });
+    } catch (error) {
+      toast.set({ message: 'Failed to generate invoice. Please try again.', type: 'error', duration: 3000 });
+    }
     isImageGenerating = false;
   }
 
@@ -284,6 +322,9 @@ const structuredDataJson = JSON.stringify({
         </p>
       </div>
     </div>
+
+    <!-- Generation Limit Banner -->
+    <GenerationLimitBanner />
 
     <!-- Main Editor Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
@@ -526,6 +567,8 @@ const structuredDataJson = JSON.stringify({
                 description="Copy the API request, save this invoice as a template background, and batch render variants."
                 curlSnippet={nextStepsCurlSnippet}
                 templateDraft={nextStepsTemplateDraft}
+                generatedUrl={imageUrl}
+                toolName="Invoice Generator"
               />
           </div>
         </div>
@@ -694,8 +737,11 @@ const structuredDataJson = JSON.stringify({
     </div>
   </main>
 
-  <Toast /> 
+  <Toast />
   <Footer />
+
+  <!-- Exit Intent Popup for lead capture -->
+  <ExitIntentPopup toolName="Invoice Generator" generatedImageUrl={imageUrl} />
 </section>
 
 <style>

@@ -98,8 +98,7 @@
 				</span>
 			</h2>
 			<p class="text-xl md:text-2xl text-gray-700 font-medium leading-relaxed">
-				Everything you need to transform data into pixel-perfect visuals at scale. No design degree
-				required.
+				Everything you need to transform data into publication-quality visuals at scale. No CSS headaches.
 			</p>
 		</div>
 
@@ -128,14 +127,14 @@
 						</div>
 						<h3 class="text-3xl font-black text-black mb-3 leading-tight">Design Visually.</h3>
 						<p class="text-black/70 font-medium text-lg">
-							Build templates with our drag-and-drop editor. No CSS wrestling needed.
+							Drag-and-drop editor with real-time preview. Zero code required.
 						</p>
 					</div>
 					<div class="mt-6">
 						<span
 							class="inline-flex items-center gap-1 font-bold text-black border-b-2 border-black group-hover:gap-2 transition-all"
 						>
-							Try the Editor <svg
+							Open the Editor <svg
 								class="w-4 h-4"
 								fill="none"
 								stroke="currentColor"
@@ -230,7 +229,7 @@
 
 					<h3 class="text-3xl font-black text-white mb-3">Integrate Easily.</h3>
 					<p class="text-gray-400 font-medium text-lg mb-8">
-						Simple JSON payload. Predictable responses. Designed for developers.
+						REST + JSON. That's it. Predictable responses every time.
 					</p>
 
 					<!-- Terminal -->
@@ -305,8 +304,7 @@
 						</div>
 						<h3 class="text-3xl font-black text-black mb-3">Scale Instantly.</h3>
 						<p class="text-black/70 font-medium text-lg max-w-md mb-8 md:mb-0">
-							Serverless architecture that handles spikes automatically. From 10 to 10 million
-							images, we've got you covered.
+							From 10 to 10 million images. No config changes. No capacity planning.
 						</p>
 					</div>
 

@@ -1,6 +1,6 @@
 /**
  * PLG (Product-Led Growth) Store
- * 
+ *
  * Manages usage tracking, milestones, feature limits, and upgrade prompts
  */
 
@@ -13,6 +13,7 @@ import {
   recordUpgradePrompt,
   getDiscountCode,
 } from '../api/plg';
+import { analytics } from '$lib/analytics.js';
 
 // ============================================
 // Stores
@@ -270,7 +271,7 @@ export const refreshUsageWidget = async () => {
 export const trackFeatureUsage = async (feature, amount = 1) => {
   try {
     const result = await incrementFeatureUsage(feature, amount);
-    
+
     // Update local state
     plgStatus.update((status) => ({
       ...status,
@@ -279,20 +280,32 @@ export const trackFeatureUsage = async (feature, amount = 1) => {
         [feature]: result.usage,
       },
     }));
-    
+
+    // Send to PostHog
+    analytics.trackFeatureUsed({
+      feature_name: feature,
+      context: { usage_after: result.usage, amount },
+    });
+
     // Check for milestone
     if (result.milestone?.isNew) {
       showMilestoneCelebration(result.milestone);
+      // Track milestone in PostHog
+      analytics.trackMilestoneAchieved({
+        milestone_id: result.milestone.id,
+        milestone_type: result.milestone.type,
+        count: result.milestone.count,
+      });
     }
-    
+
     // Show upgrade prompt if limit exceeded
     if (result.limitExceeded) {
       showFeatureLimitPrompt(feature, result);
     }
-    
+
     // Refresh usage widget
     await refreshUsageWidget();
-    
+
     return result;
   } catch (error) {
     console.error('Failed to track feature usage:', error);
@@ -365,9 +378,15 @@ export const showFeatureLimitPrompt = (feature, result) => {
       action: 'upgrade',
     },
   });
-  
-  // Record prompt shown
+
+  // Record prompt shown (backend)
   recordUpgradePrompt('shown', 'feature_limit', { feature });
+
+  // Track in PostHog
+  analytics.trackUpgradePromptShown({
+    prompt_type: 'feature_limit',
+    trigger: feature,
+  });
 };
 
 /**
@@ -375,13 +394,20 @@ export const showFeatureLimitPrompt = (feature, result) => {
  */
 export const showThresholdPrompt = (threshold) => {
   if (!threshold || threshold.type === 'info') return;
-  
+
   activeUpgradePrompt.set({
     type: 'threshold',
     ...threshold,
   });
-  
+
   recordUpgradePrompt('shown', 'threshold', { percentage: threshold.percentage });
+
+  // Track in PostHog
+  analytics.trackUpgradePromptShown({
+    prompt_type: 'threshold',
+    trigger: `${threshold.percentage}%`,
+    discount: threshold.cta?.discount,
+  });
 };
 
 /**
@@ -391,6 +417,7 @@ export const dismissUpgradePrompt = () => {
   const prompt = get(activeUpgradePrompt);
   if (prompt) {
     recordUpgradePrompt('dismissed', prompt.type, prompt);
+    analytics.trackUpgradePromptDismissed({ prompt_type: prompt.type });
   }
   activeUpgradePrompt.set(null);
 };
@@ -401,7 +428,13 @@ export const dismissUpgradePrompt = () => {
  */
 export const handleUpgradeClick = async (prompt, discount = null) => {
   recordUpgradePrompt('clicked', prompt?.type || 'general', prompt);
-  
+
+  // Track in PostHog
+  analytics.trackUpgradePromptClicked({
+    prompt_type: prompt?.type || 'general',
+    discount,
+  });
+
   // Import and use the upgrade modal store dynamically to avoid circular deps
   const { openUpgradeModal } = await import('./upgrade-modal.store.js');
   openUpgradeModal(prompt?.type || 'general', discount);
