@@ -48,7 +48,7 @@
 			counts = response.counts || {};
 		} catch (error) {
 			console.error('Error loading brand assets:', error);
-			toast.set({ message: 'Failed to load brand assets', type: 'error' });
+			toast.set({ message: 'Failed to load brand assets', type: 'error', duration: 2000 });
 		} finally {
 			loading = false;
 		}
@@ -84,10 +84,10 @@
 			$editor.setActiveObject(img);
 			$editor.renderAll();
 			
-			toast.set({ message: `${asset.name} added to canvas`, duration: 2000 });
+			toast.set({ message: `${asset.name} added to canvas`, type: 'success', duration: 2000 });
 		} catch (error) {
 			console.error('Error adding image to canvas:', error);
-			toast.set({ message: 'Failed to add image', type: 'error' });
+			toast.set({ message: 'Failed to add image', type: 'error', duration: 2000 });
 		}
 	}
 
@@ -96,7 +96,7 @@
 		
 		const activeObject = $editor.getActiveObject();
 		if (!activeObject) {
-			toast.set({ message: 'Select an object first', type: 'warning' });
+			toast.set({ message: 'Select an object first', type: 'warning', duration: 2000 });
 			return;
 		}
 
@@ -107,12 +107,12 @@
 		}
 		
 		$editor.renderAll();
-		toast.set({ message: `Applied ${color}`, duration: 2000 });
+		toast.set({ message: `Applied ${color}`, type: 'success', duration: 2000 });
 	}
 
 	function copyColor(color) {
 		navigator.clipboard.writeText(color).then(() => {
-			toast.set({ message: 'Color copied!', duration: 2000 });
+			toast.set({ message: 'Color copied!', type: 'success', duration: 2000 });
 		});
 	}
 
@@ -121,18 +121,18 @@
 		
 		const activeObject = $editor.getActiveObject();
 		if (!activeObject) {
-			toast.set({ message: 'Select a text object first', type: 'warning' });
+			toast.set({ message: 'Select a text object first', type: 'warning', duration: 2000 });
 			return;
 		}
 
 		if (activeObject.type !== 'i-text' && activeObject.type !== 'text' && activeObject.type !== 'textbox') {
-			toast.set({ message: 'Please select a text object', type: 'warning' });
+			toast.set({ message: 'Please select a text object', type: 'warning', duration: 2000 });
 			return;
 		}
 
 		activeObject.set('fontFamily', fontFamily);
 		$editor.renderAll();
-		toast.set({ message: `Applied ${fontFamily}`, duration: 2000 });
+		toast.set({ message: `Applied ${fontFamily}`, type: 'success', duration: 2000 });
 	}
 
 	onMount(() => {

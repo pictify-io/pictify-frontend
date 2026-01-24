@@ -104,7 +104,7 @@
 				isPrimary: uploadForm.isPrimary
 			});
 
-			toast.set({ message: `${ASSET_TYPE_LABELS[uploadType]} uploaded successfully!`, duration: 3000 });
+			toast.set({ message: `${ASSET_TYPE_LABELS[uploadType]} uploaded successfully!`, type: 'success', duration: 3000 });
 			closeUploadModal();
 		} catch (error) {
 			toast.set({ message: error.message || 'Upload failed', type: 'error' });
@@ -131,7 +131,7 @@
 		isUploading = true;
 		try {
 			await addColor(colorForm);
-			toast.set({ message: 'Color added successfully!', duration: 3000 });
+			toast.set({ message: 'Color added successfully!', type: 'success', duration: 3000 });
 			closeColorModal();
 		} catch (error) {
 			toast.set({ message: error.message || 'Failed to add color', type: 'error' });
@@ -155,7 +155,7 @@
 
 		try {
 			await deleteAsset(assetToDelete.uid);
-			toast.set({ message: 'Asset deleted successfully', duration: 3000 });
+			toast.set({ message: 'Asset deleted successfully', type: 'success', duration: 3000 });
 			closeDeleteConfirm();
 		} catch (error) {
 			toast.set({ message: error.message || 'Delete failed', type: 'error' });
@@ -185,7 +185,7 @@
 
 		try {
 			await deleteAssets(Array.from(selectedAssets));
-			toast.set({ message: `${selectedAssets.size} assets deleted`, duration: 3000 });
+			toast.set({ message: `${selectedAssets.size} assets deleted`, type: 'success', duration: 3000 });
 			selectedAssets.clear();
 			selectedAssets = selectedAssets;
 		} catch (error) {
@@ -195,7 +195,7 @@
 
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard!', duration: 2000 });
+			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 2000 });
 		});
 	}
 

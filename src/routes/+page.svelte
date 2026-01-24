@@ -14,6 +14,43 @@
 	import PictifyAdvantage from '$lib/components/landingPage/PictifyAdvantage.svelte';
 	import WhatYouCanDo from '$lib/components/landingPage/WhatYouCanDo.svelte';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
+	import DynamicLinks from '$lib/components/landingPage/DynamicLinks.svelte';
+	import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
+	import MidSectionCta from '$lib/components/landingPage/MidSectionCta.svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
+	import { analytics } from '$lib/analytics.js';
+
+	// Scroll depth tracking
+	let scrollDepthsTracked = new Set();
+
+	function trackScrollDepth() {
+		if (!browser) return;
+
+		const scrollTop = window.scrollY;
+		const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+		const scrollPercent = Math.round((scrollTop / docHeight) * 100);
+
+		const milestones = [25, 50, 75, 100];
+		for (const milestone of milestones) {
+			if (scrollPercent >= milestone && !scrollDepthsTracked.has(milestone)) {
+				scrollDepthsTracked.add(milestone);
+				analytics.trackScrollDepth({ depth: milestone, page: '/' });
+			}
+		}
+	}
+
+	onMount(() => {
+		if (browser) {
+			window.addEventListener('scroll', trackScrollDepth, { passive: true });
+		}
+	});
+
+	onDestroy(() => {
+		if (browser) {
+			window.removeEventListener('scroll', trackScrollDepth);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -57,11 +94,6 @@
 				price: '0',
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock'
-			},
-			aggregateRating: {
-				'@type': 'AggregateRating',
-				ratingValue: '4.8',
-				ratingCount: '150'
 			}
 		})}
 	</script>
@@ -86,6 +118,10 @@
 
 	<!-- How It Works Pipeline -->
 	<HowItWorks />
+
+	<!-- Contextual CTA after How It Works -->
+	<MidSectionCta />
+
 	<SectionSeparator icon="star" />
 
 	<!-- What You Can Do -->
@@ -100,13 +136,17 @@
 	<!-- <ApiShowcase />
 	<SectionSeparator icon="arrow" /> -->
 
-	<!-- Pictify Advantage (Merged ROI & Why) -->
-	<PictifyAdvantage />
-	<SectionSeparator icon="bolt" />
+	<!-- Pictify Advantage (Merged ROI & Why) - Commented out for targeted landing pages -->
+	<!-- <PictifyAdvantage />
+	<SectionSeparator icon="bolt" /> -->
 
 	<!-- Scale-Focused Use Cases -->
 	<ScaleUseCases />
 	<SectionSeparator icon="bolt" />
+
+	<!-- Dynamic Links -->
+	<DynamicLinks />
+	<SectionSeparator icon="star" />
 
 	<!-- Final CTA -->
 	<div class="w-full bg-[#FFFDF8]">

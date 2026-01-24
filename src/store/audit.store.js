@@ -26,6 +26,8 @@ export const auditSummary = writable({
   byStatus: {},
   timeline: [],
   totalLogs: 0,
+  totalRenders: 0,
+  totalIntegrations: 0,
   isLoading: false,
   error: null,
 });
@@ -148,6 +150,8 @@ export async function fetchSummary(options = {}) {
       byStatus: result.byStatus || {},
       timeline: result.timeline || [],
       totalLogs: result.totalLogs || 0,
+      totalRenders: result.totalRenders || 0,
+      totalIntegrations: result.totalIntegrations || 0,
       isLoading: false,
     }));
     

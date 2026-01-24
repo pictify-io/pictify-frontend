@@ -1,18 +1,33 @@
 <script>
+	import { onMount } from 'svelte';
+
 	export let html = '';
 	export let width = 1200;
 	export let height = 630;
 	export let scale = 0.3;
-	
+
 	let loaded = false;
 	let container;
+	let loadTimeout;
 
 	function handleLoad() {
+		clearTimeout(loadTimeout);
 		loaded = true;
 	}
 
-	// Reset loaded state when html changes
-	$: if (html) loaded = false;
+	// Reset loaded state when html changes and set fallback timeout
+	$: if (html) {
+		loaded = false;
+		// Fallback: show content after 500ms even if onload doesn't fire
+		clearTimeout(loadTimeout);
+		loadTimeout = setTimeout(() => {
+			loaded = true;
+		}, 500);
+	}
+
+	onMount(() => {
+		return () => clearTimeout(loadTimeout);
+	});
 </script>
 
 <div 

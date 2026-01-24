@@ -28,8 +28,8 @@
 				icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
 			},
 			pictify: {
-				label: 'Visual Builder',
-				desc: 'Designers update templates instantly. No code pushes.',
+				label: 'Visual Editor',
+				desc: 'Designers update templates with drag-and-drop. No deploys needed.',
 				icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
 				color: 'text-[#ff6b6b]',
 				bg: 'bg-[#ff6b6b]/10',
@@ -65,16 +65,16 @@
 	<div class="max-w-6xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-20">
 			<div class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] mb-6 transform -rotate-1">
-				<span class="text-sm font-bold text-white uppercase tracking-wider">The Smart Choice</span>
+				<span class="text-sm font-bold text-white uppercase tracking-wider">Build vs. Buy</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				Why not just use <br />
+				Why not build it <br />
 				<span class="relative inline-block text-gray-400 decoration-4 underline decoration-gray-300 underline-offset-8">
-					Puppeteer?
+					yourself?
 				</span>
 			</h2>
 			<p class="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
-				Building your own renderer is easy. Maintaining it at scale is a nightmare.
+				Building an image renderer is easy. Maintaining it at scale costs 40+ engineering hours a month.
 			</p>
 		</div>
 
@@ -141,7 +141,7 @@
 		<div class="mt-16 text-center">
 			<div class="inline-flex items-center gap-2 text-gray-500 font-medium bg-white px-6 py-3 rounded-full border border-gray-200 shadow-sm">
 				<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-				<span>Managing a chrome cluster costs ~$400/mo + engineering time.</span>
+				<span>DIY image infrastructure: ~$400/mo hosting + 10hrs/week engineering time.</span>
 			</div>
 		</div>
 

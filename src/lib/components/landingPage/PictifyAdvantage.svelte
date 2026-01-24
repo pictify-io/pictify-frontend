@@ -87,9 +87,9 @@
 			</h2>
 			<p class="text-xl transition-colors duration-500 font-bold max-w-2xl mx-auto {isPictify ? 'text-gray-700' : 'text-red-400 font-mono'}">
 				{#if isPictify}
-					Ditch brittle screenshot scripts and rendering hacks. Pictify is faster, cheaper, and easier to maintain.
+					Ditch brittle screenshot scripts and rendering hacks. 10x faster renders. Zero DevOps.
 				{:else}
-					> [CRITICAL] Headless Chrome process hanging. 
+					> [CRITICAL] Headless Chrome process hanging.
 					<br/>> Memory limit exceeded.
 				{/if}
 			</p>
@@ -114,7 +114,7 @@
 					></div>
 				</div>
 				<p class="text-sm font-medium leading-tight {isPictify ? 'text-gray-600' : 'text-red-400 font-mono'}">
-					{isPictify ? '<150ms average render latency. Instant engagement.' : '2-5s latency. Your users are bouncing.'}
+					{isPictify ? '150ms average. Your old solution? 2-5 seconds.' : '2-5s latency. Your users are bouncing.'}
 				</p>
 			</div>
 
@@ -142,7 +142,7 @@
 				</div>
 
 				<p class="text-sm font-medium leading-tight {isPictify ? 'text-gray-600' : 'text-red-400 font-mono'}">
-					{isPictify ? 'Visual Templates. Dev Time: Hours.' : 'Code-Only. Dev Time: Weeks.'}
+					{isPictify ? 'Drag-and-drop editor. No deploys needed.' : 'Code-Only. Dev Time: Weeks.'}
 				</p>
 			</div>
 
@@ -156,7 +156,7 @@
 					</div>
 				</div>
 				<div class="text-5xl font-black tabular-nums tracking-tighter mb-2 transition-colors {isPictify ? 'text-black' : 'text-white'}">
-					{isPictify ? '+4x' : '-20%'}<span class="text-2xl opacity-50">{isPictify ? 'CTR' : ''}</span>
+					{isPictify ? '10x' : '-20%'}<span class="text-2xl opacity-50">{isPictify ? ' Faster' : ''}</span>
 				</div>
 				
         {#if !isPictify}
@@ -167,11 +167,11 @@
         {:else}
            <div class="text-[10px] items-center font-bold flex gap-2 text-gray-400 mb-6 uppercase tracking-wider">
               <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-               Personalized Media
+               vs headless Chrome
            </div>
         {/if}
 				<p class="text-sm font-medium leading-tight {isPictify ? 'text-gray-600' : 'text-red-400 font-mono'}">
-					{isPictify ? 'Save $350+/mo vs DIY rendering clusters.' : 'Endless library updates and breaking changes.'}
+					{isPictify ? 'Save $350+/mo vs self-hosted Puppeteer clusters.' : 'Endless library updates and breaking changes.'}
 				</p>
 			</div>
 

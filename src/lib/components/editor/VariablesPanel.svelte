@@ -157,7 +157,7 @@
 	// Preview functions
 	async function togglePreview() {
 		if (!$editor) {
-			toast.set({ message: 'No canvas available', duration: 2000 });
+			toast.set({ message: 'No canvas available', type: 'error', duration: 2000 });
 			return;
 		}
 		
@@ -166,15 +166,16 @@
 			clearPreview($editor);
 			isPreviewActive = false;
 			previewStats = null;
-			toast.set({ message: 'Preview mode disabled', duration: 1500 });
+			toast.set({ message: 'Preview mode disabled', type: 'success', duration: 1500 });
 		} else {
 			// Validate before preview
 			previewValidation = validateTestValues(testValues);
 			
 			if (!previewValidation.isValid) {
-				toast.set({ 
-					message: `Preview failed: ${previewValidation.errors.join(', ')}`, 
-					duration: 3000 
+				toast.set({
+					message: `Preview failed: ${previewValidation.errors.join(', ')}`,
+					type: 'error',
+					duration: 3000
 				});
 				return;
 			}
@@ -184,9 +185,10 @@
 			isPreviewActive = true;
 			previewStats = getPreviewStats($editor, testValues);
 			
-			toast.set({ 
-				message: `Preview active: ${result.hiddenCount} hidden, ${result.loopClonesCount} loop items`, 
-				duration: 2000 
+			toast.set({
+				message: `Preview active: ${result.hiddenCount} hidden, ${result.loopClonesCount} loop items`,
+				type: 'success',
+				duration: 2000
 			});
 		}
 	}
@@ -300,7 +302,7 @@
 				defaultValue: parsedDefault,
 				required: formRequired
 			});
-			toast.set({ message: `Variable "${sanitizedName}" updated`, duration: 2000 });
+			toast.set({ message: `Variable "${sanitizedName}" updated`, type: 'success', duration: 2000 });
 			} else {
 			// Create new custom variable
 			variableActions.createCustom(
@@ -310,7 +312,7 @@
 				formDescription
 			);
 			variableActions.update(sanitizedName, { required: formRequired });
-			toast.set({ message: `Variable "${sanitizedName}" created`, duration: 2000 });
+			toast.set({ message: `Variable "${sanitizedName}" created`, type: 'success', duration: 2000 });
 		}
 		
 		editingVariable = null;
@@ -326,7 +328,7 @@
 		if (variableToDelete) {
 			const name = variableToDelete.name;
 			variableActions.delete(name);
-			toast.set({ message: `Variable "${name}" deleted`, duration: 2000 });
+			toast.set({ message: `Variable "${name}" deleted`, type: 'success', duration: 2000 });
 			variableToDelete = null;
 			showDeleteConfirm = false;
 			
@@ -402,7 +404,7 @@
 	
 	function copyApiExample() {
 		navigator.clipboard.writeText(generateApiExample());
-		toast.set({ message: 'Copied to clipboard!', duration: 1500 });
+		toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
 	}
 	
 	function updateTestValue(name, value) {
@@ -419,9 +421,10 @@
 	
 	async function testRenderApi() {
 		if (!$template?.uid) {
-			toast.set({ 
-				message: 'Please save the template first before testing the API', 
-				duration: 3000 
+			toast.set({
+				message: 'Please save the template first before testing the API',
+				type: 'warning',
+				duration: 3000
 			});
 			return;
 		}
@@ -444,28 +447,31 @@
 			
 			if (isPdf) {
 				renderedPdfUrl = result.url;
-				toast.set({ 
-					message: `PDF rendered in ${lastRenderTime}ms!`, 
-					duration: 2000 
+				toast.set({
+					message: `PDF rendered in ${lastRenderTime}ms!`,
+					type: 'success',
+					duration: 2000
 				});
 			} else {
 				renderedImageUrl = result.url;
-				toast.set({ 
-					message: `Image rendered in ${lastRenderTime}ms!`, 
-					duration: 2000 
+				toast.set({
+					message: `Image rendered in ${lastRenderTime}ms!`,
+					type: 'success',
+					duration: 2000
 				});
 			}
 		} catch (error) {
 			renderError = error.message || 'Failed to render template';
-			toast.set({ 
-				message: renderError, 
-				duration: 3000 
+			toast.set({
+				message: renderError,
+				type: 'error',
+				duration: 3000
 			});
 		} finally {
 			isRendering = false;
 		}
 	}
-	
+
 	function generateCurlCommand() {
 		if (!$template?.uid) return '';
 		
@@ -479,7 +485,7 @@
 	
 	function copyCurlCommand() {
 		navigator.clipboard.writeText(generateCurlCommand());
-		toast.set({ message: 'cURL command copied!', duration: 1500 });
+		toast.set({ message: 'cURL command copied!', type: 'success', duration: 1500 });
 	}
 	
 	function downloadImage() {
@@ -501,7 +507,7 @@
 	// Works for both guest mode AND logged-in users with unsaved templates
 	async function generateFromCanvas() {
 		if (!$editor) {
-			toast.set({ message: 'No canvas available', duration: 2000 });
+			toast.set({ message: 'No canvas available', type: 'error', duration: 2000 });
 			return;
 		}
 
@@ -613,16 +619,18 @@
 				if (isPdf) {
 					renderedPdfUrl = result.url;
 					renderedImageUrl = null;
-					toast.set({ 
-						message: `PDF generated in ${lastRenderTime}ms!`, 
-						duration: 2000 
+					toast.set({
+						message: `PDF generated in ${lastRenderTime}ms!`,
+						type: 'success',
+						duration: 2000
 					});
 				} else {
 					renderedImageUrl = result.url;
 					renderedPdfUrl = null;
-					toast.set({ 
-						message: `Image generated in ${lastRenderTime}ms!`, 
-						duration: 2000 
+					toast.set({
+						message: `Image generated in ${lastRenderTime}ms!`,
+						type: 'success',
+						duration: 2000
 					});
 				}
 			} else {
@@ -635,9 +643,10 @@
 			} else {
 				renderError = error.message || 'Failed to generate image';
 			}
-			toast.set({ 
-				message: renderError, 
-				duration: 3000 
+			toast.set({
+				message: renderError,
+				type: 'error',
+				duration: 3000
 			});
 		} finally {
 			isRendering = false;
@@ -665,6 +674,7 @@
 		// User is now logged in
 		toast.set({
 			message: 'Welcome! Saving your template...',
+			type: 'success',
 			duration: 2000
 		});
 
@@ -685,6 +695,7 @@
 					// For now, just generate - the parent should handle saving
 					toast.set({
 						message: 'Please save your template to continue',
+						type: 'warning',
 						duration: 3000
 					});
 
@@ -1615,7 +1626,7 @@
 										class="flex-1 py-2 bg-white border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1.5"
 										on:click={() => {
 											navigator.clipboard.writeText(renderedPdfUrl);
-											toast.set({ message: 'PDF URL copied!', duration: 1500 });
+											toast.set({ message: 'PDF URL copied!', type: 'success', duration: 1500 });
 										}}
 									>
 										<i class="fa fa-copy"></i>

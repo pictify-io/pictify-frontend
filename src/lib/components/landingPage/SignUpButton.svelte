@@ -1,20 +1,30 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { analytics } from '$lib/analytics.js';
 	export let text = 'Start For Free';
 	export let variant = 'primary'; // primary or secondary
+	export let location = 'landing_page';
 	let className = '';
 	export { className as class };
+
+	function handleClick() {
+		analytics.trackCTAClicked({
+			cta_text: text,
+			location: location,
+		});
+		goto('/signup');
+	}
 </script>
 
 	<button
 	type="button"
 	class="px-8 py-4 font-bold text-lg rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
 		{variant === 'primary' && !className
-			? 'bg-[#ffc480] text-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px]' 
+			? 'bg-[#ffc480] text-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px]'
 			: variant === 'secondary' && !className
 				? 'bg-white text-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px]'
 				: ''} {className}"
-	on:click={() => goto('/signup')}
+	on:click={handleClick}
 >
 	<span>{text}</span>
 	<svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">

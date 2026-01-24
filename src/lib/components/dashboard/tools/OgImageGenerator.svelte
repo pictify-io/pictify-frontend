@@ -220,12 +220,12 @@
 	// Function to handle feedback submission
 	const submitFeedback = () => {
 		if (!feedbackMessage) {
-			toast.set({ message: 'Please enter your feedback', duration: 1500 });
+			toast.set({ message: 'Please enter your feedback', type: 'warning', duration: 1500 });
 			return;
 		}
-		
+
 		// Here you would typically send this to your backend
-		toast.set({ message: 'Thank you for your feedback!', duration: 1500 });
+		toast.set({ message: 'Thank you for your feedback!', type: 'success', duration: 1500 });
 		feedbackMessage = '';
 		feedbackEmail = '';
 	};
@@ -239,7 +239,7 @@
 			isLoading = false;
 		} catch (error) {
 			console.error('Error loading templates:', error);
-			toast.set({ message: 'Failed to load templates', duration: 1500 });
+			toast.set({ message: 'Failed to load templates', type: 'error', duration: 1500 });
 			defaultTemplatesList = [];
 			isLoading = false;
 		}
@@ -277,7 +277,7 @@
 			console.log('Final saved templates:', savedTemplates);
 		} catch (error) {
 			console.error('Error loading saved templates:', error);
-			toast.set({ message: 'Failed to load saved templates', duration: 1500 });
+			toast.set({ message: 'Failed to load saved templates', type: 'error', duration: 1500 });
 			savedTemplates = [];
 			templateOptions = [];
 		} finally {
@@ -303,13 +303,13 @@
 
 			const savedTemplate = await createTemplateAction(templateData);
 			if (savedTemplate) {
-				toast.set({ message: 'Template saved successfully', duration: 1500 });
+				toast.set({ message: 'Template saved successfully', type: 'success', duration: 1500 });
 				await loadSavedTemplates();
 				activeTab = 'saved';
 			}
 		} catch (error) {
 			console.error('Error saving template:', error);
-			toast.set({ message: 'Failed to save template', duration: 1500 });
+			toast.set({ message: 'Failed to save template', type: 'error', duration: 1500 });
 		}
 	};
 
@@ -329,12 +329,12 @@
 
 			const updatedTemplate = await updateTemplateAction(templateData);
 			if (updatedTemplate) {
-				toast.set({ message: 'Template updated successfully', duration: 1500 });
+				toast.set({ message: 'Template updated successfully', type: 'success', duration: 1500 });
 				await loadSavedTemplates();
 			}
 		} catch (error) {
 			console.error('Error updating template:', error);
-			toast.set({ message: 'Failed to update template', duration: 1500 });
+			toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
 		}
 	};
 
@@ -382,12 +382,12 @@
 		try {
 			const success = await deleteTemplateAction(uid);
 			if (success) {
-				toast.set({ message: 'Template deleted successfully', duration: 1500 });
+				toast.set({ message: 'Template deleted successfully', type: 'success', duration: 1500 });
 				await loadSavedTemplates();
 			}
 		} catch (error) {
 			console.error('Error deleting template:', error);
-			toast.set({ message: 'Failed to delete template', duration: 1500 });
+			toast.set({ message: 'Failed to delete template', type: 'error', duration: 1500 });
 		}
 	};
 
@@ -406,7 +406,7 @@
 	// Add generateImage function for API testing
 	const generateImage = async () => {
 		if (!settings.template || !settings.heading) {
-			toast.set({ message: 'Please select a template and enter a heading', duration: 1500 });
+			toast.set({ message: 'Please select a template and enter a heading', type: 'warning', duration: 1500 });
 			return;
 		}
 
@@ -510,7 +510,7 @@
 			}
 		} catch (error) {
 			console.error('Error loading API tokens:', error);
-			toast.set({ message: 'Failed to load API tokens', duration: 1500 });
+			toast.set({ message: 'Failed to load API tokens', type: 'error', duration: 1500 });
 		}
 	};
 
@@ -889,7 +889,7 @@
 															class="text-xs font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
 															on:click={() => {
 																navigator.clipboard.writeText(JSON.stringify(requestPayload, null, 2));
-																toast.set({ message: 'Copied!', duration: 1500 });
+																toast.set({ message: 'Copied!', type: 'success', duration: 1500 });
 															}}
 														>
 															<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
@@ -965,7 +965,7 @@
 																	class="px-4 py-2 bg-gray-900 text-white font-bold text-xs rounded-lg hover:bg-gray-800"
 																	on:click={() => {
 																		navigator.clipboard.writeText(imageUrl);
-																		toast.set({ message: 'URL Copied!', duration: 1500 });
+																		toast.set({ message: 'URL Copied!', type: 'success', duration: 1500 });
 																	}}
 																>
 																	Copy

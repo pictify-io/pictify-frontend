@@ -86,10 +86,10 @@
 		<!-- Section Header -->
 		<div class="text-center mb-16">
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				Three Pillars of <span class="text-[#ff6b6b]">Visual Scale</span>
+				What Makes Pictify <span class="text-[#ff6b6b]">Different</span>
 			</h2>
 			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
-				Everything you need to automate visual content at any scale
+				Designers design. Devs integrate. Everyone ships.
 			</p>
 		</div>
 
@@ -119,8 +119,7 @@
 						</div>
 						<h3 class="text-3xl font-bold text-gray-900 mb-3">API-First Design</h3>
 						<p class="text-gray-600 mb-6">
-							Built for teams. Designers create reusable templates. Developers integrate once and
-							render dynamic variants with simple JSON payloads.
+							Designers create reusable templates with the visual editor. Developers integrate once and render variants with JSON.
 						</p>
 						<div class="flex gap-2">
 							<span class="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs font-mono"
@@ -181,9 +180,9 @@
 							>
 							Visual Power
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900 mb-3">Pixel Perfect</h3>
+						<h3 class="text-3xl font-bold text-gray-900 mb-3">Retina Ready</h3>
 						<p class="text-gray-600 mb-6">
-							Full CSS support. Flexbox, Grid, custom fonts, and animations.
+							Full CSS support. Flexbox, Grid, custom fonts, and animations. Up to 4K resolution.
 						</p>
 					</div>
 
@@ -264,7 +263,7 @@
 							>
 							Global Scale
 						</div>
-						<h3 class="text-2xl font-bold text-gray-900 mb-2">12 Edge Regions</h3>
+						<h3 class="text-2xl font-bold text-gray-900 mb-2">Global CDN</h3>
 					</div>
 					<div class="flex gap-2 flex-wrap mt-4">
 						<span class="w-2 h-2 rounded-full bg-gray-900" />

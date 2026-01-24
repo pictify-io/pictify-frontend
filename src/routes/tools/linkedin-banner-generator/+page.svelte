@@ -502,13 +502,13 @@
           </div>
 
           <!-- Banner Preview -->
-          <div class="relative bg-gray-100">
-            <div class="aspect-[4/1] relative">
+          <div class="relative bg-gray-100 flex items-center justify-center p-4">
+            <div class="relative inline-block">
               <OgImageTemplate
                 html={selectedTemplate.html}
                 width={LINKEDIN_BANNER_WIDTH}
                 height={LINKEDIN_BANNER_HEIGHT}
-                scale={0.5}
+                scale={0.65}
               />
 
               <!-- Safe Zone Overlay -->
@@ -518,14 +518,14 @@
                   style="
                     left: 0;
                     bottom: 0;
-                    width: calc({SAFE_ZONE.width}px * 0.5);
-                    height: calc({SAFE_ZONE.height}px * 0.5);
+                    width: calc({SAFE_ZONE.width}px * 0.65);
+                    height: calc({SAFE_ZONE.height}px * 0.65);
                     border: 2px dashed #ef4444;
                     background: rgba(239, 68, 68, 0.1);
-                    border-radius: 0 100% 0 0;
+                    border-radius: 0 50% 0 0;
                   "
                 >
-                  <div class="absolute bottom-1 left-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
+                  <div class="absolute bottom-2 left-2 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
                     Profile Photo
                   </div>
                 </div>

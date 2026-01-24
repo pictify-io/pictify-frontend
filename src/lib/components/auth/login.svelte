@@ -9,6 +9,7 @@
 	import { onMount } from 'svelte';
 	import { loginAction, signupAction, getUser, isLoggedIn } from '../../../store/user.store';
 	import { forgotPassword } from '../../../api/user';
+	import { analytics } from '$lib/analytics.js';
 
 	let email = '';
 	let password = '';
@@ -23,6 +24,8 @@
 			if (emailFromParams) {
 				email = emailFromParams;
 			}
+			// Track signup page viewed
+			analytics.trackSignupStarted({ source: redirectUrl || 'direct' });
 		}
 		await getUser();
 		if (isLoggedIn()) {

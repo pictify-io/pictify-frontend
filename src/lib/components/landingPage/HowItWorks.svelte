@@ -41,9 +41,9 @@
 				<span class="text-sm font-bold text-white uppercase tracking-wider">The Pipeline</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				From Data to <br />
+				From Database to <br />
 				<span class="relative inline-block text-[#ff6b6b]">
-					Pixel-Perfect Media
+					Download
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
 						viewBox="0 0 100 10"
@@ -54,8 +54,8 @@
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				A complete programmatic generation pipeline. <br class="hidden md:block" />
-				Designed for teams who need speed, consistency, and scale.
+				A complete image generation pipeline in three steps. <br class="hidden md:block" />
+				Designed for teams who need speed, consistency, and volume.
 			</p>
 		</div>
 
@@ -87,14 +87,14 @@
 						>
 							1
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Design Templates</h3>
+						<h3 class="text-3xl font-bold text-gray-900">Design Your Template</h3>
 					</div>
 					<p
 						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Create templates using our visual editor or standard HTML/CSS. Define <span
-							class="bg-blue-100 px-1 border-b-2 border-blue-300">dynamic variables</span
-						> to make your designs reusable.
+						Drag-and-drop in our visual editor. Add <span
+							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
+						> where your data goes.
 						{#if activeStep === 0 && !isPaused}
 							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
 						{/if}
@@ -120,14 +120,14 @@
 						>
 							2
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Send Request</h3>
+						<h3 class="text-3xl font-bold text-gray-900">Send Your Data</h3>
 					</div>
 					<p
 						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Send a request to our API. Our engine processes your data and template to create <span
-							class="bg-red-100 px-1 border-b-2 border-red-300">pixel-perfect visuals</span
-						> instantly.
+						Make a single API call with JSON. <span
+							class="bg-red-100 px-1 border-b-2 border-red-300">200ms later</span
+						>, your image is ready.
 						{#if activeStep === 1 && !isPaused}
 							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
 						{/if}
@@ -153,12 +153,12 @@
 						>
 							3
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Get Your Media</h3>
+						<h3 class="text-3xl font-bold text-gray-900">Get Your Image</h3>
 					</div>
 					<p
 						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Receive a hosted URL or binary data instantly. Ready to be embedded, shared, or stored.
+						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, or PDF.
 						{#if activeStep === 2 && !isPaused}
 							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
 						{/if}

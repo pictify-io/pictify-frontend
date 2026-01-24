@@ -427,11 +427,11 @@
 						logoWidth
 					}
 				});
-				toast.set({ message: 'Image generated successfully!', duration: 1500 });
+				toast.set({ message: 'Image generated successfully!', type: 'success', duration: 1500 });
 			})
 			.catch((error) => {
 				console.error('Error generating image:', error);
-				toast.set({ message: 'Failed to generate image', duration: 1500 });
+				toast.set({ message: 'Failed to generate image', type: 'error', duration: 1500 });
 			})
 			.finally(() => {
 				isGenerating = false;
@@ -464,7 +464,7 @@
 						class="hover:text-[#ff6b6b] transition-colors"
 						on:click={() => {
 							navigator.clipboard.writeText(template.uid);
-							toast.set({ message: 'UID copied to clipboard', duration: 1500 });
+							toast.set({ message: 'UID copied to clipboard', type: 'success', duration: 1500 });
 						}}
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -671,7 +671,7 @@
 								class="px-3 py-1 bg-black text-white rounded-md text-sm hover:bg-gray-900"
 								on:click={() => {
 									navigator.clipboard.writeText(imageUrl);
-									toast.set({ message: 'URL copied to clipboard', duration: 1500 });
+									toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 1500 });
 								}}
 							>
 								Copy URL

@@ -23,7 +23,7 @@
 					</div>
 				</a>
 				<p class="text-lg text-gray-700 font-medium leading-relaxed">
-					The infrastructure layer for programmatic media. Built for teams who ship fast.
+					The fast, scalable Puppeteer alternative. Generate images via API in under 500ms.
 				</p>
 				
 				<!-- Status Indicator -->
@@ -37,8 +37,8 @@
 			</div>
 
 			<!-- Links Columns (Span 8) -->
-			<div class="md:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
-				
+			<div class="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+
 				<!-- Product -->
 				<div class="flex flex-col gap-4">
 					<div class="text-sm font-black text-gray-900 uppercase tracking-wider border-b-[3px] border-gray-900 pb-2 w-fit">Product</div>
@@ -46,7 +46,19 @@
 						<li><a href="/pricing" class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Pricing</a></li>
 						<li><a href={PUBLIC_DOCS_URL} target="_blank" class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">API Docs</a></li>
 						<li><a href="/tools" class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Tools</a></li>
+						<li><a href="/templates" class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Templates</a></li>
 						<li><a href="https://status.pictify.io" target="_blank" class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Status</a></li>
+					</ul>
+				</div>
+
+				<!-- Resources -->
+				<div class="flex flex-col gap-4">
+					<div class="text-sm font-black text-gray-900 uppercase tracking-wider border-b-[3px] border-gray-900 pb-2 w-fit">Resources</div>
+					<ul class="flex flex-col gap-3">
+						<li><a href="/integrations" class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors">Integrations</a></li>
+						<li><a href="/alternatives" class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors">Alternatives</a></li>
+						<li><a href="/compare" class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors">Comparisons</a></li>
+						<li><a href="/glossary" class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors">Glossary</a></li>
 					</ul>
 				</div>
 
@@ -85,7 +97,7 @@
 		<!-- Bottom Bar -->
 		<div class="pt-8 border-t-[3px] border-gray-900 flex flex-col sm:flex-row items-center justify-between gap-6">
 			<div class="text-sm font-bold text-gray-500">
-				© 2025 Pictify.io. All rights reserved.
+				© 2026 Pictify.io. All rights reserved.
 			</div>
 			
 			<!-- Peerlist Badge -->

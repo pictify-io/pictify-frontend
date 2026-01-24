@@ -3,6 +3,7 @@
 	import { user } from '../../../store/user.store';
 	import { onMount, onDestroy } from 'svelte';
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
+	import { analytics } from '$lib/analytics.js';
 
 	let isLoggedIn = false;
 	let unsubscribe = () => {};
@@ -18,6 +19,18 @@
 		unsubscribe();
 	});
 	import { fly } from 'svelte/transition';
+
+	function trackNav(linkText, destination, location = 'header') {
+		analytics.trackNavClick({ link_text: linkText, destination, location });
+	}
+
+	function trackOutbound(url, linkText, location = 'header') {
+		analytics.trackOutboundLink({ url, link_text: linkText, location });
+	}
+
+	function trackCTA(ctaText, location = 'header') {
+		analytics.trackCTAClicked({ cta_text: ctaText, location });
+	}
 </script>
 
 <header
@@ -52,26 +65,37 @@
 				href={PUBLIC_DOCS_URL}
 				target="_blank"
 				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				on:click={() => trackOutbound(PUBLIC_DOCS_URL, 'Docs', 'header')}
 				>Docs</a
 			>
 			<a
 				href="/pricing"
 				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				on:click={() => trackNav('Pricing', '/pricing', 'header')}
 				>Pricing</a
 			>
 			<a
 				href="/tools"
 				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				on:click={() => trackNav('Tools', '/tools', 'header')}
 				>Tools</a
 			>
 			<a
 				href="/templates"
 				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				on:click={() => trackNav('Templates', '/templates', 'header')}
 				>Templates</a
+			>
+			<a
+				href="/integrations"
+				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				on:click={() => trackNav('Integrations', '/integrations', 'header')}
+				>Integrations</a
 			>
 			<a
 				href="/blogs"
 				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				on:click={() => trackNav('Blog', '/blogs', 'header')}
 				>Blog</a
 			>
 		</div>
@@ -86,19 +110,22 @@
 				<a
 					href="/login"
 					class="px-8 flex items-center justify-center text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors uppercase tracking-wide"
+					on:click={() => trackCTA('Sign In', 'header')}
 				>
 					Sign In
 				</a>
 				<a
 					href="/login"
 					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-[#ff6b6b] hover:text-gray-900 transition-all uppercase tracking-wide border-l-[3px] border-gray-900"
+					on:click={() => trackCTA('Start Building Free', 'header')}
 				>
-					Start For Free
+					Start Building Free
 				</a>
 			{:else}
 				<a
 					href="/dashboard"
 					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-[#4ade80] hover:text-gray-900 transition-all uppercase tracking-wide"
+					on:click={() => trackNav('Dashboard', '/dashboard', 'header')}
 				>
 					Dashboard
 				</a>
@@ -132,48 +159,62 @@
 				href={PUBLIC_DOCS_URL}
 				target="_blank"
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				on:click={() => trackOutbound(PUBLIC_DOCS_URL, 'Docs', 'mobile_menu')}
 				>Docs</a
 			>
 			<a
 				href="/pricing"
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				on:click={() => trackNav('Pricing', '/pricing', 'mobile_menu')}
 				>Pricing</a
 			>
 			<a
 				href="/tools"
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				on:click={() => trackNav('Tools', '/tools', 'mobile_menu')}
 				>Tools</a
 			>
 			<a
 				href="/templates"
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				on:click={() => trackNav('Templates', '/templates', 'mobile_menu')}
 				>Templates</a
+			>
+			<a
+				href="/integrations"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				on:click={() => trackNav('Integrations', '/integrations', 'mobile_menu')}
+				>Integrations</a
 			>
 			<a
 				href="/blogs"
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				on:click={() => trackNav('Blog', '/blogs', 'mobile_menu')}
 				>Blog</a
 			>
-			
+
 			<div class="h-px bg-gray-900 opacity-10 my-2"></div>
 
 			{#if !isLoggedIn}
 				<a
 					href="/login"
 					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-gray-100 rounded-xl uppercase active:translate-y-1 active:shadow-[2px_2px_0_0_#000] transition-all"
+					on:click={() => trackCTA('Sign In', 'mobile_menu')}
 				>
 					Sign In
 				</a>
 				<a
 					href="/login"
 					class="p-4 text-center text-lg font-black text-white border-[3px] border-gray-900 bg-[#ff6b6b] shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+					on:click={() => trackCTA('Start Building Free', 'mobile_menu')}
 				>
-					Start For Free
+					Start Building Free
 				</a>
 			{:else}
 				<a
 					href="/dashboard"
 					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-[#4ade80] shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+					on:click={() => trackNav('Dashboard', '/dashboard', 'mobile_menu')}
 				>
 					Dashboard
 				</a>

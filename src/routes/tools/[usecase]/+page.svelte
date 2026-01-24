@@ -3,6 +3,8 @@ import Nav from '$lib/components/landingPage/Nav.svelte';
 import Footer from '$lib/components/landingPage/Footer.svelte';
 import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
 import NextSteps from '$lib/components/tools/NextSteps.svelte';
+import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
+import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 import { page } from '$app/stores';
 import { useCases, useCaseDetails, formats, popularSizes, baseFormatUrl, sizeUrl, parseSize } from '$lib/pseo/config.js';
 import { getTemplateForUseCase } from '$lib/pseo/useCaseTemplates.js';
@@ -10,8 +12,15 @@ import { goto } from '$app/navigation';
 import { onMount } from 'svelte';
 import { user } from '../../../store/user.store';
 import { toast } from '../../../store/toast.store';
+import { generationLimits } from '../../../store/generationLimits.store';
 import { pageActions } from '../../../store/pages.store';
 import backend from '../../../service/backend';
+
+// User login state
+let isUserLoggedIn = false;
+user.subscribe(userData => {
+  isUserLoggedIn = !!userData?.email;
+});
 
 $: useCaseId = $page.params.usecase;
 $: config = useCaseDetails[useCaseId];
@@ -65,26 +74,30 @@ function openInCanvasEditor() {
 // Uses public endpoint (no auth required, rate limited)
 async function handleQuickGenerate() {
   if (!template?.fabricJSData) {
-    toast.set({ message: 'No template data available', duration: 2000 });
+    toast.set({ message: 'No template data available', type: 'error', duration: 2000 });
     return;
   }
 
+  // Track generation in global limits store
+  generationLimits.increment();
   isGenerating = true;
   generationError = '';
   generatedImageUrl = '';
 
   try {
     // Use public canvas endpoint (no auth required, rate limited)
+    // Request watermark for non-logged-in users
     const response = await backend.post('/image/public/canvas', {
       fabricJSData: template.fabricJSData,
       width: templateWidth,
       height: templateHeight,
-      fileExtension: 'png'
+      fileExtension: 'png',
+      watermark: !isUserLoggedIn // Request watermark for guests
     });
 
     if (response?.url) {
       generatedImageUrl = response.url;
-      toast.set({ message: 'Image generated successfully!', duration: 2000 });
+      toast.set({ message: 'Image generated successfully!', type: 'success', duration: 2000 });
     } else {
       throw new Error('No image URL in response');
     }
@@ -96,7 +109,7 @@ async function handleQuickGenerate() {
     } else {
       generationError = e.message || 'Failed to generate image';
     }
-    toast.set({ message: generationError, duration: 3000 });
+    toast.set({ message: generationError, type: 'error', duration: 3000 });
   } finally {
     isGenerating = false;
   }
@@ -304,6 +317,9 @@ $: templateDraft = template ? {
           </p>
         </div>
       </div>
+
+      <!-- Generation Limit Banner -->
+      <GenerationLimitBanner />
 
       <!-- Template Preview Section (Window Style) -->
       <div class="max-w-5xl mx-auto px-4 mb-20">
@@ -679,6 +695,9 @@ $: templateDraft = template ? {
   </main>
 
   <Footer />
+
+  <!-- Exit Intent Popup for lead capture -->
+  <ExitIntentPopup toolName={config?.label || useCaseId} generatedImageUrl={generatedImageUrl} />
 </section>
 
 <style>

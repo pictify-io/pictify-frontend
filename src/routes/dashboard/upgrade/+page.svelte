@@ -4,6 +4,7 @@
 	import { user } from '../../../store/user.store';
 	import { getProducts } from '../../../api/product';
 	import Loader from '$lib/components/Loader.svelte';
+	import { analytics } from '$lib/analytics.js';
 
 	let isLoading = true;
 	let allPlans = [];
@@ -40,6 +41,9 @@
 	}
 
 	onMount(async () => {
+		// Track pricing page view from dashboard
+		analytics.trackPricingViewed({ source: 'dashboard_upgrade' });
+
 		try {
 			const response = await getProducts();
 			allPlans = (response?.data ?? [])
@@ -67,6 +71,16 @@
 
 	function handlePurchase(plan) {
 		if (!plan) return;
+
+		// Track upgrade started
+		analytics.trackUpgradeStarted({
+			plan: plan.name,
+			source: 'dashboard_upgrade',
+			price: plan.price,
+			requests: plan.request_per_month,
+			current_plan: currentPlan
+		});
+
 		if (!isLoggedIn) {
 			window.location.href = `/signup?redirect=${plan.purchase_url ?? '/dashboard/api-token'}`;
 			return;

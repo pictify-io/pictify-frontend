@@ -5,10 +5,14 @@
   import { user } from '../../../store/user.store';
   import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
   import NextSteps from '$lib/components/tools/NextSteps.svelte';
+  import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
+  import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
   import Footer from '$lib/components/landingPage/Footer.svelte';
   import Toast from '$lib/components/Toast.svelte';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import { generationLimits } from '../../../store/generationLimits.store';
+  import { analytics } from '$lib/analytics.js';
 
   // Syntax highlighting via refractor (Prism under the hood)
   import { refractor } from 'refractor';
@@ -387,6 +391,9 @@
   }
 
   onMount(() => {
+    // Track tool opened
+    analytics.trackToolOpened({ tool_name: 'code_to_image' });
+
     // Apply presets from query params (used by /templates gallery)
     const params = $page?.url?.searchParams;
     if (params) {
@@ -465,21 +472,23 @@
       return;
     }
 
+    // Track generation in global limits store
+    generationLimits.increment();
     isGenerating = true;
     currentTab = 'image';
-    
+
     let html = buildSrcDoc();
-    
-    // Add watermark for non-logged in users after first generation
-    if (!isUserLoggedIn && freeGenerationsUsed >= 1) {
+
+    // Add watermark for ALL non-logged in users
+    if (!isUserLoggedIn) {
       const watermarkDiv = `
-        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); 
+        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9);
                     padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 9999;
-                    font-family: system-ui, -apple-system, sans-serif;">
-          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none;">pictify.io</a>
+                    font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">pictify.io</a>
         </div>
       `;
-      
+
       html = html.replace('</body>', `${watermarkDiv}</body>`);
     }
     
@@ -490,6 +499,13 @@
       const { image } = await createImagePublic({ html, width, height, fileExtension: 'png' , selector:'.wrapper'});
       generatedImage = image;
       totalImagesGenerated++;
+
+      // Track image generation
+      analytics.trackImageGenerated({
+        tool_name: 'code_to_image',
+        format: 'png',
+        with_watermark: !isUserLoggedIn,
+      });
 
       // Update usage tracking for non-logged in users
       if (!isUserLoggedIn) {
@@ -505,9 +521,9 @@
         }
       }
       
-      toast.set({ message: 'Image generated!', duration: 1500 });
+      toast.set({ message: 'Image generated!', type: 'success', duration: 1500 });
     } catch (e) {
-      toast.set({ message: 'Failed to generate image', duration: 2000 });
+      toast.set({ message: 'Failed to generate image', type: 'error', duration: 2000 });
     } finally {
       isGenerating = false;
     }
@@ -515,7 +531,7 @@
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-      toast.set({ message: 'Copied to clipboard !!', duration: 1500 });
+      toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
     });
   }
 
@@ -540,7 +556,7 @@
         localStorage.setItem(bonusKey, String(shareBonusGenerations));
         localStorage.setItem(bonusKey + '_date', new Date().toDateString());
       } catch (e) {}
-      toast.set({ message: 'Thanks for sharing! +1 extra guest generation unlocked for today.', duration: 2500 });
+      toast.set({ message: 'Thanks for sharing! +1 extra guest generation unlocked for today.', type: 'success', duration: 2500 });
     }
   }
   // Avoid literal style tags so Svelte's CSS preprocessor doesn't try to parse runtime content
@@ -606,8 +622,11 @@
       </div>
     </div>
 
+    <!-- Generation Limit Banner -->
+    <GenerationLimitBanner />
+
     <div class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 lg:gap-8 items-start">
-      
+
       <!-- Left Column: Controls -->
       <div class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] lg:shadow-[8px_8px_0_0_#000] lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1">
         <!-- Terminal Header -->
@@ -927,6 +946,8 @@
                   description="Copy the API request, save this output as a template background, and batch render variants."
                   curlSnippet={nextStepsCurlSnippet}
                   templateDraft={nextStepsTemplateDraft}
+                  generatedUrl={generatedImage?.url || ''}
+                  toolName="Code to Image"
                 />
               </div>
             {/if}
@@ -1551,7 +1572,9 @@
     <Footer />
   </main>
   <Toast />
-  
+
+  <!-- Exit Intent Popup for lead capture -->
+  <ExitIntentPopup toolName="Code to Image" generatedImageUrl={generatedImage?.url || ''} />
 </section>
 
 <style>

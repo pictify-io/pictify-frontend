@@ -39,7 +39,7 @@
 
   async function handleShare() {
     if (!assetUrl) {
-      toast.set({ message: 'No image to share', duration: 2000 });
+      toast.set({ message: 'No image to share', type: 'warning', duration: 2000 });
       return;
     }
 
@@ -65,15 +65,15 @@
         // Copy to clipboard
         try {
           await navigator.clipboard.writeText(shareUrl);
-          toast.set({ message: 'Share link copied to clipboard!', duration: 2500 });
+          toast.set({ message: 'Share link copied to clipboard!', type: 'success', duration: 2500 });
         } catch (e) {
           // Fallback: show the URL
-          toast.set({ message: `Share link: ${shareUrl}`, duration: 5000 });
+          toast.set({ message: `Share link: ${shareUrl}`, type: 'default', duration: 5000 });
         }
       }
     } catch (e) {
       console.error('Failed to create share:', e);
-      toast.set({ message: e.message || 'Failed to create share link', duration: 3000 });
+      toast.set({ message: e.message || 'Failed to create share link', type: 'error', duration: 3000 });
     } finally {
       isSharing = false;
     }

@@ -285,30 +285,35 @@
 					</div>
 
 				<!-- Hover Overlay Actions -->
-				<div class="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/10 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-					<div class="flex flex-col gap-2">
+				<div class="absolute inset-0 bg-white/90 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center p-4 gap-3">
+					
+					<!-- Primary Action: Edit -->
+					<button
+						class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#9ca3af] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 transform translate-y-4 group-hover:translate-y-0 duration-300"
+						on:click|stopPropagation={() => handleTemplateClick(template)}
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+						Edit Design
+					</button>
+
+					<!-- Secondary Actions: Usage -->
+					<div class="grid grid-cols-2 gap-3 w-full transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75">
 						<button
-							class="bg-[#ffc480] text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#000] transition-all transform translate-y-4 group-hover:translate-y-0"
-							on:click|stopPropagation={() => handleTemplateClick(template)}
+							class="py-2.5 bg-white text-gray-900 font-bold uppercase tracking-wider text-[10px] sm:text-xs rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#9ca3af] hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-1"
+							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
+							title="Render with variables"
 						>
-							Edit
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+							Render
 						</button>
-						<div class="flex gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all delay-75">
-							<button
-								class="bg-[#4ecdc4] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
-								on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
-								title="Render with variables"
-							>
-								Render
-							</button>
-							<button
-								class="bg-[#a855f7] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
-								on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
-								title="Deploy as dynamic asset"
-							>
-								Dynamic
-							</button>
-						</div>
+						<button
+							class="py-2.5 bg-white text-gray-900 font-bold uppercase tracking-wider text-[10px] sm:text-xs rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#9ca3af] hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-1"
+							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
+							title="Deploy as dynamic asset"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+							Dynamic
+						</button>
 					</div>
 				</div>
 			</div>

@@ -50,7 +50,7 @@
 
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard!', duration: 1500 });
+			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
 		});
 	}
 
@@ -307,7 +307,7 @@
 
 	const updateTemplate = async () => {
 		if (!templateName.trim()) {
-			toast.set({ message: 'Please enter a template name', duration: 1500 });
+			toast.set({ message: 'Please enter a template name', type: 'warning', duration: 1500 });
 			return;
 		}
 
@@ -357,16 +357,16 @@
 				editorTemplate = result;
 				
 				const varCount = variableDefinitions.length;
-				const message = varCount > 0 
+				const message = varCount > 0
 					? `Template updated with ${varCount} variable${varCount > 1 ? 's' : ''}!`
 					: 'Template updated successfully!';
-				toast.set({ message, duration: 2000 });
+				toast.set({ message, type: 'success', duration: 2000 });
 			} else {
-				toast.set({ message: 'Failed to update template', duration: 1500 });
+				toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
 			}
 		} catch (error) {
 			console.error('Error updating template:', error);
-			toast.set({ message: 'Failed to update template', duration: 1500 });
+			toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
 		} finally {
 			isSaving = false;
 		}
@@ -374,7 +374,7 @@
 
 	const createTemplate = async () => {
 		if (!templateName.trim()) {
-			toast.set({ message: 'Please enter a template name', duration: 1500 });
+			toast.set({ message: 'Please enter a template name', type: 'warning', duration: 1500 });
 			return;
 		}
 
@@ -419,10 +419,10 @@
 				editorTemplate = result;
 				
 				const varCount = variableDefinitions.length;
-				const message = varCount > 0 
+				const message = varCount > 0
 					? `Template created with ${varCount} variable${varCount > 1 ? 's' : ''}! You can now test the API.`
 					: 'Template created successfully!';
-				toast.set({ message, duration: 2500 });
+				toast.set({ message, type: 'success', duration: 2500 });
 				
 				// Redirect to the edit view for this template
 				// Use format-specific URL to ensure correct mode is preserved
@@ -430,11 +430,11 @@
 				const formatPath = currentFormat === 'pdf' ? 'pdf' : 'image';
 				goto(`/template-workspace/${formatPath}/${result.uid}`, { replaceState: true });
 			} else {
-				toast.set({ message: 'Failed to create template', duration: 1500 });
+				toast.set({ message: 'Failed to create template', type: 'error', duration: 1500 });
 			}
 		} catch (error) {
 			console.error('Error creating template:', error);
-			toast.set({ message: 'Failed to create template', duration: 1500 });
+			toast.set({ message: 'Failed to create template', type: 'error', duration: 1500 });
 		} finally {
 			isSaving = false;
 		}
@@ -459,7 +459,7 @@
 				}
 			} catch (e) {}
 
-			toast.set({ message: 'Create a free account to save templates and use the API.', duration: 2500 });
+			toast.set({ message: 'Create a free account to save templates and use the API.', type: 'default', duration: 2500 });
 			showAuthModal = true;
 			return;
 		}
@@ -742,13 +742,13 @@
 						fabricCanvas.fire('object:modified', { target: null });
 					}, 100);
 					
-					toast.set({ message: `Template loaded with ${variableCount} variable${variableCount !== 1 ? 's' : ''}. Customize and save!`, duration: 2500 });
+					toast.set({ message: `Template loaded with ${variableCount} variable${variableCount !== 1 ? 's' : ''}. Customize and save!`, type: 'success', duration: 2500 });
 				}).catch(err => {
 					console.error('Error loading draft template:', err);
 					if (typeof window !== 'undefined' && window.__historyBatchEnd) {
 						window.__historyBatchEnd();
 					}
-					toast.set({ message: 'Could not load template. Try adding elements manually.', duration: 2500 });
+					toast.set({ message: 'Could not load template. Try adding elements manually.', type: 'error', duration: 2500 });
 				});
 			} else {
 				fabricCanvas.renderAll();
@@ -778,10 +778,10 @@
 					fabricCanvas.sendToBack(img);
 					fabricCanvas.renderAll();
 
-					toast.set({ message: 'Imported your generated output as a background. Add variables on top →', duration: 2500 });
+					toast.set({ message: 'Imported your generated output as a background. Add variables on top →', type: 'success', duration: 2500 });
 				})
 				.catch(() => {
-					toast.set({ message: 'Could not import background image. You can add it from the Assets panel.', duration: 2500 });
+					toast.set({ message: 'Could not import background image. You can add it from the Assets panel.', type: 'error', duration: 2500 });
 				});
 		} else {
 			fabricCanvas.renderAll();
@@ -807,6 +807,7 @@
 
 		toast.set({
 			message: 'Welcome! You can now save your template.',
+			type: 'success',
 			duration: 2000
 		});
 

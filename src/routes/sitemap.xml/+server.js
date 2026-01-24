@@ -1,5 +1,15 @@
 import { getBlogLinks } from '../../api/blog';
-import { formats, popularSizes, ogPlatforms, useCases } from '$lib/pseo/config.js';
+import {
+	formats,
+	popularSizes,
+	ogPlatforms,
+	useCases,
+	templateCategories,
+	comparisons,
+	glossary,
+	integrations,
+	personas
+} from '$lib/pseo/config.js';
 
 export async function GET() {
 	const response = await getBlogLinks();
@@ -45,6 +55,56 @@ export async function GET() {
 			<lastmod>${today}</lastmod>
 			<changefreq>weekly</changefreq>
 			<priority>0.6</priority>
+		</url>
+	`);
+
+   // Template category pages
+   const templateCategoryUrls = templateCategories.map((cat) => `
+		<url>
+			<loc>https://pictify.io/templates/category/${cat.id}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>0.7</priority>
+		</url>
+	`);
+
+   // Comparison pages
+   const comparisonUrls = comparisons.map((comp) => `
+		<url>
+			<loc>https://pictify.io/compare/${comp.slug}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>monthly</changefreq>
+			<priority>0.6</priority>
+		</url>
+	`);
+
+   // Glossary term pages
+   const glossaryUrls = glossary.map((term) => `
+		<url>
+			<loc>https://pictify.io/glossary/${term.term}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>monthly</changefreq>
+			<priority>0.5</priority>
+		</url>
+	`);
+
+   // Integration pages
+   const integrationUrls = integrations.map((int) => `
+		<url>
+			<loc>https://pictify.io/integrations/${int.slug}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>0.7</priority>
+		</url>
+	`);
+
+   // Persona pages
+   const personaUrls = personas.map((p) => `
+		<url>
+			<loc>https://pictify.io/for/${p.slug}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>monthly</changefreq>
+			<priority>0.7</priority>
 		</url>
 	`);
 
@@ -120,13 +180,42 @@ export async function GET() {
          </url>
          <url>
             <loc>https://pictify.io/tools/linkedin-banner-generator</loc>
-            <lastmod>2026-01-24</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
+            <priority>0.8</priority>
+         </url>
+         <url>
+            <loc>https://pictify.io/templates</loc>
+            <lastmod>${today}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+         </url>
+         <url>
+            <loc>https://pictify.io/compare</loc>
+            <lastmod>${today}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.7</priority>
+         </url>
+         <url>
+            <loc>https://pictify.io/glossary</loc>
+            <lastmod>${today}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.7</priority>
+         </url>
+         <url>
+            <loc>https://pictify.io/integrations</loc>
+            <lastmod>${today}</lastmod>
+            <changefreq>weekly</changefreq>
             <priority>0.8</priority>
          </url>
 	   		${variantUrls.join('')}
 	   		${ogPlatformUrls.join('')}
 	   		${useCaseUrls.join('')}
+	   		${templateCategoryUrls.join('')}
+	   		${comparisonUrls.join('')}
+	   		${glossaryUrls.join('')}
+	   		${integrationUrls.join('')}
+	   		${personaUrls.join('')}
 	   		${urls.join('')}
     </urlset>
     `.trim(),

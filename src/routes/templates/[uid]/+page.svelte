@@ -47,7 +47,7 @@
       const response = await forkTemplate(uid);
       
       if (response.success && response.template) {
-        toast.set({ message: 'Template remixed! Opening editor...', duration: 2000 });
+        toast.set({ message: 'Template remixed! Opening editor...', type: 'success', duration: 2000 });
         
         // Navigate to the template editor
         setTimeout(() => {
@@ -56,7 +56,7 @@
       }
     } catch (e) {
       console.error('Failed to fork template:', e);
-      toast.set({ message: e.message || 'Failed to remix template', duration: 3000 });
+      toast.set({ message: e.message || 'Failed to remix template', type: 'error', duration: 3000 });
     } finally {
       forking = false;
     }
@@ -82,9 +82,9 @@
   async function copyToClipboard(text, message = 'Copied!') {
     try {
       await navigator.clipboard.writeText(text);
-      toast.set({ message, duration: 1500 });
+      toast.set({ message, type: 'success', duration: 1500 });
     } catch (e) {
-      toast.set({ message: 'Failed to copy', duration: 2000 });
+      toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
     }
   }
 

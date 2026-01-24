@@ -10,7 +10,7 @@
 		{
 			id: 'social',
 			title: 'Social Automation',
-			description: 'Auto-generate visuals for every blog post.',
+			description: 'Auto-post to Twitter, LinkedIn, and Instagram from one template.',
 			color: 'bg-[#ffc480]',
 			icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>`,
 			template: {
@@ -25,7 +25,7 @@
 					author: { name: 'Sarah J.', img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' }
 				},
 				{ 
-					title: 'React vs Vue in 2024', 
+					title: 'React vs Vue in 2026', 
 					tag: 'Dev', 
 					readTime: '8 MIN',
 					author: { name: 'Mike R.', img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' }
@@ -75,7 +75,7 @@
 		{
 			id: 'email',
 			title: 'Email Marketing',
-			description: 'Hyper-personalized headers for every subscriber.',
+			description: 'Name, status, and rewards in every email header.',
 			color: 'bg-[#4ade80]',
 			icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2z" /></svg>`,
 			template: {
@@ -119,7 +119,7 @@
 		<!-- Header -->
 		<div class="text-center mb-20">
 			<div class="inline-flex items-center gap-2 px-4 py-2 bg-[#4ade80] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform -rotate-1">
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Infinite Possibilities</span>
+				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Any Data → Any Image</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template. <br />
@@ -131,7 +131,7 @@
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				Design once. Let your data drive the rest. Create personalized experiences at a scale that was previously impossible.
+				Design once. Let your data drive the rest. Create personalized visuals at the scale of Netflix or Amazon.
 			</p>
 		</div>
 

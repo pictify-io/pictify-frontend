@@ -240,7 +240,7 @@
 	// Test functions for each endpoint
 	async function testEndpoint(endpointId) {
 		if (!apiToken) {
-			toast.set({ message: 'API token is required', duration: 1500 });
+			toast.set({ message: 'API token is required', type: 'error', duration: 1500 });
 			return;
 		}
 
@@ -349,12 +349,12 @@
 
 			response = data;
 			responseJson = JSON.stringify(data, null, 2);
-			toast.set({ message: 'Request successful!', duration: 1500 });
+			toast.set({ message: 'Request successful!', type: 'success', duration: 1500 });
 		} catch (error) {
 			console.error('Error:', error);
 			response = error.response?.data || { error: error.message };
 			responseJson = JSON.stringify(response, null, 2);
-			toast.set({ message: error.response?.data?.error || error.message || 'Request failed', duration: 1500 });
+			toast.set({ message: error.response?.data?.error || error.message || 'Request failed', type: 'error', duration: 1500 });
 		} finally {
 			loading = false;
 		}
@@ -363,9 +363,9 @@
 	function copyToClipboard(text) {
 		if (browser && navigator.clipboard) {
 			navigator.clipboard.writeText(text);
-			toast.set({ message: 'Copied to clipboard!', duration: 1500 });
+			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
 		} else {
-			toast.set({ message: 'Clipboard not available', duration: 1500 });
+			toast.set({ message: 'Clipboard not available', type: 'error', duration: 1500 });
 		}
 	}
 

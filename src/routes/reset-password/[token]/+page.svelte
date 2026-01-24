@@ -7,6 +7,7 @@
 	import { resetPassword } from '../../../api/user';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { analytics } from '$lib/analytics.js';
 
 	let token = '';
 	let password = '';
@@ -24,16 +25,20 @@
 
 	async function handleSubmit() {
 		if (password !== confirmPassword) {
-			toast.set({ message: 'Passwords do not match', duration: 1500 });
+			toast.set({ message: 'Passwords do not match', type: 'error', duration: 1500 });
 			return;
 		}
 		isLoading = true;
 		try {
 			await resetPassword({ token, password });
-			toast.set({ message: 'Password reset successfully', duration: 1500 });
+			toast.set({ message: 'Password reset successfully', type: 'success', duration: 1500 });
+			// Track successful password reset
+			analytics.trackPasswordReset({ step: 'completed', success: true });
 			goto('/login');
 		} catch (e) {
-			toast.set({ message: e.response.data.message, duration: 1500 });
+			toast.set({ message: e.response.data.message, type: 'error', duration: 1500 });
+			// Track failed password reset
+			analytics.trackPasswordReset({ step: 'completed', success: false });
 		}
 		isLoading = false;
 	}
