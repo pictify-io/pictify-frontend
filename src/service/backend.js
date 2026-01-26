@@ -144,6 +144,40 @@ const backend = {
 		return response.json();
 	},
 
+	patch: async (url, data, options = {}) => {
+		const apiUrl = new URL(`${PUBLIC_BACKEND_URL}${url}`);
+
+		if (options.params) {
+			Object.keys(options.params).forEach((key) =>
+				apiUrl.searchParams.append(key, options.params[key])
+			);
+		}
+
+		const response = await fetch(apiUrl, {
+			...options,
+			credentials: isCredentialsSupported ? 'include' : undefined,
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				...options.headers
+			},
+			body: JSON.stringify(data)
+		});
+		if (!response.ok) {
+			let message = response.statusText;
+			try {
+				const data = await response.json();
+				if (data && data.message) {
+					message = data.message;
+				}
+			} catch (e) {
+				// ignore
+			}
+			throw new HttpError(response.status, message);
+		}
+		return response.json();
+	},
+
 	// Upload FormData (for file uploads)
 	postFormData: async (url, formData, options = {}) => {
 		const apiUrl = new URL(`${PUBLIC_BACKEND_URL}${url}`);

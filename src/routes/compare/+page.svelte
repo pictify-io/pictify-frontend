@@ -81,9 +81,9 @@ const canonical = 'https://pictify.io/compare';
 							<!-- VS Header -->
 							<div class="flex items-center justify-between mb-8">
 								<!-- Pictify Icon -->
-								<div class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#1f2937]">
+								<div class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#ffc480]">
 									<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
 									</svg>
 								</div>
 

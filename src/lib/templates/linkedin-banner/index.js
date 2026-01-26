@@ -1,6 +1,10 @@
 // LinkedIn Banner Templates Registry
 // All templates are 1584 x 396 pixels
 
+// Variable types for template customization
+// Each variable has: id (matches element id), label (display name), type (text/badge/stat), default value
+// Variables are rendered as input fields in the editor
+
 // Developer Templates
 export const developerTemplates = [
   {
@@ -8,6 +12,11 @@ export const developerTemplates = [
     category: 'developer',
     name: 'Dark Terminal',
     popular: true,
+    variables: [
+      { id: 'template-badge', label: 'Badge', type: 'text', default: 'Open to Work' },
+      { id: 'template-heading', label: 'Name', type: 'text', default: 'Your Name' },
+      { id: 'template-subheading', label: 'Title', type: 'text', default: 'Full Stack Developer • React • Node.js' }
+    ],
     html: `<html>
 <head>
   <style>
@@ -15,6 +24,7 @@ export const developerTemplates = [
       --primary-color: #0d1117;
       --secondary-color: #58a6ff;
       --tertiary-color: #8b949e;
+      --accent-glow: rgba(88, 166, 255, 0.15);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -24,7 +34,8 @@ export const developerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 48px;
+      /* Left padding increased to 280px to clear profile picture safe zone */
+      padding: 0 60px 0 600px;
       position: relative;
       overflow: hidden;
     }
@@ -32,72 +43,116 @@ export const developerTemplates = [
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(88, 166, 255, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: linear-gradient(to bottom, black, transparent);
     }
-    .content { position: relative; z-index: 1; }
-    .terminal-header {
+    .glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: var(--accent-glow);
+      border-radius: 50%;
+      filter: blur(80px);
+      top: -100px;
+      right: -100px;
+      opacity: 0.6;
+    }
+    .window-chrome {
+      position: absolute;
+      top: 50%;
+      right: -80px;
+      transform: translateY(-50%);
+      width: 480px;
+      background: rgba(22, 27, 34, 0.6);
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      padding: 20px;
+      z-index: 1; /* Moved behind main content */
+      backdrop-filter: blur(4px);
+    }
+    .chrome-header {
       display: flex;
       gap: 8px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #30363d;
     }
-    .dot { width: 14px; height: 14px; border-radius: 50%; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
     .red { background: #ff5f56; }
     .yellow { background: #ffbd2e; }
     .green { background: #27ca40; }
+
+    .main-content {
+      position: relative;
+      z-index: 10;
+      max-width: 500px; /* Limit text width to avoid crowd */
+      text-shadow: 0 2px 10px rgba(13, 17, 23, 0.8); /* readable text */
+    }
     h1 {
-      font-size: 64px;
-      font-weight: 700;
+      font-size: 56px;
+      font-weight: 800;
       color: #f0f6fc;
-      margin-bottom: 16px;
-      letter-spacing: -1px;
+      margin-bottom: 12px;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     h1 span { color: var(--secondary-color); }
     p {
-      font-size: 24px;
+      font-size: 20px;
       color: var(--tertiary-color);
-      font-weight: 400;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .cursor {
+    .badge {
       display: inline-block;
-      width: 3px;
-      height: 28px;
-      background: var(--secondary-color);
-      margin-left: 4px;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink { 50% { opacity: 0; } }
-    .code-lines {
-      position: absolute;
-      right: 60px;
-      top: 50%;
-      transform: translateY(-50%);
-      opacity: 0.3;
-    }
-    .code-line {
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(56, 139, 253, 0.15);
+      color: var(--secondary-color);
       font-size: 14px;
-      color: #8b949e;
-      margin: 4px 0;
+      font-weight: 600;
+      border: 1px solid rgba(56, 139, 253, 0.4);
     }
+    .code-block {
+      font-size: 14px;
+      line-height: 1.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .k { color: #ff7b72; } /* Keyword */
+    .f { color: #d2a8ff; } /* Function */
+    .s { color: #a5d6ff; } /* String */
+    .c { color: #8b949e; } /* Comment */
   </style>
 </head>
 <body>
   <div class="grid-bg"></div>
-  <div class="content">
-    <div class="terminal-header">
+  <div class="glow"></div>
+
+  <div class="main-content">
+    <div class="badge" id="template-badge">Open to Work</div>
+    <h1 id="template-heading"><span>&lt;/&gt;</span> Your Name</h1>
+    <p id="template-subheading">Full Stack Developer • React • Node.js</p>
+  </div>
+
+  <div class="window-chrome">
+    <div class="chrome-header">
       <div class="dot red"></div>
       <div class="dot yellow"></div>
       <div class="dot green"></div>
     </div>
-    <h1 id="template-heading"><span>&gt;</span> Your Name</h1>
-    <p id="template-subheading">Full Stack Developer | React | Node.js | TypeScript<span class="cursor"></span></p>
-  </div>
-  <div class="code-lines">
-    <div class="code-line">const developer = {</div>
-    <div class="code-line">&nbsp;&nbsp;skills: ['React', 'Node'],</div>
-    <div class="code-line">&nbsp;&nbsp;passion: 'building'</div>
-    <div class="code-line">};</div>
+    <div class="code-block">
+      <span class="k">const</span> <span class="f">profile</span> = {<br>
+      &nbsp;&nbsp;<span class="k">current</span>: <span class="s">'Building next-gen tools'</span>,<br>
+      &nbsp;&nbsp;<span class="k">stack</span>: [<span class="s">'TypeScript'</span>, <span class="s">'Rust'</span>, <span class="s">'Go'</span>],<br>
+      &nbsp;&nbsp;<span class="k">status</span>: <span class="s">'Ship it 🚀'</span><br>
+      };
+    </div>
   </div>
 </body>
 </html>`
@@ -107,6 +162,10 @@ export const developerTemplates = [
     category: 'developer',
     name: 'Gradient Tech',
     popular: false,
+    variables: [
+      { id: 'template-heading', label: 'Name', type: 'text', default: 'Your Name' },
+      { id: 'template-subheading', label: 'Title', type: 'text', default: 'Software Engineer | Building the Future' }
+    ],
     html: `<html>
 <head>
   <style>
@@ -123,7 +182,7 @@ export const developerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 48px;
+      padding: 48px 60px 48px 600px;
       position: relative;
     }
     .shapes {
@@ -188,18 +247,12 @@ export const developerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 300px 48px 48px;
+      /* Shifted right for safe zone */
+      padding: 0 60px 0 600px;
       position: relative;
+      border-top: 8px solid #3b82f6;
     }
-    .accent-line {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 8px;
-      background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
-    }
-    .content { padding-left: 40px; }
+    .content { width: 100%; }
     h1 {
       font-size: 72px;
       font-weight: 800;
@@ -214,29 +267,147 @@ export const developerTemplates = [
     }
     .tech-stack {
       display: flex;
-      gap: 16px;
-      margin-top: 24px;
+      gap: 12px;
+      margin-top: 32px;
     }
     .tech-badge {
-      padding: 8px 16px;
-      background: #f4f4f5;
+      padding: 10px 18px;
+      background: #fff;
+      border: 1px solid #e4e4e7;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       color: #3f3f46;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; }
+    .dot-act { background: #3b82f6; }
   </style>
 </head>
 <body>
-  <div class="accent-line"></div>
   <div class="content">
     <h1 id="template-heading">Your Name</h1>
     <p id="template-subheading">Senior Software Engineer</p>
     <div class="tech-stack">
-      <span class="tech-badge">React</span>
-      <span class="tech-badge">TypeScript</span>
-      <span class="tech-badge">Node.js</span>
-      <span class="tech-badge">AWS</span>
+      <span class="tech-badge"><span class="dot dot-act"></span> React</span>
+      <span class="tech-badge"><span class="dot dot-act"></span> TypeScript</span>
+      <span class="tech-badge"><span class="dot"></span> Node.js</span>
+      <span class="tech-badge"><span class="dot"></span> AWS</span>
+    </div>
+  </div>
+</body>
+</html>`
+  },
+  {
+    id: 'dev-blueprint',
+    category: 'developer',
+    name: 'Code Architect',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #0f172a;
+      --secondary-color: #38bdf8;
+      --tertiary-color: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px; /* Safe Zone */
+      position: relative;
+      overflow: hidden;
+    }
+    /* Blueprint Grid */
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    /* Technical Markings */
+    .ruler-top {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 20px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+    .mark { width: 1px; height: 100%; background: rgba(56, 189, 248, 0.3); }
+
+    .content { position: relative; z-index: 10; }
+    
+    .frame {
+      border: 2px dashed rgba(56, 189, 248, 0.4);
+      padding: 40px;
+      position: relative;
+    }
+    .frame::before {
+      content: ''; position: absolute; top: -2px; left: -2px; width: 20px; height: 20px;
+      border-top: 2px solid #38bdf8; border-left: 2px solid #38bdf8;
+    }
+    .frame::after {
+      content: ''; position: absolute; bottom: -2px; right: -2px; width: 20px; height: 20px;
+      border-bottom: 2px solid #38bdf8; border-right: 2px solid #38bdf8;
+    }
+
+    h1 {
+      font-size: 64px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+    }
+    h1 span { color: var(--secondary-color); }
+    
+    p {
+      font-size: 24px;
+      color: var(--secondary-color);
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+    
+    .specs {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 16px 40px;
+      font-size: 14px;
+      color: var(--tertiary-color);
+    }
+    .spec-item { display: flex; gap: 8px; }
+    .spec-label { color: #38bdf8; opacity: 0.7; }
+
+  </style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="ruler-top">
+    <div class="mark"></div><div class="mark"></div><div class="mark"></div><div class="mark"></div>
+  </div>
+  
+  <div class="content">
+    <div class="frame">
+      <h1 id="template-heading">Your <span>Name</span></h1>
+      <p id="template-subheading">System Architect_ v2.0</p>
+      
+      <div class="specs">
+        <div class="spec-item"><span class="spec-label">STACK:</span> <span id="template-stack">React / Node / AWS</span></div>
+        <div class="spec-item"><span class="spec-label">STATUS:</span> <span id="template-status">Deploying...</span></div>
+        <div class="spec-item"><span class="spec-label">ROLE:</span> <span id="template-role">Tech Lead</span></div>
+        <div class="spec-item"><span class="spec-label">EXP:</span> <span id="template-experience">10+ Years</span></div>
+      </div>
     </div>
   </div>
 </body>
@@ -255,75 +426,109 @@ export const designerTemplates = [
 <head>
   <style>
     :root {
-      --primary-color: #fef3c7;
-      --secondary-color: #1f2937;
-      --tertiary-color: #6b7280;
+      --primary-color: #ffffff;
+      --secondary-color: #000000;
+      --tertiary-color: #4b5563;
+      --accent-color: #ff3e3e;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Helvetica Neue', 'Arial', sans-serif;
       background: var(--primary-color);
       width: 1584px;
       height: 396px;
+      position: relative;
+      overflow: hidden;
+    }
+    .grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 568px 1fr 1fr;
+      grid-template-rows: 1fr;
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+    }
+    .col {
+      border-right: 1px solid #e5e5e5;
+      height: 100%;
+      position: relative;
+    }
+    .col-1 { background: #f9f9f9; } /* Safe zone areaish */
+    .col-2 {
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .col-3 {
+      background: #000;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 200px;
       position: relative;
-      text-align: center;
+      overflow: hidden;
     }
-    .shapes {
-      position: absolute;
-      right: 100px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 20px;
-    }
-    .circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-    }
-    .circle-1 { background: #f472b6; }
-    .circle-2 { background: #60a5fa; transform: translateY(40px); }
-    .circle-3 { background: #34d399; transform: translateY(-20px); }
+
     h1 {
-      font-size: 80px;
-      font-weight: 900;
+      font-size: 64px;
+      font-weight: 800;
       color: var(--secondary-color);
-      margin-bottom: 12px;
-      letter-spacing: -3px;
-      line-height: 1;
+      margin-bottom: 0px;
+      letter-spacing: -2px;
+      line-height: 0.9;
+      text-transform: uppercase;
     }
     p {
-      font-size: 28px;
+      font-size: 20px;
       color: var(--tertiary-color);
       font-weight: 500;
-    }
-    .tag {
+      margin-top: 24px;
+      border-top: 4px solid var(--accent-color);
+      padding-top: 20px;
       display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: var(--secondary-color);
-      color: var(--primary-color);
+      max-width: 300px;
+    }
+
+    .big-glyph {
+      font-size: 400px;
+      font-weight: 900;
+      opacity: 0.15;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .vertical-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
       font-size: 14px;
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 4px;
       text-transform: uppercase;
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      color: rgba(255,255,255,0.5);
     }
   </style>
 </head>
 <body>
-  <div class="content">
-    <h1 id="template-heading">Your Name</h1>
-    <p id="template-subheading">Product Designer | Creating Digital Experiences</p>
-    <div class="tag">Available for Work</div>
-  </div>
-  <div class="shapes">
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
+  <div class="grid">
+    <div class="col col-1">
+      <!-- Left column reserved for profile picture visual balance -->
+    </div>
+    <div class="col col-2">
+      <h1 id="template-heading">Your Name</h1>
+      <p id="template-subheading">Senior Product Designer &amp; Art Director</p>
+    </div>
+    <div class="col col-3">
+      <div class="big-glyph">Aa</div>
+      <div class="vertical-text" id="template-tagline">Portfolio 2026</div>
+    </div>
   </div>
 </body>
 </html>`
@@ -338,7 +543,7 @@ export const designerTemplates = [
   <style>
     :root {
       --primary-color: #ffffff;
-      --secondary-color: #0a0a0a;
+      --secondary-color: #000000;
       --tertiary-color: #525252;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -349,37 +554,63 @@ export const designerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      text-align: center;
+      /* Padding left 300px to strictly avoid safe zone */
+      padding: 0 60px 0 600px;
       position: relative;
     }
-    .border-frame {
+    .accent-bar {
       position: absolute;
-      inset: 24px;
-      border: 2px solid #e5e5e5;
+      top: 60px;
+      right: 60px;
+      width: 120px;
+      height: 8px;
+      background: #000;
     }
     h1 {
-      font-size: 72px;
+      font-size: 82px;
       font-weight: 300;
       color: var(--secondary-color);
-      margin-bottom: 16px;
-      letter-spacing: 8px;
-      text-transform: uppercase;
+      margin-bottom: 20px;
+      letter-spacing: -3px;
+    }
+    h1 span { font-weight: 700; }
+
+    .meta-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
     }
     p {
-      font-size: 18px;
+      font-size: 22px;
       color: var(--tertiary-color);
-      font-weight: 400;
-      letter-spacing: 4px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
+    }
+    .separator {
+      width: 40px;
+      height: 1px;
+      background: #e5e5e5;
+    }
+    .status {
+      font-size: 14px;
+      font-weight: 600;
+      color: #16a34a;
+      background: #dcfce7;
+      padding: 6px 12px;
+      border-radius: 100px;
     }
   </style>
 </head>
 <body>
-  <div class="border-frame"></div>
+  <div class="accent-bar"></div>
   <div class="content">
-    <h1 id="template-heading">Your Name</h1>
-    <p id="template-subheading">UI/UX Designer</p>
+    <h1 id="template-heading">Your <span>Name</span></h1>
+    <div class="meta-group">
+      <p id="template-subheading">UI/UX Designer</p>
+      <div class="separator"></div>
+      <div class="status" id="template-status">Available</div>
+    </div>
   </div>
 </body>
 </html>`
@@ -405,7 +636,7 @@ export const designerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -444,6 +675,123 @@ export const designerTemplates = [
   </div>
 </body>
 </html>`
+  },
+  {
+    id: 'designer-bauhaus',
+    category: 'designer',
+    name: 'Bauhaus Studio',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #f0f0f0;
+      --secondary-color: #111;
+      --tertiary-color: #444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Bauhaus Geometry */
+    .shape-container {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 600px;
+      overflow: hidden;
+    }
+    .circle-red {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: #ef4444;
+      border-radius: 50%;
+      top: -100px;
+      right: -50px;
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+    }
+    .rect-blue {
+      position: absolute;
+      width: 200px;
+      height: 500px;
+      background: #3b82f6;
+      top: -50px;
+      right: 300px;
+      transform: rotate(15deg);
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+    }
+    .tri-yellow {
+      position: absolute;
+      width: 0; height: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-bottom: 300px solid #eab308;
+      bottom: -100px;
+      right: 150px;
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+    }
+
+    .content { position: relative; z-index: 10; }
+    h1 {
+      font-size: 80px;
+      font-weight: 900;
+      color: var(--secondary-color);
+      margin-bottom: 0;
+      letter-spacing: -3px;
+      line-height: 0.9;
+    }
+    .line {
+      width: 100px;
+      height: 8px;
+      background: #000;
+      margin: 24px 0;
+    }
+    p {
+      font-size: 28px;
+      color: var(--secondary-color);
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    .pill {
+      display: inline-block;
+      margin-top: 16px;
+      background: #000;
+      color: #fff;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="shape-container">
+    <div class="rect-blue"></div>
+    <div class="circle-red"></div>
+    <div class="tri-yellow"></div>
+  </div>
+  
+  <div class="content">
+    <h1 id="template-heading">Your Name</h1>
+    <div class="line"></div>
+    <p id="template-subheading">Multidisciplinary Designer</p>
+    <div class="pill" id="template-tagline">Portfolio 2026</div>
+  </div>
+</body>
+</html>`
   }
 ];
 
@@ -458,83 +806,122 @@ export const marketerTemplates = [
 <head>
   <style>
     :root {
-      --primary-color: #0f172a;
-      --secondary-color: #f8fafc;
-      --tertiary-color: #94a3b8;
+      --primary-color: #f8fafc;
+      --secondary-color: #0f172a;
+      --tertiary-color: #64748b;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: var(--primary-color);
       width: 1584px;
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
-      justify-content: center;
-      text-align: center;
+      /* Padding left 280px to avoid profile picture */
+      padding: 0 60px 0 600px;
+      position: relative;
+      overflow: hidden;
+    }
+    .glass-shape {
+      position: absolute;
+      background: linear-gradient(120deg, rgba(255,255,255,0.8), rgba(255,255,255,0.1));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+      z-index: 0;
+    }
+    /* Abstract decorative shapes */
+    .shape-1 { width: 300px; height: 300px; top: -50px; right: 100px; background: #e0f2fe; border-radius: 50%; border: none; filter: blur(40px); opacity: 0.6; }
+    .shape-2 { width: 250px; height: 250px; bottom: -50px; right: 350px; background: #f0fdf4; border-radius: 50%; border: none; filter: blur(50px); opacity: 0.7; }
+
+    .card {
+      position: absolute;
+      right: 100px;
+      bottom: 50px;
+      width: 280px;
+      padding: 24px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      z-index: 2;
+    }
+    .chart-line {
+      height: 4px;
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin-top: 16px;
       position: relative;
     }
-    .chart {
+    .chart-fill {
       position: absolute;
-      right: 80px;
-      bottom: 0;
-      display: flex;
-      align-items: flex-end;
-      gap: 16px;
-      height: 280px;
+      left: 0; top: 0; bottom: 0;
+      width: 75%;
+      background: #10b981;
+      border-radius: 2px;
     }
-    .bar {
-      width: 40px;
-      background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-      border-radius: 8px 8px 0 0;
-    }
-    .bar-1 { height: 40%; }
-    .bar-2 { height: 55%; }
-    .bar-3 { height: 70%; }
-    .bar-4 { height: 60%; }
-    .bar-5 { height: 85%; }
-    .bar-6 { height: 100%; }
+
     h1 {
-      font-size: 68px;
+      font-size: 64px;
       font-weight: 800;
       color: var(--secondary-color);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       letter-spacing: -2px;
+      position: relative;
+      z-index: 2;
     }
     p {
-      font-size: 26px;
+      font-size: 24px;
       color: var(--tertiary-color);
       font-weight: 500;
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
     }
-    .metric {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 24px;
-      padding: 12px 20px;
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: 8px;
-      color: #22c55e;
-      font-size: 16px;
-      font-weight: 600;
+    .stat-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 32px;
+      position: relative;
+      z-index: 2;
     }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-val { font-size: 24px; font-weight: 800; color: #0f172a; }
+    .stat-lbl { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
   </style>
 </head>
 <body>
+  <div class="shape-1"></div>
+  <div class="shape-2"></div>
+
   <div class="content">
     <h1 id="template-heading">Your Name</h1>
-    <p id="template-subheading">Growth Marketing | Driving 10x Revenue</p>
-    <div class="metric">+127% YoY Growth</div>
+    <p id="template-subheading">Growth Marketing Lead at TechCo | Scaling revenue from $1M to $10M+</p>
+
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-val" id="template-stat1">10k+</span>
+        <span class="stat-lbl" id="template-stat1-label">Community</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val" id="template-stat2">150%</span>
+        <span class="stat-lbl" id="template-stat2-label">YoY Growth</span>
+      </div>
+    </div>
   </div>
-  <div class="chart">
-    <div class="bar bar-1"></div>
-    <div class="bar bar-2"></div>
-    <div class="bar bar-3"></div>
-    <div class="bar bar-4"></div>
-    <div class="bar bar-5"></div>
-    <div class="bar bar-6"></div>
+
+  <div class="card">
+    <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">Revenue Growth</div>
+    <div style="font-size: 14px; color: #10b981; font-weight: 600;">+24.5% <span style="color: #64748b; font-weight: 400;">this month</span></div>
+    <div class="chart-line">
+      <div class="chart-fill"></div>
+    </div>
   </div>
 </body>
 </html>`
@@ -561,7 +948,7 @@ export const marketerTemplates = [
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       position: relative;
       text-align: center;
     }
@@ -650,7 +1037,7 @@ export const marketerTemplates = [
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       position: relative;
       text-align: center;
     }
@@ -704,17 +1091,141 @@ export const marketerTemplates = [
     <p id="template-subheading">Performance Marketing | Analytics & Optimization</p>
     <div class="stats">
       <div class="stat">
-        <div class="stat-value">$12M+</div>
-        <div class="stat-label">Ad Spend Managed</div>
+        <div class="stat-value" id="template-stat1">$12M+</div>
+        <div class="stat-label" id="template-stat1-label">Ad Spend Managed</div>
       </div>
       <div class="stat">
-        <div class="stat-value">3.2x</div>
-        <div class="stat-label">Avg ROAS</div>
+        <div class="stat-value" id="template-stat2">3.2x</div>
+        <div class="stat-label" id="template-stat2-label">Avg ROAS</div>
       </div>
       <div class="stat">
-        <div class="stat-value">50+</div>
-        <div class="stat-label">Campaigns</div>
+        <div class="stat-value" id="template-stat3">50+</div>
+        <div class="stat-label" id="template-stat3-label">Campaigns</div>
       </div>
+    </div>
+  </div>
+</body>
+</html>`
+  },
+  {
+    id: 'marketer-analytics',
+    category: 'marketer',
+    name: 'Social Analytics',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #f8fafc;
+      --secondary-color: #0f172a;
+      --tertiary-color: #64748b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Background Elements */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.6;
+    }
+    .blob-1 { width: 400px; height: 400px; background: #60a5fa; top: -100px; right: -50px; }
+    .blob-2 { width: 300px; height: 300px; background: #a78bfa; bottom: -50px; right: 400px; }
+
+    /* Grid of Cards */
+    .card-grid {
+      position: absolute;
+      right: 60px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      grid-template-columns: 140px 140px;
+      gap: 16px;
+      opacity: 0.9;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .card.highlight { background: rgba(255, 255, 255, 0.9); transform: scale(1.05); z-index: 2; box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15); }
+    
+    .c-val { font-size: 24px; font-weight: 700; color: #0f172a; }
+    .c-lbl { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-top: 4px; }
+    .c-icon { margin-bottom: 8px; font-size: 20px; }
+
+    .content { position: relative; z-index: 10; max-width: 500px; }
+    h1 {
+      font-size: 60px;
+      font-weight: 800;
+      color: var(--secondary-color);
+      margin-bottom: 16px;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+    }
+    p {
+      font-size: 22px;
+      color: var(--tertiary-color);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #eff6ff;
+      color: #2563eb;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  
+  <div class="content">
+    <div class="tag" id="template-badge">🚀 Growth Specialist</div>
+    <h1 id="template-heading">Your Name</h1>
+    <p id="template-subheading">Driving Revenue through Data-Driven Social Strategies</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="c-val" id="template-stat1">2.5M</div>
+      <div class="c-lbl" id="template-stat1-label">Reach</div>
+    </div>
+    <div class="card highlight">
+      <div class="c-val" id="template-stat2">+40%</div>
+      <div class="c-lbl" id="template-stat2-label">Conversion</div>
+    </div>
+    <div class="card">
+      <div class="c-val" id="template-stat3">85k</div>
+      <div class="c-lbl" id="template-stat3-label">Leads</div>
+    </div>
+    <div class="card">
+      <div class="c-val" id="template-stat4">5.0</div>
+      <div class="c-lbl" id="template-stat4-label">ROAS</div>
     </div>
   </div>
 </body>
@@ -735,7 +1246,7 @@ export const recruiterTemplates = [
     :root {
       --primary-color: #0ea5e9;
       --secondary-color: #ffffff;
-      --tertiary-color: rgba(255,255,255,0.85);
+      --tertiary-color: rgba(255,255,255,0.9);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -745,28 +1256,41 @@ export const recruiterTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
-      justify-content: center;
-      text-align: center;
+      /* Shift content right */
+      padding: 0 60px 0 600px;
       position: relative;
     }
-    .pattern {
+    .bg-pattern {
       position: absolute;
-      inset: 0;
-      opacity: 0.1;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      right: -100px;
+      top: -100px;
+      width: 600px;
+      height: 600px;
+      border: 80px solid rgba(255,255,255,0.05);
+      border-radius: 50%;
     }
-    .content { position: relative; z-index: 1; }
+    .bg-pattern-2 {
+      position: absolute;
+      right: 100px;
+      top: 50px;
+      width: 400px;
+      height: 400px;
+      border: 40px solid rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+
+    .badge-container { margin-bottom: 24px; }
     .badge {
       display: inline-block;
-      padding: 8px 16px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 700;
-      color: white;
-      letter-spacing: 1px;
-      margin-bottom: 16px;
+      padding: 10px 24px;
+      background: #ffffff;
+      border-radius: 100px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #0284c7;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: rotate(-2deg);
     }
     h1 {
       font-size: 72px;
@@ -774,20 +1298,38 @@ export const recruiterTemplates = [
       color: var(--secondary-color);
       margin-bottom: 16px;
       letter-spacing: -2px;
+      line-height: 1;
     }
     p {
       font-size: 26px;
       color: var(--tertiary-color);
       font-weight: 500;
     }
+    .contact-info {
+      margin-top: 32px;
+      display: flex;
+      gap: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+    }
+    .contact-item { display: flex; align-items: center; gap: 8px; }
+    .icon { width: 16px; height: 16px; background: currentColor; border-radius: 50%; opacity: 0.5; }
   </style>
 </head>
 <body>
-  <div class="pattern"></div>
+  <div class="bg-pattern"></div>
+  <div class="bg-pattern-2"></div>
   <div class="content">
-    <div class="badge">WE'RE HIRING</div>
+    <div class="badge-container">
+      <div class="badge" id="template-badge">WE'RE HIRING!</div>
+    </div>
     <h1 id="template-heading">Your Name</h1>
-    <p id="template-subheading">Senior Tech Recruiter | Building Amazing Teams</p>
+    <p id="template-subheading">Senior Tech Recruiter | Building Teams at HighGrowth</p>
+    <div class="contact-info">
+      <div class="contact-item"><div class="icon"></div> DM me for roles</div>
+      <div class="contact-item"><div class="icon"></div> hiring@company.com</div>
+    </div>
   </div>
 </body>
 </html>`
@@ -813,7 +1355,7 @@ export const recruiterTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -895,7 +1437,7 @@ export const recruiterTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -939,7 +1481,121 @@ export const recruiterTemplates = [
   <div class="content">
     <h1 id="template-heading">Your Name</h1>
     <p id="template-subheading">Connecting Great Talent with Amazing Opportunities</p>
-    <div class="cta">Let's Connect</div>
+    <div class="cta" id="template-cta">Let's Connect</div>
+  </div>
+</body>
+</html>`
+  },
+  {
+    id: 'recruiter-global',
+    category: 'recruiter',
+    name: 'Global Talent',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #0b1120;
+      --secondary-color: #f8fafc;
+      --tertiary-color: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Map Background */
+    .map-dots {
+      position: absolute;
+      right: -100px;
+      top: -50px;
+      width: 900px;
+      height: 600px;
+      background-image: radial-gradient(#334155 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      opacity: 0.5;
+      transform: perspective(1000px) rotateY(-15deg);
+    }
+    /* Connecting lines */
+    .connection-line {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+      height: 2px;
+      opacity: 0.4;
+    }
+    .cl-1 { width: 300px; top: 100px; right: 200px; transform: rotate(15deg); }
+    .cl-2 { width: 400px; bottom: 120px; right: 100px; transform: rotate(-10deg); }
+    
+    .node {
+      position: absolute;
+      width: 8px; height: 8px; background: #38bdf8; border-radius: 50%;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+    .n-1 { top: 120px; right: 400px; }
+    .n-2 { bottom: 150px; right: 200px; }
+    
+    .content { position: relative; z-index: 10; }
+    h1 {
+      font-size: 64px;
+      font-weight: 700;
+      background: linear-gradient(to right, #f8fafc, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      letter-spacing: -1.5px;
+    }
+    p {
+      font-size: 24px;
+      color: var(--tertiary-color);
+      font-weight: 400;
+      margin-bottom: 32px;
+    }
+    .hiring-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 20px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      color: #38bdf8;
+      font-weight: 600;
+      gap: 10px;
+      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    .pulse {
+      width: 8px; height: 8px; background: #38bdf8; border-radius: 50%;
+      box-shadow: 0 0 0 rgba(56, 189, 248, 0.7);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="map-dots"></div>
+  <div class="connection-line cl-1"></div>
+  <div class="connection-line cl-2"></div>
+  <div class="node n-1"></div>
+  <div class="node n-2"></div>
+
+  <div class="content">
+    <h1 id="template-heading">Your Name</h1>
+    <p id="template-subheading">Connecting Talent Across Borders</p>
+    <div class="hiring-badge">
+      <div class="pulse"></div> <span id="template-hiring">Now Hiring: Engineering & Product</span>
+    </div>
   </div>
 </body>
 </html>`
@@ -969,7 +1625,7 @@ export const freelancerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1024,7 +1680,7 @@ export const freelancerTemplates = [
 <body>
   <div class="gradient-line"></div>
   <div class="content">
-    <div class="availability"><span class="dot"></span>Available for Projects</div>
+    <div class="availability" id="template-availability"><span class="dot"></span>Available for Projects</div>
     <h1 id="template-heading">Your Name</h1>
     <p id="template-subheading">Freelance Developer | React, Node, TypeScript</p>
   </div>
@@ -1052,7 +1708,7 @@ export const freelancerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1127,7 +1783,7 @@ export const freelancerTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1171,7 +1827,103 @@ export const freelancerTemplates = [
   <div class="content">
     <h1 id="template-heading">Your Name</h1>
     <p id="template-subheading">Freelance Consultant | Strategy & Growth</p>
-    <div class="contact">hello@yourwebsite.com</div>
+    <div class="contact" id="template-contact">hello@yourwebsite.com</div>
+  </div>
+</body>
+</html>`
+  },
+  {
+    id: 'freelancer-workspace',
+    category: 'freelancer',
+    name: 'Creative Studio',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #fafaf9;
+      --secondary-color: #1c1917;
+      --tertiary-color: #57534e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Abstract 3D Shapes */
+    .shape {
+      position: absolute;
+      border-radius: 40px;
+      transform: rotate(-15deg);
+      box-shadow: 20px 20px 60px rgba(0,0,0,0.05), -20px -20px 60px rgba(255,255,255,0.8);
+    }
+    .s-1 {
+      width: 300px; height: 300px;
+      background: linear-gradient(135deg, #f5f5f4, #e7e5e4);
+      right: 180px; top: -50px;
+      z-index: 1;
+    }
+    .s-2 {
+      width: 150px; height: 150px;
+      background: linear-gradient(135deg, #fda4af, #fca5a5);
+      right: 420px; bottom: 40px;
+      z-index: 2;
+    }
+    .s-3 {
+      width: 100px; height: 100px;
+      background: linear-gradient(135deg, #fcd34d, #fbbf24);
+      right: 100px; top: 180px;
+      z-index: 3;
+    }
+    
+    .content { position: relative; z-index: 10; }
+    h1 {
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+    }
+    p {
+      font-size: 26px;
+      color: var(--tertiary-color);
+      font-weight: 500;
+      margin-bottom: 32px;
+    }
+    .tags {
+      display: flex;
+      gap: 12px;
+    }
+    .pill {
+      padding: 8px 16px;
+      border: 2px solid #e7e5e4;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #44403c;
+      background: rgba(255,255,255,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="shape s-1"></div>
+  <div class="shape s-2"></div>
+  <div class="shape s-3"></div>
+
+  <div class="content">
+    <h1 id="template-heading">Your Name</h1>
+    <p id="template-subheading">Digital Creator & Visual Storyteller</p>
+    <div class="tags">
+      <div class="pill">Photography</div>
+      <div class="pill">Art Direction</div>
+      <div class="pill">Content</div>
+    </div>
   </div>
 </body>
 </html>`
@@ -1201,7 +1953,7 @@ export const corporateTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1272,7 +2024,7 @@ export const corporateTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1336,7 +2088,7 @@ export const corporateTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1373,6 +2125,401 @@ export const corporateTemplates = [
   </div>
 </body>
 </html>`
+  },
+  {
+    id: 'corporate-glass',
+    category: 'corporate',
+    name: 'Glass Tower',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #f1f5f9;
+      --secondary-color: #0f172a;
+      --tertiary-color: #475569;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Glass Architecture Background */
+    .bg-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    .glass-panel {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    }
+    .p-1 {
+      width: 400px; height: 600px;
+      top: -100px; right: 200px;
+      transform: skewX(-15deg);
+    }
+    .p-2 {
+      width: 250px; height: 500px;
+      top: -50px; right: 50px;
+      transform: skewX(-15deg);
+      background: rgba(255, 255, 255, 0.6);
+    }
+    /* Abstract Building Lines */
+    .line {
+      position: absolute;
+      background: rgba(148, 163, 184, 0.3);
+      width: 1px; height: 100%;
+      transform: skewX(-15deg);
+    }
+    .l-1 { right: 300px; }
+    .l-2 { right: 450px; }
+    
+    .content { position: relative; z-index: 10; max-width: 550px; }
+    h1 {
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--secondary-color);
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+    p {
+      font-size: 22px;
+      color: var(--tertiary-color);
+      font-weight: 500;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="line l-1"></div>
+  <div class="line l-2"></div>
+  <div class="glass-panel p-1"></div>
+  <div class="glass-panel p-2"></div>
+
+  <div class="content">
+    <div class="role-badge" id="template-badge">Executive Leadership</div>
+    <h1 id="template-heading">Your Name</h1>
+    <p id="template-subheading">Driving Organization Strategy & Global Operations</p>
+  </div>
+</body>
+</html> `
+  }
+];
+
+
+// Neo-Brutalist Templates
+export const neoBrutalistTemplates = [
+  {
+    id: 'neo-bold',
+    category: 'neo-brutalist',
+    name: 'Neo Bold',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #fffdf8;
+      --secondary-color: #1f2937;
+      --tertiary-color: #000000;
+      --accent: #ff6b6b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      /* Safe zone padding */
+      padding: 0 60px 0 600px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.8;
+    }
+    .shape-1 {
+      position: absolute;
+      right: 120px;
+      top: 60px;
+      width: 140px;
+      height: 140px;
+      background: #ffc480;
+      border: 4px solid #1f2937;
+      box-shadow: 8px 8px 0 0 #1f2937;
+      border-radius: 50%;
+      z-index: 1;
+    }
+    .shape-2 {
+      position: absolute;
+      right: 180px;
+      bottom: 60px;
+      width: 100px;
+      height: 100px;
+      background: #4ade80;
+      border: 4px solid #1f2937;
+      box-shadow: 8px 8px 0 0 #1f2937;
+      transform: rotate(15deg);
+      z-index: 2;
+    }
+    
+    .card {
+      background: #fff;
+      border: 4px solid #1f2937;
+      box-shadow: 12px 12px 0 0 #1f2937;
+      padding: 40px;
+      position: relative;
+      z-index: 10;
+      transform: rotate(-1deg);
+      max-width: 900px;
+    }
+    h1 {
+      font-size: 64px;
+      font-weight: 900;
+      color: var(--secondary-color);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: -2px;
+      line-height: 0.95;
+    }
+    p {
+      font-size: 24px;
+      color: var(--secondary-color);
+      font-weight: 700;
+      background: #e5e7eb;
+      display: inline-block;
+      padding: 4px 12px;
+      border: 2px solid #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="shape-1"></div>
+  <div class="shape-2"></div>
+  
+  <div class="card">
+    <h1 id="template-heading">Your Name</h1>
+    <p id="template-subheading">Product Designer & Developer</p>
+  </div>
+</body>
+</html> `
+  },
+  {
+    id: 'neo-retro',
+    category: 'neo-brutalist',
+    name: 'Retro Pop',
+    popular: false,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #c084fc;
+      --secondary-color: #ffffff;
+      --tertiary-color: #fff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 600px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stripe {
+      position: absolute;
+      height: 40px;
+      width: 200%;
+      background: #1f2937;
+      transform: rotate(-10deg) translateY(-50px);
+      left: -50%;
+    }
+    .stripe:nth-child(2) {
+      top: 40%;
+      background: #fbbf24;
+      height: 20px;
+    }
+    
+    h1 {
+      font-size: 80px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0px;
+      letter-spacing: -4px;
+      text-shadow: 6px 6px 0px #1f2937;
+      line-height: 1;
+      font-style: italic;
+      transform: rotate(-2deg);
+    }
+    .subtitle-box {
+      margin-top: 24px;
+      background: #1f2937;
+      color: #fff;
+      padding: 16px 32px;
+      border: 3px solid #fff;
+      box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
+      transform: rotate(1deg);
+      display: inline-block;
+    }
+    p {
+      font-size: 28px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stripe"></div>
+  <div class="stripe"></div>
+  
+  <div class="content">
+    <h1 id="template-heading">Your Name</h1>
+    <div class="subtitle-box">
+      <p id="template-subheading">Creative Director</p>
+    </div>
+  </div>
+</body>
+</html> `
+  },
+  {
+    id: 'neo-acid',
+    category: 'neo-brutalist',
+    name: 'Acid GRAPHICS',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #000000;
+      --secondary-color: #ccff00;
+      --tertiary-color: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0 60px 0 650px;
+      position: relative;
+      overflow: hidden;
+    }
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px);
+    }
+    .barcode {
+      position: absolute;
+      right: 50px;
+      top: 50px;
+      width: 100px;
+      height: 300px;
+      background: repeating-linear-gradient(90deg, #fff, #fff 2px, #000 2px, #000 6px);
+      transform: rotate(180deg);
+    }
+    .sticker {
+      position: absolute;
+      right: 200px;
+      bottom: 50px;
+      width: 180px;
+      height: 180px;
+      background: #ccff00;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 24px;
+      text-align: center;
+      transform: rotate(-15deg);
+      border: 2px solid #fff;
+      box-shadow: 0 0 20px rgba(204, 255, 0, 0.5);
+      z-index: 2;
+    }
+    
+    .content { position: relative; z-index: 10; width: 100%; }
+    h1 {
+      font-size: 96px;
+      font-weight: 900;
+      color: var(--secondary-color);
+      margin-bottom: 0;
+      letter-spacing: -6px;
+      line-height: 0.8;
+      text-transform: uppercase;
+      mix-blend-mode: difference;
+    }
+    p {
+      font-size: 32px;
+      color: #fff;
+      font-weight: 700;
+      background: #000;
+      display: inline-block;
+      border: 1px solid #fff;
+      padding: 8px 16px;
+      margin-top: 24px;
+      text-transform: uppercase;
+    }
+    .warning {
+      position: absolute;
+      top: 0; left: 650px;
+      background: #ccff00;
+      color: #000;
+      font-weight: 700;
+      padding: 4px 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="warning" id="template-badge">⚠️ SYSTEM READY</div>
+  <div class="barcode"></div>
+  <div class="sticker" id="template-tagline">Thinking<br>Different</div>
+
+  <div class="content">
+    <h1 id="template-heading">YOUR NAME</h1>
+    <p id="template-subheading">Visual Designer_</p>
+  </div>
+</body>
+</html>`
   }
 ];
 
@@ -1387,59 +2534,86 @@ export const personalBrandTemplates = [
 <head>
   <style>
     :root {
-      --primary-color: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-      --secondary-color: #ffffff;
-      --tertiary-color: rgba(255,255,255,0.85);
+      --primary-color: #fdf2f8;
+      --secondary-color: #111827;
+      --tertiary-color: #831843;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+      background: #fff;
       width: 1584px;
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
-      justify-content: center;
-      text-align: center;
+      /* Padding left 300px for safe zone */
+      padding: 0 60px 0 600px;
       position: relative;
+      overflow: hidden;
     }
-    .sparkles {
+    .gradient-mesh {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
-      background-size: 40px 40px;
+      background:
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      background-size: 150% 150%;
     }
-    .content { position: relative; z-index: 1; }
+    .grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.15;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opactiy='0.5'/%3E%3C/svg%3E");
+    }
+
+    .content { position: relative; z-index: 10; color: white; }
     h1 {
-      font-size: 80px;
-      font-weight: 900;
-      color: var(--secondary-color);
-      margin-bottom: 12px;
+      font-size: 82px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
       letter-spacing: -2px;
-      text-shadow: 2px 2px 20px rgba(0,0,0,0.2);
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      line-height: 1;
+    }
+    h1 span {
+      background: linear-gradient(to right, #f472b6, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .p-container {
+      display: flex;
+      gap: 24px;
+      align-items: center;
     }
     p {
-      font-size: 28px;
-      color: var(--tertiary-color);
+      font-size: 26px;
       font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.1);
+      padding: 12px 24px;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
     }
-    .social-proof {
-      margin-top: 20px;
-      font-size: 16px;
-      color: rgba(255,255,255,0.7);
-    }
-    .social-proof strong {
-      color: white;
+    .stats {
+      font-family: 'JetBrains Mono', monospace;
+      color: #f472b6;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <div class="sparkles"></div>
+  <div class="gradient-mesh"></div>
+  <div class="grain"></div>
   <div class="content">
-    <h1 id="template-heading">Your Name</h1>
-    <p id="template-subheading">Content Creator | Speaker | Author</p>
-    <div class="social-proof"><strong>100K+</strong> followers across platforms</div>
+    <h1 id="template-heading">Your <span>Name</span></h1>
+    <div class="p-container">
+      <p id="template-subheading">Content Creator • Speaker</p>
+      <div class="stats" id="template-handle">@yourhandle</div>
+    </div>
   </div>
 </body>
 </html>`
@@ -1465,7 +2639,7 @@ export const personalBrandTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1507,7 +2681,7 @@ export const personalBrandTemplates = [
 <body>
   <div class="spotlight"></div>
   <div class="content">
-    <div class="badge">KEYNOTE SPEAKER</div>
+    <div class="badge" id="template-badge">KEYNOTE SPEAKER</div>
     <h1 id="template-heading">Your Name</h1>
     <p id="template-subheading">Leadership | Innovation | Digital Transformation</p>
   </div>
@@ -1535,7 +2709,7 @@ export const personalBrandTemplates = [
       height: 396px;
       display: flex;
       align-items: center;
-      padding: 48px 200px;
+      padding: 48px 60px 48px 600px;
       justify-content: center;
       text-align: center;
       position: relative;
@@ -1579,8 +2753,111 @@ export const personalBrandTemplates = [
   <div class="content">
     <h1 id="template-heading">Your Name</h1>
     <p id="template-subheading">Bestselling Author | Thought Leader</p>
-    <div class="books">Author of "Your Book Title" • Featured in Forbes, HBR</div>
+    <div class="books" id="template-tagline">Author of "Your Book Title" • Featured in Forbes, HBR</div>
   </div>
+</body>
+</html>`
+  },
+  {
+    id: 'personal-magazine',
+    category: 'personal-brand',
+    name: 'Editorial Magazine',
+    popular: true,
+    html: `<html>
+<head>
+  <style>
+    :root {
+      --primary-color: #f3f4f6;
+      --secondary-color: #111827;
+      --tertiary-color: #d1d5db;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Playfair Display', serif;
+      background: var(--primary-color);
+      width: 1584px;
+      height: 396px;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .image-side {
+      width: 40%;
+      height: 100%;
+      background: #e5e7eb;
+      position: relative;
+      overflow: hidden;
+    }
+    .image-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(45deg, #9ca3af, #d1d5db);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif;
+      color: #fff; font-size: 24px; font-weight: 500;
+    }
+    .text-side {
+      width: 60%;
+      padding: 60px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #4b5563;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .line { height: 1px; width: 60px; background: #9ca3af; }
+    
+    h1 {
+      font-size: 80px;
+      font-weight: 400;
+      color: var(--secondary-color);
+      margin-bottom: 24px;
+      letter-spacing: -2px;
+      line-height: 0.95;
+    }
+    h1 i { font-family: 'Inter', sans-serif; font-weight: 300; font-style: normal; color: #6b7280; font-size: 0.7em; margin-left: 12px; vertical-align: middle; }
+    
+    p {
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      color: #4b5563;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 600px;
+    }
+    .issue-number {
+      position: absolute;
+      top: 40px; right: 60px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #9ca3af;
+      transform: rotate(90deg);
+      transform-origin: right top;
+    }
+  </style>
+</head>
+<body>
+  <div class="image-side">
+    <div class="image-placeholder">Photo</div>
+  </div>
+  <div class="text-side">
+    <div class="eyebrow"><div class="line"></div><span id="template-badge">The Strategist</span></div>
+    <h1 id="template-heading">Your Name</h1>
+    <p id="template-subheading">Curating insights on leadership, culture, and the future of work.</p>
+  </div>
+  <div class="issue-number" id="template-tagline">VOL. 24</div>
 </body>
 </html>`
   }
@@ -1594,6 +2871,7 @@ export const allTemplates = [
   ...recruiterTemplates,
   ...freelancerTemplates,
   ...corporateTemplates,
+  ...neoBrutalistTemplates,
   ...personalBrandTemplates
 ];
 

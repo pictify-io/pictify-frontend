@@ -51,15 +51,16 @@ export const clearUser = () => {
 };
 
 export const setApiTokens = (apiTokens) => {
+	const tokens = apiTokens || [];
 	user.update((user) => {
 		return {
 			...user,
-			apiTokens
+			apiTokens: tokens
 		};
 	});
 
-	if (apiTokens.length > 0) {
-		activeApiToken.set(apiTokens.filter((apiToken) => apiToken.active)[0]);
+	if (tokens.length > 0) {
+		activeApiToken.set(tokens.filter((apiToken) => apiToken.active)[0]);
 	}
 };
 // Getters
@@ -201,14 +202,20 @@ export const getUserAction = async () => {
 
 export const getAPITokenAction = async () => {
 	const response = await getApiToken();
-	setApiTokens(response.apiTokens);
+	if (response && response.apiTokens) {
+		setApiTokens(response.apiTokens);
+	} else {
+		setApiTokens([]);
+	}
 	return response;
 };
 
 export const createAPITokenAction = async () => {
 	await createApiToken();
 	const response = await getApiToken();
-	setApiTokens(response.apiTokens);
+	if (response && response.apiTokens) {
+		setApiTokens(response.apiTokens);
+	}
 	analytics.trackAPIKeyCreated();
 	return response;
 };
@@ -216,7 +223,9 @@ export const createAPITokenAction = async () => {
 export const deleteAPITokenAction = async (apiTokenId) => {
 	await deleteApiToken(apiTokenId);
 	const response = await getApiToken();
-	setApiTokens(response.apiTokens);
+	if (response && response.apiTokens) {
+		setApiTokens(response.apiTokens);
+	}
 	return response;
 };
 

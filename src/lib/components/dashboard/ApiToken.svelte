@@ -6,31 +6,22 @@
 		deleteAPITokenAction,
 		getPlanDetailsAction
 	} from '../../../store/user.store';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { toast } from '../../../store/toast.store';
 	import { plgStatus, usageWidget, initPLG } from '../../../store/plg.store';
 
-	let apiTokens = [];
-	let unsubscribe = () => {};
 	let isLoading = true;
-	let currentPlan = '';
+
+	// Use reactive statements for store values - more reliable than manual subscription
+	$: apiTokens = $user.apiTokens || [];
+	$: currentPlan = $user.currentPlan || '';
 
 	onMount(async () => {
 		await Promise.all([getAPITokenAction(), getPlanDetailsAction(), initPLG()]);
-		unsubscribe = user.subscribe((u) => {
-			if (u.apiTokens) {
-				apiTokens = u.apiTokens;
-				currentPlan = u.currentPlan;
-				isLoading = false;
-			}
-		});
-	});
-
-	onDestroy(() => {
-		unsubscribe();
+		isLoading = false;
 	});
 
 	function copyToClipboard(text) {
@@ -38,10 +29,10 @@
 			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
 		});
 	}
-	
+
 	// Time saved calculation
 	$: timeSaved = $plgStatus.timeSaved?.display || '0 minutes';
-	
+
 	// Usage calculation
 	$: usagePercent = $usageWidget.percentage || 0;
 	$: usageColor = usagePercent >= 90 ? '#ff6b6b' : usagePercent >= 75 ? '#ffc480' : '#4ade80';

@@ -125,10 +125,10 @@ $: structuredData = validIntegration ? {
 
 					<!-- Pictify Icon -->
 					<div class="relative group">
-						<div class="absolute inset-0 bg-[#ff6b6b] rounded-2xl -rotate-6 group-hover:-rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"></div>
-						<div class="relative w-20 h-20 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-300">
+						<div class="absolute inset-0 bg-[#ffc480] rounded-2xl -rotate-6 group-hover:-rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"></div>
+						<div class="relative w-20 h-20 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#ffc480] group-hover:-translate-y-2 transition-transform duration-300">
 							<svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
 							</svg>
 						</div>
 					</div>

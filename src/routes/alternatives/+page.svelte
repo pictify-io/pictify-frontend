@@ -2,6 +2,7 @@
 import Nav from '$lib/components/landingPage/Nav.svelte';
 import Footer from '$lib/components/landingPage/Footer.svelte';
 import { alternatives } from '$lib/pseo/comparisons.js';
+import { brandIcons } from '$lib/config/brandIcons.js';
 
 const title = 'Pictify Alternatives | Switch to Better Image Generation';
 const description = 'Looking for an alternative to Cloudinary, Puppeteer, or other image tools? See how Pictify compares and why teams are switching.';
@@ -114,29 +115,64 @@ const canonical = 'https://pictify.io/alternatives';
 			<h2 class="text-2xl font-black text-gray-900 mb-8 text-center uppercase tracking-tight">
 				Explore Alternatives
 			</h2>
-			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 				{#each alternatives as alt}
+					{@const icon = brandIcons[alt.slug] || brandIcons.default}
 					<a
 						href="/alternatives/{alt.slug}"
-						class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[5px_5px_0_0_#4ade80] hover:shadow-[3px_3px_0_0_#4ade80] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
+						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
 					>
-						<div class="flex items-center gap-3 mb-4">
-							<div class="w-10 h-10 bg-gray-100 border-[2px] border-gray-300 rounded-lg flex items-center justify-center font-black text-gray-600 text-sm">
-								{alt.competitor.charAt(0)}
+						<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
+							<!-- VS Header -->
+							<div class="flex items-center justify-between mb-8">
+								<!-- Competitor Icon -->
+								<div class="w-14 h-14 bg-gray-50 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] group-hover:scale-110 transition-transform" style="color: {icon.color || '#1f2937'}">
+									{#if icon.type === 'url'}
+										<img src={icon.url} alt={alt.competitor} class="w-8 h-8" />
+									{:else if icon.type === 'text'}
+										<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
+									{:else if icon.type === 'svg'}
+										<svg class="w-8 h-8" fill="currentColor" viewBox={icon.viewBox}>
+											<path d={icon.path} />
+										</svg>
+									{:else}
+										<span class="text-xl font-black text-gray-900">{alt.competitor.charAt(0)}</span>
+									{/if}
+								</div>
+
+								<div class="flex flex-col items-center gap-1">
+									<div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+									<div class="text-xs font-black text-[#4ade80] uppercase tracking-widest">ALT</div>
+									<div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+								</div>
+
+								<!-- Pictify Icon -->
+								<div class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#ffc480]">
+									<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
+									</svg>
+								</div>
 							</div>
-							<h3 class="text-lg font-black text-gray-900 group-hover:text-[#4ade80] transition-colors">
-								{alt.competitor} Alternative
-							</h3>
+
+							<div class="mb-4">
+								<h3 class="text-2xl font-black text-gray-900 mb-2 group-hover:text-[#4ade80] transition-colors leading-tight">
+									{alt.competitor} <br/>Alternative
+								</h3>
+								<div class="h-1 w-12 bg-[#4ade80] mb-4"></div>
+								<p class="text-gray-500 font-medium leading-relaxed line-clamp-3">
+									{alt.metaDescription}
+								</p>
+							</div>
+
+							<div class="mt-auto pt-4 border-t-2 border-dashed border-gray-100">
+								<span class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2 group-hover:gap-3 transition-all">
+									Compare Now
+									<svg class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+									</svg>
+								</span>
+							</div>
 						</div>
-						<p class="text-gray-600 font-medium text-sm mb-4 line-clamp-2">
-							{alt.metaDescription}
-						</p>
-						<span class="text-sm font-bold text-[#4ade80] uppercase tracking-wide flex items-center gap-2">
-							Compare
-							<svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-							</svg>
-						</span>
 					</a>
 				{/each}
 			</div>
