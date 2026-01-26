@@ -5,14 +5,19 @@
 	import { createAgentScreenshotStream } from '../../../../api/image';
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import { slide } from 'svelte/transition';
 
 	// User state
 	let isUserLoggedIn = false;
 	let currentApiToken = null;
-	
+	let isEmailVerified = null;
+	let userEmail = '';
+
 	user.subscribe(userData => {
 		isUserLoggedIn = !!userData.email;
+		isEmailVerified = userData.isEmailVerified;
+		userEmail = userData.email || '';
 	});
 	
 	activeApiToken.subscribe(token => {
@@ -213,12 +218,19 @@
 						</div>
 					</div>
 
+					<!-- Email Verification Warning -->
+					{#if isUserLoggedIn && isEmailVerified === false}
+						<div class="mb-4">
+							<EmailVerificationRequired email={userEmail} feature="AI screenshot generation" />
+						</div>
+					{/if}
+
 					<!-- Generate Button -->
 					<div class="flex justify-center">
 						<button
 							class="bg-[#ff6b6b] text-white px-8 py-3 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 							on:click={generateScreenshot}
-							disabled={isGenerating || !prompt.trim()}
+							disabled={isGenerating || !prompt.trim() || (isUserLoggedIn && isEmailVerified === false)}
 						>
 							{#if isGenerating}
 								<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

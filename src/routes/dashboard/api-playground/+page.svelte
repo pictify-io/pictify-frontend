@@ -4,6 +4,7 @@
 	import { toast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import {
 		createImage,
 		createGif
@@ -29,6 +30,12 @@
 	let response = null;
 	let responseJson = '';
 	let isUserLoggedIn = false;
+	let isEmailVerified = null;
+	let userEmail = '';
+
+	// Endpoints that require email verification
+	const generationEndpoints = ['image', 'gif', 'render-template', 'batch-render'];
+	$: requiresEmailVerification = generationEndpoints.includes(selectedEndpoint) && isEmailVerified === false;
 
 	let hasTriedToFetchTokens = false;
 	let unsubscribe = () => {};
@@ -67,6 +74,8 @@
 		// Subscribe to user store to get API token
 		unsubscribe = user.subscribe(async (userData) => {
 			isUserLoggedIn = !!userData.email;
+			isEmailVerified = userData.isEmailVerified;
+			userEmail = userData.email || '';
 
 			// If user is logged in but no API tokens, fetch them (only once)
 			if (userData.email && (!userData.apiTokens || userData.apiTokens.length === 0) && !hasTriedToFetchTokens) {
@@ -1250,11 +1259,14 @@
 							</div>
 						{/if}
 
-						<div class="pt-4 border-t-[3px] border-gray-200 border-dashed">
+						<div class="pt-4 border-t-[3px] border-gray-200 border-dashed space-y-4">
+							{#if requiresEmailVerification}
+								<EmailVerificationRequired email={userEmail} feature="image and GIF generation APIs" />
+							{/if}
 							<button
 								class="w-full py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-[4px_4px_0_0_#1f2937]"
 								on:click={() => testEndpoint(selectedEndpoint)}
-								disabled={loading}
+								disabled={loading || requiresEmailVerification}
 							>
 								{#if loading}
 									<span class="flex items-center justify-center gap-2">
