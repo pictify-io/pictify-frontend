@@ -41,14 +41,18 @@
 
   function getProgressColor(percentage) {
     if (percentage >= 95) return '#ff6b6b';
-    if (percentage >= 80) return '#ffc480';
+    if (percentage >= 85) return '#ff6b6b';
+    if (percentage >= 75) return '#f59e0b';
+    if (percentage >= 65) return '#ffc480';
     if (percentage >= 50) return '#ffc480';
     return '#10b981';
   }
 
   function getUrgencyBg(urgency) {
-    if (urgency === 'critical') return 'bg-[#ff6b6b]/10';
-    if (urgency === 'warning') return 'bg-[#ffc480]/20';
+    if (urgency === 'critical') return 'bg-[#ff6b6b]/15';
+    if (urgency === 'urgent') return 'bg-[#ff6b6b]/10';
+    if (urgency === 'warning') return 'bg-[#f59e0b]/15';
+    if (urgency === 'soft_warning') return 'bg-[#ffc480]/20';
     return 'bg-white';
   }
 

@@ -65,6 +65,12 @@ export const featureGates = writable({});
 // Loading states
 export const plgLoading = writable(false);
 
+// Nudge tracking stores
+export const nudgeState = writable({
+  bannerDismissedAt: null,
+  proactiveModalShownThisCycle: false,
+});
+
 // ============================================
 // Derived Stores
 // ============================================
@@ -139,9 +145,11 @@ export const initPLG = async () => {
     // Determine urgency
     let urgency = 'normal';
     if (percentage >= 95) urgency = 'critical';
-    else if (percentage >= 80) urgency = 'warning';
+    else if (percentage >= 85) urgency = 'urgent';
+    else if (percentage >= 75) urgency = 'warning';
+    else if (percentage >= 65) urgency = 'soft_warning';
     else if (percentage >= 50) urgency = 'info';
-    
+
     const status = {
       plan,
       isPaidPlan,
@@ -215,13 +223,15 @@ export const refreshUsageWidget = async () => {
     if (limit > 7500) plan = 'business';
     
     const isPaidPlan = plan !== 'starter';
-    
+
     // Determine urgency
     let urgency = 'normal';
     if (percentage >= 95) urgency = 'critical';
-    else if (percentage >= 80) urgency = 'warning';
+    else if (percentage >= 85) urgency = 'urgent';
+    else if (percentage >= 75) urgency = 'warning';
+    else if (percentage >= 65) urgency = 'soft_warning';
     else if (percentage >= 50) urgency = 'info';
-    
+
     const widget = {
       current: usage,
       limit,
@@ -422,6 +432,43 @@ export const dismissUpgradePrompt = () => {
   activeUpgradePrompt.set(null);
 };
 
+// Discount percentage to code mapping
+const DISCOUNT_CODE_MAP = {
+  5: 'EARLY5',
+  10: 'POWER10',
+  15: 'GROW15',
+  20: 'UNLOCK20',
+  25: 'MILESTONE25',
+};
+
+/**
+ * Map discount percentage to code
+ */
+const mapDiscountToCode = (percentage) => {
+  return DISCOUNT_CODE_MAP[percentage] || null;
+};
+
+/**
+ * Get discount info based on usage percentage
+ * @param {number} usagePercentage - Current usage percentage
+ * @returns {{ discountPercent: number, discountCode: string, urgency: string } | null}
+ */
+export const getDiscountForUsage = (usagePercentage) => {
+  if (usagePercentage >= 100) {
+    return { discountPercent: 20, discountCode: 'UNLOCK20', urgency: 'limit' };
+  }
+  if (usagePercentage >= 95) {
+    return { discountPercent: 15, discountCode: 'GROW15', urgency: 'critical' };
+  }
+  if (usagePercentage >= 85) {
+    return { discountPercent: 10, discountCode: 'POWER10', urgency: 'urgent' };
+  }
+  if (usagePercentage >= 75) {
+    return { discountPercent: 5, discountCode: 'EARLY5', urgency: 'warning' };
+  }
+  return null;
+};
+
 /**
  * Handle upgrade click - now uses in-dashboard modal
  * @deprecated Use openUpgradeModal from upgrade-modal.store.js instead
@@ -435,9 +482,12 @@ export const handleUpgradeClick = async (prompt, discount = null) => {
     discount,
   });
 
+  // Convert discount percentage to code if needed
+  const discountCode = typeof discount === 'number' ? mapDiscountToCode(discount) : discount;
+
   // Import and use the upgrade modal store dynamically to avoid circular deps
   const { openUpgradeModal } = await import('./upgrade-modal.store.js');
-  openUpgradeModal(prompt?.type || 'general', discount);
+  openUpgradeModal(prompt?.type || 'general', discountCode);
 };
 
 /**
@@ -460,7 +510,7 @@ export const checkRenderMilestone = async (newCount) => {
     ? Math.round((newCount / status.usage.limit) * 100) 
     : 0;
   
-  const thresholds = [30, 50, 80, 95, 100];
+  const thresholds = [30, 50, 65, 75, 85, 95, 100];
   if (thresholds.includes(percentage)) {
     const threshold = getThresholdConfig(percentage);
     if (threshold && threshold.showUpgrade) {
@@ -493,11 +543,13 @@ const getThresholdConfig = (percentage) => {
   const thresholds = [
     { percentage: 30, type: 'info', title: 'Great Progress! 🎉', showUpgrade: false },
     { percentage: 50, type: 'info', title: 'Halfway There!', showUpgrade: true, cta: { text: 'View plans', action: 'pricing' } },
-    { percentage: 80, type: 'warning', title: 'Running Low!', showUpgrade: true, cta: { text: 'Upgrade now', action: 'upgrade', discount: 10 } },
-    { percentage: 95, type: 'urgent', title: 'Almost Out!', showUpgrade: true, cta: { text: 'Upgrade - 15% off', action: 'upgrade', discount: 15 } },
+    { percentage: 65, type: 'soft_warning', title: 'You\'re Creating Amazing Content!', showUpgrade: true, nudgeType: 'inline_banner', cta: { text: 'View plans', action: 'pricing' } },
+    { percentage: 75, type: 'warning', title: 'You\'re on a Roll!', showUpgrade: true, nudgeType: 'proactive_modal', cta: { text: 'Upgrade - 5% off', action: 'upgrade', discount: 5 } },
+    { percentage: 85, type: 'urgent', title: 'Running Low!', showUpgrade: true, nudgeType: 'toast', cta: { text: 'Upgrade - 10% off', action: 'upgrade', discount: 10 } },
+    { percentage: 95, type: 'critical', title: 'Almost Out!', showUpgrade: true, cta: { text: 'Upgrade - 15% off', action: 'upgrade', discount: 15 } },
     { percentage: 100, type: 'limit', title: 'Limit Reached', showUpgrade: true, cta: { text: 'Upgrade - 20% off', action: 'upgrade', discount: 20 } },
   ];
-  
+
   // Find the highest threshold that the percentage has reached
   const reached = thresholds.filter(t => percentage >= t.percentage);
   return reached.length > 0 ? reached[reached.length - 1] : null;
@@ -540,7 +592,9 @@ export const getUrgencyColor = (urgency) => {
   const colors = {
     normal: 'text-gray-600',
     info: 'text-gray-800',
-    warning: 'text-[#ff6b6b]',
+    soft_warning: 'text-[#f59e0b]',
+    warning: 'text-[#f59e0b]',
+    urgent: 'text-[#ff6b6b]',
     critical: 'text-[#ff6b6b]',
   };
   return colors[urgency] || colors.normal;
@@ -553,9 +607,115 @@ export const getUrgencyBg = (urgency) => {
   const colors = {
     normal: 'bg-white',
     info: 'bg-[#ffc480]/10',
+    soft_warning: 'bg-[#ffc480]/15',
     warning: 'bg-[#ffc480]/20',
-    critical: 'bg-[#ff6b6b]/10',
+    urgent: 'bg-[#ff6b6b]/10',
+    critical: 'bg-[#ff6b6b]/15',
   };
   return colors[urgency] || colors.normal;
+};
+
+// ============================================
+// Nudge State Management
+// ============================================
+
+const BANNER_DISMISS_KEY = 'pictify_usage_banner_dismissed';
+const PROACTIVE_MODAL_KEY = 'pictify_proactive_modal_shown';
+
+/**
+ * Initialize nudge state from localStorage
+ */
+export const initNudgeState = () => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const bannerDismissedAt = localStorage.getItem(BANNER_DISMISS_KEY);
+    const proactiveModalData = localStorage.getItem(PROACTIVE_MODAL_KEY);
+
+    let proactiveModalShownThisCycle = false;
+    if (proactiveModalData) {
+      const data = JSON.parse(proactiveModalData);
+      const resetDate = get(plgStatus).resetDate;
+      if (resetDate && data.shownAt && new Date(data.shownAt) >= new Date(resetDate)) {
+        proactiveModalShownThisCycle = true;
+      }
+    }
+
+    nudgeState.set({
+      bannerDismissedAt: bannerDismissedAt ? parseInt(bannerDismissedAt, 10) : null,
+      proactiveModalShownThisCycle,
+    });
+  } catch (e) {
+    console.warn('Failed to init nudge state:', e);
+  }
+};
+
+/**
+ * Check if usage banner should be shown
+ */
+export const shouldShowUsageBanner = () => {
+  const status = get(plgStatus);
+  const nudge = get(nudgeState);
+
+  // Don't show for paid users
+  if (status.isPaidPlan) return false;
+
+  // Show at 65%+ usage
+  const percentage = status.usage.percentage;
+  if (percentage < 65) return false;
+
+  // Check if dismissed within last 24 hours
+  if (nudge.bannerDismissedAt) {
+    const hoursSinceDismiss = (Date.now() - nudge.bannerDismissedAt) / (1000 * 60 * 60);
+    if (hoursSinceDismiss < 24) return false;
+  }
+
+  return true;
+};
+
+/**
+ * Dismiss the usage banner (24h cooldown)
+ */
+export const dismissUsageBanner = () => {
+  const now = Date.now();
+  nudgeState.update(s => ({ ...s, bannerDismissedAt: now }));
+
+  try {
+    localStorage.setItem(BANNER_DISMISS_KEY, now.toString());
+  } catch (e) {
+    console.warn('Failed to save banner dismiss:', e);
+  }
+};
+
+/**
+ * Check if proactive modal should be shown
+ */
+export const shouldShowProactiveModal = () => {
+  const status = get(plgStatus);
+  const nudge = get(nudgeState);
+
+  // Don't show for paid users
+  if (status.isPaidPlan) return false;
+
+  // Only show at/above 75%
+  if (status.usage.percentage < 75) return false;
+
+  // Only show once per billing cycle
+  if (nudge.proactiveModalShownThisCycle) return false;
+
+  return true;
+};
+
+/**
+ * Mark proactive modal as shown for this billing cycle
+ */
+export const markProactiveModalShown = () => {
+  nudgeState.update(s => ({ ...s, proactiveModalShownThisCycle: true }));
+
+  try {
+    localStorage.setItem(PROACTIVE_MODAL_KEY, JSON.stringify({ shownAt: new Date().toISOString() }));
+  } catch (e) {
+    console.warn('Failed to save proactive modal state:', e);
+  }
 };
 

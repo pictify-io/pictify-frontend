@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { user } from '../../../store/user.store';
 	import { getProducts } from '../../../api/product';
 	import Loader from '$lib/components/Loader.svelte';
@@ -13,6 +14,12 @@
 
 	$: isLoggedIn = !!$user.email;
 	$: currentPlan = $user.currentPlan || 'starter';
+	$: isFreeTier = currentPlan.toLowerCase() === 'starter';
+
+	// Read discount code from URL params (only apply for free tier users)
+	$: discountCodeParam = $page.url.searchParams.get('discount');
+	$: discountCode = isFreeTier ? discountCodeParam : null;
+	$: source = $page.url.searchParams.get('source');
 
 	// Featured plans to highlight
 	const featuredPlanNames = ['Basic', 'Professional', 'Business'];
@@ -75,10 +82,11 @@
 		// Track upgrade started
 		analytics.trackUpgradeStarted({
 			plan: plan.name,
-			source: 'dashboard_upgrade',
+			source: source || 'dashboard_upgrade',
 			price: plan.price,
 			requests: plan.request_per_month,
-			current_plan: currentPlan
+			current_plan: currentPlan,
+			discount_code: discountCode
 		});
 
 		if (!isLoggedIn) {
@@ -86,7 +94,13 @@
 			return;
 		}
 		if (plan.purchase_url) {
-			window.location.href = plan.purchase_url;
+			// Append discount code to LemonSqueezy checkout URL if present
+			let checkoutUrl = plan.purchase_url;
+			if (discountCode) {
+				const separator = checkoutUrl.includes('?') ? '&' : '?';
+				checkoutUrl = `${checkoutUrl}${separator}checkout[discount_code]=${encodeURIComponent(discountCode)}`;
+			}
+			window.location.href = checkoutUrl;
 		} else {
 			goto('/dashboard/api-token');
 		}
@@ -99,6 +113,21 @@
 
 <div>
 	<div>
+		<!-- Discount Banner -->
+		{#if discountCode}
+			<div class="mb-6 p-4 bg-[#10b981]/10 border-[3px] border-[#10b981] rounded-xl flex items-center gap-3">
+				<div class="w-10 h-10 bg-[#10b981] rounded-lg border-2 border-gray-900 flex items-center justify-center flex-shrink-0">
+					<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+					</svg>
+				</div>
+				<div>
+					<p class="font-bold text-gray-900">Discount code applied: <span class="text-[#10b981]">{discountCode}</span></p>
+					<p class="text-sm text-gray-600">Your discount will be applied at checkout</p>
+				</div>
+			</div>
+		{/if}
+
 		<!-- Header -->
 		<div class="mb-8 sm:mb-12">
 			<div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3">
