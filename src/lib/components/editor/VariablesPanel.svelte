@@ -70,14 +70,17 @@
 
 	export let guestMode = false;
 
+	// Store event handler reference for cleanup
+	let triggerGenerateHandler = null;
+
 	onMount(() => {
 		// Listen for trigger generate after login
-		const handleTriggerGenerate = () => {
+		triggerGenerateHandler = () => {
 			if ($user?.email && !guestMode) {
 				handleGenerate();
 			}
 		};
-		window.addEventListener('trigger-generate-after-login', handleTriggerGenerate);
+		window.addEventListener('trigger-generate-after-login', triggerGenerateHandler);
 
 		// In guest mode, we still show the whole panel, but avoid calling auth-only endpoints.
 		if (!guestMode) {
@@ -148,6 +151,11 @@
 		// Clean up debounce timeout
 		if (previewUpdateTimeout) {
 			clearTimeout(previewUpdateTimeout);
+		}
+
+		// Clean up event listener
+		if (triggerGenerateHandler) {
+			window.removeEventListener('trigger-generate-after-login', triggerGenerateHandler);
 		}
 
 		if (canvasEventCleanup) {
