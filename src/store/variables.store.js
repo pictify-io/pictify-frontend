@@ -365,17 +365,21 @@ export const variableActions = {
 	/**
 	 * Sync variables from canvas
 	 * Extracts all variables from canvas objects
+	 * Preserves user-specified type overrides from the current store
 	 */
 	syncFromCanvas(canvas) {
 		if (!canvas) {
 			console.warn('No canvas provided for sync');
 			return;
 		}
-		
+
 		canvasRef = canvas;
 		const objects = canvas.getObjects();
 		const newVariables = new Map();
-		
+
+		// Get current variables to preserve user-specified type overrides
+		const currentMap = get(variablesMap);
+
 		// 1. Extract property-based variables (isVariable = true with variableBindings)
 		objects
 			.filter(obj => obj.isVariable && obj.variableBindings && Array.isArray(obj.variableBindings))
@@ -383,14 +387,20 @@ export const variableActions = {
 				obj.variableBindings.forEach((binding, bindingIndex) => {
 					const varName = binding.variableName;
 					if (varName && !newVariables.has(varName)) {
+						// Check for existing variable with user-specified type
+						const existingVar = currentMap.get(varName);
+						const inferredType = inferTypeFromProperty(obj, binding.property);
+
 						newVariables.set(varName, createVariable({
 							id: `${obj.id}_binding_${bindingIndex}`,
 							name: varName,
-							type: inferTypeFromProperty(obj, binding.property),
+							// Preserve user-specified type if it differs from inferred
+							type: existingVar?.type || inferredType,
 							source: VARIABLE_SOURCES.PROPERTY,
-							defaultValue: getValueFromObjectProperty(obj, binding.property),
-							description: binding.description || '',
-							required: binding.required || false,
+							// Preserve user-specified default value if type was overridden
+							defaultValue: existingVar?.defaultValue ?? getValueFromObjectProperty(obj, binding.property),
+							description: existingVar?.description || binding.description || '',
+							required: existingVar?.required ?? binding.required ?? false,
 							objectId: obj.id,
 							objectType: obj.type,
 							property: binding.property || 'text',
@@ -405,27 +415,32 @@ export const variableActions = {
 					}
 				});
 			});
-		
+
 		// 2. Extract condition variables (showWhen/hideWhen)
 		objects.forEach(obj => {
 			const showWhen = obj.showWhen;
 			const hideWhen = obj.hideWhen;
-			
+
 			if (showWhen || hideWhen) {
 				const expression = showWhen || hideWhen;
 				const extractedVars = extractVariablesFromExpression(expression);
-				
+
 				extractedVars.forEach(extractedVar => {
 					if (!newVariables.has(extractedVar.name)) {
-						const varType = getExpressionVariableType(extractedVar, 'condition');
+						// Check for existing variable with user-specified type
+						const existingVar = currentMap.get(extractedVar.name);
+						const inferredType = getExpressionVariableType(extractedVar, 'condition');
+
 						newVariables.set(extractedVar.name, createVariable({
 							id: `condition_${extractedVar.name}`,
 							name: extractedVar.name,
-							type: varType,
+							// Preserve user-specified type if it differs from inferred
+							type: existingVar?.type || inferredType,
 							source: VARIABLE_SOURCES.CONDITION,
-							defaultValue: generateSampleData(extractedVar, 'condition'),
-							description: `Used in ${showWhen ? 'show' : 'hide'} condition: "${expression}"`,
-							property: varType === 'object' ? 'data' : 'value',
+							// Preserve user-specified default value if type was overridden
+							defaultValue: existingVar?.defaultValue ?? generateSampleData(extractedVar, 'condition'),
+							description: existingVar?.description || `Used in ${showWhen ? 'show' : 'hide'} condition: "${expression}"`,
+							property: (existingVar?.type || inferredType) === 'object' ? 'data' : 'value',
 							metadata: {
 								isObject: extractedVar.isObject,
 								properties: extractedVar.properties,
@@ -437,20 +452,24 @@ export const variableActions = {
 				});
 			}
 		});
-		
+
 		// 3. Extract loop variables
 		objects.forEach(obj => {
 			const loopVariable = obj.loopVariable;
-			
+
 			if (loopVariable && loopVariable !== null && loopVariable !== '') {
 				if (!newVariables.has(loopVariable)) {
+					// Check for existing variable with user-specified type
+					const existingVar = currentMap.get(loopVariable);
+
 					newVariables.set(loopVariable, createVariable({
 						id: `loop_${loopVariable}`,
 						name: loopVariable,
-						type: VARIABLE_TYPES.ARRAY,
+						// Preserve user-specified type (usually stays as array)
+						type: existingVar?.type || VARIABLE_TYPES.ARRAY,
 						source: VARIABLE_SOURCES.LOOP,
-						defaultValue: generateSampleData({ name: loopVariable }, 'loop'),
-						description: `Array variable for repeating element${obj.loopItemName ? ` (item: ${obj.loopItemName})` : ''}`,
+						defaultValue: existingVar?.defaultValue ?? generateSampleData({ name: loopVariable }, 'loop'),
+						description: existingVar?.description || `Array variable for repeating element${obj.loopItemName ? ` (item: ${obj.loopItemName})` : ''}`,
 						property: 'items',
 						metadata: {
 							loopItemName: obj.loopItemName,
@@ -461,23 +480,57 @@ export const variableActions = {
 				}
 			}
 		});
-		
+
 		// 4. Preserve custom variables that aren't tied to canvas
-		const currentMap = get(variablesMap);
 		currentMap.forEach((v, name) => {
 			if (v.source === VARIABLE_SOURCES.CUSTOM && !newVariables.has(name)) {
 				newVariables.set(name, v);
 			}
 		});
-		
+
 		variablesMap.set(newVariables);
-		
+
 		console.log('✅ Variables synced from canvas:', newVariables.size, 'variables found', {
 			property: Array.from(newVariables.values()).filter(v => v.source === 'property').length,
 			condition: Array.from(newVariables.values()).filter(v => v.source === 'condition').length,
 			loop: Array.from(newVariables.values()).filter(v => v.source === 'loop').length,
 			custom: Array.from(newVariables.values()).filter(v => v.source === 'custom').length
 		});
+	},
+
+	/**
+	 * Load variable definitions from template data
+	 * This should be called when a template is loaded to restore saved types/defaults
+	 * @param {Array} definitions - The variableDefinitions array from template
+	 */
+	loadFromDefinitions(definitions) {
+		if (!definitions || !Array.isArray(definitions)) return;
+
+		const newMap = new Map();
+
+		definitions.forEach(def => {
+			if (def.name) {
+				newMap.set(def.name, createVariable({
+					id: def.elementId || `loaded_${def.name}`,
+					name: def.name,
+					type: def.type || VARIABLE_TYPES.TEXT,
+					source: def.source || VARIABLE_SOURCES.PROPERTY,
+					defaultValue: def.defaultValue,
+					description: def.description || '',
+					required: def.validation?.required ?? false,
+					property: def.property || 'value',
+					metadata: {
+						isObject: def.isObject,
+						properties: def.properties,
+						loopItemName: def.loopItemName,
+						loopDirection: def.loopDirection
+					}
+				}));
+			}
+		});
+
+		variablesMap.set(newMap);
+		console.log('✅ Variables loaded from definitions:', newMap.size, 'variables');
 	},
 
 	/**
