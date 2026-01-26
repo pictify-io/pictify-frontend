@@ -65,9 +65,8 @@
   let imageUrl = '';
   let isImageGenerating = false;
 
-  // Editable content
-  let heading = '';
-  let subheading = '';
+  // Editable content - dynamic variables based on template
+  let templateVariables = {}; // { 'template-heading': { label: 'Name', value: 'Your Name' }, ... }
   let logoDataUrl = null;
 
   // Colors
@@ -103,6 +102,59 @@
     }
   });
 
+  // Helper to extract editable text from an element (excluding prefix spans)
+  function extractEditableText(element) {
+    if (!element) return null;
+
+    // Check if element has a prefix span as first child
+    const firstChild = element.firstElementChild;
+    const hasMultipleNodes = element.childNodes.length > 1;
+
+    if (firstChild && firstChild.tagName === 'SPAN' && hasMultipleNodes) {
+      // Has prefix span - extract only the text after it
+      let text = '';
+      for (let i = 1; i < element.childNodes.length; i++) {
+        text += element.childNodes[i].textContent;
+      }
+      return text.trim();
+    }
+
+    // Return full text content
+    return element.textContent?.trim() || null;
+  }
+
+  // Generate a human-readable label from an element id
+  function generateLabelFromId(id) {
+    // Convert 'template-heading' to 'Heading', 'template-sub-heading' to 'Sub Heading'
+    return id
+      .replace('template-', '')
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  // Auto-detect variables from template HTML
+  function detectTemplateVariables(doc, template) {
+    const vars = {};
+
+    // Always auto-detect all elements with id starting with 'template-'
+    const elements = doc.querySelectorAll('[id^="template-"]');
+
+    elements.forEach(el => {
+      const id = el.id;
+      // Check if template has predefined variable info for this element
+      const predefinedVar = template.variables?.find(v => v.id === id);
+
+      vars[id] = {
+        label: predefinedVar?.label || generateLabelFromId(id),
+        value: extractEditableText(el) || predefinedVar?.default || '',
+        type: predefinedVar?.type || 'text'
+      };
+    });
+
+    return vars;
+  }
+
   // Select a template
   function selectTemplate(template) {
     selectedTemplate = template;
@@ -111,12 +163,16 @@
     const parser = new DOMParser();
     const doc = parser.parseFromString(template.html, 'text/html');
 
-    const defaultHeading = doc.querySelector('#template-heading')?.textContent || 'Your Name';
-    const defaultSubheading = doc.querySelector('#template-subheading')?.textContent || 'Your Title';
+    // Detect and initialize template variables
+    const detectedVars = detectTemplateVariables(doc, template);
 
-    // Keep existing content if set, otherwise use template defaults
-    if (!heading) heading = defaultHeading;
-    if (!subheading) subheading = defaultSubheading;
+    // Preserve existing values if switching templates with same variable ids
+    Object.keys(detectedVars).forEach(id => {
+      if (templateVariables[id] && templateVariables[id].value) {
+        detectedVars[id].value = templateVariables[id].value;
+      }
+    });
+    templateVariables = detectedVars;
 
     // Extract colors from CSS variables
     const styleTag = doc.querySelector('style');
@@ -173,6 +229,31 @@
     }, 100);
   }
 
+  // Helper to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Helper to update element text while preserving prefix spans
+  function updateElementText(element, newText) {
+    if (!element) return;
+
+    // Check if element has a prefix span as first child (like </> code prefix)
+    const firstChild = element.firstElementChild;
+    const hasMultipleNodes = element.childNodes.length > 1;
+
+    if (firstChild && firstChild.tagName === 'SPAN' && hasMultipleNodes) {
+      // Has prefix span - preserve it and update the text after
+      const prefix = firstChild.outerHTML;
+      element.innerHTML = prefix + ' ' + escapeHtml(newText);
+    } else {
+      // Simple text or styled spans (will be replaced)
+      element.textContent = newText;
+    }
+  }
+
   // Update the HTML in the iframe
   async function updateHTML() {
     if (!bannerTemplateWrapper) return;
@@ -188,12 +269,17 @@
     }
 
     const doc = iframe.contentWindow.document;
-    const headingEl = doc.querySelector('#template-heading');
-    const subheadingEl = doc.querySelector('#template-subheading');
-    const logoEl = doc.querySelector('#template-logo');
 
-    if (headingEl) headingEl.textContent = heading;
-    if (subheadingEl) subheadingEl.textContent = subheading;
+    // Update all template variables
+    Object.entries(templateVariables).forEach(([id, variable]) => {
+      const element = doc.querySelector(`#${id}`);
+      if (element) {
+        updateElementText(element, variable.value);
+      }
+    });
+
+    // Handle logo if present
+    const logoEl = doc.querySelector('#template-logo');
 
     if (logoEl && logoDataUrl) {
       const img = doc.createElement('img');
@@ -224,15 +310,13 @@
   // Debounced HTML update for text inputs
   const debouncedUpdateHTML = debounce(() => updateHTML(), 150);
 
-  // Handle input changes with debouncing
-  function handleHeadingChange(event) {
-    heading = event.target.value;
-    debouncedUpdateHTML();
-  }
-
-  function handleSubheadingChange(event) {
-    subheading = event.target.value;
-    debouncedUpdateHTML();
+  // Handle input changes for any template variable
+  function handleVariableChange(variableId, event) {
+    if (templateVariables[variableId]) {
+      templateVariables[variableId].value = event.target.value;
+      templateVariables = templateVariables; // Trigger reactivity
+      debouncedUpdateHTML();
+    }
   }
 
   function handleLogoUpload(event) {
@@ -300,10 +384,15 @@
     // Add watermark for non-logged in users after 2 generations
     if (!isUserLoggedIn && generationCount > 2) {
       const watermarkDiv = `
-        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9);
-                    padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 9999;
-                    font-family: system-ui, -apple-system, sans-serif;">
-          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none;">pictify.io</a>
+        <div style="position: fixed; bottom: 16px; right: 16px; background: rgba(0,0,0,0.85);
+                    padding: 10px 18px; border-radius: 6px; font-size: 16px; z-index: 9999;
+                    font-family: system-ui, -apple-system, sans-serif; font-weight: 700;
+                    color: #ffffff; display: flex; align-items: center; gap: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>Made with <span style="color: #ff6b6b; font-weight: 800;">pictify.io</span></span>
         </div>
       `;
       html = html.replace('</body>', `${watermarkDiv}</body>`);
@@ -313,7 +402,8 @@
       const { image } = await createImagePublic({
         html,
         width: LINKEDIN_BANNER_WIDTH,
-        height: LINKEDIN_BANNER_HEIGHT
+        height: LINKEDIN_BANNER_HEIGHT,
+        selector: 'body'
       });
       imageUrl = image.url;
       totalBannersCreated++;
@@ -393,50 +483,79 @@
   <link rel="canonical" href="https://pictify.io/tools/linkedin-banner-generator" />
 </svelte:head>
 
-<Nav />
+<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+  <Nav />
 
-<main class="min-h-screen bg-[#FFFDF8]">
-  <!-- Hero Section -->
-  <section class="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto text-center">
-      <div class="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-        Free • No Signup Required
+  <!-- Background Elements -->
+  <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+
+  <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative z-10">
+    
+    <!-- Breadcrumb -->
+    <nav class="mb-12 flex justify-center">
+      <ol class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]">
+        <li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
+        <li class="text-gray-300">/</li>
+        <li><a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a></li>
+        <li class="text-gray-300">/</li>
+        <li class="text-gray-900">LinkedIn Banner</li>
+      </ol>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative flex flex-col items-center justify-center text-center mb-16">
+      <!-- Badge -->
+      <div class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-8">
+        <div class="px-6 py-2 bg-[#4ade80] border-[4px] border-black text-black font-black text-sm uppercase tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+          Free • No Signup Required
+        </div>
       </div>
 
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight">
-        Create a Professional<br />
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">LinkedIn Banner</span><br />
-        in 60 Seconds
+      <!-- Main Title -->
+      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-8 leading-none">
+        <span class="block">LINKEDIN BANNER</span>
+        <span class="relative inline-block text-white mt-2">
+          <span class="relative z-10 px-4">GENERATOR</span>
+          <span class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[4px] border-black shadow-[6px_6px_0_0_#000] -z-0"></span>
+        </span>
       </h1>
 
-      <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-        Choose from <span class="font-semibold text-gray-900">{allTemplates.length}+ templates</span> designed for developers,
-        marketers, designers, and professionals. Perfect <span class="font-semibold">1584×396</span> dimensions guaranteed.
-      </p>
+      <!-- Description -->
+      <div class="max-w-2xl mx-auto">
+        <p class="text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-6 shadow-[8px_8px_0_0_#e5e7eb]">
+          Choose from <span class="bg-[#ffc480] px-1 border-b-[3px] border-black">{allTemplates.length}+ templates</span> designed for developers,
+          marketers, designers, and professionals.
+          <span class="text-gray-500 text-base mt-3 block font-semibold">Perfect 1584×396 dimensions guaranteed</span>
+        </p>
+      </div>
 
-      <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
-        <span class="font-semibold text-gray-900">{totalBannersCreated.toLocaleString()}</span> banners created
-        <span class="text-yellow-500">★★★★★</span>
-        <span>4.9/5 rating</span>
+      <!-- Stats -->
+      <div class="flex items-center justify-center gap-4 mt-8">
+        <div class="px-4 py-2 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] font-black text-sm">
+          <span class="text-[#ff6b6b]">{totalBannersCreated.toLocaleString()}</span> banners created
+        </div>
+        <div class="px-4 py-2 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] font-black text-sm flex items-center gap-1">
+          <span class="text-yellow-700">★★★★★</span>
+          <span>4.9/5</span>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Category Filter -->
-  <section class="pb-8 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-      <div class="flex flex-wrap justify-center gap-2">
+    <!-- Category Filter -->
+    <div class="mb-12">
+      <div class="flex flex-wrap justify-center gap-3">
         <button
           on:click={() => selectedCategory = 'all'}
-          class="px-4 py-2 rounded-full text-sm font-medium transition-all {selectedCategory === 'all' ? 'bg-gray-900 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'}"
+          class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all {selectedCategory === 'all' ? 'bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480] -translate-x-1 -translate-y-1' : 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
         >
           All Templates
         </button>
         {#each linkedinBannerCategories as category}
           <button
             on:click={() => selectedCategory = category.id}
-            class="px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 {selectedCategory === category.id ? 'bg-gray-900 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'}"
+            class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all flex items-center gap-2 {selectedCategory === category.id ? 'bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480] -translate-x-1 -translate-y-1' : 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
           >
             {@html categoryIcons[category.icon]}
             {category.label}
@@ -444,333 +563,370 @@
         {/each}
       </div>
     </div>
-  </section>
 
-  <!-- Template Gallery -->
-  <section class="pb-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Template Gallery -->
+    <div class="mb-16">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {#each filteredTemplates as template}
           <button
             on:click={() => selectTemplate(template)}
-            class="relative group rounded-lg overflow-hidden border-2 transition-all {selectedTemplate?.id === template.id ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'}"
+            class="group relative bg-white border-[3px] border-gray-900 p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden {selectedTemplate?.id === template.id ? 'ring-4 ring-[#ffc480] ring-offset-2' : ''}"
           >
             {#if template.popular}
-              <div class="absolute top-2 left-2 z-10 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
+              <div class="absolute top-3 left-3 z-10 bg-[#ffc480] text-black text-xs font-black uppercase tracking-wider px-3 py-1 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
                 Popular
               </div>
             {/if}
-            <div class="aspect-[4/1] bg-gray-100">
+            <div class="aspect-[4/1] bg-gray-100 border-b-[3px] border-gray-900 relative overflow-hidden">
               <OgImageTemplate
                 html={template.html}
                 width={LINKEDIN_BANNER_WIDTH}
                 height={LINKEDIN_BANNER_HEIGHT}
                 scale={0.25}
               />
+              <!-- Safe Zone Overlay on Cards (rectangular, bottom-left) -->
+              {#if showSafeZone}
+                <div
+                  class="absolute pointer-events-none z-10"
+                  style="
+                    left: calc({SAFE_ZONE.left}px * 0.25);
+                    top: calc({SAFE_ZONE.top}px * 0.25);
+                    width: calc({SAFE_ZONE.width}px * 0.25);
+                    height: calc({SAFE_ZONE.height}px * 0.25);
+                    border: 2px dashed #ff6b6b;
+                    background: rgba(255, 107, 107, 0.15);
+                    border-radius: 4px;
+                  "
+                ></div>
+              {/if}
             </div>
-            <div class="p-3 bg-white border-t border-gray-100">
-              <p class="text-sm font-medium text-gray-900">{template.name}</p>
-              <p class="text-xs text-gray-500 capitalize">{template.category.replace('-', ' ')}</p>
+            <div class="p-4 bg-white">
+              <p class="text-base font-black text-gray-900 uppercase tracking-wide group-hover:text-[#ff6b6b] transition-colors">{template.name}</p>
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">{template.category.replace('-', ' ')}</p>
             </div>
           </button>
         {/each}
       </div>
     </div>
-  </section>
 
-  <!-- Editor Section -->
-  {#if selectedTemplate}
-    <section class="pb-12 px-4 sm:px-6 lg:px-8" bind:this={bannerTemplateWrapper}>
-      <div class="max-w-6xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <!-- Preview Header -->
-          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="flex gap-1.5">
-                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+    <!-- Editor Section -->
+    {#if selectedTemplate}
+      <div class="mb-16" bind:this={bannerTemplateWrapper}>
+        <div class="relative">
+          <!-- Shadow layer -->
+          <div class="absolute inset-0 bg-black translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"></div>
+          
+          <div class="relative border-[4px] border-black bg-white">
+            <!-- Window Header -->
+            <div class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[4px] border-black">
+              <div class="flex items-center gap-3">
+                <div class="flex gap-2">
+                  <div class="w-4 h-4 bg-[#ff6b6b] border-2 border-gray-700"></div>
+                  <div class="w-4 h-4 bg-[#ffc480] border-2 border-gray-700"></div>
+                  <div class="w-4 h-4 bg-[#4ade80] border-2 border-gray-700"></div>
+                </div>
+                <span class="font-mono font-bold tracking-wider text-sm uppercase">PREVIEW: {LINKEDIN_BANNER_WIDTH} × {LINKEDIN_BANNER_HEIGHT}px</span>
               </div>
-              <span class="text-sm text-gray-600">Preview: {LINKEDIN_BANNER_WIDTH} × {LINKEDIN_BANNER_HEIGHT}px</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                <input type="checkbox" bind:checked={showSafeZone} class="rounded" />
-                Show safe zone
+              <label class="flex items-center gap-2 text-sm font-bold cursor-pointer hover:text-[#ffc480] transition-colors">
+                <input type="checkbox" bind:checked={showSafeZone} class="w-4 h-4 accent-[#ffc480]" />
+                Show Safe Zone
               </label>
             </div>
-          </div>
 
-          <!-- Banner Preview -->
-          <div class="relative bg-gray-100 flex items-center justify-center p-4">
-            <div class="relative inline-block">
-              <OgImageTemplate
-                html={selectedTemplate.html}
-                width={LINKEDIN_BANNER_WIDTH}
-                height={LINKEDIN_BANNER_HEIGHT}
-                scale={0.65}
-              />
+            <!-- Banner Preview -->
+            <div class="relative bg-[#f0f0f0] flex items-center justify-center p-6 border-b-[4px] border-black" style="background-image: repeating-linear-gradient(45deg, #e5e5e5 25%, transparent 25%, transparent 75%, #e5e5e5 75%, #e5e5e5), repeating-linear-gradient(45deg, #e5e5e5 25%, #f0f0f0 25%, #f0f0f0 75%, #e5e5e5 75%, #e5e5e5); background-position: 0 0, 10px 10px; background-size: 20px 20px;">
+              <div class="relative inline-block border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden">
+                <OgImageTemplate
+                  html={selectedTemplate.html}
+                  width={LINKEDIN_BANNER_WIDTH}
+                  height={LINKEDIN_BANNER_HEIGHT}
+                  scale={0.65}
+                />
 
-              <!-- Safe Zone Overlay -->
-              {#if showSafeZone}
-                <div
-                  class="absolute pointer-events-none z-10"
-                  style="
-                    left: 0;
-                    bottom: 0;
-                    width: calc({SAFE_ZONE.width}px * 0.65);
-                    height: calc({SAFE_ZONE.height}px * 0.65);
-                    border: 2px dashed #ef4444;
-                    background: rgba(239, 68, 68, 0.1);
-                    border-radius: 0 50% 0 0;
-                  "
+                <!-- Safe Zone Overlay - Rectangle at bottom-left -->
+                {#if showSafeZone}
+                  <div
+                    class="absolute pointer-events-none z-10"
+                    style="
+                      left: calc({SAFE_ZONE.left}px * 0.65);
+                      top: calc({SAFE_ZONE.top}px * 0.65);
+                      width: calc({SAFE_ZONE.width}px * 0.65);
+                      height: calc({SAFE_ZONE.height}px * 0.65);
+                      border: 3px dashed #ff6b6b;
+                      background: rgba(255, 107, 107, 0.15);
+                      border-radius: 8px;
+                    "
+                  >
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 bg-[#ff6b6b] text-white text-[10px] font-black uppercase tracking-wider border-[2px] border-black whitespace-nowrap">
+                      Safe Zone (568×264px)
+                    </div>
+                  </div>
+                {/if}
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="p-6 md:p-8 bg-[#FFFDF8]">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Dynamic Text Inputs based on Template Variables -->
+                <div class="space-y-6">
+                  {#each Object.entries(templateVariables) as [variableId, variable]}
+                    <div>
+                      <label class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3">{variable.label}</label>
+                      <input
+                        type="text"
+                        value={variable.value}
+                        on:input={(e) => handleVariableChange(variableId, e)}
+                        class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+                        placeholder={variable.label}
+                      />
+                    </div>
+                  {/each}
+                  <div>
+                    <label class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3">Logo (Optional)</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      on:change={handleLogoUpload}
+                      class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-[#ffc480] file:text-black file:font-black file:uppercase file:text-xs file:tracking-wider file:cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <!-- Style Controls -->
+                <div class="space-y-6">
+                  <div>
+                    <label class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3">Font Family</label>
+                    <div class="flex flex-wrap gap-2">
+                      {#each combinedFonts as font}
+                        <button
+                          on:click={() => updateFont(font)}
+                          class="px-4 py-2 border-[3px] border-gray-900 text-sm font-bold transition-all {selectedFont.id === font.id ? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#ffc480]' : 'bg-white text-gray-900 shadow-[3px_3px_0_0_#e5e7eb] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+                          style="font-family: {font.id}"
+                        >
+                          {font.name}
+                        </button>
+                      {/each}
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3">Background</label>
+                      <div class="color-picker-wrapper">
+                        <ColorPicker
+                          bind:rgb={backgroundColorRgb}
+                          on:input={updateBackgroundColor}
+                          isPopup={true}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3">Heading</label>
+                      <div class="color-picker-wrapper">
+                        <ColorPicker
+                          bind:rgb={headingColorRgb}
+                          on:input={updateHeadingColor}
+                          isPopup={true}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3">Subheading</label>
+                      <div class="color-picker-wrapper">
+                        <ColorPicker
+                          bind:rgb={subHeadingColorRgb}
+                          on:input={updateSubheadingColor}
+                          isPopup={true}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generate Button -->
+              <div class="mt-8 flex flex-col items-center">
+                <button
+                  on:click={generateBanner}
+                  disabled={isImageGenerating}
+                  class="px-12 py-5 bg-[#ff6b6b] text-white border-[4px] border-black font-black text-xl uppercase tracking-wider shadow-[8px_8px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
                 >
-                  <div class="absolute bottom-2 left-2 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
-                    Profile Photo
+                  {#if isImageGenerating}
+                    <svg class="animate-spin h-6 w-6" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating...
+                  {:else}
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Generate Banner
+                  {/if}
+                </button>
+              </div>
+
+              <!-- Progress Bar -->
+              {#if isImageGenerating}
+                <div class="mt-6 w-full max-w-md mx-auto">
+                  <div class="h-3 bg-white border-[3px] border-gray-900">
+                    <div class="h-full bg-[#4ade80] transition-all" style="width: {$progress}%"></div>
                   </div>
                 </div>
               {/if}
             </div>
           </div>
+        </div>
+      </div>
+    {/if}
 
-          <!-- Controls -->
-          <div class="p-6 border-t border-gray-200">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Text Inputs -->
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Your Name / Headline</label>
-                  <input
-                    type="text"
-                    bind:value={heading}
-                    on:input={handleHeadingChange}
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Your Name"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Title / Description</label>
-                  <input
-                    type="text"
-                    bind:value={subheading}
-                    on:input={handleSubheadingChange}
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Your Title"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Logo (Optional)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    on:change={handleLogoUpload}
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:font-medium"
-                  />
-                </div>
-              </div>
-
-              <!-- Style Controls -->
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Font</label>
-                  <div class="flex flex-wrap gap-2">
-                    {#each combinedFonts as font}
-                      <button
-                        on:click={() => updateFont(font)}
-                        class="px-3 py-2 text-sm border rounded-lg transition-all {selectedFont.id === font.id ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}"
-                        style="font-family: {font.id}"
-                      >
-                        {font.name}
-                      </button>
-                    {/each}
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Background</label>
-                    <ColorPicker
-                      bind:rgb={backgroundColorRgb}
-                      on:input={updateBackgroundColor}
-                      isPopup={true}
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Heading</label>
-                    <ColorPicker
-                      bind:rgb={headingColorRgb}
-                      on:input={updateHeadingColor}
-                      isPopup={true}
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Subheading</label>
-                    <ColorPicker
-                      bind:rgb={subHeadingColorRgb}
-                      on:input={updateSubheadingColor}
-                      isPopup={true}
-                    />
-                  </div>
-                </div>
-              </div>
+    <!-- Result Section -->
+    {#if imageUrl}
+      <div class="mb-16">
+        <div class="relative">
+          <div class="absolute inset-0 bg-[#4ade80] translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"></div>
+          
+          <div class="relative border-[4px] border-black bg-white">
+            <!-- Header -->
+            <div class="bg-[#4ade80] text-black px-6 py-4 flex items-center gap-3 border-b-[4px] border-black">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+              <h3 class="text-2xl font-black uppercase tracking-tight">Your Banner is Ready!</h3>
             </div>
+            
+            <div class="p-6 md:p-8">
+              <!-- Banner Preview -->
+              <div class="aspect-[4/1] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden mb-6">
+                <img src={imageUrl} alt="Generated LinkedIn Banner" class="w-full h-full object-cover" />
+              </div>
 
-            <!-- Generate Button -->
-            <div class="mt-6 flex flex-col sm:flex-row gap-4 items-center justify-center">
-              <button
-                on:click={generateBanner}
-                disabled={isImageGenerating}
-                class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {#if isImageGenerating}
-                  <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <!-- Watermark Notice -->
+              {#if !isUserLoggedIn && generationCount > 2}
+                <div class="bg-[#ffc480] border-[3px] border-gray-900 p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]">
+                  <p class="font-black text-gray-900 uppercase tracking-wide">Free downloads include a small Pictify watermark</p>
+                  <p class="text-sm font-bold text-gray-700 mt-1">Sign up free to download without watermark</p>
+                  <a href="/signup" class="inline-block mt-3 px-6 py-3 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:shadow-[2px_2px_0_0_#ff6b6b] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    Remove Watermark Free
+                  </a>
+                </div>
+              {/if}
+
+              <!-- Action Buttons -->
+              <div class="flex flex-wrap gap-4">
+                <button
+                  on:click={downloadBanner}
+                  class="flex-1 sm:flex-none px-8 py-4 bg-[#4ade80] text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Generating...
-                {:else}
-                  Generate Banner
-                {/if}
-              </button>
-            </div>
-
-            <!-- Progress Bar -->
-            {#if isImageGenerating}
-              <div class="mt-4 w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all" style="width: {$progress}%"></div>
+                  Download PNG
+                </button>
+                <button
+                  on:click={() => copyToClipboard(imageUrl)}
+                  class="flex-1 sm:flex-none px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy URL
+                </button>
               </div>
-            {/if}
-          </div>
-        </div>
-      </div>
-    </section>
-  {/if}
-
-  <!-- Result Section -->
-  {#if imageUrl}
-    <section class="pb-12 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-4xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Your LinkedIn Banner is Ready!</h3>
-
-            <div class="aspect-[4/1] rounded-lg overflow-hidden mb-6 border border-gray-200">
-              <img src={imageUrl} alt="Generated LinkedIn Banner" class="w-full h-full object-cover" />
-            </div>
-
-            <!-- Watermark Notice -->
-            {#if !isUserLoggedIn && generationCount > 2}
-              <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-6">
-                <p class="font-bold text-yellow-800">Free downloads include a small Pictify watermark</p>
-                <p class="text-sm text-yellow-700 mt-1">Sign up free to download without watermark</p>
-                <a href="/signup" class="inline-block mt-3 px-4 py-2 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition-colors">
-                  Remove Watermark Free
-                </a>
-              </div>
-            {/if}
-
-            <div class="flex flex-wrap gap-3">
-              <button
-                on:click={downloadBanner}
-                class="flex-1 sm:flex-none px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download PNG
-              </button>
-              <button
-                on:click={() => copyToClipboard(imageUrl)}
-                class="flex-1 sm:flex-none px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copy URL
-              </button>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  {/if}
+    {/if}
 
-  <!-- How to Use Section -->
-  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">How to Add Your Banner to LinkedIn</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
-          <h3 class="font-bold text-gray-900 mb-2">Create Your Banner</h3>
-          <p class="text-gray-600 text-sm">Choose a template, customize it with your details, and download</p>
-        </div>
-        <div class="text-center">
-          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
-          <h3 class="font-bold text-gray-900 mb-2">Go to LinkedIn</h3>
-          <p class="text-gray-600 text-sm">Open your LinkedIn profile and click the camera icon on your cover photo</p>
-        </div>
-        <div class="text-center">
-          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
-          <h3 class="font-bold text-gray-900 mb-2">Upload & Save</h3>
-          <p class="text-gray-600 text-sm">Upload your banner and adjust the positioning if needed</p>
-        </div>
+    <!-- How to Use Section -->
+    <div class="mb-16 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]">
+      <div class="bg-gray-900 text-white px-6 py-4 border-b-[4px] border-gray-900">
+        <h2 class="text-2xl font-black uppercase tracking-tight">How to Add Your Banner to LinkedIn</h2>
       </div>
-    </div>
-  </section>
-
-  <!-- Dimensions Info -->
-  <section class="py-16 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-      <div class="bg-white rounded-2xl border border-gray-200 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">LinkedIn Banner Size Guide</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h3 class="font-semibold text-gray-900 mb-3">Recommended Dimensions</h3>
-            <ul class="space-y-2 text-gray-600">
-              <li class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Personal Profile: <strong>1584 x 396 pixels</strong>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Company Page: <strong>1128 x 191 pixels</strong>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Aspect Ratio: <strong>4:1</strong>
-              </li>
-            </ul>
+      
+      <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              01
+            </div>
+            <h3 class="font-black text-gray-900 uppercase tracking-wide mb-2">Create Your Banner</h3>
+            <p class="text-gray-600 font-bold text-sm">Choose a template, customize it with your details, and download</p>
           </div>
-          <div>
-            <h3 class="font-semibold text-gray-900 mb-3">Important Notes</h3>
-            <ul class="space-y-2 text-gray-600">
-              <li class="flex items-start gap-2">
-                <svg class="w-5 h-5 text-yellow-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>Profile photo overlaps the bottom-left corner (~250x200px area)</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Keep important text and elements away from the safe zone</span>
-              </li>
-            </ul>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-[#ff6b6b] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              02
+            </div>
+            <h3 class="font-black text-gray-900 uppercase tracking-wide mb-2">Go to LinkedIn</h3>
+            <p class="text-gray-600 font-bold text-sm">Open your LinkedIn profile and click the camera icon on your cover photo</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+              03
+            </div>
+            <h3 class="font-black text-gray-900 uppercase tracking-wide mb-2">Upload & Save</h3>
+            <p class="text-gray-600 font-bold text-sm">Upload your banner and adjust the positioning if needed</p>
           </div>
         </div>
       </div>
     </div>
-  </section>
+
+    <!-- Dimensions Info -->
+    <div class="mb-16">
+      <div class="relative">
+        <div class="absolute inset-0 bg-[#ffc480] translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"></div>
+        
+        <div class="relative bg-white border-[4px] border-black">
+          <div class="bg-[#ffc480] text-black px-6 py-4 border-b-[4px] border-black">
+            <h2 class="text-2xl font-black uppercase tracking-tight">LinkedIn Banner Size Guide</h2>
+          </div>
+          
+          <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 class="font-black text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                  <span class="w-8 h-8 bg-gray-900 text-white flex items-center justify-center text-sm font-bold">✓</span>
+                  Recommended Dimensions
+                </h3>
+                <ul class="space-y-3">
+                  <li class="flex items-center gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
+                    <span class="text-[#4ade80] font-black">✓</span>
+                    <span class="font-bold">Personal Profile: <strong class="text-[#ff6b6b]">1584 x 396 pixels</strong></span>
+                  </li>
+                  <li class="flex items-center gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
+                    <span class="text-[#4ade80] font-black">✓</span>
+                    <span class="font-bold">Company Page: <strong class="text-[#ff6b6b]">1128 x 191 pixels</strong></span>
+                  </li>
+                  <li class="flex items-center gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
+                    <span class="text-[#4ade80] font-black">✓</span>
+                    <span class="font-bold">Aspect Ratio: <strong class="text-[#ff6b6b]">4:1</strong></span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="font-black text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                  <span class="w-8 h-8 bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center text-sm font-bold">!</span>
+                  Important Notes
+                </h3>
+                <ul class="space-y-3">
+                  <li class="flex items-start gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
+                    <span class="text-[#ffc480] font-black mt-0.5">⚠</span>
+                    <span class="font-medium">Mobile App Profile Photo covers large left area (~600px)</span>
+                  </li>
+                  <li class="flex items-start gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
+                    <span class="text-blue-500 font-black mt-0.5">ℹ</span>
+                    <span class="font-medium">All templates now keep important text on the right side</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
   <!-- API Section -->
   <ApiPromptSection
@@ -782,12 +938,18 @@
     docsLabel={apiCtaDetails.docsLabel}
     secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
   />
-</main>
 
-<Footer />
+  <Footer />
+</section>
 
 <style>
   :global(.color-picker) {
     --picker-width: 100%;
+  }
+  
+  .color-picker-wrapper :global(button) {
+    border: 3px solid #1f2937 !important;
+    border-radius: 0 !important;
+    box-shadow: 3px 3px 0 0 #1f2937;
   }
 </style>

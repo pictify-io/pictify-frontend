@@ -20,9 +20,9 @@ export const brandIcons = {
 		color: '#EA4B71'
 	},
 	pipedream: {
-		type: 'url',
-		url: 'https://cdn.simpleicons.org/pipedream/000000',
-		color: '#000000'
+		type: 'text',
+		text: 'PD',
+		color: '#30D5C8'
 	},
 
 	// Languages/Frameworks
@@ -52,8 +52,8 @@ export const brandIcons = {
 		color: '#000000'
 	},
 	nuxt: {
-		type: 'url',
-		url: 'https://cdn.simpleicons.org/nuxtdotjs/00DC82',
+		type: 'text',
+		text: 'NX',
 		color: '#00DC82'
 	},
 	svelte: {
@@ -91,8 +91,8 @@ export const brandIcons = {
 		color: '#3448C5'
 	},
 	imgix: {
-		type: 'url',
-		url: 'https://cdn.simpleicons.org/imgix/FF4F00',
+		type: 'text',
+		text: 'IX',
 		color: '#FF4F00'
 	},
 	placid: {
@@ -159,6 +159,136 @@ export const brandIcons = {
 		type: 'text',
 		text: 'S1',
 		color: '#111827'
+	},
+	'vercel-og': {
+		type: 'url',
+		url: 'https://cdn.simpleicons.org/vercel/000000',
+		color: '#000000'
+	},
+	filestack: {
+		type: 'text',
+		text: 'FS',
+		color: '#0066FF'
+	},
+	uploadcare: {
+		type: 'text',
+		text: 'UC',
+		color: '#3771FF'
+	},
+	'cloudflare-images': {
+		type: 'url',
+		url: 'https://cdn.simpleicons.org/cloudflare/F38020',
+		color: '#F38020'
+	},
+	playwright: {
+		type: 'text',
+		text: 'PW',
+		color: '#2EAD33'
+	},
+	screenshotmachine: {
+		type: 'text',
+		text: 'SM',
+		color: '#4A90A4'
+	},
+	stillio: {
+		type: 'text',
+		text: 'ST',
+		color: '#6366F1'
+	},
+	htmlpdf: {
+		type: 'text',
+		text: 'HP',
+		color: '#DC2626'
+	},
+	pika: {
+		type: 'text',
+		text: 'PK',
+		color: '#F472B6'
+	},
+	abyssale: {
+		type: 'text',
+		text: 'AB',
+		color: '#8B5CF6'
+	},
+	robolly: {
+		type: 'text',
+		text: 'RB',
+		color: '#10B981'
+	},
+	ogshot: {
+		type: 'text',
+		text: 'OG',
+		color: '#F59E0B'
+	},
+	resoc: {
+		type: 'text',
+		text: 'RS',
+		color: '#14B8A6'
+	},
+	'imgix-rendering': {
+		type: 'text',
+		text: 'IXR',
+		color: '#FF4F00'
+	},
+	htmltodesign: {
+		type: 'text',
+		text: 'H2D',
+		color: '#9333EA'
+	},
+	templated: {
+		type: 'text',
+		text: 'TM',
+		color: '#0EA5E9'
+	},
+	imagekit: {
+		type: 'text',
+		text: 'IK',
+		color: '#0288D1'
+	},
+	chartimg: {
+		type: 'text',
+		text: 'CI',
+		color: '#22C55E'
+	},
+	orshot: {
+		type: 'text',
+		text: 'OR',
+		color: '#EF4444'
+	},
+	'html-css-to-image': {
+		type: 'text',
+		text: 'H2I',
+		color: '#E11D48'
+	},
+	'puppeteer-self-hosted': {
+		type: 'url',
+		url: 'https://cdn.simpleicons.org/puppeteer/40B5A4',
+		color: '#40B5A4'
+	},
+	'playwright-self-hosted': {
+		type: 'text',
+		text: 'PW',
+		color: '#2EAD33'
+	},
+	'screenshot-machine': {
+		type: 'text',
+		text: 'SM',
+		color: '#4A90A4'
+	},
+	'html-to-pdf-apis': {
+		type: 'text',
+		text: 'PDF',
+		color: '#DC2626'
+	},
+	'hcti-io': {
+		type: 'text',
+		text: 'HC',
+		color: '#E11D48'
+	},
+	'html-to-design': {
+		type: 'text',
+		text: 'H2D',
+		color: '#9333EA'
 	},
 
 	// Default

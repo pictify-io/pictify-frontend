@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { getUser } from '../../store/user.store';
+	import { completeOnboardingStep } from '../../api/onboarding';
 	import Loader from '$lib/components/Loader.svelte';
 
 	let isVerifying = true;
@@ -13,6 +14,11 @@
 			goto('/login');
 			return;
 		}
+
+		// Complete the try_editor onboarding step
+		completeOnboardingStep('try_editor').catch(() => {
+			// Silently ignore errors - onboarding is not critical
+		});
 
 		isVerifying = false;
 	});

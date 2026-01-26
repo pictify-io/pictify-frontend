@@ -313,6 +313,17 @@ const apiSnippet = `curl -X POST https://api.pictify.io/image \\
 
   <main class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative cursor-crosshair">
     
+    <!-- Breadcrumb -->
+    <nav class="mb-12 flex justify-center">
+      <ol class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]">
+        <li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
+        <li class="text-gray-300">/</li>
+        <li><a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a></li>
+        <li class="text-gray-300">/</li>
+        <li class="text-gray-900">URL to Image</li>
+      </ol>
+    </nav>
+
     <!-- Hero Section -->
     <div class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10">
 

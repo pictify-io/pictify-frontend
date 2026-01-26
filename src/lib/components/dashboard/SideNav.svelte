@@ -7,6 +7,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import TeamSwitcher from './TeamSwitcher.svelte';
+	import { initializeTeamState, currentTeam, isTeamOwner } from '../../../store/team.store';
 
 	let isMediaListExpanded = false;
 	let isPaidPlan = false;
@@ -26,6 +28,13 @@
 		unsubscribe = user.subscribe((u) => {
 			isPaidPlan = u.currentPlan !== 'starter' && u.currentPlan !== 'free';
 		});
+
+		// Initialize team state
+		try {
+			await initializeTeamState();
+		} catch (error) {
+			console.error('Failed to initialize team state:', error);
+		}
 	});
 
 	onDestroy(() => {
@@ -50,6 +59,11 @@
 
 	<!-- Navigation -->
 	<div class="flex-1 overflow-y-auto py-6 px-3 relative z-10 scrollbar-hide">
+
+		<!-- Team Switcher -->
+		<div class="mb-6">
+			<TeamSwitcher />
+		</div>
 
 		<nav class="space-y-2">
 			<!-- Templates -->
@@ -200,6 +214,29 @@
 				</svg>
 				<span>Integrations</span>
 			</a>
+
+			<!-- Team Settings (visible when user has a team) -->
+			{#if $currentTeam}
+				<div class="h-[2px] bg-gray-200 my-4 mx-4"></div>
+
+				<a
+					href="/dashboard/team"
+					class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+						{$page.url.pathname === '/dashboard/team' || $page.url.pathname.startsWith('/dashboard/team/')
+							? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+							: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+				>
+					<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/team' || $page.url.pathname.startsWith('/dashboard/team/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+					</svg>
+					<span>Team Settings</span>
+					{#if $isTeamOwner}
+						<span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-[#ffc480] text-gray-900 rounded-full border border-gray-900">
+							Owner
+						</span>
+					{/if}
+				</a>
+			{/if}
 		</nav>
 
 		<!-- Support Section -->

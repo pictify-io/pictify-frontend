@@ -4,8 +4,10 @@
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
 	import VerifyEmailBanner from '$lib/components/dashboard/VerifyEmailBanner.svelte';
 	import PLGProvider from '$lib/components/plg/PLGProvider.svelte';
+	import OnboardingChecklist from '$lib/components/onboarding/OnboardingChecklist.svelte';
 
 	import { getUser } from '../../store/user.store';
+	import { initOnboarding } from '../../store/onboarding.store';
 
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -13,6 +15,7 @@
 	import { page } from '$app/stores';
 
 	let user = null;
+	let isUserLoaded = false;
 	let isSidebarOpen = false; // Default to closed on mobile
 	let windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
 
@@ -51,6 +54,12 @@
 			goto('/login');
 			return;
 		}
+
+		// Mark user as loaded so child components can safely make API calls
+		isUserLoaded = true;
+
+		// Initialize onboarding checklist
+		initOnboarding();
 
 		// Only redirect to api-token if user is on the exact dashboard root path
 		const currentPath = window.location.pathname;
@@ -114,9 +123,20 @@
 				style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;">
 			</div>
 			<div class="w-full max-w-7xl mx-auto p-6 h-full relative z-10">
-				<slot />
+				{#if isUserLoaded}
+					<slot />
+				{:else}
+					<div class="flex items-center justify-center h-full">
+						<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
+
+	<!-- Onboarding Checklist -->
+	{#if isUserLoaded}
+		<OnboardingChecklist />
+	{/if}
 </div>
 </PLGProvider>

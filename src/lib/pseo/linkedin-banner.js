@@ -4,13 +4,15 @@
 export const LINKEDIN_BANNER_WIDTH = 1584;
 export const LINKEDIN_BANNER_HEIGHT = 396;
 
-// Profile photo safe zone (bottom-left area that gets covered by profile photo)
-// Based on actual LinkedIn layout: profile photo is ~152px diameter, positioned at bottom-left
+// Profile photo safe zone - rectangular area at bottom-left
+// Based on LinkedIn mobile view measurements (larger than desktop)
+// Desktop: 364 x 224 pixels, Mobile: 568 x 264 pixels
+// Using mobile dimensions as safe zone since it's larger
 export const SAFE_ZONE = {
   left: 0,
-  top: 276, // 396 - 120
-  width: 170,
-  height: 120
+  top: 132,    // 396 - 264 = 132 (bottom-aligned)
+  width: 568,
+  height: 264
 };
 
 // Template categories for the LinkedIn Banner Generator
@@ -21,6 +23,7 @@ export const linkedinBannerCategories = [
   { id: 'recruiter', label: 'Recruiter', icon: 'users', description: 'Professional banners for HR and talent acquisition specialists' },
   { id: 'freelancer', label: 'Freelancer', icon: 'briefcase', description: 'Stand out as an independent professional or consultant' },
   { id: 'corporate', label: 'Corporate', icon: 'building', description: 'Clean, professional banners for executives and business leaders' },
+  { id: 'neo-brutalist', label: 'Neo-Brutalist', icon: 'star', description: 'Bold, high-contrast designs that make a statement' },
   { id: 'personal-brand', label: 'Personal Brand', icon: 'star', description: 'Build your personal brand with impactful banners' }
 ];
 

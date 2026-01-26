@@ -5,10 +5,12 @@ import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 import { alternatives } from '$lib/pseo/comparisons.js';
+import { brandIcons } from '$lib/config/brandIcons.js';
 
 $: slug = $page.params.slug;
 $: alt = alternatives.find(a => a.slug === slug);
 $: validAlt = !!alt;
+$: icon = validAlt ? (brandIcons[slug] || brandIcons.default) : brandIcons.default;
 
 // Redirect if not found
 $: if (browser && !validAlt && slug) {
@@ -120,55 +122,71 @@ $: structuredData = validAlt ? {
 							<span class="text-gray-800 font-medium">{advantage}</span>
 						</div>
 					{/each}
-				</div>
+			</div>
 			</section>
 
 			<!-- Comparison Cards -->
 			<section class="grid md:grid-cols-2 gap-6 mb-12">
 				<!-- Pictify Card -->
-				<div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-6">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 text-sm">
-							P
+				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-[6px_6px_0_0_#4ade80]">
+					<div class="flex items-center gap-4 mb-6">
+						<div class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#ffc480]">
+							<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
+							</svg>
 						</div>
-						<h3 class="text-xl font-black text-gray-900">Choose Pictify if...</h3>
+						<h3 class="text-2xl font-black text-gray-900">Choose Pictify if...</h3>
 					</div>
-					<p class="text-gray-700 font-medium mb-4">
+					<p class="text-gray-700 font-medium mb-6 leading-relaxed">
 						{alt.comparison.bestFor.pictify}
 					</p>
-					<div class="space-y-2">
+					<ul class="space-y-3">
 						{#each alt.comparison.advantages.slice(0, 4) as adv}
-							<div class="flex items-center gap-2">
-								<svg class="w-5 h-5 text-[#4ade80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-								</svg>
-								<span class="text-sm text-gray-700 font-medium">{adv}</span>
-							</div>
+							<li class="flex items-start gap-3">
+								<div class="w-6 h-6 rounded-full bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+									<svg class="w-3 h-3 text-gray-900 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
+									</svg>
+								</div>
+								<span class="text-gray-900 font-bold">{adv}</span>
+							</li>
 						{/each}
-					</div>
+						</ul>
 				</div>
 
 				<!-- Competitor Card -->
-				<div class="bg-gray-100 border-[3px] border-gray-300 rounded-2xl p-6">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-gray-300 border-[2px] border-gray-400 rounded-lg flex items-center justify-center font-black text-gray-600 text-sm">
-							{alt.competitor.charAt(0)}
+				<div class="bg-gray-50 border-[3px] border-dashed border-gray-400 rounded-2xl p-8">
+					<div class="flex items-center gap-4 mb-6">
+						<div class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#9ca3af]" style="color: {icon.color || '#1f2937'}">
+							{#if icon.type === 'url'}
+								<img src={icon.url} alt={alt.competitor} class="w-8 h-8" />
+							{:else if icon.type === 'text'}
+								<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
+							{:else if icon.type === 'svg'}
+								<svg class="w-8 h-8" fill="currentColor" viewBox={icon.viewBox}>
+									<path d={icon.path} />
+								</svg>
+							{:else}
+								<span class="text-xl font-black text-gray-600">{alt.competitor.charAt(0)}</span>
+							{/if}
 						</div>
-						<h3 class="text-xl font-black text-gray-700">Stay with {alt.competitor} if...</h3>
+						<h3 class="text-2xl font-black text-gray-500">Stay with {alt.competitor} if...</h3>
 					</div>
-					<p class="text-gray-600 font-medium mb-4">
+					<p class="text-gray-500 font-medium mb-6 leading-relaxed">
 						{alt.comparison.bestFor.competitor}
 					</p>
-					<div class="space-y-2">
+					<ul class="space-y-3">
 						{#each alt.comparison.competitorAdvantages.slice(0, 4) as adv}
-							<div class="flex items-center gap-2">
-								<svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-								</svg>
-								<span class="text-sm text-gray-600 font-medium">{adv}</span>
-							</div>
+							<li class="flex items-start gap-3">
+								<div class="w-6 h-6 rounded-full bg-gray-200 border-[2px] border-gray-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+									<svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
+									</svg>
+								</div>
+								<span class="text-gray-500 font-medium">{adv}</span>
+							</li>
 						{/each}
-					</div>
+					</ul>
 				</div>
 			</section>
 
@@ -283,11 +301,27 @@ $: structuredData = validAlt ? {
 				</h2>
 				<div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
 					{#each otherAlts as other}
+						{@const otherIcon = brandIcons[other.slug] || brandIcons.default}
 						<a
 							href="/alternatives/{other.slug}"
-							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all group text-center"
+							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all group"
 						>
-							<span class="font-black text-gray-900 text-sm">{other.competitor}</span>
+							<div class="flex items-center gap-3">
+								<div class="w-8 h-8 bg-white border-[2px] border-gray-900 rounded-lg flex items-center justify-center" style="color: {otherIcon.color || '#1f2937'}">
+									{#if otherIcon.type === 'url'}
+										<img src={otherIcon.url} alt={other.competitor} class="w-4 h-4" />
+									{:else if otherIcon.type === 'text'}
+										<span class="text-xs font-black" style="color: {otherIcon.color}">{otherIcon.text}</span>
+									{:else if otherIcon.type === 'svg'}
+										<svg class="w-4 h-4" fill="currentColor" viewBox={otherIcon.viewBox}>
+											<path d={otherIcon.path} />
+										</svg>
+									{:else}
+										<span class="text-xs font-black">{other.competitor.charAt(0)}</span>
+									{/if}
+								</div>
+								<span class="font-black text-gray-900 text-sm">{other.competitor}</span>
+							</div>
 						</a>
 					{/each}
 				</div>

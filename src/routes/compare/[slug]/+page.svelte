@@ -205,9 +205,9 @@ $: structuredData = validComparison ? {
 				<!-- VS Matchup -->
 				<div class="flex items-center justify-center gap-4 sm:gap-8 mb-10">
 					<!-- Pictify Icon -->
-					<div class="w-20 h-20 sm:w-28 sm:h-28 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+					<div class="w-20 h-20 sm:w-28 sm:h-28 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#ffc480] transform -rotate-3 hover:rotate-0 transition-transform duration-300">
 						<svg class="w-10 h-10 sm:w-14 sm:h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
 						</svg>
 					</div>
 
@@ -261,9 +261,9 @@ $: structuredData = validComparison ? {
 				<!-- Pictify Card -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-[6px_6px_0_0_#4ade80]">
 					<div class="flex items-center gap-4 mb-6">
-						<div class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center font-black text-gray-900 text-sm shadow-[3px_3px_0_0_#4ade80]">
+						<div class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center font-black text-gray-900 text-sm shadow-[3px_3px_0_0_#ffc480]">
 							<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
 							</svg>
 						</div>
 						<h2 class="text-2xl font-black text-gray-900">Pictify</h2>
