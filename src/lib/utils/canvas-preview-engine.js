@@ -8,13 +8,19 @@
  * variable values before actually rendering via the API.
  */
 
-import { get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { variables as variablesStore } from '../../store/variables.store';
 
 // Store original object states for restoration
 let originalStates = new Map();
 let loopClones = [];
-let isPreviewActive = false;
+
+// Export isPreviewActive as a writable store for reactive subscriptions
+// This enables components to subscribe and react to preview state changes
+export const isPreviewActive = writable(false);
+
+// Operation lock to prevent race conditions during async preview operations
+let previewOperationInProgress = false;
 
 /**
  * Built-in functions for expression evaluation
@@ -370,9 +376,22 @@ function restoreOriginalState(obj) {
  * Apply preview to canvas
  */
 export async function applyPreview(canvas, testValues) {
-	if (!canvas) return { hiddenCount: 0, loopClonesCount: 0 };
-	
-	isPreviewActive = true;
+	if (!canvas) return { hiddenCount: 0, loopClonesCount: 0, success: false };
+
+	// Prevent overlapping preview operations (race condition mitigation)
+	if (previewOperationInProgress) {
+		console.warn('Preview operation already in progress');
+		return { hiddenCount: 0, loopClonesCount: 0, success: false, reason: 'operation_in_progress' };
+	}
+
+	previewOperationInProgress = true;
+
+	// Batch rendering: disable auto-render during preview operations
+	const originalRenderOnAddRemove = canvas.renderOnAddRemove;
+	canvas.renderOnAddRemove = false;
+
+	try {
+		isPreviewActive.set(true);
 	
 	// Clear previous loop clones
 	loopClones.forEach(clone => {
@@ -448,18 +467,23 @@ export async function applyPreview(canvas, testValues) {
 	// Wait for all loop processing to complete
 	await Promise.all(loopPromises);
 	
-	// Apply visibility
-	objectsToHide.forEach(obj => {
-		obj.set('visible', false);
-		obj.set('opacity', 0);
-	});
-	
-	canvas.requestRenderAll();
-	
-	return {
-		hiddenCount: objectsToHide.length,
-		loopClonesCount: loopClones.length
-	};
+		// Apply visibility
+		objectsToHide.forEach(obj => {
+			obj.set('visible', false);
+			obj.set('opacity', 0);
+		});
+
+		return {
+			hiddenCount: objectsToHide.length,
+			loopClonesCount: loopClones.length,
+			success: true
+		};
+	} finally {
+		// Restore auto-render and trigger single render
+		canvas.renderOnAddRemove = originalRenderOnAddRemove;
+		canvas.requestRenderAll();
+		previewOperationInProgress = false;
+	}
 }
 
 /**
@@ -624,9 +648,12 @@ async function processLoop(canvas, obj, items, baseContext) {
  */
 export function clearPreview(canvas) {
 	if (!canvas) return;
-	
-	isPreviewActive = false;
-	
+
+	// Check if preview is actually active before clearing
+	if (!get(isPreviewActive)) return;
+
+	isPreviewActive.set(false);
+
 	// Remove loop clones
 	loopClones.forEach(clone => {
 		try {
@@ -636,24 +663,25 @@ export function clearPreview(canvas) {
 		}
 	});
 	loopClones = [];
-	
+
 	// Restore original states
 	const objects = canvas.getObjects();
 	objects.forEach(obj => {
 		restoreOriginalState(obj);
 	});
-	
+
 	// Clear stored states
 	originalStates.clear();
-	
+
 	canvas.requestRenderAll();
 }
 
 /**
  * Check if preview is currently active
+ * Returns the current value (not the store itself)
  */
 export function isPreviewModeActive() {
-	return isPreviewActive;
+	return get(isPreviewActive);
 }
 
 /**

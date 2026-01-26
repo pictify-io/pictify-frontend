@@ -18,6 +18,7 @@
 		applyPreview,
 		clearPreview,
 		isPreviewModeActive,
+		isPreviewActive,
 		getPreviewStats,
 		validateTestValues
 	} from '../../utils/canvas-preview-engine';
@@ -59,7 +60,8 @@
 	let showRequestDetails = false;
 	
 	// Preview state
-	let isPreviewActive = false;
+	// Note: isPreviewActive is now imported as a writable store from canvas-preview-engine
+	// Use $isPreviewActive for reactive access
 	let previewStats = null;
 	let previewValidation = { errors: [], warnings: [], isValid: true };
 	
@@ -143,13 +145,18 @@
 	}
 	
 	onDestroy(() => {
+		// Clean up debounce timeout
+		if (previewUpdateTimeout) {
+			clearTimeout(previewUpdateTimeout);
+		}
+
 		if (canvasEventCleanup) {
 			canvasEventCleanup();
 		}
 		variableActions.clearCanvas();
-		
+
 		// Clean up preview if active
-		if (isPreviewActive && $editor) {
+		if ($isPreviewActive && $editor) {
 			clearPreview($editor);
 		}
 	});
@@ -160,17 +167,17 @@
 			toast.set({ message: 'No canvas available', type: 'error', duration: 2000 });
 			return;
 		}
-		
-		if (isPreviewActive) {
+
+		if ($isPreviewActive) {
 			// Turn off preview
 			clearPreview($editor);
-			isPreviewActive = false;
+			// Note: isPreviewActive store is updated inside clearPreview
 			previewStats = null;
 			toast.set({ message: 'Preview mode disabled', type: 'success', duration: 1500 });
 		} else {
 			// Validate before preview
 			previewValidation = validateTestValues(testValues);
-			
+
 			if (!previewValidation.isValid) {
 				toast.set({
 					message: `Preview failed: ${previewValidation.errors.join(', ')}`,
@@ -179,32 +186,40 @@
 				});
 				return;
 			}
-			
+
 			// Turn on preview
 			const result = await applyPreview($editor, testValues);
-			isPreviewActive = true;
+			// Note: isPreviewActive store is updated inside applyPreview
 			previewStats = getPreviewStats($editor, testValues);
-			
-			toast.set({
-				message: `Preview active: ${result.hiddenCount} hidden, ${result.loopClonesCount} loop items`,
-				type: 'success',
-				duration: 2000
-			});
+
+			if (result.success !== false) {
+				toast.set({
+					message: `Preview active: ${result.hiddenCount} hidden, ${result.loopClonesCount} loop items`,
+					type: 'success',
+					duration: 2000
+				});
+			} else if (result.reason === 'operation_in_progress') {
+				toast.set({
+					message: 'Preview operation already in progress',
+					type: 'warning',
+					duration: 2000
+				});
+			}
 		}
 	}
 	
 	async function updatePreview() {
-		if (!isPreviewActive || !$editor) return;
-		
+		if (!$isPreviewActive || !$editor) return;
+
 		// Re-apply preview with updated values
 		clearPreview($editor);
 		await applyPreview($editor, testValues);
 		previewStats = getPreviewStats($editor, testValues);
 	}
-	
+
 	// Auto-update preview when test values change (debounced)
 	let previewUpdateTimeout = null;
-	$: if (isPreviewActive && testValues) {
+	$: if ($isPreviewActive && testValues) {
 		if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
 		previewUpdateTimeout = setTimeout(() => {
 			updatePreview();
@@ -769,7 +784,7 @@
 				on:click={() => activeTab = 'preview'}
 			>
 				Preview
-				{#if isPreviewActive}
+				{#if $isPreviewActive}
 					<span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse border border-gray-900"></span>
 				{/if}
 			</button>
@@ -1077,13 +1092,13 @@
 						<h4 class="text-sm font-black text-gray-900 uppercase tracking-wide">Canvas Preview</h4>
 					</div>
 					<p class="text-[10px] text-gray-500 mb-3 font-medium">See how your template behaves with test data</p>
-					<button 
-						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 {isPreviewActive 
-							? 'bg-gray-900 text-white hover:bg-black' 
+					<button
+						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 {$isPreviewActive
+							? 'bg-gray-900 text-white hover:bg-black'
 							: 'bg-white text-gray-900 hover:bg-gray-50'}"
 						on:click={togglePreview}
 					>
-						{#if isPreviewActive}
+						{#if $isPreviewActive}
 							<i class="fa fa-stop mr-1.5"></i>Stop Preview
 						{:else}
 							<i class="fa fa-play mr-1.5"></i>Start Preview
@@ -1091,7 +1106,7 @@
 					</button>
 
 					
-					{#if isPreviewActive}
+					{#if $isPreviewActive}
 						<div class="flex items-center gap-2 text-xs text-gray-900 font-bold mt-3">
 							<span class="flex items-center gap-1">
 								<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse border border-gray-900"></span>

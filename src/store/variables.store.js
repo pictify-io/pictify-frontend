@@ -264,9 +264,11 @@ export const variableActions = {
 			name: sanitizedName
 		});
 		
+		// Copy-before-mutate pattern for proper Svelte reactivity
 		variablesMap.update(map => {
-			map.set(sanitizedName, variable);
-			return new Map(map);
+			const newMap = new Map(map);
+			newMap.set(sanitizedName, variable);
+			return newMap;
 		});
 		
 		console.log('✅ Variable created:', sanitizedName);
@@ -277,30 +279,32 @@ export const variableActions = {
 	 * Update an existing variable
 	 */
 	update(name, updates) {
+		// Copy-before-mutate pattern for proper Svelte reactivity
 		variablesMap.update(map => {
 			if (!map.has(name)) {
 				console.warn(`Variable "${name}" not found`);
 				return map;
 			}
-			
-			const existing = map.get(name);
+
+			const newMap = new Map(map);
+			const existing = newMap.get(name);
 			const updated = {
 				...existing,
 				...updates,
 				updatedAt: Date.now()
 			};
-			
+
 			// If name changed, need to re-key
 			if (updates.name && updates.name !== name) {
 				const newName = updates.name.replace(/[^a-zA-Z0-9_]/g, '_');
-				if (map.has(newName) && newName !== name) {
+				if (newMap.has(newName) && newName !== name) {
 					console.warn(`Variable "${newName}" already exists`);
 					return map;
 				}
-				map.delete(name);
+				newMap.delete(name);
 				updated.name = newName;
-				map.set(newName, updated);
-				
+				newMap.set(newName, updated);
+
 				// Update canvas object if exists
 				if (canvasRef && existing.objectId) {
 					const obj = canvasRef.getObjects().find(o => o.id === existing.objectId);
@@ -310,10 +314,10 @@ export const variableActions = {
 					}
 				}
 			} else {
-				map.set(name, updated);
+				newMap.set(name, updated);
 			}
-			
-			return new Map(map);
+
+			return newMap;
 		});
 	},
 
@@ -321,14 +325,15 @@ export const variableActions = {
 	 * Delete a variable
 	 */
 	delete(name) {
+		// Copy-before-mutate pattern for proper Svelte reactivity
 		variablesMap.update(map => {
 			const variable = map.get(name);
-			
+
 			if (!variable) {
 				console.warn(`Variable "${name}" not found`);
 				return map;
 			}
-			
+
 			// If tied to canvas object, remove variable properties from object
 			if (canvasRef && variable.objectId && variable.source === VARIABLE_SOURCES.PROPERTY) {
 				const obj = canvasRef.getObjects().find(o => o.id === variable.objectId);
@@ -341,10 +346,11 @@ export const variableActions = {
 					canvasRef.renderAll();
 				}
 			}
-			
-			map.delete(name);
+
+			const newMap = new Map(map);
+			newMap.delete(name);
 			console.log('✅ Variable deleted:', name);
-			return new Map(map);
+			return newMap;
 		});
 	},
 

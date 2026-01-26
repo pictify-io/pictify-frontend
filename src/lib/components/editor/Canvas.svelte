@@ -5,6 +5,7 @@
 	import { canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved } from '../../../store/history.store';
 	import { currentPageIndex, pages, pageActions, outputFormat, pdfPreset } from '../../../store/pages.store';
 	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
+	import { isPreviewModeActive, clearPreview } from '../../utils/canvas-preview-engine';
 
 	let scale = 1;
 	let containerWidth = 0;
@@ -68,18 +69,23 @@
 			console.log('❌ Cannot undo - at beginning of history');
 			return;
 		}
-		
+
+		// Clear preview FIRST - undo will load historical state that doesn't include preview modifications
+		if (isPreviewModeActive()) {
+			clearPreview(fabricCanvas);
+		}
+
 		isPerformingUndoRedo = true;
 		historyIndex--;
 		console.log('⏪ Undoing to index:', historyIndex);
-		
+
 		const state = historyStack[historyIndex];
 		fabricCanvas.loadFromJSON(state, () => {
 			fabricCanvas.renderAll();
 			editorActions.clearSelection();
 			updateHistoryFlags();
 			console.log('✅ Undo complete. New index:', historyIndex);
-			
+
 			// Delay resetting the flag to ensure all Fabric.js events have been processed
 			// Fabric fires object:added/removed events AFTER this callback completes
 			setTimeout(() => {
@@ -96,18 +102,23 @@
 			console.log('❌ Cannot redo - at end of history');
 			return;
 		}
-		
+
+		// Clear preview FIRST - redo will load historical state that doesn't include preview modifications
+		if (isPreviewModeActive()) {
+			clearPreview(fabricCanvas);
+		}
+
 		isPerformingUndoRedo = true;
 		historyIndex++;
 		console.log('⏩ Redoing to index:', historyIndex);
-		
+
 		const state = historyStack[historyIndex];
 		fabricCanvas.loadFromJSON(state, () => {
 			fabricCanvas.renderAll();
 			editorActions.clearSelection();
 			updateHistoryFlags();
 			console.log('✅ Redo complete. New index:', historyIndex);
-			
+
 			// Delay resetting the flag to ensure all Fabric.js events have been processed
 			setTimeout(() => {
 				isPerformingUndoRedo = false;
@@ -463,7 +474,13 @@
 			pagesUnsubscribe = currentPageIndex.subscribe((newIndex) => {
 				if (fabricCanvas && previousPageIndex !== newIndex) {
 					console.log(`📄 Switching from page ${previousPageIndex + 1} to page ${newIndex + 1}`);
-					
+
+					// CRITICAL: Clear preview BEFORE serialization to avoid saving preview clones
+					// Preview clones have _isPreviewClone=true but that's not in the serialization list
+					if (isPreviewModeActive()) {
+						clearPreview(fabricCanvas);
+					}
+
 					// Save current page data before switching
 					const currentData = fabricCanvas.toJSON([
 						'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
