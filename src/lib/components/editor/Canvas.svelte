@@ -65,8 +65,9 @@
 
 	function performUndo() {
 		console.log('⏪ Undo called. Current index:', historyIndex, 'Stack length:', historyStack.length);
-		if (!fabricCanvas || historyIndex <= 0) {
-			console.log('❌ Cannot undo - at beginning of history');
+		if (!fabricCanvas || historyIndex <= 0 || isPerformingUndoRedo) {
+			if (isPerformingUndoRedo) console.log('❌ Cannot undo - operation already in progress');
+			else console.log('❌ Cannot undo - at beginning of history');
 			return;
 		}
 
@@ -98,8 +99,9 @@
 
 	function performRedo() {
 		console.log('⏩ Redo called. Current index:', historyIndex, 'Stack length:', historyStack.length);
-		if (!fabricCanvas || historyIndex >= historyStack.length - 1) {
-			console.log('❌ Cannot redo - at end of history');
+		if (!fabricCanvas || historyIndex >= historyStack.length - 1 || isPerformingUndoRedo) {
+			if (isPerformingUndoRedo) console.log('❌ Cannot redo - operation already in progress');
+			else console.log('❌ Cannot redo - at end of history');
 			return;
 		}
 
