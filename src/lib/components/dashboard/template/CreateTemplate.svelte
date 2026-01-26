@@ -11,7 +11,7 @@
 	} from '../../../../store/template.store';
 	import { extractVariablesFromExpression, generateSampleData, getVariableType as getExpressionVariableType } from '../../../utils/expression-parser';
 	import { get } from 'svelte/store';
-	import { variables as variablesStore } from '../../../../store/variables.store';
+	import { variables as variablesStore, variableActions } from '../../../../store/variables.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
 	import { user, getUser } from '../../../../store/user.store';
@@ -514,15 +514,22 @@
 			hasLoadedTemplate,
 			templateUid: editorTemplate?.uid
 		});
-		
+
 		if (!fabricCanvas || !editorTemplate?.fabricJSData || hasLoadedTemplate) {
 			console.log('loadTemplateIntoCanvas returning early - condition not met');
 			return;
 		}
-		
+
 		console.log('Loading template into canvas:', editorTemplate.uid, 'with', editorTemplate.fabricJSData?.objects?.length, 'objects');
 		hasLoadedTemplate = true;
-		
+
+		// Load saved variable definitions BEFORE canvas sync
+		// This ensures user-specified types are preserved when syncFromCanvas runs
+		if (editorTemplate.variableDefinitions && editorTemplate.variableDefinitions.length > 0) {
+			console.log('Loading variable definitions from template:', editorTemplate.variableDefinitions.length, 'variables');
+			variableActions.loadFromDefinitions(editorTemplate.variableDefinitions);
+		}
+
 		// Start history batch to prevent saving during load
 		if (typeof window !== 'undefined' && window.__historyBatchStart) {
 			window.__historyBatchStart();
