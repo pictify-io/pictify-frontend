@@ -4,10 +4,12 @@
 	import { goto } from '$app/navigation';
 	import { getTemplateById, getTemplateVariables, renderTemplate } from '../../../../../api/template';
 	import { getApiToken, createApiToken } from '../../../../../api/user';
+	import { user } from '../../../../../store/user.store';
 	import { toast } from '../../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
 	import RenderForm from '$lib/components/render/RenderForm.svelte';
 	import RenderPreview from '$lib/components/render/RenderPreview.svelte';
+	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import { analytics } from '$lib/analytics.js';
 
 	let template = null;
@@ -22,6 +24,10 @@
 	let apiTokens = [];
 	let selectedApiKey = '';
 	let isCreatingToken = false;
+
+	// Email verification state
+	$: isEmailVerified = $user?.isEmailVerified;
+	$: userEmail = $user?.email || '';
 
 	// Race condition prevention
 	let renderInProgress = false;
@@ -364,10 +370,13 @@ console.log(result.url); // CDN URL of rendered image`;
 										</button>
 									</div>
 
-									<button
-										class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-										on:click={handleRender}
-										disabled={isRendering || !selectedApiKey}
+									{#if isEmailVerified === false}
+										<EmailVerificationRequired email={userEmail} feature="template rendering" />
+									{:else}
+										<button
+											class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+											on:click={handleRender}
+											disabled={isRendering || !selectedApiKey}
 									>
 										{#if isRendering}
 											<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
@@ -383,13 +392,14 @@ console.log(result.url); // CDN URL of rendered image`;
 											Render Image
 										{/if}
 									</button>
-									
+
 									<button
 										class="text-xs font-bold text-gray-500 hover:text-gray-900 underline uppercase tracking-wider text-center"
 										on:click={generateApiCode}
 									>
 										View API Request Code
 									</button>
+									{/if}
 								</div>
 							{:else}
 								<div class="bg-amber-50 border-[3px] border-amber-200 border-dashed rounded-lg p-6 text-center">

@@ -13,6 +13,7 @@
 	} from '../../../../store/template.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import OgImageEditor from './OgImageEditor.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
 	import { slide } from 'svelte/transition';
@@ -21,9 +22,13 @@
 	// User state
 	let isUserLoggedIn = false;
 	let apiKey = '';
+	let isEmailVerified = null;
+	let userEmail = '';
 
 	user.subscribe(userData => {
 		isUserLoggedIn = !!userData.email;
+		isEmailVerified = userData.isEmailVerified;
+		userEmail = userData.email || '';
 		console.log('userData', userData);
 		if (userData && Array.isArray(userData.apiTokens) && userData.apiTokens.length > 0) {
 			apiKey = userData.apiTokens[0].token || '';
@@ -912,11 +917,16 @@
 												</div>
 											</div>
 
+											<!-- Email Verification Warning -->
+											{#if isUserLoggedIn && isEmailVerified === false}
+												<EmailVerificationRequired email={userEmail} feature="OG image generation API" />
+											{/if}
+
 											<!-- Action Button -->
 											<button
 												class="w-full py-4 bg-[#ff6b6b] text-white font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
 												on:click={handleTestEndpoint}
-												disabled={!apiKey || (selectedEndpoint === 'generate' && (!settings.template || !settings.heading)) || isImageGenerating || isLoadingTemplates}
+												disabled={!apiKey || (selectedEndpoint === 'generate' && (!settings.template || !settings.heading)) || isImageGenerating || isLoadingTemplates || (isUserLoggedIn && isEmailVerified === false)}
 											>
 												{#if isImageGenerating || isLoadingTemplates}
 													<span class="flex items-center justify-center gap-3">
