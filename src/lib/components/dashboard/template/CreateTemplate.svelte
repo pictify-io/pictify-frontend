@@ -11,6 +11,7 @@
 	} from '../../../../store/template.store';
 	import { extractVariablesFromExpression, generateSampleData, getVariableType as getExpressionVariableType } from '../../../utils/expression-parser';
 	import { get } from 'svelte/store';
+	import { variables as variablesStore } from '../../../../store/variables.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
 	import { user, getUser } from '../../../../store/user.store';
@@ -59,11 +60,15 @@
 	 */
 	function extractVariableDefinitions() {
 		if (!fabricCanvas) return [];
-		
+
 		const objects = fabricCanvas.getObjects();
 		// Map to track unique variables by name to avoid duplicates
 		const variableMap = new Map();
-		
+
+		// Get current variables from store for type overrides
+		const storeVariables = get(variablesStore);
+		const storeVariableMap = new Map(storeVariables.map(v => [v.name, v]));
+
 		// 1. Extract variables from variableBindings array (new format)
 		objects.forEach((obj) => {
 			if (obj.isVariable && obj.variableBindings && Array.isArray(obj.variableBindings)) {
@@ -72,19 +77,25 @@
 					const uniqueId = `obj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 					obj.set('id', uniqueId);
 				}
-				
+
 				// Process each binding
 				obj.variableBindings.forEach(binding => {
 					const varName = binding.variableName;
 					if (varName && !variableMap.has(varName)) {
+						// Check if user has overridden the type in the variables store
+						const storeVar = storeVariableMap.get(varName);
+						const inferredType = getVariableTypeForProperty(obj, binding.property);
+
 						variableMap.set(varName, {
 							name: varName,
-							type: getVariableTypeForProperty(obj, binding.property),
-							defaultValue: getDefaultValueForProperty(obj, binding.property),
-							description: binding.description || '',
+							// Use store type if available, otherwise infer from property
+							type: storeVar?.type || inferredType,
+							// Use store default value if available, otherwise infer from property
+							defaultValue: storeVar?.defaultValue ?? getDefaultValueForProperty(obj, binding.property),
+							description: storeVar?.description || binding.description || '',
 							elementId: obj.id,
 							property: binding.property,
-							validation: { required: binding.required || false },
+							validation: { required: storeVar?.required ?? binding.required ?? false },
 							source: 'property'
 						});
 					}
@@ -96,22 +107,25 @@
 		objects.forEach(obj => {
 			const showWhen = obj.showWhen;
 			const hideWhen = obj.hideWhen;
-			
+
 			if (showWhen || hideWhen) {
 				const expression = showWhen || hideWhen;
 				const extractedVars = extractVariablesFromExpression(expression);
-				
+
 				extractedVars.forEach(extractedVar => {
 					if (!variableMap.has(extractedVar.name)) {
-						const varType = getExpressionVariableType(extractedVar, 'condition');
+						// Check if user has overridden the type in the variables store
+						const storeVar = storeVariableMap.get(extractedVar.name);
+						const inferredType = getExpressionVariableType(extractedVar, 'condition');
+
 						variableMap.set(extractedVar.name, {
 							name: extractedVar.name,
-							type: varType,
-							defaultValue: generateSampleData(extractedVar, 'condition'),
-							description: `Used in ${showWhen ? 'show' : 'hide'} condition`,
+							type: storeVar?.type || inferredType,
+							defaultValue: storeVar?.defaultValue ?? generateSampleData(extractedVar, 'condition'),
+							description: storeVar?.description || `Used in ${showWhen ? 'show' : 'hide'} condition`,
 							elementId: `condition_${extractedVar.name}`,
-							property: varType === 'object' ? 'data' : 'value',
-							validation: { required: false },
+							property: (storeVar?.type || inferredType) === 'object' ? 'data' : 'value',
+							validation: { required: storeVar?.required ?? false },
 							source: 'condition',
 							isObject: extractedVar.isObject,
 							properties: extractedVar.properties
@@ -120,21 +134,24 @@
 				});
 			}
 		});
-		
+
 		// 3. Extract variables from loop/repeat configurations
 		objects.forEach(obj => {
 			const loopVariable = obj.loopVariable;
-			
+
 			if (loopVariable && loopVariable !== null && loopVariable !== '') {
 				if (!variableMap.has(loopVariable)) {
+					// Check if user has overridden the type in the variables store
+					const storeVar = storeVariableMap.get(loopVariable);
+
 					variableMap.set(loopVariable, {
 						name: loopVariable,
-						type: 'array',
-						defaultValue: generateSampleData({ name: loopVariable }, 'loop'),
-						description: `Array variable for repeating element`,
+						type: storeVar?.type || 'array',
+						defaultValue: storeVar?.defaultValue ?? generateSampleData({ name: loopVariable }, 'loop'),
+						description: storeVar?.description || `Array variable for repeating element`,
 						elementId: `loop_${loopVariable}`,
 						property: 'items',
-						validation: { required: false },
+						validation: { required: storeVar?.required ?? false },
 						source: 'loop',
 						loopItemName: obj.loopItemName,
 						loopDirection: obj.loopDirection
@@ -142,14 +159,30 @@
 				}
 			}
 		});
-		
+
+		// 4. Include custom variables from store that aren't tied to canvas objects
+		storeVariables.forEach(storeVar => {
+			if (storeVar.source === 'custom' && !variableMap.has(storeVar.name)) {
+				variableMap.set(storeVar.name, {
+					name: storeVar.name,
+					type: storeVar.type,
+					defaultValue: storeVar.defaultValue,
+					description: storeVar.description || '',
+					elementId: storeVar.id || `custom_${storeVar.name}`,
+					property: 'value',
+					validation: { required: storeVar.required ?? false },
+					source: 'custom'
+				});
+			}
+		});
+
 		const variables = Array.from(variableMap.values());
-		
+
 		console.log('Extracted variables:', variables);
-		
+
 		return variables;
 	}
-	
+
 	function getVariableTypeForProperty(obj, property) {
 		switch (property) {
 			case 'text':
