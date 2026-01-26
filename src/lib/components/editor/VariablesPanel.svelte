@@ -111,9 +111,10 @@
 		setTimeout(() => syncVariables(), 100);
 	}
 	
-	// Initialize test values when variables change
-	$: if ($variables.length > 0) {
-		initializeTestValues();
+	// Initialize test values when variables change (including type changes)
+	// Using $variables directly (not just length) to react to any property changes
+	$: if ($variables) {
+		initializeTestValues($variables);
 	}
 	
 	// Set up canvas event listeners
@@ -239,17 +240,36 @@
 		variableActions.syncFromCanvas($editor);
 	}
 	
-	function initializeTestValues() {
-		$variables.forEach(v => {
-			if (testValues[v.name] === undefined) {
-				testValues[v.name] = v.defaultValue || '';
+	// Track variable types to detect changes
+	let variableTypes = {};
+
+	function initializeTestValues(vars) {
+		if (!vars) return;
+
+		vars.forEach(v => {
+			const previousType = variableTypes[v.name];
+			const typeChanged = previousType && previousType !== v.type;
+
+			// Initialize if undefined OR if type changed (need to reset to new default)
+			if (testValues[v.name] === undefined || typeChanged) {
+				testValues[v.name] = v.defaultValue ?? getDefaultForType(v.type);
+				if (typeChanged) {
+					console.log(`Variable "${v.name}" type changed from ${previousType} to ${v.type}, resetting test value`);
+				}
 			}
+
+			// Track current type for future change detection
+			variableTypes[v.name] = v.type;
 		});
+
+		// Remove test values for deleted variables
 		Object.keys(testValues).forEach(key => {
-			if (!$variables.find(v => v.name === key)) {
+			if (!vars.find(v => v.name === key)) {
 				delete testValues[key];
+				delete variableTypes[key];
 			}
 		});
+
 		testValues = { ...testValues };
 	}
 	
