@@ -4,6 +4,8 @@
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
 	import VerifyEmailBanner from '$lib/components/dashboard/VerifyEmailBanner.svelte';
 	import PLGProvider from '$lib/components/plg/PLGProvider.svelte';
+	import UsageBanner from '$lib/components/plg/UsageBanner.svelte';
+	import ProactiveUpgradeModal from '$lib/components/plg/ProactiveUpgradeModal.svelte';
 	import OnboardingChecklist from '$lib/components/onboarding/OnboardingChecklist.svelte';
 
 	import { getUser } from '../../store/user.store';
@@ -89,6 +91,9 @@
 	{#if user?.isEmailVerified === false}
 		<VerifyEmailBanner email={user?.email} />
 	{/if}
+	{#if isUserLoaded}
+		<UsageBanner />
+	{/if}
 	<div class="flex w-full flex-grow overflow-hidden relative">
 		<!-- Backdrop for mobile/tablet -->
 		{#if isSidebarOpen && windowWidth < 1024}
@@ -139,4 +144,9 @@
 		<OnboardingChecklist />
 	{/if}
 </div>
+
+	<!-- Proactive Upgrade Modal (shows once at 75%) -->
+	{#if isUserLoaded}
+		<ProactiveUpgradeModal />
+	{/if}
 </PLGProvider>

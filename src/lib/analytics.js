@@ -288,6 +288,79 @@ export const analytics = {
     });
   },
 
+  // ============================================
+  // Usage Nudge Tracking
+  // ============================================
+
+  /**
+   * Track usage banner shown
+   * @param {Object} params - { percentage, plan }
+   */
+  trackUsageBannerShown: (params = {}) => {
+    analytics.track('usage_banner_shown', {
+      percentage: params.percentage,
+      plan: params.plan,
+    });
+  },
+
+  /**
+   * Track usage banner dismissed
+   * @param {Object} params - { percentage, plan }
+   */
+  trackUsageBannerDismissed: (params = {}) => {
+    analytics.track('usage_banner_dismissed', {
+      percentage: params.percentage,
+      plan: params.plan,
+    });
+  },
+
+  /**
+   * Track usage banner upgrade clicked
+   * @param {Object} params - { percentage, plan }
+   */
+  trackUsageBannerUpgradeClicked: (params = {}) => {
+    analytics.track('usage_banner_upgrade_clicked', {
+      percentage: params.percentage,
+      plan: params.plan,
+    });
+  },
+
+  /**
+   * Track proactive modal shown
+   * @param {Object} params - { percentage, plan, renders_completed, time_saved }
+   */
+  trackProactiveModalShown: (params = {}) => {
+    analytics.track('proactive_modal_shown', {
+      percentage: params.percentage,
+      plan: params.plan,
+      renders_completed: params.renders_completed,
+      time_saved: params.time_saved,
+    });
+  },
+
+  /**
+   * Track proactive modal dismissed
+   * @param {Object} params - { percentage, plan }
+   */
+  trackProactiveModalDismissed: (params = {}) => {
+    analytics.track('proactive_modal_dismissed', {
+      percentage: params.percentage,
+      plan: params.plan,
+    });
+  },
+
+  /**
+   * Track proactive modal upgrade clicked
+   * @param {Object} params - { percentage, plan, discount }
+   */
+  trackProactiveModalUpgradeClicked: (params = {}) => {
+    analytics.track('proactive_modal_upgrade_clicked', {
+      percentage: params.percentage,
+      plan: params.plan,
+      discount: params.discount,
+    });
+  },
+
   /**
    * Track API key created
    */
