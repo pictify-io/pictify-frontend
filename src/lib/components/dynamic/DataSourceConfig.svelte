@@ -67,17 +67,14 @@
 
 <div class="space-y-8">
 	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide flex items-center gap-3">
-			<span class="w-8 h-8 bg-gray-900 border-2 border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_#9ca3af]">
-				<span class="text-white text-lg font-black">1</span>
-			</span>
-			Configure Data Source
-		</h2>
+		<!-- Header removed as it is now in parent -->
+		<div></div> 
 		<button
-			class="px-4 py-2 text-xs font-black bg-white hover:bg-gray-50 text-gray-900 border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+			class="px-5 py-2.5 text-xs font-black bg-white hover:bg-gray-50 text-gray-900 border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest flex items-center gap-2"
 			on:click={() => { showNewForm = true; dispatch('select', null); }}
 		>
-			+ Create New
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+			New Connection
 		</button>
 	</div>
 
@@ -112,8 +109,8 @@
 	{#if showNewForm || dataSources.length === 0}
 		<!-- New Data Source Form -->
 		<div class="space-y-6 p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937]">
-			<div class="flex items-center gap-3 pb-4 border-b-[3px] border-gray-100 border-dashed">
-				<div class="w-3 h-3 rounded-full bg-gray-900 border-2 border-gray-900"></div>
+			<div class="flex items-center gap-3 pb-4 border-b-[3px] border-gray-900">
+				<span class="w-3 h-3 bg-[#3b82f6] border-2 border-gray-900 rounded-full"></span>
 				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">New Connection Details</h3>
 			</div>
 
@@ -190,7 +187,7 @@
 										<span class="text-xs font-mono text-gray-500 truncate">{getMaskedValue(key, value)}</span>
 									</div>
 									<button
-										class="text-gray-400 hover:text-[#ff6b6b] transition-colors p-1 hover:bg-red-50 rounded"
+										class="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
 										on:click={() => removeHeader(key)}
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,11 +260,11 @@
 			</div>
 
 			{#if testResult}
-				<div class="p-6 rounded-xl border-[3px] {testResult.success ? 'bg-[#f0fdf4] border-[#4ade80] shadow-[4px_4px_0_0_#166534]' : 'bg-red-50 border-[#ff6b6b] shadow-[4px_4px_0_0_#991b1b]'} transition-all">
+				<div class="p-6 rounded-xl border-[3px] {testResult.success ? 'bg-[#dcfce7] border-gray-900 shadow-[4px_4px_0_0_#166534]' : 'bg-red-50 border-gray-900 shadow-[4px_4px_0_0_#991b1b]'} transition-all animation-slide-up">
 					{#if testResult.success}
-						<div class="flex items-center gap-3 mb-3 pb-3 border-b-2 border-green-200/50">
-							<div class="w-8 h-8 rounded-full bg-[#4ade80] flex items-center justify-center border-2 border-[#166534]">
-								<svg class="w-5 h-5 text-[#166534]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<div class="flex items-center gap-4 mb-3 pb-3 border-b-2 border-green-200/50">
+							<div class="w-10 h-10 rounded-lg bg-white border-[3px] border-gray-900 flex items-center justify-center text-lg">
+								<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
 								</svg>
 							</div>
@@ -303,7 +300,7 @@
 	<div class="flex justify-end gap-4 pt-6 mt-6 border-t-[3px] border-gray-900">
 		{#if showNewForm && !selectedDataSource}
 			<button
-				class="px-8 py-4 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				on:click={handleCreate}
 				disabled={!newDataSource.name || !newDataSource.url}
 			>
@@ -311,7 +308,7 @@
 			</button>
 		{:else}
 			<button
-				class="px-8 py-4 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
+				class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
 				on:click={handleNext}
 				disabled={!selectedDataSource}
 			>
