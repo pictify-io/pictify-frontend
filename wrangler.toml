@@ -1,0 +1,39 @@
+# Cloudflare Pages configuration for Pictify
+# See: https://developers.cloudflare.com/pages/platform/wrangler-configuration/
+
+name = "pictify-frontend"
+compatibility_date = "2024-01-01"
+
+# KV Namespaces for PSEO content caching
+# These need to be created in the Cloudflare dashboard first
+# Then update the IDs below
+
+# Production KV namespaces
+[[kv_namespaces]]
+binding = "PSEO_CONTENT"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[[kv_namespaces]]
+binding = "PSEO_CACHE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Preview/Development KV namespaces (optional)
+# [[kv_namespaces]]
+# binding = "PSEO_CONTENT"
+# id = "REPLACE_WITH_PREVIEW_KV_NAMESPACE_ID"
+# preview_id = "REPLACE_WITH_PREVIEW_KV_NAMESPACE_ID"
+
+# Environment variables
+[vars]
+PUBLIC_BASE_URL = "https://pictify.io"
+
+# Build configuration
+[build]
+command = "npm run build"
+
+# Environment-specific settings
+[env.production]
+vars = { PUBLIC_BASE_URL = "https://pictify.io" }
+
+[env.preview]
+vars = { PUBLIC_BASE_URL = "https://preview.pictify.io" }
