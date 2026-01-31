@@ -34,20 +34,13 @@
 </script>
 
 <div class="space-y-8">
-	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide flex items-center gap-3">
-			<span class="w-8 h-8 bg-gray-900 border-2 border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_#9ca3af]">
-				<span class="text-white text-lg font-black">3</span>
-			</span>
-			Refresh Strategy
-		</h2>
-	</div>
+	<!-- Header removed as it is now in parent -->
 
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 		<!-- TTL Configuration -->
 		<div class="space-y-6">
 			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
-				<span class="w-3 h-3 bg-[#ffe66d] rounded-full border-2 border-black"></span>
+				<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black"></span>
 				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Cache Duration (TTL)</h3>
 			</div>
 			
@@ -98,7 +91,7 @@
 
 			<div class="space-y-3">
 				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
-					{refreshPolicy.onError === 'serve_stale' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-purple-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+					{refreshPolicy.onError === 'serve_stale' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
 					<div class="relative flex items-center justify-center">
 						<input
 							type="radio"
@@ -117,7 +110,7 @@
 				</label>
 
 				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
-					{refreshPolicy.onError === 'serve_default' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-purple-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+					{refreshPolicy.onError === 'serve_default' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
 					<div class="relative flex items-center justify-center">
 						<input
 							type="radio"
@@ -136,7 +129,7 @@
 				</label>
 
 				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
-					{refreshPolicy.onError === 'error' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-purple-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+					{refreshPolicy.onError === 'error' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
 					<div class="relative flex items-center justify-center">
 						<input
 							type="radio"
@@ -160,7 +153,7 @@
 	<!-- Output Configuration -->
 	<div class="mt-8 pt-8 border-t-[3px] border-gray-200 border-dashed">
 		<div class="flex items-center gap-2 pb-4">
-			<span class="w-3 h-3 bg-blue-400 rounded-full border-2 border-black"></span>
+			<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black"></span>
 			<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Output Format</h3>
 		</div>
 
@@ -170,7 +163,7 @@
 					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Image Format</label>
 					<div class="relative">
 						<select
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffe66d] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all bg-white appearance-none"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#3b82f6] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all bg-white appearance-none"
 							value={outputConfig.format}
 							on:change={(e) => handleOutputChange({ format: e.target.value })}
 						>
@@ -187,14 +180,14 @@
 				<div>
 					<div class="flex justify-between mb-2">
 						<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Quality</label>
-						<span class="text-xs font-black text-[#a855f7] bg-purple-50 px-2 rounded border border-purple-100">{outputConfig.quality}%</span>
+						<span class="text-xs font-black text-[#3b82f6] bg-blue-50 px-2 rounded border border-blue-100">{outputConfig.quality}%</span>
 					</div>
 					<input
 						type="range"
 						min="50"
 						max="100"
 						step="5"
-						class="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#a855f7] border-2 border-gray-300"
+						class="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#3b82f6] border-2 border-gray-300"
 						value={outputConfig.quality}
 						on:input={(e) => handleOutputChange({ quality: parseInt(e.target.value) })}
 					/>
@@ -216,7 +209,7 @@
 			Back
 		</button>
 		<button
-			class="px-8 py-4 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Publish

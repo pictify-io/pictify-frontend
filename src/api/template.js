@@ -141,16 +141,11 @@ const batchRenderTemplate = async (uid, variableSets, options = {}) => {
 /**
  * Get batch job results
  * @param {string} batchId - Batch job ID
- * @returns {Promise<Object>} - { batchId, status, progress, results, errors }
+ * @returns {Promise<Object>} - { batchId, status, progress, results, errors } or throws error
  */
 const getBatchJobResults = async (batchId) => {
-	try {
-		const response = await backend.get(`/templates/batch/${batchId}/results`);
-		return response;
-	} catch (error) {
-		console.error('Error fetching batch results:', error);
-		return null;
-	}
+	const response = await backend.get(`/templates/batch/${batchId}/results`);
+	return response;
 };
 
 /**
@@ -165,6 +160,51 @@ const cancelBatchJob = async (batchId) => {
 	} catch (error) {
 		console.error('Error cancelling batch job:', error);
 		return null;
+	}
+};
+
+/**
+ * Batch render a template from a CSV URL
+ * Backend downloads and parses the CSV - no row limit
+ * Uses the unified batch-render endpoint with CSV mode
+ * @param {string} uid - Template UID
+ * @param {string} csvUrl - URL to the CSV file
+ * @param {Object} mappings - Map of CSV column names to template variable names
+ * @param {Object} options - Render options
+ * @returns {Promise<Object>} - { batchId, status, totalItems }
+ */
+const batchRenderFromCsv = async (uid, csvUrl, mappings, options = {}) => {
+	try {
+		const response = await backend.post(`/templates/${uid}/batch-render`, {
+			csvUrl,
+			mappings,
+			format: options.format || 'png',
+			quality: options.quality || 0.9,
+			concurrency: options.concurrency || 5
+		}, {
+			headers: options.headers || {}
+		});
+		return response;
+	} catch (error) {
+		console.error('Error batch rendering from CSV:', error);
+		throw error;
+	}
+};
+
+/**
+ * Upload a CSV file for batch rendering
+ * @param {File} file - The CSV file to upload
+ * @returns {Promise<Object>} - { url, filename, size }
+ */
+const uploadCsvForBatch = async (file) => {
+	try {
+		const formData = new FormData();
+		formData.append('file', file);
+		const response = await backend.postFormData('/templates/upload-csv', formData);
+		return response;
+	} catch (error) {
+		console.error('Error uploading CSV:', error);
+		throw error;
 	}
 };
 
@@ -324,6 +364,8 @@ export {
 	getTemplateVariables,
 	// New exports
 	batchRenderTemplate,
+	batchRenderFromCsv,
+	uploadCsvForBatch,
 	getBatchJobResults,
 	cancelBatchJob,
 	regenerateThumbnail,

@@ -6,6 +6,8 @@
 	import {
 		getBindingsForTemplate,
 		createBinding,
+		updateBinding,
+		deleteBinding,
 		getDataSources,
 		createDataSource,
 		testDataSource
@@ -65,6 +67,9 @@
 	// Published binding
 	let publishedBinding = null;
 	let isPublishing = false;
+	let isEditing = false;
+	let isDeleting = false;
+	let isUpdating = false;
 
 	$: uid = $page.params.uid;
 
@@ -96,7 +101,8 @@
 		isLoading = true;
 
 		try {
-			const [templateRes, variablesRes, bindingsRes, dataSourcesRes] = await Promise.all([
+			// Use Promise.allSettled for graceful degradation - page can load even if some calls fail
+			const [templateRes, variablesRes, bindingsRes, dataSourcesRes] = await Promise.allSettled([
 				getTemplateById(uid),
 				getTemplateVariables(uid),
 				getBindingsForTemplate(uid),
@@ -106,16 +112,28 @@
 			// Check if component is still mounted and this is still the current load
 			if (!mounted || thisLoad !== loadVersion) return;
 
-			if (!templateRes?.template) {
+			// Template is required - fail if not available
+			if (templateRes.status === 'rejected' || !templateRes.value?.template) {
 				toast.set({ message: 'Template not found', type: 'error', duration: 3000 });
 				goto('/dashboard/template');
 				return;
 			}
 
-			template = templateRes.template;
-			variables = variablesRes?.variables || [];
-			existingBindings = bindingsRes?.bindings || [];
-			dataSources = dataSourcesRes?.dataSources || [];
+			template = templateRes.value.template;
+			variables = variablesRes.status === 'fulfilled' ? (variablesRes.value?.variables || []) : [];
+			existingBindings = bindingsRes.status === 'fulfilled' ? (bindingsRes.value?.bindings || []) : [];
+			dataSources = dataSourcesRes.status === 'fulfilled' ? (dataSourcesRes.value?.dataSources || []) : [];
+
+			// Log warnings for partial failures
+			if (variablesRes.status === 'rejected') {
+				console.warn('Failed to load variables:', variablesRes.reason);
+			}
+			if (bindingsRes.status === 'rejected') {
+				console.warn('Failed to load bindings:', bindingsRes.reason);
+			}
+			if (dataSourcesRes.status === 'rejected') {
+				console.warn('Failed to load data sources:', dataSourcesRes.reason);
+			}
 
 			// If there's an existing binding, load it
 			if (existingBindings.length > 0) {
@@ -308,6 +326,118 @@
 		activeTab = tab;
 	};
 
+	// Edit binding - enters edit mode with existing binding data
+	const handleEditBinding = () => {
+		if (!publishedBinding) return;
+		isEditing = true;
+		activeTab = 'datasource';
+		toast.set({ message: 'Editing binding - make changes and save', type: 'info', duration: 2000 });
+	};
+
+	// Update existing binding
+	const handleUpdateBinding = async () => {
+		if (!publishedBinding || isUpdating) return;
+		isUpdating = true;
+
+		try {
+			// Build updated binding data
+			const dataSourceForBinding = selectedDataSource ? {
+				type: selectedDataSource.type || 'http',
+				url: selectedDataSource.url,
+				method: selectedDataSource.method || 'GET',
+				headers: selectedDataSource.headers || {}
+			} : {
+				type: 'static'
+			};
+
+			const updates = {
+				dataSource: dataSourceForBinding,
+				mapping,
+				defaults,
+				refreshPolicy: {
+					type: 'ttl',
+					ttlSeconds: refreshPolicy.ttlSeconds || 300,
+					onError: refreshPolicy.onError || 'serve_stale'
+				},
+				outputConfig: {
+					format: outputConfig.format || 'png',
+					quality: outputConfig.quality || 90
+				}
+			};
+
+			const result = await updateBinding(publishedBinding.uid, updates);
+
+			if (!mounted) return;
+
+			publishedBinding = result.binding || result;
+			isEditing = false;
+			activeTab = 'publish';
+			toast.set({ message: 'Binding updated successfully!', type: 'success', duration: 3000 });
+
+			analytics.trackFeatureUsed({ feature_name: 'dynamic_binding_updated', context: uid });
+		} catch (error) {
+			if (!mounted) return;
+			toast.set({ message: `Update failed: ${error.message}`, type: 'error', duration: 3000 });
+		} finally {
+			if (mounted) {
+				isUpdating = false;
+			}
+		}
+	};
+
+	// Delete binding
+	const handleDeleteBinding = async () => {
+		if (!publishedBinding || isDeleting) return;
+
+		// Confirm deletion
+		const confirmed = confirm('Are you sure you want to delete this dynamic binding? This action cannot be undone.');
+		if (!confirmed) return;
+
+		isDeleting = true;
+
+		try {
+			await deleteBinding(publishedBinding.uid);
+
+			if (!mounted) return;
+
+			// Reset state
+			publishedBinding = null;
+			existingBindings = existingBindings.filter(b => b.uid !== publishedBinding?.uid);
+			isEditing = false;
+			activeTab = 'datasource';
+
+			// Reset form
+			mapping = {};
+			defaults = {};
+			refreshPolicy = { ttlSeconds: 300, onError: 'serve_stale' };
+			outputConfig = { format: 'png', quality: 90 };
+
+			toast.set({ message: 'Binding deleted successfully', type: 'success', duration: 3000 });
+
+			analytics.trackFeatureUsed({ feature_name: 'dynamic_binding_deleted', context: uid });
+		} catch (error) {
+			if (!mounted) return;
+			toast.set({ message: `Delete failed: ${error.message}`, type: 'error', duration: 3000 });
+		} finally {
+			if (mounted) {
+				isDeleting = false;
+			}
+		}
+	};
+
+	// Cancel editing
+	const handleCancelEdit = () => {
+		isEditing = false;
+		activeTab = 'publish';
+		// Reload original binding data
+		if (publishedBinding) {
+			mapping = publishedBinding.mapping || {};
+			defaults = publishedBinding.defaults || {};
+			refreshPolicy = publishedBinding.refreshPolicy || { ttlSeconds: 300, onError: 'serve_stale' };
+			outputConfig = publishedBinding.outputConfig || { format: 'png', quality: 90 };
+		}
+	};
+
 	// Note: loadData is called reactively when uid changes (see reactive statement above)
 	// onMount is no longer needed for initial load since the reactive $: if (uid && mounted) handles it
 </script>
@@ -332,7 +462,7 @@
 						Loading...
 					{/if}
 				</h1>
-				<div class="px-2 py-1 bg-[#a855f7] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]">
+				<div class="px-2 py-1 bg-[#3b82f6] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]">
 					Dynamic Mode
 				</div>
 			</div>
@@ -356,7 +486,13 @@
 				Render
 			</button>
 			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all bg-[#a855f7] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
+				on:click={() => goto(`/dashboard/template/${uid}/bulk-render`)}
+			>
+				Bulk
+			</button>
+			<button
+				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all bg-[#3b82f6] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 			>
 				Dynamic
 			</button>
@@ -370,68 +506,71 @@
 			</div>
 		{:else if template}
 			<!-- Progress Tabs -->
-			<div class="flex flex-wrap gap-4 mb-8">
-				<button
-					class="flex-1 min-w-[140px] px-4 py-4 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex flex-col items-center justify-center gap-2 border-[3px]
-						{activeTab === 'datasource' 
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#9ca3af] translate-x-[-2px] translate-y-[-2px]' 
-							: 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
-					on:click={() => goToTab('datasource')}
-				>
-					<span class="w-6 h-6 rounded-full {activeTab === 'datasource' ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-400'} text-xs font-black flex items-center justify-center border-2 {activeTab === 'datasource' ? 'border-gray-900' : 'border-current'}">1</span>
-					Data Source
-				</button>
-				
-				<div class="hidden sm:flex items-center text-gray-300">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+			<!-- Step Indicator -->
+			<div class="flex gap-4 mb-8 px-1">
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
+						{activeTab === 'datasource' ? 'bg-[#3b82f6] text-white -translate-y-1' : ['mapping', 'refresh', 'publish'].includes(activeTab) ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
+						{#if ['mapping', 'refresh', 'publish'].includes(activeTab)}
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
+						{:else}
+							1
+						{/if}
+					</div>
+					<div class="hidden sm:flex flex-col">
+						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 1</span>
+						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Data Source</span>
+					</div>
 				</div>
+				<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {['mapping', 'refresh', 'publish'].includes(activeTab) ? 'bg-gray-900' : ''}"></div>
 
-				<button
-					class="flex-1 min-w-[140px] px-4 py-4 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex flex-col items-center justify-center gap-2 border-[3px]
-						{activeTab === 'mapping' 
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#9ca3af] translate-x-[-2px] translate-y-[-2px]' 
-							: canProceedToMapping ? 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900' : 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'}"
-					on:click={() => canProceedToMapping && goToTab('mapping')}
-					disabled={!canProceedToMapping}
-				>
-					<span class="w-6 h-6 rounded-full {activeTab === 'mapping' ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-400'} text-xs font-black flex items-center justify-center border-2 {activeTab === 'mapping' ? 'border-gray-900' : 'border-current'}">2</span>
-					Mapping
-				</button>
-
-				<div class="hidden sm:flex items-center text-gray-300">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
+						{activeTab === 'mapping' ? 'bg-[#3b82f6] text-white -translate-y-1' : ['refresh', 'publish'].includes(activeTab) ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
+						{#if ['refresh', 'publish'].includes(activeTab)}
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
+						{:else}
+							2
+						{/if}
+					</div>
+					<div class="hidden sm:flex flex-col">
+						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 2</span>
+						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Mapping</span>
+					</div>
 				</div>
+				<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {['refresh', 'publish'].includes(activeTab) ? 'bg-gray-900' : ''}"></div>
 
-				<button
-					class="flex-1 min-w-[140px] px-4 py-4 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex flex-col items-center justify-center gap-2 border-[3px]
-						{activeTab === 'refresh' 
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#9ca3af] translate-x-[-2px] translate-y-[-2px]' 
-							: canProceedToRefresh ? 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900' : 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'}"
-					on:click={() => canProceedToRefresh && goToTab('refresh')}
-					disabled={!canProceedToRefresh}
-				>
-					<span class="w-6 h-6 rounded-full {activeTab === 'refresh' ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-400'} text-xs font-black flex items-center justify-center border-2 {activeTab === 'refresh' ? 'border-gray-900' : 'border-current'}">3</span>
-					Refresh
-				</button>
-
-				<div class="hidden sm:flex items-center text-gray-300">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
+						{activeTab === 'refresh' ? 'bg-[#3b82f6] text-white -translate-y-1' : ['publish'].includes(activeTab) ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
+						{#if ['publish'].includes(activeTab)}
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
+						{:else}
+							3
+						{/if}
+					</div>
+					<div class="hidden sm:flex flex-col">
+						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 3</span>
+						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Refresh</span>
+					</div>
 				</div>
+				<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {['publish'].includes(activeTab) ? 'bg-gray-900' : ''}"></div>
 
-				<button
-					class="flex-1 min-w-[140px] px-4 py-4 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex flex-col items-center justify-center gap-2 border-[3px]
-						{activeTab === 'publish' 
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#9ca3af] translate-x-[-2px] translate-y-[-2px]' 
-							: 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
-					on:click={() => goToTab('publish')}
-				>
-					<span class="w-6 h-6 rounded-full {activeTab === 'publish' ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-400'} text-xs font-black flex items-center justify-center border-2 {activeTab === 'publish' ? 'border-gray-900' : 'border-current'}">4</span>
-					Publish
-				</button>
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
+						{activeTab === 'publish' ? 'bg-[#3b82f6] text-white -translate-y-1' : 'bg-white text-gray-400'}">
+						4
+					</div>
+					<div class="hidden sm:flex flex-col">
+						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 4</span>
+						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Publish</span>
+					</div>
+				</div>
 			</div>
 
 			<!-- Tab Content -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] p-6 sm:p-8">
+			<!-- Tab Content -->
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] p-6 sm:p-8">
 				{#if activeTab === 'datasource'}
 					<DataSourceConfig
 						{dataSources}
@@ -472,7 +611,13 @@
 						{refreshPolicy}
 						{outputConfig}
 						{isPublishing}
-						on:publish={handlePublish}
+						{isEditing}
+						{isUpdating}
+						{isDeleting}
+						on:publish={isEditing ? handleUpdateBinding : handlePublish}
+						on:edit={handleEditBinding}
+						on:delete={handleDeleteBinding}
+						on:cancelEdit={handleCancelEdit}
 						on:back={() => goToTab('refresh')}
 					/>
 				{/if}

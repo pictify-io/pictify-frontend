@@ -17,6 +17,7 @@
 		getTemplateVariables,
 		renderTemplate as renderTemplateApi,
 		batchRenderTemplate,
+		batchRenderFromCsv,
 		getBatchJobResults,
 		cancelBatchJob
 	} from '../../../api/template';
@@ -34,7 +35,7 @@
 	let userEmail = '';
 
 	// Endpoints that require email verification
-	const generationEndpoints = ['image', 'gif', 'render-template', 'batch-render'];
+	const generationEndpoints = ['image', 'gif', 'render-template', 'batch-render', 'batch-render-csv'];
 	$: requiresEmailVerification = generationEndpoints.includes(selectedEndpoint) && isEmailVerified === false;
 
 	let hasTriedToFetchTokens = false;
@@ -50,6 +51,7 @@
 		'delete-template': false,
 		'render-template': false,
 		'batch-render': false,
+		'batch-render-csv': false,
 		'get-variables': false
 	};
 
@@ -158,6 +160,20 @@
 		concurrency: 5
 	};
 
+	// Batch render from CSV parameters
+	let batchRenderCsvParams = {
+		templateUid: '',
+		csvUrl: '',
+		mappings: JSON.stringify({
+			'CSV Column Name': 'templateVariableName',
+			'Title Column': 'title',
+			'Subtitle Column': 'subtitle'
+		}, null, 2),
+		format: 'png',
+		quality: 0.9,
+		concurrency: 5
+	};
+
 	let batchStatusParams = {
 		batchId: ''
 	};
@@ -189,6 +205,11 @@
 				batchRenderParams.templateUid = templateUid;
 				// Auto-fetch variables for batch render
 				fetchTemplateVariables(templateUid, true);
+				break;
+			case 'batch-render-csv':
+				batchRenderCsvParams.templateUid = templateUid;
+				// Auto-fetch variables for CSV batch render mappings
+				fetchTemplateVariablesForCsv(templateUid);
 				break;
 			case 'get-variables':
 				getVariablesParams.uid = templateUid;
@@ -228,6 +249,26 @@
 			}
 		} catch (error) {
 			console.error('Error fetching template variables:', error);
+		}
+	}
+
+	// Fetch template variables for CSV mapping
+	async function fetchTemplateVariablesForCsv(templateUid) {
+		if (!templateUid) return;
+
+		try {
+			const result = await getTemplateVariables(templateUid);
+			if (result && result.variables) {
+				// Create example mappings from variable names
+				const exampleMappings = {};
+				result.variables.forEach(v => {
+					// Use variable name as both key and value for example
+					exampleMappings[`${v.name}_column`] = v.name;
+				});
+				batchRenderCsvParams.mappings = JSON.stringify(exampleMappings, null, 2);
+			}
+		} catch (error) {
+			console.error('Error fetching template variables for CSV:', error);
 		}
 	}
 
@@ -327,6 +368,26 @@
 							format: batchRenderParams.format,
 							quality: batchRenderParams.quality,
 							concurrency: batchRenderParams.concurrency,
+							headers: { Authorization: `Bearer ${apiToken}` }
+						}
+					);
+					break;
+
+				case 'batch-render-csv':
+					if (!batchRenderCsvParams.templateUid) {
+						throw new Error('Template UID is required');
+					}
+					if (!batchRenderCsvParams.csvUrl) {
+						throw new Error('CSV URL is required');
+					}
+					data = await batchRenderFromCsv(
+						batchRenderCsvParams.templateUid,
+						batchRenderCsvParams.csvUrl,
+						JSON.parse(batchRenderCsvParams.mappings),
+						{
+							format: batchRenderCsvParams.format,
+							quality: batchRenderCsvParams.quality,
+							concurrency: batchRenderCsvParams.concurrency,
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -513,6 +574,19 @@
 			requiresAuth: true
 		},
 		{
+			id: 'batch-render-csv',
+			method: 'POST',
+			path: `/templates/${batchRenderCsvParams.templateUid || ':uid'}/batch-render`,
+			payload: {
+				csvUrl: batchRenderCsvParams.csvUrl,
+				mappings: JSON.parse(batchRenderCsvParams.mappings || '{}'),
+				format: batchRenderCsvParams.format,
+				quality: batchRenderCsvParams.quality,
+				concurrency: batchRenderCsvParams.concurrency
+			},
+			requiresAuth: true
+		},
+		{
 			id: 'batch-status',
 			method: 'GET',
 			path: `/templates/batch/${batchStatusParams.batchId || ':batchId'}/results`,
@@ -558,6 +632,7 @@
 			endpoints: [
 				{ id: 'render-template', path: '/templates/:uid/render', method: 'POST', label: 'Render Template' },
 				{ id: 'batch-render', path: '/templates/:uid/batch-render', method: 'POST', label: 'Batch Render' },
+				{ id: 'batch-render-csv', path: '/templates/:uid/batch-render', method: 'POST', label: 'Batch Render (CSV Mode)' },
 				{ id: 'batch-status', path: '/templates/batch/:batchId/results', method: 'GET', label: 'Batch Status' },
 				{ id: 'cancel-batch', path: '/templates/batch/:batchId/cancel', method: 'POST', label: 'Cancel Batch' }
 			]
@@ -579,7 +654,8 @@
 			'delete-template': 'Delete a template',
 			'search-templates': 'Search templates by name',
 			'render-template': 'Render a template with variables',
-			'batch-render': 'Render multiple variations in bulk',
+			'batch-render': 'Render multiple variations in bulk (variableSets mode, max 100 items)',
+			'batch-render-csv': 'Batch render using CSV URL with column mappings (unified endpoint, CSV mode)',
 			'batch-status': 'Check batch job status and results',
 			'cancel-batch': 'Cancel a running batch job',
 			'get-variables': 'Get template variable definitions'
@@ -1139,6 +1215,126 @@
 											max="10"
 											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
 											bind:value={batchRenderParams.concurrency}
+										/>
+									</div>
+								</div>
+							</div>
+						{:else if selectedEndpoint === 'batch-render-csv'}
+							<div class="space-y-4">
+								<div>
+									<div class="flex items-center justify-between mb-2">
+										<label class="text-xs font-black text-gray-900 uppercase tracking-wide">Template UID</label>
+										<button
+											class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
+											on:click={() => manualTemplateInput['batch-render-csv'] = !manualTemplateInput['batch-render-csv']}
+										>
+											{manualTemplateInput['batch-render-csv'] ? 'Select from list' : 'Enter manually'}
+											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4 4-4 4m5-4h3" />
+											</svg>
+										</button>
+									</div>
+
+									{#if manualTemplateInput['batch-render-csv']}
+										<input
+											type="text"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={batchRenderCsvParams.templateUid}
+											placeholder="Enter template UID"
+										/>
+									{:else}
+										<select
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
+											on:change={(e) => selectTemplate('batch-render-csv', e.target.value)}
+											value={batchRenderCsvParams.templateUid}
+										>
+											<option value="">Select a template...</option>
+											{#if loadingTemplates}
+												<option disabled>Loading templates...</option>
+											{:else}
+												{#each userTemplates as template}
+													<option value={template.uid}>
+														{template.name} ({template.uid.slice(0, 8)}...)
+													</option>
+												{/each}
+											{/if}
+											{#if userTemplates.length === 0 && !loadingTemplates}
+												<option disabled>No templates found</option>
+											{/if}
+										</select>
+									{/if}
+								</div>
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">CSV URL</label>
+									<input
+										type="url"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										bind:value={batchRenderCsvParams.csvUrl}
+										placeholder="https://example.com/data.csv"
+									/>
+									<p class="mt-1 text-[10px] text-gray-600">💡 URL to a publicly accessible CSV file. No row limit!</p>
+								</div>
+								<div>
+									<div class="flex items-center justify-between mb-2">
+										<label class="text-xs font-black text-gray-900 uppercase tracking-wide">Column Mappings (JSON)</label>
+										<div class="flex gap-2">
+											{#if batchRenderCsvParams.templateUid}
+												<button
+													class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide flex items-center gap-1"
+													on:click={() => fetchTemplateVariablesForCsv(batchRenderCsvParams.templateUid)}
+												>
+													<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+													</svg>
+													Auto-fill
+												</button>
+											{/if}
+											<button
+												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
+												on:click={() => batchRenderCsvParams.mappings = '{}'}
+											>
+												Clear
+											</button>
+										</div>
+									</div>
+									<textarea
+										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
+										bind:value={batchRenderCsvParams.mappings}
+										placeholder={'{"CSV Column Name": "templateVariableName"}'}
+									></textarea>
+									<p class="mt-1 text-[10px] text-gray-600">💡 Map CSV column names to template variable names: {"{"}"Email Column": "email", "Name Column": "name"{"}"}</p>
+								</div>
+								<div class="grid grid-cols-3 gap-4">
+									<div>
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Format</label>
+										<select
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											bind:value={batchRenderCsvParams.format}
+										>
+											<option value="png">PNG</option>
+											<option value="jpeg">JPEG</option>
+											<option value="webp">WebP</option>
+										</select>
+									</div>
+									<div>
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Quality</label>
+										<input
+											type="number"
+											min="0.1"
+											max="1"
+											step="0.1"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={batchRenderCsvParams.quality}
+										/>
+									</div>
+									<div>
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Concurrency</label>
+										<input
+											type="number"
+											min="1"
+											max="10"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={batchRenderCsvParams.concurrency}
 										/>
 									</div>
 								</div>

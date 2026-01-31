@@ -286,6 +286,12 @@ console.log(result.url); // CDN URL of rendered image`;
 			</button>
 			<button
 				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
+				on:click={() => goto(`/dashboard/template/${uid}/bulk-render`)}
+			>
+				Bulk
+			</button>
+			<button
+				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
 				on:click={() => goto(`/dashboard/template/${uid}/dynamic`)}
 			>
 				Dynamic
@@ -326,7 +332,7 @@ console.log(result.url); // CDN URL of rendered image`;
 					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
 							<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-								<span class="w-3 h-3 bg-[#a855f7] border-2 border-gray-900 rounded-full"></span>
+								<span class="w-3 h-3 bg-[#60a5fa] border-2 border-gray-900 rounded-full"></span>
 								Authentication
 							</h3>
 						</div>
@@ -338,7 +344,7 @@ console.log(result.url); // CDN URL of rendered image`;
 										<div class="relative flex-1">
 											<select
 												bind:value={selectedApiKey}
-												class="w-full pl-4 pr-10 py-3 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#a855f7] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all appearance-none truncate"
+												class="w-full pl-4 pr-10 py-3 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#60a5fa] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all appearance-none truncate"
 											>
 												{#each apiTokens as token}
 													<option value={token.token}>
