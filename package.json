@@ -39,6 +39,8 @@
 		"fabric": "^6.9.0",
 		"github-markdown-css": "^5.6.1",
 		"hast-util-to-html": "^9.0.1",
+		"jszip": "^3.10.1",
+		"papaparse": "^5.5.3",
 		"posthog-js": "^1.257.2",
 		"prismjs": "^1.29.0",
 		"qrcode": "^1.5.4",

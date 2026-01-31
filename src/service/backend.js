@@ -1,7 +1,5 @@
 import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-const isCredentialsSupported = 'credentials' in Request.prototype;
-
 class HttpError extends Error {
 	constructor(status, message) {
 		super(message);
@@ -21,7 +19,7 @@ const backend = {
 
 		const response = await fetch(apiUrl, {
 			...options,
-			credentials: isCredentialsSupported ? 'include' : undefined,
+			credentials: 'include',
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -54,7 +52,7 @@ const backend = {
 
 		const response = await fetch(apiUrl, {
 			...options,
-			credentials: isCredentialsSupported ? 'include' : undefined,
+			credentials: 'include',
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -88,7 +86,7 @@ const backend = {
 
 		const response = await fetch(apiUrl, {
 			...options,
-			credentials: isCredentialsSupported ? 'include' : undefined,
+			credentials: 'include',
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -122,7 +120,7 @@ const backend = {
 
 		const response = await fetch(apiUrl, {
 			...options,
-			credentials: isCredentialsSupported ? 'include' : undefined,
+			credentials: 'include',
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
@@ -155,7 +153,7 @@ const backend = {
 
 		const response = await fetch(apiUrl, {
 			...options,
-			credentials: isCredentialsSupported ? 'include' : undefined,
+			credentials: 'include',
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json',
@@ -190,7 +188,7 @@ const backend = {
 
 		const response = await fetch(apiUrl, {
 			...options,
-			credentials: isCredentialsSupported ? 'include' : undefined,
+			credentials: 'include',
 			method: 'POST',
 			// Don't set Content-Type header - browser will set it with boundary for FormData
 			headers: {
