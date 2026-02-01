@@ -1,14 +1,23 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 	import { editor } from '../../../store/editor.store';
-	import { streamSimpleGenerate } from '../../../api/copilot-simple';
+	import { streamSimpleGenerate, streamCopilotGenerate } from '../../../api/copilot-simple';
 	import { getBrandAssets } from '../../../api/brand-assets';
 	import { tick } from 'svelte';
 	import { fade, fly, slide } from 'svelte/transition';
-	import { copilotExecution, copilotActions } from '../../../store/copilot.store';
-	import { 
-		canUseFeature, 
-		trackFeatureUsage, 
+	import {
+		copilotExecution,
+		copilotActions,
+		copilotConversation,
+		contextMessages
+	} from '../../../store/copilot.store';
+	import {
+		canSafelyUndo,
+		historyActions
+	} from '../../../store/history.store';
+	import {
+		canUseFeature,
+		trackFeatureUsage,
 		featureGates,
 		plgStatus,
 		showMilestoneCelebration,
@@ -23,10 +32,9 @@
 	let chatContainer;
 	let textareaElement;
 	let activeStream = null;
-	
-	// History for Undo
-	let previousState = null;
-	let canUndo = false;
+
+	// Undo is now handled by unified history store
+	// Check $canSafelyUndo for whether undo is available and safe
 
 	// Quality metrics from swarm
 	let lastQualityScore = null;
@@ -86,10 +94,9 @@
 			height: canvasJson.height
 		});
 
-		// Batch history to prevent polluting undo/redo stack during copilot updates
-		if (typeof window !== 'undefined' && window.__historyBatchStart) {
-			window.__historyBatchStart();
-		}
+		// Use unified history store for batching copilot updates
+		historyActions.startBatch('Copilot canvas update', 'copilot');
+		historyActions.setStreaming(true);
 
 		await new Promise((resolve) => {
 		$editor.loadFromJSON(canvasJson, () => {
@@ -129,9 +136,8 @@
 	});
 
 	// End batch after render completes
-	if (typeof window !== 'undefined' && window.__historyBatchEnd) {
-		window.__historyBatchEnd();
-	}
+	historyActions.setStreaming(false);
+	historyActions.endBatch();
 	}
 
 	/**
@@ -279,10 +285,13 @@
 			}
 		}
 		
+		// Save canvas snapshot for conversation context (unified history handles undo)
 		if ($editor) {
-			previousState = JSON.stringify($editor.toJSON());
-			canUndo = true;
+			copilotActions.saveCanvasSnapshot($editor.toJSON());
 		}
+
+		// Add message to conversation store for multi-turn context
+		copilotActions.addMessage('user', textToUse);
 
 		const userMessage = { role: 'user', content: textToUse };
 		messages = [...messages, userMessage];
@@ -358,26 +367,32 @@
 	}
 
 	function handleUndo() {
-		if (!previousState || !$editor) return;
-		
-		$editor.loadFromJSON(JSON.parse(previousState), () => {
-			$editor.renderAll();
-			canUndo = false;
-			previousState = null;
+		// Use unified history store for undo
+		// The $canSafelyUndo check prevents undo during streaming
+		if (!$canSafelyUndo || !$editor) {
+			if (!$canSafelyUndo) {
+				messages = [...messages, { role: 'system', content: "Cannot undo while AI is working." }];
+				scrollToBottom();
+			}
+			return;
+		}
+
+		const success = historyActions.requestUndo();
+		if (success) {
 			messages = [...messages, { role: 'system', content: "Undid last change." }];
 			scrollToBottom();
-		});
+		}
 	}
 
 	function handleClearHistory() {
 		messages = [];
-		canUndo = false;
-		previousState = null;
 		lastQualityScore = null;
 		lastQualityStrengths = [];
 		agentSteps = [];
 		currentAgent = null;
 		copilotActions.clearExecution();
+		copilotActions.clearConversation();
+		copilotActions.clearSuggestions();
 		cleanupStream();
 	}
 
@@ -464,11 +479,11 @@
 		</div>
 		
 		<div class="flex items-center gap-1">
-			{#if canUndo}
-				<button 
+			{#if $canSafelyUndo}
+				<button
 					class="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
 					on:click={handleUndo}
-					title="Undo last AI change"
+					title="Undo last change (Ctrl+Z)"
 				>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M3 7v6h6"></path>
