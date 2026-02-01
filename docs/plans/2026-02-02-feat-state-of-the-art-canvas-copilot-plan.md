@@ -138,11 +138,11 @@ const PARITY_TOOLS = [
 **Objective**: Enable multi-turn conversations with basic tool use
 
 **Deliverables:**
-- [ ] Conversation history persistence in copilot store
-- [ ] Tool schema definitions for canvas operations
-- [ ] Backend API updates to support tool-based generation
-- [ ] Streaming protocol for tool execution feedback
-- [ ] Element identification system (labels/names)
+- [x] Conversation history persistence in copilot store
+- [x] Tool schema definitions for canvas operations
+- [ ] Backend API updates to support tool-based generation (backend work needed)
+- [x] Streaming protocol for tool execution feedback
+- [x] Element identification system (labels/names)
 
 **Key Changes:**
 
@@ -341,10 +341,10 @@ const debouncedSerialize = debounce(() => {
 **Objective**: AI understands and can critique design quality
 
 **Deliverables:**
-- [ ] Design analysis tools (hierarchy, accessibility, color)
-- [ ] Proactive suggestion system
-- [ ] Explanation generation for AI decisions
-- [ ] Quality scoring with breakdown
+- [x] Design analysis tools (hierarchy, accessibility, color)
+- [x] Proactive suggestion system (store infrastructure ready)
+- [ ] Explanation generation for AI decisions (needs backend)
+- [x] Quality scoring with breakdown
 
 **Key Changes:**
 
@@ -501,9 +501,9 @@ export const copilotActions = {
 **Objective**: Single undo/redo system with progressive updates
 
 **Deliverables:**
-- [ ] Merge Copilot undo into canvas history
-- [ ] Support partial canvas updates (element-level)
-- [ ] "Preserve these elements" constraint support
+- [x] Merge Copilot undo into canvas history
+- [x] Support partial canvas updates (element-level) - API ready
+- [ ] "Preserve these elements" constraint support (needs backend)
 - [ ] Before/after comparison view
 
 **Key Changes:**
@@ -667,10 +667,10 @@ export const historyActions = {
 **Objective**: Production-ready performance and UX refinements
 
 **Deliverables:**
-- [ ] Context window management (trim old messages)
-- [ ] Complex canvas handling (50+ elements)
-- [ ] Element reference resolution ("the blue button")
-- [ ] Keyboard shortcuts (Cmd+K for copilot)
+- [x] Context window management (trim old messages)
+- [x] Complex canvas handling (50+ elements) - spatial index ready
+- [x] Element reference resolution ("the blue button")
+- [x] Keyboard shortcuts (Cmd+K for copilot)
 - [ ] Error recovery and retry logic
 
 **Key Changes:**
