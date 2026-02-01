@@ -33,6 +33,10 @@
 	let textareaElement;
 	let activeStream = null;
 
+	// Race condition guards
+	let destroyed = false;
+	let renderTimeoutId = null;
+
 	// Undo is now handled by unified history store
 	// Check $canSafelyUndo for whether undo is available and safe
 
@@ -69,13 +73,28 @@
 			activeStream.abort();
 		}
 		activeStream = null;
+
+		// Clear any pending render timeout
+		if (renderTimeoutId) {
+			clearTimeout(renderTimeoutId);
+			renderTimeoutId = null;
+		}
+
+		// Reset streaming and loading state to prevent stuck UI
+		historyActions.setStreaming(false);
+		isLoading = false;
+		copilotActions.setLoading(false);
 	}
 
 	onDestroy(() => {
+		destroyed = true;
 		cleanupStream();
 	});
 
 	async function applyCanvasState(canvasJson) {
+		// Guard: check if destroyed before proceeding
+		if (destroyed) return;
+
 		if (!$editor || !canvasJson) {
 			console.warn('[Copilot] Cannot apply canvas state:', { hasEditor: !!$editor, hasState: !!canvasJson });
 			return;
@@ -98,46 +117,70 @@
 		historyActions.startBatch('Copilot canvas update', 'copilot');
 		historyActions.setStreaming(true);
 
-		await new Promise((resolve) => {
-		$editor.loadFromJSON(canvasJson, () => {
-			// Log canvas and first few objects for debugging
-			console.log('[Copilot] Canvas dimensions after load:', {
-				width: $editor.width,
-				height: $editor.height,
-				zoom: $editor.getZoom()
-			});
-			
-			const objects = $editor.getObjects();
-			if (objects.length > 0) {
-				console.log('[Copilot] First object:', {
-					type: objects[0].type,
-					left: objects[0].left,
-					top: objects[0].top,
-					width: objects[0].width,
-					height: objects[0].height,
-					fill: objects[0].fill,
-					opacity: objects[0].opacity,
-					visible: objects[0].visible
-				});
-			}
-			
-			// Explicitly render all objects
-			$editor.renderAll();
-			$editor.requestRenderAll();
-			
-			// Force a second render after a delay to ensure all objects are drawn
-			setTimeout(() => {
-				$editor.renderAll();
-				$editor.requestRenderAll();
-				console.log('[Copilot] Canvas rendered with', $editor.getObjects().length, 'objects');
-				resolve();
-			}, 100);
-		});
-	});
+		try {
+			await new Promise((resolve) => {
+				// Guard: check if destroyed in callback
+				if (destroyed) {
+					resolve();
+					return;
+				}
 
-	// End batch after render completes
-	historyActions.setStreaming(false);
-	historyActions.endBatch();
+				$editor.loadFromJSON(canvasJson, () => {
+					// Guard: check if destroyed after async load
+					if (destroyed) {
+						resolve();
+						return;
+					}
+
+					// Log canvas and first few objects for debugging
+					console.log('[Copilot] Canvas dimensions after load:', {
+						width: $editor.width,
+						height: $editor.height,
+						zoom: $editor.getZoom()
+					});
+
+					const objects = $editor.getObjects();
+					if (objects.length > 0) {
+						console.log('[Copilot] First object:', {
+							type: objects[0].type,
+							left: objects[0].left,
+							top: objects[0].top,
+							width: objects[0].width,
+							height: objects[0].height,
+							fill: objects[0].fill,
+							opacity: objects[0].opacity,
+							visible: objects[0].visible
+						});
+					}
+
+					// Explicitly render all objects
+					$editor.renderAll();
+					$editor.requestRenderAll();
+
+					// Force a second render after a delay to ensure all objects are drawn
+					// Store timeout ID for cleanup
+					if (renderTimeoutId) {
+						clearTimeout(renderTimeoutId);
+					}
+					renderTimeoutId = setTimeout(() => {
+						renderTimeoutId = null;
+						// Guard: check if destroyed before rendering
+						if (destroyed || !$editor) {
+							resolve();
+							return;
+						}
+						$editor.renderAll();
+						$editor.requestRenderAll();
+						console.log('[Copilot] Canvas rendered with', $editor.getObjects().length, 'objects');
+						resolve();
+					}, 100);
+				});
+			});
+		} finally {
+			// Always clean up streaming state, even on error
+			historyActions.setStreaming(false);
+			historyActions.endBatch();
+		}
 	}
 
 	/**
@@ -145,21 +188,24 @@
 	 * Payload contains: { step, canvasState }
 	 */
 	async function handleStepPayload(payload = {}) {
+		// Guard: check if destroyed before processing
+		if (destroyed) return;
+
 		console.log('[Copilot Swarm] Received step payload:', payload);
 		console.log('[Copilot Swarm] Canvas state present?', !!payload.canvasState);
-		
+
 		const { step, canvasState } = payload;
-		
+
 		if (step) {
 			// Track current agent
 			currentAgent = step.agent;
-			
+
 			// Add step to agent steps list
 			agentSteps = [...agentSteps, step];
-			
+
 			// Update copilot store with the step
 			copilotActions.upsertSteps([step]);
-			
+
 			// Add assistant message for agent progress
 			if (step.status === 'started') {
 				const agentEmoji = {
@@ -170,13 +216,13 @@
 					'Canvas': '🖼️'
 				};
 				const emoji = agentEmoji[step.agent] || '🤖';
-				messages = [...messages, { 
-					role: 'system', 
-					content: `${emoji} ${step.agent}: ${step.description}` 
+				messages = [...messages, {
+					role: 'system',
+					content: `${emoji} ${step.agent}: ${step.description}`
 				}];
 			}
 		}
-		
+
 		// Apply canvas state if provided (real-time preview)
 		if (canvasState) {
 			console.log('[Copilot Swarm] Applying canvas state from step event');
@@ -184,17 +230,22 @@
 		} else {
 			console.log('[Copilot Swarm] No canvas state in step payload');
 		}
-		
-		scrollToBottom();
+
+		if (!destroyed) {
+			scrollToBottom();
+		}
 	}
 
 	async function handleCompletePayload(payload = {}) {
 		cleanupStream();
-		
+
+		// Guard: check if destroyed before processing
+		if (destroyed) return;
+
 		console.log('[Copilot Swarm] Generation complete:', payload);
 		console.log('[Copilot Swarm] Complete payload keys:', Object.keys(payload));
 		console.log('[Copilot Swarm] Canvas state present?', !!payload.canvasState);
-		
+
 		// Extract canvas state from swarm response
 		if (payload.success && payload.canvasState) {
 			console.log('[Copilot Swarm] Applying final canvas state from complete event');
@@ -205,22 +256,25 @@
 				hasCanvasState: !!payload.canvasState
 			});
 		}
-		
+
+		// Guard: check again after async operations
+		if (destroyed) return;
+
 		// Store quality metrics
 		if (payload.quality) {
 			lastQualityScore = payload.quality.score;
 			lastQualityStrengths = payload.quality.strengths || [];
 		}
-		
+
 		// Update store with execution steps if provided
 		if (payload.executedSteps) {
 			copilotActions.upsertSteps(payload.executedSteps);
 		}
-		
+
 		copilotActions.setLoading(false);
 		isLoading = false;
 		currentAgent = null;
-		
+
 		if (payload.success) {
 			let responseMessage = '✨ Design generated successfully!';
 			if (payload.design?.reasoning) {
@@ -238,12 +292,16 @@
 			error = payload.error || 'Generation failed';
 			messages = [...messages, { role: 'assistant', content: `Error: ${error}` }];
 		}
-		
+
 		scrollToBottom();
 	}
 
 	function handleStreamFailure(err) {
 		cleanupStream();
+
+		// Guard: check if destroyed before updating UI
+		if (destroyed) return;
+
 		streamError = err?.message || 'Streaming interrupted. Please try again.';
 		error = streamError;
 		copilotActions.setError(streamError);
@@ -262,7 +320,13 @@
 	async function handleGenerate(customPrompt = null) {
 		const textToUse = customPrompt || prompt;
 		if (!textToUse.trim()) return;
-		
+
+		// Guard: prevent multiple concurrent generations
+		if (isLoading) {
+			console.warn('[Copilot] Generation already in progress, ignoring request');
+			return;
+		}
+
 		// Check feature limit for free users
 		if (!isPaidPlan) {
 			const limitCheck = await canUseFeature('aiCopilot');
