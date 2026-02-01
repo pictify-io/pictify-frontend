@@ -2,7 +2,10 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { Canvas, ActiveSelection } from 'fabric'; // v6 import
 	import { editor, editorActions } from '../../../store/editor.store';
-	import { canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved } from '../../../store/history.store';
+	import {
+	canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved,
+	batchState, isBatching, setupLegacyGlobals, cleanupLegacyGlobals
+} from '../../../store/history.store';
 	import { currentPageIndex, pages, pageActions, outputFormat, pdfPreset } from '../../../store/pages.store';
 	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
 	import { isPreviewModeActive, clearPreview } from '../../utils/canvas-preview-engine';
@@ -23,15 +26,19 @@
 	let savedHistoryIndex = -1; // Tracks the index where the last save occurred
 	let isPerformingUndoRedo = false;
 	let isLoadingCanvas = false; // Flag to prevent saves during initial load
-	let isBatchingOperations = false; // Flag to batch multiple operations into one history entry
+	// isBatchingOperations is now managed via batchState store
+	let batchUnsubscribe; // Subscription to batchState for reactive batching
 	const MAX_HISTORY = 50;
 
 	function saveState() {
+		// Check if batching is active via store
+		const isBatchingActive = $isBatching;
+
 		// Only log if blocked to reduce noise, or if successful
-		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingOperations) {
+		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingActive) {
 			if (isPerformingUndoRedo) console.log('🚫 saveState blocked: performing undo/redo');
 			if (isLoadingCanvas) console.log('🚫 saveState blocked: loading canvas');
-			if (isBatchingOperations) console.log('🚫 saveState blocked: batching operations');
+			if (isBatchingActive) console.log('🚫 saveState blocked: batching operations');
 			return;
 		}
 		
@@ -223,19 +230,21 @@
 
 		// Set the editor store
 		editorActions.setCanvas(fabricCanvas);
-		
-		// Expose history control functions for other components to batch operations
-		if (typeof window !== 'undefined') {
-			window.__historyBatchStart = () => { 
-				console.log('🔄 History batch started');
-				isBatchingOperations = true; 
-			};
-			window.__historyBatchEnd = () => { 
-				console.log('🔄 History batch ended');
-				isBatchingOperations = false; 
-				saveState(); // Save once after batch completes
-			};
-		}
+
+		// Set up legacy window globals for backward compatibility
+		// This allows existing code using window.__historyBatchStart/End to continue working
+		setupLegacyGlobals();
+
+		// Subscribe to batchState changes to trigger saveState when batch ends
+		batchUnsubscribe = batchState.subscribe(($batch) => {
+			// When batch transitions from active to inactive, save state
+			if (!$batch.isActive && fabricCanvas) {
+				// Small delay to ensure all canvas operations have completed
+				setTimeout(() => {
+					saveState();
+				}, 10);
+			}
+		});
 
 		// Handle selection events
 		fabricCanvas.on('selection:created', handleSelection);
@@ -450,6 +459,9 @@
 		if (unsubscribeUndo) unsubscribeUndo();
 		if (unsubscribeRedo) unsubscribeRedo();
 		if (unsubscribeMarkSaved) unsubscribeMarkSaved();
+		if (batchUnsubscribe) batchUnsubscribe();
+		// Clean up legacy window globals
+		cleanupLegacyGlobals();
 		if (fabricCanvas) {
 			fabricCanvas.dispose();
 		}

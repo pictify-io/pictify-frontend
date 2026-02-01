@@ -1,10 +1,10 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import TopBar from './TopBar.svelte';
 	import AnimatedBackground from './AnimatedBackground.svelte';
 	import PageNavigator from './PageNavigator.svelte';
-	
+
 	const dispatch = createEventDispatcher();
 	import LeftSidebar from './LeftSidebar.svelte';
 	import AssetPanel from './AssetPanel.svelte';
@@ -24,13 +24,30 @@
 	function setRightTab(tab) {
 		editorActions.toggleRightSidebarTab(tab);
 	}
-	
+
 	function handlePageSwitch(event) {
 		// Dispatch event for parent components to save current canvas state
 		dispatch('pageSwitch', event.detail);
 	}
 
+	// Keyboard shortcut: Cmd+K / Ctrl+K to toggle Copilot panel
+	function handleGlobalKeydown(e) {
+		if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+			e.preventDefault();
+			// Toggle copilot panel
+			if ($activeSidebarTab === 'copilot') {
+				editorActions.toggleLeftSidebarTab(null); // Close panel
+			} else {
+				editorActions.toggleLeftSidebarTab('copilot'); // Open copilot
+			}
+		}
+	}
+
 	onMount(() => {
+		// Register global keyboard shortcut
+		if (typeof window !== 'undefined') {
+			window.addEventListener('keydown', handleGlobalKeydown);
+		}
 		// Make the full editor discoverable in guest mode:
 		// keep both sidebars open and land on Variables (API/preview) tab.
 		if (guestMode) {
@@ -43,6 +60,13 @@
 			if ($activeRightSidebarTab !== 'variables') {
 				editorActions.toggleRightSidebarTab('variables');
 			}
+		}
+	});
+
+	onDestroy(() => {
+		// Clean up global keyboard shortcut listener
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('keydown', handleGlobalKeydown);
 		}
 	});
 </script>
