@@ -320,6 +320,148 @@ export const PARITY_TOOLS = [
       required: ['selector']
     },
     schema: SelectElementsSchema
+  },
+  {
+    name: 'duplicate_element',
+    description: 'Create a copy of an existing element.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        element_id: {
+          type: 'string',
+          description: 'The ID of the element to duplicate'
+        },
+        offset: {
+          type: 'object',
+          description: 'Position offset from original element',
+          properties: {
+            x: { type: 'number', description: 'X offset in pixels' },
+            y: { type: 'number', description: 'Y offset in pixels' }
+          }
+        }
+      },
+      required: ['element_id']
+    }
+  },
+  {
+    name: 'reorder_layer',
+    description: 'Change the layer order (z-index) of an element.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        element_id: {
+          type: 'string',
+          description: 'The ID of the element to reorder'
+        },
+        action: {
+          type: 'string',
+          enum: ['bring_front', 'send_back', 'bring_forward', 'send_backward'],
+          description: 'Layer action to perform'
+        }
+      },
+      required: ['element_id', 'action']
+    }
+  },
+  {
+    name: 'toggle_visibility',
+    description: 'Show or hide an element on the canvas.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        element_id: {
+          type: 'string',
+          description: 'The ID of the element to toggle'
+        },
+        visible: {
+          type: 'boolean',
+          description: 'Whether to make the element visible'
+        }
+      },
+      required: ['element_id']
+    }
+  },
+  {
+    name: 'toggle_lock',
+    description: 'Lock or unlock an element to prevent/allow editing.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        element_id: {
+          type: 'string',
+          description: 'The ID of the element to lock/unlock'
+        },
+        locked: {
+          type: 'boolean',
+          description: 'Whether to lock the element'
+        }
+      },
+      required: ['element_id']
+    }
+  },
+  {
+    name: 'rename_element',
+    description: 'Rename an element for easier identification in the layers panel.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        element_id: {
+          type: 'string',
+          description: 'The ID of the element to rename'
+        },
+        name: {
+          type: 'string',
+          description: 'New name for the element'
+        }
+      },
+      required: ['element_id', 'name']
+    }
+  },
+  {
+    name: 'group_elements',
+    description: 'Group multiple elements together into a single selectable unit.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        element_ids: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of element IDs to group together'
+        }
+      },
+      required: ['element_ids']
+    }
+  },
+  {
+    name: 'ungroup_elements',
+    description: 'Ungroup a previously grouped element into its individual components.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        group_id: {
+          type: 'string',
+          description: 'The ID of the group to ungroup'
+        }
+      },
+      required: ['group_id']
+    }
+  },
+  {
+    name: 'save_template',
+    description: 'Save the current canvas state as a reusable template.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Name for the template'
+        },
+        description: {
+          type: 'string',
+          description: 'Description of the template'
+        }
+      },
+      required: ['name']
+    }
   }
 ];
 
