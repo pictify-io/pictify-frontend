@@ -237,7 +237,29 @@
 					{/if}
 				</a>
 			{/if}
-		</nav>
+
+			<!-- Billing -->
+			<div class="h-[2px] bg-gray-200 my-4 mx-4"></div>
+
+			<a
+				href="/dashboard/billing"
+				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+					{$page.url.pathname === '/dashboard/billing' || $page.url.pathname.startsWith('/dashboard/billing/')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+			>
+				<svg class="w-5 h-5 mr-3 {($page.url.pathname === '/dashboard/billing' || $page.url.pathname.startsWith('/dashboard/billing/')) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+				</svg>
+				<span>Billing</span>
+				{#if !isPaidPlan}
+					<span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-[#10b981] text-white rounded-full">
+						Free
+					</span>
+				{/if}
+			</a>
+
+					</nav>
 
 		<!-- Support Section -->
 			<div class="mt-8 space-y-1 px-2">
@@ -269,8 +291,8 @@
 	<div class="p-4 bg-white border-t-[3px] border-gray-900 relative z-20">
 		<!-- Subscription CTA -->
 		{#if !isPaidPlan}
-			<button
-				on:click={() => openUpgradeModal('sidebar')}
+			<a
+				href="/dashboard/billing"
 				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-[#ff6b6b] uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all overflow-hidden"
 			>
 				<div class="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%] animate-[shimmer_2s_infinite]"></div>
@@ -278,7 +300,7 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
 				</svg>
 				<span class="relative z-10">Upgrade Plan</span>
-			</button>
+			</a>
 		{/if}
 
 		<!-- Logout Button -->
@@ -289,7 +311,7 @@
 			<svg class="w-4 h-4 mr-2 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
 			</svg>
-			<span>Disconnect</span>
+			<span>Logout</span>
 		</button>
 	</div>
 </div>

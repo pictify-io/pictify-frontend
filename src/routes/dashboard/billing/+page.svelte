@@ -256,7 +256,7 @@
 </script>
 
 <svelte:head>
-	<title>Upgrade Plan - Pictify.io</title>
+	<title>Billing - Pictify.io</title>
 </svelte:head>
 
 <div>
