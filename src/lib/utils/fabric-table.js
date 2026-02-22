@@ -99,7 +99,8 @@ export function createTable(config = {}) {
     showRowNumbers = false,
     alternateRows = true,
     title = '',
-    customStyle = null
+    customStyle = null,
+    fontFamily = 'Inter, system-ui, sans-serif'
   } = config;
 
   const objects = [];
@@ -122,7 +123,7 @@ export function createTable(config = {}) {
       fill: tableStyle.headerText === '#ffffff' ? tableStyle.headerBg : tableStyle.textColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -187,7 +188,7 @@ export function createTable(config = {}) {
       fill: tableStyle.headerText,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(numHeaderText);
   }
@@ -203,7 +204,7 @@ export function createTable(config = {}) {
       fill: tableStyle.headerText,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(headerText);
 
@@ -275,7 +276,7 @@ export function createTable(config = {}) {
         fill: tableStyle.textColor,
         originX: 'center',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        fontFamily,
         opacity: 0.6
       });
       objects.push(rowNumText);
@@ -284,14 +285,21 @@ export function createTable(config = {}) {
     // Cell text
     row.forEach((cell, colIndex) => {
       const x = (colIndex + colOffset) * cellWidth + cellWidth / 2;
-      const cellText = new IText(String(cell), {
+      // Truncate text if it exceeds cell width (minus padding)
+      let displayText = String(cell);
+      const maxTextWidth = cellWidth - padding * 2;
+      if (displayText.length > Math.floor(maxTextWidth / (fontSize * 0.6))) {
+        const maxChars = Math.floor(maxTextWidth / (fontSize * 0.6));
+        displayText = displayText.slice(0, Math.max(1, maxChars - 1)) + '…';
+      }
+      const cellText = new IText(displayText, {
         left: x,
         top: y + cellHeight / 2,
         fontSize: fontSize,
         fill: tableStyle.textColor,
         originX: 'center',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(cellText);
     });
@@ -333,11 +341,13 @@ export function createStatsTable(config = {}) {
     style = 'modern',
     positiveColor = '#10b981',
     negativeColor = '#ef4444',
-    title = ''
+    title = '',
+    fontFamily = 'Inter, system-ui, sans-serif',
+    customStyle = null
   } = config;
 
   // Get style from TABLE_STYLES or use defaults
-  const tableStyle = TABLE_STYLES[style] || TABLE_STYLES.modern;
+  const tableStyle = customStyle || TABLE_STYLES[style] || TABLE_STYLES.modern;
   
   // Map table style to stats card colors
   const backgroundColor = tableStyle.rowBg;
@@ -360,7 +370,7 @@ export function createStatsTable(config = {}) {
       fill: valueColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -396,7 +406,7 @@ export function createStatsTable(config = {}) {
       fill: labelColor,
       originX: 'left',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(label);
 
@@ -409,7 +419,7 @@ export function createStatsTable(config = {}) {
       fill: valueColor,
       originX: 'left',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(value);
 
@@ -424,7 +434,7 @@ export function createStatsTable(config = {}) {
         fill: changeColor,
         originX: 'right',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(changeText);
     }
@@ -461,11 +471,13 @@ export function createComparisonTable(config = {}) {
     cellHeight = 40,
     headerHeight = 60,
     style = 'modern',
-    title = ''
+    title = '',
+    fontFamily = 'Inter, system-ui, sans-serif',
+    customStyle = null
   } = config;
 
   // Get style from TABLE_STYLES
-  const tableStyle = TABLE_STYLES[style] || TABLE_STYLES.modern;
+  const tableStyle = customStyle || TABLE_STYLES[style] || TABLE_STYLES.modern;
   
   // Map table style to comparison table colors
   const backgroundColor = tableStyle.rowBg;
@@ -493,7 +505,7 @@ export function createComparisonTable(config = {}) {
       fill: textColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -544,7 +556,7 @@ export function createComparisonTable(config = {}) {
       fill: isHighlighted ? highlightColor : textColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(planName);
 
@@ -556,7 +568,7 @@ export function createComparisonTable(config = {}) {
       fill: isHighlighted ? highlightColor : textColor + '99',
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(priceText);
   });
@@ -570,7 +582,7 @@ export function createComparisonTable(config = {}) {
     fill: textColor + '99',
     originX: 'center',
     originY: 'center',
-    fontFamily: 'Inter, system-ui, sans-serif'
+    fontFamily
   });
   objects.push(featuresHeader);
 
@@ -602,7 +614,7 @@ export function createComparisonTable(config = {}) {
       fill: textColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(featureText);
 
@@ -620,7 +632,7 @@ export function createComparisonTable(config = {}) {
         fill: isCheck ? '#10b981' : isCross ? '#ef4444' : textColor,
         originX: 'center',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(valueText);
     });

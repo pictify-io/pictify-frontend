@@ -1,21 +1,26 @@
 <script>
 	import { fly } from 'svelte/transition';
 	import { quadOut } from 'svelte/easing';
-	import { toast } from '../../store/toast.store';
+	import { visibleToasts, dismissToast } from '../../store/toast.store';
+	import { onDestroy } from 'svelte';
 
-	let message = '';
-	let type = 'default';
-	let visible = false;
+	// Track auto-dismiss timers
+	let timers = {};
 
-	toast.subscribe((value) => {
-		if (value) {
-			({ message, type = 'default' } = value);
-			visible = true;
-			setTimeout(() => {
-				visible = false;
-				toast.set(null);
-			}, value.duration || 3000);
-		}
+	// Set up auto-dismiss for each toast
+	$: {
+		$visibleToasts.forEach(t => {
+			if (!timers[t.id]) {
+				timers[t.id] = setTimeout(() => {
+					dismissToast(t.id);
+					delete timers[t.id];
+				}, t.duration || 3000);
+			}
+		});
+	}
+
+	onDestroy(() => {
+		Object.values(timers).forEach(clearTimeout);
 	});
 
 	const TYPE_CONFIG = {
@@ -44,40 +49,52 @@
 			title: 'Note'
 		}
 	};
+
+	function handleDismiss(id) {
+		if (timers[id]) {
+			clearTimeout(timers[id]);
+			delete timers[id];
+		}
+		dismissToast(id);
+	}
 </script>
 
-{#if visible}
-	<div
-		transition:fly={{ y: 50, duration: 300, easing: quadOut }}
-		class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] rounded-xl overflow-hidden"
-	>
-		<!-- Color Strip / Icon Area -->
-		<div class="{TYPE_CONFIG[type]?.bg || TYPE_CONFIG.default.bg} w-12 flex items-center justify-center border-r-[3px] border-gray-900 flex-shrink-0">
-			<div class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-[2px_2px_0_0_#000]">
-				<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d={TYPE_CONFIG[type]?.icon || TYPE_CONFIG.default.icon} />
-				</svg>
-			</div>
-		</div>
+{#if $visibleToasts.length > 0}
+	<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse gap-3 items-center">
+		{#each $visibleToasts as t (t.id)}
+			<div
+				transition:fly={{ y: 50, duration: 300, easing: quadOut }}
+				class="flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] rounded-xl overflow-hidden"
+			>
+				<!-- Color Strip / Icon Area -->
+				<div class="{TYPE_CONFIG[t.type]?.bg || TYPE_CONFIG.default.bg} w-12 flex items-center justify-center border-r-[3px] border-gray-900 flex-shrink-0">
+					<div class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-[2px_2px_0_0_#000]">
+						<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d={TYPE_CONFIG[t.type]?.icon || TYPE_CONFIG.default.icon} />
+						</svg>
+					</div>
+				</div>
 
-		<!-- Content Area -->
-		<div class="px-5 py-4 flex-1">
-			<div class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-0.5">
-				{TYPE_CONFIG[type]?.title || 'Notice'}
-			</div>
-			<div class="text-sm font-bold text-gray-900 leading-tight">
-				{message}
-			</div>
-		</div>
+				<!-- Content Area -->
+				<div class="px-5 py-4 flex-1">
+					<div class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-0.5">
+						{TYPE_CONFIG[t.type]?.title || 'Notice'}
+					</div>
+					<div class="text-sm font-bold text-gray-900 leading-tight">
+						{t.message}
+					</div>
+				</div>
 
-		<!-- Close Button (Optional decorative or functional) -->
-		<button 
-			on:click={() => visible = false}
-			class="px-3 hover:bg-gray-100 border-l-[3px] border-gray-900 transition-colors flex items-center justify-center group"
-		>
-			<svg class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-			</svg>
-		</button>
+				<!-- Close Button -->
+				<button
+					on:click={() => handleDismiss(t.id)}
+					class="px-3 hover:bg-gray-100 border-l-[3px] border-gray-900 transition-colors flex items-center justify-center group"
+				>
+					<svg class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+		{/each}
 	</div>
 {/if}

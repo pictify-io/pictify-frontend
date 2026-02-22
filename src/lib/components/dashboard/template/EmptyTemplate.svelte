@@ -1,15 +1,10 @@
 <script>
-	import FileIcon from '$lib/assets/landing-page/file.svg';
-	import { goto } from '$app/navigation';
-	import { browser } from '$app/environment';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
 
 	const openTemplateCreator = () => {
-		const url = '/template-workspace/create';
-		if (browser) {
-			window.open(url, '_blank', 'noopener,noreferrer');
-		} else {
-			goto(url);
-		}
+		dispatch('create');
 	};
 </script>
 

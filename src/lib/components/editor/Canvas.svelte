@@ -1,6 +1,6 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
-	import { Canvas, ActiveSelection } from 'fabric'; // v6 import
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+	import { Canvas as FabricCanvas, ActiveSelection } from 'fabric'; // v6 import
 	import { editor, editorActions } from '../../../store/editor.store';
 	import {
 	canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved,
@@ -9,16 +9,20 @@
 	import { currentPageIndex, pages, pageActions, outputFormat, pdfPreset } from '../../../store/pages.store';
 	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
 	import { isPreviewModeActive, clearPreview } from '../../utils/canvas-preview-engine';
+	import { showToast } from '../../../store/toast.store';
+
+	const dispatch = createEventDispatcher();
 
 	let scale = 1;
 	let containerWidth = 0;
 	let containerHeight = 0;
 	let canvasContainer;
 	let fabricCanvas;
-	
+
 	// Page switching for multi-page PDF
 	let previousPageIndex = -1;
 	let pagesUnsubscribe;
+	let isPageSwitching = false; // Guard for race conditions during page switch
 
 	// Undo/Redo History Management
 	let historyStack = [];
@@ -30,25 +34,36 @@
 	let batchUnsubscribe; // Subscription to batchState for reactive batching
 	const MAX_HISTORY = 50;
 
+	// Per-page history preservation
+	let pageHistoryMap = {};
+
+	// Auto-save timer
+	let autoSaveTimer = null;
+	const AUTO_SAVE_DELAY = 30000; // 30 seconds
+
+	// Empty state tracking
+	let showEmptyState = false;
+
 	function saveState() {
 		// Check if batching is active via store
 		const isBatchingActive = $isBatching;
 
 		// Only log if blocked to reduce noise, or if successful
-		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingActive) {
+		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingActive || isPageSwitching) {
 			if (isPerformingUndoRedo) console.log('🚫 saveState blocked: performing undo/redo');
 			if (isLoadingCanvas) console.log('🚫 saveState blocked: loading canvas');
 			if (isBatchingActive) console.log('🚫 saveState blocked: batching operations');
+			if (isPageSwitching) console.log('🚫 saveState blocked: page switching');
 			return;
 		}
-		
+
 		// Remove all states after current index (if we've undone and then made a new change)
 		historyStack = historyStack.slice(0, historyIndex + 1);
-		
+
 		// Save the current state
 		const state = fabricCanvas.toJSON();
 		historyStack.push(state);
-		
+
 		// Limit history size
 		if (historyStack.length > MAX_HISTORY) {
 			historyStack.shift();
@@ -57,17 +72,43 @@
 		} else {
 			historyIndex++;
 		}
-		
+
 		console.log('📝 State saved. Index:', historyIndex, 'SavedIndex:', savedHistoryIndex, 'Stack length:', historyStack.length);
-		
+
 		// Update can undo/redo flags
 		updateHistoryFlags();
+
+		// Start auto-save debounce timer
+		startAutoSaveTimer();
+
+		// Update empty state
+		updateEmptyState();
 	}
 
 	function updateHistoryFlags() {
 		canUndo.set(historyIndex > 0);
 		canRedo.set(historyIndex < historyStack.length - 1);
 		isDirty.set(historyIndex !== savedHistoryIndex);
+	}
+
+	function startAutoSaveTimer() {
+		if (autoSaveTimer) {
+			clearTimeout(autoSaveTimer);
+		}
+		autoSaveTimer = setTimeout(() => {
+			if ($isDirty) {
+				console.log('⏰ Auto-save triggered');
+				dispatch('autosave');
+			}
+		}, AUTO_SAVE_DELAY);
+	}
+
+	function updateEmptyState() {
+		if (!fabricCanvas || isLoadingCanvas) {
+			showEmptyState = false;
+			return;
+		}
+		showEmptyState = fabricCanvas.getObjects().length === 0;
 	}
 
 	function performUndo() {
@@ -99,6 +140,7 @@
 			setTimeout(() => {
 				isPerformingUndoRedo = false;
 				fabricCanvas.requestRenderAll(); // Force visual update
+				updateEmptyState();
 				console.log('🔓 Undo flag reset');
 			}, 50);
 		});
@@ -132,6 +174,7 @@
 			setTimeout(() => {
 				isPerformingUndoRedo = false;
 				fabricCanvas.requestRenderAll(); // Force visual update
+				updateEmptyState();
 				console.log('🔓 Redo flag reset');
 			}, 50);
 		});
@@ -147,7 +190,7 @@
 
 	function updateScale() {
 		if (!canvasContainer || !fabricCanvas) return;
-		
+
 		// Get the dimensions of the wrapper div (the available space)
 		const wrapper = canvasContainer.parentElement.parentElement;
 		const availableWidth = wrapper.clientWidth - 64; // Subtract padding (p-8 = 2rem = 32px * 2)
@@ -160,9 +203,9 @@
 
 		const scaleX = availableWidth / canvasWidth;
 		const scaleY = availableHeight / canvasHeight;
-		
+
 		// Use the smaller scale to ensure it fits entirely
-		// Cap at 1 to avoid upscaling small canvases if not desired, 
+		// Cap at 1 to avoid upscaling small canvases if not desired,
 		// but user asked to "make it smaller such that it fits", so we mainly care about downscaling.
 		// Let's allow upscaling too if the screen is huge, but usually it's about fitting.
 		scale = Math.min(scaleX, scaleY, 1) * 0.95; // 0.95 for a little extra breathing room
@@ -182,7 +225,7 @@
 		// Get dimensions based on output format
 		let width = 1080;
 		let height = 1080;
-		
+
 		// For PDF templates, use the preset dimensions at 72 DPI (standard PDF points)
 		// The backend will scale these to the correct PDF page size (96 DPI for Puppeteer)
 		if ($outputFormat === 'pdf') {
@@ -208,7 +251,7 @@
 		const canvasElement = document.createElement('canvas');
 		canvasContainer.appendChild(canvasElement);
 
-		fabricCanvas = new Canvas(canvasElement, {
+		fabricCanvas = new FabricCanvas(canvasElement, {
 			width: width,
 			height: height,
 			backgroundColor: '#ffffff',
@@ -250,7 +293,7 @@
 		fabricCanvas.on('selection:created', handleSelection);
 		fabricCanvas.on('selection:updated', handleSelection);
 		fabricCanvas.on('selection:cleared', handleSelectionCleared);
-		
+
 		// Track if we're in drawing mode
 		let isDrawing = false;
 
@@ -261,23 +304,23 @@
 				console.warn('⚠️ User interaction detected while isLoadingCanvas=true. Forcing false.');
 				isLoadingCanvas = false;
 			}
-			
+
 			if (fabricCanvas.isDrawingMode) {
 				isDrawing = true;
 			}
 		});
-		
+
 		// Save when path is completely drawn
 		fabricCanvas.on('path:created', () => {
 			console.log('✏️ Path drawing complete');
 			isDrawing = false;
 			saveState();
 		});
-		
+
 		// object:modified fires ONCE when transformation completes (not during drag/resize)
 		fabricCanvas.on('object:modified', (e) => {
 			console.log('🔧 Object modified:', e.target?.type);
-			
+
 			// Don't save during undo/redo operations
 			if (isPerformingUndoRedo) {
 				console.log('🚫 object:modified ignored during undo/redo');
@@ -287,7 +330,7 @@
 				console.log('🚫 object:modified ignored during loading');
 				return;
 			}
-			
+
 			if (fabricCanvas.getActiveObject()) {
 				editorActions.selectComponent(fabricCanvas.getActiveObject());
 			}
@@ -298,11 +341,11 @@
 		fabricCanvas.on('object:added', (e) => {
 			// Ignore guideline objects (snap-to-align helper lines)
 			if (e.target?.guideline) return;
-			
+
 			// Ignore temporary/helper objects (like polygon construction guides)
 			// These have selectable:false and evented:false
 			if (e.target?.selectable === false && e.target?.evented === false) return;
-			
+
 			if (!isDrawing && !isPerformingUndoRedo && !isLoadingCanvas) {
 				console.log('➕ Object added:', e.target?.type);
 				saveState();
@@ -311,10 +354,10 @@
 		fabricCanvas.on('object:removed', (e) => {
 			// Ignore guideline objects (snap-to-align helper lines)
 			if (e.target?.guideline) return;
-			
+
 			// Ignore temporary/helper objects (like polygon construction guides)
 			if (e.target?.selectable === false && e.target?.evented === false) return;
-			
+
 			if (!isDrawing && !isPerformingUndoRedo && !isLoadingCanvas) {
 				console.log('➖ Object removed:', e.target?.type);
 				saveState();
@@ -328,7 +371,7 @@
 				// Manual ungroup implementation since toActiveSelection is missing
 				// 1. Get items and restore their canvas coordinates
 				const items = target._objects.concat(); // Copy array
-				
+
 				// Restore objects to their original state (canvas coordinates)
 				if (typeof target._restoreObjectsState === 'function') {
 					target._restoreObjectsState();
@@ -340,23 +383,23 @@
 
 				// 2. Remove group from canvas
 				fabricCanvas.remove(target);
-				
+
 				// 3. Add items back to canvas
 				items.forEach(obj => {
 					fabricCanvas.add(obj);
 				});
-				
+
 				// 4. Create active selection
 				const activeSelection = new ActiveSelection(items, {
 					canvas: fabricCanvas
 				});
-				
+
 				fabricCanvas.setActiveObject(activeSelection);
 				fabricCanvas.requestRenderAll();
-				
+
 				// Update selection in store
 				editorActions.selectComponent(activeSelection);
-				
+
 				// Save state since structure changed
 				saveState();
 				console.log('🔓 Group ungrouped manually via double-click');
@@ -372,7 +415,7 @@
 			}
 			previousUndoValue = value;
 		});
-		
+
 		unsubscribeRedo = triggerRedo.subscribe((value) => {
 			console.log('🔔 triggerRedo subscription fired. Value:', value, 'Previous:', previousRedoValue);
 			if (previousRedoValue !== undefined && value !== previousRedoValue) {
@@ -400,16 +443,13 @@
 			// Initial state is considered saved
 			savedHistoryIndex = historyIndex;
 			updateHistoryFlags();
+			updateEmptyState();
 			console.log('🎨 Canvas initialization complete, history tracking started');
 		}, 500); // Increased delay to ensure canvas is fully set up
 
 		// Initial scale update
 		updateScale();
-		
-		// Update scale when canvas dimensions change
-		// We can hook into a custom event or just check periodically/on window resize
-		// Fabric doesn't emit a generic 'dimensions:modified' event easily accessible here without mixins
-		// But we can listen to our own store or just rely on the ResizeObserver for the container
+
 	}
 
 	// ... (handleSelection, handleSelectionCleared, handleKeyDown remain same)
@@ -443,11 +483,27 @@
 		if (e.key === 'Delete') {
 			const activeObject = fabricCanvas.getActiveObject();
 			if (activeObject && !activeObject.isEditing) {
-				fabricCanvas.remove(activeObject);
-				fabricCanvas.discardActiveObject();
+				// Handle multi-selection (ActiveSelection contains multiple objects)
+				if (activeObject.type === 'activeselection' || activeObject.type === 'ActiveSelection') {
+					const objects = activeObject.getObjects().concat();
+					fabricCanvas.discardActiveObject();
+					objects.forEach(obj => fabricCanvas.remove(obj));
+				} else {
+					fabricCanvas.remove(activeObject);
+					fabricCanvas.discardActiveObject();
+				}
 				fabricCanvas.renderAll();
 				editorActions.clearSelection();
+				showToast('Element deleted — Cmd+Z to undo', 'default', 2500);
 			}
+		}
+	}
+
+	// Beforeunload handler - warn user about unsaved changes
+	function handleBeforeUnload(e) {
+		if ($isDirty) {
+			e.preventDefault();
+			e.returnValue = '';
 		}
 	}
 
@@ -455,6 +511,10 @@
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('keydown', handleKeyDown);
 			window.removeEventListener('resize', updateScale);
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		}
+		if (autoSaveTimer) {
+			clearTimeout(autoSaveTimer);
 		}
 		if (unsubscribeUndo) unsubscribeUndo();
 		if (unsubscribeRedo) unsubscribeRedo();
@@ -472,18 +532,19 @@
 		if (typeof window !== 'undefined') {
 			window.addEventListener('keydown', handleKeyDown);
 			window.addEventListener('resize', updateScale);
+			window.addEventListener('beforeunload', handleBeforeUnload);
 		}
 		// Initialize Fabric Canvas
 		// We need to wait for the container to be available
 		if (canvasContainer) {
 			initCanvas();
-			
+
 			// Observe container resizing
 			const resizeObserver = new ResizeObserver(() => {
 				updateScale();
 			});
 			resizeObserver.observe(canvasContainer.parentElement.parentElement);
-			
+
 			// Subscribe to page changes for multi-page PDF
 			pagesUnsubscribe = currentPageIndex.subscribe((newIndex) => {
 				if (fabricCanvas && previousPageIndex !== newIndex) {
@@ -493,6 +554,17 @@
 					// Preview clones have _isPreviewClone=true but that's not in the serialization list
 					if (isPreviewModeActive()) {
 						clearPreview(fabricCanvas);
+					}
+
+					isPageSwitching = true;
+
+					// Save current page's undo history before switching
+					if (previousPageIndex >= 0) {
+						pageHistoryMap[previousPageIndex] = {
+							historyStack: [...historyStack],
+							historyIndex,
+							savedHistoryIndex
+						};
 					}
 
 					// Save current page data before switching
@@ -506,46 +578,53 @@
 					]);
 					// Pass previousPageIndex to ensure we save to the page we are LEAVING
 					pageActions.updateCurrentPageData(currentData, previousPageIndex);
-					
+
 					// Load new page data
 					const newPageData = $pages[newIndex]?.fabricJSData;
 					if (newPageData) {
 						isLoadingCanvas = true;
-						// Fabric v6 uses Promises for loadFromJSON
-						const loadPromise = fabricCanvas.loadFromJSON(newPageData);
-						
-						if (loadPromise && typeof loadPromise.then === 'function') {
-							loadPromise.then(() => {
+						try {
+							// Fabric v6 uses Promises for loadFromJSON
+							const loadPromise = fabricCanvas.loadFromJSON(newPageData);
+
+							if (loadPromise && typeof loadPromise.then === 'function') {
+								loadPromise.then(() => {
+									fabricCanvas.renderAll();
+									fabricCanvas.requestRenderAll();
+									editorActions.clearSelection();
+									// Restore page-specific history or initialize fresh
+									restorePageHistory(newIndex);
+									isLoadingCanvas = false;
+									isPageSwitching = false;
+									updateEmptyState();
+									console.log('✅ Page loaded via Promise');
+
+									// Force another render after a short delay
+									setTimeout(() => {
+										fabricCanvas.requestRenderAll();
+									}, 50);
+								}).catch(err => {
+									console.error('Error loading page:', err);
+									showToast('Failed to load page — staying on current page', 'error');
+									isLoadingCanvas = false;
+									isPageSwitching = false;
+								});
+							} else {
+								// Fallback for older Fabric.js behavior
 								fabricCanvas.renderAll();
 								fabricCanvas.requestRenderAll();
 								editorActions.clearSelection();
-								// Reset history for new page
-								historyStack = [fabricCanvas.toJSON()];
-								historyIndex = 0;
-								savedHistoryIndex = 0;
-								updateHistoryFlags();
+								restorePageHistory(newIndex);
 								isLoadingCanvas = false;
-								console.log('✅ Page loaded via Promise');
-								
-								// Force another render after a short delay
-								setTimeout(() => {
-									fabricCanvas.requestRenderAll();
-								}, 50);
-							}).catch(err => {
-								console.error('Error loading page:', err);
-								isLoadingCanvas = false;
-							});
-						} else {
-							// Fallback for older Fabric.js behavior
-							fabricCanvas.renderAll();
-							fabricCanvas.requestRenderAll();
-							editorActions.clearSelection();
-							historyStack = [fabricCanvas.toJSON()];
-							historyIndex = 0;
-							savedHistoryIndex = 0;
-							updateHistoryFlags();
+								isPageSwitching = false;
+								updateEmptyState();
+								console.log('✅ Page loaded (sync)');
+							}
+						} catch (err) {
+							console.error('Error loading page:', err);
+							showToast('Failed to load page — staying on current page', 'error');
 							isLoadingCanvas = false;
-							console.log('✅ Page loaded (sync)');
+							isPageSwitching = false;
 						}
 					} else {
 						// New blank page - clear canvas
@@ -555,38 +634,77 @@
 						fabricCanvas.requestRenderAll();
 						editorActions.clearSelection();
 						// Reset history
-						historyStack = [fabricCanvas.toJSON()];
-						historyIndex = 0;
-						savedHistoryIndex = 0;
-						updateHistoryFlags();
+						restorePageHistory(newIndex);
+						isPageSwitching = false;
+						updateEmptyState();
 						console.log('📄 Blank page created');
 					}
-					
+
 					previousPageIndex = newIndex;
 				}
 			});
-			
+
 			return () => {
 				resizeObserver.disconnect();
 				if (pagesUnsubscribe) pagesUnsubscribe();
 			};
 		}
 	});
-	
+
+	// Restore or initialize history for a page
+	function restorePageHistory(pageIndex) {
+		const saved = pageHistoryMap[pageIndex];
+		if (saved) {
+			historyStack = [...saved.historyStack];
+			historyIndex = saved.historyIndex;
+			savedHistoryIndex = saved.savedHistoryIndex;
+		} else {
+			historyStack = [fabricCanvas.toJSON()];
+			historyIndex = 0;
+			savedHistoryIndex = 0;
+		}
+		updateHistoryFlags();
+	}
+
+	// Clean up history when a page is deleted
+	export function clearPageHistory(pageIndex) {
+		delete pageHistoryMap[pageIndex];
+	}
+
 	// Reactive statement to update scale if editor dimensions change programmatically
 	$: if ($editor && ($editor.width || $editor.height)) {
 		updateScale();
 	}
+
 </script>
 
-<div class="absolute inset-0 bg-[#e5e5e5] overflow-hidden flex items-center justify-center p-8" 
+<div class="absolute inset-0 bg-[#e5e5e5] overflow-hidden flex items-center justify-center p-8"
 	style="padding-top: 80px; background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 20px 20px;">
-	<div 
-		class="shadow-[8px_8px_0_0_#1f2937] border-[3px] border-gray-900 bg-white transition-transform duration-200 ease-out origin-center"
+	<!-- Loading overlay -->
+	{#if isLoadingCanvas || isPageSwitching}
+		<div class="absolute inset-0 z-10 flex items-center justify-center bg-[#e5e5e5]/60">
+			<div class="flex flex-col items-center gap-3">
+				<div class="w-8 h-8 border-[3px] border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+				<span class="text-xs font-black uppercase tracking-widest text-gray-600">Loading canvas...</span>
+			</div>
+		</div>
+	{/if}
+
+	<div
+		class="shadow-[8px_8px_0_0_#1f2937] border-[3px] border-gray-900 bg-white transition-transform duration-200 ease-out origin-center relative"
 		style="transform: scale({scale});"
 	>
 		<div bind:this={canvasContainer}>
 			<!-- Canvas will be injected here -->
 		</div>
+
+		<!-- Empty state overlay -->
+		{#if showEmptyState && !isLoadingCanvas}
+			<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+				<p class="text-gray-300 text-sm font-medium text-center px-8">
+					Click <span class="font-black">+</span> to add elements or use <span class="font-black">Cmd+K</span> for AI Copilot
+				</p>
+			</div>
+		{/if}
 	</div>
 </div>

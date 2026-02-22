@@ -38,12 +38,12 @@
 			<div
 				class="inline-block px-4 py-1.5 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
 			>
-				<span class="text-sm font-bold text-white uppercase tracking-wider">The Pipeline</span>
+				<span class="text-sm font-bold text-white uppercase tracking-wider">How It Works</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				From Database to <br />
+				From Data to <br />
 				<span class="relative inline-block text-[#ff6b6b]">
-					Download
+					Pixel-Perfect Output
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
 						viewBox="0 0 100 10"
@@ -54,8 +54,8 @@
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				A complete image generation pipeline in three steps. <br class="hidden md:block" />
-				Designed for teams who need speed, consistency, and volume.
+				Three steps. One API call. Under 200ms. <br class="hidden md:block" />
+				Here's the entire workflow.
 			</p>
 		</div>
 
@@ -87,14 +87,14 @@
 						>
 							1
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Design Your Template</h3>
+						<h3 class="text-3xl font-bold text-gray-900">Build Your Template</h3>
 					</div>
 					<p
 						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Drag-and-drop in our visual editor. Add <span
+						Drag-and-drop canvas. Add <span
 							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
-						> where your data goes.
+						>, conditions, and formatting rules. Save and you're ready to render.
 						{#if activeStep === 0 && !isPaused}
 							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
 						{/if}
@@ -125,9 +125,9 @@
 					<p
 						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Make a single API call with JSON. <span
+						Just send raw data — the template's logic handles the rest. <span
 							class="bg-red-100 px-1 border-b-2 border-red-300">200ms later</span
-						>, your image is ready.
+						>, your visual is ready.
 						{#if activeStep === 1 && !isPaused}
 							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
 						{/if}
@@ -153,12 +153,12 @@
 						>
 							3
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Get Your Image</h3>
+						<h3 class="text-3xl font-bold text-gray-900">Get Your Output</h3>
 					</div>
 					<p
 						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, or PDF.
+						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, PDF, or video.
 						{#if activeStep === 2 && !isPaused}
 							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
 						{/if}
@@ -266,9 +266,10 @@
 									<div class="text-white opacity-90">
 										{`{`}
 										<div class="pl-4"><span class="text-[#ffc480]">"template"</span>: "promo",</div>
-										<div class="pl-4"><span class="text-[#ffc480]">"data"</span>: {`{`}</div>
-										<div class="pl-8">"title": "Sale",</div>
-										<div class="pl-8">"discount": "50%"</div>
+										<div class="pl-4"><span class="text-[#ffc480]">"variables"</span>: {`{`}</div>
+										<div class="pl-8">"product": "Nike Air",</div>
+										<div class="pl-8">"price": <span class="text-[#4ade80]">129</span>,</div>
+										<div class="pl-8">"inStock": <span class="text-[#4ade80]">true</span></div>
 										<div class="pl-4">{`}`}</div>
 										{`}`}
 									</div>

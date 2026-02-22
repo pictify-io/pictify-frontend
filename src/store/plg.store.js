@@ -11,9 +11,55 @@ import {
   checkFeatureLimit,
   recordMilestone,
   recordUpgradePrompt,
-  getDiscountCode,
 } from '../api/plg';
 import { analytics } from '$lib/analytics.js';
+import {
+  PLANS,
+  PLAN_DISPLAY_NAMES,
+  FEATURES,
+  PLAN_FEATURES,
+  FEATURE_METADATA,
+  FEATURE_UPGRADE_MESSAGES,
+  FEATURE_MIN_PLAN,
+  OVERAGE_PRICING,
+  getFeatureLimit,
+  hasFeatureAccess,
+  hasUnlimitedAccess,
+  getMinimumPlan,
+  getNextPlan,
+  getPlanToUnlock,
+  formatLimit,
+  formatLimitWithUnit,
+  comparePlans,
+  meetsMinimumPlan,
+  isOverageEligible,
+  formatOverageRate,
+} from '../config/plan-features.js';
+import { getBillingPreferences, updateBillingPreferences, getOverageSummary } from '../api/billing.js';
+
+// Re-export plan features config for convenience
+export {
+  PLANS,
+  PLAN_DISPLAY_NAMES,
+  FEATURES,
+  PLAN_FEATURES,
+  FEATURE_METADATA,
+  FEATURE_UPGRADE_MESSAGES,
+  FEATURE_MIN_PLAN,
+  OVERAGE_PRICING,
+  getFeatureLimit,
+  hasFeatureAccess,
+  hasUnlimitedAccess,
+  getMinimumPlan,
+  getNextPlan,
+  getPlanToUnlock,
+  formatLimit,
+  formatLimitWithUnit,
+  comparePlans,
+  meetsMinimumPlan,
+  isOverageEligible,
+  formatOverageRate,
+};
 
 // ============================================
 // Stores
@@ -71,6 +117,28 @@ export const nudgeState = writable({
   proactiveModalShownThisCycle: false,
 });
 
+// Overage billing state
+export const overageState = writable({
+  loaded: false,
+  eligible: false,
+  allowOverages: false,
+  spendingCapCents: null,
+  currentCycleOverages: 0,
+  currentCycleOverageCostCents: 0,
+  ratePerRenderCents: null,
+  ratePerRenderFormatted: null,
+});
+
+// Overage warning modal state
+export const overageWarningModal = writable({
+  show: false,
+  pendingRenderCallback: null,
+  overageCost: 0,
+  currentCycleOverages: 0,
+  currentCycleCost: 0,
+  remainingBudget: null,
+});
+
 // ============================================
 // Derived Stores
 // ============================================
@@ -98,9 +166,58 @@ export const urgencyLevel = derived(usageWidget, ($usageWidget) => $usageWidget.
 // ============================================
 
 /**
- * Initialize PLG status using existing plan details endpoint
+ * Reset PLG state so the next initPLG() re-fetches from the server.
+ * Call this when switching teams to clear cached data from the previous team.
  */
+export const resetPLG = () => {
+  _initPLGPromise = null;
+  plgStatus.set({
+    plan: 'starter',
+    isPaidPlan: false,
+    usage: { current: 0, limit: 50, percentage: 0, remaining: 50 },
+    featureUsage: {},
+    featureLimits: {},
+    milestones: { current: null, next: null, achieved: [] },
+    threshold: null,
+    timeSaved: { value: 0, unit: 'minutes', display: '0 minutes' },
+    resetDate: null,
+    loaded: false,
+  });
+  usageWidget.set({
+    current: 0, limit: 50, percentage: 0,
+    plan: 'starter', isPaidPlan: false, showUpgrade: false, urgency: 'normal',
+  });
+  overageState.set({
+    loaded: false, eligible: false, allowOverages: false,
+    spendingCapCents: null, currentCycleOverages: 0,
+    currentCycleOverageCostCents: 0, ratePerRenderCents: null,
+    ratePerRenderFormatted: null,
+  });
+};
+
+/**
+ * Initialize PLG status using existing plan details endpoint.
+ * Deduplicates concurrent calls - if already initializing, returns the existing promise.
+ */
+let _initPLGPromise = null;
+
 export const initPLG = async () => {
+  // Deduplicate concurrent calls
+  if (_initPLGPromise) return _initPLGPromise;
+
+  // Skip if already loaded
+  const currentStatus = get(plgStatus);
+  if (currentStatus.loaded) return currentStatus;
+
+  _initPLGPromise = _doInitPLG();
+  try {
+    return await _initPLGPromise;
+  } finally {
+    _initPLGPromise = null;
+  }
+};
+
+const _doInitPLG = async () => {
   plgLoading.set(true);
   try {
     // Use the existing plan details endpoint
@@ -120,14 +237,16 @@ export const initPLG = async () => {
     const percentage = limit > 0 ? Math.round((usage / limit) * 100) : 0;
     const remaining = Math.max(0, limit - usage);
     
-    // Determine plan from limit (you might want to get this from user store)
-    let plan = 'starter';
-    if (limit > 50) plan = 'basic';
-    if (limit > 1500) plan = 'standard';
-    if (limit > 3500) plan = 'professional';
-    if (limit > 7500) plan = 'business';
+    // Determine plan from limit (maps to plan-features.js PLAN_FEATURES)
+    // Supports legacy Basic for grandfathered users
+    // New 3-tier: Free (starter), Pro (standard: 10k), Business (40k)
+    // Legacy standard (3.5k) and professional (7.5k) users map to Pro tier
+    let plan = PLANS.STARTER;
+    if (limit > 50) plan = PLANS.BASIC;        // Legacy: 500 renders
+    if (limit > 500) plan = PLANS.STANDARD;    // Pro: includes legacy 3.5k and new 10k
+    if (limit > 10000) plan = PLANS.BUSINESS;  // Business: 40,000 renders
     
-    const isPaidPlan = plan !== 'starter';
+    const isPaidPlan = plan !== PLANS.STARTER;
     
     // Calculate time saved (10 min per render)
     const minutesSaved = usage * 10;
@@ -215,14 +334,16 @@ export const refreshUsageWidget = async () => {
     const percentage = limit > 0 ? Math.round((usage / limit) * 100) : 0;
     const remaining = Math.max(0, limit - usage);
     
-    // Determine plan from limit
-    let plan = 'starter';
-    if (limit > 50) plan = 'basic';
-    if (limit > 1500) plan = 'standard';
-    if (limit > 3500) plan = 'professional';
-    if (limit > 7500) plan = 'business';
+    // Determine plan from limit (maps to plan-features.js PLAN_FEATURES)
+    // Supports legacy Basic for grandfathered users
+    // New 3-tier: Free (starter), Pro (standard: 10k), Business (40k)
+    // Legacy standard (3.5k) and professional (7.5k) users map to Pro tier
+    let plan = PLANS.STARTER;
+    if (limit > 50) plan = PLANS.BASIC;        // Legacy: 500 renders
+    if (limit > 500) plan = PLANS.STANDARD;    // Pro: includes legacy 3.5k and new 10k
+    if (limit > 10000) plan = PLANS.BUSINESS;  // Business: 40,000 renders
     
-    const isPaidPlan = plan !== 'starter';
+    const isPaidPlan = plan !== PLANS.STARTER;
 
     // Determine urgency
     let urgency = 'normal';
@@ -324,24 +445,137 @@ export const trackFeatureUsage = async (feature, amount = 1) => {
 };
 
 /**
- * Check feature availability before using
+ * Check feature availability before using (async - calls backend)
  */
 export const canUseFeature = async (feature, amount = 1) => {
   try {
     const result = await checkFeatureLimit(feature, amount);
-    
+
     // Update feature gates
     featureGates.update((gates) => ({
       ...gates,
       [feature]: result,
     }));
-    
+
     return result;
   } catch (error) {
     console.error('Failed to check feature limit:', error);
     return { allowed: true }; // Fail open
   }
 };
+
+/**
+ * Check if user has access to a feature based on their plan (sync - local check)
+ * @param {string} feature - Feature identifier from FEATURES
+ * @returns {{ hasAccess: boolean, limit: number|boolean|null, isUnlimited: boolean, minPlan: string, upgradeToUnlock: string|null }}
+ */
+export const checkFeatureAccessSync = (feature) => {
+  const status = get(plgStatus);
+  const currentPlan = status.plan || PLANS.STARTER;
+
+  const hasAccess = hasFeatureAccess(currentPlan, feature);
+  const limit = getFeatureLimit(currentPlan, feature);
+  const isUnlimited = hasUnlimitedAccess(currentPlan, feature);
+  const minPlan = getMinimumPlan(feature);
+  const upgradeToUnlock = hasAccess ? null : getPlanToUnlock(currentPlan, feature);
+
+  return {
+    hasAccess,
+    limit,
+    isUnlimited,
+    minPlan,
+    upgradeToUnlock,
+    currentPlan,
+  };
+};
+
+/**
+ * Get feature usage status including current usage and limits
+ * @param {string} feature - Feature identifier
+ * @returns {{ hasAccess: boolean, limit: number|null, used: number, remaining: number, percentage: number, isUnlimited: boolean }}
+ */
+export const getFeatureUsageStatus = (feature) => {
+  const status = get(plgStatus);
+  const currentPlan = status.plan || PLANS.STARTER;
+
+  const hasAccess = hasFeatureAccess(currentPlan, feature);
+  const limit = getFeatureLimit(currentPlan, feature);
+  const isUnlimited = hasUnlimitedAccess(currentPlan, feature);
+  const used = status.featureUsage?.[feature] || 0;
+
+  let remaining = 0;
+  let percentage = 0;
+
+  if (typeof limit === 'number') {
+    remaining = Math.max(0, limit - used);
+    percentage = limit > 0 ? Math.round((used / limit) * 100) : 0;
+  } else if (isUnlimited) {
+    remaining = Infinity;
+    percentage = 0;
+  }
+
+  return {
+    hasAccess,
+    limit,
+    used,
+    remaining,
+    percentage,
+    isUnlimited,
+  };
+};
+
+/**
+ * Get upgrade prompt data for a feature
+ * @param {string} feature - Feature identifier
+ * @returns {object|null} - Upgrade prompt data or null if no upgrade needed
+ */
+export const getFeatureUpgradePrompt = (feature) => {
+  const accessStatus = checkFeatureAccessSync(feature);
+
+  if (accessStatus.hasAccess && accessStatus.isUnlimited) {
+    return null; // No upgrade needed
+  }
+
+  const upgradeMessages = FEATURE_UPGRADE_MESSAGES[feature] || {};
+  const metadata = FEATURE_METADATA[feature] || {};
+  const targetPlan = accessStatus.upgradeToUnlock || getNextPlan(accessStatus.currentPlan);
+
+  if (!targetPlan) {
+    return null; // Already on highest plan
+  }
+
+  const targetLimit = getFeatureLimit(targetPlan, feature);
+
+  return {
+    feature,
+    featureName: metadata.name || formatFeatureName(feature),
+    title: upgradeMessages.title || `Upgrade for ${metadata.name || feature}`,
+    message: upgradeMessages.message || `Unlock ${metadata.name || feature} with ${PLAN_DISPLAY_NAMES[targetPlan]}`,
+    benefit: upgradeMessages.benefit || metadata.description,
+    currentPlan: accessStatus.currentPlan,
+    targetPlan,
+    targetPlanName: PLAN_DISPLAY_NAMES[targetPlan],
+    currentLimit: accessStatus.limit,
+    targetLimit,
+    icon: metadata.icon,
+  };
+};
+
+/**
+ * Derived store for current plan's feature limits
+ */
+export const currentPlanFeatures = derived(plgStatus, ($plgStatus) => {
+  const plan = $plgStatus.plan || PLANS.STARTER;
+  return PLAN_FEATURES[plan] || PLAN_FEATURES[PLANS.STARTER];
+});
+
+/**
+ * Derived store for checking if user is on a paid plan
+ */
+export const isPaidUser = derived(plgStatus, ($plgStatus) => {
+  const plan = $plgStatus.plan || PLANS.STARTER;
+  return plan !== PLANS.STARTER;
+});
 
 /**
  * Show milestone celebration
@@ -718,4 +952,191 @@ export const markProactiveModalShown = () => {
     console.warn('Failed to save proactive modal state:', e);
   }
 };
+
+// ============================================
+// Overage Billing Functions
+// ============================================
+
+/**
+ * Initialize overage state from billing preferences
+ */
+export const initOverageState = async () => {
+  try {
+    const preferences = await getBillingPreferences();
+
+    if (preferences) {
+      overageState.set({
+        loaded: true,
+        eligible: preferences.overagePricing?.eligible || false,
+        allowOverages: preferences.allowOverages || false,
+        spendingCapCents: preferences.spendingCapCents,
+        currentCycleOverages: preferences.currentCycleOverages || 0,
+        currentCycleOverageCostCents: preferences.currentCycleOverageCostCents || 0,
+        ratePerRenderCents: preferences.overagePricing?.ratePerRenderCents,
+        ratePerRenderFormatted: preferences.overagePricing?.ratePerRenderFormatted,
+      });
+    }
+
+    return preferences;
+  } catch (error) {
+    console.error('Failed to init overage state:', error);
+    return null;
+  }
+};
+
+/**
+ * Update overage preferences
+ * @param {Object} options
+ * @param {boolean} [options.allowOverages]
+ * @param {number|null} [options.spendingCapCents]
+ */
+export const updateOveragePreferences = async ({ allowOverages, spendingCapCents }) => {
+  try {
+    const result = await updateBillingPreferences({ allowOverages, spendingCapCents });
+
+    if (result.success) {
+      overageState.update(state => ({
+        ...state,
+        allowOverages: result.allowOverages,
+        spendingCapCents: result.spendingCapCents,
+      }));
+
+      analytics.track('overage_preferences_updated', {
+        allow_overages: result.allowOverages,
+        spending_cap_cents: result.spendingCapCents,
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Failed to update overage preferences:', error);
+    throw error;
+  }
+};
+
+/**
+ * Refresh overage summary
+ */
+export const refreshOverageSummary = async () => {
+  try {
+    const summary = await getOverageSummary();
+
+    if (summary) {
+      overageState.update(state => ({
+        ...state,
+        currentCycleOverages: summary.currentCycleOverages || 0,
+        currentCycleOverageCostCents: summary.currentCycleOverageCostCents || 0,
+        allowOverages: summary.allowOverages || false,
+        spendingCapCents: summary.spendingCapCents,
+      }));
+    }
+
+    return summary;
+  } catch (error) {
+    console.error('Failed to refresh overage summary:', error);
+    return null;
+  }
+};
+
+/**
+ * Check if user can render (considering overages)
+ * Returns { canRender: boolean, isOverage: boolean, requiresConfirmation: boolean, overageCost: number }
+ */
+export const checkRenderAllowed = () => {
+  const status = get(plgStatus);
+  const overage = get(overageState);
+
+  // Check if under limit
+  if (status.usage.current < status.usage.limit) {
+    return { canRender: true, isOverage: false, requiresConfirmation: false, overageCost: 0 };
+  }
+
+  // Over limit - check if overages are allowed
+  if (!overage.allowOverages || !overage.eligible) {
+    return {
+      canRender: false,
+      isOverage: true,
+      requiresConfirmation: false,
+      overageCost: 0,
+      reason: overage.eligible ? 'overages_not_enabled' : 'plan_not_eligible',
+    };
+  }
+
+  // Check spending cap
+  const overageCost = overage.ratePerRenderCents || 0;
+  if (overage.spendingCapCents !== null) {
+    const projectedCost = overage.currentCycleOverageCostCents + overageCost;
+    if (projectedCost > overage.spendingCapCents) {
+      return {
+        canRender: false,
+        isOverage: true,
+        requiresConfirmation: false,
+        overageCost,
+        reason: 'spending_cap_reached',
+      };
+    }
+  }
+
+  // Can render as overage
+  return {
+    canRender: true,
+    isOverage: true,
+    requiresConfirmation: true, // Show warning before overage render
+    overageCost,
+  };
+};
+
+/**
+ * Show overage warning modal before rendering
+ * @param {Function} onConfirm - Callback to execute the render
+ */
+export const showOverageWarning = (onConfirm) => {
+  const overage = get(overageState);
+
+  const remainingBudget = overage.spendingCapCents !== null
+    ? Math.max(0, overage.spendingCapCents - overage.currentCycleOverageCostCents)
+    : null;
+
+  overageWarningModal.set({
+    show: true,
+    pendingRenderCallback: onConfirm,
+    overageCost: overage.ratePerRenderCents || 0,
+    currentCycleOverages: overage.currentCycleOverages,
+    currentCycleCost: overage.currentCycleOverageCostCents,
+    remainingBudget,
+    rateFormatted: overage.ratePerRenderFormatted,
+  });
+};
+
+/**
+ * Confirm overage render and execute callback
+ */
+export const confirmOverageRender = () => {
+  const modal = get(overageWarningModal);
+  if (modal.pendingRenderCallback) {
+    modal.pendingRenderCallback();
+  }
+  dismissOverageWarning();
+};
+
+/**
+ * Dismiss overage warning without rendering
+ */
+export const dismissOverageWarning = () => {
+  overageWarningModal.set({
+    show: false,
+    pendingRenderCallback: null,
+    overageCost: 0,
+    currentCycleOverages: 0,
+    currentCycleCost: 0,
+    remainingBudget: null,
+  });
+};
+
+// Derived store for overage status
+export const isOverageEnabled = derived(overageState, ($overage) => $overage.allowOverages && $overage.eligible);
+export const hasReachedSpendingCap = derived(overageState, ($overage) => {
+  if (!$overage.spendingCapCents) return false;
+  return $overage.currentCycleOverageCostCents >= $overage.spendingCapCents;
+});
 

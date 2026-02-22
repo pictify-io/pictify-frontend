@@ -123,7 +123,6 @@ const backend = {
 			credentials: 'include',
 			method: 'DELETE',
 			headers: {
-				'Content-Type': 'application/json',
 				...options.headers
 			}
 		});

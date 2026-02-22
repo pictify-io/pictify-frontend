@@ -39,9 +39,9 @@ export const templatesPagination = writable({
 });
 
 // Actions
-export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all' } = {}) => {
+export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all', hasDynamicLink } = {}) => {
 	try {
-		const response = await getTemplates({ page, limit, sort, outputFormat });
+		const response = await getTemplates({ page, limit, sort, outputFormat, hasDynamicLink });
 		if (!response?.templates) {
 			templates.set([]);
 			templatesPagination.set({

@@ -55,18 +55,18 @@
 						<h2
 							class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight"
 						>
-							Start Generating <br class="md:hidden" />
-							<span class="text-[#ff6b6b]">Images Today</span>
+							Render Your First Image <br class="md:hidden" />
+							<span class="text-[#ff6b6b]">in Under 5 Minutes</span>
 						</h2>
 
 						<p class="text-xl text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed font-medium">
-							Sign up, get your API key, and generate your first image—all in under 2 minutes.
+							Sign up, design a template, hit the API, and get a pixel-perfect PNG back. Free tier, no credit card.
 						</p>
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
 							<SignUpButton
 								class="w-full sm:w-auto px-8 py-4 bg-[#ffc480] text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
-								text="Get Your Free API Key"
+								text="Try It Free"
 								location="cta_section"
 							/>
 
@@ -101,7 +101,7 @@
 						<div class="grid sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
 							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
 								<h4 class="font-bold text-gray-900 text-sm mb-1">How long to integrate?</h4>
-								<p class="text-xs text-gray-600">Most teams integrate in under 2 hours. It's just REST + JSON.</p>
+								<p class="text-xs text-gray-600">Most teams integrate in under 2 hours. One endpoint, JSON in, image out.</p>
 							</div>
 							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
 								<h4 class="font-bold text-gray-900 text-sm mb-1">What about my data?</h4>

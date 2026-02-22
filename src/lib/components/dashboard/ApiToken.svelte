@@ -10,10 +10,12 @@
 	import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
-	import { toast } from '../../../store/toast.store';
 	import { plgStatus, usageWidget, initPLG } from '../../../store/plg.store';
+	import { copyToClipboard } from '$lib/utils/format.js';
 
 	let isLoading = true;
+	let tokenToRevoke = null;
+	let showRevokeConfirm = false;
 
 	// Use reactive statements for store values - more reliable than manual subscription
 	$: apiTokens = $user.apiTokens || [];
@@ -24,10 +26,23 @@
 		isLoading = false;
 	});
 
-	function copyToClipboard(text) {
-		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
-		});
+	function confirmRevoke(token) {
+		tokenToRevoke = token;
+		showRevokeConfirm = true;
+	}
+
+	async function executeRevoke() {
+		if (tokenToRevoke) {
+			await deleteAPITokenAction(tokenToRevoke.uid);
+			toast.set({ message: 'API key revoked successfully', type: 'success', duration: 2000 });
+		}
+		showRevokeConfirm = false;
+		tokenToRevoke = null;
+	}
+
+	function cancelRevoke() {
+		showRevokeConfirm = false;
+		tokenToRevoke = null;
 	}
 
 	// Time saved calculation
@@ -177,7 +192,7 @@
 
 											<!-- Middle: Token -->
 											<div class="flex-1 bg-gray-50 rounded-lg border-2 border-gray-200 p-2 sm:p-3 flex items-center justify-between group-hover:border-gray-400 transition-colors min-w-0">
-												<code class="font-mono text-xs sm:text-sm font-bold text-gray-800 truncate mr-2 sm:mr-4" title={token.token}>
+												<code class="font-mono text-xs sm:text-sm font-bold text-gray-800 truncate mr-2 sm:mr-4">
 													{token.token.slice(0, 12)}...{token.token.slice(-4)}
 												</code>
 												<button 
@@ -192,7 +207,7 @@
 											<!-- Right: Actions -->
 											<button
 												class="text-[10px] sm:text-xs font-bold text-gray-400 hover:text-red-600 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide border-2 border-transparent hover:border-red-100 w-full md:w-auto"
-												on:click={() => deleteAPITokenAction(token.uid)}
+												on:click={() => confirmRevoke(token)}
 											>
 												Revoke
 											</button>
@@ -215,6 +230,54 @@
 
 		</div>
 	</div>
+	<!-- Revoke Confirmation Modal -->
+	{#if showRevokeConfirm}
+		<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+			<div class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full relative overflow-hidden">
+				<!-- Header Strip -->
+				<div class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b-[3px] border-gray-900 z-10"></div>
+
+				<div class="p-6 pt-8">
+					<!-- Warning Icon -->
+					<div class="flex justify-center mb-4">
+						<div class="w-14 h-14 rounded-xl bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center">
+							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+							</svg>
+						</div>
+					</div>
+
+					<h3 class="text-xl font-black text-gray-900 text-center uppercase tracking-tight mb-2">Revoke API Key?</h3>
+					<p class="text-sm text-gray-600 text-center font-medium mb-6 leading-relaxed">
+						This action cannot be undone. Any applications using this key will immediately lose access.
+					</p>
+
+					{#if tokenToRevoke}
+						<div class="bg-gray-50 rounded-lg border-2 border-gray-200 p-3 mb-6">
+							<code class="font-mono text-xs font-bold text-gray-600">
+								{tokenToRevoke.token.slice(0, 12)}...{tokenToRevoke.token.slice(-4)}
+							</code>
+						</div>
+					{/if}
+
+					<div class="flex gap-3">
+						<button
+							on:click={cancelRevoke}
+							class="flex-1 px-4 py-3 text-xs font-black text-gray-900 bg-white rounded-lg border-[3px] border-gray-300 hover:border-gray-900 hover:bg-gray-50 transition-all uppercase tracking-widest"
+						>
+							Cancel
+						</button>
+						<button
+							on:click={executeRevoke}
+							class="flex-1 px-4 py-3 text-xs font-black text-white bg-[#ff6b6b] rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+						>
+							Revoke Key
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
 </section>
 
 <Toast />

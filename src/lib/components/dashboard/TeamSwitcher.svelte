@@ -1,7 +1,8 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
 	import {
 		teamStore,
 		teams,
@@ -70,8 +71,9 @@
 		try {
 			await switchTeamAction(teamId);
 			isOpen = false;
-			// Optionally refresh the page to load new team context
-			window.location.reload();
+			// Force page re-mount to re-trigger onMount data fetches for new team
+			const currentPath = $page.url.pathname + $page.url.search;
+			await goto(currentPath, { replaceState: true, invalidateAll: true });
 		} catch (err) {
 			error = err.message;
 		} finally {
@@ -95,7 +97,7 @@
 			isCreating = false;
 			newTeamName = '';
 			isOpen = false;
-			window.location.reload();
+			await invalidateAll();
 		} catch (err) {
 			// Check if error has upgrade URL (team limit reached)
 			if (err.upgradeUrl || err.message?.includes('team limit') || err.message?.includes('Team limit')) {
@@ -117,7 +119,7 @@
 		try {
 			await migrateToTeamsAction();
 			isOpen = false;
-			window.location.reload();
+			await invalidateAll();
 		} catch (err) {
 			error = err.message;
 		} finally {
@@ -158,6 +160,9 @@
 	<!-- Team Switcher Button -->
 	<button
 		on:click={toggleDropdown}
+		aria-haspopup="listbox"
+		aria-expanded={isOpen}
+		aria-label="Switch team"
 		class="w-full flex items-center justify-between px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all {isOpen ? 'translate-x-[2px] translate-y-[2px] shadow-[2px_2px_0_0_#1f2937] bg-gray-50' : ''}"
 		disabled={loading}
 	>
@@ -196,7 +201,12 @@
 
 	<!-- Dropdown Menu -->
 	{#if isOpen}
-		<div class="absolute left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top">
+		<div
+			class="absolute left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top"
+			role="listbox"
+			aria-label="Teams"
+			on:keydown={(e) => { if (e.key === 'Escape') isOpen = false; }}
+		>
 			<!-- Usage Bar (if current team) -->
 			{#if $currentTeam && $teamUsage}
 				<div class="px-4 py-3 border-b-[3px] border-gray-900 bg-gray-50">
@@ -234,6 +244,8 @@
 				{#each $teams as teamItem}
 					<button
 						on:click={() => handleSwitchTeam(teamItem.team?.uid)}
+						role="option"
+						aria-selected={teamItem.team?.uid === $currentTeam?.uid}
 						class="w-full flex items-center px-4 py-3 hover:bg-[#FFFDF8] transition-colors text-left group
 							{teamItem.team?.uid === $currentTeam?.uid ? 'bg-[#FFFDF8]' : ''}"
 						disabled={loading}

@@ -1,6 +1,7 @@
 <script>
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { onMount, tick } from 'svelte';
+	import { fly } from 'svelte/transition';
 	import TopBar from './TopBar.svelte';
 	import AnimatedBackground from './AnimatedBackground.svelte';
 	import PageNavigator from './PageNavigator.svelte';
@@ -21,6 +22,25 @@
 	export let isSaving = false;
 	export let guestMode = false;
 
+	// Keyboard shortcuts modal
+	let showShortcutsModal = false;
+
+	const isMac = typeof navigator !== 'undefined' && navigator.platform.includes('Mac');
+	const modKey = isMac ? 'Cmd' : 'Ctrl';
+
+	const shortcuts = [
+		{ keys: `${modKey}+Z`, description: 'Undo' },
+		{ keys: `${modKey}+Shift+Z`, description: 'Redo' },
+		{ keys: `${modKey}+K`, description: 'Toggle Copilot' },
+		{ keys: `${modKey}+S`, description: 'Save' },
+		{ keys: 'Delete', description: 'Remove selected element' },
+		{ keys: `${modKey}+C`, description: 'Copy' },
+		{ keys: `${modKey}+V`, description: 'Paste' },
+		{ keys: `${modKey}+D`, description: 'Duplicate' },
+		{ keys: 'Arrow keys', description: 'Nudge selected element' },
+		{ keys: '?', description: 'Show this dialog' },
+	];
+
 	function setRightTab(tab) {
 		editorActions.toggleRightSidebarTab(tab);
 	}
@@ -40,6 +60,17 @@
 			} else {
 				editorActions.toggleLeftSidebarTab('copilot'); // Open copilot
 			}
+		}
+
+		// Escape to close shortcuts modal
+		if (e.key === 'Escape' && showShortcutsModal) {
+			showShortcutsModal = false;
+		}
+	}
+
+	function handleShortcutsClickOutside(e) {
+		if (showShortcutsModal && e.target.classList.contains('shortcuts-backdrop')) {
+			showShortcutsModal = false;
 		}
 	}
 
@@ -102,7 +133,7 @@
 		<!-- Canvas Area -->
 		<div class="relative flex-1 overflow-hidden bg-transparent">
 			<AlignmentGuides />
-			<Canvas />
+			<Canvas on:autosave={() => { console.log('EditorLayout: autosave event received'); dispatch('save'); }} />
 			
 			{#if $selectedComponent && import.meta.env.PUBLIC_ENABLE_COPILOT === 'true'}
 				<FloatingCopilot element={$selectedComponent} scale={$canvasZoom / 100} />
@@ -139,7 +170,7 @@
                         <span class="sr-only">Layers</span>
                     {/if}
 				</button>
-				<button 
+				<button
 					class="py-3 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors relative group
 					{$activeRightSidebarTab ? 'flex-1' : 'w-full border-b-[2px] border-gray-900'}
 					{$activeRightSidebarTab === 'variables' ? 'bg-[#ffc480] text-gray-900' : 'text-gray-500'}"
@@ -171,9 +202,56 @@
 			</div>
 		</div>
 	</div>
-	
-	
 
+	<!-- Keyboard Shortcuts Button -->
+	<button
+		class="fixed bottom-4 right-4 z-30 w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-full text-gray-900 font-black text-sm shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all hover:bg-[#ffc480]"
+		on:click={() => showShortcutsModal = true}
+		title="Keyboard Shortcuts"
+	>
+		?
+	</button>
+
+	<!-- Keyboard Shortcuts Modal -->
+	{#if showShortcutsModal}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div
+			class="shortcuts-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+			on:click={handleShortcutsClickOutside}
+			transition:fly={{ y: 0, duration: 150 }}
+		>
+			<div
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] w-full max-w-sm mx-4"
+				transition:fly={{ y: 20, duration: 200 }}
+			>
+				<!-- Header -->
+				<div class="flex items-center justify-between px-5 py-3 border-b-[3px] border-gray-900 bg-[#FFFDF8] rounded-t-lg">
+					<h3 class="text-sm font-black uppercase tracking-widest text-gray-900">Keyboard Shortcuts</h3>
+					<button
+						class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+						on:click={() => showShortcutsModal = false}
+					>
+						<i class="fa fa-times text-gray-500 text-sm"></i>
+					</button>
+				</div>
+
+				<!-- Shortcuts List -->
+				<div class="p-4 space-y-2 max-h-[50vh] overflow-y-auto">
+					{#each shortcuts as shortcut}
+						<div class="flex items-center justify-between py-1.5">
+							<span class="text-sm text-gray-700">{shortcut.description}</span>
+							<kbd class="text-[11px] font-mono font-bold bg-gray-100 border-[2px] border-gray-900 rounded-md px-2 py-1 shadow-[2px_2px_0_0_#e5e7eb] text-gray-900">{shortcut.keys}</kbd>
+						</div>
+					{/each}
+				</div>
+
+				<!-- Footer -->
+				<div class="px-5 py-3 border-t-[2px] border-gray-200 bg-[#FFFDF8] rounded-b-lg">
+					<p class="text-[10px] text-gray-400 text-center uppercase tracking-widest font-bold">Press Escape to close</p>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>

@@ -4,6 +4,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
+	import { copyToClipboard as sharedCopy, formatRelativeDate, getPageNumbers as sharedGetPageNumbers } from '$lib/utils/format.js';
 
 	export let mediaType = 'images';
 
@@ -24,9 +25,7 @@
 
 	function copyToClipboard(text, event) {
 		event?.stopPropagation();
-		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'URL copied to clipboard!', type: 'success', duration: 2000 });
-		});
+		sharedCopy(text, 'URL copied to clipboard!');
 	}
 
 	function downloadMedia(url, event) {
@@ -80,47 +79,10 @@
 	}
 
 	function formatDate(dateString) {
-		const date = new Date(dateString);
-		const now = new Date();
-		const diffTime = Math.abs(now - date);
-		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-		
-		if (diffDays === 1) return 'Today';
-		if (diffDays === 2) return 'Yesterday';
-		if (diffDays <= 7) return `${diffDays - 1} days ago`;
-		
-		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		return formatRelativeDate(dateString);
 	}
 
-	// Generate page numbers for pagination
-	const getPageNumbers = () => {
-		const pages = [];
-		const maxVisible = 5;
-		
-		if (totalPages <= maxVisible) {
-			for (let i = 1; i <= totalPages; i++) {
-				pages.push(i);
-			}
-		} else {
-			if (currentPage <= 3) {
-				for (let i = 1; i <= 4; i++) pages.push(i);
-				pages.push('...');
-				pages.push(totalPages);
-			} else if (currentPage >= totalPages - 2) {
-				pages.push(1);
-				pages.push('...');
-				for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-			} else {
-				pages.push(1);
-				pages.push('...');
-				for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-				pages.push('...');
-				pages.push(totalPages);
-			}
-		}
-		
-		return pages;
-	};
+	const getPageNumbers = () => sharedGetPageNumbers(currentPage, totalPages);
 
 	onMount(async () => {
 		if (unsubscribe) unsubscribe();
@@ -212,6 +174,10 @@
 				<p class="text-gray-500 font-bold max-w-md text-center">
 					Start generating {mediaType === 'images' ? 'images' : mediaType === 'gifs' ? 'GIFs' : 'PDFs'} from your templates to see them appear here.
 				</p>
+				<a href="/dashboard/template" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-[#ffc480] hover:text-gray-900 transition-colors border-2 border-gray-900">
+					Open Templates
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+				</a>
 			</div>
 		{:else}
 			<!-- Media Grid -->

@@ -4,6 +4,8 @@
   import {
     plgStatus,
     usageWidget,
+    overageState,
+    isOverageEnabled,
     shouldShowUsageBanner,
     dismissUsageBanner,
     initNudgeState,
@@ -11,6 +13,7 @@
   } from '../../../store/plg.store';
   import { openUpgradeModal } from '../../../store/upgrade-modal.store';
   import { analytics } from '$lib/analytics.js';
+  import { goto } from '$app/navigation';
 
   let showBanner = false;
   let mounted = false;
@@ -19,6 +22,10 @@
   $: discountInfo = getDiscountForUsage($usageWidget.percentage);
   $: hasDiscount = discountInfo !== null;
 
+  // Overage state
+  $: overageEnabled = $isOverageEnabled;
+  $: overageRate = $overageState.ratePerRenderFormatted;
+
   // Dynamic copy based on urgency
   $: headline = getHeadline($usageWidget.percentage);
   $: subline = getSubline($usageWidget.percentage, discountInfo);
@@ -26,6 +33,8 @@
   $: bannerStyle = getBannerStyle($usageWidget.percentage);
 
   function getHeadline(percentage) {
+    // If overages are enabled and at/over limit, show different messaging
+    if (percentage >= 100 && overageEnabled) return "Now using overage renders";
     if (percentage >= 100) return "You've hit your limit";
     if (percentage >= 95) return "Almost out of renders";
     if (percentage >= 85) return "Running low on renders";
@@ -33,6 +42,10 @@
   }
 
   function getSubline(percentage, discount) {
+    // If overages are enabled and at/over limit, show overage rate
+    if (percentage >= 100 && overageEnabled) {
+      return `Additional renders are billed at ${overageRate}/render.`;
+    }
     if (percentage >= 100) return "Upgrade now to keep creating.";
     if (percentage >= 95) return discount ? `Upgrade now and save ${discount.discountPercent}%.` : "Upgrade to keep creating.";
     if (percentage >= 85) return discount ? `Lock in ${discount.discountPercent}% off before you hit your limit.` : "Upgrade to avoid interruption.";
@@ -40,6 +53,8 @@
   }
 
   function getCtaText(discount) {
+    // If at limit with overages enabled, show different CTA
+    if ($usageWidget.percentage >= 100 && overageEnabled) return "Manage overages";
     if (discount) return `Save ${discount.discountPercent}%`;
     return "Keep creating";
   }
@@ -86,7 +101,15 @@
       percentage: $usageWidget.percentage,
       plan: $usageWidget.plan,
       discount_code: discountInfo?.discountCode,
+      overage_enabled: overageEnabled,
     });
+
+    // If at limit with overages enabled, go to billing settings instead
+    if ($usageWidget.percentage >= 100 && overageEnabled) {
+      goto('/dashboard/billing');
+      return;
+    }
+
     openUpgradeModal('usage_banner', discountInfo?.discountCode || null);
   }
 </script>
@@ -119,17 +142,17 @@
         <!-- Right: CTA and dismiss -->
         <div class="flex items-center gap-3 flex-shrink-0">
           <button
-            class="px-5 py-2.5 bg-gray-900 text-white text-xs font-black uppercase tracking-widest rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#FFFDF8] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#FFFDF8] hover:bg-black transition-all whitespace-nowrap flex items-center gap-2 group"
+            class="px-4 py-2 bg-gray-900 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#FFFDF8] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#FFFDF8] hover:bg-black transition-all whitespace-nowrap flex items-center gap-2 group"
             on:click={handleUpgradeClick}
           >
             {ctaText}
-            <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
             </svg>
           </button>
 
           <button
-            class="p-2 text-gray-900 hover:text-white hover:bg-gray-900 rounded-lg border-2 border-transparent hover:border-gray-900 transition-colors"
+            class="p-1.5 text-gray-900 hover:bg-gray-900/10 rounded-lg border-2 border-transparent hover:border-gray-900 transition-colors"
             on:click={handleDismiss}
             aria-label="Dismiss banner"
           >

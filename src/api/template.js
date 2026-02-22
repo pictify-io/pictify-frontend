@@ -6,9 +6,20 @@ const getTemplate = async ({ type, variables }) => {
 	return response;
 };
 
-const getTemplates = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all' } = {}) => {
+const getTemplates = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all', hasDynamicLink } = {}) => {
 	try {
-		const response = await backend.get(`/templates?page=${page}&limit=${limit}&sort=${sort}&outputFormat=${outputFormat}`);
+		const params = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			sort,
+			outputFormat
+		});
+
+		if (hasDynamicLink !== undefined) {
+			params.append('hasDynamicLink', hasDynamicLink.toString());
+		}
+
+		const response = await backend.get(`/templates?${params}`);
 		return response;
 	} catch (error) {
 		return null;
@@ -85,8 +96,47 @@ const renderTemplate = async (uid, variables = {}, options = {}) => {
 			headers['Authorization'] = `Bearer ${options.apiKey}`;
 		}
 
-		const response = await backend.post(`/templates/${uid}/render`, {
+		const body = {
 			variables,
+			format: options.format || 'png',
+			quality: options.quality || 0.9
+		};
+
+		// Add dimension overrides for custom size rendering
+		if (options.width && options.height) {
+			body.width = options.width;
+			body.height = options.height;
+		}
+
+		const response = await backend.post(`/templates/${uid}/render`, body, {
+			headers
+		});
+		return response;
+	} catch (error) {
+		console.error('Error rendering template:', error);
+		throw error;
+	}
+};
+
+/**
+ * Render a template at multiple sizes in one request
+ * @param {string} uid - Template UID
+ * @param {Object} variables - Variable key-value pairs
+ * @param {Array} sizes - Array of { width, height, label? } or { preset }
+ * @param {Object} options - Render options (format, quality, apiKey)
+ * @returns {Promise<Object>} - { results, errors, totalSizes, totalErrors }
+ */
+const renderTemplateMultiSize = async (uid, variables = {}, sizes = [], options = {}) => {
+	try {
+		const headers = { ...(options.headers || {}) };
+
+		if (options.apiKey) {
+			headers['Authorization'] = `Bearer ${options.apiKey}`;
+		}
+
+		const response = await backend.post(`/templates/${uid}/multi-size-render`, {
+			variables,
+			sizes,
 			format: options.format || 'png',
 			quality: options.quality || 0.9
 		}, {
@@ -94,7 +144,7 @@ const renderTemplate = async (uid, variables = {}, options = {}) => {
 		});
 		return response;
 	} catch (error) {
-		console.error('Error rendering template:', error);
+		console.error('Error multi-size rendering template:', error);
 		throw error;
 	}
 };
@@ -361,6 +411,7 @@ export {
 	searchTemplates,
 	getTemplatesForType,
 	renderTemplate,
+	renderTemplateMultiSize,
 	getTemplateVariables,
 	// New exports
 	batchRenderTemplate,

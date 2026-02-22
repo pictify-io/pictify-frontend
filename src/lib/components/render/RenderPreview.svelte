@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 
 	export let renderResult = null;
 	export let renderError = null;
@@ -15,13 +15,50 @@
 	const handleCopyUrl = () => {
 		dispatch('copyUrl');
 	};
+
+	// Retry logic for images that aren't available on S3 yet
+	const MAX_RETRIES = 10;
+	const RETRY_DELAY_MS = 1500;
+	let retryCount = 0;
+	let retryTimer = null;
+	let imgSrc = '';
+	let imgLoaded = false;
+	let lastResultUrl = '';
+
+	// Reset retry state only when the URL actually changes (new render)
+	$: if (renderResult?.url && renderResult.url !== lastResultUrl) {
+		lastResultUrl = renderResult.url;
+		retryCount = 0;
+		imgLoaded = false;
+		clearTimeout(retryTimer);
+		imgSrc = renderResult.url;
+	}
+
+	function handleImgError() {
+		if (retryCount < MAX_RETRIES && renderResult?.url) {
+			retryCount++;
+			retryTimer = setTimeout(() => {
+				const sep = renderResult.url.includes('?') ? '&' : '?';
+				imgSrc = `${renderResult.url}${sep}_r=${retryCount}`;
+			}, RETRY_DELAY_MS);
+		}
+	}
+
+	function handleImgLoad() {
+		imgLoaded = true;
+		retryCount = 0;
+	}
+
+	onDestroy(() => {
+		clearTimeout(retryTimer);
+	});
 </script>
 
 <div class="space-y-6">
 	<!-- Preview Area -->
 	<div class="relative bg-gray-50 border-[3px] border-gray-900 rounded-xl min-h-[400px] flex items-center justify-center overflow-hidden shadow-inner">
 		<!-- Background Grid Pattern -->
-		<div class="absolute inset-0 opacity-10 pointer-events-none" 
+		<div class="absolute inset-0 opacity-10 pointer-events-none"
 			 style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;">
 		</div>
 
@@ -45,10 +82,22 @@
 			</div>
 		{:else if renderResult?.url}
 			<div class="relative w-full h-full p-6 flex items-center justify-center bg-[#FFFDF8]" style="min-height: 400px;">
+				{#if !imgLoaded}
+					<div class="text-center py-8">
+						<div class="relative w-16 h-16 mx-auto mb-4">
+							<div class="absolute inset-0 border-[5px] border-gray-200 rounded-full"></div>
+							<div class="absolute inset-0 border-[5px] border-[#ffc480] rounded-full border-t-transparent animate-spin"></div>
+						</div>
+						<p class="text-xs font-black text-gray-500 uppercase tracking-widest">Loading image...</p>
+					</div>
+				{/if}
 				<img
-					src={renderResult.url}
+					src={imgSrc}
 					alt="Rendered output"
 					class="max-w-full max-h-[500px] object-contain shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] border-[2px] border-gray-200"
+					class:hidden={!imgLoaded}
+					on:error={handleImgError}
+					on:load={handleImgLoad}
 				/>
 			</div>
 		{:else if templateThumbnail}
@@ -117,7 +166,7 @@
 					</button>
 				</div>
 			</div>
-			
+
 			<div class="mt-4 pt-4 border-t-2 border-green-200/50">
 				<p class="text-[10px] font-black text-green-800/70 uppercase tracking-widest mb-1.5">CDN Asset URL</p>
 				<div class="bg-white/50 border-[2px] border-green-200 rounded p-2 font-mono text-xs text-green-900 break-all select-all">

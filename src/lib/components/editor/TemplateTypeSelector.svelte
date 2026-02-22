@@ -1,10 +1,22 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-	
+	import {
+		checkFeatureAccessSync,
+		FEATURES,
+		PLAN_DISPLAY_NAMES,
+		getMinimumPlan
+	} from '../../../store/plg.store';
+
 	const dispatch = createEventDispatcher();
-	
+
 	let selectedFormat = 'image';
 	let selectedPreset = 'CUSTOM';
+
+	// Feature access check for PDF output
+	$: pdfAccess = checkFeatureAccessSync(FEATURES.PDF_OUTPUT);
+	$: hasPdfAccess = pdfAccess?.hasAccess ?? false;
+	$: pdfMinPlan = getMinimumPlan(FEATURES.PDF_OUTPUT);
+	$: pdfMinPlanName = PLAN_DISPLAY_NAMES[pdfMinPlan];
 	
 	const formats = [
 		{ 
@@ -12,14 +24,22 @@
 			label: 'Image Template', 
 			icon: 'fa-image',
 			description: 'PNG/JPEG output for social media, OG images, banners',
-			color: 'blue'
+			color: '#ffc480',
+			bgColor: 'bg-[#ffc480]',
+			borderColor: 'border-[#ffc480]',
+			textOnBg: 'text-gray-900',
+			shadowColor: 'shadow-[4px_4px_0_0_#ffc480]'
 		},
 		{ 
 			value: 'pdf', 
 			label: 'PDF Document', 
 			icon: 'fa-file-pdf',
 			description: 'Multi-page PDF with selectable text for invoices, reports',
-			color: 'red'
+			color: '#ff6b6b',
+			bgColor: 'bg-[#ff6b6b]',
+			borderColor: 'border-[#ff6b6b]',
+			textOnBg: 'text-white',
+			shadowColor: 'shadow-[4px_4px_0_0_#ff6b6b]'
 		}
 	];
 	
@@ -74,31 +94,45 @@
 		<div class="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
 			<!-- Format Selection -->
 			<div class="space-y-3">
-				<label class="text-sm font-bold uppercase tracking-wider text-gray-700">Output Format</label>
-				<div class="grid grid-cols-2 gap-4">
+				<label class="text-xs font-black uppercase tracking-widest text-gray-900">Output Format</label>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					{#each formats as format}
+						{@const isLocked = format.value === 'pdf' && !hasPdfAccess}
 						<button
-							class="relative p-4 rounded-xl border-[3px] text-left transition-all
-								{selectedFormat === format.value 
-									? `border-${format.color}-500 bg-${format.color}-50 shadow-[4px_4px_0_0_#1f2937]`
-									: 'border-gray-300 bg-white hover:border-gray-400'}"
-							on:click={() => selectedFormat = format.value}
+							class="relative p-5 rounded-xl border-[3px] text-left transition-all
+								{isLocked
+									? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-75'
+									: selectedFormat === format.value
+										? `border-gray-900 ${format.bgColor}/10 shadow-[4px_4px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]`
+										: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
+							on:click={() => !isLocked && (selectedFormat = format.value)}
+							disabled={isLocked}
 						>
-							{#if selectedFormat === format.value}
-								<div class="absolute top-2 right-2 w-5 h-5 bg-{format.color}-500 rounded-full flex items-center justify-center">
-									<i class="fa fa-check text-white text-xs"></i>
+							{#if isLocked}
+								<!-- Locked badge -->
+								<div class="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-gray-200 rounded text-gray-500 border-2 border-gray-300">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+									</svg>
+									<span class="text-[10px] font-black uppercase">{pdfMinPlanName}+</span>
+								</div>
+							{:else if selectedFormat === format.value}
+								<div class="absolute top-3 right-3 w-6 h-6 border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] {format.bgColor} rounded-full flex items-center justify-center">
+									<i class="fa fa-check {format.textOnBg} text-xs font-bold"></i>
 								</div>
 							{/if}
-							<div class="flex items-start gap-3">
-								<div class="w-12 h-12 rounded-lg flex items-center justify-center
-									{selectedFormat === format.value 
-										? (format.color === 'blue' ? 'bg-blue-500 text-white' : 'bg-red-500 text-white')
-										: 'bg-gray-100 text-gray-500'}">
+							<div class="flex items-start gap-4">
+								<div class="w-12 h-12 rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center flex-shrink-0
+									{isLocked
+										? 'bg-gray-200 text-gray-400 border-gray-300 shadow-none'
+										: selectedFormat === format.value
+											? `${format.bgColor} ${format.textOnBg}`
+											: 'bg-white text-gray-900'}">
 									<i class="fa {format.icon} text-xl"></i>
 								</div>
 								<div>
-									<div class="font-bold text-gray-900">{format.label}</div>
-									<div class="text-xs text-gray-500 mt-0.5">{format.description}</div>
+									<div class="font-black text-gray-900 text-base uppercase tracking-tight">{format.label}</div>
+									<div class="text-xs font-bold text-gray-600 mt-1 leading-relaxed">{format.description}</div>
 								</div>
 							</div>
 						</button>
@@ -108,23 +142,23 @@
 			
 			<!-- PDF Preset Selection (only shown for PDF) -->
 			{#if selectedFormat === 'pdf'}
-				<div class="space-y-3 border-t-2 border-gray-200 pt-5">
-					<label class="text-sm font-bold uppercase tracking-wider text-gray-700">Page Size</label>
+				<div class="space-y-4 border-t-[3px] border-dashed border-gray-200 pt-6">
+					<label class="text-xs font-black uppercase tracking-widest text-gray-900">Page Size</label>
 					<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
 						{#each pdfPresets as preset}
 							<button
-								class="p-3 rounded-lg border-2 text-left transition-all
+								class="p-3 rounded-lg border-[3px] text-left transition-all
 									{selectedPreset === preset.value 
-										? 'border-red-500 bg-red-50 shadow-[3px_3px_0_0_#1f2937]'
-										: 'border-gray-200 bg-white hover:border-gray-300'}"
+										? 'border-gray-900 bg-[#ff6b6b]/10 shadow-[4px_4px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
+										: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
 								on:click={() => selectedPreset = preset.value}
 							>
-								<div class="font-bold text-sm text-gray-900">{preset.label}</div>
-								<div class="text-xs text-gray-500">
+								<div class="font-black text-xs uppercase text-gray-900 tracking-tight">{preset.label}</div>
+								<div class="text-[10px] font-bold text-gray-600 mt-1">
 									{#if preset.value === 'CUSTOM'}
-										{customWidth} × {customHeight}
+										{customWidth} × {customHeight} px
 									{:else}
-										{preset.width} × {preset.height}
+										{preset.width} × {preset.height} px
 									{/if}
 								</div>
 							</button>
@@ -132,24 +166,24 @@
 					</div>
 					
 					{#if selectedPreset === 'CUSTOM'}
-						<div class="flex items-center gap-4 mt-4 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
-							<div class="flex-1">
-								<label class="text-xs font-bold uppercase text-gray-600">Width</label>
+						<div class="flex items-center gap-4 mt-4 p-5 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
+							<div class="flex-1 space-y-1.5">
+								<label class="text-[10px] font-black uppercase tracking-widest text-gray-900">Width (px)</label>
 								<input 
 									type="number" 
 									bind:value={customWidth}
-									class="w-full mt-1 px-3 py-2 border-2 border-gray-300 rounded-lg font-bold focus:border-gray-900 focus:outline-none"
+									class="w-full px-4 py-2.5 border-[3px] border-gray-900 rounded-lg text-sm font-black focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:-translate-y-1 transition-all"
 									min="100"
 									max="5000"
 								/>
 							</div>
-							<div class="text-gray-400 font-bold pt-5">×</div>
-							<div class="flex-1">
-								<label class="text-xs font-bold uppercase text-gray-600">Height</label>
+							<div class="text-gray-900 font-black text-xl pt-6">×</div>
+							<div class="flex-1 space-y-1.5">
+								<label class="text-[10px] font-black uppercase tracking-widest text-gray-900">Height (px)</label>
 								<input 
 									type="number" 
 									bind:value={customHeight}
-									class="w-full mt-1 px-3 py-2 border-2 border-gray-300 rounded-lg font-bold focus:border-gray-900 focus:outline-none"
+									class="w-full px-4 py-2.5 border-[3px] border-gray-900 rounded-lg text-sm font-black focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:-translate-y-1 transition-all"
 									min="100"
 									max="5000"
 								/>
@@ -161,20 +195,20 @@
 		</div>
 		
 		<!-- Footer -->
-		<div class="px-6 py-4 border-t-[3px] border-gray-900 bg-gray-50 flex justify-end gap-3">
+		<div class="px-6 py-4 border-t-[3px] border-gray-900 bg-gray-50 flex justify-end gap-4 overflow-visible shrink-0">
 			<button 
 				on:click={handleClose}
-				class="px-6 py-2.5 rounded-lg border-2 border-gray-300 text-gray-600 font-bold uppercase text-sm hover:border-gray-400 transition-colors"
+				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 bg-white text-gray-900 font-black uppercase text-xs tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Cancel
 			</button>
 			<button
 				on:click={handleContinue}
-				class="px-6 py-2.5 rounded-xl border-[3px] border-gray-900 font-black uppercase text-sm tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all
-					{selectedFormat === 'image' ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'}"
+				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 font-black uppercase text-xs tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2
+					{selectedFormat === 'image' ? 'bg-[#ffc480] text-gray-900 hover:bg-[#ffb360]' : 'bg-[#ff6b6b] text-white hover:bg-[#ff5252]'}"
 			>
-				<i class="fa fa-arrow-right mr-2"></i>
 				Continue to Editor
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 			</button>
 		</div>
 	</div>

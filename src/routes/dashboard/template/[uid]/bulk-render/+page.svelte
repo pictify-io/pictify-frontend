@@ -11,6 +11,21 @@
 	import { analytics } from '$lib/analytics.js';
 	import Papa from 'papaparse';
 	import JSZip from 'jszip';
+	import {
+		plgStatus,
+		checkFeatureAccessSync,
+		FEATURES,
+		PLAN_DISPLAY_NAMES,
+		getFeatureLimit,
+		formatLimit,
+	} from '../../../../../store/plg.store';
+	import { openUpgradeModal } from '../../../../../store/upgrade-modal.store';
+
+	// Feature access check
+	$: featureAccess = checkFeatureAccessSync(FEATURES.BATCH_RENDER);
+	$: hasBatchAccess = featureAccess?.hasAccess ?? false;
+	$: batchItemsLimit = getFeatureLimit($plgStatus.plan, FEATURES.BATCH_ITEMS_PER_REQUEST);
+	$: targetPlan = featureAccess?.upgradeToUnlock || 'standard';  // Pro tier
 
 	// === STATE ===
 	let step = 'upload'; // upload | map | progress | results
@@ -598,6 +613,49 @@
 		{#if isLoading}
 			<div class="flex items-center justify-center py-32">
 				<Loader size="16" show={true} />
+			</div>
+		{:else if !hasBatchAccess}
+			<!-- Feature Gate: Batch Rendering not available -->
+			<div class="max-w-2xl mx-auto">
+				<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div class="bg-[#ffc480] border-b-[3px] border-gray-900 p-6 text-center">
+						<div class="text-5xl mb-3">📦</div>
+						<h2 class="text-2xl font-black text-gray-900">Batch Rendering</h2>
+						<p class="text-gray-800 font-medium mt-1">Process multiple images at once</p>
+					</div>
+					<div class="p-8 text-center">
+						<p class="text-gray-600 mb-6">
+							Batch rendering lets you generate hundreds of images from a CSV file in minutes.
+							This feature is available on <strong>{PLAN_DISPLAY_NAMES[targetPlan]}</strong> and higher plans.
+						</p>
+						<div class="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+							<h4 class="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">What you get:</h4>
+							<ul class="space-y-2 text-sm text-gray-700">
+								<li class="flex items-center gap-2">
+									<svg class="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+									Upload CSV with your data
+								</li>
+								<li class="flex items-center gap-2">
+									<svg class="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+									Map columns to template variables
+								</li>
+								<li class="flex items-center gap-2">
+									<svg class="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+									Download all images as ZIP
+								</li>
+							</ul>
+						</div>
+						<button
+							class="px-8 py-3 bg-[#ffc480] text-gray-900 font-black rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide"
+							on:click={() => openUpgradeModal('batch_render')}
+						>
+							Upgrade to {PLAN_DISPLAY_NAMES[targetPlan]}
+						</button>
+						<p class="text-xs text-gray-400 mt-4">
+							Need single renders? <a href="/dashboard/template/{uid}/render" class="text-gray-600 underline hover:text-gray-900">Use the render page instead</a>
+						</p>
+					</div>
+				</div>
 			</div>
 		{:else if template}
 			<!-- Step Indicator -->

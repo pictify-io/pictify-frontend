@@ -9,9 +9,15 @@
 
 	const dispatch = createEventDispatcher();
 
-	let showNewForm = false;
 	let newHeaderKey = '';
 	let newHeaderValue = '';
+	let manualShowNewForm = false;
+
+	// Show form automatically if newDataSource has data (e.g., when editing an existing binding) or user clicked "New Connection"
+	$: showNewForm = manualShowNewForm || (!selectedDataSource && (newDataSource.name || newDataSource.url));
+
+	// Can proceed if we have a selected data source OR a valid new data source config
+	$: canProceed = selectedDataSource || (newDataSource.name && newDataSource.url);
 
 	// Sensitive header detection and masking
 	const sensitiveKeyPatterns = ['authorization', 'api-key', 'x-api-key', 'bearer', 'token', 'secret', 'password', 'credential'];
@@ -31,7 +37,7 @@
 
 	const selectDataSource = (ds) => {
 		dispatch('select', ds);
-		showNewForm = false;
+		manualShowNewForm = false;
 	};
 
 	const handleTest = () => {
@@ -71,7 +77,7 @@
 		<div></div> 
 		<button
 			class="px-5 py-2.5 text-xs font-black bg-white hover:bg-gray-50 text-gray-900 border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest flex items-center gap-2"
-			on:click={() => { showNewForm = true; dispatch('select', null); }}
+			on:click={() => { manualShowNewForm = true; dispatch('select', null); }}
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
 			New Connection
@@ -298,23 +304,13 @@
 
 	<!-- Actions -->
 	<div class="flex justify-end gap-4 pt-6 mt-6 border-t-[3px] border-gray-900">
-		{#if showNewForm && !selectedDataSource}
-			<button
-				class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-				on:click={handleCreate}
-				disabled={!newDataSource.name || !newDataSource.url}
-			>
-				Create & Continue
-			</button>
-		{:else}
-			<button
-				class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
-				on:click={handleNext}
-				disabled={!selectedDataSource}
-			>
-				Next Step
-				<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-			</button>
-		{/if}
+		<button
+			class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
+			on:click={handleNext}
+			disabled={!canProceed}
+		>
+			Next Step
+			<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+		</button>
 	</div>
 </div>

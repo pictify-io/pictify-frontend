@@ -23,7 +23,7 @@
 					</div>
 				</a>
 				<p class="text-lg text-gray-700 font-medium leading-relaxed">
-					The fast, scalable Puppeteer alternative. Generate images via API in under 500ms.
+					The programmable image engine. Design once, render millions via API.
 				</p>
 				
 				<!-- Status Indicator -->

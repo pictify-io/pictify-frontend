@@ -10,9 +10,11 @@
 		fetchTeamInvitations,
 		removeMemberAction,
 		createInvitationAction,
-		revokeInvitationAction
+		revokeInvitationAction,
+		resendInvitationAction
 	} from '../../../../store/team.store';
 	import { toast } from '../../../../store/toast.store';
+	import { formatRelativeDate } from '$lib/utils/format.js';
 
 	let loading = true;
 	let inviteEmail = '';
@@ -20,6 +22,7 @@
 	let error = null;
 	let removingMemberId = null;
 	let revokingInvitationId = null;
+	let resendingInvitationId = null;
 
 	onMount(async () => {
 		if (!$currentTeam) {
@@ -93,13 +96,44 @@
 		}
 	}
 
+	async function copyInviteLink(invitation) {
+		const inviteUrl = invitation.inviteUrl;
+		if (!inviteUrl) {
+			toast.set({ message: 'Invite link not available', type: 'error', duration: 2000 });
+			return;
+		}
+
+		try {
+			await navigator.clipboard.writeText(inviteUrl);
+			toast.set({ message: 'Invite link copied to clipboard', type: 'success', duration: 2000 });
+		} catch (err) {
+			// Fallback for older browsers
+			const textArea = document.createElement('textarea');
+			textArea.value = inviteUrl;
+			document.body.appendChild(textArea);
+			textArea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textArea);
+			toast.set({ message: 'Invite link copied to clipboard', type: 'success', duration: 2000 });
+		}
+	}
+
+	async function handleResendInvitation(invitation) {
+		resendingInvitationId = invitation.uid;
+
+		try {
+			await resendInvitationAction($currentTeam.uid, invitation.uid);
+			toast.set({ message: 'Invitation email resent', type: 'success', duration: 2000 });
+		} catch (err) {
+			toast.set({ message: err.message, type: 'error', duration: 3000 });
+		} finally {
+			resendingInvitationId = null;
+		}
+	}
+
 	function formatDate(dateString) {
 		if (!dateString) return '';
-		return new Date(dateString).toLocaleDateString('en-US', {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric'
-		});
+		return formatRelativeDate(dateString);
 	}
 
 	$: seatUsage = $teamMembers.length;
@@ -229,12 +263,12 @@
 				</div>
 
 				<!-- Pending Invitations -->
-				{#if $teamInvitations.length > 0 || $isTeamOwner}
-					<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
-						<div class="px-8 py-6 border-b-[3px] border-gray-900 bg-gray-50">
-							<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">Pending Invites ({$teamInvitations.length})</h2>
-						</div>
-						<div class="divide-y-[3px] divide-gray-100">
+				<!-- Debug: invitations count = {$teamInvitations.length}, isOwner = {$isTeamOwner} -->
+				<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div class="px-8 py-6 border-b-[3px] border-gray-900 bg-gray-50">
+						<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">Pending Invites ({$teamInvitations.length})</h2>
+					</div>
+					<div class="divide-y-[3px] divide-gray-100">
 							{#each $teamInvitations as invitation}
 								<div class="p-6 hover:bg-[#FFFDF8] transition-colors">
 									<div class="flex items-center justify-between">
@@ -251,7 +285,28 @@
 												</p>
 											</div>
 										</div>
-										{#if $isTeamOwner}
+										<div class="flex items-center gap-2">
+											<button
+												on:click={() => copyInviteLink(invitation)}
+												class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#4ade80] hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+												title="Copy invite link"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+												</svg>
+												Copy
+											</button>
+											<button
+												on:click={() => handleResendInvitation(invitation)}
+												disabled={resendingInvitationId === invitation.uid}
+												class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#3b82f6] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+												title="Resend invitation email"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+												</svg>
+												{resendingInvitationId === invitation.uid ? 'Sending...' : 'Resend'}
+											</button>
 											<button
 												on:click={() => handleRevokeInvitation(invitation)}
 												disabled={revokingInvitationId === invitation.uid}
@@ -259,7 +314,7 @@
 											>
 												{revokingInvitationId === invitation.uid ? 'Revoking...' : 'Revoke'}
 											</button>
-										{/if}
+										</div>
 									</div>
 								</div>
 							{:else}
@@ -269,7 +324,6 @@
 							{/each}
 						</div>
 					</div>
-				{/if}
 			</div>
 
 			<!-- Sidebar: Invite Form -->

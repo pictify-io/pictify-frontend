@@ -14,13 +14,13 @@ The editor includes **AI-powered background removal** processed on your powerful
 
 ### ⚡ Performance Benefits
 
-| Feature | Client-Side | Server-Side | Winner |
-|---------|-------------|-------------|--------|
-| **First Use** | 5-10s (model download) | 3-5s (instant) | ✅ Server |
-| **Processing Speed** | 2-5s | 2-3s | ✅ Server |
-| **Mobile Devices** | Slow/crashes | Fast | ✅ Server |
-| **Low-end Devices** | Very slow | Fast | ✅ Server |
-| **Model Storage** | ~40MB user device | 0MB user device | ✅ Server |
+| Feature              | Client-Side            | Server-Side     | Winner    |
+| -------------------- | ---------------------- | --------------- | --------- |
+| **First Use**        | 5-10s (model download) | 3-5s (instant)  | ✅ Server |
+| **Processing Speed** | 2-5s                   | 2-3s            | ✅ Server |
+| **Mobile Devices**   | Slow/crashes           | Fast            | ✅ Server |
+| **Low-end Devices**  | Very slow              | Fast            | ✅ Server |
+| **Model Storage**    | ~40MB user device      | 0MB user device | ✅ Server |
 
 ### 📱 Device Compatibility
 
@@ -92,13 +92,15 @@ The editor includes **AI-powered background removal** processed on your powerful
 #### 1. **Service Layer** (`service/background-removal.js`)
 
 Functions:
+
 ```javascript
-removeBackgroundFromUrl(url, options)
-removeBackgroundFromBuffer(buffer, options)
-optimizeImage(buffer, options)
+removeBackgroundFromUrl(url, options);
+removeBackgroundFromBuffer(buffer, options);
+optimizeImage(buffer, options);
 ```
 
 Features:
+
 - AI background removal processing
 - Image optimization with Sharp
 - Error handling and logging
@@ -107,10 +109,12 @@ Features:
 #### 2. **Route Layer** (`routes/background-removal.js`)
 
 Endpoints:
+
 - `POST /background-removal` - Remove background from image
 - `GET /background-removal/health` - Health check
 
 Features:
+
 - Authentication (JWT token)
 - Quota management
 - S3 upload
@@ -122,6 +126,7 @@ Features:
 #### `PropertiesPanel.svelte`
 
 Features:
+
 - Remove background button
 - Restore original button
 - Loading states
@@ -148,30 +153,30 @@ Authorization: Bearer <user_auth_token>
 
 ```json
 {
-  "imageUrl": "https://example.com/image.jpg",
-  "model": "medium",
-  "optimize": true
+	"imageUrl": "https://example.com/image.jpg",
+	"model": "medium",
+	"optimize": true
 }
 ```
 
 ### Parameters
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `imageUrl` | string | Yes | - | URL of image to process |
-| `model` | string | No | 'medium' | Model size: 'small', 'medium', 'large' |
-| `optimize` | boolean | No | true | Enable image optimization |
+| Parameter  | Type    | Required | Default  | Description                            |
+| ---------- | ------- | -------- | -------- | -------------------------------------- |
+| `imageUrl` | string  | Yes      | -        | URL of image to process                |
+| `model`    | string  | No       | 'medium' | Model size: 'small', 'medium', 'large' |
+| `optimize` | boolean | No       | true     | Enable image optimization              |
 
 ### Response
 
 ```json
 {
-  "success": true,
-  "url": "https://bucket.s3.amazonaws.com/image.png",
-  "key": "images/uuid.png",
-  "size": 123456,
-  "model": "medium",
-  "optimized": true
+	"success": true,
+	"url": "https://bucket.s3.amazonaws.com/image.png",
+	"key": "images/uuid.png",
+	"size": 123456,
+	"model": "medium",
+	"optimized": true
 }
 ```
 
@@ -179,8 +184,8 @@ Authorization: Bearer <user_auth_token>
 
 ```json
 {
-  "error": "Background removal failed",
-  "details": "Network error fetching image"
+	"error": "Background removal failed",
+	"details": "Network error fetching image"
 }
 ```
 
@@ -194,22 +199,22 @@ Edit `/service/background-removal.js`:
 
 ```javascript
 const BG_REMOVAL_CONFIG = {
-  model: 'medium',  // Change to 'small', 'medium', or 'large'
-  output: {
-    format: 'image/png',
-    quality: 0.95,
-    type: 'foreground'
-  }
+	model: 'medium', // Change to 'small', 'medium', or 'large'
+	output: {
+		format: 'image/png',
+		quality: 0.95,
+		type: 'foreground'
+	}
 };
 ```
 
 ### Model Comparison
 
-| Model | Memory | Speed | Quality | Best For |
-|-------|--------|-------|---------|----------|
-| **small** | ~200MB | Fast (2-3s) | Good | High volume |
-| **medium** | ~400MB | Moderate (3-5s) | Excellent | ✅ Default |
-| **large** | ~800MB | Slow (5-8s) | Best | Professional |
+| Model      | Memory | Speed           | Quality   | Best For     |
+| ---------- | ------ | --------------- | --------- | ------------ |
+| **small**  | ~200MB | Fast (2-3s)     | Good      | High volume  |
+| **medium** | ~400MB | Moderate (3-5s) | Excellent | ✅ Default   |
+| **large**  | ~800MB | Slow (5-8s)     | Best      | Professional |
 
 ---
 
@@ -218,11 +223,13 @@ const BG_REMOVAL_CONFIG = {
 ### Backend Setup
 
 1. **Install Dependencies** (Already done):
+
 ```bash
 npm install @imgly/background-removal sharp
 ```
 
 2. **Files Created**:
+
    - `/service/background-removal.js` - Core AI processing
    - `/routes/background-removal.js` - API endpoint
 
@@ -234,6 +241,7 @@ npm install @imgly/background-removal sharp
 ### Frontend Setup
 
 1. **Update Configuration** (Already done):
+
    - `/src/lib/config/background-remover.js`
 
 2. **API URL** (automatic):
@@ -246,20 +254,20 @@ npm install @imgly/background-removal sharp
 
 ### Processing Times
 
-| Image Size | Model | Time | Quality |
-|-----------|-------|------|---------|
-| 500x500px | medium | 2-3s | Excellent |
+| Image Size  | Model  | Time | Quality   |
+| ----------- | ------ | ---- | --------- |
+| 500x500px   | medium | 2-3s | Excellent |
 | 1000x1000px | medium | 3-4s | Excellent |
 | 2000x2000px | medium | 4-5s | Excellent |
 | 4000x4000px | medium | 5-7s | Excellent |
 
 ### Server Resources
 
-| Model | RAM Usage | CPU Usage | Concurrent |
-|-------|-----------|-----------|------------|
-| small | ~200MB | Medium | 4-5 |
-| medium | ~400MB | High | 2-3 |
-| large | ~800MB | Very High | 1-2 |
+| Model  | RAM Usage | CPU Usage | Concurrent |
+| ------ | --------- | --------- | ---------- |
+| small  | ~200MB    | Medium    | 4-5        |
+| medium | ~400MB    | High      | 2-3        |
+| large  | ~800MB    | Very High | 1-2        |
 
 **Recommendation**: Use 'medium' model with 2-3 concurrent requests
 
@@ -277,7 +285,7 @@ services:
   api:
     image: your-api
     deploy:
-      replicas: 3  # Run 3 instances
+      replicas: 3 # Run 3 instances
     environment:
       - MODEL_SIZE=medium
 ```
@@ -286,12 +294,12 @@ services:
 
 Upgrade server resources:
 
-| Traffic | Recommended Server |
-|---------|-------------------|
-| <100/day | t3.small (2GB RAM) |
-| 100-500/day | t3.medium (4GB RAM) |
-| 500-2000/day | t3.large (8GB RAM) |
-| 2000+/day | t3.xlarge (16GB RAM) |
+| Traffic      | Recommended Server   |
+| ------------ | -------------------- |
+| <100/day     | t3.small (2GB RAM)   |
+| 100-500/day  | t3.medium (4GB RAM)  |
+| 500-2000/day | t3.large (8GB RAM)   |
+| 2000+/day    | t3.xlarge (16GB RAM) |
 
 ### Optimization Tips
 
@@ -308,34 +316,34 @@ Upgrade server resources:
 
 **Assumptions**: 1000 background removals/month
 
-| Resource | Cost/Month | Notes |
-|----------|-----------|-------|
-| **Compute** (t3.medium) | $30 | EC2 or equivalent |
-| **Storage** (S3) | $2 | 1000 images @ ~200KB |
-| **Bandwidth** | $1 | Outbound data transfer |
-| **Total** | **~$33/mo** | For 1000 images |
+| Resource                | Cost/Month  | Notes                  |
+| ----------------------- | ----------- | ---------------------- |
+| **Compute** (t3.medium) | $30         | EC2 or equivalent      |
+| **Storage** (S3)        | $2          | 1000 images @ ~200KB   |
+| **Bandwidth**           | $1          | Outbound data transfer |
+| **Total**               | **~$33/mo** | For 1000 images        |
 
 **Per Image Cost**: $0.033 (3.3 cents)
 
 ### vs API Services
 
-| Solution | 1000 Images | Cost |
-|----------|-------------|------|
-| **remove.bg** | 1000 | $1,400 |
-| **Clipdrop** | 1000 | $900 |
-| **Our Server** | 1000 | **$33** |
+| Solution       | 1000 Images | Cost    |
+| -------------- | ----------- | ------- |
+| **remove.bg**  | 1000        | $1,400  |
+| **Clipdrop**   | 1000        | $900    |
+| **Our Server** | 1000        | **$33** |
 
 **Savings**: $867-$1,367/month! 💰
 
 ### vs Client-Side
 
-| Factor | Client-Side | Server-Side |
-|--------|-------------|-------------|
-| **Server Cost** | $0 | $33/mo |
-| **User Experience** | Slow on mobile | Fast everywhere |
-| **First Use** | Terrible (40MB download) | Perfect (instant) |
-| **Quality** | Good | Excellent |
-| **Control** | Limited | Full |
+| Factor              | Client-Side              | Server-Side       |
+| ------------------- | ------------------------ | ----------------- |
+| **Server Cost**     | $0                       | $33/mo            |
+| **User Experience** | Slow on mobile           | Fast everywhere   |
+| **First Use**       | Terrible (40MB download) | Perfect (instant) |
+| **Quality**         | Good                     | Excellent         |
+| **Control**         | Limited                  | Full              |
 
 **Winner**: Server-side for professional use! ✅
 
@@ -390,6 +398,7 @@ Upgrade server resources:
 ### User Feedback
 
 All errors show user-friendly messages:
+
 - ❌ "Network error. Please try again."
 - ❌ "Image too large. Please use smaller image."
 - ❌ "Processing failed. Please try different image."
@@ -407,10 +416,11 @@ All errors show user-friendly messages:
 ### Rate Limiting
 
 Can add to route:
+
 ```javascript
 fastify.register(rateLimit, {
-  max: 20,  // 20 requests
-  timeWindow: '1 minute'
+	max: 20, // 20 requests
+	timeWindow: '1 minute'
 });
 ```
 
@@ -467,6 +477,7 @@ ab -n 100 -c 10 \
 ### Environment Variables
 
 Required:
+
 ```bash
 # AWS S3 (already configured)
 AWS_BUCKET_NAME=your-bucket
@@ -519,21 +530,21 @@ curl http://localhost:3001/background-removal/health
 
 ### vs Canva
 
-| Feature | Canva | Our Solution | Winner |
-|---------|-------|--------------|--------|
-| **Cost** | $12.99/mo | ~$33/mo for 1000 images | ✅ Us ($0.033/image) |
-| **Quality** | Excellent | Excellent | 🤝 Tie |
-| **Speed** | 2-3s | 2-3s | 🤝 Tie |
-| **Limits** | Included in Pro | Unlimited | ✅ Us |
-| **Mobile** | Requires upload | Works great | ✅ Us |
+| Feature     | Canva           | Our Solution            | Winner               |
+| ----------- | --------------- | ----------------------- | -------------------- |
+| **Cost**    | $12.99/mo       | ~$33/mo for 1000 images | ✅ Us ($0.033/image) |
+| **Quality** | Excellent       | Excellent               | 🤝 Tie               |
+| **Speed**   | 2-3s            | 2-3s                    | 🤝 Tie               |
+| **Limits**  | Included in Pro | Unlimited               | ✅ Us                |
+| **Mobile**  | Requires upload | Works great             | ✅ Us                |
 
 ### vs API Services
 
-| Service | Cost per 1000 | Our Cost | Savings |
-|---------|---------------|----------|---------|
-| **remove.bg** | $1,400 | $33 | **$1,367** 💰 |
-| **Clipdrop** | $900 | $33 | **$867** 💰 |
-| **PhotoRoom** | $1,200 | $33 | **$1,167** 💰 |
+| Service       | Cost per 1000 | Our Cost | Savings       |
+| ------------- | ------------- | -------- | ------------- |
+| **remove.bg** | $1,400        | $33      | **$1,367** 💰 |
+| **Clipdrop**  | $900          | $33      | **$867** 💰   |
+| **PhotoRoom** | $1,200        | $33      | **$1,167** 💰 |
 
 **Annual Savings**: $10,404 - $16,404/year! 💰
 
@@ -547,7 +558,7 @@ Users can request different models:
 
 ```javascript
 // In frontend config
-BACKGROUND_REMOVER_CONFIG.model = 'large'  // Best quality
+BACKGROUND_REMOVER_CONFIG.model = 'large'; // Best quality
 ```
 
 ### Batch Processing (Future)
@@ -599,6 +610,7 @@ INFO background_removal_complete userId=abc model=medium outputUrl=https://...
 ### Metrics Dashboard
 
 Track these KPIs:
+
 - Requests per day
 - Average processing time
 - Success rate
@@ -613,11 +625,13 @@ Track these KPIs:
 ### Issue: Slow processing
 
 **Causes**:
+
 - Server CPU overloaded
 - Too many concurrent requests
 - Large images
 
 **Solutions**:
+
 1. Upgrade server size
 2. Add rate limiting
 3. Implement queue system
@@ -626,11 +640,13 @@ Track these KPIs:
 ### Issue: Out of memory
 
 **Causes**:
+
 - Too many concurrent requests
 - Model too large for server
 - Memory leak
 
 **Solutions**:
+
 1. Limit concurrent requests
 2. Use smaller model
 3. Increase server RAM
@@ -639,11 +655,13 @@ Track these KPIs:
 ### Issue: Network errors
 
 **Causes**:
+
 - Image URL unreachable
 - CORS issues
 - Timeout
 
 **Solutions**:
+
 1. Validate URLs before processing
 2. Add retry logic
 3. Increase timeout limits
@@ -675,16 +693,19 @@ Track these KPIs:
 ### Tips to Reduce Costs
 
 1. **Cache Results**
+
    - Store processed images with hash
    - Reuse for duplicate requests
    - Saves compute + storage
 
 2. **Lazy Model Loading**
+
    - Load model on first request
    - Keep in memory for subsequent requests
    - Unload after 30min inactivity
 
 3. **Queue System**
+
    - Process in batches
    - Better resource utilization
    - Reduce cold starts
@@ -708,7 +729,7 @@ Track these KPIs:
 ### Marketing Messages
 
 > **AI Background Removal - Server-Powered**
-> 
+>
 > Remove backgrounds with professional-grade AI running on powerful servers. Works instantly on all devices - mobile, tablet, or desktop. No large downloads, no waiting, just fast professional results!
 
 ### Key Points
@@ -724,16 +745,19 @@ Track these KPIs:
 ## Files Modified/Created
 
 ### Created
+
 1. `/service/background-removal.js` - AI processing service
 2. `/routes/background-removal.js` - API endpoint
 3. Documentation files
 
 ### Modified
+
 1. `/src/lib/components/editor/PropertiesPanel.svelte` - UI and API calls
 2. `/src/lib/config/background-remover.js` - Server-side config
 3. `package.json` (backend) - Added dependencies
 
 ### Removed
+
 1. Frontend @imgly/background-removal dependency (not needed)
 
 ---
@@ -759,5 +783,4 @@ Server-side background removal provides:
 **Quality**: Professional  
 **Speed**: 2-5 seconds  
 **Compatibility**: All devices  
-**Setup**: Zero configuration  
-
+**Setup**: Zero configuration

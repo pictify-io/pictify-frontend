@@ -1,18 +1,31 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
-	import { 
-		brandAssets, 
-		fetchBrandAssets, 
-		uploadAsset, 
-		addColor, 
+	import {
+		brandAssets,
+		fetchBrandAssets,
+		uploadAsset,
+		addColor,
 		deleteAsset,
-		deleteAssets 
+		deleteAssets
 	} from '../../../store/brand-assets.store';
 	import { toast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
+	import { copyToClipboard as sharedCopy, formatRelativeDate } from '$lib/utils/format.js';
 	import Loader from '$lib/components/Loader.svelte';
 	import { ASSET_TYPE_LABELS, ASSET_TYPE_ICONS, COLOR_CATEGORIES, getAcceptString } from '../../../api/brand-assets';
 	import { user } from '../../../store/user.store';
+	import { FeatureUpgradePrompt } from '$lib/components/plg';
+	import FeatureGate from '$lib/components/plg/FeatureGate.svelte';
+	import {
+		checkFeatureAccessSync,
+		FEATURES,
+		getFeatureUpgradePrompt
+	} from '../../../store/plg.store';
+
+	// Feature gating for Brand Assets
+	$: brandAssetsAccess = checkFeatureAccessSync(FEATURES.BRAND_ASSETS);
+	$: hasBrandAssetsAccess = brandAssetsAccess?.hasAccess ?? false;
+	$: brandAssetsUpgradePrompt = getFeatureUpgradePrompt(FEATURES.BRAND_ASSETS);
 
 	let isLoading = true;
 	let isUploading = false;
@@ -25,6 +38,18 @@
 	let uploadType = 'image';
 	let currentPlan = '';
 	let unsubscribeUser = () => {};
+
+	// Mock Data for Locked State
+	const MOCK_ASSETS = [
+		{ uid: 'mock-1', type: 'logo', name: 'Primary Logo Dark', url: 'https://via.placeholder.com/150?text=LOGO', createdAt: new Date().toISOString() },
+		{ uid: 'mock-2', type: 'color', name: 'Brand Primary', value: '#ff6b6b', isPrimary: true, createdAt: new Date().toISOString() },
+		{ uid: 'mock-3', type: 'font', name: 'Inter Bold', metadata: { fontFamily: 'Inter' }, createdAt: new Date().toISOString() },
+		{ uid: 'mock-4', type: 'color', name: 'Surface Gray', value: '#f3f4f6', createdAt: new Date().toISOString() },
+		{ uid: 'mock-5', type: 'icon', name: 'Menu Icon', url: 'https://via.placeholder.com/150?text=ICON', createdAt: new Date().toISOString() },
+		{ uid: 'mock-6', type: 'image', name: 'Hero Background', url: 'https://via.placeholder.com/150?text=BG', createdAt: new Date().toISOString() },
+		{ uid: 'mock-7', type: 'font', name: 'JetBrains Mono', metadata: { fontFamily: 'JetBrains Mono' }, createdAt: new Date().toISOString() },
+		{ uid: 'mock-8', type: 'color', name: 'Accent Yellow', value: '#ffc480', createdAt: new Date().toISOString() },
+	];
 
 	// Color form
 	let colorForm = {
@@ -194,14 +219,11 @@
 	}
 
 	function copyToClipboard(text) {
-		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 2000 });
-		});
+		sharedCopy(text);
 	}
 
 	function formatDate(dateString) {
-		const date = new Date(dateString);
-		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		return formatRelativeDate(dateString);
 	}
 
 	onMount(async () => {
@@ -229,19 +251,74 @@
 					Brand <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Assets</span>
 				</h1>
 			</div>
-			
+
 			<!-- Stats / Plan -->
 			<div class="flex items-center gap-4 sm:gap-6 md:gap-8">
 				<div class="text-right">
 					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Total Assets</div>
-					<div class="text-lg sm:text-xl font-black text-gray-900 tabular-nums">{pagination.total || 0}</div>
+					<div class="text-lg sm:text-xl font-black text-gray-900 tabular-nums">{hasBrandAssetsAccess ? (pagination.total || 0) : 'LOCKED'}</div>
 				</div>
-				<div class="text-right border-l-2 border-gray-200 pl-4 sm:pl-6 md:pl-8">
+				<div class="text-right border-l-2 border-gray-200 pl-4 sm:pl-6 md:gap-8">
 					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Current Plan</div>
 					<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">{currentPlan || 'Starter'}</div>
 				</div>
 			</div>
 		</div>
+
+		<FeatureGate feature={FEATURES.BRAND_ASSETS}>
+			{#if !hasBrandAssetsAccess}
+				<!-- MOCK VIEW (Blurred Backdrop) -->
+				<div class="select-none opacity-50 grayscale transition-all duration-500">
+					<!-- Mock Filters & Actions -->
+					<div class="flex flex-wrap gap-2 mb-6 sm:mb-8 pointer-events-none">
+						<button class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]">All</button>
+						{#each ASSET_TYPES as type}
+							<button class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 bg-white text-gray-600">
+								{ASSET_TYPE_LABELS[type]}s
+							</button>
+						{/each}
+						
+						<div class="flex-grow"></div>
+						
+						<button class="px-4 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] flex items-center gap-2">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+							Logo
+						</button>
+					</div>
+
+					<!-- Mock Grid -->
+					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pointer-events-none">
+						{#each MOCK_ASSETS as asset}
+							<div class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] relative">
+								<div class="relative aspect-square bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] flex items-center justify-center overflow-hidden border-b-[3px] border-gray-900">
+									{#if asset.type === 'color'}
+										<div class="w-full h-full" style="background-color: {asset.value}"></div>
+									{:else if asset.type === 'font'}
+										<div class="text-center w-full px-4">
+											<span class="text-5xl text-gray-900 block mb-2" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">Aa</span>
+										</div>
+									{:else if asset.type === 'logo' || asset.type === 'icon' || asset.type === 'image'}
+										<div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 font-black text-xs">IMG</div>
+									{/if}
+									
+									<div class="absolute top-3 right-3">
+										<span class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-white text-gray-900 border-[2px] border-gray-900">
+											{asset.type}
+										</span>
+									</div>
+								</div>
+								<div class="p-4 bg-white">
+									<h3 class="font-black text-gray-900 text-xs uppercase tracking-wide truncate mb-1">{asset.name}</h3>
+									<div class="flex items-center justify-between">
+										<span class="text-[10px] font-bold text-gray-400 uppercase">{formatDate(asset.createdAt)}</span>
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+			{:else}
 
 		<!-- Filter Tabs and Actions -->
 		<div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
@@ -439,7 +516,9 @@
 				</div>
 			{/if}
 		</div>
-	</div>
+
+	{/if}
+	</FeatureGate>
 </section>
 
 <!-- Modals share the same design language -->

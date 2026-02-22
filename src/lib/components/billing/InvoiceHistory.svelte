@@ -1,16 +1,17 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
 	import { formatCurrency } from '../../../store/billing.store';
+	import { formatRelativeDate } from '$lib/utils/format.js';
 
 	export let invoices = [];
 	export let loading = false;
+	export let error = null;
+
+	const dispatch = createEventDispatcher();
 
 	function formatDate(dateString) {
 		if (!dateString) return 'N/A';
-		return new Date(dateString).toLocaleDateString('en-US', {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric',
-		});
+		return formatRelativeDate(dateString);
 	}
 
 	function getStatusColor(status) {
@@ -33,7 +34,7 @@
 	}
 </script>
 
-<div class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] overflow-hidden">
+<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
 	<!-- Header -->
 	<div class="px-5 py-4 border-b-2 border-gray-200 flex items-center justify-between">
 		<div>
@@ -56,6 +57,17 @@
 				</svg>
 				<span class="text-sm">Loading invoices...</span>
 			</div>
+		</div>
+	{:else if error}
+		<div class="p-6 text-center">
+			<div class="w-12 h-12 bg-[#ff6b6b]/10 rounded-xl border-2 border-[#ff6b6b] flex items-center justify-center mx-auto mb-3">
+				<svg class="w-6 h-6 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+			</div>
+			<p class="text-sm font-bold text-gray-900 mb-1">Failed to load invoices</p>
+			<p class="text-xs text-gray-500 mb-3">Please try again later</p>
+			<button on:click={() => dispatch('retry')} class="text-xs font-bold text-[#ff6b6b] hover:underline uppercase tracking-wider">
+				Retry
+			</button>
 		</div>
 	{:else if invoices.length === 0}
 		<div class="p-8 text-center">

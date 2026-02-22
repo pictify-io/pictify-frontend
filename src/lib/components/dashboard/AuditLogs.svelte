@@ -13,6 +13,7 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../store/toast.store';
+	import { formatDateTime } from '$lib/utils/format.js';
 
 	let logs = [];
 	let summary = {};
@@ -192,14 +193,7 @@
 	}
 
 	function formatDate(dateString) {
-		const date = new Date(dateString);
-		return date.toLocaleString('en-US', {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
-		});
+		return formatDateTime(dateString);
 	}
 
 	function formatDuration(ms) {

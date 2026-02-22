@@ -60,14 +60,14 @@
     }
   }
 
-  function getMilestoneEmoji(type) {
-    const emojis = {
-      celebration: '🎉',
-      soft_upsell: '⭐',
-      urgent_upsell: '🚀',
-      limit_reached: '🎯',
+  function getMilestoneIcon(type) {
+    const icons = {
+      celebration: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z', // Sparkle/Star
+      soft_upsell: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', // Star
+      urgent_upsell: 'M13 10V3L4 14h7v7l9-11h-7z', // Zap
+      limit_reached: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', // Warning
     };
-    return emojis[type] || '🎉';
+    return icons[type] || icons.celebration;
   }
 
   function getHeaderBg(type) {
@@ -128,29 +128,30 @@
 
     <!-- Modal -->
     <div 
-      class="relative bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
+      class="relative bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
       transition:scale={{ duration: 400, easing: elasticOut, start: 0.8 }}
       on:click|stopPropagation
     >
       <!-- Header -->
-      <div class="{getHeaderBg($activeMilestone.type)} py-8 relative overflow-hidden">
-        <!-- Decorative circles -->
-        <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/20 rounded-full" />
-        <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-white/20 rounded-full" />
-        
-        <!-- Large emoji -->
-        <div class="relative flex items-center justify-center">
-          <span 
-            class="text-6xl drop-shadow-lg"
+      <div class="{getHeaderBg($activeMilestone.type)} py-8 relative overflow-hidden border-b-[3px] border-gray-900">
+        <!-- Decorative bg pattern -->
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:10px_10px]"></div>
+
+        <!-- Large Icon -->
+        <div class="relative flex items-center justify-center z-10">
+          <div 
+            class="w-24 h-24 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center transform rotate-3"
             in:fly={{ y: -30, duration: 500, delay: 200, easing: quintOut }}
           >
-            {getMilestoneEmoji($activeMilestone.type)}
-          </span>
+             <svg class="w-12 h-12 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getMilestoneIcon($activeMilestone.type)} />
+             </svg>
+          </div>
         </div>
 
         <!-- Close button -->
         <button
-          class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/30 hover:bg-white/50 text-gray-900 transition-colors border border-gray-900/20"
+          class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg bg-white/30 hover:bg-white/50 text-gray-900 transition-colors border-2 border-gray-900/20"
           on:click={dismissMilestone}
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,14 +163,14 @@
       <!-- Content -->
       <div class="p-6 text-center">
         <h2 
-          class="text-2xl font-bold text-gray-900 mb-2"
+          class="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tight"
           in:fly={{ y: 20, duration: 400, delay: 300 }}
         >
           {$activeMilestone.title}
         </h2>
         
         <p 
-          class="text-gray-600 mb-6 font-medium"
+          class="text-gray-800 mb-6 font-bold text-sm leading-relaxed"
           in:fly={{ y: 20, duration: 400, delay: 400 }}
         >
           {$activeMilestone.message}
@@ -178,11 +179,11 @@
         <!-- Time saved badge -->
         {#if $activeMilestone.timeSaved}
           <div 
-            class="inline-flex items-center gap-2 px-4 py-2 bg-[#10b981]/10 text-[#059669] rounded-full text-sm font-bold mb-6 border border-[#10b981]/30"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#10b981] text-gray-900 rounded-lg text-sm font-black mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
             in:fly={{ y: 20, duration: 400, delay: 450 }}
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             ~{$activeMilestone.timeSaved} saved
           </div>
@@ -191,11 +192,11 @@
         <!-- Discount badge -->
         {#if $activeMilestone.cta?.discount}
           <div 
-            class="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc480]/30 text-gray-900 rounded-full text-sm font-bold mb-6 border-2 border-gray-900"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc480] text-gray-900 rounded-lg text-sm font-black mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform rotate-1"
             in:scale={{ duration: 400, delay: 500, start: 0.8 }}
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
             </svg>
             {$activeMilestone.cta.discount}% OFF - Limited Time!
           </div>
@@ -208,7 +209,7 @@
             in:fly={{ y: 20, duration: 400, delay: 500 }}
           >
             <button
-              class="w-full py-3 px-6 {getButtonBg($activeMilestone.type)} text-gray-900 font-bold rounded-full border-2 border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 transition-all"
+              class="w-full py-3 px-6 {getButtonBg($activeMilestone.type)} text-gray-900 font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               on:click={handleCTA}
             >
               {$activeMilestone.cta.text}
@@ -216,7 +217,7 @@
             
             {#if $activeMilestone.type !== 'celebration'}
               <button
-                class="text-sm text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                class="text-xs text-gray-500 hover:text-gray-900 font-bold uppercase tracking-widest transition-colors py-2"
                 on:click={dismissMilestone}
               >
                 Maybe later
@@ -225,7 +226,7 @@
           </div>
         {:else}
           <button
-            class="w-full py-3 px-6 bg-gray-900 text-white font-bold rounded-full border-2 border-gray-900 hover:bg-gray-800 transition-colors"
+            class="w-full py-3 px-6 bg-gray-900 text-white font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 hover:bg-black shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             on:click={dismissMilestone}
           >
             Continue Creating

@@ -19,6 +19,13 @@
 	import RefreshStrategy from '$lib/components/dynamic/RefreshStrategy.svelte';
 	import PublishPanel from '$lib/components/dynamic/PublishPanel.svelte';
 	import { analytics } from '$lib/analytics.js';
+	import { FeatureUpgradePrompt } from '$lib/components/plg';
+	import { ConfirmModal } from '$lib/components/billing';
+	import {
+		checkFeatureAccessSync,
+		FEATURES,
+		getFeatureUpgradePrompt
+	} from '../../../../../store/plg.store';
 
 	// Lifecycle cleanup flags
 	let mounted = true;
@@ -70,6 +77,12 @@
 	let isEditing = false;
 	let isDeleting = false;
 	let isUpdating = false;
+	let showDeleteModal = false;
+
+	// Feature gating for Dynamic Links
+	$: dynamicLinksAccess = checkFeatureAccessSync(FEATURES.DYNAMIC_LINKS);
+	$: hasDynamicLinksAccess = dynamicLinksAccess?.hasAccess ?? false;
+	$: dynamicLinksUpgradePrompt = getFeatureUpgradePrompt(FEATURES.DYNAMIC_LINKS);
 
 	$: uid = $page.params.uid;
 
@@ -139,7 +152,21 @@
 			if (existingBindings.length > 0) {
 				const binding = existingBindings[0];
 				publishedBinding = binding;
-				selectedDataSource = dataSources.find(ds => ds.uid === binding.dataSourceId);
+				// Try to find matching data source by ID first, then by URL if binding has embedded dataSource
+				selectedDataSource = dataSources.find(ds => ds.uid === binding.dataSourceId)
+					|| dataSources.find(ds => ds.url === binding.dataSource?.url)
+					|| null;
+				// If no matching data source found but binding has embedded dataSource, use it directly
+				if (!selectedDataSource && binding.dataSource && binding.dataSource.url) {
+					// Create a virtual data source from the embedded config for editing
+					newDataSource = {
+						name: binding.dataSource.name || 'Data Source',
+						type: binding.dataSource.type || 'http',
+						url: binding.dataSource.url || '',
+						method: binding.dataSource.method || 'GET',
+						headers: binding.dataSource.headers || {}
+					};
+				}
 				mapping = binding.mapping || {};
 				defaults = binding.defaults || {};
 				refreshPolicy = binding.refreshPolicy || { ttlSeconds: 300, onError: 'serve_stale' };
@@ -340,15 +367,25 @@
 		isUpdating = true;
 
 		try {
-			// Build updated binding data
-			const dataSourceForBinding = selectedDataSource ? {
-				type: selectedDataSource.type || 'http',
-				url: selectedDataSource.url,
-				method: selectedDataSource.method || 'GET',
-				headers: selectedDataSource.headers || {}
-			} : {
-				type: 'static'
-			};
+			// Build updated binding data - use selectedDataSource if available, otherwise use newDataSource
+			let dataSourceForBinding;
+			if (selectedDataSource) {
+				dataSourceForBinding = {
+					type: selectedDataSource.type || 'http',
+					url: selectedDataSource.url,
+					method: selectedDataSource.method || 'GET',
+					headers: selectedDataSource.headers || {}
+				};
+			} else if (newDataSource.url) {
+				dataSourceForBinding = {
+					type: newDataSource.type || 'http',
+					url: newDataSource.url,
+					method: newDataSource.method || 'GET',
+					headers: newDataSource.headers || {}
+				};
+			} else {
+				dataSourceForBinding = { type: 'static' };
+			}
 
 			const updates = {
 				dataSource: dataSourceForBinding,
@@ -385,30 +422,38 @@
 		}
 	};
 
-	// Delete binding
-	const handleDeleteBinding = async () => {
+	// Show delete confirmation modal
+	const handleDeleteBinding = () => {
+		if (!publishedBinding || isDeleting) return;
+		showDeleteModal = true;
+	};
+
+	// Actually delete binding after confirmation
+	const confirmDeleteBinding = async () => {
 		if (!publishedBinding || isDeleting) return;
 
-		// Confirm deletion
-		const confirmed = confirm('Are you sure you want to delete this dynamic binding? This action cannot be undone.');
-		if (!confirmed) return;
-
 		isDeleting = true;
+		showDeleteModal = false;
+
+		// Capture the uid BEFORE setting publishedBinding to null
+		const bindingUid = publishedBinding.uid;
 
 		try {
-			await deleteBinding(publishedBinding.uid);
+			await deleteBinding(bindingUid);
 
 			if (!mounted) return;
 
-			// Reset state
+			// Reset state - use captured uid for filtering
+			existingBindings = existingBindings.filter(b => b.uid !== bindingUid);
 			publishedBinding = null;
-			existingBindings = existingBindings.filter(b => b.uid !== publishedBinding?.uid);
+			selectedDataSource = null;
 			isEditing = false;
 			activeTab = 'datasource';
 
 			// Reset form
 			mapping = {};
 			defaults = {};
+			newDataSource = { name: '', type: 'http', url: '', method: 'GET', headers: {} };
 			refreshPolicy = { ttlSeconds: 300, onError: 'serve_stale' };
 			outputConfig = { format: 'png', quality: 90 };
 
@@ -423,6 +468,11 @@
 				isDeleting = false;
 			}
 		}
+	};
+
+	// Cancel delete
+	const cancelDeleteBinding = () => {
+		showDeleteModal = false;
 	};
 
 	// Cancel editing
@@ -503,6 +553,18 @@
 		{#if isLoading}
 			<div class="flex items-center justify-center py-32">
 				<Loader size="16" show={true} />
+			</div>
+		{:else if !hasDynamicLinksAccess}
+			<!-- Feature gated - show upgrade prompt -->
+			<div class="max-w-2xl mx-auto">
+				<FeatureUpgradePrompt
+					feature={FEATURES.DYNAMIC_LINKS}
+					currentPlan={dynamicLinksAccess.currentPlan}
+					targetPlan={dynamicLinksUpgradePrompt?.targetPlan}
+					variant="card"
+					show={true}
+					onDismiss={() => goto(`/dashboard/template/${uid}/render`)}
+				/>
 			</div>
 		{:else if template}
 			<!-- Progress Tabs -->
@@ -625,3 +687,16 @@
 		{/if}
 	</div>
 </section>
+
+<!-- Delete Confirmation Modal -->
+<ConfirmModal
+	open={showDeleteModal}
+	title="Delete Dynamic Binding"
+	description="Are you sure you want to delete this dynamic binding? This will remove the live URL and cannot be undone."
+	confirmText="Delete Binding"
+	cancelText="Cancel"
+	variant="danger"
+	loading={isDeleting}
+	on:confirm={confirmDeleteBinding}
+	on:cancel={cancelDeleteBinding}
+/>

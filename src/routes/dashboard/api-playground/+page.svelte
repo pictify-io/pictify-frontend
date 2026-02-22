@@ -103,7 +103,45 @@
 
 	onDestroy(() => {
 		unsubscribe();
+		clearTimeout(previewRetryTimer);
 	});
+
+	// Retry logic for preview images not yet available on S3
+	const PREVIEW_MAX_RETRIES = 10;
+	const PREVIEW_RETRY_DELAY = 1500;
+	let previewRetryCount = 0;
+	let previewRetryTimer = null;
+	let previewImgSrc = '';
+	let previewImgLoaded = false;
+	let lastPreviewUrl = '';
+
+	// Reset retry state only when the URL actually changes
+	$: {
+		const newUrl = response?.url || response?.gif?.url || '';
+		if (newUrl && newUrl !== lastPreviewUrl) {
+			lastPreviewUrl = newUrl;
+			previewRetryCount = 0;
+			previewImgLoaded = false;
+			clearTimeout(previewRetryTimer);
+			previewImgSrc = newUrl;
+		}
+	}
+
+	function handlePreviewImgError() {
+		const url = response?.url || response?.gif?.url;
+		if (previewRetryCount < PREVIEW_MAX_RETRIES && url) {
+			previewRetryCount++;
+			previewRetryTimer = setTimeout(() => {
+				const sep = url.includes('?') ? '&' : '?';
+				previewImgSrc = `${url}${sep}_r=${previewRetryCount}`;
+			}, PREVIEW_RETRY_DELAY);
+		}
+	}
+
+	function handlePreviewImgLoad() {
+		previewImgLoaded = true;
+		previewRetryCount = 0;
+	}
 
 	// Image endpoint parameters
 	let imageParams = {
@@ -1566,11 +1604,22 @@
 												</div>
 												<!-- Image -->
 												<div class="p-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwYXRoIGQ9Ik0wIDBoNHY0SDB6bTQgNGg0djRINHoiIGZpbGw9IiNlZGVkZWQiIGZpbGwtb3BhY2l0eT0iLjUiLz48L3N2Zz4=')]">
-													<img
-														src={response.url || response.gif?.url}
-														alt="Result"
-														class="w-full rounded-lg border-2 border-gray-200"
-													/>
+													{#if !previewImgLoaded}
+													<div class="w-full aspect-video rounded-lg border-2 border-gray-200 bg-gray-50 flex items-center justify-center">
+														<div class="flex items-center gap-2">
+															<div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+															<span class="text-xs font-bold text-gray-500 uppercase">Loading image...</span>
+														</div>
+													</div>
+												{/if}
+												<img
+													src={previewImgSrc}
+													alt="Result"
+													class="w-full rounded-lg border-2 border-gray-200"
+													class:hidden={!previewImgLoaded}
+													on:error={handlePreviewImgError}
+													on:load={handlePreviewImgLoad}
+												/>
 												</div>
 											</div>
 										{/if}

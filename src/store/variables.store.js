@@ -246,7 +246,6 @@ export const variableActions = {
 		
 		// Validate name
 		if (!name || typeof name !== 'string') {
-			console.error('Variable name is required');
 			return null;
 		}
 		
@@ -255,7 +254,6 @@ export const variableActions = {
 		
 		// Check for duplicates
 		if (get(variablesMap).has(sanitizedName)) {
-			console.warn(`Variable "${sanitizedName}" already exists`);
 			return get(variablesMap).get(sanitizedName);
 		}
 		
@@ -271,7 +269,6 @@ export const variableActions = {
 			return newMap;
 		});
 		
-		console.log('✅ Variable created:', sanitizedName);
 		return variable;
 	},
 
@@ -282,15 +279,18 @@ export const variableActions = {
 		// Copy-before-mutate pattern for proper Svelte reactivity
 		variablesMap.update(map => {
 			if (!map.has(name)) {
-				console.warn(`Variable "${name}" not found`);
 				return map;
 			}
 
 			const newMap = new Map(map);
 			const existing = newMap.get(name);
+			// Filter out undefined values to prevent overwriting with undefined
+			const filteredUpdates = Object.fromEntries(
+				Object.entries(updates).filter(([, v]) => v !== undefined)
+			);
 			const updated = {
 				...existing,
-				...updates,
+				...filteredUpdates,
 				updatedAt: Date.now()
 			};
 
@@ -298,7 +298,6 @@ export const variableActions = {
 			if (updates.name && updates.name !== name) {
 				const newName = updates.name.replace(/[^a-zA-Z0-9_]/g, '_');
 				if (newMap.has(newName) && newName !== name) {
-					console.warn(`Variable "${newName}" already exists`);
 					return map;
 				}
 				newMap.delete(name);
@@ -330,7 +329,6 @@ export const variableActions = {
 			const variable = map.get(name);
 
 			if (!variable) {
-				console.warn(`Variable "${name}" not found`);
 				return map;
 			}
 
@@ -349,7 +347,6 @@ export const variableActions = {
 
 			const newMap = new Map(map);
 			newMap.delete(name);
-			console.log('✅ Variable deleted:', name);
 			return newMap;
 		});
 	},
@@ -359,7 +356,6 @@ export const variableActions = {
 	 */
 	clear() {
 		variablesMap.set(new Map());
-		console.log('✅ All variables cleared');
 	},
 
 	/**
@@ -369,7 +365,6 @@ export const variableActions = {
 	 */
 	syncFromCanvas(canvas) {
 		if (!canvas) {
-			console.warn('No canvas provided for sync');
 			return;
 		}
 
@@ -489,13 +484,6 @@ export const variableActions = {
 		});
 
 		variablesMap.set(newVariables);
-
-		console.log('✅ Variables synced from canvas:', newVariables.size, 'variables found', {
-			property: Array.from(newVariables.values()).filter(v => v.source === 'property').length,
-			condition: Array.from(newVariables.values()).filter(v => v.source === 'condition').length,
-			loop: Array.from(newVariables.values()).filter(v => v.source === 'loop').length,
-			custom: Array.from(newVariables.values()).filter(v => v.source === 'custom').length
-		});
 	},
 
 	/**
@@ -530,7 +518,6 @@ export const variableActions = {
 		});
 
 		variablesMap.set(newMap);
-		console.log('✅ Variables loaded from definitions:', newMap.size, 'variables');
 	},
 
 	/**
