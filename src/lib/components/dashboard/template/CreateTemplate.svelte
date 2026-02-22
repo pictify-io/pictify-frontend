@@ -932,7 +932,8 @@
 					pageActions.setPdfPreset(editorTemplate.pdfPreset);
 					console.log('Restored pdfPreset:', editorTemplate.pdfPreset);
 				}
-				
+
+
 				// Try to load template when template data becomes available
 				attemptTemplateLoad();
 			}

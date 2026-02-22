@@ -4,20 +4,19 @@
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
 	import { getPaymentPortal } from '../../../api/user';
 	import { user } from '../../../store/user.store';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 	import TeamSwitcher from './TeamSwitcher.svelte';
 	import { initializeTeamState, currentTeam, isTeamOwner } from '../../../store/team.store';
 
 	let isMediaListExpanded = false;
-	let isPaidPlan = false;
+
+	$: isPaidPlan = $user?.currentPlan !== 'starter' && $user?.currentPlan !== 'free';
 
 	function toggleMediaList() {
 		isMediaListExpanded = !isMediaListExpanded;
 	}
-
-	let unsubscribe = () => {};
 
 	// Reactive statement to auto-expand media list when on a media sub-route
 	$: if ($page.url.pathname.startsWith('/dashboard/media/')) {
@@ -25,20 +24,12 @@
 	}
 
 	onMount(async () => {
-		unsubscribe = user.subscribe((u) => {
-			isPaidPlan = u.currentPlan !== 'starter' && u.currentPlan !== 'free';
-		});
-
 		// Initialize team state
 		try {
 			await initializeTeamState();
 		} catch (error) {
 			console.error('Failed to initialize team state:', error);
 		}
-	});
-
-	onDestroy(() => {
-		unsubscribe();
 	});
 
 	async function gotoPaymentPortal() {
@@ -65,10 +56,11 @@
 			<TeamSwitcher />
 		</div>
 
-		<nav class="space-y-2">
+		<nav class="space-y-2" aria-label="Main navigation">
 			<!-- Templates -->
 			<a
 				href="/dashboard/template"
+				aria-current={$page.url.pathname === '/dashboard/template' || $page.url.pathname.startsWith('/dashboard/template/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/template' || $page.url.pathname.startsWith('/dashboard/template/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -83,6 +75,7 @@
 			<!-- Brand Assets -->
 			<a
 				href="/dashboard/brand-assets"
+				aria-current={$page.url.pathname === '/dashboard/brand-assets' || $page.url.pathname.startsWith('/dashboard/brand-assets/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/brand-assets' || $page.url.pathname.startsWith('/dashboard/brand-assets/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -99,6 +92,8 @@
 				<div class="relative">
 					<button
 						on:click={toggleMediaList}
+						aria-expanded={isMediaListExpanded}
+						aria-controls="media-submenu"
 						class="w-full group relative flex items-center justify-between px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 							{$page.url.pathname.startsWith('/dashboard/media')
 								? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -124,9 +119,10 @@
 					</button>
 
 					{#if isMediaListExpanded}
-						<div class="mt-1 ml-4 space-y-1 pl-4 border-l-2 border-gray-200">
+						<div id="media-submenu" role="group" aria-label="Generated Media" class="mt-1 ml-4 space-y-1 pl-4 border-l-2 border-gray-200">
 							<a
 								href="/dashboard/media/images"
+								aria-current={$page.url.pathname === '/dashboard/media/images' ? 'page' : undefined}
 								class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
 									{$page.url.pathname === '/dashboard/media/images'
 										? 'text-gray-900 bg-gray-100'
@@ -136,6 +132,7 @@
 							</a>
 							<a
 								href="/dashboard/media/gifs"
+								aria-current={$page.url.pathname === '/dashboard/media/gifs' ? 'page' : undefined}
 								class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
 									{$page.url.pathname === '/dashboard/media/gifs'
 										? 'text-gray-900 bg-gray-100'
@@ -145,6 +142,7 @@
 							</a>
 							<a
 								href="/dashboard/media/pdfs"
+								aria-current={$page.url.pathname === '/dashboard/media/pdfs' ? 'page' : undefined}
 								class="flex items-center px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200
 									{$page.url.pathname === '/dashboard/media/pdfs'
 										? 'text-gray-900 bg-gray-100'
@@ -162,6 +160,7 @@
 			<!-- API Playground -->
 			<a
 				href="/dashboard/api-playground"
+				aria-current={$page.url.pathname === '/dashboard/api-playground' || $page.url.pathname.startsWith('/dashboard/api-playground/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/api-playground' || $page.url.pathname.startsWith('/dashboard/api-playground/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -176,6 +175,7 @@
 			<!-- API Usage -->
 			<a
 				href="/dashboard/api-token"
+				aria-current={$page.url.pathname === '/dashboard/api-token' || $page.url.pathname.startsWith('/dashboard/api-token/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/api-token' || $page.url.pathname.startsWith('/dashboard/api-token/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -190,6 +190,7 @@
 			<!-- Activity Logs -->
 			<a
 				href="/dashboard/activity-logs"
+				aria-current={$page.url.pathname === '/dashboard/activity-logs' || $page.url.pathname.startsWith('/dashboard/activity-logs/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/activity-logs' || $page.url.pathname.startsWith('/dashboard/activity-logs/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -204,6 +205,7 @@
 			<!-- Integrations -->
 			<a
 				href="/dashboard/integrations"
+				aria-current={$page.url.pathname === '/dashboard/integrations' || $page.url.pathname.startsWith('/dashboard/integrations/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/integrations' || $page.url.pathname.startsWith('/dashboard/integrations/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -221,6 +223,7 @@
 
 				<a
 					href="/dashboard/team"
+					aria-current={$page.url.pathname === '/dashboard/team' || $page.url.pathname.startsWith('/dashboard/team/') ? 'page' : undefined}
 					class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 						{$page.url.pathname === '/dashboard/team' || $page.url.pathname.startsWith('/dashboard/team/')
 							? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -243,6 +246,7 @@
 
 			<a
 				href="/dashboard/billing"
+				aria-current={$page.url.pathname === '/dashboard/billing' || $page.url.pathname.startsWith('/dashboard/billing/') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/billing' || $page.url.pathname.startsWith('/dashboard/billing/')
 						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'

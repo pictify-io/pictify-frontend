@@ -21,14 +21,14 @@
 
 			<div class="relative z-10 flex flex-col items-center">
 				<h2 class="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight leading-tight">
-					Ready to automate your images?
+					Your first template is 30 seconds away.
 				</h2>
 				<p class="text-lg md:text-xl text-gray-900/80 font-bold mb-8 max-w-xl">
-					Stop wasting time on manual screenshots. Get your API key and start generating in 30 seconds.
+					Sign up, grab your API key, and render your first image. Free tier, no credit card.
 				</p>
 
 				<SignUpButton
-					text="Generate Your First Image"
+					text="Get Your Free API Key"
 					class="bg-white text-gray-900 text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] hover:bg-gray-50 transition-all font-black uppercase tracking-wider flex-shrink-0"
 				/>
 			</div>

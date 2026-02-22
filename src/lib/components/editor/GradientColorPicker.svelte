@@ -244,32 +244,37 @@
 
 	function toggleColorPicker() {
 		showColorPicker = !showColorPicker;
-		
+
 		if (showColorPicker && pickerButton) {
-			// Calculate position - open to the left
 			const rect = pickerButton.getBoundingClientRect();
 			const modalWidth = 280;
+			const modalHeight = 550; // Conservative estimate for gradient mode
 			const gap = 8;
-			
-			// Position to the left of the button
-			modalPosition = {
-				top: rect.top,
-				left: rect.left - modalWidth - gap
-			};
-			
-			// Adjust if off-screen
-			if (modalPosition.left < 10) {
-				// If not enough space on left, open to right
-				modalPosition.left = rect.right + gap;
+			const margin = 10; // Minimum distance from viewport edges
+
+			let top = rect.top;
+			let left = rect.left - modalWidth - gap;
+
+			// Horizontal: prefer left, fallback to right, clamp to viewport
+			if (left < margin) {
+				left = rect.right + gap;
 			}
-			
-			// Adjust vertical position if needed
-			const modalHeight = 450;
-			if (modalPosition.top + modalHeight > window.innerHeight - 20) {
-				modalPosition.top = window.innerHeight - modalHeight - 20;
+			if (left + modalWidth > window.innerWidth - margin) {
+				left = window.innerWidth - modalWidth - margin;
 			}
-		} else {
-			// Removed debug log
+			if (left < margin) {
+				left = margin;
+			}
+
+			// Vertical: clamp to viewport
+			if (top + modalHeight > window.innerHeight - margin) {
+				top = window.innerHeight - modalHeight - margin;
+			}
+			if (top < margin) {
+				top = margin;
+			}
+
+			modalPosition = { top, left };
 		}
 	}
 
@@ -377,15 +382,15 @@
 <div class="space-y-2">
 	<!-- Label and Color Preview Button -->
 	<div class="flex items-center justify-between">
-		<div class="text-xs font-black text-gray-900 uppercase tracking-wider">{label}</div>
+		<div class="text-[11px] font-medium text-gray-500">{label}</div>
 		<button
 			bind:this={pickerButton}
 			type="button"
-			class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all bg-white"
+			class="flex items-center gap-2 px-2 py-1 rounded-lg border-[2px] border-gray-300 hover:border-gray-400 transition-all bg-white"
 			on:click={(e) => { console.log('[ColorPicker] Button clicked!'); e.stopPropagation(); toggleColorPicker(); }}
 		>
 			<!-- Color Preview Swatch -->
-			<div class="relative w-6 h-6 rounded overflow-hidden border-[2px] border-gray-900">
+			<div class="relative w-5 h-5 rounded overflow-hidden border border-gray-300">
 				<!-- Checkerboard background -->
 				<div class="absolute inset-0 opacity-30" 
 					 style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;">
@@ -401,8 +406,8 @@
 {#if showColorPicker}
 	<div 
 		use:portal
-		class="fixed color-picker-modal border-[3px] border-gray-900 rounded-lg shadow-[8px_8px_0_0_#1f2937] overflow-hidden bg-white"
-		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px; z-index: 999999 !important;"
+		class="fixed color-picker-modal border-[3px] border-gray-900 rounded-lg shadow-[8px_8px_0_0_#1f2937] bg-white"
+		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px; max-height: calc(100vh - 20px); overflow-y: auto; z-index: 999999 !important;"
 	>
 		<div class="bg-white">
 			<!-- Header with close button -->

@@ -13,6 +13,7 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../store/toast.store';
+	import { formatDateTime } from '$lib/utils/format.js';
 	import { analytics } from '$lib/analytics.js';
 
 	let logs = [];
@@ -33,6 +34,7 @@
 
 	// UI State
 	let showFilters = false;
+	let showExportMenu = false;
 	let selectedLog = null;
 	let showLogDetail = false;
 
@@ -172,9 +174,7 @@
 	}
 
 	function formatDate(dateString) {
-		return new Date(dateString).toLocaleString('en-US', {
-			month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
-		});
+		return formatDateTime(dateString);
 	}
 
 	function formatDuration(ms) {
@@ -184,7 +184,15 @@
 
 	$: currentPage = Math.floor(offset / limit) + 1;
 	$: totalPages = Math.ceil(total / limit);
+
+	function handleClickOutside(event) {
+		if (showExportMenu && !event.target.closest('.relative')) {
+			showExportMenu = false;
+		}
+	}
 </script>
+
+<svelte:window on:click={handleClickOutside} />
 
 <div class="min-h-full">
 	<div>
@@ -266,15 +274,20 @@
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 						Filters
 					</button>
-					<div class="relative group">
-						<button class="px-4 py-2 bg-[#ffc480] border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-[#ffb356] transition-all shadow-[2px_2px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2">
+					<div class="relative">
+						<button
+							class="px-4 py-2 bg-[#ffc480] border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-[#ffb356] transition-all shadow-[2px_2px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
+							on:click={() => showExportMenu = !showExportMenu}
+						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 							Export
 						</button>
-						<div class="absolute top-full left-0 mt-2 w-32 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] hidden group-hover:block z-20">
-							<button class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-100 border-b border-gray-100" on:click={() => handleExport('json')}>JSON</button>
-							<button class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-100" on:click={() => handleExport('csv')}>CSV</button>
-						</div>
+						{#if showExportMenu}
+							<div class="absolute top-full left-0 mt-2 w-32 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] z-20">
+								<button class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-100 border-b border-gray-100" on:click={() => { handleExport('json'); showExportMenu = false; }}>JSON</button>
+								<button class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-100" on:click={() => { handleExport('csv'); showExportMenu = false; }}>CSV</button>
+							</div>
+						{/if}
 					</div>
 				</div>
 

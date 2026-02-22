@@ -101,19 +101,19 @@
 	<div class="max-w-7xl mx-auto px-6">
 		<div class="text-center mb-16">
 			<div class="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc480] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1">
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Visual Editor</span>
+				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Template Builder</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				Design Without <br />
+				Feels Like Figma. <br />
 				<span class="relative inline-block text-[#ff6b6b]">
-					Writing Code
+					Ships Like Code.
 					<svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
 					</svg>
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				Drag, drop, and design pixel-perfect templates. Export as HTML/CSS or use directly with our API.
+				Drag-and-drop editor with a properties panel, layer controls, and a variable sidebar. No context-switching between design tools and code.
 			</p>
 		</div>
 
@@ -160,7 +160,7 @@
 								</div>
 							</button>
 							<div class="absolute bottom-8 text-white text-sm font-medium opacity-80">
-								Click to start designing with our visual editor
+								Click to start building with the template editor
 							</div>
 						</div>
 					{/if}

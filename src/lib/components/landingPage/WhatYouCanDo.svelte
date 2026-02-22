@@ -10,13 +10,15 @@
 	// API Card Animation State
 	let apiStep = 0;
 	let showResponse = false;
-	const apiText = `const render = await pictify.create({
-  template: 'product-launch',
-  data: {
-    title: 'New Arrival',
-    price: '$99.00'
+	const apiText = `const img = await pictify.render({
+  template: 'product-card',
+  variables: {
+    product: 'Nike Air',
+    price: 129,
+    inStock: true
   }
-});`;
+});
+// Template logic handles the rest`;
 
 	let displayedApiText = '';
 
@@ -81,13 +83,13 @@
 			<div
 				class="inline-block mb-4 px-4 py-1.5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2"
 			>
-				<span class="font-bold text-sm text-black uppercase tracking-wider">Capabilities</span>
+				<span class="font-bold text-sm text-black uppercase tracking-wider">The Engine</span>
 			</div>
 
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				What You Can <br />
+				What Makes It <br />
 				<span class="relative inline-block text-[#ff6b6b]">
-					Build & Ship
+					Programmable
 					<svg
 						class="absolute w-full h-4 -bottom-1 left-0 text-black z-[-1] opacity-20"
 						viewBox="0 0 100 10"
@@ -98,7 +100,7 @@
 				</span>
 			</h2>
 			<p class="text-xl md:text-2xl text-gray-700 font-medium leading-relaxed">
-				Everything you need to transform data into publication-quality visuals at scale. No CSS headaches.
+				Design in a visual editor. Render through a REST API. Scale to millions without config changes.
 			</p>
 		</div>
 
@@ -125,9 +127,9 @@
 								/></svg
 							>
 						</div>
-						<h3 class="text-3xl font-black text-black mb-3 leading-tight">Design Visually.</h3>
+						<h3 class="text-3xl font-black text-black mb-3 leading-tight">Build Visually.</h3>
 						<p class="text-black/70 font-medium text-lg">
-							Drag-and-drop editor with real-time preview. Zero code required.
+							Canvas editor with layers, a properties panel, and real-time preview. No code required to design.
 						</p>
 					</div>
 					<div class="mt-6">
@@ -223,13 +225,13 @@
 						<div
 							class="px-3 py-1 bg-[#4ade80] text-black text-xs font-bold uppercase rounded-full border border-black"
 						>
-							Fast API
+							50+ Functions
 						</div>
 					</div>
 
-					<h3 class="text-3xl font-black text-white mb-3">Integrate Easily.</h3>
+					<h3 class="text-3xl font-black text-white mb-3">Integrate in Minutes.</h3>
 					<p class="text-gray-400 font-medium text-lg mb-8">
-						REST + JSON. That's it. Predictable responses every time.
+						One API call, one JSON payload, one rendered image back. SDKs for Node, Python, and REST.
 					</p>
 
 					<!-- Terminal -->
@@ -304,7 +306,7 @@
 						</div>
 						<h3 class="text-3xl font-black text-black mb-3">Scale Instantly.</h3>
 						<p class="text-black/70 font-medium text-lg max-w-md mb-8 md:mb-0">
-							From 10 to 10 million images. No config changes. No capacity planning.
+							From 10 to 10 million renders. Images, GIFs, PDFs. No config changes.
 						</p>
 					</div>
 

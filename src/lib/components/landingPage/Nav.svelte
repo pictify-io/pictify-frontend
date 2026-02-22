@@ -42,8 +42,6 @@
 		href="/"
 		class="flex flex-shrink-0 items-center justify-center px-6 sm:px-8 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-[#ffc480] transition-all group relative overflow-hidden"
 	>
-		<!-- Decorative Corner Accent -->
-		<div class="absolute top-0 left-0 w-2 h-2 sm:w-3 sm:h-3 border-r border-b border-gray-900 bg-white"></div>
 		
 		<div class="flex items-center gap-2 sm:gap-3">
 			<!-- Logo Icon (Abstract Shapes) -->

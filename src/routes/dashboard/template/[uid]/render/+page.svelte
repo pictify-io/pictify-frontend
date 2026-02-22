@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getTemplateById, getTemplateVariables, renderTemplate } from '../../../../../api/template';
+	import { getTemplateById, getTemplateVariables, renderTemplate, renderTemplateMultiSize } from '../../../../../api/template';
 	import { getApiToken, createApiToken } from '../../../../../api/user';
 	import { user } from '../../../../../store/user.store';
 	import { toast } from '../../../../../store/toast.store';
@@ -19,6 +19,26 @@
 	let isRendering = false;
 	let renderResult = null;
 	let renderError = null;
+
+	// Output options
+	let selectedFormat = 'png';
+	let sizeMode = 'original'; // 'original' | 'preset' | 'custom'
+	let customWidth = '';
+	let customHeight = '';
+	let selectedPreset = '';
+
+	const PLATFORM_PRESETS = [
+		{ id: 'instagram-post', width: 1080, height: 1080, label: 'Instagram Post' },
+		{ id: 'instagram-story', width: 1080, height: 1920, label: 'Instagram Story' },
+		{ id: 'facebook-post', width: 1200, height: 630, label: 'Facebook Post' },
+		{ id: 'linkedin-post', width: 1200, height: 627, label: 'LinkedIn Post' },
+		{ id: 'twitter-post', width: 1024, height: 512, label: 'Twitter/X Post' },
+		{ id: 'youtube-thumbnail', width: 1280, height: 720, label: 'YouTube Thumbnail' },
+		{ id: 'og-image', width: 1200, height: 630, label: 'OG Image' },
+		{ id: 'pinterest-pin', width: 1000, height: 1500, label: 'Pinterest Pin' },
+	];
+
+	$: activePreset = PLATFORM_PRESETS.find(p => p.id === selectedPreset);
 
 	// API Key state
 	let apiTokens = [];
@@ -44,6 +64,11 @@
 		variableValues = {};
 		renderResult = null;
 		renderError = null;
+		selectedFormat = 'png';
+		sizeMode = 'original';
+		customWidth = '';
+		customHeight = '';
+		selectedPreset = '';
 		// Load fresh data
 		loadTemplate();
 		// Track page view
@@ -113,11 +138,23 @@
 		renderError = null;
 
 		try {
-			const result = await renderTemplate(uid, variableValues, {
-				format: template?.outputFormat === 'pdf' ? 'pdf' : 'png',
+			const format = template?.outputFormat === 'pdf' ? 'pdf' : selectedFormat;
+			const renderOptions = {
+				format,
 				quality: 0.9,
 				apiKey: selectedApiKey
-			});
+			};
+
+			// Add dimension overrides based on size mode
+			if (sizeMode === 'preset' && activePreset) {
+				renderOptions.width = activePreset.width;
+				renderOptions.height = activePreset.height;
+			} else if (sizeMode === 'custom' && customWidth && customHeight) {
+				renderOptions.width = parseInt(customWidth, 10);
+				renderOptions.height = parseInt(customHeight, 10);
+			}
+
+			const result = await renderTemplate(uid, variableValues, renderOptions);
 
 			// Check if this render is still current
 			if (thisRenderVersion !== currentRenderVersion) return;
@@ -127,7 +164,7 @@
 			// Track successful template render
 			analytics.trackTemplateRendered({
 				template_id: uid,
-				format: template?.outputFormat === 'pdf' ? 'pdf' : 'png',
+				format,
 			});
 		} catch (error) {
 			// Check if this render is still current
@@ -207,22 +244,44 @@
 	};
 
 	const generateApiCode = () => {
-		const code = `// Render template via API
-const response = await fetch('${import.meta.env.VITE_BACKEND_URL || ''}/templates/${uid}/render', {
+		const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+		const format = template?.outputFormat === 'pdf' ? 'pdf' : selectedFormat;
+
+		// Build body object
+		const body = {
+			variables: variableValues,
+			format,
+			quality: 0.9
+		};
+		if (sizeMode === 'preset' && activePreset) {
+			body.width = activePreset.width;
+			body.height = activePreset.height;
+		} else if (sizeMode === 'custom' && customWidth && customHeight) {
+			body.width = parseInt(customWidth, 10);
+			body.height = parseInt(customHeight, 10);
+		}
+
+		// Build URL-param render URL
+		const queryParts = Object.entries(variableValues)
+			.filter(([, v]) => v !== '' && v !== undefined)
+			.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+		const urlParamUrl = `${backendUrl}/r/${uid}.${format}?token=YOUR_API_TOKEN${queryParts.length ? '&' + queryParts.join('&') : ''}`;
+
+		const code = `// === Option 1: POST API (full control) ===
+const response = await fetch('${backendUrl}/templates/${uid}/render', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_TOKEN'
   },
-  body: JSON.stringify({
-    variables: ${JSON.stringify(variableValues, null, 2)},
-    format: '${template?.outputFormat === 'pdf' ? 'pdf' : 'png'}',
-    quality: 0.9
-  })
+  body: JSON.stringify(${JSON.stringify(body, null, 4)})
 });
-
 const result = await response.json();
-console.log(result.url); // CDN URL of rendered image`;
+console.log(result.url); // CDN URL of rendered image
+
+// === Option 2: URL Parameter Render (for <img> tags & emails) ===
+// Returns binary image directly — use as an img src:
+// <img src="${urlParamUrl}" />`;
 
 		navigator.clipboard.writeText(code);
 		toast.set({ message: 'API code copied to clipboard', type: 'success', duration: 2000 });
@@ -325,6 +384,96 @@ console.log(result.url); // CDN URL of rendered image`;
 								on:change={handleVariableChange}
 								on:jsonImport={handleJsonImport}
 							/>
+						</div>
+					</div>
+
+					<!-- Output Options -->
+					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
+							<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+								<span class="w-3 h-3 bg-[#a78bfa] border-2 border-gray-900 rounded-full"></span>
+								Output Options
+							</h3>
+						</div>
+						<div class="p-6 space-y-5">
+							<!-- Format selector -->
+							<div class="space-y-2">
+								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Format</label>
+								<div class="flex gap-2">
+									{#each ['png', 'jpeg', 'webp'] as fmt}
+										<button
+											class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {selectedFormat === fmt ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+											on:click={() => selectedFormat = fmt}
+										>
+											{fmt}
+										</button>
+									{/each}
+								</div>
+							</div>
+
+							<!-- Size mode -->
+							<div class="space-y-2">
+								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Size</label>
+								<div class="flex gap-2">
+									<button
+										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode === 'original' ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+										on:click={() => { sizeMode = 'original'; selectedPreset = ''; }}
+									>
+										Original
+									</button>
+									<button
+										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode === 'preset' ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+										on:click={() => { sizeMode = 'preset'; }}
+									>
+										Preset
+									</button>
+									<button
+										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode === 'custom' ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+										on:click={() => { sizeMode = 'custom'; selectedPreset = ''; }}
+									>
+										Custom
+									</button>
+								</div>
+							</div>
+
+							<!-- Preset grid -->
+							{#if sizeMode === 'preset'}
+								<div class="grid grid-cols-2 gap-2">
+									{#each PLATFORM_PRESETS as preset}
+										<button
+											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedPreset === preset.id ? 'bg-[#4ecdc4]/10 border-[#4ecdc4] shadow-[2px_2px_0_0_#0d9488]' : 'bg-white border-gray-200 hover:border-gray-900'}"
+											on:click={() => selectedPreset = preset.id}
+										>
+											<span class="block text-xs font-black text-gray-900 leading-tight">{preset.label}</span>
+											<span class="block text-[10px] font-bold text-gray-500 font-mono">{preset.width}x{preset.height}</span>
+										</button>
+									{/each}
+								</div>
+							{/if}
+
+							<!-- Custom dimensions -->
+							{#if sizeMode === 'custom'}
+								<div class="flex gap-3 items-center">
+									<input
+										type="number"
+										bind:value={customWidth}
+										placeholder="Width"
+										min="10"
+										max="4096"
+										class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#a78bfa] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
+									/>
+									<span class="text-gray-400 font-black text-lg">x</span>
+									<input
+										type="number"
+										bind:value={customHeight}
+										placeholder="Height"
+										min="10"
+										max="4096"
+										class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#a78bfa] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
+									/>
+								</div>
+								<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Min 10px, Max 4096px</p>
+							{/if}
 						</div>
 					</div>
 

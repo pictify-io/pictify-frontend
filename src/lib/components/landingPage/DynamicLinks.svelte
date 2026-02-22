@@ -185,17 +185,17 @@
 		<!-- Header -->
 		<div class="text-center mb-16 md:mb-20">
 			<div class="inline-flex items-center gap-2 px-4 py-2 bg-[#ff6b6b] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 -rotate-2">
-				<span class="text-sm font-bold text-white uppercase tracking-wider">Live Images</span>
+				<span class="text-sm font-bold text-white uppercase tracking-wider">Live Data Bindings</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-[1.1]">
-				Images That <br class="sm:hidden" />
+				Visuals That <br class="sm:hidden" />
 				<span class="relative inline-block text-gray-900">
 					Update Themselves
 					<div class="absolute -bottom-2 left-0 w-full h-4 bg-[#ffc480] -z-10 transform -rotate-1 opacity-60"></div>
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				Connect your image to any API endpoint. Pictify polls your data and regenerates the image automatically. One URL, always fresh content.
+				Connect your templates to any API endpoint. Pictify binds live data and regenerates automatically. One URL, always fresh output.
 			</p>
 		</div>
 
@@ -326,9 +326,9 @@
 		<!-- Step Cards -->
 		<div class="grid sm:grid-cols-3 gap-6 mt-20 md:mt-24">
 			{#each [
-				{ num: '01', title: 'Design Template', text: 'Use the drag-and-drop editor', color: 'bg-[#ff6b6b]' },
-				{ num: '02', title: 'Connect Endpoint', text: 'Point to your API or database', color: 'bg-[#ffc480]' },
-				{ num: '03', title: 'Share One URL', text: 'Image updates when your data changes', color: 'bg-[#4ade80]' }
+				{ num: '01', title: 'Build Template', text: 'Design your layout and bind variables to elements', color: 'bg-[#ff6b6b]' },
+				{ num: '02', title: 'Bind Data Source', text: 'Point to your API, database, or webhook', color: 'bg-[#ffc480]' },
+				{ num: '03', title: 'Share One URL', text: 'Output updates when your data changes', color: 'bg-[#4ade80]' }
 			] as step}
 				<div class="relative group cursor-default">
 					<div class="absolute inset-0 bg-gray-900 rounded-xl translate-x-1 translate-y-1 transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>

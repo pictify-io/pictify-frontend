@@ -54,21 +54,21 @@
 </script>
 
 <svelte:head>
-	<title>Pictify.io: Dynamic Media Infrastructure for Teams | HTML to Image API</title>
+	<title>Pictify.io: The Programmable Image Engine | Templates with Logic, Data Bindings & AI</title>
 	<meta
 		name="description"
-		content="Dynamic media infrastructure for teams. Designers build templates, developers integrate APIs, and your company renders pixel-perfect images, GIFs, and PDFs at scale."
+		content="The programmable image engine for developers. Design templates with IF/ELSE logic, 50+ functions, and data bindings — then just send raw data via API. Pictify renders pixel-perfect images, GIFs, and PDFs."
 	/>
 	<meta
 		name="keywords"
-		content="HTML to image API, image generation API, visual content automation, programmatic image generation, enterprise image API, Pictify.io"
+		content="programmable image API, image generation with logic, template expressions, dynamic image API, data-driven visuals, conditional image generation, AI image templates, Pictify.io"
 	/>
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta property="og:title" content="Pictify.io: Dynamic Media Infrastructure for Teams" />
+	<meta property="og:title" content="Pictify.io: The Programmable Image Engine" />
 	<meta
 		property="og:description"
-		content="Design-first, API-powered dynamic media. Build templates, render variants, and generate pixel-perfect images, GIFs, and PDFs at scale."
+		content="Templates with logic, not just placeholders. Build with 50+ expression functions, conditionals, live data bindings, and an AI copilot. Generate pixel-perfect images, GIFs, and PDFs via API."
 	/>
 	<meta
 		property="og:image"
@@ -86,7 +86,7 @@
 			url: 'https://pictify.io',
 			image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
 			description:
-				'Dynamic media infrastructure for teams. Designers build templates, developers integrate APIs, and you render pixel-perfect media at scale.',
+				'The programmable image engine. Build templates with expressions, conditionals, and live data bindings. Generate pixel-perfect images, GIFs, and PDFs via API.',
 			applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
 			operatingSystem: 'Web',
 			offers: {

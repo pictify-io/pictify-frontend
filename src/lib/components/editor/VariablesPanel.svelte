@@ -1,5 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
+	import { slide } from 'svelte/transition';
 	import { editor, selectedComponent, editorActions } from '../../../store/editor.store';
 	import { user, getAPITokenAction } from '../../../store/user.store';
 	import { template } from '../../../store/template.store';
@@ -27,11 +28,13 @@
 	import { goto } from '$app/navigation';
 	import AuthModal from './AuthModal.svelte';
 
-	// Neo-brutalist input styling constants
-	const inputBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+	// Design system tokens — matched to PropertiesPanel
+	const inputBaseClass = "w-full text-sm border-[2px] border-gray-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all";
 	const inputNumberClass = inputBaseClass;
-	const buttonBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white hover:bg-gray-50 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] transition-all";
-	const selectClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+	const selectClass = "w-full text-sm border-[2px] border-gray-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all appearance-none";
+	const fieldLabelClass = "block text-[11px] font-medium text-gray-500 mb-1";
+	const sectionHeaderClass = "text-[11px] font-bold text-gray-900 uppercase tracking-wide";
+	const toggleSwitchClass = "w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black";
 
 	// UI State
 	let activeTab = 'list'; // 'list' | 'create' | 'test' | 'preview'
@@ -41,6 +44,16 @@
 	let showDeleteConfirm = false;
 	let variableToDelete = null;
 	let showAuthModal = false;
+
+	// Multi-select state
+	let selectedVariableNames = new Set();
+	let isSelectMode = false;
+	$: selectedCount = selectedVariableNames.size;
+	// Clear selection when leaving list tab
+	$: if (activeTab !== 'list' && isSelectMode) {
+		isSelectMode = false;
+		selectedVariableNames = new Set();
+	}
 	
 	// Create/Edit form state
 	let formName = '';
@@ -58,15 +71,53 @@
 	let renderError = null;
 	let lastRenderTime = null;
 	let showRequestDetails = false;
-	
+
+	// Retry logic for images not yet available on S3
+	const IMG_MAX_RETRIES = 10;
+	const IMG_RETRY_DELAY = 1500;
+	let imgRetryCount = 0;
+	let imgRetryTimer = null;
+	let imgSrc = '';
+	let imgLoaded = false;
+	let lastRenderedUrl = '';
+
+	$: if (renderedImageUrl && renderedImageUrl !== lastRenderedUrl) {
+		lastRenderedUrl = renderedImageUrl;
+		imgRetryCount = 0;
+		imgLoaded = false;
+		clearTimeout(imgRetryTimer);
+		imgSrc = renderedImageUrl;
+	}
+
+	function handleRenderImgError() {
+		if (imgRetryCount < IMG_MAX_RETRIES && renderedImageUrl) {
+			imgRetryCount++;
+			imgRetryTimer = setTimeout(() => {
+				const sep = renderedImageUrl.includes('?') ? '&' : '?';
+				imgSrc = `${renderedImageUrl}${sep}_r=${imgRetryCount}`;
+			}, IMG_RETRY_DELAY);
+		}
+	}
+
+	function handleRenderImgLoad() {
+		imgLoaded = true;
+		imgRetryCount = 0;
+	}
+
 	// Preview state
 	// Note: isPreviewActive is now imported as a writable store from canvas-preview-engine
 	// Use $isPreviewActive for reactive access
 	let previewStats = null;
 	let previewValidation = { errors: [], warnings: [], isValid: true };
-	
+	let showQuickTips = false;
+	let previewAutoUpdateFlash = false;
+	let previewFlashTimeout = null;
+	let jsonParseErrors = {};
+
 	// Track refresh trigger
 	let refreshTrigger = 0;
+	let syncTimeout = null;
+	let refreshTimeout = null;
 
 	export let guestMode = false;
 
@@ -108,7 +159,7 @@
 	}
 	
 	$: if ($selectedComponent !== undefined) {
-		setTimeout(() => syncVariables(), 100);
+		syncTimeout = setTimeout(() => syncVariables(), 100);
 	}
 	
 	// Initialize test values when variables change (including type changes)
@@ -130,7 +181,7 @@
 		variableActions.setCanvas($editor);
 		
 		const handleChange = () => {
-			setTimeout(() => {
+			refreshTimeout = setTimeout(() => {
 				refreshTrigger++;
 			}, 200);
 		};
@@ -148,11 +199,23 @@
 		};
 	}
 	
-	onDestroy(() => {
-		// Clean up debounce timeout
-		if (previewUpdateTimeout) {
-			clearTimeout(previewUpdateTimeout);
+	// Clean up preview when leaving preview tab (#23)
+	let previousTab = activeTab;
+	$: {
+		if (previousTab === 'preview' && activeTab !== 'preview' && $isPreviewActive && $editor) {
+			clearPreview($editor);
+			previewStats = null;
 		}
+		previousTab = activeTab;
+	}
+
+	onDestroy(() => {
+		// Clean up all timeouts
+		if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
+		if (previewFlashTimeout) clearTimeout(previewFlashTimeout);
+		if (syncTimeout) clearTimeout(syncTimeout);
+		if (refreshTimeout) clearTimeout(refreshTimeout);
+		clearTimeout(imgRetryTimer);
 
 		// Clean up event listener
 		if (triggerGenerateHandler) {
@@ -232,8 +295,23 @@
 		if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
 		previewUpdateTimeout = setTimeout(() => {
 			updatePreview();
+			// Flash indicator for auto-update feedback (#11)
+			previewAutoUpdateFlash = true;
+			if (previewFlashTimeout) clearTimeout(previewFlashTimeout);
+			previewFlashTimeout = setTimeout(() => { previewAutoUpdateFlash = false; }, 800);
 		}, 300);
 	}
+
+	// Check if test values match defaults (for reset button disable — #9)
+	$: resetDisabled = $variables.every(v => {
+		const current = testValues[v.name];
+		const def = v.defaultValue ?? getDefaultForType(v.type);
+		if (current === undefined) return true;
+		if (typeof current === 'object' && typeof def === 'object') {
+			return JSON.stringify(current) === JSON.stringify(def);
+		}
+		return current === def || (current === '' && (def === '' || def === undefined));
+	});
 	
 	function syncVariables() {
 		if (!$editor) return;
@@ -253,9 +331,6 @@
 			// Initialize if undefined OR if type changed (need to reset to new default)
 			if (testValues[v.name] === undefined || typeChanged) {
 				testValues[v.name] = v.defaultValue ?? getDefaultForType(v.type);
-				if (typeChanged) {
-					console.log(`Variable "${v.name}" type changed from ${previousType} to ${v.type}, resetting test value`);
-				}
 			}
 
 			// Track current type for future change detection
@@ -315,8 +390,8 @@
 		
 		const sanitizedName = formName.replace(/[^a-zA-Z0-9_]/g, '_');
 		
-		// Check for duplicates (except when editing)
-		if (!editingVariable && variableActions.has(sanitizedName)) {
+		// Check for duplicates (also when renaming during edit)
+		if (variableActions.has(sanitizedName) && (!editingVariable || editingVariable.name !== sanitizedName)) {
 			formError = 'A variable with this name already exists';
 			return;
 		}
@@ -366,7 +441,7 @@
 		variableToDelete = variable;
 		showDeleteConfirm = true;
 	}
-	
+
 	function deleteVariable() {
 		if (variableToDelete) {
 			const name = variableToDelete.name;
@@ -374,10 +449,55 @@
 			toast.set({ message: `Variable "${name}" deleted`, type: 'success', duration: 2000 });
 			variableToDelete = null;
 			showDeleteConfirm = false;
-			
-			// Refresh from canvas to clean up
 			syncVariables();
 		}
+	}
+
+	// Multi-select functions
+	function toggleSelectMode() {
+		isSelectMode = !isSelectMode;
+		if (!isSelectMode) {
+			selectedVariableNames = new Set();
+		}
+	}
+
+	function toggleVariableSelection(name) {
+		const next = new Set(selectedVariableNames);
+		if (next.has(name)) {
+			next.delete(name);
+		} else {
+			next.add(name);
+		}
+		selectedVariableNames = next;
+		// Auto-exit select mode if nothing selected
+		if (next.size === 0 && isSelectMode) {
+			isSelectMode = false;
+		}
+	}
+
+	function selectAllVariables() {
+		selectedVariableNames = new Set($variables.map(v => v.name));
+	}
+
+	function deselectAllVariables() {
+		selectedVariableNames = new Set();
+	}
+
+	function confirmDeleteSelected() {
+		showDeleteConfirm = true;
+		// variableToDelete stays null — modal checks selectedCount
+	}
+
+	function deleteSelectedVariables() {
+		const names = [...selectedVariableNames];
+		for (const name of names) {
+			variableActions.delete(name);
+		}
+		toast.set({ message: `${names.length} variable${names.length > 1 ? 's' : ''} deleted`, type: 'success', duration: 2000 });
+		selectedVariableNames = new Set();
+		isSelectMode = false;
+		showDeleteConfirm = false;
+		syncVariables();
 	}
 	
 	function getDefaultForType(type) {
@@ -418,25 +538,25 @@
 	
 	function getTypeColor(type) {
 		switch (type) {
-			case 'text': return 'bg-blue-100 text-blue-700 border border-blue-200';
-			case 'image': return 'bg-purple-100 text-purple-700 border border-purple-200';
-			case 'color': return 'bg-orange-100 text-orange-700 border border-orange-200';
-			case 'chart': return 'bg-pink-100 text-pink-700 border border-pink-200';
-			case 'table': return 'bg-teal-100 text-teal-700 border border-teal-200';
-			case 'boolean': return 'bg-green-100 text-green-700 border border-green-200';
-			case 'number': return 'bg-indigo-100 text-indigo-700 border border-indigo-200';
-			case 'array': return 'bg-amber-100 text-amber-700 border border-amber-200';
-			case 'object': return 'bg-violet-100 text-violet-700 border border-violet-200';
-			default: return 'bg-gray-100 text-gray-700 border border-gray-200';
+			case 'text': return 'bg-blue-100 text-blue-700 border-[2px] border-blue-200';
+			case 'image': return 'bg-purple-100 text-purple-700 border-[2px] border-purple-200';
+			case 'color': return 'bg-orange-100 text-orange-700 border-[2px] border-orange-200';
+			case 'chart': return 'bg-pink-100 text-pink-700 border-[2px] border-pink-200';
+			case 'table': return 'bg-teal-100 text-teal-700 border-[2px] border-teal-200';
+			case 'boolean': return 'bg-green-100 text-green-700 border-[2px] border-green-200';
+			case 'number': return 'bg-indigo-100 text-indigo-700 border-[2px] border-indigo-200';
+			case 'array': return 'bg-amber-100 text-amber-700 border-[2px] border-amber-200';
+			case 'object': return 'bg-violet-100 text-violet-700 border-[2px] border-violet-200';
+			default: return 'bg-gray-100 text-gray-700 border-[2px] border-gray-200';
 		}
 	}
-	
+
 	function getSourceBadge(source) {
 		switch (source) {
-			case 'property': return { label: 'Element', color: 'bg-emerald-100 text-emerald-700 border border-emerald-200' };
-			case 'condition': return { label: 'Condition', color: 'bg-yellow-100 text-yellow-700 border border-yellow-200' };
-			case 'loop': return { label: 'Loop', color: 'bg-cyan-100 text-cyan-700 border border-cyan-200' };
-			case 'custom': return { label: 'Custom', color: 'bg-gray-100 text-gray-600 border border-gray-200' };
+			case 'property': return { label: 'Element', color: 'bg-emerald-100 text-emerald-700 border-[2px] border-emerald-200' };
+			case 'condition': return { label: 'Condition', color: 'bg-yellow-100 text-yellow-700 border-[2px] border-yellow-200' };
+			case 'loop': return { label: 'Loop', color: 'bg-cyan-100 text-cyan-700 border-[2px] border-cyan-200' };
+			case 'custom': return { label: 'Custom', color: 'bg-gray-100 text-gray-600 border-[2px] border-gray-200' };
 			default: return { label: 'Unknown', color: 'bg-gray-100 text-gray-600' };
 		}
 	}
@@ -454,11 +574,37 @@
 		testValues[name] = value;
 		testValues = { ...testValues };
 	}
+
+	function handleJsonTestInput(name, rawValue) {
+		try {
+			const parsed = JSON.parse(rawValue);
+			delete jsonParseErrors[name];
+			jsonParseErrors = { ...jsonParseErrors };
+			updateTestValue(name, parsed);
+		} catch {
+			jsonParseErrors[name] = 'Invalid JSON';
+			jsonParseErrors = { ...jsonParseErrors };
+			updateTestValue(name, rawValue);
+		}
+	}
+
+	function handleNumberTestInput(name, rawValue) {
+		const parsed = parseFloat(rawValue);
+		if (rawValue === '' || rawValue === '-') {
+			updateTestValue(name, rawValue);
+		} else if (isNaN(parsed)) {
+			// Don't silently coerce — keep as string so user sees the invalid input
+			updateTestValue(name, rawValue);
+		} else {
+			updateTestValue(name, parsed);
+		}
+	}
 	
 	function resetTestValues() {
 		$variables.forEach(v => {
-			testValues[v.name] = v.defaultValue || '';
+			testValues[v.name] = v.defaultValue ?? getDefaultForType(v.type);
 		});
+		jsonParseErrors = {};
 		testValues = { ...testValues };
 	}
 	
@@ -583,11 +729,6 @@
 				source: v.source,
 				defaultValue: v.defaultValue // Used for fallback matching if ID doesn't match
 			}));
-
-			// Debug: log what we're sending
-			console.log('[generateFromCanvas] testValues:', JSON.stringify(testValues));
-			console.log('[generateFromCanvas] variableDefinitions:', variableDefinitions.length);
-			console.log('[generateFromCanvas] outputFormat:', $outputFormat);
 
 			// Use appropriate endpoint based on output format
 			const isPdf = $outputFormat === 'pdf';
@@ -787,11 +928,11 @@
 
 <div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
 	<!-- Header with Tabs -->
-	<div class="px-4 py-3 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+	<div class="px-4 py-3 border-b-[2px] border-gray-300 flex-shrink-0 bg-[#FFFDF8]">
 		<div class="flex items-center justify-between mb-3">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Variables</h3>
 			<button 
-				class="text-xs px-2.5 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 flex items-center gap-1.5 uppercase font-bold tracking-wide border-2 border-gray-900"
+				class="text-xs px-2.5 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 flex items-center gap-1.5 uppercase font-bold tracking-wide border-[2px] border-gray-900"
 				on:click={startCreate}
 			>
 				<i class="fa fa-plus text-[10px]"></i>
@@ -800,24 +941,34 @@
 	</div>
 	
 		<!-- Tabs -->
-		<div class="flex gap-1 bg-[#FFFDF8] p-1 border-b-2 border-gray-900">
-			<button 
-				class="flex-1 text-xs font-bold uppercase tracking-wide py-1.5 px-2 rounded transition-colors {activeTab === 'list' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+		<div class="flex gap-1 bg-[#FFFDF8] p-1 border-b-[2px] border-gray-300" role="tablist" aria-label="Variable panel tabs">
+			<button
+				class="flex-1 text-xs font-bold uppercase tracking-wide py-1.5 px-2 rounded transition-colors {activeTab === 'list' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-[2px] border-transparent hover:border-gray-300'}"
+				role="tab"
+				aria-selected={activeTab === 'list'}
+				aria-controls="panel-list"
 				on:click={() => activeTab = 'list'}
 			>
 				All ({$variables.length})
 			</button>
-			<button 
-				class="flex-1 text-xs font-bold uppercase tracking-wide py-1.5 px-2 rounded transition-colors relative {activeTab === 'preview' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+			<button
+				id="tab-preview"
+				class="flex-1 text-xs font-bold uppercase tracking-wide py-1.5 px-2 rounded transition-colors relative {activeTab === 'preview' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-[2px] border-transparent hover:border-gray-300'}"
+				role="tab"
+				aria-selected={activeTab === 'preview'}
+				aria-controls="panel-preview"
 				on:click={() => activeTab = 'preview'}
 			>
 				Preview
 				{#if $isPreviewActive}
-					<span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse border border-gray-900"></span>
+					<span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse border border-gray-900" title="Preview is active"></span>
 				{/if}
 			</button>
-			<button 
-				class="flex-1 text-xs font-bold uppercase tracking-wide py-1.5 px-2 rounded transition-colors {activeTab === 'test' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+			<button
+				class="flex-1 text-xs font-bold uppercase tracking-wide py-1.5 px-2 rounded transition-colors {activeTab === 'test' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-[2px] border-transparent hover:border-gray-300'}"
+				role="tab"
+				aria-selected={activeTab === 'test'}
+				aria-controls="panel-api"
 				on:click={() => activeTab = 'test'}
 			>
 				API
@@ -842,14 +993,14 @@
 				</div>
 				
 				{#if formError}
-					<div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]">
+					<div class="bg-red-50 border-[2px] border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]" role="alert">
 						<p class="text-xs font-bold text-red-700 uppercase">{formError}</p>
 					</div>
 				{/if}
 				
 				<!-- Name -->
 				<div>
-					<label for="variable-name" class="block text-xs font-bold text-gray-900 uppercase mb-1">Name *</label>
+					<label for="variable-name" class={fieldLabelClass}>Name *</label>
 					<input
 						id="variable-name"
 						type="text"
@@ -862,7 +1013,7 @@
 				
 				<!-- Type -->
 				<div>
-					<label for="variable-type" class="block text-xs font-bold text-gray-900 uppercase mb-1">Type</label>
+					<label for="variable-type" class={fieldLabelClass}>Type</label>
 					<select
 						id="variable-type"
 						class={selectClass + " font-medium"}
@@ -882,7 +1033,7 @@
 				
 				<!-- Description -->
 				<div>
-					<label for="variable-description" class="block text-xs font-bold text-gray-900 uppercase mb-1">Description</label>
+					<label for="variable-description" class={fieldLabelClass}>Description</label>
 					<textarea
 						id="variable-description"
 						class={inputBaseClass + " font-medium"}
@@ -894,7 +1045,7 @@
 				
 				<!-- Default Value -->
 				<div>
-					<label for="variable-default-value" class="block text-xs font-bold text-gray-900 uppercase mb-1">Default Value</label>
+					<label for="variable-default-value" class={fieldLabelClass}>Default Value</label>
 					{#if formType === VARIABLE_TYPES.BOOLEAN}
 						<select
 							id="variable-default-value"
@@ -946,20 +1097,23 @@
 				</div>
 				
 				<!-- Required -->
-				<div class="flex items-center gap-2">
-					<input
-						type="checkbox"
-						id="required-checkbox"
-						class="w-5 h-5 border-2 border-gray-900 rounded focus:ring-0 text-black"
-						bind:checked={formRequired}
-					/>
-					<label for="required-checkbox" class="text-xs font-bold text-gray-900 uppercase">Required variable</label>
-				</div>
+				<label for="required-checkbox" class="flex items-center gap-3 cursor-pointer">
+					<div class="relative inline-flex items-center">
+						<input
+							type="checkbox"
+							id="required-checkbox"
+							class="sr-only peer"
+							bind:checked={formRequired}
+						/>
+						<div class={toggleSwitchClass}></div>
+					</div>
+					<span class={fieldLabelClass + " mb-0"}>Required variable</span>
+				</label>
 				
 				<!-- Actions -->
 				<div class="flex gap-2 pt-2">
 					<button 
-						class="flex-1 py-2.5 px-4 bg-gray-900 text-white rounded-lg text-xs font-black uppercase tracking-wider border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
+						class="flex-1 py-2.5 px-4 bg-gray-900 text-white rounded-lg text-xs font-black uppercase tracking-wider border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
 						on:click={saveVariable}
 					>
 						{editingVariable ? 'Update' : 'Create'} Variable
@@ -977,7 +1131,7 @@
 		{:else if activeTab === 'list'}
 			{#if $variables.length === 0}
 			<div class="text-center py-8">
-				<div class="w-16 h-16 mx-auto mb-4 bg-[#FFFDF8] border-2 border-gray-900 rounded-full flex items-center justify-center shadow-[4px_4px_0_0_#1f2937]">
+				<div class="w-16 h-16 mx-auto mb-4 bg-[#FFFDF8] border-[2px] border-gray-300 rounded-full flex items-center justify-center">
 					<i class="fa fa-code text-2xl text-gray-900"></i>
 				</div>
 				<h4 class="text-sm font-black text-gray-900 mb-2 uppercase tracking-wide">No Variables Yet</h4>
@@ -985,7 +1139,7 @@
 						Create variables to make your template dynamic.
 					</p>
 					<button 
-						class="text-xs px-4 py-2 bg-gray-900 text-white border-2 border-gray-900 rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 uppercase font-bold"
+						class="text-xs px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 uppercase font-bold"
 						on:click={startCreate}
 					>
 						<i class="fa fa-plus mr-1.5"></i>
@@ -993,14 +1147,44 @@
 					</button>
 			</div>
 		{:else}
+				<!-- Select mode toolbar -->
+				<div class="flex items-center justify-between mb-3">
+					<button
+						class="text-[10px] font-bold uppercase tracking-wide transition-colors {isSelectMode ? 'text-blue-600 hover:text-blue-800' : 'text-gray-400 hover:text-gray-600'}"
+						on:click={toggleSelectMode}
+						aria-label={isSelectMode ? 'Exit select mode' : 'Enter select mode'}
+					>
+						<i class="fa fa-{isSelectMode ? 'times' : 'check-square'} mr-1"></i>
+						{isSelectMode ? 'Cancel' : 'Select'}
+					</button>
+					{#if isSelectMode}
+						<div class="flex items-center gap-2">
+							<button
+								class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wide transition-colors"
+								on:click={selectedCount === $variables.length ? deselectAllVariables : selectAllVariables}
+							>
+								{selectedCount === $variables.length ? 'Deselect all' : 'Select all'}
+							</button>
+							{#if selectedCount > 0}
+								<button
+									class="text-[10px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wide transition-colors"
+									on:click={confirmDeleteSelected}
+								>
+									<i class="fa fa-trash mr-1"></i>Delete ({selectedCount})
+								</button>
+							{/if}
+						</div>
+					{/if}
+				</div>
+
 				<!-- Variables by Source -->
 				{#each Object.entries($variablesBySource) as [source, vars]}
 					{#if vars.length > 0}
 						<div class="mb-4">
 							<div class="flex items-center gap-2 mb-2">
-								<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-									{source === 'property' ? 'Element Variables' : 
-									 source === 'condition' ? 'Condition Variables' : 
+								<span class={sectionHeaderClass}>
+									{source === 'property' ? 'Element Variables' :
+									 source === 'condition' ? 'Condition Variables' :
 									 source === 'loop' ? 'Loop Variables' : 'Custom Variables'}
 								</span>
 								<span class="text-[10px] font-bold text-gray-400">({vars.length})</span>
@@ -1008,52 +1192,70 @@
 							
 							<div class="space-y-3">
 								{#each vars as variable}
-									<div 
-										class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-3 transition-all hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 group"
-					>
-						<div class="flex items-start justify-between mb-2">
+									<div
+										class="bg-white border-[2px] rounded-lg p-3 transition-all group {selectedVariableNames.has(variable.name) ? 'border-blue-400 shadow-[2px_2px_0_0_#93c5fd] bg-blue-50/30' : 'border-gray-300 shadow-[2px_2px_0_0_#d1d5db] hover:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400'}"
+										on:click={() => { if (isSelectMode) toggleVariableSelection(variable.name); }}
+										role={isSelectMode ? 'checkbox' : undefined}
+										aria-checked={isSelectMode ? selectedVariableNames.has(variable.name) : undefined}
+									>
+										<div class="flex items-start justify-between mb-2">
 											<div class="flex items-center gap-2 flex-wrap">
-								<span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border-2 ${getTypeColor(variable.type).replace('border ', 'border-')}`}>
-									<i class={`fa ${getTypeIcon(variable.type)} mr-1`}></i>
-									{variable.type}
-								</span>
+												{#if isSelectMode}
+													<div
+														class="w-5 h-5 rounded border-[2px] flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer {selectedVariableNames.has(variable.name) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 hover:border-gray-400 bg-white'}"
+														on:click|stopPropagation={() => toggleVariableSelection(variable.name)}
+													>
+														{#if selectedVariableNames.has(variable.name)}
+															<i class="fa fa-check text-white text-[9px]"></i>
+														{/if}
+													</div>
+												{/if}
+												<span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${getTypeColor(variable.type)}`}>
+													<i class={`fa ${getTypeIcon(variable.type)} mr-1`}></i>
+													{variable.type}
+												</span>
 												{#if variable.source !== 'property'}
-													<span class={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border-2 ${getSourceBadge(variable.source).color.replace('border ', 'border-')}`}>
+													<span class={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${getSourceBadge(variable.source).color}`}>
 														{getSourceBadge(variable.source).label}
 													</span>
 												{/if}
-								{#if variable.required}
-									<span class="px-1.5 py-0.5 bg-red-100 text-red-700 border-2 border-red-200 text-[10px] rounded font-bold uppercase tracking-wide">
-										Required
-									</span>
-								{/if}
-							</div>
-											<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-												{#if variable.objectId}
-							<button 
-														class="p-1.5 text-gray-500 hover:text-white hover:bg-gray-900 rounded border border-transparent hover:border-gray-900 transition-colors"
-														on:click={() => selectVariable(variable)}
-														title="Select element"
-													>
-														<i class="fa fa-crosshairs text-xs"></i>
-													</button>
+												{#if variable.required}
+													<span class="px-1.5 py-0.5 bg-red-100 text-red-700 border-[2px] border-red-200 text-[10px] rounded font-bold uppercase tracking-wide">
+														Required
+													</span>
 												{/if}
-												<button 
-													class="p-1.5 text-gray-500 hover:text-white hover:bg-gray-900 rounded border border-transparent hover:border-gray-900 transition-colors"
-													on:click={() => startEdit(variable)}
-													title="Edit variable"
-												>
-													<i class="fa fa-pencil text-xs"></i>
-												</button>
-												<button 
-													class="p-1.5 text-gray-500 hover:text-white hover:bg-red-600 rounded border border-transparent hover:border-red-600 transition-colors"
-													on:click={() => confirmDelete(variable)}
-													title="Delete variable"
-												>
-													<i class="fa fa-trash text-xs"></i>
-							</button>
 											</div>
-						</div>
+											{#if !isSelectMode}
+												<div class="flex items-center gap-1">
+													{#if variable.objectId}
+														<button
+															class="p-1.5 text-gray-400 hover:text-white hover:bg-gray-900 rounded-lg border-[2px] border-transparent hover:border-gray-900 transition-colors"
+															on:click={() => selectVariable(variable)}
+															aria-label="Select element on canvas"
+															title="Select element"
+														>
+															<i class="fa fa-crosshairs text-xs"></i>
+														</button>
+													{/if}
+													<button
+														class="p-1.5 text-gray-400 hover:text-white hover:bg-gray-900 rounded-lg border-[2px] border-transparent hover:border-gray-900 transition-colors"
+														on:click={() => startEdit(variable)}
+														aria-label="Edit variable {variable.name}"
+														title="Edit variable"
+													>
+														<i class="fa fa-pencil text-xs"></i>
+													</button>
+													<button
+														class="p-1.5 text-gray-400 hover:text-white hover:bg-red-600 rounded-lg border-[2px] border-transparent hover:border-red-600 transition-colors"
+														on:click={() => confirmDelete(variable)}
+														aria-label="Delete variable {variable.name}"
+														title="Delete variable"
+													>
+														<i class="fa fa-trash text-xs"></i>
+													</button>
+												</div>
+											{/if}
+										</div>
 						
 										<button 
 											class="w-full text-left"
@@ -1075,29 +1277,31 @@
 				{/each}
 		
 				<!-- API Example Section -->
-		<div class="pt-4 border-t-2 border-gray-900">
-				<button 
-					class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity mb-3"
-						on:click={() => showApiExample = !showApiExample}
-					>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">API Documentation</span>
-						<i class="fa fa-chevron-{showApiExample ? 'up' : 'down'} text-xs text-gray-900"></i>
-					</button>
-					
-					{#if showApiExample}
-						<div class="space-y-3">
-							<div class="bg-gray-900 rounded-lg p-4 relative border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
-								<button 
-									class="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
-									on:click={copyApiExample}
-									title="Copy to clipboard"
-								>
-									<i class="fa fa-copy text-xs"></i>
-								</button>
+		<div class="pt-4 border-t border-gray-200">
+				<button
+					class="w-full flex items-center justify-between text-left group mb-3"
+					aria-expanded={showApiExample}
+					on:click={() => showApiExample = !showApiExample}
+				>
+					<span class={sectionHeaderClass}>API Documentation</span>
+					<i class="fa fa-chevron-{showApiExample ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+				</button>
+
+				{#if showApiExample}
+					<div class="space-y-3" transition:slide={{duration: 150}}>
+						<div class="bg-gray-900 rounded-lg p-4 relative border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+							<button
+								class="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
+								on:click={copyApiExample}
+								aria-label="Copy API example to clipboard"
+								title="Copy to clipboard"
+							>
+								<i class="fa fa-copy text-xs"></i>
+							</button>
 								<pre class="text-xs text-green-400 overflow-x-auto font-mono"><code>{generateApiExample()}</code></pre>
 							</div>
 							
-							<div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 shadow-[2px_2px_0_0_#bfdbfe]">
+							<div class="bg-blue-50 border-[2px] border-blue-200 rounded-lg p-3">
 								<p class="text-xs text-blue-900 mb-2 break-all font-bold font-mono">
 									<span class="bg-blue-200 px-1 rounded">POST</span> /templates/{$template?.uid || '{uid}'}/render
 								</p>
@@ -1112,19 +1316,169 @@
 		
 		<!-- Preview Tab -->
 		{:else if activeTab === 'preview'}
-			<div class="space-y-4">
-				<!-- Preview Header -->
-				<div class="bg-white border-[2px] border-gray-900 rounded-lg p-4 shadow-[4px_4px_0_0_#1f2937]">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa fa-eye text-[#ff6b6b]"></i>
-						<h4 class="text-sm font-black text-gray-900 uppercase tracking-wide">Canvas Preview</h4>
+			<div class="space-y-4" id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+
+				<!-- Test Data Section (moved above header — #13) -->
+				<div class="space-y-3">
+					<div class="flex items-center justify-between">
+						<span class={sectionHeaderClass}>Test Data</span>
+						<div class="flex items-center gap-2">
+							{#if previewAutoUpdateFlash && $isPreviewActive}
+								<span class="text-[10px] font-bold text-green-600 animate-pulse" aria-live="polite">
+									<i class="fa fa-sync text-[8px] mr-0.5"></i>Updated
+								</span>
+							{/if}
+							<button
+								class="text-[10px] font-bold transition-colors {resetDisabled ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-900'}"
+								on:click={resetTestValues}
+								disabled={resetDisabled}
+								aria-label="Reset test data to default values"
+								title={resetDisabled ? 'Values already at defaults' : 'Reset to defaults'}
+							>
+								<i class="fa fa-undo mr-1"></i>Reset
+							</button>
+						</div>
 					</div>
-					<p class="text-[10px] text-gray-500 mb-3 font-medium">See how your template behaves with test data</p>
+
+					{#if $variables.length === 0}
+						<div class="text-center py-6 bg-[#FFFDF8] rounded-lg border-[2px] border-gray-300 border-dashed">
+							<div class="block mb-2">
+								<i class="fa fa-info-circle text-gray-400 text-xl"></i>
+							</div>
+							<p class="text-xs font-bold text-gray-500 uppercase">No variables defined yet</p>
+							<p class="text-[10px] font-medium text-gray-500 mt-1">Add variables to preview your template</p>
+						</div>
+					{:else}
+						{#each $variables as variable}
+							<div>
+								<label for={'preview-' + variable.name} class="flex items-center gap-2 text-xs font-bold text-gray-700 mb-1.5">
+									<span class={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${getTypeColor(variable.type)}`}>
+										<i class={`fa ${getTypeIcon(variable.type)} mr-0.5`}></i>
+										{variable.type}
+									</span>
+									<span class="font-mono">{variable.name}</span>
+									{#if variable.required}
+										<span class="text-red-500" aria-label="required">*</span>
+									{/if}
+								</label>
+
+								{#if variable.type === 'text'}
+									<input
+										id={'preview-' + variable.name}
+										type="text"
+										class={inputBaseClass + " text-xs font-medium"}
+										placeholder={variable.defaultValue || 'Enter text...'}
+										value={testValues[variable.name] || ''}
+										on:input={(e) => updateTestValue(variable.name, e.target.value)}
+										aria-label={'Test value for ' + variable.name}
+									/>
+								{:else if variable.type === 'image'}
+									<input
+										id={'preview-' + variable.name}
+										type="url"
+										class={inputBaseClass + " text-xs font-medium"}
+										placeholder="https://example.com/image.jpg"
+										value={testValues[variable.name] || ''}
+										on:input={(e) => updateTestValue(variable.name, e.target.value)}
+										aria-label={'Image URL for ' + variable.name}
+									/>
+								{:else if variable.type === 'color'}
+									<div class="flex gap-2">
+										<input
+											type="color"
+											id={'preview-color-' + variable.name}
+											class="w-10 h-9 border-[2px] border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-all"
+											value={testValues[variable.name] || '#000000'}
+											on:input={(e) => updateTestValue(variable.name, e.target.value)}
+											aria-label={'Color picker for ' + variable.name}
+										/>
+										<input
+											id={'preview-' + variable.name}
+											type="text"
+											class={inputBaseClass + " flex-1 text-xs font-mono font-medium"}
+											placeholder="#000000"
+											value={testValues[variable.name] || ''}
+											on:input={(e) => updateTestValue(variable.name, e.target.value)}
+											aria-label={'Hex color value for ' + variable.name}
+										/>
+									</div>
+								{:else if variable.type === 'boolean'}
+									<label for={'preview-' + variable.name} class="flex items-center gap-3 cursor-pointer">
+										<div class="relative inline-flex items-center">
+											<input
+												id={'preview-' + variable.name}
+												type="checkbox"
+												class="sr-only peer"
+												checked={testValues[variable.name] === true || testValues[variable.name] === 'true'}
+												on:change={(e) => updateTestValue(variable.name, e.target.checked)}
+												aria-label={'Toggle ' + variable.name}
+											/>
+											<div class={toggleSwitchClass}></div>
+										</div>
+										<span class="text-xs font-bold text-gray-600 uppercase">
+											{testValues[variable.name] === true || testValues[variable.name] === 'true' ? 'true' : 'false'}
+										</span>
+									</label>
+								{:else if variable.type === 'number'}
+									<input
+										id={'preview-' + variable.name}
+										type="number"
+										class={inputBaseClass + " text-xs font-medium"}
+										placeholder={variable.defaultValue?.toString() || '0'}
+										value={testValues[variable.name] ?? variable.defaultValue ?? ''}
+										on:input={(e) => handleNumberTestInput(variable.name, e.target.value)}
+										aria-label={'Number value for ' + variable.name}
+									/>
+								{:else}
+									<!-- Array, Object, Chart, Table -->
+									<textarea
+										id={'preview-' + variable.name}
+										class={"w-full h-24 text-[10px] font-mono font-medium " + inputBaseClass + (jsonParseErrors[variable.name] ? ' border-red-400 focus:border-red-500 focus:shadow-[2px_2px_0_0_#ef4444]' : '')}
+										placeholder={JSON.stringify(variable.defaultValue || {}, null, 2)}
+										value={typeof testValues[variable.name] === 'string' ? testValues[variable.name] : JSON.stringify(testValues[variable.name] || variable.defaultValue || {}, null, 2)}
+										on:input={(e) => handleJsonTestInput(variable.name, e.target.value)}
+										aria-label={'JSON data for ' + variable.name}
+										aria-invalid={!!jsonParseErrors[variable.name]}
+									></textarea>
+									{#if jsonParseErrors[variable.name]}
+										<p class="text-[10px] font-medium text-red-500 mt-1" role="alert">
+											<i class="fa fa-exclamation-circle mr-0.5"></i>{jsonParseErrors[variable.name]}
+										</p>
+									{/if}
+								{/if}
+
+								{#if variable.description}
+									<p class="text-[10px] font-medium text-gray-500 mt-1.5">{variable.description}</p>
+								{/if}
+							</div>
+						{/each}
+					{/if}
+				</div>
+
+				<!-- Preview Control -->
+				<div class="pt-3 border-t border-gray-200">
+					<div class="flex items-center justify-between mb-3">
+						<div class="flex items-center gap-2">
+							<i class="fa fa-eye text-[#ff6b6b] text-sm"></i>
+							<span class={sectionHeaderClass}>Canvas Preview</span>
+						</div>
+						{#if $isPreviewActive}
+							<span class="flex items-center gap-1.5 text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full border-[2px] border-green-300" aria-live="polite">
+								<span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+								Live
+							</span>
+						{/if}
+					</div>
+
+					<p class="text-[10px] text-gray-600 mb-3 font-medium">See how your template behaves with test data. Changes auto-update while active.</p>
+
 					<button
-						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 {$isPreviewActive
-							? 'bg-gray-900 text-white hover:bg-black'
-							: 'bg-white text-gray-900 hover:bg-gray-50'}"
+						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-[2px] border-gray-900 {$isPreviewActive
+							? 'bg-gray-200 text-gray-900 shadow-[2px_2px_0_0_#d1d5db] hover:shadow-[4px_4px_0_0_#d1d5db] hover:-translate-y-0.5'
+							: 'bg-[#4ade80] text-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5'}"
 						on:click={togglePreview}
+						aria-pressed={$isPreviewActive}
+						aria-label={$isPreviewActive ? 'Stop canvas preview' : 'Start canvas preview'}
 					>
 						{#if $isPreviewActive}
 							<i class="fa fa-stop mr-1.5"></i>Stop Preview
@@ -1132,45 +1486,33 @@
 							<i class="fa fa-play mr-1.5"></i>Start Preview
 						{/if}
 					</button>
-
-					
-					{#if $isPreviewActive}
-						<div class="flex items-center gap-2 text-xs text-gray-900 font-bold mt-3">
-							<span class="flex items-center gap-1">
-								<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse border border-gray-900"></span>
-								Preview Active
-							</span>
-							<span class="text-gray-300">|</span>
-							<span>Changes update live</span>
-						</div>
-					{/if}
 				</div>
-				
-				<!-- Preview Stats -->
-				{#if previewStats}
-					<div class="grid grid-cols-2 gap-2">
-						<div class="bg-white border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#1f2937]">
-							<div class="flex items-center gap-2 mb-1">
-								<i class="fa fa-eye-slash text-gray-400 text-xs"></i>
+
+				<!-- Preview Stats (inline with preview control — #3, #14, #15) -->
+				{#if previewStats && $isPreviewActive}
+					<div class="grid grid-cols-2 gap-2" aria-live="polite" aria-label="Preview statistics">
+						<div class="bg-white border-[2px] border-gray-300 rounded-lg p-2.5">
+							<div class="flex items-center gap-1.5 mb-0.5">
+								<i class="fa fa-eye-slash text-gray-400 text-[10px]"></i>
 								<span class="text-[10px] font-black text-gray-500 uppercase">Hidden</span>
 							</div>
-							<div class="text-xl font-black text-gray-900">{previewStats.hiddenByCondition}</div>
-							<div class="text-[10px] font-medium text-gray-400">of {previewStats.conditionsCount} conditions</div>
+							<div class="text-lg font-black text-gray-900 leading-tight">{previewStats.hiddenByCondition}<span class="text-[10px] font-medium text-gray-400 ml-1">/ {previewStats.conditionsCount}</span></div>
+							<div class="text-[9px] font-medium text-gray-400">elements hidden by conditions</div>
 						</div>
-						<div class="bg-white border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#1f2937]">
-							<div class="flex items-center gap-2 mb-1">
-								<i class="fa fa-copy text-gray-400 text-xs"></i>
-								<span class="text-[10px] font-black text-gray-500 uppercase">Loop Items</span>
+						<div class="bg-white border-[2px] border-gray-300 rounded-lg p-2.5">
+							<div class="flex items-center gap-1.5 mb-0.5">
+								<i class="fa fa-layer-group text-gray-400 text-[10px]"></i>
+								<span class="text-[10px] font-black text-gray-500 uppercase">Loops</span>
 							</div>
-							<div class="text-xl font-black text-gray-900">{previewStats.loopIterations}</div>
-							<div class="text-[10px] font-medium text-gray-400">from {previewStats.loopsCount} loops</div>
+							<div class="text-lg font-black text-gray-900 leading-tight">{previewStats.loopIterations}<span class="text-[10px] font-medium text-gray-400 ml-1">items</span></div>
+							<div class="text-[9px] font-medium text-gray-400">from {previewStats.loopsCount} loop{previewStats.loopsCount !== 1 ? 's' : ''}</div>
 						</div>
 					</div>
 				{/if}
-				
-				<!-- Validation Messages -->
+
+				<!-- Validation Messages (#4 border fix, #18 role=alert, #19 aria) -->
 				{#if previewValidation.errors.length > 0}
-					<div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]">
+					<div class="bg-red-50 border-[2px] border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]" role="alert" aria-label="Validation errors">
 						<div class="flex items-center gap-2 mb-2">
 							<i class="fa fa-exclamation-circle text-red-500"></i>
 							<span class="text-xs font-black text-red-700 uppercase">Validation Errors</span>
@@ -1182,9 +1524,9 @@
 						</ul>
 					</div>
 				{/if}
-				
+
 				{#if previewValidation.warnings.length > 0}
-					<div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 shadow-[2px_2px_0_0_#fbbf24]">
+					<div class="bg-yellow-50 border-[2px] border-yellow-200 rounded-lg p-3 shadow-[2px_2px_0_0_#fbbf24]" role="alert" aria-label="Validation warnings">
 						<div class="flex items-center gap-2 mb-2">
 							<i class="fa fa-exclamation-triangle text-yellow-600"></i>
 							<span class="text-xs font-black text-yellow-800 uppercase">Warnings</span>
@@ -1196,133 +1538,36 @@
 						</ul>
 					</div>
 				{/if}
-				
-				<!-- Test Values Input -->
-				<div class="space-y-3">
-					<div class="flex items-center justify-between">
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Test Data</span>
-						<button 
-							class="text-[10px] font-bold text-gray-500 hover:text-gray-900"
-							on:click={resetTestValues}
-						>
-							<i class="fa fa-undo mr-1"></i>Reset
-						</button>
-					</div>
-					
-					{#if $variables.length === 0}
-						<div class="text-center py-6 bg-[#FFFDF8] rounded-lg border-2 border-gray-900 border-dashed">
-							<i class="fa fa-info-circle text-gray-400 text-xl mb-2"></i>
-							<p class="text-xs font-bold text-gray-500 uppercase">No variables defined yet</p>
-							<p class="text-[10px] font-medium text-gray-400 mt-1">Add variables to preview your template</p>
+
+				<!-- Quick Tips (collapsible — #12, deduplicated — #16) -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						aria-expanded={showQuickTips}
+						on:click={() => showQuickTips = !showQuickTips}
+					>
+						<span class="flex items-center gap-1.5">
+							<i class="fa fa-lightbulb text-amber-500 text-[10px]"></i>
+							<span class={sectionHeaderClass}>How It Works</span>
+						</span>
+						<i class="fa fa-chevron-{showQuickTips ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+					</button>
+					{#if showQuickTips}
+						<div class="mt-2 space-y-1.5" transition:slide={{duration: 150}}>
+							<p class="text-[10px] font-medium text-gray-600 flex items-start gap-1.5">
+								<i class="fa fa-font text-blue-400 text-[9px] mt-0.5 flex-shrink-0"></i>
+								Variables replace <code class="bg-gray-200 px-1 rounded text-gray-900 font-mono">{"{{ name }}"}</code> in text elements
+							</p>
+							<p class="text-[10px] font-medium text-gray-600 flex items-start gap-1.5">
+								<i class="fa fa-eye-slash text-orange-400 text-[9px] mt-0.5 flex-shrink-0"></i>
+								Conditions show/hide elements based on variable values
+							</p>
+							<p class="text-[10px] font-medium text-gray-600 flex items-start gap-1.5">
+								<i class="fa fa-layer-group text-purple-400 text-[9px] mt-0.5 flex-shrink-0"></i>
+								Loops repeat elements for each item in an array variable
+							</p>
 						</div>
-					{:else}
-						{#each $variables as variable}
-							<div class="bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded-lg p-3">
-								<div class="flex items-center gap-2 text-xs font-bold text-gray-700 mb-2">
-									<span class={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border-2 ${getTypeColor(variable.type).replace('border ', 'border-')}`}>
-										<i class={`fa ${getTypeIcon(variable.type)} mr-0.5`}></i>
-										{variable.type}
-									</span>
-									<span class="font-mono">{variable.name}</span>
-									{#if variable.required}
-										<span class="text-red-500">*</span>
-									{/if}
-								</div>
-								
-								{#if variable.type === 'text'}
-									<input
-										type="text"
-										class={inputBaseClass + " text-xs font-medium"}
-										placeholder={variable.defaultValue || 'Enter text...'}
-										value={testValues[variable.name] || ''}
-										on:input={(e) => updateTestValue(variable.name, e.target.value)}
-									/>
-								{:else if variable.type === 'image'}
-									<input
-										type="url"
-										class={inputBaseClass + " text-xs font-medium"}
-										placeholder="https://example.com/image.jpg"
-										value={testValues[variable.name] || ''}
-										on:input={(e) => updateTestValue(variable.name, e.target.value)}
-									/>
-								{:else if variable.type === 'color'}
-									<div class="flex gap-2">
-										<input
-											type="color"
-											class="w-10 h-9 border-2 border-gray-900 rounded-lg cursor-pointer shadow-[2px_2px_0_0_#1f2937]"
-											value={testValues[variable.name] || '#000000'}
-											on:input={(e) => updateTestValue(variable.name, e.target.value)}
-										/>
-										<input
-											type="text"
-											class="flex-1 text-xs border-2 border-gray-900 rounded-lg px-3 py-2 font-mono focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
-											placeholder="#000000"
-											value={testValues[variable.name] || ''}
-											on:input={(e) => updateTestValue(variable.name, e.target.value)}
-										/>
-									</div>
-								{:else if variable.type === 'boolean'}
-									<label class="flex items-center gap-3 cursor-pointer">
-										<div class="relative">
-											<input
-												type="checkbox"
-												class="sr-only peer"
-												checked={testValues[variable.name] || false}
-												on:change={(e) => updateTestValue(variable.name, e.target.checked)}
-											/>
-											<div class="w-10 h-6 bg-gray-200 rounded-full border-2 border-gray-900 peer-checked:bg-gray-900 transition-colors"></div>
-											<div class="absolute left-1 top-1 w-4 h-4 bg-white border border-gray-900 rounded-full shadow peer-checked:translate-x-4 transition-transform"></div>
-										</div>
-										<span class="text-xs font-bold text-gray-600 uppercase">
-											{testValues[variable.name] ? 'true' : 'false'}
-										</span>
-									</label>
-								{:else if variable.type === 'number'}
-									<input
-										type="number"
-										class={inputBaseClass + " text-xs font-medium"}
-										placeholder={variable.defaultValue?.toString() || '0'}
-										value={testValues[variable.name] ?? variable.defaultValue ?? ''}
-										on:input={(e) => updateTestValue(variable.name, parseFloat(e.target.value) || 0)}
-									/>
-								{:else}
-									<!-- Array, Object, Chart, Table -->
-									<textarea
-										class="w-full h-24 text-[10px] font-mono border-2 border-gray-900 rounded-lg px-3 py-2 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
-										placeholder={JSON.stringify(variable.defaultValue || {}, null, 2)}
-										value={typeof testValues[variable.name] === 'string' ? testValues[variable.name] : JSON.stringify(testValues[variable.name] || variable.defaultValue || {}, null, 2)}
-										on:input={(e) => {
-											try {
-												const parsed = JSON.parse(e.target.value);
-												updateTestValue(variable.name, parsed);
-											} catch {
-												updateTestValue(variable.name, e.target.value);
-											}
-										}}
-									></textarea>
-								{/if}
-								
-								{#if variable.description}
-									<p class="text-[10px] font-medium text-gray-400 mt-1.5">{variable.description}</p>
-								{/if}
-							</div>
-						{/each}
 					{/if}
-				</div>
-				
-				<!-- Quick Tips -->
-				<div class="bg-[#FFFDF8] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#1f2937]">
-					<div class="flex items-start gap-2">
-						<i class="fa fa-lightbulb text-gray-900 mt-0.5"></i>
-						<div>
-							<p class="text-xs font-black text-gray-900 mb-1 uppercase">Preview Tips</p>
-							<ul class="text-[10px] font-medium text-gray-600 space-y-0.5">
-								<li>• Conditions: Elements will show/hide based on your test data</li>
-								<li>• Loops: Array variables will repeat elements with each item</li>
-								<li>• Text: Use <code class="bg-gray-200 px-1 rounded text-gray-900 font-mono">{"{{ variable }}"}</code> for dynamic text</li>
-							</ul>
-						</div>
-					</div>
 				</div>
 			</div>
 		
@@ -1330,9 +1575,9 @@
 		{:else if activeTab === 'test'}
 					<div class="space-y-4">
 						{#if guestMode && !$user?.email}
-							<div class="bg-[#fff7ed] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#1f2937]">
+							<div class="bg-[#fff7ed] border-[2px] border-amber-300 rounded-lg p-3">
 								<div class="flex items-start gap-2">
-									<i class="fa fa-lock text-gray-900 mt-0.5"></i>
+									<i class="fa fa-lock text-amber-600 mt-0.5"></i>
 									<div>
 										<p class="text-xs font-black text-gray-900 uppercase mb-1">Guest mode</p>
 										<p class="text-[10px] font-medium text-gray-700">
@@ -1351,7 +1596,7 @@
 
 						<!-- Template Status -->
 						{#if !$template?.uid}
-							<div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 shadow-[2px_2px_0_0_#fbbf24]">
+							<div class="bg-yellow-50 border-[2px] border-yellow-200 rounded-lg p-3 shadow-[2px_2px_0_0_#fbbf24]">
 								<div class="flex items-start gap-2">
 									<i class="fa fa-exclamation-triangle text-yellow-700 mt-0.5"></i>
 									<div>
@@ -1363,7 +1608,7 @@
 								</div>
 							</div>
 						{:else}
-							<div class="bg-green-50 border-2 border-green-200 rounded-lg p-2 shadow-[2px_2px_0_0_#86efac]">
+							<div class="bg-green-50 border-[2px] border-green-200 rounded-lg p-2">
 								<p class="text-[10px] font-medium text-green-900">
 									<i class="fa fa-check-circle mr-1"></i>
 									Template ID: <span class="font-mono font-bold">{$template.uid}</span>
@@ -1374,7 +1619,7 @@
 						<!-- API Token Selection -->
 						<div class="space-y-1">
 							<div class="flex items-center justify-between">
-								<label for="api-token-select" class="text-xs font-bold text-gray-900 uppercase">API Token</label>
+								<label for="api-token-select" class={fieldLabelClass}>API Token</label>
 								{#if guestMode}
 									<button
 										on:click={saveAndShowAuth}
@@ -1392,7 +1637,7 @@
 							{#if apiTokens.length > 0}
 								<select
 									id="api-token-select"
-									class="w-full text-xs border-2 border-gray-900 rounded-lg px-2 py-1.5 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium bg-white"
+									class={selectClass + " text-xs font-medium"}
 									bind:value={selectedToken}
 								>
 									{#each apiTokens as token}
@@ -1400,7 +1645,7 @@
 									{/each}
 								</select>
 							{:else}
-								<div class="bg-gray-50 border-2 border-gray-900 rounded-lg px-3 py-2 text-center border-dashed">
+								<div class="bg-gray-50 border-[2px] border-gray-300 rounded-lg px-3 py-2 text-center border-dashed">
 									<p class="text-[10px] font-bold text-gray-500 mb-1 uppercase">No API tokens found</p>
 									{#if guestMode}
 										<button
@@ -1422,8 +1667,8 @@
 				{#if $variables.length > 0}
 						<div class="space-y-3">
 							<div class="flex items-center justify-between">
-								<span class="text-xs font-black text-gray-900 uppercase tracking-wide">Test Values</span>
-								<button 
+								<span class={sectionHeaderClass}>Test Values</span>
+								<button
 									class="text-[10px] font-bold text-gray-500 hover:text-gray-900"
 									on:click={resetTestValues}
 								>
@@ -1438,7 +1683,7 @@
 										{#if variable.required}
 											<span class="text-red-500">*</span>
 										{/if}
-									<span class={`ml-1 ${getTypeColor(variable.type).replace('border ', 'border-')} border-2 px-1 py-0.5 rounded text-[9px]`}>
+									<span class={`ml-1 ${getTypeColor(variable.type)} px-1 py-0.5 rounded text-[9px]`}>
 										{variable.type}
 									</span>
 									</label>
@@ -1446,7 +1691,7 @@
 										<input
 											id={'test-val-' + variable.name}
 											type="text"
-											class="w-full text-xs border-2 border-gray-900 rounded-lg px-2 py-1.5 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+											class={inputBaseClass + " text-xs font-medium"}
 											placeholder={variable.defaultValue || 'Enter text...'}
 											value={testValues[variable.name] || ''}
 											on:input={(e) => updateTestValue(variable.name, e.target.value)}
@@ -1455,7 +1700,7 @@
 										<input
 											id={'test-val-' + variable.name}
 											type="url"
-											class="w-full text-xs border-2 border-gray-900 rounded-lg px-2 py-1.5 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+											class={inputBaseClass + " text-xs font-medium"}
 											placeholder="https://example.com/image.jpg"
 											value={testValues[variable.name] || ''}
 											on:input={(e) => updateTestValue(variable.name, e.target.value)}
@@ -1464,37 +1709,40 @@
 										<div class="flex gap-2">
 											<input
 												type="color"
-												class="w-10 h-8 border-2 border-gray-900 rounded-lg cursor-pointer shadow-[2px_2px_0_0_#1f2937]"
+												class="w-10 h-8 border-[2px] border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-all"
 												value={testValues[variable.name] || '#000000'}
 												on:input={(e) => updateTestValue(variable.name, e.target.value)}
 											/>
 											<input
 												id={'test-val-' + variable.name}
 												type="text"
-											class="flex-1 text-xs border-2 border-gray-900 rounded-lg px-2 py-1.5 font-mono focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+												class={inputBaseClass + " flex-1 text-xs font-mono font-medium"}
 												placeholder="#000000"
 												value={testValues[variable.name] || ''}
 												on:input={(e) => updateTestValue(variable.name, e.target.value)}
 											/>
 										</div>
 									{:else if variable.type === 'boolean'}
-										<div class="flex items-center gap-2">
-											<input
-												id={'test-val-' + variable.name}
-												type="checkbox"
-												class="w-4 h-4 border-2 border-gray-900 rounded cursor-pointer text-black focus:ring-0"
-												checked={testValues[variable.name] || false}
-												on:change={(e) => updateTestValue(variable.name, e.target.checked)}
-											/>
-											<span class="text-xs font-bold text-gray-500 uppercase">
+										<label class="flex items-center gap-3 cursor-pointer">
+											<div class="relative inline-flex items-center">
+												<input
+													id={'test-val-' + variable.name}
+													type="checkbox"
+													class="sr-only peer"
+													checked={testValues[variable.name] || false}
+													on:change={(e) => updateTestValue(variable.name, e.target.checked)}
+												/>
+												<div class={toggleSwitchClass}></div>
+											</div>
+											<span class="text-xs font-bold text-gray-600 uppercase">
 												{testValues[variable.name] ? 'true' : 'false'}
 											</span>
-										</div>
+										</label>
 									{:else if variable.type === 'number'}
 										<input
 											id={'test-val-' + variable.name}
 											type="number"
-											class="w-full text-xs border-2 border-gray-900 rounded-lg px-2 py-1.5 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+											class={inputBaseClass + " text-xs font-medium"}
 											placeholder={variable.defaultValue?.toString() || '0'}
 											value={testValues[variable.name] ?? variable.defaultValue ?? ''}
 											on:input={(e) => updateTestValue(variable.name, parseFloat(e.target.value) || 0)}
@@ -1503,7 +1751,7 @@
 									<!-- Array, Object, Chart, Table -->
 											<textarea
 												id={'test-val-' + variable.name}
-												class="w-full h-24 text-[10px] font-mono border-2 border-gray-900 rounded-lg px-2 py-1.5 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 outline-none transition-all font-medium"
+												class={"w-full h-24 text-[10px] font-mono " + inputBaseClass + " font-medium"}
 										placeholder={JSON.stringify(variable.defaultValue || {}, null, 2)}
 										value={typeof testValues[variable.name] === 'string' ? testValues[variable.name] : JSON.stringify(testValues[variable.name] || variable.defaultValue || {}, null, 2)}
 												on:input={(e) => {
@@ -1520,16 +1768,18 @@
 							{/each}
 						</div>
 				{:else}
-					<div class="text-center py-6 bg-[#FFFDF8] rounded-lg border-2 border-gray-900 border-dashed">
+					<div class="text-center py-6 bg-[#FFFDF8] rounded-lg border-[2px] border-gray-300 border-dashed">
+						<i class="fa fa-flask text-gray-300 text-xl mb-2"></i>
 						<p class="text-xs font-bold text-gray-500 uppercase">No variables to test</p>
+						<p class="text-[10px] font-medium text-gray-400 mt-1">Add variables to test your API</p>
 					</div>
 				{/if}
 
 						<!-- Guest Mode Message -->
 						{#if guestMode && !$user?.email}
-							<div class="bg-[#fff7ed] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#1f2937]">
+							<div class="bg-[#fff7ed] border-[2px] border-amber-300 rounded-lg p-3">
 								<div class="flex items-center gap-2">
-									<i class="fa fa-info-circle text-[#ffc480]"></i>
+									<i class="fa fa-info-circle text-amber-500"></i>
 									<p class="text-[10px] font-bold text-gray-900 uppercase">Free account required</p>
 								</div>
 								<p class="text-[10px] font-medium text-gray-700 mt-1">
@@ -1540,7 +1790,7 @@
 
 						<!-- Render Button -->
 						<button
-							class="w-full py-2.5 px-3 {guestMode && !$user?.email ? 'bg-[#ffc480]' : guestMode ? 'bg-[#4ade80]' : 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email ? 'gray-900' : 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_{guestMode && !$user?.email ? '#ff6b6b' : '#ffc480'}] hover:-translate-y-0.5 font-black uppercase tracking-wider border-2 border-gray-900"
+							class="w-full py-2.5 px-3 {guestMode && !$user?.email ? 'bg-[#ffc480]' : guestMode ? 'bg-[#4ade80]' : 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email ? 'gray-900' : 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_{guestMode && !$user?.email ? '#ff6b6b' : '#ffc480'}] hover:-translate-y-0.5 font-black uppercase tracking-wider border-[2px] border-gray-900"
 							on:click={handleGenerate}
 							disabled={isRendering}
 							title={guestMode && !$user?.email ? 'Sign up to generate images' : ''}
@@ -1576,27 +1826,40 @@
 								</div>
 								
 								<div class="relative group">
-									<img 
-										src={renderedImageUrl} 
+									{#if !imgLoaded}
+										<div class="w-full aspect-video rounded-lg border-[2px] border-gray-300 bg-gray-50 flex items-center justify-center">
+											<div class="flex items-center gap-2">
+												<div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+												<span class="text-xs font-bold text-gray-500 uppercase">Loading image...</span>
+											</div>
+										</div>
+									{/if}
+									<img
+										src={imgSrc}
 										alt="Rendered template"
-										class="w-full rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+										class="w-full rounded-lg border-[2px] border-gray-300 shadow-[2px_2px_0_0_#d1d5db]"
+										class:hidden={!imgLoaded}
+										on:error={handleRenderImgError}
+										on:load={handleRenderImgLoad}
 									/>
-									<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2 backdrop-blur-sm">
-										<button 
-											class="p-2 bg-white border-2 border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
-											on:click={openImageInNewTab}
-											title="Open in new tab"
-										>
-											<i class="fa fa-external-link-alt text-gray-900"></i>
-										</button>
-										<button 
-											class="p-2 bg-white border-2 border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
-											on:click={downloadImage}
-											title="Download image"
-										>
-											<i class="fa fa-download text-gray-900"></i>
-										</button>
-									</div>
+									{#if imgLoaded}
+										<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2 backdrop-blur-sm">
+											<button
+												class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
+												on:click={openImageInNewTab}
+												title="Open in new tab"
+											>
+												<i class="fa fa-external-link-alt text-gray-900"></i>
+											</button>
+											<button
+												class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
+												on:click={downloadImage}
+												title="Download image"
+											>
+												<i class="fa fa-download text-gray-900"></i>
+											</button>
+										</div>
+									{/if}
 								</div>
 								
 								<!-- Action buttons row -->
@@ -1624,14 +1887,14 @@
 								
 								<!-- Guest mode signup CTA -->
 								{#if guestMode}
-									<div class="bg-[#f0fdf4] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#4ade80]">
+									<div class="bg-[#f0fdf4] border-[2px] border-green-300 rounded-lg p-3">
 										<p class="text-xs font-bold text-gray-700 mb-2">
 											<i class="fa fa-star text-[#ffc480] mr-1"></i>
 											Sign up to save your template and automate variants via API.
 										</p>
 										<button
-											class="w-full py-2 bg-[#ff6b6b] text-white border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-											on:click={saveAndSignup}
+											class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+											on:click={saveAndShowAuth}
 										>
 											Create free account
 										</button>
@@ -1651,22 +1914,22 @@
 								{/if}
 							</div>
 							
-							<div class="bg-green-50 border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#22c55e]">
+							<div class="bg-green-50 border-[2px] border-green-300 rounded-lg p-3">
 								<div class="flex items-center gap-2 mb-2">
 									<i class="fa fa-file-pdf text-red-500 text-lg"></i>
 									<span class="text-xs font-bold text-gray-900">PDF Generated Successfully!</span>
 								</div>
-								
+
 								<!-- URL Display -->
-								<div class="bg-white border-2 border-gray-300 rounded-lg p-2 mb-3">
+								<div class="bg-white border-[2px] border-gray-300 rounded-lg p-2 mb-3">
 									<p class="text-[10px] font-bold text-gray-500 uppercase mb-1">PDF URL</p>
 									<p class="text-xs font-mono text-gray-700 break-all select-all">{renderedPdfUrl}</p>
 								</div>
-								
+
 								<!-- Action Buttons -->
 								<div class="flex gap-2">
-									<button 
-										class="flex-1 py-2 bg-white border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1.5"
+									<button
+										class="flex-1 py-2 bg-white border-[2px] border-gray-300 rounded-lg font-black text-xs uppercase hover:border-gray-400 transition-all flex items-center justify-center gap-1.5"
 										on:click={() => {
 											navigator.clipboard.writeText(renderedPdfUrl);
 											toast.set({ message: 'PDF URL copied!', type: 'success', duration: 1500 });
@@ -1675,8 +1938,8 @@
 										<i class="fa fa-copy"></i>
 										Copy URL
 									</button>
-									<button 
-										class="flex-1 py-2 bg-[#ffc480] border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1.5"
+									<button
+										class="flex-1 py-2 bg-[#ffc480] border-[2px] border-amber-500 rounded-lg font-black text-xs uppercase hover:border-amber-600 transition-all flex items-center justify-center gap-1.5"
 										on:click={() => window.open(renderedPdfUrl, '_blank')}
 									>
 										<i class="fa fa-external-link-alt"></i>
@@ -1684,17 +1947,17 @@
 									</button>
 								</div>
 							</div>
-							
+
 							<!-- Guest mode signup CTA for PDF -->
 							{#if guestMode}
-								<div class="bg-[#f0fdf4] border-2 border-gray-900 rounded-lg p-3 shadow-[2px_2px_0_0_#4ade80]">
+								<div class="bg-[#f0fdf4] border-[2px] border-green-300 rounded-lg p-3">
 									<p class="text-xs font-bold text-gray-700 mb-2">
 										<i class="fa fa-star text-[#ffc480] mr-1"></i>
 										Sign up to save your template and automate PDF generation via API.
 									</p>
 									<button
-										class="w-full py-2 bg-[#ff6b6b] text-white border-2 border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-										on:click={saveAndSignup}
+										class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										on:click={saveAndShowAuth}
 									>
 										Create free account
 									</button>
@@ -1704,7 +1967,7 @@
 					{/if}
 					
 					{#if renderError}
-						<div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]">
+						<div class="bg-red-50 border-[2px] border-red-200 rounded-lg p-3 shadow-[2px_2px_0_0_#ef4444]" role="alert">
 							<p class="text-xs font-bold text-red-800 uppercase">
 								<i class="fa fa-exclamation-circle mr-1"></i>
 								{renderError}
@@ -1713,29 +1976,31 @@
 					{/if}
 						
 						<!-- Request Details -->
-						<div class="pt-3 border-t-2 border-gray-900">
-							<button 
-								class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity mb-2"
+						<div class="pt-3 border-t border-gray-200">
+							<button
+								class="w-full flex items-center justify-between text-left group mb-2"
+								aria-expanded={showRequestDetails}
 								on:click={() => showRequestDetails = !showRequestDetails}
 							>
-								<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Request Details</span>
-								<i class="fa fa-chevron-{showRequestDetails ? 'up' : 'down'} text-[10px] text-gray-900"></i>
+								<span class={sectionHeaderClass}>Request Details</span>
+								<i class="fa fa-chevron-{showRequestDetails ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
 							</button>
-							
+
 							{#if showRequestDetails}
-								<div class="space-y-2">
-									<div class="bg-gray-900 rounded-lg p-3 relative border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
-										<button 
+								<div class="space-y-2" transition:slide={{duration: 150}}>
+									<div class="bg-gray-900 rounded-lg p-3 relative border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+										<button
 											class="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
 											on:click={copyCurlCommand}
+											aria-label="Copy cURL command to clipboard"
 											title="Copy cURL command"
 										>
 											<i class="fa fa-copy text-[10px]"></i>
 										</button>
 										<pre class="text-[10px] text-green-400 overflow-x-auto whitespace-pre-wrap font-mono"><code>{generateCurlCommand()}</code></pre>
 									</div>
-									
-									<div class="bg-gray-100 border-2 border-gray-900 rounded-lg p-2 shadow-[2px_2px_0_0_#1f2937]">
+
+									<div class="bg-gray-100 border-[2px] border-gray-300 rounded-lg p-2">
 										<p class="text-[10px] text-gray-600 mb-1 font-bold uppercase tracking-wide">Request Body:</p>
 										<pre class="text-[10px] text-gray-800 font-mono overflow-x-auto font-medium"><code>{JSON.stringify({ variables: testValues }, null, 2)}</code></pre>
 									</div>
@@ -1748,33 +2013,86 @@
 			
 	<!-- Delete Confirmation Modal -->
 	{#if showDeleteConfirm}
-		<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] p-6 max-w-sm mx-4">
-				<div class="text-center">
-					<div class="w-12 h-12 mx-auto mb-4 bg-red-100 border-2 border-red-200 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#ef4444]">
-						<i class="fa fa-trash text-red-600 text-xl"></i>
-					</div>
-					<h4 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-wide">Delete Variable?</h4>
-					<p class="text-sm font-medium text-gray-600 mb-4">
-						Are you sure you want to delete <span class="font-mono font-bold text-gray-900 bg-gray-100 px-1 rounded">"{variableToDelete?.name}"</span>? 
-						{#if variableToDelete?.source === 'property'}
-							This will also remove the variable from the associated element.
-						{/if}
-					</p>
-					<div class="flex gap-3">
-				<button 
-							class="flex-1 py-2 px-4 border-[2px] border-gray-900 rounded-lg text-sm font-black text-gray-900 hover:bg-gray-50 transition-all uppercase tracking-wider shadow-[2px_2px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5"
-							on:click={() => { showDeleteConfirm = false; variableToDelete = null; }}
-				>
-							Cancel
-				</button>
-							<button 
-							class="flex-1 py-2 px-4 bg-red-600 text-white border-2 border-gray-900 rounded-lg text-sm font-black hover:bg-red-700 transition-all uppercase tracking-wider shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5"
-							on:click={deleteVariable}
-							>
-							Delete
-							</button>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			role="alertdialog"
+			aria-modal="true"
+			aria-labelledby="delete-dialog-title"
+			on:click|self={() => { showDeleteConfirm = false; variableToDelete = null; }}
+			on:keydown={(e) => { if (e.key === 'Escape') { showDeleteConfirm = false; variableToDelete = null; } }}
+		>
+			<div class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-sm w-full relative overflow-hidden">
+				<!-- Red header strip -->
+				<div class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b-[3px] border-gray-900 z-10"></div>
+				<!-- Decorative bg pattern -->
+				<div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px]"></div>
+
+				<div class="p-6 pt-5 relative z-10">
+					<!-- Close button -->
+					<button
+						class="absolute top-4 right-4 p-1 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						on:click={() => { showDeleteConfirm = false; variableToDelete = null; }}
+						aria-label="Close dialog"
+					>
+						<i class="fa fa-times text-sm"></i>
+					</button>
+
+					<div class="text-center">
+						<div class="w-14 h-14 mx-auto mb-4 mt-2 bg-red-100 border-[3px] border-gray-900 rounded-full flex items-center justify-center shadow-[4px_4px_0_0_#1f2937]">
+							<i class="fa fa-trash text-red-600 text-xl"></i>
 						</div>
+
+						{#if selectedCount > 0 && !variableToDelete}
+							<!-- Multi-delete mode -->
+							<h4 id="delete-dialog-title" class="text-lg font-black text-gray-900 mb-2 uppercase tracking-wider">Delete {selectedCount} Variable{selectedCount > 1 ? 's' : ''}&nbsp;&nbsp;?</h4>
+							<p class="text-sm font-medium text-gray-600 mb-3">This action cannot be undone.</p>
+							<div class="flex flex-wrap gap-1.5 justify-center mb-5">
+								{#each [...selectedVariableNames] as name}
+									<span class="font-mono font-bold text-gray-900 bg-[#ffc480] px-2 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]">{name}</span>
+								{/each}
+							</div>
+							<div class="flex gap-3">
+								<button
+									class="flex-1 py-2.5 px-4 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-black text-gray-900 uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									on:click={() => { showDeleteConfirm = false; }}
+								>
+									Cancel
+								</button>
+								<button
+									class="flex-1 py-2.5 px-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									on:click={deleteSelectedVariables}
+								>
+									Delete {selectedCount}
+								</button>
+							</div>
+						{:else}
+							<!-- Single delete mode -->
+							<h4 id="delete-dialog-title" class="text-lg font-black text-gray-900 mb-2 uppercase tracking-wider">Delete Variable?</h4>
+							<p class="text-sm font-medium text-gray-600 mb-5">
+								Are you sure you want to delete
+								<span class="font-mono font-bold text-gray-900 bg-[#ffc480] px-1.5 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]">"{variableToDelete?.name}"</span>&nbsp;&nbsp;?
+								{#if variableToDelete?.source === 'property'}
+									<br/><span class="text-xs text-gray-500 mt-1 inline-block">This will also remove the variable from the associated element.</span>
+								{/if}
+							</p>
+							<div class="flex gap-3">
+								<button
+									class="flex-1 py-2.5 px-4 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-black text-gray-900 uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									on:click={() => { showDeleteConfirm = false; variableToDelete = null; }}
+								>
+									Cancel
+								</button>
+								<button
+									class="flex-1 py-2.5 px-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									on:click={deleteVariable}
+								>
+									Delete
+								</button>
+							</div>
+						{/if}
+					</div>
 						</div>
 						</div>
 					</div>

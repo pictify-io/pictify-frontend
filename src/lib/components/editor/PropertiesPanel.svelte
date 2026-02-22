@@ -1,16 +1,26 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
+	import { slide } from 'svelte/transition';
 	import { Gradient, filters, FabricImage, Rect, Path, Circle, Ellipse } from 'fabric';
 	import { selectedComponent, editor, editorActions } from '../../../store/editor.store';
 	import { variableActions, variables as variablesStore, variableNames } from '../../../store/variables.store';
+	import CodeMirror from 'svelte-codemirror-editor';
+	import { json } from '@codemirror/lang-json';
 	import GradientColorPicker from './GradientColorPicker.svelte';
 	import ConditionBuilder from './ConditionBuilder.svelte';
 	import { getRoundedRectPath } from '../../utils/shape-utils';
 	import { BACKGROUND_REMOVER_CONFIG, isBackgroundRemoverAvailable, getModelInfo, SERVER_SIDE_BENEFITS } from '../../config/background-remover.js';
 	import backend from '../../../service/backend';
+	import { showToast } from '../../../store/toast.store';
 	import { getAllFonts, preloadFonts, searchFonts, addGoogleFont, CATEGORY_LABELS, CATEGORY_ICONS } from '../../../api/fonts';
 	import { outputFormat, pdfPreset, pageActions } from '../../../store/pages.store';
 	import { loadBrandFonts, getBrandFontFamilies } from '../../utils/brand-fonts-loader';
+	import {
+		checkFeatureAccessSync,
+		FEATURES,
+		PLAN_DISPLAY_NAMES,
+		getMinimumPlan
+	} from '../../../store/plg.store';
 	import {
 		createQRCode,
 		updateQRCode,
@@ -20,12 +30,26 @@
 		ERROR_CORRECTION_OPTIONS
 	} from '../../utils/fabric-qr';
 
+	// Numeric input validation helper
+	function clampNumber(value, min, max, fallback = 0) {
+		const num = parseFloat(value);
+		if (isNaN(num)) return fallback;
+		return Math.min(Math.max(num, min), max);
+	}
+
+	// --- Typography & Styling Hierarchy ---
+	// Section headers: visible section titles (Appearance, Size & Position, Effects, etc.)
+	const sectionHeaderClass = "text-[11px] font-bold text-gray-900 uppercase tracking-wide";
+	// Field labels: individual input labels (Width, Height, Font Family, etc.)
+	const fieldLabelClass = "block text-[11px] font-medium text-gray-500 mb-1";
+
 	// Neo-brutalist input styling constants
-	const inputBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
+	const inputBaseClass = "w-full text-sm border-[2px] border-gray-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all";
 	const inputNumberClass = inputBaseClass;
-	const buttonBaseClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white hover:bg-gray-50 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] transition-all";
-	const selectClass = "w-full text-sm border-[3px] border-gray-900 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#e5e7eb] transition-all";
-	const rangeInputClass = "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ffc480] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-gray-900 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-900 hover:[&::-webkit-slider-thumb]:bg-[#ffc480] [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-gray-900 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-900 hover:[&::-moz-range-thumb]:bg-[#ffc480]";
+	const buttonBaseClass = "w-full text-sm border-[2px] border-gray-300 rounded-lg px-3 py-1.5 bg-white hover:bg-gray-50 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all";
+	const selectClass = "w-full text-sm border-[2px] border-gray-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all";
+	const toggleSwitchClass = "w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black";
+	const rangeInputClass = "w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ffc480] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-gray-900 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-900 hover:[&::-webkit-slider-thumb]:bg-[#ffc480] [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:bg-gray-900 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-900 hover:[&::-moz-range-thumb]:bg-[#ffc480]";
 
 	let styles = {};
 	let content = '';
@@ -84,7 +108,13 @@
 	let isRemovingBackground = false;
 	let backgroundRemovalError = null;
 	let originalImageUrl = null; // Store original for undo
-	
+
+	// Feature gating for AI Background Remover
+	$: bgRemoverAccess = checkFeatureAccessSync(FEATURES.AI_BACKGROUND_REMOVER);
+	$: hasBgRemoverAccess = bgRemoverAccess?.hasAccess ?? false;
+	$: bgRemoverMinPlan = getMinimumPlan(FEATURES.AI_BACKGROUND_REMOVER);
+	$: bgRemoverMinPlanName = PLAN_DISPLAY_NAMES[bgRemoverMinPlan];
+
 	// Image clip/mask state
 	let currentClipShape = 'none'; // 'none', 'circle', 'ellipse', 'rounded-rect'
 	let clipCornerRadius = 20;
@@ -100,21 +130,46 @@
 	let variableBindings = []; // Array of { variableName, property, description, required }
 	
 	// Conditional logic state
-	let showConditionPanel = false;
 	let conditionType = 'none'; // 'none', 'showWhen', 'hideWhen'
 	let conditionExpression = '';
 	let conditionValid = true;
 	let conditionError = '';
 	
 	// Loop state
-	let showLoopPanel = false;
 	let isLoopElement = false;
 	
 	// Panel mode: 'design' | 'logic'
 	let panelMode = 'design';
+
+	// Collapsible section states
+	let showPositionSection = true;
+	let showAppearanceSection = true;
+	let showShadowSection = false;
+	let showTextSection = true;
 	
+	// Logic tab accordion section states
+	let showVariablesSection = true;
+	let showConditionSection = true;
+	let showLoopSection = true;
+	let showApiPreview = false;
+
+	// Validation state
+	let variableNameErrors = {};
+	let loopVariableError = '';
+	let strippedCharsMessage = '';
+	let strippedCharsTimeout = null;
+
+	// Destructive action confirmation
+	let pendingDestructiveAction = null;
+
 	// Check if element has any logic configured
 	$: hasLogicConfigured = isVariable || conditionType !== 'none' || isLoopElement;
+
+	// Computed: available vars for condition builder
+	$: conditionAvailableVars = variableBindings.map(b => b.variableName).filter(Boolean);
+	// Computed: set of bound properties for Design tab indicators
+	$: boundProperties = new Set(variableBindings.map(b => b.property));
+
 	let loopVariable = '';
 	let loopItemName = 'item';
 	let loopIndexName = 'index';
@@ -133,13 +188,74 @@
 	let showChartDataEditor = false;
 	let chartDataInput = '';
 	let chartDataFormat = 'json'; // 'json' or 'csv'
-	
+	let maximizeChartEditor = false;
+
 	// Table data editing state
 	let showTableDataEditor = false;
 	let tableDataInput = '';
 	let tableDataFormat = 'json'; // 'json' or 'csv'
 	let tableDataError = '';
 	let chartDataError = '';
+	let maximizeTableEditor = false;
+
+	// Chart appearance customization
+	let chartFontFamily = 'Inter';
+	let chartColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dfe6e9', '#fd79a8', '#a29bfe', '#6c5ce7', '#00b894'];
+	let chartTitleColor = '#333333';
+	let chartLabelColor = '#666666';
+	let chartGridColor = '#eeeeee';
+	let chartBackgroundColor = '#ffffff';
+	let chartBorderColor = '#e5e5e5';
+	let showChartAppearance = false;
+
+	// Chart color palette presets
+	const CHART_PALETTES = {
+		default: { name: 'Default', colors: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'] },
+		warm: { name: 'Warm', colors: ['#ff6b6b', '#ff8c42', '#ffd166', '#f4845f', '#e76f51'] },
+		cool: { name: 'Cool', colors: ['#4ecdc4', '#45b7d1', '#6c5ce7', '#a29bfe', '#74b9ff'] },
+		pastel: { name: 'Pastel', colors: ['#ffc8dd', '#bde0fe', '#a2d2ff', '#cdb4db', '#d5bdaf'] },
+		mono: { name: 'Mono', colors: ['#2d3436', '#636e72', '#b2bec3', '#dfe6e9', '#f5f5f5'] }
+	};
+
+	// Simple font list for chart/table font dropdown
+	const CHART_FONT_OPTIONS = [
+		'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins',
+		'PT Sans', 'Source Sans Pro', 'system-ui'
+	];
+
+	// Table appearance customization
+	let tableFontFamily = 'Inter';
+	let tableCustomColors = null; // null = use preset, object = custom overrides
+	let showTableCustomize = false;
+
+	// QR Code section collapse state
+	let showQRAppearance = true;
+	let showQRContent = true;
+	let showQRErrorCorrection = false;
+
+	// Format CSV with proper alignment for readability
+	function formatCSV(csvText) {
+		if (!csvText || !csvText.trim()) return csvText;
+		const lines = csvText.trim().split('\n').map(l => l.split(',').map(c => c.trim()));
+		if (lines.length === 0) return csvText;
+		const colWidths = [];
+		for (const row of lines) {
+			row.forEach((cell, i) => {
+				colWidths[i] = Math.max(colWidths[i] || 0, cell.length);
+			});
+		}
+		return lines.map(row =>
+			row.map((cell, i) => cell.padEnd(colWidths[i] || 0)).join(', ')
+		).join('\n');
+	}
+
+	function formatChartCSV() {
+		if (chartDataFormat === 'csv') chartDataInput = formatCSV(chartDataInput);
+	}
+
+	function formatTableCSV() {
+		if (tableDataFormat === 'csv') tableDataInput = formatCSV(tableDataInput);
+	}
 	
 	// QR Code state
 	let isQRCode = false;
@@ -271,6 +387,7 @@
 			}
 		} catch (error) {
 			addFontError = error.message || 'Failed to add font';
+			showToast('Failed to load font: ' + (error.message || 'Unknown error'), 'error');
 		} finally {
 			addingFont = false;
 		}
@@ -279,10 +396,28 @@
 	// Simple font names array for backward compatibility
 	$: fonts = allFonts.map(f => f.family);
 
+	// Font dropdown click-outside and Escape key handler
+	let fontDropdownRef;
+	function handleFontDropdownClickOutside(e) {
+		if (isFontDropdownOpen && fontDropdownRef && !fontDropdownRef.contains(e.target)) {
+			isFontDropdownOpen = false;
+		}
+	}
+	function handleFontDropdownKeydown(e) {
+		if (e.key === 'Escape' && isFontDropdownOpen) {
+			isFontDropdownOpen = false;
+		}
+	}
+
 	const DEFAULT_FILL = '#000000';
 	const DEFAULT_BACKGROUND = '#ffffff';
 
 	onMount(async () => {
+		// Font dropdown click-outside listener
+		if (typeof window !== 'undefined') {
+			window.addEventListener('click', handleFontDropdownClickOutside);
+			window.addEventListener('keydown', handleFontDropdownKeydown);
+		}
 		// Fetch fonts from API
 		try {
 			const response = await getAllFonts();
@@ -311,8 +446,6 @@
 
 					// Prepend brand fonts to show them first
 					allFonts = [...brandFontObjects, ...allFonts];
-
-					console.log('📝 Added brand fonts to font list:', brandFonts);
 				}
 			} catch (error) {
 				console.warn('Failed to load brand fonts:', error);
@@ -373,7 +506,6 @@
 		// Set new timer - fire event after 300ms of no changes
 		propertyChangeTimer = setTimeout(() => {
 			if ($editor && target) {
-				console.log('🔥 Firing object:modified for', target.type);
 				$editor.fire('object:modified', { target });
 			}
 			propertyChangeTimer = null;
@@ -383,12 +515,17 @@
 	
 	
 	onDestroy(() => {
+		// Clean up font dropdown listeners
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('click', handleFontDropdownClickOutside);
+			window.removeEventListener('keydown', handleFontDropdownKeydown);
+		}
+
 		if (propertyChangeTimer) {
 			clearTimeout(propertyChangeTimer);
 			// If there's a pending change when panel closes, fire it immediately
 			// This ensures we catch the last change before user navigates away or switches selection
 			if ($editor && pendingTarget) {
-				console.log('🔥 Firing pending object:modified on destroy');
 				$editor.fire('object:modified', { target: pendingTarget });
 			}
 		}
@@ -562,11 +699,21 @@
 			// Auto-populate chart data editor with current data
 			chartDataError = '';
 			loadSampleChartData();
+
+			// Load chart appearance from config
+			const cc = obj.chartConfig || {};
+			chartFontFamily = (cc.fontFamily || 'Inter, system-ui, sans-serif').split(',')[0].trim();
+			chartColors = cc.colors || ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dfe6e9', '#fd79a8', '#a29bfe', '#6c5ce7', '#00b894'];
+			chartTitleColor = cc.titleColor || '#333333';
+			chartLabelColor = cc.labelColor || '#666666';
+			chartGridColor = cc.gridColor || '#eeeeee';
+			chartBackgroundColor = cc.backgroundColor || '#ffffff';
+			chartBorderColor = cc.borderColor || '#e5e5e5';
 		}
 		if (isTable) {
 			tableType = obj.tableType || 'standard';
 			tableStyle = obj.tableStyle || obj.tableConfig?.style || 'modern';
-			
+
 			// Load data based on table type
 			if (tableType === 'stats') {
 				tableData = {
@@ -583,10 +730,20 @@
 					rows: obj.tableRows || obj.tableConfig?.rows || []
 				};
 			}
-			
+
 			// Auto-populate table data editor with current data
 			tableDataError = '';
 			loadSampleTableData();
+
+			// Load table appearance from config
+			const tc = obj.tableConfig || {};
+			tableFontFamily = (tc.fontFamily || 'Inter, system-ui, sans-serif').split(',')[0].trim();
+			const currentTableStyle = TABLE_STYLES[tableStyle] || TABLE_STYLES.modern;
+			if (tc.customStyle) {
+				tableCustomColors = { ...tc.customStyle };
+			} else {
+				tableCustomColors = null;
+			}
 		}
 		
 		// Load QR code state
@@ -677,7 +834,6 @@
 			if (!$selectedComponent.id) {
 				const uniqueId = `obj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 				$selectedComponent.set('id', uniqueId);
-				console.log('Generated ID for variable object:', uniqueId);
 			}
 			
 			// Add initial binding if none exist
@@ -800,15 +956,21 @@
 	// Update a specific binding
 	function updateVariableBinding(index, field, value) {
 		if (!$selectedComponent || !$editor) return;
-		
+
 		if (field === 'variableName') {
+			const original = value;
 			value = value.replace(/[^a-zA-Z0-9_]/g, '');
+			showStrippedFeedback(original, value);
 		}
-		
-		variableBindings = variableBindings.map((b, i) => 
+
+		variableBindings = variableBindings.map((b, i) =>
 			i === index ? { ...b, [field]: value } : b
 		);
-		
+
+		if (field === 'variableName') {
+			validateAllBindings();
+		}
+
 		saveVariableBindings();
 	}
 	
@@ -859,26 +1021,34 @@
 	}
 	
 	// Conditional logic update functions
-	function updateConditionType(type) {
+	function updateConditionType(newType) {
 		if (!$selectedComponent || !$editor) return;
-		
+
+		// Confirm when switching to 'none' and there's a configured expression
+		if (newType === 'none' && conditionType !== 'none' && conditionExpression) {
+			requestConfirmation('condition', () => _applyConditionType(newType));
+			return;
+		}
+		_applyConditionType(newType);
+	}
+
+	function _applyConditionType(type) {
 		conditionType = type;
-		
+
 		// Clear old condition properties
 		$selectedComponent.set('showWhen', null);
 		$selectedComponent.set('hideWhen', null);
-		
+
 		// Set new condition - use empty string as placeholder if no expression yet
-		// This ensures the property exists so loadVariableState can detect it
 		if (type === 'showWhen') {
 			$selectedComponent.set('showWhen', conditionExpression || '');
 		} else if (type === 'hideWhen') {
 			$selectedComponent.set('hideWhen', conditionExpression || '');
 		}
-		
+
 		$editor.renderAll();
 		debouncedPropertyChange($selectedComponent);
-		
+
 		// Sync with centralized variables store
 		variableActions.syncFromCanvas($editor);
 	}
@@ -937,12 +1107,21 @@
 	// Loop update functions
 	function toggleLoop(enabled) {
 		if (!$selectedComponent || !$editor) return;
-		
+
+		// Confirm when disabling a configured loop
+		if (!enabled && isLoopElement && loopVariable) {
+			requestConfirmation('loop', () => _applyLoopToggle(false));
+			return;
+		}
+		_applyLoopToggle(enabled);
+	}
+
+	function _applyLoopToggle(enabled) {
+		if (!$selectedComponent || !$editor) return;
+
 		isLoopElement = enabled;
-		
+
 		if (enabled) {
-			// Set empty string (not null) to indicate loop is enabled
-			// This distinguishes "loop enabled but no variable yet" from "loop disabled"
 			$selectedComponent.set('loopVariable', loopVariable || '');
 			$selectedComponent.set('loopItemName', loopItemName || 'item');
 			$selectedComponent.set('loopIndexName', loopIndexName || 'index');
@@ -950,7 +1129,7 @@
 			$selectedComponent.set('loopSpacing', loopSpacing || 50);
 			$selectedComponent.set('loopColumns', loopColumns || 3);
 		} else {
-			// Set to null to indicate loop is disabled
+			// Null on canvas but preserve local state for re-enable
 			$selectedComponent.set('loopVariable', null);
 			$selectedComponent.set('loopItemName', null);
 			$selectedComponent.set('loopIndexName', null);
@@ -1008,7 +1187,98 @@
 		$selectedComponent.set('loopColumns', loopColumns);
 		debouncedPropertyChange($selectedComponent);
 	}
-	
+
+	function updateLoopGap(gap) {
+		if (!$selectedComponent || !$editor) return;
+		loopSpacing = parseInt(gap) || 0;
+		$selectedComponent.set('loopSpacing', loopSpacing);
+		debouncedPropertyChange($selectedComponent);
+	}
+
+	// --- Validation helpers ---
+
+	function validateVariableName(name, index) {
+		if (!name || !name.trim()) return 'Variable name is required';
+		if (!/^[a-zA-Z_]/.test(name)) return 'Must start with a letter or underscore';
+		if (!/^[a-zA-Z0-9_]+$/.test(name)) return 'Only letters, numbers, and underscores allowed';
+		// Check duplicates across other bindings
+		const isDuplicate = variableBindings.some((b, i) => i !== index && b.variableName === name);
+		if (isDuplicate) return 'Duplicate variable name';
+		return '';
+	}
+
+	function validateAllBindings() {
+		const errors = {};
+		variableBindings.forEach((b, i) => {
+			const err = validateVariableName(b.variableName, i);
+			if (err) errors[i] = err;
+		});
+		variableNameErrors = errors;
+	}
+
+	function validateLoopVariable(name) {
+		if (!name || !name.trim()) {
+			loopVariableError = 'Loop variable name is required';
+			return;
+		}
+		if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+			loopVariableError = 'Only letters, numbers, and underscores allowed';
+			return;
+		}
+		loopVariableError = '';
+	}
+
+	function showStrippedFeedback(original, sanitized) {
+		if (original !== sanitized) {
+			strippedCharsMessage = `"${original}" → "${sanitized}" (special characters removed)`;
+			if (strippedCharsTimeout) clearTimeout(strippedCharsTimeout);
+			strippedCharsTimeout = setTimeout(() => { strippedCharsMessage = ''; }, 4000);
+		}
+	}
+
+	function buildApiPreviewJson() {
+		return variableBindings.reduce((acc, b) => {
+			if (b.property === 'chartData') {
+				acc[b.variableName || 'chart_data'] = [{"label": "A", "value": 10}];
+			} else if (b.property === 'tableData') {
+				acc[b.variableName || 'table_data'] = {"headers": ["..."], "rows": [["..."]]};
+			} else if (b.property === 'src') {
+				acc[b.variableName || 'image_url'] = "https://...";
+			} else if (b.property === 'fill' || b.property === 'stroke') {
+				acc[b.variableName || 'color'] = "#ff0000";
+			} else if (b.property === 'opacity') {
+				acc[b.variableName || 'opacity'] = 0.8;
+			} else if (b.property === 'fontSize' || b.property === 'strokeWidth') {
+				acc[b.variableName || 'size'] = 24;
+			} else {
+				acc[b.variableName || 'variable'] = "value";
+			}
+			return acc;
+		}, {});
+	}
+
+	// --- Destructive action confirmation helpers ---
+
+	function requestConfirmation(type, callback) {
+		pendingDestructiveAction = { type, callback };
+		// Scroll the confirmation into view after Svelte renders it
+		setTimeout(() => {
+			const modal = document.querySelector('[role="alertdialog"]');
+			if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		}, 50);
+	}
+
+	function confirmDestructiveAction() {
+		if (pendingDestructiveAction) {
+			pendingDestructiveAction.callback();
+			pendingDestructiveAction = null;
+		}
+	}
+
+	function cancelDestructiveAction() {
+		pendingDestructiveAction = null;
+	}
+
 	// Chart/Table update functions
 	async function updateChartData(parsedData = null) {
 		if (!$selectedComponent || !$editor || !isChart) return;
@@ -1048,28 +1318,30 @@
 			
 		} catch (error) {
 			console.error('Failed to update chart data:', error);
+			showToast('Failed to update chart data: ' + (error.message || 'Unknown error'), 'error');
 		}
 	}
-	
+
 	async function updateTableData(newHeaders, newRows) {
 		if (!$selectedComponent || !$editor || !isTable) return;
-		
+
 		try {
 			const { updateTableData: updateTable } = await import('../../utils/fabric-table');
-			
+
 			const newTableData = {};
 			if (newHeaders) newTableData.headers = newHeaders;
 			if (newRows) newTableData.rows = newRows;
-			
+
 			const newTable = updateTable($selectedComponent, newTableData);
-			
+
 			$editor.remove($selectedComponent);
 			$editor.add(newTable);
 			$editor.setActiveObject(newTable);
 			$editor.renderAll();
-			
+
 		} catch (error) {
 			console.error('Failed to update table data:', error);
+			showToast('Failed to update table data: ' + (error.message || 'Unknown error'), 'error');
 		}
 	}
 	
@@ -1448,11 +1720,12 @@
 				variableBindings: $selectedComponent.variableBindings || []
 			};
 			
-			// Get current table config and update style
+			// Get current table config and update style, removing custom overrides
 			const currentConfig = $selectedComponent.tableConfig || {};
 			const newConfig = {
 				...currentConfig,
-				style: newStyle
+				style: newStyle,
+				customStyle: null
 			};
 			
 			let newTable;
@@ -1484,13 +1757,171 @@
 				$editor.renderAll();
 				
 				tableStyle = newStyle;
+				// Clear custom colors when switching presets
+				tableCustomColors = null;
 			}
-			
+
 		} catch (error) {
 			console.error('Failed to change table style:', error);
+			showToast('Failed to change table style', 'error');
 		}
 	}
-	
+
+	// Chart appearance update
+	async function updateChartAppearance() {
+		if (!$selectedComponent || !$editor || !isChart) return;
+
+		try {
+			const { createBarChart, createLineChart, createPieChart, createHorizontalBarChart } = await import('../../utils/fabric-chart');
+
+			const position = {
+				left: $selectedComponent.left,
+				top: $selectedComponent.top,
+				scaleX: $selectedComponent.scaleX,
+				scaleY: $selectedComponent.scaleY,
+				angle: $selectedComponent.angle
+			};
+
+			const variableProps = {
+				isVariable: $selectedComponent.isVariable,
+				variableBindings: $selectedComponent.variableBindings || []
+			};
+
+			const fontFamilyValue = chartFontFamily === 'system-ui' ? 'system-ui, sans-serif' : `${chartFontFamily}, system-ui, sans-serif`;
+
+			const currentConfig = $selectedComponent.chartConfig || {};
+			const newConfig = {
+				...currentConfig,
+				colors: [...chartColors],
+				titleColor: chartTitleColor,
+				labelColor: chartLabelColor,
+				gridColor: chartGridColor,
+				backgroundColor: chartBackgroundColor,
+				borderColor: chartBorderColor,
+				fontFamily: fontFamilyValue
+			};
+
+			let newChart;
+			switch (chartType) {
+				case 'bar':
+					newChart = createBarChart(newConfig);
+					break;
+				case 'line':
+					newChart = createLineChart(newConfig);
+					break;
+				case 'pie':
+					newChart = createPieChart(newConfig);
+					break;
+				case 'donut':
+					newChart = createPieChart({ ...newConfig, donut: true });
+					break;
+				case 'horizontal-bar':
+					newChart = createHorizontalBarChart(newConfig);
+					break;
+				default:
+					return;
+			}
+
+			if (newChart) {
+				newChart.set(position);
+				newChart.set(variableProps);
+
+				$editor.remove($selectedComponent);
+				$editor.add(newChart);
+				$editor.setActiveObject(newChart);
+				$editor.renderAll();
+			}
+		} catch (error) {
+			console.error('Failed to update chart appearance:', error);
+			showToast('Failed to update chart appearance', 'error');
+		}
+	}
+
+	// Table appearance update
+	async function updateTableAppearance() {
+		if (!$selectedComponent || !$editor || !isTable) return;
+
+		try {
+			const { createTable, createStatsTable, createComparisonTable } = await import('../../utils/fabric-table');
+
+			const position = {
+				left: $selectedComponent.left,
+				top: $selectedComponent.top,
+				scaleX: $selectedComponent.scaleX,
+				scaleY: $selectedComponent.scaleY,
+				angle: $selectedComponent.angle
+			};
+
+			const variableProps = {
+				isVariable: $selectedComponent.isVariable,
+				variableBindings: $selectedComponent.variableBindings || []
+			};
+
+			const fontFamilyValue = tableFontFamily === 'system-ui' ? 'system-ui, sans-serif' : `${tableFontFamily}, system-ui, sans-serif`;
+
+			const currentConfig = $selectedComponent.tableConfig || {};
+			const newConfig = {
+				...currentConfig,
+				fontFamily: fontFamilyValue
+			};
+
+			// Apply custom colors if set
+			if (tableCustomColors) {
+				newConfig.customStyle = { ...tableCustomColors };
+			}
+
+			let newTable;
+			if (tableType === 'stats') {
+				newConfig.stats = $selectedComponent.tableData || tableData.stats;
+				newTable = createStatsTable(newConfig);
+			} else if (tableType === 'comparison') {
+				newConfig.features = $selectedComponent.tableFeatures || tableData.features;
+				newConfig.plans = $selectedComponent.tablePlans || tableData.plans;
+				newTable = createComparisonTable(newConfig);
+			} else {
+				newConfig.headers = $selectedComponent.tableHeaders || tableData.headers;
+				newConfig.rows = $selectedComponent.tableRows || tableData.rows;
+				newTable = createTable(newConfig);
+			}
+
+			if (newTable) {
+				newTable.set(position);
+				newTable.set(variableProps);
+				newTable.set('tableStyle', tableStyle);
+
+				$editor.remove($selectedComponent);
+				$editor.add(newTable);
+				$editor.setActiveObject(newTable);
+				$editor.renderAll();
+			}
+		} catch (error) {
+			console.error('Failed to update table appearance:', error);
+			showToast('Failed to update table appearance', 'error');
+		}
+	}
+
+	// Reset table custom colors to current preset
+	function resetTableToPreset() {
+		tableCustomColors = null;
+		tableFontFamily = 'Inter';
+		updateTableAppearance();
+	}
+
+	// Initialize table custom colors from current style
+	function initTableCustomColors() {
+		const currentStyle = TABLE_STYLES[tableStyle] || TABLE_STYLES.modern;
+		tableCustomColors = {
+			headerBg: currentStyle.headerBg,
+			headerText: currentStyle.headerText,
+			rowBg: currentStyle.rowBg,
+			altRowBg: currentStyle.altRowBg,
+			borderColor: currentStyle.borderColor,
+			textColor: currentStyle.textColor,
+			headerFontWeight: currentStyle.headerFontWeight || 'bold',
+			borderRadius: currentStyle.borderRadius ?? 8
+		};
+	}
+
 	// QR Code update functions
 	async function updateQRCodeContent(newContent) {
 		if (!$selectedComponent || !$editor || !isQRCode) return;
@@ -1514,9 +1945,10 @@
 			debouncedPropertyChange(newQR);
 		} catch (error) {
 			console.error('Failed to update QR code:', error);
+			showToast('Failed to update QR code', 'error');
 		}
 	}
-	
+
 	async function updateQRCodeConfig(configKey, value) {
 		if (!$selectedComponent || !$editor || !isQRCode) return;
 
@@ -1539,9 +1971,10 @@
 			debouncedPropertyChange(newQR);
 		} catch (error) {
 			console.error('Failed to update QR code config:', error);
+			showToast('Failed to update QR code config', 'error');
 		}
 	}
-	
+
 	function loadTextEffects() {
 		if (!$selectedComponent || (type !== 'i-text' && type !== 'text')) return;
 		
@@ -1821,20 +2254,12 @@
 			// Get current image URL
 			const imageUrl = $selectedComponent.getSrc();
 			
-			console.log('[Background Removal] Starting...', {
-				imageUrl,
-				model: BACKGROUND_REMOVER_CONFIG.model,
-				optimize: BACKGROUND_REMOVER_CONFIG.optimize
-			});
-			
-			// Call backend API using the backend service (handles auth automatically via cookies)
+				// Call backend API using the backend service (handles auth automatically via cookies)
 			const result = await backend.post('/background-removal', {
 				imageUrl: imageUrl,
 				model: BACKGROUND_REMOVER_CONFIG.model,
 				optimize: BACKGROUND_REMOVER_CONFIG.optimize
 			});
-			
-			console.log('[Background Removal] Success!', result);
 			
 			// Create new image from processed URL
 			const processedUrl = result.proxyUrl || result.url;
@@ -1885,9 +2310,6 @@
 			}
 			
 			isRemovingBackground = false;
-			
-			console.log('[Background Removal] Complete!');
-			
 		} catch (error) {
 			console.error('[Background Removal] Error:', error);
 			console.error('[Background Removal] Error details:', {
@@ -1920,10 +2342,10 @@
 				errorMsg += `${error.message || 'An unexpected error occurred.'}\n\nStatus Code: ${error.status || 'Unknown'}`;
 			}
 			
-			alert(errorMsg);
+			showToast(errorMsg.replace(/\n+/g, ' ').trim(), 'error', 5000);
 		}
 	}
-	
+
 	function restoreOriginalBackground() {
 		if (!$selectedComponent || !originalImageUrl || type !== 'image' || !$editor) return;
 		
@@ -2591,50 +3013,56 @@
 </script>
 
 <div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
-	<div class="px-4 py-3 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
-		<div class="flex items-center justify-between mb-3">
-			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Properties</h3>
+	<div class="px-4 py-3 border-b border-gray-200 flex-shrink-0 bg-[#FFFDF8]">
+		<div class="flex items-center justify-between {$selectedComponent ? 'mb-2.5' : ''}">
+			<h3 class="font-bold text-xs text-gray-900 uppercase tracking-wider">Properties</h3>
 		</div>
-		
+
 		<!-- Design/Logic Toggle -->
 		{#if $selectedComponent}
-			<div class="flex bg-[#FFFDF8] p-1 border-b-2 border-gray-900">
-				<button 
-					class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-none text-xs font-black uppercase tracking-wide transition-all {panelMode === 'design' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+			<div class="flex bg-gray-100 rounded-lg p-0.5" role="tablist" aria-label="Properties panel tabs">
+				<button
+					class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all {panelMode === 'design' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}"
 					on:click={() => panelMode = 'design'}
+					role="tab"
+					aria-selected={panelMode === 'design'}
+					aria-controls="panel-design"
 				>
 					<i class="fa fa-palette text-[10px]"></i>
 					Design
 				</button>
-				<button 
-					class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-none text-xs font-black uppercase tracking-wide transition-all relative {panelMode === 'logic' ? 'bg-[#ffc480] text-gray-900 border-2 border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-gray-500 hover:text-gray-900 border-2 border-transparent hover:border-gray-900'}"
+				<button
+					class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all relative {panelMode === 'logic' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}"
 					on:click={() => panelMode = 'logic'}
+					role="tab"
+					aria-selected={panelMode === 'logic'}
+					aria-controls="panel-logic"
 				>
 					<i class="fa fa-code text-[10px]"></i>
 					Logic
 					{#if hasLogicConfigured}
-						<span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full border border-gray-900"></span>
+						<span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full"></span>
 					{/if}
 				</button>
 			</div>
 		{/if}
 	</div>
-	<div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-5 bg-[#FFFDF8]">
+	<div class="px-4 py-3 flex-1 overflow-y-auto custom-scrollbar space-y-4 bg-[#FFFDF8]">
 		{#if $selectedComponent}
 			<!-- Element Type Badge -->
-			<div class="flex items-center gap-3 pb-3 border-b border-gray-900">
-				<span class="px-2.5 py-1 bg-[#ff6b6b]/10 text-[#ff6b6b] text-xs font-bold rounded-md uppercase tracking-wide shadow-sm">
+			<div class="flex items-center gap-2 pb-3 border-b border-gray-200">
+				<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded uppercase tracking-wide">
 					{type}
 				</span>
-				<span class="text-xs font-medium text-gray-500">Selected Element</span>
 			</div>
-			
+
 			<!-- DESIGN MODE -->
 			{#if panelMode === 'design'}
 
 			{#if type === 'i-text' || type === 'text'}
 				<!-- CONTENT SECTION -->
 				<div class="space-y-3">
+					{#if boundProperties.has('text')}<span class="text-[9px] text-green-500"><i class="fa fa-link"></i> Text bound to API variable</span>{/if}
 					<textarea
 						class={inputNumberClass}
 						rows="2"
@@ -2648,18 +3076,18 @@
 				<div class="space-y-3 pt-4 border-t border-gray-200">
 					
 					<!-- Font Family -->
-					<div class="relative">
-						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Font Family</label>
+					<div class="relative" bind:this={fontDropdownRef}>
+						<label class="{fieldLabelClass}">Font Family{#if boundProperties.has('fontFamily')}<i class="fa fa-link text-[9px] text-green-500 ml-1" title="Bound to API variable"></i>{/if}</label>
 						<button
-							class="w-full text-sm border border-gray-900 border-[2px] rounded-lg px-3 py-2 text-left bg-white flex items-center justify-between focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 focus:outline-none focus:ring-1"
-							on:click={() => isFontDropdownOpen = !isFontDropdownOpen}
+							class="w-full text-sm border-[2px] border-gray-300 rounded-lg px-3 py-1.5 text-left bg-white flex items-center justify-between focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 focus:outline-none hover:border-gray-400 transition-all"
+							on:click|stopPropagation={() => isFontDropdownOpen = !isFontDropdownOpen}
 						>
 							<span style="font-family: {styles.fontFamily}">{styles.fontFamily}</span>
 							<i class="fa fa-chevron-down text-xs text-gray-400"></i>
 						</button>
 						
 						{#if isFontDropdownOpen}
-							<div class="absolute z-50 w-full mt-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-xl max-h-[400px] flex flex-col">
+							<div class="absolute z-[100] w-full mt-1 bg-white border-[2px] border-gray-300 rounded-lg shadow-xl max-h-[400px] flex flex-col">
 								<!-- Search & Custom Font -->
 								<div class="p-3 border-b border-gray-100 sticky top-0 bg-white z-10">
 									{#if showCustomFontInput}
@@ -2668,7 +3096,7 @@
 											<input
 												type="text"
 												placeholder="e.g., Crimson Text or fonts.google.com URL"
-												class="w-full text-sm border-gray-900 rounded-md mb-2 p-2 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+												class="{inputBaseClass} mb-2"
 												bind:value={customFontUrl}
 											/>
 											{#if addFontError}
@@ -2676,7 +3104,7 @@
 											{/if}
 											<div class="flex gap-2">
 												<button
-													class="flex-1 bg-black text-white text-sm py-1.5 rounded-md hover:bg-gray-800 font-medium disabled:opacity-50"
+													class="flex-1 bg-gray-900 text-white text-sm py-1.5 border-[2px] border-gray-900 rounded-lg hover:bg-black font-medium disabled:opacity-50"
 													on:click={addCustomFont}
 													disabled={addingFont}
 												>
@@ -2686,7 +3114,7 @@
 													Add Font
 												</button>
 												<button
-													class="flex-1 bg-gray-100 text-gray-700 text-sm py-1.5 rounded-md hover:bg-gray-200 font-medium"
+													class="flex-1 bg-white text-gray-700 text-sm py-1.5 border-[2px] border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
 													on:click={() => { showCustomFontInput = false; addFontError = ''; }}
 												>
 													Cancel
@@ -2700,7 +3128,7 @@
 												<input
 													type="text"
 													placeholder="Search any Google Font..."
-													class="w-full text-sm border-gray-900 rounded-md pl-8 pr-8 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+													class="w-full text-sm border-[2px] border-gray-300 rounded-lg pl-8 pr-8 py-1.5 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all"
 													value={fontSearchQuery}
 													on:input={(e) => handleFontSearch(e.target.value)}
 												/>
@@ -2737,7 +3165,7 @@
 										
 										<!-- Search hint -->
 										{#if fontSearchQuery.length > 0 && fontSearchQuery.length < 3}
-											<p class="text-[10px] text-gray-400 mt-2">Type 3+ characters to search all Google Fonts</p>
+											<p class="text-[10px] text-gray-500 mt-2">Type 3+ characters to search all Google Fonts</p>
 										{/if}
 									{/if}
 								</div>
@@ -2867,7 +3295,7 @@
 								</div>
 								
 								<!-- Footer -->
-								<div class="px-3 py-2 border-t-[2px] border-gray-900 bg-gray-50 text-[10px] text-gray-500 flex items-center justify-between">
+								<div class="px-3 py-2 border-t border-gray-200 bg-gray-50 text-[10px] text-gray-500 flex items-center justify-between">
 									<span>
 										{filteredFonts.length} of {allFonts.length} fonts
 										{#if extendedSearchResults.length > 0}
@@ -2901,19 +3329,21 @@
 					<!-- Size & Weight Row -->
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Size</label>
+							<label class="{fieldLabelClass}">Size{#if boundProperties.has('fontSize')}<i class="fa fa-link text-[9px] text-green-500 ml-1" title="Bound to API variable"></i>{/if}</label>
 							<div class="relative">
 								<input
 									type="number"
 									class={inputNumberClass + " pr-8"}
 									value={styles.fontSize}
-									on:input={(e) => updateProperty('fontSize', parseInt(e.target.value))}
+									min="1"
+									max="500"
+									on:input={(e) => updateProperty('fontSize', clampNumber(e.target.value, 1, 500, 16))}
 								/>
-								<span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">px</span>
+								<span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">px</span>
 							</div>
 						</div>
 						<div>
-							<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Spacing</label>
+							<label class="{fieldLabelClass}">Spacing</label>
 							<input
 								type="number"
 								class={inputNumberClass}
@@ -2926,7 +3356,7 @@
 					
 					<!-- Font Weight -->
 					<div class="relative">
-						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Weight</label>
+						<label class="{fieldLabelClass}">Weight{#if boundProperties.has('fontWeight')}<i class="fa fa-link text-[9px] text-green-500 ml-1" title="Bound to API variable"></i>{/if}</label>
 						<button
 							class={buttonBaseClass + " text-left flex items-center justify-between"}
 							on:click={() => isWeightDropdownOpen = !isWeightDropdownOpen}
@@ -2938,7 +3368,7 @@
 						</button>
 						
 						{#if isWeightDropdownOpen}
-							<div class="absolute z-50 w-full mt-1 bg-white border-[2px] border-gray-900 rounded-md shadow-lg max-h-60 overflow-y-auto">
+							<div class="absolute z-[100] w-full mt-1 bg-white border-[2px] border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
 								{#each fontWeights as weight}
 									<button
 										class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between"
@@ -2966,6 +3396,7 @@
 				
 				<!-- COLOR SECTION -->
 				<div class="space-y-3 pt-4 border-t border-gray-200">
+					{#if boundProperties.has('fill')}<span class="text-[9px] text-green-500 mb-[-4px] block"><i class="fa fa-link"></i> Bound to API variable</span>{/if}
 					<GradientColorPicker
 						label="Text Color"
 						value={styles.fill}
@@ -2978,63 +3409,64 @@
 				<!-- EFFECTS SECTION -->
 				<div class="space-y-3 pt-4 border-t border-gray-200">
 					<button
-						class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
+						class="w-full flex items-center justify-between text-left group"
 						on:click={() => showTextEffectsPanel = !showTextEffectsPanel}
+						aria-expanded={showTextEffectsPanel}
 					>
-						<span class="text-[10px] font-black text-gray-900 uppercase tracking-wide">Effects</span>
-						<i class="fa fa-chevron-{showTextEffectsPanel ? 'up' : 'down'} text-xs text-gray-400"></i>
+						<span class="{sectionHeaderClass}">Effects</span>
+						<i class="fa fa-chevron-{showTextEffectsPanel ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
 					</button>
 					
 					{#if showTextEffectsPanel}
-						<div class="space-y-4 pt-2">
+						<div class="space-y-4 pt-2" transition:slide={{duration: 150}}>
 							<!-- Quick Presets -->
 							<div>
-								<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Presets</label>
+								<label class="{fieldLabelClass}">Presets</label>
 								<div class="grid grid-cols-4 gap-1.5">
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('none')}
 										title="None"
 									>
 										None
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('soft-shadow')}
 										title="Soft Shadow"
 									>
 										Soft
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('hard-shadow')}
 										title="Hard Shadow"
 									>
 										Hard
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('outline')}
 										title="Outline"
 									>
 										Outline
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('glow')}
 										title="Glow"
 									>
 										Glow
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('neon')}
 										title="Neon"
 									>
 										Neon
 									</button>
 									<button 
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded hover:border-black hover:bg-gray-50 transition-all font-medium col-span-2"
+										class="px-2 py-1.5 text-[10px] bg-white border border-gray-200 rounded hover:border-gray-400 hover:bg-gray-50 transition-all font-medium col-span-2"
 										on:click={() => applyTextEffectPreset('bold-outline')}
 										title="Bold Outline"
 									>
@@ -3044,9 +3476,9 @@
 							</div>
 
 							<!-- Shadow Controls -->
-							<div class="pt-3 border-t-[2px] border-gray-900">
+							<div class="pt-3 border-t border-gray-200">
 								<div class="flex items-center justify-between mb-3">
-									<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Shadow</label>
+									<label class="{fieldLabelClass} mb-0">Shadow</label>
 									<label class="relative inline-flex items-center cursor-pointer">
 										<input 
 											type="checkbox" 
@@ -3054,12 +3486,12 @@
 											checked={textEffects.shadow.enabled}
 											on:change={(e) => applyTextShadow('enabled', e.target.checked)}
 										/>
-										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+										<div class="{toggleSwitchClass}"></div>
 									</label>
 								</div>
 								
 								{#if textEffects.shadow.enabled}
-									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-900">
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
 										<!-- Shadow Color -->
 										<GradientColorPicker
 											label="Color"
@@ -3072,7 +3504,7 @@
 										<!-- Shadow Blur -->
 										<div>
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-xs text-gray-600">Blur</label>
+												<label class="{fieldLabelClass} mb-0">Blur</label>
 												<span class="text-xs text-gray-500">{textEffects.shadow.blur}px</span>
 											</div>
 											<input
@@ -3089,7 +3521,7 @@
 										<!-- Shadow Offset X -->
 										<div>
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-xs text-gray-600">Horizontal Offset</label>
+												<label class="{fieldLabelClass} mb-0">Horizontal Offset</label>
 												<span class="text-xs text-gray-500">{textEffects.shadow.offsetX}px</span>
 											</div>
 											<input
@@ -3106,7 +3538,7 @@
 										<!-- Shadow Offset Y -->
 										<div>
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-xs text-gray-600">Vertical Offset</label>
+												<label class="{fieldLabelClass} mb-0">Vertical Offset</label>
 												<span class="text-xs text-gray-500">{textEffects.shadow.offsetY}px</span>
 											</div>
 											<input
@@ -3124,9 +3556,9 @@
 							</div>
 							
 							<!-- Stroke Controls -->
-							<div class="pt-3 border-t-[2px] border-gray-900">
+							<div class="pt-3 border-t border-gray-200">
 								<div class="flex items-center justify-between mb-3">
-									<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Stroke (Outline)</label>
+									<label class="{fieldLabelClass} mb-0">Stroke (Outline)</label>
 									<label class="relative inline-flex items-center cursor-pointer">
 										<input 
 											type="checkbox" 
@@ -3134,12 +3566,12 @@
 											checked={textEffects.stroke.enabled}
 											on:change={(e) => applyTextStroke('enabled', e.target.checked)}
 										/>
-										<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+										<div class="{toggleSwitchClass}"></div>
 									</label>
 								</div>
 								
 								{#if textEffects.stroke.enabled}
-									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-900">
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
 										<!-- Stroke Color -->
 										<GradientColorPicker
 											label="Color"
@@ -3152,7 +3584,7 @@
 										<!-- Stroke Width -->
 										<div>
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-xs text-gray-600">Width</label>
+												<label class="{fieldLabelClass} mb-0">Width</label>
 												<span class="text-xs text-gray-500">{textEffects.stroke.width}px</span>
 											</div>
 											<input
@@ -3170,7 +3602,7 @@
 							</div>
 							
 							<!-- Background Button -->
-							<div class="pt-3 border-t-[2px] border-gray-900">
+							<div class="pt-3 border-t border-gray-200">
 								<button 
 									class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium text-xs flex items-center justify-center gap-2"
 									on:click={addTextBackground}
@@ -3186,10 +3618,16 @@
 
 			<!-- Universal Stroke & Fill Controls for All Shapes -->
 			{#if type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path'}
-				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
-					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Appearance</h4>
-					
+				<div class="pt-4 border-t border-gray-200">
+					<button class="flex items-center justify-between w-full mb-3 group" on:click={() => showAppearanceSection = !showAppearanceSection} aria-expanded={showAppearanceSection}>
+						<h4 class="{sectionHeaderClass}">Appearance</h4>
+						<i class="fa fa-chevron-{showAppearanceSection ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+					</button>
+				{#if showAppearanceSection}
+				<div class="space-y-4" transition:slide={{duration: 150}}>
+
 					<!-- Fill Color -->
+					{#if boundProperties.has('fill')}<span class="text-[9px] text-green-500 mb-[-4px] block"><i class="fa fa-link"></i> Bound to API variable</span>{/if}
 					<GradientColorPicker
 						label="Fill Color"
 						value={styles.fill || '#000000'}
@@ -3208,12 +3646,13 @@
 									checked={styles.fill !== '' && styles.fill !== null}
 									on:change={(e) => updateProperty('fill', e.target.checked ? '#3b82f6' : '')}
 								/>
-								<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+								<div class="{toggleSwitchClass}"></div>
 							</label>
 						</div>
 					{/if}
 					
 					<!-- Stroke Color -->
+					{#if boundProperties.has('stroke')}<span class="text-[9px] text-green-500 mb-[-4px] block"><i class="fa fa-link"></i> Bound to API variable</span>{/if}
 					<GradientColorPicker
 						label="Stroke Color"
 						value={styles.stroke || '#333333'}
@@ -3221,11 +3660,11 @@
 						supportsGradient={false}
 						onSolidChange={(color) => updateProperty('stroke', color)}
 					/>
-					
+
 					<!-- Stroke Width -->
 					<div>
 						<div class="flex items-center justify-between mb-2">
-							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Stroke Width</label>
+							<label class="{fieldLabelClass}">Stroke Width{#if boundProperties.has('strokeWidth')}<i class="fa fa-link text-[9px] text-green-500 ml-1" title="Bound to API variable"></i>{/if}</label>
 							<span class="text-xs text-gray-500">{styles.strokeWidth}px</span>
 						</div>
 						<input
@@ -3239,6 +3678,8 @@
 						/>
 					</div>
 				</div>
+				{/if}
+				</div>
 			{/if}
 
 			<!-- Keep old type-specific sections for backward compatibility -->
@@ -3247,23 +3688,35 @@
 			{/if}
 
 
+			<!-- Position & Size Section (collapsible) -->
+			<div class="pt-4 border-t border-gray-200">
+				<button class="flex items-center justify-between w-full group" on:click={() => showPositionSection = !showPositionSection} aria-expanded={showPositionSection}>
+					<h4 class="{sectionHeaderClass}">Size & Position</h4>
+					<i class="fa fa-chevron-{showPositionSection ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+				</button>
+			{#if showPositionSection}
+			<div class="mt-3" transition:slide={{duration: 150}}>
 			<div class="grid grid-cols-2 gap-2">
 				<div>
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Width</label>
+					<label class="{fieldLabelClass}">Width</label>
 					<input
 						type="number"
 						class={inputNumberClass}
 						value={styles.width}
-						on:change={(e) => updateProperty('width', e.target.value)}
+						min="1"
+						max="5000"
+						on:change={(e) => updateProperty('width', clampNumber(e.target.value, 1, 5000, 100))}
 					/>
 				</div>
 				<div>
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">Height</label>
+					<label class="{fieldLabelClass}">Height</label>
 					<input
 						type="number"
 						class={inputNumberClass}
 						value={styles.height}
-						on:change={(e) => updateProperty('height', e.target.value)}
+						min="1"
+						max="5000"
+						on:change={(e) => updateProperty('height', clampNumber(e.target.value, 1, 5000, 100))}
 					/>
 				</div>
 			</div>
@@ -3271,7 +3724,7 @@
 			{#if type === 'rect' || ($selectedComponent && $selectedComponent.isRoundedRect)}
 				<div class="pt-2">
 					<div class="flex items-center justify-between mb-2">
-						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest">Corner Radius</label>
+						<label class="{fieldLabelClass}">Corner Radius</label>
 						<button 
 							class="text-gray-500 hover:text-black focus:outline-none"
 							title="Individual Corners"
@@ -3293,7 +3746,7 @@
 								min="0"
 								max="100"
 								value={styles.radius}
-								class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+								class={"flex-1 " + rangeInputClass}
 								on:input={(e) => {
 									const val = parseInt(e.target.value);
 									if ($selectedComponent.isRoundedRect) {
@@ -3305,10 +3758,12 @@
 							/>
 							<input
 								type="number"
-								class="w-14 text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0"
+								class="w-14 text-sm border-gray-300 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:border-gray-400 transition-all"
 								value={styles.radius}
+								min="0"
+								max="500"
 								on:input={(e) => {
-									const val = parseInt(e.target.value);
+									const val = clampNumber(e.target.value, 0, 500, 0);
 									if ($selectedComponent.isRoundedRect) {
 										updateProperty('cornerRadii', { tl: val, tr: val, br: val, bl: val });
 									} else {
@@ -3327,7 +3782,9 @@
 									class={inputNumberClass}
 									placeholder="TL"
 									value={cornerRadii.tl}
-									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tl: parseInt(e.target.value) || 0 })}
+									min="0"
+									max="500"
+									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tl: clampNumber(e.target.value, 0, 500, 0) })}
 								/>
 							</div>
 							<!-- Top Right -->
@@ -3338,7 +3795,9 @@
 									class={inputNumberClass}
 									placeholder="TR"
 									value={cornerRadii.tr}
-									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tr: parseInt(e.target.value) || 0 })}
+									min="0"
+									max="500"
+									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, tr: clampNumber(e.target.value, 0, 500, 0) })}
 								/>
 							</div>
 							<!-- Bottom Left -->
@@ -3349,7 +3808,9 @@
 									class={inputNumberClass}
 									placeholder="BL"
 									value={cornerRadii.bl}
-									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, bl: parseInt(e.target.value) || 0 })}
+									min="0"
+									max="500"
+									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, bl: clampNumber(e.target.value, 0, 500, 0) })}
 								/>
 							</div>
 							<!-- Bottom Right -->
@@ -3360,22 +3821,29 @@
 									class={inputNumberClass}
 									placeholder="BR"
 									value={cornerRadii.br}
-									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, br: parseInt(e.target.value) || 0 })}
+									min="0"
+									max="500"
+									on:input={(e) => updateProperty('cornerRadii', { ...cornerRadii, br: clampNumber(e.target.value, 0, 500, 0) })}
 								/>
 							</div>
 						</div>
 					{/if}
 				</div>
 			{/if}
-			
+			</div>
+			{/if}
+			</div>
+			<!-- End of collapsible Position & Size section -->
+
 			{#if type === 'image'}
+				{#if boundProperties.has('src')}<div class="text-[9px] text-green-500 pt-2"><i class="fa fa-link"></i> Image source bound to API variable</div>{/if}
 				<!-- Image Shape Clipping -->
-				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-wide mb-2">Clip Shape</label>
+				<div class="space-y-3 pt-4 border-t border-gray-200">
+					<label class="{fieldLabelClass}">Clip Shape</label>
 					
 					<div class="grid grid-cols-4 gap-2">
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'none' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'none' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-500'}"
 							on:click={() => applyClipShape('none')}
 							title="No clipping"
 						>
@@ -3385,7 +3853,7 @@
 							<span class="text-[10px] font-medium">None</span>
 						</button>
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'circle' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'circle' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-500'}"
 							on:click={() => applyClipShape('circle')}
 							title="Circle clip"
 						>
@@ -3395,7 +3863,7 @@
 							<span class="text-[10px] font-medium">Circle</span>
 						</button>
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'ellipse' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'ellipse' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-500'}"
 							on:click={() => applyClipShape('ellipse')}
 							title="Ellipse clip"
 						>
@@ -3405,7 +3873,7 @@
 							<span class="text-[10px] font-medium">Ellipse</span>
 						</button>
 						<button 
-							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'rounded-rect' ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
+							class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape === 'rounded-rect' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 bg-white hover:border-gray-400 text-gray-500'}"
 							on:click={() => applyClipShape('rounded-rect')}
 							title="Rounded rectangle clip"
 						>
@@ -3418,9 +3886,9 @@
 					
 					{#if currentClipShape !== 'none'}
 						<!-- Clip Adjustment Controls -->
-						<div class="mt-3 pt-3 border-t-[2px] border-gray-900 space-y-3">
+						<div class="mt-3 pt-3 border-t border-gray-200 space-y-3">
 							<div class="flex items-center justify-between">
-								<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Adjust Clip Area</span>
+								<span class="{fieldLabelClass}">Adjust Clip Area</span>
 								<button 
 									class="text-[10px] px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded transition-colors"
 									on:click={resetClipPosition}
@@ -3500,105 +3968,130 @@
 				</div>
 				
 				<!-- Background Remover -->
-				<div class="pt-4 border-t-[2px] border-gray-900">
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Remove Background</label>
-					
-					<div class="space-y-2">
-						<button 
-							class="w-full py-2.5 px-3 bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] hover:brightness-110 text-white rounded-md transition-all font-medium text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-							on:click={removeBackground}
-							disabled={isRemovingBackground}
-						>
-							{#if isRemovingBackground}
-								<i class="fa fa-spinner fa-spin"></i>
-								Processing (3-5 seconds)...
-							{:else}
-								<i class="fa fa-magic"></i>
-								Remove Background (AI)
-							{/if}
-						</button>
-						
-						{#if originalImageUrl}
-							<button 
-								class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium text-xs flex items-center justify-center gap-2"
-								on:click={restoreOriginalBackground}
-							>
-								<i class="fa fa-undo"></i>
-								Restore Original
-							</button>
-						{/if}
-						
-						{#if backgroundRemovalError}
-							<div class="bg-red-50 border border-red-200 rounded-lg p-2">
-								<p class="text-xs text-red-800">{backgroundRemovalError}</p>
+				<div class="pt-4 border-t border-gray-200">
+					<label class="{fieldLabelClass}">Remove Background</label>
+
+					{#if !hasBgRemoverAccess}
+						<!-- Locked state for non-subscribers -->
+						<div class="bg-gray-50 border-[2px] border-gray-200 rounded-lg p-3 space-y-2">
+							<div class="flex items-center gap-2">
+								<div class="w-8 h-8 rounded-lg bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] flex items-center justify-center opacity-60">
+									<i class="fa fa-magic text-white text-xs"></i>
+								</div>
+								<div class="flex-1">
+									<div class="text-xs font-bold text-gray-700">AI Background Remover</div>
+									<div class="text-[10px] text-gray-500">Remove backgrounds instantly</div>
+								</div>
+								<div class="flex items-center gap-1 px-2 py-0.5 bg-gray-200 rounded-full">
+									<svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+									</svg>
+									<span class="text-[10px] font-bold text-gray-500 uppercase">{bgRemoverMinPlanName}+</span>
+								</div>
 							</div>
-						{/if}
-					</div>
+							<a
+								href="/pricing"
+								class="block w-full py-2 px-3 bg-gray-900 hover:bg-gray-800 text-white rounded-md transition-colors font-bold text-xs text-center uppercase tracking-wide"
+							>
+								Upgrade to Unlock
+							</a>
+						</div>
+					{:else}
+						<div class="space-y-2">
+							<button
+								class="w-full py-2.5 px-3 bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] hover:brightness-110 text-white rounded-md transition-all font-medium text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+								on:click={removeBackground}
+								disabled={isRemovingBackground}
+							>
+								{#if isRemovingBackground}
+									<i class="fa fa-spinner fa-spin"></i>
+									Processing (3-5 seconds)...
+								{:else}
+									<i class="fa fa-magic"></i>
+									Remove Background (AI)
+								{/if}
+							</button>
+
+							{#if originalImageUrl}
+								<button
+									class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium text-xs flex items-center justify-center gap-2"
+									on:click={restoreOriginalBackground}
+								>
+									<i class="fa fa-undo"></i>
+									Restore Original
+								</button>
+							{/if}
+
+							{#if backgroundRemovalError}
+								<div class="bg-red-50 border border-red-200 rounded-lg p-2">
+									<p class="text-xs text-red-800">{backgroundRemovalError}</p>
+								</div>
+							{/if}
+						</div>
+					{/if}
 				</div>
 				
 				<!-- Filters & Effects -->
-				<div class="pt-4 border-t-[2px] border-gray-900">
-					<button 
-						class="w-full flex items-center justify-between text-left text-[10px] font-black text-gray-900 uppercase tracking-widest mb-3 hover:text-black transition-colors"
+				<div class="pt-4 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group mb-3"
 						on:click={() => showFiltersPanel = !showFiltersPanel}
+						aria-expanded={showFiltersPanel}
 					>
-						<span class="flex items-center gap-2">
-							<i class="fa fa-magic"></i>
-							Filters & Effects
-						</span>
-						<i class="fa fa-chevron-{showFiltersPanel ? 'up' : 'down'} text-xs"></i>
+						<span class="{sectionHeaderClass}">Filters & Effects</span>
+						<i class="fa fa-chevron-{showFiltersPanel ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
 					</button>
 					
 					{#if showFiltersPanel}
-						<div class="space-y-4">
+						<div class="space-y-4" transition:slide={{duration: 150}}>
 							<!-- Preset Filters -->
 							<div>
-								<label class="block text-xs font-medium text-gray-600 mb-2">Quick Filters</label>
+								<label class="{fieldLabelClass}">Quick Filters</label>
 								<div class="grid grid-cols-2 gap-2">
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('none')}
 									>
 										Original
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('grayscale')}
 									>
 										B&W
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('sepia')}
 									>
 										Sepia
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('vintage')}
 									>
 										Vintage
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('cool')}
 									>
 										Cool
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('warm')}
 									>
 										Warm
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('dramatic')}
 									>
 										Dramatic
 									</button>
 									<button 
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-md hover:border-black hover:bg-gray-50 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border border-gray-200 rounded-md hover:border-gray-400 hover:bg-gray-50 transition-all font-medium"
 										on:click={() => applyPresetFilter('fade')}
 									>
 										Fade
@@ -3606,13 +4099,13 @@
 								</div>
 							</div>
 							
-							<div class="pt-3 border-t-[2px] border-gray-900">
-								<label class="block text-xs font-medium text-gray-600 mb-3">Adjust</label>
+							<div class="pt-3 border-t border-gray-200">
+								<label class="{fieldLabelClass}">Adjust</label>
 								
 								<!-- Brightness -->
 								<div class="mb-4">
 									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs text-gray-700">Brightness</label>
+										<label class="{fieldLabelClass} mb-0">Brightness</label>
 										<span class="text-xs text-gray-500">{Math.round(imageFilters.brightness * 100)}%</span>
 									</div>
 									<input
@@ -3629,7 +4122,7 @@
 								<!-- Contrast -->
 								<div class="mb-4">
 									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs text-gray-700">Contrast</label>
+										<label class="{fieldLabelClass} mb-0">Contrast</label>
 										<span class="text-xs text-gray-500">{Math.round(imageFilters.contrast * 100)}%</span>
 									</div>
 									<input
@@ -3646,7 +4139,7 @@
 								<!-- Saturation -->
 								<div class="mb-4">
 									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs text-gray-700">Saturation</label>
+										<label class="{fieldLabelClass} mb-0">Saturation</label>
 										<span class="text-xs text-gray-500">{Math.round(imageFilters.saturation * 100)}%</span>
 									</div>
 									<input
@@ -3663,7 +4156,7 @@
 								<!-- Blur -->
 								<div class="mb-4">
 									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs text-gray-700">Blur</label>
+										<label class="{fieldLabelClass} mb-0">Blur</label>
 										<span class="text-xs text-gray-500">{Math.round(imageFilters.blur * 100)}%</span>
 									</div>
 									<input
@@ -3680,7 +4173,7 @@
 								<!-- Hue Rotation -->
 								<div class="mb-4">
 									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs text-gray-700">Hue Rotation</label>
+										<label class="{fieldLabelClass} mb-0">Hue Rotation</label>
 										<span class="text-xs text-gray-500">{Math.round(imageFilters.hue * 360)}°</span>
 									</div>
 									<input
@@ -3689,7 +4182,7 @@
 										max="0.5"
 										step="0.01"
 										value={imageFilters.hue}
-										class="w-full h-2 bg-gradient-to-r from-red-500 via-green-500 to-blue-500 rounded-lg appearance-none cursor-pointer slider"
+										class={rangeInputClass + " !bg-gradient-to-r !from-red-500 !via-green-500 !to-blue-500"}
 										on:input={(e) => applyImageFilter('hue', parseFloat(e.target.value))}
 									/>
 								</div>
@@ -3711,54 +4204,88 @@
 			
 			<!-- CHART PROPERTIES SECTION -->
 			{#if isChart}
-				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-wide mb-2">Chart</label>
-					
-					<div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3">
-						<p class="text-xs text-purple-800">
-							<i class="fa fa-info-circle mr-1"></i>
-							<strong>{chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart</strong> - Edit data to update the visualization.
-						</p>
-					</div>
-					
+				<div class="space-y-3 pt-4 border-t border-gray-200">
 					<!-- Chart Data Editor -->
 					<div>
-						<button 
-							class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity mb-2"
+						<button
+							class="w-full flex items-center justify-between text-left group"
 							on:click={() => showChartDataEditor = !showChartDataEditor}
+							aria-expanded={showChartDataEditor}
 						>
-							<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Edit Chart Data</span>
-							<i class="fa fa-chevron-{showChartDataEditor ? 'up' : 'down'} text-xs text-gray-400"></i>
+							<span class="{sectionHeaderClass}">Chart Data{#if boundProperties.has('chartData')}<i class="fa fa-link text-[9px] text-green-500 ml-1" title="Bound to API variable"></i>{/if}</span>
+							<i class="fa fa-chevron-{showChartDataEditor ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
 						</button>
-						
+
 						{#if showChartDataEditor}
-							<div class="space-y-3">
-								<!-- Format Toggle -->
-								<div class="flex gap-1 p-1 bg-gray-100 rounded-lg">
-									<button 
-										class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat === 'json' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
-										on:click={() => { chartDataFormat = 'json'; loadSampleChartData(); }}
+							<div class="space-y-3" transition:slide={{duration: 150}}>
+								<!-- Format Toggle + Maximize -->
+								<div class="flex items-center gap-2">
+									<div class="flex gap-1 p-1 bg-gray-100 rounded-lg flex-1">
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat === 'json' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => { chartDataFormat = 'json'; loadSampleChartData(); }}
+										>
+											<i class="fa fa-code mr-1"></i>JSON
+										</button>
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat === 'csv' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => { chartDataFormat = 'csv'; loadSampleChartData(); }}
+										>
+											<i class="fa fa-file-csv mr-1"></i>CSV
+										</button>
+									</div>
+									{#if chartDataFormat === 'csv'}
+										<button
+											class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+											on:click={formatChartCSV}
+											title="Format CSV"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+										</button>
+									{/if}
+									<button
+										class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+										on:click={() => maximizeChartEditor = true}
+										title="Maximize editor"
 									>
-										<i class="fa fa-code mr-1"></i>JSON
-									</button>
-									<button 
-										class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat === 'csv' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
-										on:click={() => { chartDataFormat = 'csv'; loadSampleChartData(); }}
-									>
-										<i class="fa fa-file-csv mr-1"></i>CSV
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
 									</button>
 								</div>
-								
-								<textarea
-									class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
-									placeholder={chartDataFormat === 'csv' ? 'label,value\nJan,30\nFeb,45' : '[{"label": "Jan", "value": 30}, ...]'}
-									bind:value={chartDataInput}
-								></textarea>
-								
+
+								{#if chartDataFormat === 'json'}
+									<div class="border border-gray-300 rounded-lg overflow-hidden focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1">
+										<CodeMirror
+											bind:value={chartDataInput}
+											lang={json()}
+											styles={{
+												'&': {
+													height: '144px',
+													fontSize: '12px',
+													fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+												},
+												'.cm-content': { padding: '8px' },
+												'.cm-line': { padding: '0' },
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '30px'
+												}
+											}}
+										/>
+									</div>
+								{:else}
+									<textarea
+										class="w-full h-36 text-xs font-mono border-gray-300 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:border-gray-400 transition-all p-2"
+										placeholder='label,value\nJan,30\nFeb,45'
+										bind:value={chartDataInput}
+									></textarea>
+								{/if}
+
 								{#if chartDataError}
 									<p class="text-xs text-red-600"><i class="fa fa-exclamation-circle mr-1"></i>{chartDataError}</p>
 								{/if}
-								
+
 								<div class="flex gap-2">
 									<button
 										class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
@@ -3773,98 +4300,327 @@
 										<i class="fa fa-check mr-1"></i>Apply
 									</button>
 								</div>
-								
+
 								<!-- Format Examples -->
-								<div class="bg-gray-50 border-[2px] border-gray-900 rounded-lg p-2 text-[10px] text-gray-600">
+								<div class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-500">
 									{#if chartDataFormat === 'csv'}
-										<p class="font-medium mb-1">CSV Format:</p>
-										<code class="block text-gray-500">label,value<br/>Jan,30<br/>Feb,45</code>
+										<p class="font-medium mb-1 text-gray-600">CSV Format:</p>
+										<code class="block text-gray-400">label,value<br/>Jan,30<br/>Feb,45</code>
 									{:else}
-										<p class="font-medium mb-1">JSON Format:</p>
-										<code class="block text-gray-500">[{"{"}"label": "Jan", "value": 30{"}"}]</code>
+										<p class="font-medium mb-1 text-gray-600">JSON Format:</p>
+										<code class="block text-gray-400">[{"{"}"label": "Jan", "value": 30{"}"}]</code>
 									{/if}
 								</div>
 							</div>
 						{/if}
 					</div>
-					
+
+					<!-- Chart Appearance -->
+					<div class="pt-3 border-t border-gray-200">
+						<button
+							class="w-full flex items-center justify-between text-left group"
+							on:click={() => showChartAppearance = !showChartAppearance}
+							aria-expanded={showChartAppearance}
+						>
+							<span class="{sectionHeaderClass}">Appearance</span>
+							<i class="fa fa-chevron-{showChartAppearance ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+						</button>
+
+						{#if showChartAppearance}
+							<div class="space-y-4" transition:slide={{duration: 150}}>
+								<!-- Font Family -->
+								<div>
+									<label class="{fieldLabelClass}">Font Family</label>
+									<select
+										class={selectClass}
+										bind:value={chartFontFamily}
+										on:change={updateChartAppearance}
+									>
+										{#each CHART_FONT_OPTIONS as font}
+											<option value={font}>{font}</option>
+										{/each}
+									</select>
+								</div>
+
+								<!-- Color Palette Presets -->
+								<div>
+									<label class="{fieldLabelClass}">Color Palette</label>
+									<div class="flex gap-2 flex-wrap">
+										{#each Object.entries(CHART_PALETTES) as [key, palette]}
+											<button
+												class="flex flex-col items-center gap-1 group"
+												on:click={() => { chartColors = [...palette.colors, ...chartColors.slice(5)]; updateChartAppearance(); }}
+												title={palette.name}
+											>
+												<div class="w-12 h-4 rounded border border-gray-300 flex overflow-hidden hover:border-gray-400 transition-colors">
+													{#each palette.colors as color}
+														<div class="flex-1" style="background: {color};"></div>
+													{/each}
+												</div>
+												<span class="text-[9px] text-gray-400 group-hover:text-gray-600">{palette.name}</span>
+											</button>
+										{/each}
+									</div>
+								</div>
+
+								<!-- Individual Color Swatches -->
+								<div>
+									<label class="{fieldLabelClass}">Data Colors</label>
+									<div class="flex gap-2 flex-wrap">
+										{#each chartColors.slice(0, chartData.length || 5) as color, i}
+											<div class="relative">
+												<GradientColorPicker
+													label=""
+													value={color}
+													defaultColor={color}
+													supportsGradient={false}
+													onSolidChange={(newColor) => {
+														chartColors = chartColors.map((c, idx) => idx === i ? newColor : c);
+														updateChartAppearance();
+													}}
+												/>
+											</div>
+										{/each}
+									</div>
+								</div>
+
+								<!-- Accent Colors -->
+								<div class="space-y-3 pt-3 border-t border-gray-100">
+									<label class="{fieldLabelClass}">Accent Colors</label>
+									<GradientColorPicker
+										label="Title Color"
+										value={chartTitleColor}
+										defaultColor="#333333"
+										supportsGradient={false}
+										onSolidChange={(color) => { chartTitleColor = color; updateChartAppearance(); }}
+									/>
+									<GradientColorPicker
+										label="Label Color"
+										value={chartLabelColor}
+										defaultColor="#666666"
+										supportsGradient={false}
+										onSolidChange={(color) => { chartLabelColor = color; updateChartAppearance(); }}
+									/>
+									<GradientColorPicker
+										label="Grid Color"
+										value={chartGridColor}
+										defaultColor="#eeeeee"
+										supportsGradient={false}
+										onSolidChange={(color) => { chartGridColor = color; updateChartAppearance(); }}
+									/>
+									<GradientColorPicker
+										label="Background"
+										value={chartBackgroundColor}
+										defaultColor="#ffffff"
+										supportsGradient={false}
+										onSolidChange={(color) => { chartBackgroundColor = color; updateChartAppearance(); }}
+									/>
+									<GradientColorPicker
+										label="Border Color"
+										value={chartBorderColor}
+										defaultColor="#e5e5e5"
+										supportsGradient={false}
+										onSolidChange={(color) => { chartBorderColor = color; updateChartAppearance(); }}
+									/>
+								</div>
+							</div>
+						{/if}
+					</div>
+
 				</div>
 			{/if}
-			
+
 			<!-- TABLE PROPERTIES SECTION -->
 			{#if isTable}
-				<div class="space-y-3 pt-4 border-t-[2px] border-gray-900">
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-wide mb-2">Table</label>
-					
-					<div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-3">
-						<p class="text-xs text-teal-800">
-							<i class="fa fa-info-circle mr-1"></i>
-							<strong>{tableType.charAt(0).toUpperCase() + tableType.slice(1)} Table</strong> - Update data via API for dynamic content.
-						</p>
-					</div>
-					
-					<!-- Table Style Selector (applies to all table types) -->
+				<div class="space-y-3 pt-4 border-t border-gray-200">
+					<!-- Table Style Selector -->
 					<div>
-						<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Table Style</label>
+						<label class="{fieldLabelClass}">Style</label>
 						<div class="grid grid-cols-5 gap-2">
 							{#each Object.entries(TABLE_STYLES) as [key, style]}
-								<button 
-									class="flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all {tableStyle === key ? 'border-black bg-gray-50' : 'border-gray-900 hover:border-gray-400'}"
+								<button
+									class="flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all {tableStyle === key ? 'border-gray-900 bg-gray-50 shadow-sm' : 'border-gray-200 hover:border-gray-400'}"
 									on:click={() => changeTableStyle(key)}
 									title={style.name}
 								>
-									<div class="w-full h-6 rounded overflow-hidden border-[2px] border-gray-900 flex flex-col">
+									<div class="w-full h-5 rounded overflow-hidden border border-gray-200 flex flex-col">
 										<div class="h-2" style="background: {style.headerBg};"></div>
 										<div class="flex-1" style="background: {style.rowBg};"></div>
 										<div class="h-1" style="background: {style.altRowBg};"></div>
 									</div>
-									<span class="text-[9px] text-gray-600">{style.name}</span>
+									<span class="text-[9px] text-gray-400">{style.name}</span>
 								</button>
 							{/each}
 						</div>
 					</div>
-					
-					<!-- Table Data Editor -->
-					<div>
-						<button 
-							class="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity mb-2"
-							on:click={() => showTableDataEditor = !showTableDataEditor}
+
+					<!-- Table Customize Style -->
+					<div class="pt-3 border-t border-gray-200">
+						<button
+							class="w-full flex items-center justify-between text-left group"
+							on:click={() => { showTableCustomize = !showTableCustomize; if (showTableCustomize && !tableCustomColors) initTableCustomColors(); }}
+							aria-expanded={showTableCustomize}
 						>
-							<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Edit Table Data</span>
-							<i class="fa fa-chevron-{showTableDataEditor ? 'up' : 'down'} text-xs text-gray-400"></i>
+							<span class="{sectionHeaderClass}">Customize Colors</span>
+							<i class="fa fa-chevron-{showTableCustomize ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
 						</button>
-						
+
+						{#if showTableCustomize}
+							<div class="space-y-4" transition:slide={{duration: 150}}>
+								<!-- Font Family -->
+								<div>
+									<label class="{fieldLabelClass}">Font Family</label>
+									<select
+										class={selectClass}
+										bind:value={tableFontFamily}
+										on:change={updateTableAppearance}
+									>
+										{#each CHART_FONT_OPTIONS as font}
+											<option value={font}>{font}</option>
+										{/each}
+									</select>
+								</div>
+
+								<!-- Color Overrides -->
+								{#if tableCustomColors}
+									<div class="space-y-3">
+										<GradientColorPicker
+											label="Header Background"
+											value={tableCustomColors.headerBg}
+											defaultColor={tableCustomColors.headerBg}
+											supportsGradient={false}
+											onSolidChange={(color) => { tableCustomColors = { ...tableCustomColors, headerBg: color }; updateTableAppearance(); }}
+										/>
+										<GradientColorPicker
+											label="Header Text"
+											value={tableCustomColors.headerText}
+											defaultColor={tableCustomColors.headerText}
+											supportsGradient={false}
+											onSolidChange={(color) => { tableCustomColors = { ...tableCustomColors, headerText: color }; updateTableAppearance(); }}
+										/>
+										<GradientColorPicker
+											label="Row Background"
+											value={tableCustomColors.rowBg}
+											defaultColor={tableCustomColors.rowBg}
+											supportsGradient={false}
+											onSolidChange={(color) => { tableCustomColors = { ...tableCustomColors, rowBg: color }; updateTableAppearance(); }}
+										/>
+										<GradientColorPicker
+											label="Alternate Row"
+											value={tableCustomColors.altRowBg}
+											defaultColor={tableCustomColors.altRowBg}
+											supportsGradient={false}
+											onSolidChange={(color) => { tableCustomColors = { ...tableCustomColors, altRowBg: color }; updateTableAppearance(); }}
+										/>
+										<GradientColorPicker
+											label="Border Color"
+											value={tableCustomColors.borderColor}
+											defaultColor={tableCustomColors.borderColor}
+											supportsGradient={false}
+											onSolidChange={(color) => { tableCustomColors = { ...tableCustomColors, borderColor: color }; updateTableAppearance(); }}
+										/>
+										<GradientColorPicker
+											label="Text Color"
+											value={tableCustomColors.textColor}
+											defaultColor={tableCustomColors.textColor}
+											supportsGradient={false}
+											onSolidChange={(color) => { tableCustomColors = { ...tableCustomColors, textColor: color }; updateTableAppearance(); }}
+										/>
+									</div>
+								{/if}
+
+								<!-- Reset Button -->
+								<button
+									class="w-full px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+									on:click={resetTableToPreset}
+								>
+									<i class="fa fa-undo mr-1"></i>Reset to Preset
+								</button>
+							</div>
+						{/if}
+					</div>
+
+					<!-- Table Data Editor -->
+					<div class="pt-3 border-t border-gray-200">
+						<button
+							class="w-full flex items-center justify-between text-left group"
+							on:click={() => showTableDataEditor = !showTableDataEditor}
+							aria-expanded={showTableDataEditor}
+						>
+							<span class="{sectionHeaderClass}">Table Data{#if boundProperties.has('tableData')}<i class="fa fa-link text-[9px] text-green-500 ml-1" title="Bound to API variable"></i>{/if}</span>
+							<i class="fa fa-chevron-{showTableDataEditor ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+						</button>
+
 						{#if showTableDataEditor}
-							<div class="space-y-3">
-								<!-- Format Toggle -->
-								<div class="flex gap-1 p-1 bg-gray-100 rounded-lg">
-									<button 
-										class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat === 'json' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
-										on:click={() => { tableDataFormat = 'json'; loadSampleTableData(); }}
+							<div class="space-y-3" transition:slide={{duration: 150}}>
+								<!-- Format Toggle + Maximize -->
+								<div class="flex items-center gap-2">
+									<div class="flex gap-1 p-1 bg-gray-100 rounded-lg flex-1">
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat === 'json' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => { tableDataFormat = 'json'; loadSampleTableData(); }}
+										>
+											<i class="fa fa-code mr-1"></i>JSON
+										</button>
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat === 'csv' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => { tableDataFormat = 'csv'; loadSampleTableData(); }}
+										>
+											<i class="fa fa-file-csv mr-1"></i>CSV
+										</button>
+									</div>
+									{#if tableDataFormat === 'csv'}
+										<button
+											class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+											on:click={formatTableCSV}
+											title="Format CSV"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+										</button>
+									{/if}
+									<button
+										class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+										on:click={() => maximizeTableEditor = true}
+										title="Maximize editor"
 									>
-										<i class="fa fa-code mr-1"></i>JSON
-									</button>
-									<button 
-										class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat === 'csv' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
-										on:click={() => { tableDataFormat = 'csv'; loadSampleTableData(); }}
-									>
-										<i class="fa fa-file-csv mr-1"></i>CSV
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
 									</button>
 								</div>
-								
-								<textarea
-									class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
-									placeholder={tableDataFormat === 'csv' 
-										? 'Header1,Header2,Header3\nValue1,Value2,Value3' 
-										: '{"headers": ["Col1", "Col2"], "rows": [["A", "B"]]}'
-									}
-									bind:value={tableDataInput}
-								></textarea>
-								
+
+								{#if tableDataFormat === 'json'}
+									<div class="border border-gray-300 rounded-lg overflow-hidden focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1">
+										<CodeMirror
+											bind:value={tableDataInput}
+											lang={json()}
+											styles={{
+												'&': {
+													height: '144px',
+													fontSize: '12px',
+													fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+												},
+												'.cm-content': { padding: '8px' },
+												'.cm-line': { padding: '0' },
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '30px'
+												}
+											}}
+										/>
+									</div>
+								{:else}
+									<textarea
+										class="w-full h-36 text-xs font-mono border-gray-300 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:border-gray-400 transition-all p-2"
+										placeholder='Header1,Header2,Header3\nValue1,Value2,Value3'
+										bind:value={tableDataInput}
+									></textarea>
+								{/if}
+
 								{#if tableDataError}
 									<p class="text-xs text-red-600"><i class="fa fa-exclamation-circle mr-1"></i>{tableDataError}</p>
 								{/if}
-								
+
 								<div class="flex gap-2">
 									<button
 										class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
@@ -3879,11 +4635,11 @@
 										<i class="fa fa-check mr-1"></i>Apply
 									</button>
 								</div>
-								
-								<!-- Format Examples - Universal format for all table types -->
-								<div class="bg-gray-50 border-[2px] border-gray-900 rounded-lg p-2 text-[10px] text-gray-600">
-									<p class="font-medium mb-1">
-										{tableDataFormat === 'csv' ? 'CSV' : 'JSON'} Format (Universal):
+
+								<!-- Format Examples -->
+								<div class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-500">
+									<p class="font-medium mb-1 text-gray-600">
+										{tableDataFormat === 'csv' ? 'CSV' : 'JSON'} Format:
 									</p>
 									{#if tableDataFormat === 'csv'}
 										{#if tableType === 'stats'}
@@ -3896,7 +4652,7 @@
 									{:else}
 										<code class="block text-gray-500">{"{"}"headers": [...], "rows": [[...]]{"}"}</code>
 									{/if}
-									<p class="text-[9px] text-gray-400 mt-1">Same format works for all table types via API</p>
+									<p class="text-[9px] text-gray-500 mt-1">Same format works for all table types via API</p>
 								</div>
 							</div>
 						{/if}
@@ -3927,107 +4683,122 @@
 			
 			<!-- QR CODE PROPERTIES SECTION -->
 			{#if isQRCode}
-				<!-- Appearance Section - matching shape styling -->
-				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
-					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Appearance</h4>
-					
-					<!-- Foreground Color -->
-					<GradientColorPicker
-						label="Foreground Color"
-						value={qrConfig.fgColor || '#000000'}
-						defaultColor="#000000"
-						supportsGradient={false}
-						onSolidChange={(color) => updateQRCodeConfig('fgColor', color)}
-					/>
-					
-					<!-- Background Color -->
-					<GradientColorPicker
-						label="Background Color"
-						value={qrConfig.bgColor || '#ffffff'}
-						defaultColor="#ffffff"
-						supportsGradient={false}
-						onSolidChange={(color) => updateQRCodeConfig('bgColor', color)}
-					/>
+				<!-- Appearance -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => showQRAppearance = !showQRAppearance}
+						aria-expanded={showQRAppearance}
+					>
+						<span class="{sectionHeaderClass}">Appearance</span>
+						<i class="fa fa-chevron-{showQRAppearance ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+					</button>
+
+					{#if showQRAppearance}
+						<div class="space-y-4 mt-3" transition:slide={{duration: 150}}>
+							<GradientColorPicker
+								label="Foreground Color"
+								value={qrConfig.fgColor || '#000000'}
+								defaultColor="#000000"
+								supportsGradient={false}
+								onSolidChange={(color) => updateQRCodeConfig('fgColor', color)}
+							/>
+							<GradientColorPicker
+								label="Background Color"
+								value={qrConfig.bgColor || '#ffffff'}
+								defaultColor="#ffffff"
+								supportsGradient={false}
+								onSolidChange={(color) => updateQRCodeConfig('bgColor', color)}
+							/>
+
+							<!-- Data Pattern -->
+							<div>
+								<label class="{fieldLabelClass}">Data Pattern</label>
+								<div class="grid grid-cols-3 gap-1.5">
+									{#each PATTERN_STYLES as style}
+										<button
+											class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.patternStyle === style.type ? 'border-gray-900 bg-gray-50 shadow-sm' : 'border-gray-200 hover:border-gray-400 text-gray-600'}"
+											on:click={() => updateQRCodeConfig('patternStyle', style.type)}
+										>
+											<span class="text-base">{style.preview}</span>
+											<span class="text-[9px] text-gray-400">{style.label}</span>
+										</button>
+									{/each}
+								</div>
+							</div>
+
+							<!-- Corner Pattern -->
+							<div>
+								<label class="{fieldLabelClass}">Corner Pattern</label>
+								<div class="grid grid-cols-3 gap-1.5">
+									{#each PATTERN_STYLES as style}
+										<button
+											class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.cornerStyle === style.type ? 'border-gray-900 bg-gray-50 shadow-sm' : 'border-gray-200 hover:border-gray-400 text-gray-600'}"
+											on:click={() => updateQRCodeConfig('cornerStyle', style.type)}
+										>
+											<span class="text-base">{style.preview}</span>
+											<span class="text-[9px] text-gray-400">{style.label}</span>
+										</button>
+									{/each}
+								</div>
+							</div>
+						</div>
+					{/if}
 				</div>
-				
-				<!-- QR Content Section -->
-				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
-					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">QR Content</h4>
-					
-					<div>
-						<div class="flex items-center justify-between mb-2">
-							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">URL or Text</label>
+
+				<!-- Content -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => showQRContent = !showQRContent}
+						aria-expanded={showQRContent}
+					>
+						<span class="{sectionHeaderClass}">Content</span>
+						<i class="fa fa-chevron-{showQRContent ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+					</button>
+
+					{#if showQRContent}
+						<div class="mt-3" transition:slide={{duration: 150}}>
+							<label class="{fieldLabelClass}">URL or Text</label>
+							<input
+								type="text"
+								class={inputBaseClass}
+								placeholder="https://example.com"
+								value={qrData}
+								on:change={(e) => updateQRCodeContent(e.target.value)}
+							/>
 						</div>
-						<input 
-							type="text"
-							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
-							placeholder="https://example.com"
-							value={qrData}
-							on:change={(e) => updateQRCodeContent(e.target.value)}
-						/>
-					</div>
+					{/if}
 				</div>
-				
-				<!-- Style Section -->
-				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
-					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Style</h4>
-					
-					<!-- Data Pattern -->
-					<div>
-						<div class="flex items-center justify-between mb-2">
-							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Data Pattern</label>
+
+				<!-- Error Correction -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => showQRErrorCorrection = !showQRErrorCorrection}
+						aria-expanded={showQRErrorCorrection}
+					>
+						<span class="{sectionHeaderClass}">Error Correction</span>
+						<i class="fa fa-chevron-{showQRErrorCorrection ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+					</button>
+
+					{#if showQRErrorCorrection}
+						<div class="mt-3" transition:slide={{duration: 150}}>
+							<div class="flex items-center justify-between">
+								<label class="{fieldLabelClass}">Level</label>
+								<span class="text-[10px] text-gray-500">{qrConfig.errorCorrectionLevel || 'M'}</span>
+							</div>
+							<select
+								class={selectClass}
+								value={qrConfig.errorCorrectionLevel || 'M'}
+								on:change={(e) => updateQRCodeConfig('errorCorrectionLevel', e.target.value)}
+							>
+								{#each ERROR_CORRECTION_OPTIONS as option}
+									<option value={option.level}>{option.label} - {option.description}</option>
+								{/each}
+							</select>
 						</div>
-						<div class="grid grid-cols-3 gap-2">
-							{#each PATTERN_STYLES as style}
-								<button 
-									class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {qrConfig.patternStyle === style.type ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
-									on:click={() => updateQRCodeConfig('patternStyle', style.type)}
-								>
-									<span class="text-base">{style.preview}</span>
-									<span class="text-[9px]">{style.label}</span>
-								</button>
-							{/each}
-						</div>
-					</div>
-					
-					<!-- Corner Pattern -->
-					<div>
-						<div class="flex items-center justify-between mb-2">
-							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Corner Pattern</label>
-						</div>
-						<div class="grid grid-cols-3 gap-2">
-							{#each PATTERN_STYLES as style}
-								<button 
-									class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {qrConfig.cornerStyle === style.type ? 'border-black bg-black text-white' : 'border-gray-900 bg-white hover:border-gray-400 text-gray-600'}"
-									on:click={() => updateQRCodeConfig('cornerStyle', style.type)}
-								>
-									<span class="text-base">{style.preview}</span>
-									<span class="text-[9px]">{style.label}</span>
-								</button>
-							{/each}
-						</div>
-					</div>
-				</div>
-				
-				<!-- Error Correction Section -->
-				<div class="space-y-4 pt-4 border-t-[2px] border-gray-900">
-					<h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Error Correction</h4>
-					
-					<div>
-						<div class="flex items-center justify-between mb-2">
-							<label class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Level</label>
-							<span class="text-xs text-gray-500">{qrConfig.errorCorrectionLevel || 'M'}</span>
-						</div>
-						<select 
-							class="w-full text-sm border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 p-2"
-							value={qrConfig.errorCorrectionLevel || 'M'}
-							on:change={(e) => updateQRCodeConfig('errorCorrectionLevel', e.target.value)}
-						>
-							{#each ERROR_CORRECTION_OPTIONS as option}
-								<option value={option.level}>{option.label} - {option.description}</option>
-							{/each}
-						</select>
-					</div>
+					{/if}
 				</div>
 			{/if}
 			{/if}
@@ -4035,311 +4806,380 @@
 			
 			<!-- LOGIC MODE -->
 			{#if panelMode === 'logic'}
-				<!-- Logic Mode Header -->
-				<div class="mb-4 pb-3 border-b border-gray-100">
-					<div class="flex items-center gap-2">
-						<i class="fa fa-code text-[#ff6b6b]"></i>
-						<div>
-							<h4 class="text-sm font-bold text-gray-900">Dynamic Behavior</h4>
-							<p class="text-[10px] text-gray-500">Variables, conditions & loops</p>
-						</div>
+				<!-- View All Variables link at top -->
+				<button
+					class="inline-flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-900 font-medium mb-3 transition-colors"
+					on:click={() => editorActions.toggleRightSidebarTab('variables')}
+					aria-label="View all template variables"
+				>
+					<i class="fa fa-list-ul text-[10px]"></i>
+					View All Variables
+					<i class="fa fa-arrow-right text-[9px]"></i>
+				</button>
+
+				<!-- Stripped chars feedback -->
+				{#if strippedCharsMessage}
+					<div class="mb-2 px-2 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-700" role="alert">
+						<i class="fa fa-info-circle mr-1"></i>{strippedCharsMessage}
 					</div>
-				</div>
-				
-				<!-- VARIABLE SECTION - Multi-binding -->
-				<div class="bg-white rounded-lg border-[2px] border-gray-900 p-4 mb-4">
-					<div class="flex items-center justify-between mb-3">
+				{/if}
+
+				<!-- VARIABLES SECTION — accordion -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => showVariablesSection = !showVariablesSection}
+						aria-expanded={showVariablesSection}
+					>
 						<div class="flex items-center gap-2">
-							<span class="w-2 h-2 rounded-full {isVariable && variableBindings.length > 0 ? 'bg-green-500' : 'bg-gray-300'}"></span>
-							<span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Variables</span>
+							<span class="{sectionHeaderClass}">Variables</span>
 							{#if isVariable && variableBindings.length > 0}
 								<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded font-medium">{variableBindings.length}</span>
 							{/if}
 						</div>
-						<label class="relative inline-flex items-center cursor-pointer">
-							<input 
-								type="checkbox" 
-								class="sr-only peer"
-								checked={isVariable}
-								on:change={(e) => toggleVariable(e.target.checked)}
-							/>
-							<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-						</label>
-					</div>
-					
-					{#if !isVariable}
-						<p class="text-xs text-gray-500">Make this element customizable via API</p>
-					{:else}
-						<div class="space-y-3">
-							<!-- Variable Bindings List -->
-							{#each variableBindings as binding, index}
-								<div class="bg-gray-50 rounded-lg p-3 border-[2px] border-gray-900 relative group">
-									<div class="flex items-center justify-between mb-2">
-										<span class="text-[10px] font-semibold text-gray-500 uppercase">Binding #{index + 1}</span>
-										<button 
-											class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500 p-1"
-											on:click={() => removeVariableBinding(index)}
-											title="Remove binding"
-										>
-											<i class="fa fa-times text-xs"></i>
-										</button>
-									</div>
-									
-									<!-- Property Selection -->
-									<div class="mb-2">
-										<label class="block text-[10px] font-medium text-gray-600 mb-1">Property</label>
-										{#if isChart || isTable}
-											<div class="text-xs text-gray-700 bg-white rounded px-2 py-1.5 border-[2px] border-gray-900">
-												<i class="fa fa-{isChart ? 'chart-bar' : 'table'} mr-1 text-gray-400"></i>
-												{isChart ? 'Chart Data' : 'Table Data'}
-											</div>
-										{:else}
-											<select
-												class="w-full text-xs border-[2px] border-gray-900 rounded px-2 py-1.5 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none bg-white"
-												value={binding.property}
-												on:change={(e) => updateVariableBinding(index, 'property', e.target.value)}
+						<div class="flex items-center gap-2">
+							<label class="relative inline-flex items-center cursor-pointer" on:click|stopPropagation>
+								<input
+									type="checkbox"
+									class="sr-only peer"
+									checked={isVariable}
+									on:change={(e) => toggleVariable(e.target.checked)}
+									aria-label="Enable variables"
+								/>
+								<div class="{toggleSwitchClass}"></div>
+							</label>
+							<i class="fa fa-chevron-{showVariablesSection ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+						</div>
+					</button>
+
+					{#if showVariablesSection}
+						<div class="space-y-3 mt-3" transition:slide={{duration: 150}}>
+							{#if !isVariable}
+								<p class="text-xs text-gray-500">Make this element customizable via API</p>
+							{:else}
+								<!-- Variable Bindings List -->
+								{#each variableBindings as binding, index}
+									<div class="bg-gray-50 rounded-lg p-3 border border-gray-200 relative">
+										<div class="flex items-center justify-between mb-2">
+											<span class="{fieldLabelClass} mb-0">Binding #{index + 1}</span>
+											<button
+												class="text-gray-400 hover:text-red-500 p-1 transition-colors"
+												on:click={() => removeVariableBinding(index)}
+												title="Remove binding"
+												aria-label="Remove binding {index + 1}"
 											>
-												{#each getAvailablePropertiesForType() as prop}
-													<option value={prop.value} disabled={variableBindings.some((b, i) => i !== index && b.property === prop.value)}>
-														{prop.label} {variableBindings.some((b, i) => i !== index && b.property === prop.value) ? '(in use)' : ''}
-													</option>
-												{/each}
-											</select>
+												<i class="fa fa-times text-xs"></i>
+											</button>
+										</div>
+
+										<!-- Property Selection -->
+										<div class="mb-2">
+											<label class="{fieldLabelClass}">Property</label>
+											{#if isChart || isTable}
+												<div class="text-xs text-gray-700 bg-white rounded-lg px-3 py-1.5 border-[2px] border-gray-200">
+													<i class="fa fa-{isChart ? 'chart-bar' : 'table'} mr-1 text-gray-400"></i>
+													{isChart ? 'Chart Data' : 'Table Data'}
+												</div>
+											{:else}
+												<select
+													class={selectClass}
+													value={binding.property}
+													on:change={(e) => updateVariableBinding(index, 'property', e.target.value)}
+												>
+													{#each getAvailablePropertiesForType() as prop}
+														<option value={prop.value} disabled={variableBindings.some((b, i) => i !== index && b.property === prop.value)}>
+															{prop.label} {variableBindings.some((b, i) => i !== index && b.property === prop.value) ? '(in use)' : ''}
+														</option>
+													{/each}
+												</select>
+											{/if}
+										</div>
+
+										<!-- Variable Name -->
+										<div class="mb-2">
+											<label class="{fieldLabelClass}">
+												Variable Name
+												<span class="text-red-500">*</span>
+											</label>
+											<input
+												type="text"
+												class="{inputBaseClass} bg-yellow-50"
+												placeholder="e.g., backgroundColor"
+												value={binding.variableName}
+												on:input={(e) => updateVariableBinding(index, 'variableName', e.target.value)}
+												aria-required="true"
+												aria-invalid={!!variableNameErrors[index]}
+											/>
+											{#if variableNameErrors[index]}
+												<p class="text-[10px] text-red-500 mt-1" role="alert">{variableNameErrors[index]}</p>
+											{/if}
+										</div>
+
+										<!-- Description -->
+										<div class="mb-2">
+											<label class="{fieldLabelClass}">Description <span class="text-gray-500">(optional)</span></label>
+											<input
+												type="text"
+												class={inputBaseClass}
+												placeholder="Brief description for API docs"
+												value={binding.description}
+												on:input={(e) => updateVariableBinding(index, 'description', e.target.value)}
+											/>
+										</div>
+
+										<!-- Required Toggle -->
+										<div class="flex items-center justify-between pt-1">
+											<label class="{fieldLabelClass} mb-0">Required</label>
+											<label class="relative inline-flex items-center cursor-pointer">
+												<input
+													type="checkbox"
+													class="sr-only peer"
+													checked={binding.required}
+													on:change={(e) => updateVariableBinding(index, 'required', e.target.checked)}
+												/>
+												<div class="{toggleSwitchClass}"></div>
+											</label>
+										</div>
+									</div>
+								{/each}
+
+								<!-- Add Another Binding Button -->
+								{#if getAvailablePropertiesForType().length > variableBindings.length}
+									<button
+										class="w-full py-2 px-3 border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+										on:click={addVariableBinding}
+									>
+										<i class="fa fa-plus text-[10px]"></i>
+										Add Another Property
+									</button>
+								{:else}
+									<p class="text-[10px] text-gray-500 text-center py-2">All available properties are bound</p>
+								{/if}
+
+								<!-- Collapsible API Usage Preview -->
+								<button
+									class="w-full flex items-center justify-between text-left text-[10px] text-gray-500 hover:text-gray-700 transition-colors"
+									on:click={() => showApiPreview = !showApiPreview}
+									aria-expanded={showApiPreview}
+								>
+									<span class="font-medium">API Preview</span>
+									<i class="fa fa-chevron-{showApiPreview ? 'up' : 'down'} text-[9px]"></i>
+								</button>
+								{#if showApiPreview}
+									<div class="bg-gray-900 rounded-lg p-3" transition:slide={{duration: 150}}>
+										<pre class="text-green-400 text-[10px] whitespace-pre-wrap overflow-x-auto"><code>{JSON.stringify(buildApiPreviewJson(), null, 2)}</code></pre>
+									</div>
+								{/if}
+							{/if}
+						</div>
+					{/if}
+				</div>
+
+				<!-- CONDITION SECTION — accordion -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => showConditionSection = !showConditionSection}
+						aria-expanded={showConditionSection}
+					>
+						<div class="flex items-center gap-2">
+							<span class="{sectionHeaderClass}">Condition</span>
+							{#if conditionType !== 'none'}
+								<span class="px-1.5 py-0.5 text-[10px] rounded font-medium {conditionType === 'showWhen' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+									{conditionType === 'showWhen' ? 'Show if' : 'Hide if'}
+								</span>
+							{/if}
+						</div>
+						<i class="fa fa-chevron-{showConditionSection ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+					</button>
+
+					{#if showConditionSection}
+						<div class="space-y-3 mt-3" transition:slide={{duration: 150}}>
+							<div class="flex rounded-lg overflow-hidden border-[2px] border-gray-300 text-[11px]" role="group" aria-label="Condition type">
+								<button
+									class="flex-1 py-2 px-3 transition-colors font-medium {conditionType === 'none' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
+									on:click={() => updateConditionType('none')}
+									aria-pressed={conditionType === 'none'}
+								>Always</button>
+								<button
+									class="flex-1 py-2 px-3 border-l-[2px] border-gray-300 transition-colors font-medium {conditionType === 'showWhen' ? 'bg-green-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
+									on:click={() => updateConditionType('showWhen')}
+									aria-pressed={conditionType === 'showWhen'}
+								>Show if</button>
+								<button
+									class="flex-1 py-2 px-3 border-l-[2px] border-gray-300 transition-colors font-medium {conditionType === 'hideWhen' ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
+									on:click={() => updateConditionType('hideWhen')}
+									aria-pressed={conditionType === 'hideWhen'}
+								>Hide if</button>
+							</div>
+
+							{#if conditionType !== 'none'}
+								<ConditionBuilder
+									condition={conditionExpression}
+									availableVariables={conditionAvailableVars}
+									on:change={(e) => updateConditionExpression(e.detail.expression)}
+								/>
+
+								{#if !conditionValid && conditionError}
+									<p class="text-[10px] text-red-500" role="alert">{conditionError}</p>
+								{/if}
+							{:else}
+								<p class="text-xs text-gray-500">Control when this element is visible</p>
+							{/if}
+						</div>
+					{/if}
+				</div>
+
+				<!-- LOOP SECTION — accordion -->
+				<div class="pt-3 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => showLoopSection = !showLoopSection}
+						aria-expanded={showLoopSection}
+					>
+						<div class="flex items-center gap-2">
+							<span class="{sectionHeaderClass}">Loop</span>
+							{#if isLoopElement}
+								<span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-medium">Active</span>
+							{/if}
+						</div>
+						<div class="flex items-center gap-2">
+							<label class="relative inline-flex items-center cursor-pointer" on:click|stopPropagation>
+								<input
+									type="checkbox"
+									class="sr-only peer"
+									checked={isLoopElement}
+									on:change={(e) => toggleLoop(e.target.checked)}
+									aria-label="Enable loop"
+								/>
+								<div class="{toggleSwitchClass}"></div>
+							</label>
+							<i class="fa fa-chevron-{showLoopSection ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+						</div>
+					</button>
+
+					{#if showLoopSection}
+						<div class="space-y-3 mt-3" transition:slide={{duration: 150}}>
+							{#if !isLoopElement}
+								<p class="text-xs text-gray-500">Repeat this element for each item in an array</p>
+							{:else}
+								<div class="grid grid-cols-2 gap-2">
+									<div>
+										<label class="{fieldLabelClass}">Array Variable</label>
+										<input
+											type="text"
+											class={inputBaseClass}
+											placeholder="items"
+											value={loopVariable}
+											on:input={(e) => { updateLoopVariable(e.target.value); validateLoopVariable(e.target.value); }}
+											aria-required="true"
+											aria-invalid={!!loopVariableError}
+										/>
+										{#if loopVariableError}
+											<p class="text-[10px] text-red-500 mt-1" role="alert">{loopVariableError}</p>
 										{/if}
 									</div>
-									
-									<!-- Variable Name -->
-									<div class="mb-2">
-										<label class="block text-[10px] font-medium text-gray-600 mb-1">
-											Variable Name
-											<span class="text-[#ff6b6b]">*</span>
-											<span class="text-[9px] text-gray-400">(customize for API)</span>
-										</label>
-										<input
-											type="text"
-											class={inputBaseClass + " bg-yellow-50"}
-											placeholder="e.g., backgroundColor, primaryColor"
-											value={binding.variableName}
-											on:input={(e) => updateVariableBinding(index, 'variableName', e.target.value)}
-										/>
-									</div>
-									
-									<!-- Description -->
-									<div class="mb-2">
-										<label class="block text-[10px] font-medium text-gray-600 mb-1">Description <span class="text-gray-400">(optional)</span></label>
+									<div>
+										<label class="{fieldLabelClass}">Item Alias</label>
 										<input
 											type="text"
 											class={inputBaseClass}
-											placeholder="Brief description for API docs"
-											value={binding.description}
-											on:input={(e) => updateVariableBinding(index, 'description', e.target.value)}
+											placeholder="item"
+											value={loopItemName}
+											on:input={(e) => updateLoopItemName(e.target.value)}
 										/>
 									</div>
-									
-									<!-- Required Toggle -->
-									<div class="flex items-center justify-between pt-1">
-										<label class="text-[10px] font-medium text-gray-600">Required</label>
-										<label class="relative inline-flex items-center cursor-pointer">
-											<input 
-												type="checkbox" 
-												class="sr-only peer"
-												checked={binding.required}
-												on:change={(e) => updateVariableBinding(index, 'required', e.target.checked)}
+								</div>
+
+								<div class="grid grid-cols-2 gap-2">
+									<div>
+										<label class="{fieldLabelClass}">Layout</label>
+										<select
+											class={selectClass}
+											value={loopDirection}
+											on:change={(e) => updateLoopDirection(e.target.value)}
+										>
+											<option value="vertical">Vertical</option>
+											<option value="horizontal">Horizontal</option>
+											<option value="grid">Grid</option>
+										</select>
+									</div>
+									<div>
+										<label class="{fieldLabelClass}">{loopDirection === 'grid' ? 'Columns' : 'Gap (px)'}</label>
+										{#if loopDirection === 'grid'}
+											<input
+												type="number"
+												class={inputBaseClass}
+												min="1"
+												max="10"
+												value={loopColumns}
+												on:input={(e) => updateLoopColumns(e.target.value)}
 											/>
-											<div class="w-7 h-4 bg-gray-200 rounded-full peer peer-checked:after:translate-x-3 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-black"></div>
-										</label>
+										{:else}
+											<input
+												type="number"
+												class={inputBaseClass}
+												min="0"
+												value={loopSpacing}
+												on:input={(e) => updateLoopSpacing(e.target.value)}
+											/>
+										{/if}
 									</div>
 								</div>
-							{/each}
-							
-							<!-- Add Another Binding Button -->
-							{#if getAvailablePropertiesForType().length > variableBindings.length}
-								<button 
-									class="w-full py-2 px-3 border-2 border-dashed border-gray-900 rounded-lg text-xs text-gray-500 hover:text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-									on:click={addVariableBinding}
-								>
-									<i class="fa fa-plus text-[10px]"></i>
-									Add Another Property
-								</button>
-							{:else}
-								<p class="text-[10px] text-gray-400 text-center py-2">All available properties are bound</p>
-							{/if}
-							
-							<!-- API Usage Preview -->
-							<div class="bg-gray-900 rounded-lg p-3 mt-3">
-								<p class="text-[10px] text-gray-400 mb-1">API Usage:</p>
-								<pre class="text-green-400 text-[10px] whitespace-pre-wrap overflow-x-auto"><code>{JSON.stringify(
-									variableBindings.reduce((acc, b) => {
-										if (b.property === 'chartData') {
-											acc[b.variableName || 'chart_data'] = [{"label": "A", "value": 10}];
-										} else if (b.property === 'tableData') {
-											acc[b.variableName || 'table_data'] = {"headers": ["..."], "rows": [["..."]]};
-										} else if (b.property === 'src') {
-											acc[b.variableName || 'image_url'] = "https://...";
-										} else if (b.property === 'fill' || b.property === 'stroke') {
-											acc[b.variableName || 'color'] = "#ff0000";
-										} else if (b.property === 'opacity') {
-											acc[b.variableName || 'opacity'] = 0.8;
-										} else if (b.property === 'fontSize' || b.property === 'strokeWidth') {
-											acc[b.variableName || 'size'] = 24;
-										} else {
-											acc[b.variableName || 'variable'] = "value";
-										}
-										return acc;
-									}, {}),
-									null, 2
-								)}</code></pre>
-							</div>
-						</div>
-					{/if}
-				</div>
-				
-				<!-- CONDITIONAL VISIBILITY -->
-				<div class="bg-white rounded-lg border-[2px] border-gray-900 p-4 mb-4">
-					<div class="flex items-center justify-between mb-3">
-						<div class="flex items-center gap-2">
-							<span class="w-2 h-2 rounded-full {conditionType !== 'none' ? 'bg-[#ff6b6b]' : 'bg-gray-300'}"></span>
-							<span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Condition</span>
-						</div>
-					</div>
-					
-					<div class="flex rounded-lg overflow-hidden border-2 border-gray-900 text-[11px] mb-3">
-						<button 
-							class="flex-1 py-2 px-3 transition-colors {conditionType === 'none' ? 'bg-black text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
-							on:click={() => updateConditionType('none')}
-						>Always</button>
-						<button 
-							class="flex-1 py-2 px-3 border-l-2 border-gray-900 transition-colors {conditionType === 'showWhen' ? 'bg-green-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
-							on:click={() => updateConditionType('showWhen')}
-						>Show if</button>
-						<button 
-							class="flex-1 py-2 px-3 border-l-2 border-gray-900 transition-colors {conditionType === 'hideWhen' ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}"
-							on:click={() => updateConditionType('hideWhen')}
-						>Hide if</button>
-					</div>
-					
-					{#if conditionType !== 'none'}
-						<ConditionBuilder 
-							condition={conditionExpression}
-							on:change={(e) => updateConditionExpression(e.detail.expression)}
-						/>
-						
-						{#if !conditionValid && conditionError}
-							<p class="text-[10px] text-red-500 mt-2">{conditionError}</p>
-						{/if}
-					{:else}
-						<p class="text-xs text-gray-500">Control when this element is visible</p>
-					{/if}
-				</div>
-				
-				<!-- LOOP/REPEAT SECTION -->
-				<div class="bg-white rounded-lg border-[2px] border-gray-900 p-4 mb-4">
-					<div class="flex items-center justify-between mb-3">
-						<div class="flex items-center gap-2">
-							<span class="w-2 h-2 rounded-full {isLoopElement ? 'bg-[#ff6b6b]' : 'bg-gray-300'}"></span>
-							<span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Loop</span>
-						</div>
-						<label class="relative inline-flex items-center cursor-pointer">
-							<input 
-								type="checkbox" 
-								class="sr-only peer"
-								checked={isLoopElement}
-								on:change={(e) => toggleLoop(e.target.checked)}
-							/>
-							<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-0/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-						</label>
-					</div>
-					
-					{#if !isLoopElement}
-						<p class="text-xs text-gray-500">Repeat this element for each item in an array</p>
-					{:else}
-						<div class="space-y-3">
-							<div class="grid grid-cols-2 gap-2">
-								<div>
-									<label class="block text-[10px] text-gray-500 mb-1">Array Variable</label>
-									<input
-										type="text"
-										class={inputBaseClass}
-										placeholder="items"
-										value={loopVariable}
-										on:input={(e) => updateLoopVariable(e.target.value)}
-									/>
-								</div>
-								<div>
-									<label class="block text-[10px] text-gray-500 mb-1">Item Alias</label>
-									<input
-										type="text"
-										class={inputBaseClass}
-										placeholder="item"
-										value={loopItemName}
-										on:input={(e) => updateLoopItemName(e.target.value)}
-									/>
-								</div>
-							</div>
-							
-							<div class="grid grid-cols-2 gap-2">
-								<div>
-									<label class="block text-[10px] text-gray-500 mb-1">Layout</label>
-									<select
-										class="w-full text-sm border-2 border-gray-900 rounded px-3 py-2 bg-white focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
-										value={loopDirection}
-										on:change={(e) => updateLoopDirection(e.target.value)}
-									>
-										<option value="vertical">Vertical</option>
-										<option value="horizontal">Horizontal</option>
-										<option value="grid">Grid</option>
-									</select>
-								</div>
-								<div>
-									<label class="block text-[10px] text-gray-500 mb-1">{loopDirection === 'grid' ? 'Columns' : 'Gap (px)'}</label>
-									{#if loopDirection === 'grid'}
-										<input
-											type="number"
-											class={inputBaseClass}
-											min="1"
-											max="10"
-											value={loopColumns}
-											on:input={(e) => updateLoopColumns(e.target.value)}
-										/>
-									{:else}
+
+								{#if loopDirection === 'grid'}
+									<div>
+										<label class="{fieldLabelClass}">Gap (px)</label>
 										<input
 											type="number"
 											class={inputBaseClass}
 											min="0"
 											value={loopSpacing}
-											on:input={(e) => updateLoopSpacing(e.target.value)}
+											on:input={(e) => updateLoopGap(e.target.value)}
 										/>
-									{/if}
+									</div>
+								{/if}
+
+								<div class="bg-gray-50 rounded-lg p-2 border border-gray-200">
+									<p class="text-[10px] text-gray-600">
+										<i class="fa fa-info-circle mr-1 text-gray-400"></i>
+										Use <code class="bg-gray-200 px-1 rounded text-gray-700">{"{{" + (loopItemName || 'item') + ".field}}"}</code> in text elements
+									</p>
 								</div>
-							</div>
-							
-							<div class="bg-gray-100 rounded-lg p-2 border-[2px] border-gray-900">
-								<p class="text-[10px] text-gray-600">
-									<i class="fa fa-info-circle mr-1 text-gray-400"></i>
-									Use <code class="bg-gray-200 px-1 rounded text-gray-700">{"{{" + (loopItemName || 'item') + ".field}}"}</code> in text elements
-								</p>
-							</div>
+							{/if}
 						</div>
 					{/if}
 				</div>
-				
-				<!-- Variables Panel Link -->
-				<div class="bg-gray-100 rounded-lg border-[2px] border-gray-900 p-4">
-					<button 
-						class="w-full flex items-center justify-center gap-2 text-sm text-gray-700 hover:text-black font-medium"
-						on:click={() => editorActions.toggleRightSidebarTab('variables')}
-					>
-						<i class="fa fa-list-ul"></i>
-						View All Variables
-						<i class="fa fa-arrow-right text-xs"></i>
-					</button>
-					<p class="text-[10px] text-gray-500 text-center mt-2">Manage all template variables in one place</p>
-				</div>
+
+				<!-- Destructive Action Confirmation Modal -->
+				{#if pendingDestructiveAction}
+					<div class="mt-3 p-3 bg-amber-50 border-[2px] border-amber-300 rounded-lg" role="alertdialog" aria-label="Confirm action">
+						<p class="text-xs text-amber-800 font-medium mb-2">
+							{#if pendingDestructiveAction.type === 'condition'}
+								Remove condition? Your expression will be cleared.
+							{:else if pendingDestructiveAction.type === 'loop'}
+								Disable loop? The loop configuration on canvas will be removed.
+							{:else}
+								Are you sure?
+							{/if}
+						</p>
+						<div class="flex gap-2">
+							<button
+								class="flex-1 py-1.5 px-3 text-[11px] font-medium bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+								on:click={confirmDestructiveAction}
+							>Confirm</button>
+							<button
+								class="flex-1 py-1.5 px-3 text-[11px] font-medium bg-white text-gray-700 border-[2px] border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+								on:click={cancelDestructiveAction}
+							>Cancel</button>
+						</div>
+					</div>
+				{/if}
 			{/if}
 			<!-- END LOGIC MODE -->
 
 			<!-- GROUP/UNGROUP SECTION (always visible) -->
-			<div class="pt-4 border-t-[2px] border-gray-900">
+			<div class="pt-4 border-t border-gray-200">
 				<div class="flex items-center justify-between">
 					<span class="text-xs font-medium text-gray-600">Grouping</span>
 					{#if type === 'activeSelection'}
@@ -4357,40 +5197,44 @@
 							Ungroup
 						</button>
 					{:else if type === 'group'}
-						<span class="text-[10px] text-gray-400">Protected element</span>
+						<span class="text-[10px] text-gray-500">Protected element</span>
 					{:else}
-						<span class="text-[10px] text-gray-400">Shift+click to multi-select</span>
+						<span class="text-[10px] text-gray-500">Shift+click to multi-select</span>
 					{/if}
 				</div>
 			</div>
 
-			<div class="pt-4 border-t-[2px] border-gray-900">
-				<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Layer Arrangement</label>
-				<div class="flex items-center justify-between gap-2">
-					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
+			<div class="pt-4 border-t border-gray-200">
+				<label class="{fieldLabelClass}">Layer Arrangement</label>
+				<div class="flex items-center justify-between gap-1.5">
+					<button
+						class="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded border border-gray-200 flex-1 transition-colors"
 						title="Bring to Front"
+						aria-label="Bring to Front"
 						on:click={bringToFront}
 					>
 						<i class="fa fa-angle-double-up"></i>
 					</button>
-					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
+					<button
+						class="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded border border-gray-200 flex-1 transition-colors"
 						title="Bring Forward"
+						aria-label="Bring Forward"
 						on:click={bringForward}
 					>
 						<i class="fa fa-angle-up"></i>
 					</button>
-					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
+					<button
+						class="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded border border-gray-200 flex-1 transition-colors"
 						title="Send Backward"
+						aria-label="Send Backward"
 						on:click={sendBackwards}
 					>
 						<i class="fa fa-angle-down"></i>
 					</button>
-					<button 
-						class="p-2 text-gray-600 hover:bg-gray-100 rounded border-[2px] border-gray-900 flex-1"
+					<button
+						class="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded border border-gray-200 flex-1 transition-colors"
 						title="Send to Back"
+						aria-label="Send to Back"
 						on:click={sendToBack}
 					>
 						<i class="fa fa-angle-double-down"></i>
@@ -4399,15 +5243,42 @@
 			</div>
 			
 		{:else}
+			{#if !$editor}
+				<!-- Skeleton loading state while canvas initializes -->
+				<div class="space-y-4 animate-pulse">
+					<div class="flex items-center gap-2 pb-4 border-b border-gray-100">
+						<div class="h-6 w-16 bg-gray-200 rounded"></div>
+						<div class="h-4 w-12 bg-gray-100 rounded"></div>
+					</div>
+					<div class="space-y-3">
+						<div class="h-3 w-20 bg-gray-200 rounded"></div>
+						<div class="h-10 w-full bg-gray-100 border-[2px] border-gray-200 rounded-lg"></div>
+					</div>
+					<div class="grid grid-cols-2 gap-2">
+						<div class="space-y-1">
+							<div class="h-3 w-10 bg-gray-200 rounded"></div>
+							<div class="h-10 bg-gray-100 border-[2px] border-gray-200 rounded-lg"></div>
+						</div>
+						<div class="space-y-1">
+							<div class="h-3 w-10 bg-gray-200 rounded"></div>
+							<div class="h-10 bg-gray-100 border-[2px] border-gray-200 rounded-lg"></div>
+						</div>
+					</div>
+					<div class="space-y-1">
+						<div class="h-3 w-28 bg-gray-200 rounded"></div>
+						<div class="h-10 bg-gray-100 border-[2px] border-gray-200 rounded-lg"></div>
+					</div>
+				</div>
+			{:else}
 			<div class="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
 				<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded uppercase">
 					Canvas
 				</span>
-				<span class="text-xs text-gray-400">Settings</span>
+				<span class="text-xs text-gray-500">Settings</span>
 			</div>
 
 			<div>
-				<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+				<label class="{fieldLabelClass}">
 					{#if $outputFormat === 'pdf'}
 						Page Size
 					{:else}
@@ -4475,30 +5346,34 @@
 
 			<div class="grid grid-cols-2 gap-2">
 				<div>
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+					<label class="{fieldLabelClass}">
 						Width
 						<input
 							type="number"
 							class={inputNumberClass + " mt-1"}
 							value={$editor ? $editor.width : 0}
+							min="100"
+							max="5000"
 							on:change={(e) => {
 								if ($editor) {
-									$editor.setDimensions({ width: parseInt(e.target.value), height: $editor.height });
+									$editor.setDimensions({ width: clampNumber(e.target.value, 100, 5000, 1080), height: $editor.height });
 								}
 							}}
 						/>
 					</label>
 				</div>
 				<div>
-					<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+					<label class="{fieldLabelClass}">
 						Height
 						<input
 							type="number"
 							class={inputNumberClass + " mt-1"}
 							value={$editor ? $editor.height : 0}
+							min="100"
+							max="5000"
 							on:change={(e) => {
 								if ($editor) {
-									$editor.setDimensions({ width: $editor.width, height: parseInt(e.target.value) });
+									$editor.setDimensions({ width: $editor.width, height: clampNumber(e.target.value, 100, 5000, 1080) });
 								}
 							}}
 						/>
@@ -4514,44 +5389,248 @@
 				onSolidChange={setBackgroundSolidColor}
 				onGradientChange={applyGradientToBackground}
 			/>
+			{/if}
 		{/if}
 	</div>
 </div>
 
+<!-- Maximized Chart Data Editor Modal -->
+{#if maximizeChartEditor}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => maximizeChartEditor = false}
+	>
+		<div class="bg-white rounded-2xl border-[2px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[2px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#ffc480] rounded-lg border-[2px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit Chart Data</h3>
+				</div>
+				<div class="flex items-center gap-2">
+					<!-- Format Toggle -->
+					<div class="flex gap-1 p-1 bg-gray-100 rounded-lg">
+						<button
+							class="px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat === 'json' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+							on:click={() => { chartDataFormat = 'json'; loadSampleChartData(); }}
+						>
+							<i class="fa fa-code mr-1"></i>JSON
+						</button>
+						<button
+							class="px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat === 'csv' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+							on:click={() => { chartDataFormat = 'csv'; loadSampleChartData(); }}
+						>
+							<i class="fa fa-file-csv mr-1"></i>CSV
+						</button>
+					</div>
+					{#if chartDataFormat === 'csv'}
+						<button
+							class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+							on:click={formatChartCSV}
+							title="Format CSV"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+						</button>
+					{/if}
+					<button
+						class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+						on:click={() => maximizeChartEditor = false}
+						title="Minimize"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				{#if chartDataFormat === 'json'}
+					<div class="border-[2px] border-gray-900 rounded-lg overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+						<CodeMirror
+							bind:value={chartDataInput}
+							lang={json()}
+							styles={{
+								'&': {
+									height: '100%',
+									fontSize: '13px',
+									fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+								},
+								'.cm-content': { padding: '12px' },
+								'.cm-line': { padding: '0' },
+								'.cm-gutters': {
+									backgroundColor: '#f9fafb',
+									color: '#9ca3af',
+									borderRight: '1px solid #f3f4f6',
+									minWidth: '40px'
+								},
+								'.cm-scroller': { overflow: 'auto' }
+							}}
+						/>
+					</div>
+				{:else}
+					<textarea
+						class="w-full h-full text-sm font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] focus:ring-0 p-4 resize-none overflow-auto"
+						placeholder='label,value&#10;Jan,30&#10;Feb,45'
+						bind:value={chartDataInput}
+					></textarea>
+				{/if}
+			</div>
+
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[2px] border-gray-900 flex items-center justify-between gap-3">
+				{#if chartDataError}
+					<p class="text-xs text-red-600 flex-1"><i class="fa fa-exclamation-circle mr-1"></i>{chartDataError}</p>
+				{:else}
+					<div class="text-[10px] text-gray-500 flex-1">
+						{#if chartDataFormat === 'csv'}
+							Format: <code class="bg-gray-100 px-1 rounded">label,value</code> per row
+						{:else}
+							Format: <code class="bg-gray-100 px-1 rounded">[{"{"}label, value{"}"}]</code>
+						{/if}
+					</div>
+				{/if}
+				<div class="flex gap-2">
+					<button
+						class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg border-[2px] border-gray-900 hover:bg-gray-200 transition-colors"
+						on:click={loadSampleChartData}
+					>
+						<i class="fa fa-undo mr-1"></i>Load Current
+					</button>
+					<button
+						class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						on:click={() => { applyChartDataFromInput(); if (!chartDataError) maximizeChartEditor = false; }}
+					>
+						<i class="fa fa-check mr-1"></i>Apply
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Maximized Table Data Editor Modal -->
+{#if maximizeTableEditor}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => maximizeTableEditor = false}
+	>
+		<div class="bg-white rounded-2xl border-[2px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[2px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#a2ffc1] rounded-lg border-[2px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit Table Data</h3>
+				</div>
+				<div class="flex items-center gap-2">
+					<!-- Format Toggle -->
+					<div class="flex gap-1 p-1 bg-gray-100 rounded-lg">
+						<button
+							class="px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat === 'json' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+							on:click={() => { tableDataFormat = 'json'; loadSampleTableData(); }}
+						>
+							<i class="fa fa-code mr-1"></i>JSON
+						</button>
+						<button
+							class="px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat === 'csv' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}"
+							on:click={() => { tableDataFormat = 'csv'; loadSampleTableData(); }}
+						>
+							<i class="fa fa-file-csv mr-1"></i>CSV
+						</button>
+					</div>
+					{#if tableDataFormat === 'csv'}
+						<button
+							class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+							on:click={formatTableCSV}
+							title="Format CSV"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+						</button>
+					{/if}
+					<button
+						class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+						on:click={() => maximizeTableEditor = false}
+						title="Minimize"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				{#if tableDataFormat === 'json'}
+					<div class="border-[2px] border-gray-900 rounded-lg overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+						<CodeMirror
+							bind:value={tableDataInput}
+							lang={json()}
+							styles={{
+								'&': {
+									height: '100%',
+									fontSize: '13px',
+									fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+								},
+								'.cm-content': { padding: '12px' },
+								'.cm-line': { padding: '0' },
+								'.cm-gutters': {
+									backgroundColor: '#f9fafb',
+									color: '#9ca3af',
+									borderRight: '1px solid #f3f4f6',
+									minWidth: '40px'
+								},
+								'.cm-scroller': { overflow: 'auto' }
+							}}
+						/>
+					</div>
+				{:else}
+					<textarea
+						class="w-full h-full text-sm font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] focus:ring-0 p-4 resize-none overflow-auto"
+						placeholder='Header1,Header2,Header3&#10;Value1,Value2,Value3'
+						bind:value={tableDataInput}
+					></textarea>
+				{/if}
+			</div>
+
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[2px] border-gray-900 flex items-center justify-between gap-3">
+				{#if tableDataError}
+					<p class="text-xs text-red-600 flex-1"><i class="fa fa-exclamation-circle mr-1"></i>{tableDataError}</p>
+				{:else}
+					<div class="text-[10px] text-gray-500 flex-1">
+						{#if tableDataFormat === 'csv'}
+							Format: <code class="bg-gray-100 px-1 rounded">Header1,Header2</code> first row, then data rows
+						{:else}
+							Format: <code class="bg-gray-100 px-1 rounded">{"{"}headers: [...], rows: [[...]]{"}"}</code>
+						{/if}
+					</div>
+				{/if}
+				<div class="flex gap-2">
+					<button
+						class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg border-[2px] border-gray-900 hover:bg-gray-200 transition-colors"
+						on:click={loadSampleTableData}
+					>
+						<i class="fa fa-undo mr-1"></i>Load Current
+					</button>
+					<button
+						class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						on:click={() => { applyTableDataFromInput(); if (!tableDataError) maximizeTableEditor = false; }}
+					>
+						<i class="fa fa-check mr-1"></i>Apply
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <style>
-	/* Custom slider styling */
-	.slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 16px;
-		height: 16px;
-		border-radius: 50%;
-		background: #000;
-		cursor: pointer;
-		border: 2px solid white;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	.slider::-moz-range-thumb {
-		width: 16px;
-		height: 16px;
-		border-radius: 50%;
-		background: #000;
-		cursor: pointer;
-		border: 2px solid white;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	.slider::-webkit-slider-thumb:hover {
-		background: #333;
-		transform: scale(1.1);
-	}
-
-	.slider::-moz-range-thumb:hover {
-		background: #333;
-		transform: scale(1.1);
-	}
-
 	/* Custom scrollbar for properties panel */
 	.custom-scrollbar::-webkit-scrollbar {
 		width: 6px;

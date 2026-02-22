@@ -1,6 +1,17 @@
 <script>
 	import ConnectorConfigs from '$lib/components/dashboard/integrations/ConnectorConfigs.svelte';
 	import { fade, fly } from 'svelte/transition';
+	import { FeatureUpgradePrompt } from '$lib/components/plg';
+	import {
+		checkFeatureAccessSync,
+		FEATURES,
+		getFeatureUpgradePrompt
+	} from '../../../../store/plg.store';
+
+	// Feature gating for Storage Connectors
+	$: storageAccess = checkFeatureAccessSync(FEATURES.STORAGE_CONNECTORS);
+	$: hasStorageAccess = storageAccess?.hasAccess ?? false;
+	$: storageUpgradePrompt = getFeatureUpgradePrompt(FEATURES.STORAGE_CONNECTORS);
 </script>
 
 <div class="min-h-full pb-12">

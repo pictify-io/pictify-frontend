@@ -10,6 +10,7 @@ import {
 	getTeamInvitations as getInvitationsAPI,
 	createInvitation as createInvitationAPI,
 	revokeInvitation as revokeInvitationAPI,
+	resendInvitation as resendInvitationAPI,
 	updateTeam as updateTeamAPI,
 	getPendingInvitations as getPendingAPI,
 	acceptInvitation as acceptAPI,
@@ -17,6 +18,7 @@ import {
 } from '../api/teams';
 import { analytics } from '$lib/analytics.js';
 import { initOnboarding } from './onboarding.store';
+import { resetPLG } from './plg.store';
 
 /**
  * Team Store - Manages team state for the application
@@ -226,6 +228,9 @@ export const switchTeamAction = async (teamId) => {
 			loading: { ...state.loading, switching: false }
 		}));
 
+		// Clear cached PLG state so it re-fetches for the new team
+		resetPLG();
+
 		// Refresh onboarding state for the new team
 		initOnboarding().catch((err) => {
 			console.error('Failed to refresh onboarding after team switch:', err);
@@ -362,6 +367,7 @@ export const fetchTeamInvitations = async (teamId) => {
 
 	try {
 		const response = await getInvitationsAPI(targetTeamId);
+		console.log('[Team Store] Fetched invitations:', response);
 		teamStore.update((state) => ({
 			...state,
 			invitations: response.invitations || [],
@@ -369,6 +375,7 @@ export const fetchTeamInvitations = async (teamId) => {
 		}));
 		return response.invitations;
 	} catch (error) {
+		console.error('[Team Store] Error fetching invitations:', error);
 		setError(error);
 		setLoading('invitations', false);
 		throw error;
@@ -389,9 +396,15 @@ export const createInvitationAction = async (teamId, email) => {
 			invitee_email: email
 		});
 
+		// Include inviteUrl in the invitation object
+		const invitationWithUrl = {
+			...response.invitation,
+			inviteUrl: response.inviteUrl
+		};
+
 		teamStore.update((state) => ({
 			...state,
-			invitations: [...state.invitations, response.invitation]
+			invitations: [...state.invitations, invitationWithUrl]
 		}));
 
 		return response;
@@ -416,6 +429,27 @@ export const revokeInvitationAction = async (teamId, invitationUid) => {
 		}));
 
 		return { success: true };
+	} catch (error) {
+		setError(error);
+		throw error;
+	}
+};
+
+/**
+ * Resend an invitation email
+ */
+export const resendInvitationAction = async (teamId, invitationUid) => {
+	setError(null);
+
+	try {
+		const response = await resendInvitationAPI(teamId, invitationUid);
+
+		analytics.track('Team Invitation Resent', {
+			team_id: teamId,
+			invitation_uid: invitationUid
+		});
+
+		return response;
 	} catch (error) {
 		setError(error);
 		throw error;

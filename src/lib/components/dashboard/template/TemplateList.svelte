@@ -3,17 +3,15 @@
 	import { browser } from '$app/environment';
 	import { createEventDispatcher } from 'svelte';
 	import DOMPurify from 'dompurify';
-	
+	import { getPageNumbers as sharedGetPageNumbers } from '$lib/utils/format.js';
+
 	export let templates;
 	export let pagination = { page: 1, limit: 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false };
-	export let formatFilter = 'all'; // Controlled by parent, synced with API
-	
+
 	const dispatch = createEventDispatcher();
 
 	// Handle format filter change - dispatch to parent to refetch from API
-	const handleFilterChange = (filter) => {
-		dispatch('filterChange', filter);
-	};
+
 
 	const handleTemplateClick = (template) => {
 		// Route to format-specific editor based on outputFormat
@@ -158,93 +156,38 @@
 		}
 	};
 
-	// Generate page numbers for pagination
-	const getPageNumbers = () => {
-		const { page, totalPages } = pagination;
-		const pages = [];
-		const maxVisible = 5;
-		
-		if (totalPages <= maxVisible) {
-			for (let i = 1; i <= totalPages; i++) {
-				pages.push(i);
-			}
-		} else {
-			if (page <= 3) {
-				for (let i = 1; i <= 4; i++) pages.push(i);
-				pages.push('...');
-				pages.push(totalPages);
-			} else if (page >= totalPages - 2) {
-				pages.push(1);
-				pages.push('...');
-				for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-			} else {
-				pages.push(1);
-				pages.push('...');
-				for (let i = page - 1; i <= page + 1; i++) pages.push(i);
-				pages.push('...');
-				pages.push(totalPages);
-			}
-		}
-		
-		return pages;
-	};
+	const getPageNumbers = () => sharedGetPageNumbers(pagination.page, pagination.totalPages);
 </script>
 
 <section>
-	<!-- Format Filter -->
-	<div class="flex items-center gap-2 mb-4">
-		<span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Filter:</span>
-		<div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
-			<button
-				on:click={() => handleFilterChange('all')}
-				class="px-3 py-1 text-xs font-bold rounded-md transition-all duration-200
-					{formatFilter === 'all' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-white hover:text-gray-900'}"
-			>
-				All
-			</button>
-			<button
-				on:click={() => handleFilterChange('image')}
-				class="px-3 py-1 text-xs font-bold rounded-md transition-all duration-200
-					{formatFilter === 'image' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-white hover:text-gray-900'}"
-			>
-				<span class="flex items-center gap-1">
-					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-					Image
-				</span>
-			</button>
-			<button
-				on:click={() => handleFilterChange('pdf')}
-				class="px-3 py-1 text-xs font-bold rounded-md transition-all duration-200
-					{formatFilter === 'pdf' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-white hover:text-gray-900'}"
-			>
-				<span class="flex items-center gap-1">
-					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-					PDF
-				</span>
-			</button>
-		</div>
-	</div>
-
 	<!-- Template Grid -->
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8">
 		{#each templates as template (template.uid)}
 			<div
 				role="button"
 				tabindex="0"
-				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] sm:hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col"
+				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] sm:hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col
+					{template.hasDynamicLink ? 'border-[#a855f7] ring-2 ring-[#a855f7]/30' : 'border-gray-900'}"
 				on:click={() => handleTemplateClick(template)}
 				on:keydown={(e) => {
 					if (e.key === 'Enter') handleTemplateClick(template);
 				}}
 			>
 				<!-- Card Header / Tab -->
-				<div class="h-7 sm:h-8 bg-gray-100 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center justify-between px-2 sm:px-3">
+				<div class="h-7 sm:h-8 border-b-[2px] sm:border-b-[3px] flex items-center justify-between px-2 sm:px-3
+					{template.hasDynamicLink ? 'bg-[#a855f7]/10 border-[#a855f7]' : 'bg-gray-100 border-gray-900'}">
 					<div class="flex items-center gap-1 sm:gap-1.5">
 						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
 						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
 						<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
 					</div>
 					<div class="flex items-center gap-2">
+						{#if template.hasDynamicLink}
+							<span class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-[#a855f7] text-white uppercase tracking-wider rounded border border-gray-900 flex items-center gap-0.5">
+								<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+								LIVE
+							</span>
+						{/if}
 						{#if template.outputFormat === 'pdf'}
 							<span class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-[#ff6b6b] text-white uppercase tracking-wider rounded border border-gray-900">
 								PDF
@@ -319,19 +262,31 @@
 			</div>
 			
 			<!-- Footer Info -->
-			<div class="p-3 sm:p-4 border-t-[2px] sm:border-t-[3px] border-gray-900 bg-white flex-1 flex flex-col justify-between">
+			<div class="p-3 sm:p-4 border-t-[2px] sm:border-t-[3px] bg-white flex-1 flex flex-col justify-between
+				{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}">
 				<div>
 					<h3 class="font-black text-gray-900 text-base sm:text-lg leading-tight mb-2 sm:mb-3 line-clamp-1" title={template.name}>
 						{template.name}
 					</h3>
 					
 					<div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+						<!-- Dynamic Link Tag -->
+						{#if template.hasDynamicLink}
+							<div class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#a855f7]/20 border border-[#a855f7] rounded text-[9px] sm:text-[10px] font-bold uppercase text-[#7c3aed] tracking-wide">
+								<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+								<span class="flex items-center gap-1">
+									Dynamic
+									<span class="w-1.5 h-1.5 bg-[#a855f7] rounded-full animate-pulse"></span>
+								</span>
+							</div>
+						{/if}
+
 						<!-- Date Tag -->
 						<div class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 border border-gray-300 rounded text-[9px] sm:text-[10px] font-bold uppercase text-gray-600 tracking-wide">
 							<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 							{formatDate(template.createdAt)}
 						</div>
-						
+
 						<!-- Usage Tag -->
 						{#if template.usageCount > 0}
 							<div class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#4ade80]/20 border border-[#4ade80] rounded text-[9px] sm:text-[10px] font-bold uppercase text-gray-900 tracking-wide">

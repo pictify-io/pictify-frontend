@@ -73,9 +73,7 @@
     transition:fade={{ duration: 150 }}
     on:click={handleDismiss}
     on:keydown={(e) => e.key === 'Escape' && handleDismiss()}
-    role="button"
-    tabindex="0"
-    aria-label="Close modal"
+    role="presentation"
   >
     <!-- Modal -->
     <div
@@ -89,8 +87,11 @@
     >
       <!-- Header with solid color -->
       <div class="bg-[#ffc480] p-6 relative border-b-[3px] border-gray-900">
+        <!-- Decorative pattern -->
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px]"></div>
+
         <!-- Discount badge -->
-        <div class="absolute top-5 right-5 px-3 py-1 bg-white rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] transform rotate-3">
+        <div class="absolute top-5 right-5 px-3 py-1 bg-white rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] transform rotate-3 z-10">
           <span class="text-xs font-black text-gray-900 tracking-wide">{discountInfo.discountPercent}% OFF</span>
         </div>
 
@@ -100,51 +101,42 @@
               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h2 id="proactive-modal-title" class="text-2xl font-black text-gray-900 tracking-tight">Look what you've built</h2>
+          <h2 id="proactive-modal-title" class="text-3xl font-black text-gray-900 tracking-tighter uppercase">Level Up</h2>
           <p class="text-gray-900 text-sm mt-2 font-bold leading-relaxed max-w-[90%]">
             You're getting real value from Pictify. Don't let a limit slow you down.
           </p>
         </div>
-
-        <!-- Close button -->
-        <button
-          class="absolute top-4 left-4 hidden" 
-          on:click={handleDismiss}
-          aria-label="Close"
-        >
-          <!-- Hidden close button for accessibility, visual close is 'Not now' button -->
-        </button>
       </div>
 
       <!-- Content -->
       <div class="p-6">
         <!-- Value delivered stats -->
         <div class="grid grid-cols-2 gap-4 mb-6">
-          <div class="p-4 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#10b981] text-center transform -rotate-1 hover:rotate-0 transition-transform">
-            <div class="w-10 h-10 bg-[#10b981] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]">
+          <div class="p-4 bg-white rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#10b981] text-center transform -rotate-1 hover:rotate-0 transition-transform">
+            <div class="w-10 h-10 bg-[#10b981] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]">
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <p class="text-2xl font-black text-gray-900">{rendersCompleted}</p>
-            <p class="text-xs text-gray-700 font-bold uppercase tracking-wide mt-1">Renders done</p>
+            <p class="text-[10px] text-gray-700 font-black uppercase tracking-wide mt-1">Renders done</p>
           </div>
 
-          <div class="p-4 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#6366f1] text-center transform rotate-1 hover:rotate-0 transition-transform">
-            <div class="w-10 h-10 bg-[#6366f1] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]">
+          <div class="p-4 bg-white rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#6366f1] text-center transform rotate-1 hover:rotate-0 transition-transform">
+            <div class="w-10 h-10 bg-[#6366f1] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]">
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <p class="text-2xl font-black text-gray-900">~{timeSaved?.display || '0 min'}</p>
-            <p class="text-xs text-gray-700 font-bold uppercase tracking-wide mt-1">Time saved</p>
+            <p class="text-[10px] text-gray-700 font-black uppercase tracking-wide mt-1">Time saved</p>
           </div>
         </div>
 
         <!-- Benefits list -->
-        <div class="space-y-3 mb-8 bg-gray-50 p-4 rounded-xl border-[2px] border-gray-900 border-dashed">
+        <div class="space-y-3 mb-8 bg-gray-50 p-4 rounded-xl border-2 border-gray-900 border-dashed">
           <div class="flex items-center gap-3 text-sm font-bold text-gray-800">
-            <div class="w-5 h-5 rounded bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+            <div class="w-5 h-5 rounded bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]">
                <svg class="w-3.5 h-3.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
               </svg>
@@ -152,7 +144,7 @@
             <span>Higher limits so you can create more</span>
           </div>
           <div class="flex items-center gap-3 text-sm font-bold text-gray-800">
-             <div class="w-5 h-5 rounded bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+             <div class="w-5 h-5 rounded bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]">
                <svg class="w-3.5 h-3.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
               </svg>
@@ -160,7 +152,7 @@
             <span>Clean exports without the watermark</span>
           </div>
           <div class="flex items-center gap-3 text-sm font-bold text-gray-800">
-             <div class="w-5 h-5 rounded bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+             <div class="w-5 h-5 rounded bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]">
                <svg class="w-3.5 h-3.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
               </svg>
@@ -172,7 +164,7 @@
         <!-- CTA Buttons -->
         <div class="space-y-3">
           <button
-            class="w-full py-3.5 px-6 bg-gray-900 text-white font-black uppercase tracking-widest text-sm rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#9ca3af] transition-all group relative overflow-hidden"
+            class="w-full py-3.5 px-6 bg-gray-900 text-white font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#9ca3af] transition-all group relative overflow-hidden"
             on:click={handleUpgradeClick}
           >
             <span class="relative z-10 flex items-center justify-center gap-2">
@@ -184,7 +176,7 @@
           </button>
 
           <button
-            class="w-full py-3 text-xs font-bold text-gray-600 hover:text-gray-900 uppercase tracking-widest transition-colors"
+            class="w-full py-3 text-xs font-bold text-gray-500 hover:text-gray-900 uppercase tracking-widest transition-colors"
             on:click={handleDismiss}
           >
             No thanks, maybe later
@@ -192,7 +184,7 @@
         </div>
 
         <!-- Trust signals -->
-        <div class="mt-6 pt-0 flex items-center justify-center gap-6 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+        <div class="mt-6 pt-0 flex items-center justify-center gap-6 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
           <span class="flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />

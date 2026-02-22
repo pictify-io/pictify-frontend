@@ -153,6 +153,23 @@ export const revokeInvitation = async (teamId, invitationUid) => {
 	}
 };
 
+/**
+ * Resend an invitation email (Owner only)
+ */
+export const resendInvitation = async (teamId, invitationUid) => {
+	try {
+		return await backend.post(`/api/teams/${teamId}/invitations/${invitationUid}/resend`);
+	} catch (error) {
+		if (error.status === 403) throw new Error('Only team owners can resend invitations');
+		if (error.status === 404) throw new Error('Invitation not found');
+		if (error.status === 429) {
+			const retryAfter = error.retryAfter || 120;
+			throw new Error(`Please wait ${retryAfter} seconds before resending`);
+		}
+		throw new Error(error.message || 'Error resending invitation');
+	}
+};
+
 // Invitation-related endpoints (user-facing)
 
 /**

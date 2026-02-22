@@ -74,7 +74,7 @@
 					<span class="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-[#4ade80] rounded-full animate-pulse delay-150" />
 				</div>
 				<span class="text-xs sm:text-sm font-bold text-gray-900 tracking-wide uppercase"
-					>Dynamic Media API</span
+					>Programmable Image Engine</span
 				>
 			</div>
 
@@ -83,9 +83,9 @@
 				in:fly={{ y: 20, duration: 800, delay: 150 }}
 				class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[1.1] tracking-tight"
 			>
-				One Template. <br />
+				Templates With <br />
 				<span class="relative inline-block text-[#ff6b6b]">
-					Unlimited
+					Logic
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-gray-900 opacity-20"
 						viewBox="0 0 100 10"
@@ -94,7 +94,7 @@
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
 					</svg>
 				</span>
-				Images.
+				Inside.
 			</h1>
 
 			<!-- Subheadline -->
@@ -102,14 +102,14 @@
 				in:fly={{ y: 20, duration: 800, delay: 300 }}
 				class="text-lg sm:text-xl text-gray-700 max-w-lg leading-relaxed font-medium border-l-[4px] border-[#ffc480] pl-4 sm:pl-6"
 			>
-				Design templates visually, render them programmatically. Generate social cards, product images, and PDFs at scale—no design team or DevOps required.
+				Build templates with 50+ expression functions, conditionals, and live data bindings. Generate images, GIFs, and PDFs via API—with built-in logic, not just placeholders.
 			</p>
 
 			<!-- CTAs -->
 			<div in:fly={{ y: 20, duration: 800, delay: 450 }} class="flex flex-col gap-6 w-full sm:w-auto min-w-[320px]">
 				<div class="flex flex-col sm:flex-row items-stretch gap-4">
 					<SignUpButton
-						text="Get Your Free API Key"
+						text="Start Building Free"
 						location="hero"
 						class="flex-1 bg-[#ff6b6b] text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all font-black uppercase tracking-wider text-center"
 					/>
@@ -448,7 +448,7 @@
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
 						</svg>
-						<span>Instant</span>
+						<span>Logic Built In</span>
 					</div>
 				</div>
 				<div class="absolute bottom-[20%] left-[10%] animate-bounce [animation-duration:4s] z-40">
@@ -456,9 +456,9 @@
 						class="px-3 py-1.5 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-lg transform -rotate-3 font-bold text-xs flex items-center gap-1.5"
 					>
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
 						</svg>
-						<span>No-Code</span>
+						<span>Dev-First</span>
 					</div>
 				</div>
 			</div>

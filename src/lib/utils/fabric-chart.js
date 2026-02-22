@@ -8,7 +8,7 @@
 import { Group, Rect, Path, Circle, IText, Line } from 'fabric';
 
 // Default chart colors palette
-const DEFAULT_COLORS = [
+export const DEFAULT_COLORS = [
   '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7',
   '#dfe6e9', '#fd79a8', '#a29bfe', '#6c5ce7', '#00b894'
 ];
@@ -46,7 +46,8 @@ export function createBarChart(config = {}) {
     borderColor = '#e5e5e5',
     titleColor = '#333333',
     labelColor = '#666666',
-    gridColor = '#eeeeee'
+    gridColor = '#eeeeee',
+    fontFamily = 'Inter, system-ui, sans-serif'
   } = config;
 
   const objects = [];
@@ -78,7 +79,7 @@ export function createBarChart(config = {}) {
       fill: titleColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -109,7 +110,7 @@ export function createBarChart(config = {}) {
         fill: labelColor,
         originX: 'right',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(yLabel);
     }
@@ -142,7 +143,7 @@ export function createBarChart(config = {}) {
         fill: titleColor,
         originX: 'center',
         originY: 'bottom',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(valueLabel);
     }
@@ -156,7 +157,7 @@ export function createBarChart(config = {}) {
         fill: labelColor,
         originX: 'center',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(label);
     }
@@ -204,7 +205,8 @@ export function createLineChart(config = {}) {
     borderColor = '#e5e5e5',
     titleColor = '#333333',
     labelColor = '#666666',
-    gridColor = '#eeeeee'
+    gridColor = '#eeeeee',
+    fontFamily = 'Inter, system-ui, sans-serif'
   } = config;
 
   const objects = [];
@@ -236,7 +238,7 @@ export function createLineChart(config = {}) {
       fill: titleColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -265,7 +267,7 @@ export function createLineChart(config = {}) {
         fill: labelColor,
         originX: 'right',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(yLabel);
     }
@@ -334,7 +336,7 @@ export function createLineChart(config = {}) {
         fill: labelColor,
         originX: 'center',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(label);
     }
@@ -378,7 +380,8 @@ export function createPieChart(config = {}) {
     backgroundColor = '#ffffff',
     borderColor = '#e5e5e5',
     titleColor = '#333333',
-    labelColor = '#666666'
+    labelColor = '#666666',
+    fontFamily = 'Inter, system-ui, sans-serif'
   } = config;
 
   const objects = [];
@@ -411,7 +414,7 @@ export function createPieChart(config = {}) {
       fill: titleColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -467,7 +470,7 @@ export function createPieChart(config = {}) {
           fill: '#ffffff',
           originX: 'center',
           originY: 'center',
-          fontFamily: 'Inter, system-ui, sans-serif'
+          fontFamily
         });
         objects.push(pctLabel);
       }
@@ -503,7 +506,7 @@ export function createPieChart(config = {}) {
         fill: labelColor,
         originX: 'left',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(legendLabel);
     });
@@ -543,7 +546,8 @@ export function createHorizontalBarChart(config = {}) {
     backgroundColor = '#ffffff',
     borderColor = '#e5e5e5',
     titleColor = '#333333',
-    labelColor = '#666666'
+    labelColor = '#666666',
+    fontFamily = 'Inter, system-ui, sans-serif'
   } = config;
 
   const objects = [];
@@ -575,7 +579,7 @@ export function createHorizontalBarChart(config = {}) {
       fill: titleColor,
       originX: 'center',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(titleText);
   }
@@ -597,7 +601,7 @@ export function createHorizontalBarChart(config = {}) {
       fill: labelColor,
       originX: 'right',
       originY: 'center',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily
     });
     objects.push(label);
 
@@ -623,7 +627,7 @@ export function createHorizontalBarChart(config = {}) {
         fill: titleColor,
         originX: 'left',
         originY: 'center',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily
       });
       objects.push(valueLabel);
     }

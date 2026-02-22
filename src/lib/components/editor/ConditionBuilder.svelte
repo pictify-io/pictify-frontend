@@ -2,12 +2,12 @@
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	import { editor } from '../../../store/editor.store';
 	import { variableNames, variableActions } from '../../../store/variables.store';
-	
+
 	export let condition = '';
 	export let availableVariables = [];
-	
+
 	const dispatch = createEventDispatcher();
-	
+
 	// Simplified operators
 	const OPERATORS = [
 		{ value: 'equals', label: 'is' },
@@ -20,7 +20,7 @@
 		{ value: 'is_not_empty', label: 'has value', noValue: true },
 		{ value: 'contains', label: 'contains' },
 	];
-	
+
 	// State
 	let selectedVariable = '';
 	let selectedOperator = 'equals';
@@ -30,29 +30,29 @@
 	let customVarMode = false;
 	let customVarInput = '';
 	let containerRef;
-	
+
 	// Get variables from centralized store + props
 	$: allVariables = [...new Set([...availableVariables, ...$variableNames])];
-	
+
 	// Get operator label - use function to ensure fresh lookup
 	function getOperatorLabel(opValue) {
 		const op = OPERATORS.find(o => o.value === opValue);
 		return op?.label || 'is';
 	}
-	
+
 	function operatorNeedsValue(opValue) {
 		const op = OPERATORS.find(o => o.value === opValue);
 		return !op?.noValue;
 	}
-	
+
 	// Parse incoming condition - track last parsed to avoid re-parsing same value
 	let lastParsedCondition = '';
-	
+
 	$: if (condition !== lastParsedCondition) {
 		parseCondition(condition);
 		lastParsedCondition = condition;
 	}
-	
+
 	function parseCondition(expr) {
 		if (!expr || typeof expr !== 'string') {
 			// Reset to defaults if no condition
@@ -63,9 +63,9 @@
 		}
 		const t = expr.trim();
 		if (!t) return;
-		
+
 		let m;
-		
+
 		// Boolean checks MUST come first (most specific)
 		if ((m = t.match(/^(\w+)\s*==\s*true$/i))) {
 			selectedVariable = m[1];
@@ -79,7 +79,7 @@
 			conditionValue = '';
 			return;
 		}
-		
+
 		// Function-style checks
 		if ((m = t.match(/^isEmpty\((\w+)\)$/))) {
 			selectedVariable = m[1];
@@ -99,7 +99,7 @@
 			conditionValue = m[2];
 			return;
 		}
-		
+
 		// Comparison operators (excluding true/false values)
 		if ((m = t.match(/^(\w+)\s*==\s*["'](.+?)["']$/))) {
 			// Quoted string value
@@ -134,7 +134,7 @@
 			return;
 		}
 	}
-	
+
 	function buildExpression() {
 		if (!selectedVariable) return '';
 		switch (selectedOperator) {
@@ -150,11 +150,11 @@
 			default: return `${selectedVariable} == "${conditionValue}"`;
 		}
 	}
-	
+
 	function emitChange() {
 		dispatch('change', { expression: buildExpression() });
 	}
-	
+
 	function selectVar(name) {
 		selectedVariable = name;
 		showVarDropdown = false;
@@ -162,12 +162,12 @@
 		customVarInput = '';
 		emitChange();
 	}
-	
+
 	function enterCustomMode(e) {
 		e.stopPropagation();
 		customVarMode = true;
 	}
-	
+
 	function confirmCustom() {
 		if (customVarInput.trim()) {
 			selectedVariable = customVarInput.trim();
@@ -177,19 +177,35 @@
 			emitChange();
 		}
 	}
-	
+
+	function cancelCustom() {
+		customVarMode = false;
+		customVarInput = '';
+	}
+
 	function selectOp(op) {
 		selectedOperator = op;
 		showOpDropdown = false;
 		if (!operatorNeedsValue(op)) conditionValue = '';
 		emitChange();
 	}
-	
+
 	function handleValue(e) {
 		conditionValue = e.target.value;
 		emitChange();
 	}
-	
+
+	function handleKeydown(e) {
+		if (e.key === 'Escape') {
+			if (customVarMode) {
+				cancelCustom();
+			} else {
+				showVarDropdown = false;
+				showOpDropdown = false;
+			}
+		}
+	}
+
 	function closeDropdowns(e) {
 		if (containerRef && !containerRef.contains(e.target)) {
 			showVarDropdown = false;
@@ -197,46 +213,67 @@
 			customVarMode = false;
 		}
 	}
-	
+
 	onMount(() => document.addEventListener('click', closeDropdowns));
 	onDestroy(() => document.removeEventListener('click', closeDropdowns));
 </script>
 
-<div class="cb" bind:this={containerRef}>
+<div class="flex flex-col gap-2" bind:this={containerRef} on:keydown={handleKeydown}>
 	<!-- Row 1: Variable -->
-	<div class="row">
-		<span class="label">When</span>
-		<div class="field-wrap">
-			<button 
-				class="field {selectedVariable ? '' : 'placeholder'}"
+	<div class="flex items-center gap-2">
+		<span class="text-[11px] font-bold text-gray-900 uppercase min-w-[36px]">When</span>
+		<div class="relative flex-1">
+			<button
+				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all"
+				aria-expanded={showVarDropdown}
+				aria-label="Select variable"
 				on:click|stopPropagation={() => { showVarDropdown = !showVarDropdown; showOpDropdown = false; }}
 			>
-				<span>{selectedVariable || 'choose variable'}</span>
-				<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+				<span class={selectedVariable ? 'font-medium' : 'text-gray-400'}>{selectedVariable || 'choose variable'}</span>
+				<i class="fa fa-chevron-down text-[10px] text-gray-400 flex-shrink-0"></i>
 			</button>
-			
+
 			{#if showVarDropdown}
-				<div class="dropdown">
+				<div
+					class="absolute top-[calc(100%+4px)] left-0 min-w-full bg-white border-[2px] border-gray-300 rounded-lg shadow-lg z-[100] max-h-[200px] overflow-y-auto"
+					role="listbox"
+					aria-label="Variables"
+				>
 					{#if customVarMode}
-						<div class="custom-row">
-							<input 
-								type="text" 
-								placeholder="Variable name" 
+						<div class="flex gap-1.5 p-2">
+							<input
+								type="text"
+								class="flex-1 px-2 py-1.5 border-[2px] border-gray-300 rounded-lg text-xs focus:outline-none focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480]"
+								placeholder="Variable name"
 								bind:value={customVarInput}
-								on:keydown={(e) => e.key === 'Enter' && confirmCustom()}
+								on:keydown={(e) => {
+									if (e.key === 'Enter') confirmCustom();
+									if (e.key === 'Escape') { e.stopPropagation(); cancelCustom(); }
+								}}
 							/>
-							<button class="ok-btn" on:click|stopPropagation={confirmCustom}>✓</button>
+							<button
+								class="px-2.5 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-black transition-colors"
+								on:click|stopPropagation={confirmCustom}
+							>&#10003;</button>
 						</div>
 					{:else}
 						{#each allVariables as v}
-							<button class="opt {selectedVariable === v ? 'sel' : ''}" on:click|stopPropagation={() => selectVar(v)}>
+							<button
+								class="block w-full px-3 py-2 text-left text-xs border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors {selectedVariable === v ? 'bg-amber-100 font-semibold text-gray-900' : 'text-gray-700 hover:bg-gray-50'}"
+								role="option"
+								aria-selected={selectedVariable === v}
+								on:click|stopPropagation={() => selectVar(v)}
+							>
 								{v}
 							</button>
 						{/each}
 						{#if allVariables.length === 0}
-							<div class="empty">No variables on canvas</div>
+							<div class="px-3 py-3 text-center text-[11px] text-gray-400">No variables on canvas</div>
 						{/if}
-						<button class="opt custom" on:click|stopPropagation={enterCustomMode}>
+						<button
+							class="block w-full px-3 py-2 text-left text-xs font-semibold text-gray-700 border-t border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+							on:click|stopPropagation={enterCustomMode}
+						>
 							+ Add custom
 						</button>
 					{/if}
@@ -244,230 +281,49 @@
 			{/if}
 		</div>
 	</div>
-	
-	<!-- Row 2: Operator -->
-	<div class="row">
-		<div class="field-wrap">
-			<button 
-				class="field op-field"
+
+	<!-- Row 2: Operator + Value -->
+	<div class="flex items-center gap-2">
+		<div class="relative flex-1">
+			<button
+				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs font-medium text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all"
+				aria-expanded={showOpDropdown}
+				aria-label="Select operator"
 				on:click|stopPropagation={() => { showOpDropdown = !showOpDropdown; showVarDropdown = false; }}
 			>
 				<span>{getOperatorLabel(selectedOperator)}</span>
-				<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+				<i class="fa fa-chevron-down text-[10px] text-gray-400 flex-shrink-0"></i>
 			</button>
-			
+
 			{#if showOpDropdown}
-				<div class="dropdown op-dropdown">
+				<div
+					class="absolute top-[calc(100%+4px)] left-0 min-w-[100px] bg-white border-[2px] border-gray-300 rounded-lg shadow-lg z-[100] max-h-[200px] overflow-y-auto"
+					role="listbox"
+					aria-label="Operators"
+				>
 					{#each OPERATORS as op}
-						<button class="opt {selectedOperator === op.value ? 'sel' : ''}" on:click|stopPropagation={() => selectOp(op.value)}>
+						<button
+							class="block w-full px-3 py-2 text-left text-xs border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors {selectedOperator === op.value ? 'bg-amber-100 font-semibold text-gray-900' : 'text-gray-700 hover:bg-gray-50'}"
+							role="option"
+							aria-selected={selectedOperator === op.value}
+							on:click|stopPropagation={() => selectOp(op.value)}
+						>
 							{op.label}
 						</button>
 					{/each}
 				</div>
 			{/if}
 		</div>
-		
+
 		{#if operatorNeedsValue(selectedOperator)}
-			<input 
-				type="text" 
-				class="value-input" 
+			<input
+				type="text"
+				class="flex-1 min-w-0 px-3 py-1.5 border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all"
 				placeholder="value"
+				aria-label="Condition value"
 				value={conditionValue}
 				on:input={handleValue}
 			/>
 		{/if}
 	</div>
 </div>
-
-<style>
-	.cb {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-	
-	.row {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-	
-	.label {
-		font-size: 12px;
-		color: #111827;
-		min-width: 36px;
-        font-weight: 800;
-        text-transform: uppercase;
-	}
-	
-	.field-wrap {
-		position: relative;
-		flex: 1;
-	}
-	
-	.field {
-		width: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 6px 10px;
-		background: #fff;
-		border: 2px solid #111827;
-		border-radius: 6px;
-		font-size: 12px;
-		color: #111827;
-		cursor: pointer;
-		transition: all 0.15s;
-        box-shadow: 2px 2px 0 0 #111827;
-        font-weight: 700;
-        text-transform: uppercase;
-	}
-	
-	.field:hover {
-		background: #fff;
-        transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0 0 #111827;
-	}
-	
-	.field.placeholder span {
-		color: #6b7280;
-	}
-	
-	.field svg {
-		width: 14px;
-		height: 14px;
-		color: #111827;
-		flex-shrink: 0;
-	}
-	
-	.op-field {
-		background: #fff;
-		border-color: #111827;
-		color: #111827;
-	}
-	
-	.op-field:hover {
-		background: #fff;
-	}
-	
-	.value-input {
-		flex: 1;
-		padding: 6px 10px;
-		border: 2px solid #111827;
-		border-radius: 6px;
-		font-size: 12px;
-		min-width: 0;
-        box-shadow: 2px 2px 0 0 #111827;
-        font-weight: 600;
-        color: #111827;
-	}
-	
-	.value-input:focus {
-		outline: none;
-		border-color: #111827;
-		box-shadow: 2px 2px 0 0 #ffc480;
-	}
-	
-	.dropdown {
-		position: absolute;
-		top: calc(100% + 4px);
-		left: 0;
-		min-width: 100%;
-		background: white;
-		border: 2px solid #111827;
-		border-radius: 8px;
-		box-shadow: 4px 4px 0 0 #1f2937;
-		z-index: 100;
-		max-height: 200px;
-		overflow-y: auto;
-	}
-	
-	.op-dropdown {
-		min-width: 100px;
-	}
-	
-	.opt {
-		display: block;
-		width: 100%;
-		padding: 8px 12px;
-		text-align: left;
-		background: none;
-		border: none;
-        border-bottom: 1px solid #eee;
-		font-size: 12px;
-		color: #111827;
-		cursor: pointer;
-        font-weight: 600;
-        text-transform: uppercase;
-	}
-    
-    .opt:last-child {
-        border-bottom: none;
-    }
-	
-	.opt:hover {
-		background: #f3f4f6;
-        color: #000;
-	}
-	
-	.opt.sel {
-		background: #ffc480;
-		color: #111827;
-		font-weight: 800;
-	}
-	
-	.opt.custom {
-		border-top: 2px solid #111827;
-		color: #111827;
-		font-weight: 800;
-        background: #f9fafb;
-	}
-	
-	.empty {
-		padding: 12px;
-		text-align: center;
-		color: #6b7280;
-		font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-	}
-	
-	.custom-row {
-		display: flex;
-		gap: 6px;
-		padding: 8px;
-	}
-	
-	.custom-row input {
-		flex: 1;
-		padding: 6px 8px;
-		border: 2px solid #111827;
-		border-radius: 4px;
-		font-size: 12px;
-        font-weight: 600;
-	}
-	
-	.custom-row input:focus {
-		outline: none;
-		border-color: #111827;
-        box-shadow: 2px 2px 0 0 #ffc480;
-	}
-	
-	.ok-btn {
-		padding: 0 10px;
-		background: #111827;
-		color: white;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 12px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0 0 #000;
-	}
-	
-	.ok-btn:hover {
-		background: #000;
-        transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0 0 #ffc480;
-	}
-</style>

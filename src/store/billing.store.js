@@ -97,12 +97,14 @@ export const nextBillingDate = derived(billingState, ($state) => {
 /**
  * Initialize billing state with dashboard data
  * Call this on page mount
+ * @param {Object} options
+ * @param {boolean} [options.refresh=false] - Force refresh from server (bypass cache)
  */
-export const initBilling = async () => {
+export const initBilling = async ({ refresh = false } = {}) => {
   billingState.update((s) => ({ ...s, loading: true, error: null }));
 
   try {
-    const dashboard = await getBillingDashboard();
+    const dashboard = await getBillingDashboard({ refresh });
 
     billingState.set({
       loaded: true,
@@ -112,7 +114,8 @@ export const initBilling = async () => {
       invoices: dashboard.invoices || [],
       timeline: dashboard.timeline || [],
       usage: dashboard.usage,
-      customerPortalUrl: dashboard.customerPortalUrl,
+      // customerPortalUrl is nested inside subscription from the API
+      customerPortalUrl: dashboard.subscription?.customerPortalUrl || null,
     });
 
     return dashboard;
@@ -178,9 +181,9 @@ export const doPauseSubscription = async ({ resumesAt } = {}) => {
   billingActions.update((a) => ({ ...a, pausing: true }));
 
   try {
-    const result = await pauseSubscription({ resumesAt });
-    billingState.update((s) => ({ ...s, subscription: result.subscription }));
-    return { success: true, subscription: result.subscription };
+    await pauseSubscription({ resumesAt });
+    await initBilling({ refresh: true });
+    return { success: true };
   } catch (error) {
     console.error('Failed to pause subscription:', error);
     return { success: false, error: error.message || 'Failed to pause subscription' };
@@ -196,9 +199,9 @@ export const doResumeSubscription = async () => {
   billingActions.update((a) => ({ ...a, resuming: true }));
 
   try {
-    const result = await resumeSubscription();
-    billingState.update((s) => ({ ...s, subscription: result.subscription }));
-    return { success: true, subscription: result.subscription };
+    await resumeSubscription();
+    await initBilling({ refresh: true });
+    return { success: true };
   } catch (error) {
     console.error('Failed to resume subscription:', error);
     return { success: false, error: error.message || 'Failed to resume subscription' };
@@ -214,9 +217,9 @@ export const doCancelSubscription = async () => {
   billingActions.update((a) => ({ ...a, cancelling: true }));
 
   try {
-    const result = await cancelSubscription();
-    billingState.update((s) => ({ ...s, subscription: result.subscription }));
-    return { success: true, subscription: result.subscription };
+    await cancelSubscription();
+    await initBilling({ refresh: true });
+    return { success: true };
   } catch (error) {
     console.error('Failed to cancel subscription:', error);
     return { success: false, error: error.message || 'Failed to cancel subscription' };
@@ -232,9 +235,9 @@ export const doReactivateSubscription = async () => {
   billingActions.update((a) => ({ ...a, reactivating: true }));
 
   try {
-    const result = await reactivateSubscription();
-    billingState.update((s) => ({ ...s, subscription: result.subscription }));
-    return { success: true, subscription: result.subscription };
+    await reactivateSubscription();
+    await initBilling({ refresh: true });
+    return { success: true };
   } catch (error) {
     console.error('Failed to reactivate subscription:', error);
     return { success: false, error: error.message || 'Failed to reactivate subscription' };

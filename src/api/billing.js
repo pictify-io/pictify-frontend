@@ -15,9 +15,10 @@ import backend from '../service/backend';
  * This is the primary endpoint - use it for initial page load
  * @returns {Promise<Object>} Complete billing dashboard data
  */
-export async function getBillingDashboard() {
+export async function getBillingDashboard({ refresh = false } = {}) {
   try {
-    const response = await backend.get('/api/billing/dashboard');
+    const url = refresh ? '/api/billing/dashboard?refresh=true' : '/api/billing/dashboard';
+    const response = await backend.get(url);
     return response;
   } catch (error) {
     console.error('Failed to get billing dashboard:', error);
@@ -84,6 +85,17 @@ export async function cancelSubscription() {
  */
 export async function reactivateSubscription() {
   const response = await backend.post('/api/billing/subscription/reactivate');
+  return response;
+}
+
+/**
+ * Get fresh signed customer portal URL
+ * This URL bypasses LemonSqueezy authentication - users go directly to their portal
+ * The URL is valid for 24 hours from the time of request
+ * @returns {Promise<Object>} { customerPortalUrl, updatePaymentMethodUrl }
+ */
+export async function getPortalUrl() {
+  const response = await backend.get('/api/billing/portal-url');
   return response;
 }
 

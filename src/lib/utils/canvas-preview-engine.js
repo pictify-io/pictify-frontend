@@ -530,10 +530,21 @@ function applyVariableValueByProperty(obj, property, value) {
 			}
 			break;
 		case 'chartData':
-			// Chart data - would need special handling, skip in preview
+			// Store chart data for potential re-creation
+			// Full chart recreation would require importing chart utils which is heavy
+			// Mark the object so users know dynamic data is not fully previewed
+			if (obj.isChart) {
+				obj.set('chartData', value);
+				console.log(`[Preview] Chart data bound to variable, full preview not supported — data stored for render`);
+			}
 			break;
 		case 'tableData':
-			// Table data - would need special handling, skip in preview
+			// Store table data for potential re-creation
+			if (obj.isTable) {
+				if (value && value.headers) obj.set('tableHeaders', value.headers);
+				if (value && value.rows) obj.set('tableRows', value.rows);
+				console.log(`[Preview] Table data bound to variable, full preview not supported — data stored for render`);
+			}
 			break;
 		default:
 			// Try to set the property directly
@@ -546,6 +557,11 @@ function applyVariableValueByProperty(obj, property, value) {
 }
 
 /**
+ * Maximum number of loop items to process in preview
+ */
+const MAX_LOOP_ITEMS = 50;
+
+/**
  * Process a loop element - create clones for each item
  */
 async function processLoop(canvas, obj, items, baseContext) {
@@ -554,9 +570,15 @@ async function processLoop(canvas, obj, items, baseContext) {
 	const direction = obj.loopDirection || 'vertical';
 	const spacing = obj.loopSpacing || 50;
 	const columns = obj.loopColumns || 3;
-	
-	for (let index = 0; index < items.length; index++) {
-		const item = items[index];
+
+	// Limit loop items to prevent performance issues
+	const limitedItems = items.slice(0, MAX_LOOP_ITEMS);
+	if (items.length > MAX_LOOP_ITEMS) {
+		console.warn(`Loop preview limited to ${MAX_LOOP_ITEMS} items (${items.length} total)`);
+	}
+
+	for (let index = 0; index < limitedItems.length; index++) {
+		const item = limitedItems[index];
 		
 		// Create context for this iteration
 		const loopContext = {
@@ -564,8 +586,8 @@ async function processLoop(canvas, obj, items, baseContext) {
 			[itemName]: item,
 			[indexName]: index,
 			__loopFirst: index === 0,
-			__loopLast: index === items.length - 1,
-			__loopLength: items.length,
+			__loopLast: index === limitedItems.length - 1,
+			__loopLength: limitedItems.length,
 		};
 		
 		try {

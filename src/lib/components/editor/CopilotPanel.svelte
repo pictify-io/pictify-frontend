@@ -21,8 +21,12 @@
 		featureGates,
 		plgStatus,
 		showMilestoneCelebration,
+		checkFeatureAccessSync,
+		FEATURES,
+		getFeatureUpgradePrompt,
 	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import { FeatureUpgradePrompt } from '../plg';
 
 	let messages = [];
 	let prompt = '';
@@ -36,6 +40,8 @@
 	// Race condition guards
 	let destroyed = false;
 	let renderTimeoutId = null;
+	let streamingTimeoutId = null; // Safety net for stuck streaming state
+	const STREAMING_TIMEOUT = 60000; // 60 seconds max
 
 	// Undo is now handled by unified history store
 	// Check $canSafelyUndo for whether undo is available and safe
@@ -51,14 +57,21 @@
 	// PLG Feature gating
 	let aiCopilotLimit = null;
 	let featureLimitReached = false;
-	
+
 	$: isPaidPlan = $plgStatus.isPaidPlan;
 	$: aiCopilotUsage = $featureGates.aiCopilot;
-	
+
+	// Plan-based feature access check
+	$: copilotAccess = checkFeatureAccessSync(FEATURES.AI_COPILOT);
+	$: hasCopilotAccess = copilotAccess?.hasAccess ?? false;
+	$: copilotUpgradePrompt = getFeatureUpgradePrompt(FEATURES.AI_COPILOT);
+
 	onMount(async () => {
-		// Check feature availability on mount
-		aiCopilotLimit = await canUseFeature('aiCopilot');
-		featureLimitReached = !aiCopilotLimit?.allowed;
+		// Check feature availability on mount (usage limits)
+		if (hasCopilotAccess) {
+			aiCopilotLimit = await canUseFeature('aiCopilot');
+			featureLimitReached = !aiCopilotLimit?.allowed;
+		}
 	});
 
 	const QUICK_ACTIONS = [
@@ -80,15 +93,41 @@
 			renderTimeoutId = null;
 		}
 
+		// Clear streaming safety timeout
+		if (streamingTimeoutId) {
+			clearTimeout(streamingTimeoutId);
+			streamingTimeoutId = null;
+		}
+
 		// Reset streaming and loading state to prevent stuck UI
 		historyActions.setStreaming(false);
 		isLoading = false;
 		copilotActions.setLoading(false);
 	}
 
+	// Start streaming safety timeout - auto-resets if stuck for too long
+	function startStreamingSafetyTimeout() {
+		if (streamingTimeoutId) {
+			clearTimeout(streamingTimeoutId);
+		}
+		streamingTimeoutId = setTimeout(() => {
+			if (isLoading) {
+				console.warn('[Copilot] Streaming timeout reached (60s), force-resetting state');
+				cleanupStream();
+				if (!destroyed) {
+					streamError = 'Generation timed out. Please try again.';
+					messages = [...messages, { role: 'system', content: '⏰ Generation timed out after 60 seconds.' }];
+				}
+			}
+		}, STREAMING_TIMEOUT);
+	}
+
 	onDestroy(() => {
 		destroyed = true;
+		// Force-reset all streaming state on component destroy
 		cleanupStream();
+		// Double-ensure streaming flag is cleared even if cleanupStream has edge cases
+		historyActions.setStreaming(false);
 	});
 
 	async function applyCanvasState(canvasJson) {
@@ -377,6 +416,7 @@
 			currentAgent = null;
 
 			cleanupStream();
+			startStreamingSafetyTimeout();
 
 			// Fetch user's brand assets for context
 			let brandAssets = null;
@@ -495,8 +535,21 @@
 </script>
 
 <div class="flex flex-col h-full bg-[#FFFDF8]">
-	<!-- Feature limit banner -->
-	{#if featureLimitReached && !isPaidPlan}
+	<!-- Feature not available on current plan -->
+	{#if !hasCopilotAccess}
+		<div class="flex-1 flex items-center justify-center p-6">
+			<div class="max-w-sm w-full">
+				<FeatureUpgradePrompt
+					feature={FEATURES.AI_COPILOT}
+					currentPlan={copilotAccess.currentPlan}
+					targetPlan={copilotUpgradePrompt?.targetPlan}
+					variant="card"
+					show={true}
+					onDismiss={() => {}}
+				/>
+			</div>
+		</div>
+	{:else if featureLimitReached}
 		<div class="px-4 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
@@ -514,12 +567,14 @@
 				</button>
 			</div>
 		</div>
-	{:else if !isPaidPlan && aiCopilotLimit?.remaining > 0 && aiCopilotLimit?.remaining <= 3}
-		<div class="px-4 py-2 bg-amber-50 border-b border-amber-200 text-amber-800 text-xs flex items-center justify-between">
-			<span>⚡ {aiCopilotLimit.remaining} free AI generation{aiCopilotLimit.remaining !== 1 ? 's' : ''} remaining</span>
-			<button on:click={() => openUpgradeModal('ai_copilot')} class="font-semibold text-amber-700 hover:underline">Upgrade</button>
-		</div>
-	{/if}
+	{:else}
+		<!-- User has access - show warning if close to limit -->
+		{#if !copilotAccess.isUnlimited && aiCopilotLimit?.remaining > 0 && aiCopilotLimit?.remaining <= 3}
+			<div class="px-4 py-2 bg-amber-50 border-b border-amber-200 text-amber-800 text-xs flex items-center justify-between">
+				<span>⚡ {aiCopilotLimit.remaining} AI generation{aiCopilotLimit.remaining !== 1 ? 's' : ''} remaining this month</span>
+				<button on:click={() => openUpgradeModal('ai_copilot')} class="font-semibold text-amber-700 hover:underline">Upgrade</button>
+			</div>
+		{/if}
 
 	<!-- Header -->
 	<div class="px-4 py-3 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex justify-between items-center shrink-0">
@@ -738,4 +793,5 @@
 			</button>
 		</div>
 	</div>
+	{/if}
 </div>
