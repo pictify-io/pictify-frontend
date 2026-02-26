@@ -4,7 +4,7 @@
 		{
 			title: 'Email Marketing',
 			description: 'Generate personalized email banners and graphics at scale',
-			image: 'https://htgf.s3.amazonaws.com/bvhew-1703216378968.png'
+			image: 'https://media.pictify.io/bvhew-1703216378968.png'
 		},
 		{
 			title: 'Social Cards',
@@ -14,7 +14,7 @@
 		{
 			title: 'Certificates',
 			description: 'Generate beautiful certificates and badges instantly',
-			image: 'https://htgf.s3.amazonaws.com/68lk2-1704017409595.png'
+			image: 'https://media.pictify.io/68lk2-1704017409595.png'
 		},
 		{
 			title: 'Awards and Badges',
