@@ -109,6 +109,12 @@ export const FEATURES = {
   DYNAMIC_LINKS: 'dynamicLinks',
   STORAGE_CONNECTORS: 'storageConnectors',
 
+  // Experiments
+  AB_TESTING: 'abTesting',
+  SMART_LINKS: 'smartLinks',
+  SCHEDULED_IMAGES: 'scheduledImages',
+  AUTO_OPTIMIZATION: 'autoOptimization',
+
   // Enterprise
   BRAND_ASSETS: 'brandAssets',
   SSO_SAML: 'ssoSaml',
@@ -157,6 +163,12 @@ export const PLAN_FEATURES = {
     [FEATURES.DYNAMIC_LINKS]: false,
     [FEATURES.STORAGE_CONNECTORS]: false,
 
+    // Experiments
+    [FEATURES.AB_TESTING]: 1,
+    [FEATURES.SMART_LINKS]: false,
+    [FEATURES.SCHEDULED_IMAGES]: false,
+    [FEATURES.AUTO_OPTIMIZATION]: false,
+
     // Enterprise
     [FEATURES.BRAND_ASSETS]: false,
     [FEATURES.SSO_SAML]: false,
@@ -194,6 +206,12 @@ export const PLAN_FEATURES = {
     [FEATURES.WEBHOOKS]: false,
     [FEATURES.DYNAMIC_LINKS]: false,
     [FEATURES.STORAGE_CONNECTORS]: false,
+
+    // Experiments
+    [FEATURES.AB_TESTING]: 3,
+    [FEATURES.SMART_LINKS]: 1,
+    [FEATURES.SCHEDULED_IMAGES]: 1,
+    [FEATURES.AUTO_OPTIMIZATION]: false,
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
@@ -233,6 +251,12 @@ export const PLAN_FEATURES = {
     [FEATURES.DYNAMIC_LINKS]: true,
     [FEATURES.STORAGE_CONNECTORS]: true,
 
+    // Experiments
+    [FEATURES.AB_TESTING]: 5,
+    [FEATURES.SMART_LINKS]: 3,
+    [FEATURES.SCHEDULED_IMAGES]: 3,
+    [FEATURES.AUTO_OPTIMIZATION]: 1,
+
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
     [FEATURES.SSO_SAML]: false,
@@ -270,6 +294,12 @@ export const PLAN_FEATURES = {
     [FEATURES.WEBHOOKS]: true,
     [FEATURES.DYNAMIC_LINKS]: null, // Unlimited
     [FEATURES.STORAGE_CONNECTORS]: true,
+
+    // Experiments
+    [FEATURES.AB_TESTING]: 10,
+    [FEATURES.SMART_LINKS]: 5,
+    [FEATURES.SCHEDULED_IMAGES]: 5,
+    [FEATURES.AUTO_OPTIMIZATION]: 1,
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
@@ -309,6 +339,12 @@ export const PLAN_FEATURES = {
     [FEATURES.DYNAMIC_LINKS]: null,
     [FEATURES.STORAGE_CONNECTORS]: true,
 
+    // Experiments
+    [FEATURES.AB_TESTING]: null,
+    [FEATURES.SMART_LINKS]: null,
+    [FEATURES.SCHEDULED_IMAGES]: null,
+    [FEATURES.AUTO_OPTIMIZATION]: 5,
+
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
     [FEATURES.SSO_SAML]: true,
@@ -334,6 +370,11 @@ export const PLAN_FEATURES = {
     [FEATURES.WEBHOOKS]: true,
     [FEATURES.DYNAMIC_LINKS]: null,
     [FEATURES.STORAGE_CONNECTORS]: true,
+    // Experiments
+    [FEATURES.AB_TESTING]: null,
+    [FEATURES.SMART_LINKS]: null,
+    [FEATURES.SCHEDULED_IMAGES]: null,
+    [FEATURES.AUTO_OPTIMIZATION]: null,
     [FEATURES.BRAND_ASSETS]: true,
     [FEATURES.SSO_SAML]: true,
     [FEATURES.AUDIT_LOGS]: true,
@@ -405,7 +446,7 @@ export const FEATURE_METADATA = {
     category: 'integrations',
   },
   [FEATURES.DYNAMIC_LINKS]: {
-    name: 'Dynamic Links',
+    name: 'Live Links',
     description: 'Real-time data bindings',
     icon: 'link',
     category: 'integrations',
@@ -415,6 +456,30 @@ export const FEATURE_METADATA = {
     description: 'S3, GCS, Cloudinary integration',
     icon: 'cloud',
     category: 'integrations',
+  },
+  [FEATURES.AB_TESTING]: {
+    name: 'A/B Testing',
+    description: 'Test image variants to find the best performer',
+    icon: 'split',
+    category: 'experiments',
+  },
+  [FEATURES.SMART_LINKS]: {
+    name: 'Smart Links',
+    description: 'Show different images based on viewer context',
+    icon: 'target',
+    category: 'experiments',
+  },
+  [FEATURES.SCHEDULED_IMAGES]: {
+    name: 'Scheduled Images',
+    description: 'Schedule image changes and set expiration dates',
+    icon: 'clock',
+    category: 'experiments',
+  },
+  [FEATURES.AUTO_OPTIMIZATION]: {
+    name: 'Auto-Optimization',
+    description: 'AI-powered variant optimization with Thompson Sampling',
+    icon: 'trending-up',
+    category: 'experiments',
   },
   [FEATURES.BRAND_ASSETS]: {
     name: 'Brand Assets',
@@ -457,6 +522,7 @@ export const FEATURE_CATEGORIES = {
   ai: { name: 'AI Features', order: 5 },
   team: { name: 'Team & Collaboration', order: 6 },
   integrations: { name: 'Integrations', order: 7 },
+  experiments: { name: 'Experiments', order: 7.5 },
   branding: { name: 'Branding', order: 8 },
   enterprise: { name: 'Enterprise', order: 9 },
 };
@@ -488,6 +554,10 @@ export const FEATURE_MIN_PLAN = {
   [FEATURES.DYNAMIC_LINKS]: PLANS.STANDARD,  // Pro tier
   [FEATURES.STORAGE_CONNECTORS]: PLANS.STANDARD,  // Pro tier (was Professional)
   [FEATURES.BRAND_ASSETS]: PLANS.STANDARD,  // Pro tier (was Basic)
+  [FEATURES.AB_TESTING]: PLANS.STARTER,
+  [FEATURES.SMART_LINKS]: PLANS.BASIC,
+  [FEATURES.SCHEDULED_IMAGES]: PLANS.BASIC,
+  [FEATURES.AUTO_OPTIMIZATION]: PLANS.STANDARD,
   [FEATURES.SSO_SAML]: PLANS.BUSINESS,
   [FEATURES.AUDIT_LOGS]: PLANS.BUSINESS,
   [FEATURES.WHITE_LABEL]: PLANS.BUSINESS,
@@ -532,7 +602,7 @@ export const FEATURE_UPGRADE_MESSAGES = {
     benefit: 'Integrate with your existing tools and systems',
   },
   [FEATURES.DYNAMIC_LINKS]: {
-    title: 'Dynamic Links Available on Pro',
+    title: 'Live Links Available on Pro',
     message: 'Create images with real-time data bindings.',
     benefit: 'Perfect for personalized content at scale',
   },
@@ -540,6 +610,26 @@ export const FEATURE_UPGRADE_MESSAGES = {
     title: 'Storage Connectors on Pro',
     message: 'Connect to S3, GCS, or Cloudinary.',
     benefit: 'Store renders directly in your cloud storage',
+  },
+  [FEATURES.AB_TESTING]: {
+    title: 'Unlock More A/B Tests',
+    message: "You've reached your A/B test limit.",
+    benefit: 'Test more variants and find what performs best',
+  },
+  [FEATURES.SMART_LINKS]: {
+    title: 'Smart Links Available on Basic+',
+    message: 'Show different images based on device, location, or time.',
+    benefit: 'Personalize images for every viewer automatically',
+  },
+  [FEATURES.SCHEDULED_IMAGES]: {
+    title: 'Scheduled Images on Basic+',
+    message: 'Schedule image changes for campaigns and promotions.',
+    benefit: 'Set it and forget it - images change on your schedule',
+  },
+  [FEATURES.AUTO_OPTIMIZATION]: {
+    title: 'Auto-Optimization on Pro',
+    message: 'Let AI pick the best performing variant automatically.',
+    benefit: 'Thompson Sampling finds winners faster than manual A/B tests',
   },
 };
 

@@ -71,7 +71,7 @@
 	};
 </script>
 
-<div class="space-y-8">
+<div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<!-- Header removed as it is now in parent -->
 		<div></div> 
@@ -305,7 +305,7 @@
 	<!-- Actions -->
 	<div class="flex justify-end gap-4 pt-6 mt-6 border-t-[3px] border-gray-900">
 		<button
-			class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
+			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
 			on:click={handleNext}
 			disabled={!canProceed}
 		>

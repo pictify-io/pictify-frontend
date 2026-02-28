@@ -5,6 +5,7 @@
 	export let renderError = null;
 	export let isRendering = false;
 	export let templateThumbnail = null;
+	export let isCopyingUrl = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -147,13 +148,18 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<button
-						class="p-3 bg-white border-[3px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="p-3 bg-white border-[3px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 						on:click={handleCopyUrl}
-						title="Copy URL"
+						disabled={isCopyingUrl}
+						title="Copy share link"
 					>
-						<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-						</svg>
+						{#if isCopyingUrl}
+							<svg class="w-5 h-5 text-gray-900 animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+						{:else}
+							<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+							</svg>
+						{/if}
 					</button>
 					<button
 						class="p-3 bg-gray-900 border-[3px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#9ca3af] hover:bg-gray-800 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
@@ -168,7 +174,7 @@
 			</div>
 
 			<div class="mt-4 pt-4 border-t-2 border-green-200/50">
-				<p class="text-[10px] font-black text-green-800/70 uppercase tracking-widest mb-1.5">CDN Asset URL</p>
+				<p class="text-[10px] font-black text-green-800/70 uppercase tracking-widest mb-1.5">Asset URL <span class="text-green-600/40 normal-case font-bold">&mdash; Copy URL creates a trackable share link</span></p>
 				<div class="bg-white/50 border-[2px] border-green-200 rounded p-2 font-mono text-xs text-green-900 break-all select-all">
 					{renderResult.url}
 				</div>

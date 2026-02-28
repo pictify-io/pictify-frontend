@@ -2,7 +2,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { page } from '$app/stores';
 	import {
 		teamStore,
 		teams,
@@ -71,9 +70,8 @@
 		try {
 			await switchTeamAction(teamId);
 			isOpen = false;
-			// Force page re-mount to re-trigger onMount data fetches for new team
-			const currentPath = $page.url.pathname + $page.url.search;
-			await goto(currentPath, { replaceState: true, invalidateAll: true });
+			// Full reload to reset all client-side stores (templates, editor, variables, etc.)
+			window.location.reload();
 		} catch (err) {
 			error = err.message;
 		} finally {

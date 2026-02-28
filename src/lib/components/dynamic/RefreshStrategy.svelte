@@ -33,10 +33,10 @@
 	};
 </script>
 
-<div class="space-y-8">
+<div class="space-y-6">
 	<!-- Header removed as it is now in parent -->
 
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 		<!-- TTL Configuration -->
 		<div class="space-y-6">
 			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
@@ -158,7 +158,7 @@
 		</div>
 
 		<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 				<div>
 					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Image Format</label>
 					<div class="relative">
@@ -203,13 +203,13 @@
 	<!-- Actions -->
 	<div class="flex justify-between gap-3 pt-6 mt-6 border-t-[3px] border-gray-900">
 		<button
-			class="px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#9ca3af] hover:shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+			class="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-900 font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			on:click={handleBack}
 		>
 			Back
 		</button>
 		<button
-			class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Publish

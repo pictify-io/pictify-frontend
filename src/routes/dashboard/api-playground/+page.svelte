@@ -22,8 +22,12 @@
 		cancelBatchJob
 	} from '../../../api/template';
 	import backend from '../../../service/backend';
+	import { createShareResult } from '../../../api/public-templates.js';
 	import { onMount, onDestroy } from 'svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import CodeMirror from 'svelte-codemirror-editor';
+	import { json } from '@codemirror/lang-json';
+	import { html as htmlLang } from '@codemirror/lang-html';
 
 	let apiToken = '';
 	let selectedEndpoint = 'image';
@@ -42,6 +46,13 @@
 	let unsubscribe = () => {};
 	let copiedCurl = false;
 	let expandedCategory = 'Image Generation'; // Default expanded category
+
+	// Maximize state for CodeMirror editors
+	let maximizeImageHtml = false;
+	let maximizeGifHtml = false;
+	let maximizeRenderVars = false;
+	let maximizeBatchVars = false;
+	let maximizeCsvMappings = false;
 
 	// User templates for dropdown
 	let userTemplates = [];
@@ -145,7 +156,16 @@
 
 	// Image endpoint parameters
 	let imageParams = {
-		html: '<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: Arial, sans-serif; border-radius: 10px;"><h1>Hello World!</h1><p>This is a test image</p></div>',
+		html: `<div style="
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  border-radius: 10px;
+">
+  <h1>Hello World!</h1>
+  <p>This is a test image</p>
+</div>`.trim(),
 		width: 800,
 		height: 600,
 		selector: 'body',
@@ -155,7 +175,25 @@
 
 	// GIF endpoint parameters
 	let gifParams = {
-		html: '<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: Arial, sans-serif; border-radius: 10px;"><h1 id="animated-text">Animated Text</h1><style>@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } } #animated-text { animation: pulse 2s infinite; }</style></div>',
+		html: `<div style="
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  border-radius: 10px;
+">
+  <h1 id="animated-text">Animated Text</h1>
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    #animated-text {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</div>`.trim(),
 		width: 800,
 		height: 600,
 		framesPerSecond: 15,
@@ -310,20 +348,6 @@
 		}
 	}
 
-	// Quick fill examples
-	function fillExampleData(endpoint) {
-		switch(endpoint) {
-			case 'image':
-				imageParams.html = '<div style="padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: system-ui; border-radius: 20px; text-align: center;"><h1 style="font-size: 48px; margin: 0;">Beautiful Design</h1><p style="font-size: 20px; opacity: 0.9;">Created with Pictify API</p></div>';
-				break;
-			case 'gif':
-				gifParams.html = '<div style="padding: 40px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; font-family: system-ui; border-radius: 20px; text-align: center;"><h1 id="title" style="font-size: 48px; margin: 0;">Animated Title</h1><style>@keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } #title { animation: slideIn 2s ease-out infinite; }</style></div>';
-				break;
-			case 'search-templates':
-				searchTemplatesParams.q = 'social';
-				break;
-		}
-	}
 
 	// Test functions for each endpoint
 	async function testEndpoint(endpointId) {
@@ -456,6 +480,7 @@
 			}
 
 			response = data;
+			playgroundShareCache = null;
 			responseJson = JSON.stringify(data, null, 2);
 			toast.set({ message: 'Request successful!', type: 'success', duration: 1500 });
 		} catch (error) {
@@ -477,6 +502,40 @@
 		}
 	}
 
+	let playgroundShareCache = null;
+	let isCopyingShareUrl = false;
+
+	async function copyShareUrl(cdnUrl) {
+		if (!cdnUrl || !browser) return;
+		isCopyingShareUrl = true;
+		try {
+			if (!playgroundShareCache || playgroundShareCache.cdnUrl !== cdnUrl) {
+				const isGif = cdnUrl.includes('.gif') || response?.gif;
+				const params = isGif ? gifParams : imageParams;
+				const res = await createShareResult({
+					assetUrl: cdnUrl,
+					contentType: isGif ? 'gif' : 'image',
+					format: isGif ? 'gif' : 'png',
+					source: 'api',
+					title: 'API Playground Result',
+					width: response?.width || params.width,
+					height: response?.height || params.height,
+				});
+				if (res.success && res.shareUrl) {
+					playgroundShareCache = { cdnUrl, shareUrl: `${window.location.origin}${res.shareUrl}` };
+				}
+			}
+			const urlToCopy = playgroundShareCache?.shareUrl || cdnUrl;
+			await navigator.clipboard.writeText(urlToCopy);
+			toast.set({ message: 'Share link copied!', type: 'success', duration: 1500 });
+		} catch (e) {
+			// Fallback to CDN URL
+			copyToClipboard(cdnUrl);
+		} finally {
+			isCopyingShareUrl = false;
+		}
+	}
+
 	function handleCopyCurl() {
 		if (!curlExample) return;
 
@@ -488,6 +547,7 @@
 	}
 
 	const escapeSingleQuotes = (value = '') => value.replace(/'/g, `'"'"'`);
+	const escapeHtml = (str = '') => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 	function setSelectedEndpoint(endpoint) {
 		selectedEndpoint = endpoint;
@@ -855,22 +915,29 @@
 						{#if selectedEndpoint === 'image'}
 							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div class="md:col-span-2">
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide">HTML Content</label>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">HTML Content</label>
+									<div class="relative">
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white">
+											<CodeMirror
+												bind:value={imageParams.html}
+												lang={htmlLang()}
+												styles={{
+													'&': { height: '128px', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-line': { padding: '0' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+													'.cm-scroller': { overflow: 'auto' }
+												}}
+											/>
+										</div>
 										<button
-											class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide flex items-center gap-1"
-											on:click={() => fillExampleData('image')}
+											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
+											on:click={() => (maximizeImageHtml = true)}
+											title="Maximize editor"
 										>
-											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-											</svg>
-											Example
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
 										</button>
 									</div>
-									<textarea
-										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
-										bind:value={imageParams.html}
-									></textarea>
 								</div>
 								<div>
 									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Width (px)</label>
@@ -1115,12 +1182,28 @@
 											</button>
 										</div>
 									</div>
-									<textarea
-										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
-										bind:value={renderTemplateParams.variables}
-										placeholder={'{"title": "Example Title", "subtitle": "Example Subtitle"}'}
-									></textarea>
-									<p class="mt-1 text-[10px] text-gray-600">💡 Select a template to auto-fill example variables</p>
+									<div class="relative">
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white">
+											<CodeMirror
+												bind:value={renderTemplateParams.variables}
+												lang={json()}
+												styles={{
+													'&': { height: '128px', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-line': { padding: '0' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+													'.cm-scroller': { overflow: 'auto' }
+												}}
+											/>
+										</div>
+										<button
+											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
+											on:click={() => (maximizeRenderVars = true)}
+											title="Maximize editor"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+										</button>
+									</div>
 								</div>
 								<div class="grid grid-cols-2 gap-4">
 									<div>
@@ -1215,12 +1298,28 @@
 											</button>
 										</div>
 									</div>
-									<textarea
-										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
-										bind:value={batchRenderParams.variableSets}
-										placeholder={'[{"title": "First", "subtitle": "Example"}, {"title": "Second", "subtitle": "Example"}]'}
-									></textarea>
-									<p class="mt-1 text-[10px] text-gray-600">💡 Each object in the array represents one rendered variation</p>
+									<div class="relative">
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white">
+											<CodeMirror
+												bind:value={batchRenderParams.variableSets}
+												lang={json()}
+												styles={{
+													'&': { height: '128px', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-line': { padding: '0' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+													'.cm-scroller': { overflow: 'auto' }
+												}}
+											/>
+										</div>
+										<button
+											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
+											on:click={() => (maximizeBatchVars = true)}
+											title="Maximize editor"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+										</button>
+									</div>
 								</div>
 								<div class="grid grid-cols-3 gap-4">
 									<div>
@@ -1310,7 +1409,6 @@
 										bind:value={batchRenderCsvParams.csvUrl}
 										placeholder="https://example.com/data.csv"
 									/>
-									<p class="mt-1 text-[10px] text-gray-600">💡 URL to a publicly accessible CSV file. No row limit!</p>
 								</div>
 								<div>
 									<div class="flex items-center justify-between mb-2">
@@ -1335,12 +1433,28 @@
 											</button>
 										</div>
 									</div>
-									<textarea
-										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
-										bind:value={batchRenderCsvParams.mappings}
-										placeholder={'{"CSV Column Name": "templateVariableName"}'}
-									></textarea>
-									<p class="mt-1 text-[10px] text-gray-600">💡 Map CSV column names to template variable names: {"{"}"Email Column": "email", "Name Column": "name"{"}"}</p>
+									<div class="relative">
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white">
+											<CodeMirror
+												bind:value={batchRenderCsvParams.mappings}
+												lang={json()}
+												styles={{
+													'&': { height: '128px', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-line': { padding: '0' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+													'.cm-scroller': { overflow: 'auto' }
+												}}
+											/>
+										</div>
+										<button
+											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
+											on:click={() => (maximizeCsvMappings = true)}
+											title="Maximize editor"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+										</button>
+									</div>
 								</div>
 								<div class="grid grid-cols-3 gap-4">
 									<div>
@@ -1386,7 +1500,6 @@
 									bind:value={batchStatusParams.batchId}
 									placeholder="Enter batch ID (e.g., batch_ABC123)"
 								/>
-								<p class="mt-1 text-[10px] text-gray-600">💡 The batch ID is returned when you start a batch render job</p>
 							</div>
 						{:else if selectedEndpoint === 'cancel-batch'}
 							<div>
@@ -1441,28 +1554,33 @@
 										{/if}
 									</select>
 								{/if}
-								<p class="mt-1 text-[10px] text-gray-600">💡 Get the list of variables defined in the template</p>
 							</div>
 						{:else if selectedEndpoint === 'gif'}
 							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div class="md:col-span-2">
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide">HTML Content</label>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">HTML Content</label>
+									<div class="relative">
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white">
+											<CodeMirror
+												bind:value={gifParams.html}
+												lang={htmlLang()}
+												styles={{
+													'&': { height: '128px', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-line': { padding: '0' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+													'.cm-scroller': { overflow: 'auto' }
+												}}
+											/>
+										</div>
 										<button
-											class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide flex items-center gap-1"
-											on:click={() => fillExampleData('gif')}
+											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
+											on:click={() => (maximizeGifHtml = true)}
+											title="Maximize editor"
 										>
-											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-											</svg>
-											Animated Example
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
 										</button>
 									</div>
-									<textarea
-										class="w-full h-32 px-4 py-3 bg-gray-50 border-[3px] border-gray-900 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] transition-all resize-none"
-										bind:value={gifParams.html}
-									></textarea>
 								</div>
 								<div>
 									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Width (px)</label>
@@ -1586,11 +1704,16 @@
 													<span class="text-xs font-black text-gray-900 uppercase tracking-wide">Preview Output</span>
 													<div class="flex gap-2">
 														<button
-															class="p-1.5 hover:bg-white rounded-lg text-gray-600 hover:text-gray-900 transition-colors border-2 border-transparent hover:border-gray-900"
-															on:click={() => copyToClipboard(response.url || response.gif?.url)}
-															title="Copy URL"
+															class="p-1.5 hover:bg-white rounded-lg text-gray-600 hover:text-gray-900 transition-colors border-2 border-transparent hover:border-gray-900 disabled:opacity-50"
+															on:click={() => copyShareUrl(response.url || response.gif?.url)}
+															disabled={isCopyingShareUrl}
+															title="Copy share link"
 														>
-															<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+															{#if isCopyingShareUrl}
+																<svg class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+															{:else}
+																<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+															{/if}
 														</button>
 														<a
 															href={response.url || response.gif?.url}
@@ -1642,7 +1765,7 @@
 											<span class="text-xs font-black text-gray-900 uppercase tracking-wide">cURL Command</span>
 										</div>
 										<div class="p-4 bg-gray-50">
-											<pre class="text-gray-900 whitespace-pre-wrap break-all text-xs font-mono leading-relaxed">{@html curlExample.display
+											<pre class="text-gray-900 whitespace-pre-wrap break-all text-xs font-mono leading-relaxed">{@html escapeHtml(curlExample.display)
 												.replace(/curl/g, '<span class="text-[#ff6b6b] font-bold">curl</span>')
 												.replace(/-X/g, '<span class="text-[#ffc480] font-bold">-X</span>')
 												.replace(/-H/g, '<span class="text-[#ffc480] font-bold">-H</span>')
@@ -1670,6 +1793,281 @@
 		</div>
 	</div>
 </div>
+
+<!-- Maximized Image HTML Editor Modal -->
+{#if maximizeImageHtml}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => (maximizeImageHtml = false)}
+	>
+		<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit HTML Content</h3>
+				</div>
+				<button
+					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+					on:click={() => (maximizeImageHtml = false)}
+					title="Close"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+					<CodeMirror
+						bind:value={imageParams.html}
+						lang={htmlLang()}
+						styles={{
+							'&': { height: '100%', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+							'.cm-content': { padding: '12px' },
+							'.cm-line': { padding: '0' },
+							'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+							'.cm-scroller': { overflow: 'auto' }
+						}}
+					/>
+				</div>
+			</div>
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
+				<div class="text-[10px] text-gray-500">HTML with inline styles and CSS</div>
+				<button
+					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					on:click={() => (maximizeImageHtml = false)}
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Maximized GIF HTML Editor Modal -->
+{#if maximizeGifHtml}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => (maximizeGifHtml = false)}
+	>
+		<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit HTML Content</h3>
+				</div>
+				<button
+					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+					on:click={() => (maximizeGifHtml = false)}
+					title="Close"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+					<CodeMirror
+						bind:value={gifParams.html}
+						lang={htmlLang()}
+						styles={{
+							'&': { height: '100%', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+							'.cm-content': { padding: '12px' },
+							'.cm-line': { padding: '0' },
+							'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+							'.cm-scroller': { overflow: 'auto' }
+						}}
+					/>
+				</div>
+			</div>
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
+				<div class="text-[10px] text-gray-500">HTML with CSS animations for GIF generation</div>
+				<button
+					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					on:click={() => (maximizeGifHtml = false)}
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Maximized Render Template Variables Editor Modal -->
+{#if maximizeRenderVars}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => (maximizeRenderVars = false)}
+	>
+		<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit Variables (JSON)</h3>
+				</div>
+				<button
+					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+					on:click={() => (maximizeRenderVars = false)}
+					title="Close"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+					<CodeMirror
+						bind:value={renderTemplateParams.variables}
+						lang={json()}
+						styles={{
+							'&': { height: '100%', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+							'.cm-content': { padding: '12px' },
+							'.cm-line': { padding: '0' },
+							'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+							'.cm-scroller': { overflow: 'auto' }
+						}}
+					/>
+				</div>
+			</div>
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
+				<div class="text-[10px] text-gray-500">Format: <code class="bg-gray-100 px-1 rounded">{"{"}"key": "value"{"}"}</code></div>
+				<button
+					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					on:click={() => (maximizeRenderVars = false)}
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Maximized Batch Render Variable Sets Editor Modal -->
+{#if maximizeBatchVars}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => (maximizeBatchVars = false)}
+	>
+		<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit Variable Sets (JSON)</h3>
+				</div>
+				<button
+					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+					on:click={() => (maximizeBatchVars = false)}
+					title="Close"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+					<CodeMirror
+						bind:value={batchRenderParams.variableSets}
+						lang={json()}
+						styles={{
+							'&': { height: '100%', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+							'.cm-content': { padding: '12px' },
+							'.cm-line': { padding: '0' },
+							'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+							'.cm-scroller': { overflow: 'auto' }
+						}}
+					/>
+				</div>
+			</div>
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
+				<div class="text-[10px] text-gray-500">Format: <code class="bg-gray-100 px-1 rounded">[{"{"}"key": "value"{"}"}]</code> — each object is one variation</div>
+				<button
+					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					on:click={() => (maximizeBatchVars = false)}
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Maximized CSV Column Mappings Editor Modal -->
+{#if maximizeCsvMappings}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		on:click|self={() => (maximizeCsvMappings = false)}
+	>
+		<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
+				<div class="flex items-center gap-3">
+					<div class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center">
+						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+					</div>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Edit Column Mappings (JSON)</h3>
+				</div>
+				<button
+					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+					on:click={() => (maximizeCsvMappings = false)}
+					title="Close"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<!-- Editor -->
+			<div class="flex-1 min-h-0 p-5">
+				<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full">
+					<CodeMirror
+						bind:value={batchRenderCsvParams.mappings}
+						lang={json()}
+						styles={{
+							'&': { height: '100%', fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+							'.cm-content': { padding: '12px' },
+							'.cm-line': { padding: '0' },
+							'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' },
+							'.cm-scroller': { overflow: 'auto' }
+						}}
+					/>
+				</div>
+			</div>
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
+				<div class="text-[10px] text-gray-500">Format: <code class="bg-gray-100 px-1 rounded">{"{"}"CSV Column": "templateVar"{"}"}</code></div>
+				<button
+					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					on:click={() => (maximizeCsvMappings = false)}
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <Toast />
 
