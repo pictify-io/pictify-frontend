@@ -161,12 +161,12 @@
 
 <section>
 	<!-- Template Grid -->
-	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8">
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8">
 		{#each templates as template (template.uid)}
 			<div
 				role="button"
 				tabindex="0"
-				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] sm:hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col
+				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] sm:hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 overflow-hidden flex flex-col
 					{template.hasDynamicLink ? 'border-[#a855f7] ring-2 ring-[#a855f7]/30' : 'border-gray-900'}"
 				on:click={() => handleTemplateClick(template)}
 				on:keydown={(e) => {
@@ -227,55 +227,30 @@
 						{/if}
 					</div>
 
-				<!-- Hover Overlay Actions -->
-				<div class="absolute inset-0 bg-white/90 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center p-4 gap-3">
-					
-					<!-- Primary Action: Edit -->
-					<button
-						class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#9ca3af] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 transform translate-y-4 group-hover:translate-y-0 duration-300"
-						on:click|stopPropagation={() => handleTemplateClick(template)}
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-						Edit Design
-					</button>
-
-					<!-- Secondary Actions: Usage -->
-					<div class="grid grid-cols-2 gap-3 w-full transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75">
-						<button
-							class="py-2.5 bg-white text-gray-900 font-bold uppercase tracking-wider text-[10px] sm:text-xs rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#9ca3af] hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-1"
-							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
-							title="Render with variables"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-							Render
-						</button>
-						<button
-							class="py-2.5 bg-white text-gray-900 font-bold uppercase tracking-wider text-[10px] sm:text-xs rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#9ca3af] hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-1"
-							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
-							title="Deploy as dynamic asset"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-							Dynamic
-						</button>
-					</div>
+				<!-- Edit Hint Pill (hover only) -->
+				<div class="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 pointer-events-none z-10">
+					<span class="inline-flex items-center gap-1 px-2 py-1 bg-[#ffc480] text-gray-900 font-bold text-[10px] sm:text-xs uppercase tracking-wider rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+						Edit
+					</span>
 				</div>
 			</div>
 			
 			<!-- Footer Info -->
-			<div class="p-3 sm:p-4 border-t-[2px] sm:border-t-[3px] bg-white flex-1 flex flex-col justify-between
+			<div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 border-t-[2px] sm:border-t-[3px] bg-white flex-1 flex flex-col justify-between
 				{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}">
 				<div>
 					<h3 class="font-black text-gray-900 text-base sm:text-lg leading-tight mb-2 sm:mb-3 line-clamp-1" title={template.name}>
 						{template.name}
 					</h3>
-					
-					<div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-						<!-- Dynamic Link Tag -->
+
+					<div class="flex flex-wrap gap-1.5 sm:gap-2">
+						<!-- Live Link Tag -->
 						{#if template.hasDynamicLink}
 							<div class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#a855f7]/20 border border-[#a855f7] rounded text-[9px] sm:text-[10px] font-bold uppercase text-[#7c3aed] tracking-wide">
 								<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
 								<span class="flex items-center gap-1">
-									Dynamic
+									Live
 									<span class="w-1.5 h-1.5 bg-[#a855f7] rounded-full animate-pulse"></span>
 								</span>
 							</div>
@@ -296,6 +271,49 @@
 						{/if}
 					</div>
 				</div>
+			</div>
+
+			<!-- Footer Action Bar -->
+			<div class="grid grid-cols-3 border-t-[2px] sm:border-t-[3px]
+				{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}">
+				<button
+					class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#4ecdc4] hover:bg-[#4ecdc4]/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
+						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
+					on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
+					title="Render with variables"
+				>
+					<svg class="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+					<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider">Render</span>
+				</button>
+				<button
+					class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#ff6b6b] hover:bg-[#ff6b6b]/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
+						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
+					on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/bulk-render`)}
+					title="Batch render from CSV"
+				>
+					<svg class="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+					<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider">Bulk</span>
+				</button>
+				{#if template.hasDynamicLink}
+					<button
+						class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-[#a855f7] bg-[#a855f7]/10 hover:bg-[#a855f7]/20 transition-all duration-150"
+						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
+						title="View live link"
+					>
+						<svg class="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+						<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider">Live</span>
+						<span class="w-1.5 h-1.5 bg-[#a855f7] rounded-full animate-pulse"></span>
+					</button>
+				{:else}
+					<button
+						class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-all duration-150"
+						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
+						title="Deploy as live link"
+					>
+						<svg class="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+						<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider">Live</span>
+					</button>
+				{/if}
 			</div>
 			</div>
 		{/each}

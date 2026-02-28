@@ -5,6 +5,7 @@
 	import { toast } from '../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
 	import { copyToClipboard as sharedCopy, formatRelativeDate, getPageNumbers as sharedGetPageNumbers } from '$lib/utils/format.js';
+	import { createShareResult } from '../../../../api/public-templates.js';
 
 	export let mediaType = 'images';
 
@@ -23,9 +24,41 @@
 	$: hasPrev = currentPage > 1;
 	$: hasNext = currentPage < totalPages;
 
-	function copyToClipboard(text, event) {
+	// Cache share URLs by CDN URL to avoid re-creating
+	const shareUrlCache = new Map();
+	let isCopyingLink = false;
+
+	async function copyToClipboard(cdnUrl, event) {
 		event?.stopPropagation();
-		sharedCopy(text, 'URL copied to clipboard!');
+		if (!cdnUrl) return;
+		isCopyingLink = true;
+		try {
+			if (!shareUrlCache.has(cdnUrl)) {
+				const contentType = mediaType === 'gifs' ? 'gif' : 'image';
+				const format = mediaType === 'gifs' ? 'gif' : mediaType === 'pdfs' ? 'pdf' : 'png';
+				// Find the matching media item to get dimensions
+				const media = mediaList.find(m => m.url === cdnUrl);
+				const res = await createShareResult({
+					assetUrl: cdnUrl,
+					contentType,
+					format,
+					source: 'dashboard',
+					width: media?.width,
+					height: media?.height,
+				});
+				if (res.success && res.shareUrl) {
+					shareUrlCache.set(cdnUrl, `${window.location.origin}${res.shareUrl}`);
+				}
+			}
+			const shareUrl = shareUrlCache.get(cdnUrl) || cdnUrl;
+			await navigator.clipboard.writeText(shareUrl);
+			toast.set({ message: 'Share link copied!', type: 'success', duration: 1500 });
+		} catch (e) {
+			// Fallback to raw CDN URL
+			sharedCopy(cdnUrl, 'URL copied to clipboard!');
+		} finally {
+			isCopyingLink = false;
+		}
 	}
 
 	function downloadMedia(url, event) {

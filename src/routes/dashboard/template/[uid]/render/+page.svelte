@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { getTemplateById, getTemplateVariables, renderTemplate, renderTemplateMultiSize } from '../../../../../api/template';
+	import { createShareResult } from '../../../../../api/public-templates.js';
 	import { getApiToken, createApiToken } from '../../../../../api/user';
 	import { user } from '../../../../../store/user.store';
 	import { toast } from '../../../../../store/toast.store';
@@ -11,6 +12,7 @@
 	import RenderPreview from '$lib/components/render/RenderPreview.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import { analytics } from '$lib/analytics.js';
+	import ModeTabs from '$lib/components/dashboard/ModeTabs.svelte';
 
 	let template = null;
 	let variables = [];
@@ -234,13 +236,44 @@
 		});
 	};
 
-	const copyUrl = () => {
-		if (!renderResult?.url) return;
-		navigator.clipboard.writeText(renderResult.url);
-		toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 2000 });
+	let isCopyingUrl = false;
+	let cachedShareUrl = null;
+	// Reset cached share URL when render result changes
+	$: if (renderResult?.url) cachedShareUrl = null;
 
-		// Track copy
-		analytics.trackCopy({ content_type: 'url', context: 'template_render' });
+	const copyUrl = async () => {
+		if (!renderResult?.url) return;
+		isCopyingUrl = true;
+		try {
+			// Create share result if not cached
+			if (!cachedShareUrl) {
+				const response = await createShareResult({
+					assetUrl: renderResult.url,
+					contentType: renderResult.format === 'gif' ? 'gif' : 'image',
+					width: renderResult.width,
+					height: renderResult.height,
+					format: renderResult.format || 'png',
+					source: 'template',
+					templateUid: uid,
+					title: template?.name || '',
+				});
+				if (response.success && response.shareUrl) {
+					cachedShareUrl = `${window.location.origin}${response.shareUrl}`;
+				}
+			}
+			const urlToCopy = cachedShareUrl || renderResult.url;
+			await navigator.clipboard.writeText(urlToCopy);
+			toast.set({ message: 'Share link copied to clipboard', type: 'success', duration: 2000 });
+
+			// Track copy
+			analytics.trackCopy({ content_type: 'url', context: 'template_render' });
+		} catch (e) {
+			// Fallback to CDN URL if share creation fails
+			await navigator.clipboard.writeText(renderResult.url);
+			toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 2000 });
+		} finally {
+			isCopyingUrl = false;
+		}
 	};
 
 	const generateApiCode = () => {
@@ -331,31 +364,7 @@ console.log(result.url); // CDN URL of rendered image
 		</div>
 
 		<!-- Mode Tabs -->
-		<div class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-400 cursor-not-allowed border-[2px] border-transparent"
-				disabled
-			>
-				Editor
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all bg-[#4ecdc4] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
-			>
-				Render
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
-				on:click={() => goto(`/dashboard/template/${uid}/bulk-render`)}
-			>
-				Bulk
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
-				on:click={() => goto(`/dashboard/template/${uid}/dynamic`)}
-			>
-				Dynamic
-			</button>
-		</div>
+		<ModeTabs activeMode="render" {uid} />
 	</div>
 
 	<div>
@@ -606,6 +615,7 @@ console.log(result.url); // CDN URL of rendered image
 								{renderResult}
 								{renderError}
 								{isRendering}
+								{isCopyingUrl}
 								templateThumbnail={template?.thumbnail}
 								on:download={handleDownload}
 								on:copyUrl={copyUrl}

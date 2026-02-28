@@ -150,20 +150,20 @@
 	};
 </script>
 
-<div class="space-y-8">
+<div class="space-y-6">
 	<!-- Header removed as it is now in parent -->
 
-	<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+	<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 		<!-- Main Mapping Section -->
 		<div class="lg:col-span-8">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden">
 				<div class="bg-[#60a5fa] border-b-[3px] border-gray-900 px-6 py-4">
 					<h2 class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2 text-shadow-sm">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
 						Map Variables to Data
 					</h2>
 				</div>
-				<div class="p-6 sm:p-8">
+				<div class="p-6">
 					{#if variables.length === 0}
 						<div class="text-center py-12 text-gray-500">
 							<p>No variables found in this template.</p>
@@ -292,7 +292,7 @@
 		<!-- Right Column: Instructions & Source Data -->
 		<div class="lg:col-span-4 space-y-6">
 			<!-- Tips Box (Matches Bulk) -->
-			<div class="bg-[#eff6ff] border-[3px] border-[#60a5fa] rounded-xl p-6 shadow-[8px_8px_0_0_#bfdbfe]">
+			<div class="bg-[#eff6ff] border-[3px] border-[#60a5fa] rounded-xl p-6 shadow-[6px_6px_0_0_#bfdbfe]">
 				<h3 class="font-black text-blue-900 uppercase tracking-widest text-sm mb-4">JSON Mapping Tips</h3>
 				<ul class="space-y-3">
 					<li class="flex gap-2 text-sm text-blue-900 font-medium">
@@ -307,7 +307,7 @@
 			</div>
 
 			<!-- Source Data Preview -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col max-h-[500px]">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col max-h-[500px]">
 				<div class="bg-gray-100 border-b-[3px] border-gray-900 px-4 py-3 flex justify-between items-center shrink-0">
 					<h3 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
 						<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -343,13 +343,13 @@
 	<!-- Actions -->
 	<div class="flex justify-between gap-3 pt-6 mt-6 border-t-[3px] border-gray-900">
 		<button
-			class="px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#9ca3af] hover:shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+			class="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-900 font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			on:click={handleBack}
 		>
 			Back
 		</button>
 		<button
-			class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Refresh Strategy

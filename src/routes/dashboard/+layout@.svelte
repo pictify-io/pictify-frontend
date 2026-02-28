@@ -2,6 +2,7 @@
 	import '../../app.css';
 	import Nav from '$lib/components/dashboard/Nav.svelte';
 	import SideNav from '$lib/components/dashboard/SideNav.svelte';
+	import CommandPalette from '$lib/components/dashboard/CommandPalette.svelte';
 	import VerifyEmailBanner from '$lib/components/dashboard/VerifyEmailBanner.svelte';
 	import PLGProvider from '$lib/components/plg/PLGProvider.svelte';
 	import UsageBanner from '$lib/components/plg/UsageBanner.svelte';
@@ -63,11 +64,7 @@
 		// Initialize onboarding checklist
 		initOnboarding();
 
-		// Only redirect to api-token if user is on the exact dashboard root path
-		const currentPath = window.location.pathname;
-		if (currentPath === '/dashboard' || currentPath === '/dashboard/') {
-			goto('/dashboard/api-token');
-		}
+		// Home page now exists at /dashboard — no redirect needed
 
 		// Add resize listener
 		window.addEventListener('resize', handleResize);
@@ -149,4 +146,7 @@
 	{#if isUserLoaded}
 		<ProactiveUpgradeModal />
 	{/if}
+
+	<!-- Command Palette (Cmd+K) -->
+	<CommandPalette />
 </PLGProvider>

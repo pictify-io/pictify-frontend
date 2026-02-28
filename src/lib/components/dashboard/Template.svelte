@@ -274,7 +274,7 @@
 
 				<div class="hidden sm:block w-[1px] h-6 bg-gray-300 mx-1"></div>
 
-				<!-- Dynamic Link Filter -->
+				<!-- Live Link Filter -->
 				<button
 					on:click={handleDynamicFilterChange}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
@@ -283,7 +283,7 @@
 							: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
 				>
 					<svg class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-[#a855f7]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-					Dynamic Links
+					Live Links
 					{#if dynamicFilter}
 						<svg class="w-4 h-4 text-white ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
 					{/if}

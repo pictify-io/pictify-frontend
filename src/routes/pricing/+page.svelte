@@ -58,7 +58,7 @@
 			{ label: 'Batch Rendering', feature: FEATURES.BATCH_RENDER },
 			{ label: 'Items per Batch', feature: FEATURES.BATCH_ITEMS_PER_REQUEST },
 			{ label: 'Webhooks', feature: FEATURES.WEBHOOKS },
-			{ label: 'Dynamic Links', feature: FEATURES.DYNAMIC_LINKS },
+			{ label: 'Live Links', feature: FEATURES.DYNAMIC_LINKS },
 		]},
 		// AI Features
 		{ category: 'AI Features', features: [

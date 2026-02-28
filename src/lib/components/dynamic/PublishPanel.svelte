@@ -38,7 +38,7 @@
 
 	const generateEmbedCode = () => {
 		if (!dynamicUrl) return '';
-		return `<img src="${dynamicUrl}" alt="${template?.name || 'Dynamic Image'}" />`;
+		return `<img src="${dynamicUrl}" alt="${template?.name || 'Live Image'}" />`;
 	};
 
 	const handlePublish = () => {
@@ -55,7 +55,7 @@
 	};
 </script>
 
-<div class="space-y-8">
+<div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<!-- Edit/Delete actions for existing binding -->
 		{#if publishedBinding && !isEditing}
@@ -118,11 +118,11 @@
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 					<div class="p-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#9ca3af]">
 						<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Variables Mapped</h4>
-						<p class="text-3xl font-black text-gray-900">{Object.values(mapping).filter(v => v).length}</p>
+						<p class="text-2xl font-black text-gray-900">{Object.values(mapping).filter(v => v).length}</p>
 					</div>
 					<div class="p-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#9ca3af]">
 						<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Refresh Rate</h4>
-						<p class="text-3xl font-black text-gray-900">{formatTtl(refreshPolicy.ttlSeconds)}</p>
+						<p class="text-2xl font-black text-gray-900">{formatTtl(refreshPolicy.ttlSeconds)}</p>
 					</div>
 					<div class="p-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#9ca3af]">
 						<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Output Format</h4>
@@ -133,13 +133,13 @@
 
 			<div class="flex justify-between gap-3 pt-4 border-t-[3px] border-gray-900">
 				<button
-					class="px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#9ca3af] hover:shadow-[3px_3px_0_0_#9ca3af] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+					class="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-900 font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#9ca3af] hover:shadow-[1px_1px_0_0_#9ca3af] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={isEditing ? handleCancelEdit : handleBack}
 				>
 					{isEditing ? 'Cancel' : 'Back'}
 				</button>
 				<button
-					class="px-8 py-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-2 group"
+					class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-2 group"
 					on:click={handlePublish}
 					disabled={isEditing ? isUpdating : isPublishing}
 				>
@@ -162,7 +162,7 @@
 							</svg>
 							Publishing...
 						{:else}
-							Publish Dynamic Asset
+							Publish Live Asset
 							<svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
 						{/if}
 					{/if}
@@ -172,11 +172,11 @@
 	{:else}
 		<!-- Published State -->
 		<div class="space-y-6">
-			<!-- Dynamic URL -->
+			<!-- Live URL -->
 			<div class="p-6 bg-gradient-to-br from-gray-50 to-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
 				<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-200 mb-4">
 					<span class="w-3 h-3 bg-gray-900 rounded-full border-2 border-black"></span>
-					<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Dynamic Asset URL</h3>
+					<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Live Asset URL</h3>
 				</div>
 				
 				<div class="flex items-stretch gap-3">
@@ -216,10 +216,10 @@
 			{#if dynamicUrl}
 				<div class="space-y-3">
 					<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Live Preview</h3>
-					<div class="bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-[3px] border-gray-900 rounded-xl p-8 flex items-center justify-center min-h-[300px] shadow-[4px_4px_0_0_#1f2937] bg-white">
+					<div class="bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-[3px] border-gray-900 rounded-xl p-6 flex items-center justify-center min-h-[300px] shadow-[4px_4px_0_0_#1f2937] bg-white">
 						<img
 							src={dynamicUrl}
-							alt="Dynamic asset preview"
+							alt="Live asset preview"
 							class="max-w-full max-h-[300px] object-contain shadow-2xl rounded-lg border-2 border-gray-900"
 						/>
 					</div>

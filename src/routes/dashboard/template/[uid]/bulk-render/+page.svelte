@@ -9,6 +9,8 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import { analytics } from '$lib/analytics.js';
+	import WizardStepper from '$lib/components/dashboard/WizardStepper.svelte';
+	import ModeTabs from '$lib/components/dashboard/ModeTabs.svelte';
 	import Papa from 'papaparse';
 	import JSZip from 'jszip';
 	import {
@@ -547,8 +549,12 @@
 	}
 
 	// Steps for indicator
-	const steps = ['upload', 'map', 'progress', 'results'];
-	$: currentStepIndex = steps.indexOf(step);
+	const wizardSteps = [
+		{ id: 'upload', label: 'Upload' },
+		{ id: 'map', label: 'Map' },
+		{ id: 'progress', label: 'Progress' },
+		{ id: 'results', label: 'Results' },
+	];
 </script>
 
 <section class="min-h-full pb-12">
@@ -582,31 +588,7 @@
 		</div>
 
 		<!-- Mode Tabs -->
-		<div class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-400 cursor-not-allowed border-[2px] border-transparent"
-				disabled
-			>
-				Editor
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
-				on:click={() => goto(`/dashboard/template/${uid}/render`)}
-			>
-				Render
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all bg-[#ff6b6b] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
-			>
-				Bulk
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
-				on:click={() => goto(`/dashboard/template/${uid}/dynamic`)}
-			>
-				Dynamic
-			</button>
-		</div>
+		<ModeTabs activeMode="bulk" {uid} />
 	</div>
 
 	<div>
@@ -659,27 +641,7 @@
 			</div>
 		{:else if template}
 			<!-- Step Indicator -->
-			<div class="flex gap-4 mb-8 px-1">
-				{#each steps as s, i}
-					<div class="flex items-center gap-3">
-						<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
-							{currentStepIndex === i ? 'bg-[#ffc480] -translate-y-1' : i < currentStepIndex ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
-							{#if i < currentStepIndex}
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
-							{:else}
-								{i + 1}
-							{/if}
-						</div>
-						<div class="hidden sm:flex flex-col">
-							<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step {i + 1}</span>
-							<span class="text-sm font-black capitalize text-gray-900 leading-tight">{s}</span>
-						</div>
-					</div>
-					{#if i < steps.length - 1}
-						<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {i < currentStepIndex ? 'bg-gray-900' : ''}"></div>
-					{/if}
-				{/each}
-			</div>
+			<WizardStepper steps={wizardSteps} currentStep={step} on:step={(e) => step = e.detail} />
 
 			<!-- Step Content -->
 			{#if step === 'upload'}

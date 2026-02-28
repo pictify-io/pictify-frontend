@@ -19,6 +19,8 @@
 	import RefreshStrategy from '$lib/components/dynamic/RefreshStrategy.svelte';
 	import PublishPanel from '$lib/components/dynamic/PublishPanel.svelte';
 	import { analytics } from '$lib/analytics.js';
+	import WizardStepper from '$lib/components/dashboard/WizardStepper.svelte';
+	import ModeTabs from '$lib/components/dashboard/ModeTabs.svelte';
 	import { FeatureUpgradePrompt } from '$lib/components/plg';
 	import { ConfirmModal } from '$lib/components/billing';
 	import {
@@ -334,7 +336,7 @@
 
 			publishedBinding = result.binding || result;
 			activeTab = 'publish';
-			toast.set({ message: 'Dynamic asset published!', type: 'success', duration: 3000 });
+			toast.set({ message: 'Live asset published!', type: 'success', duration: 3000 });
 
 			// Track dynamic binding publish
 			analytics.trackFeatureUsed({ feature_name: 'dynamic_binding_published', context: uid });
@@ -513,7 +515,7 @@
 					{/if}
 				</h1>
 				<div class="px-2 py-1 bg-[#3b82f6] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]">
-					Dynamic Mode
+					Live Mode
 				</div>
 			</div>
 			<p class="text-gray-600 font-bold mt-2 text-sm sm:text-base max-w-2xl">
@@ -522,31 +524,7 @@
 		</div>
 
 		<!-- Mode Tabs -->
-		<div class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-400 cursor-not-allowed border-[2px] border-transparent"
-				disabled
-			>
-				Editor
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
-				on:click={() => goto(`/dashboard/template/${uid}/render`)}
-			>
-				Render
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
-				on:click={() => goto(`/dashboard/template/${uid}/bulk-render`)}
-			>
-				Bulk
-			</button>
-			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all bg-[#3b82f6] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
-			>
-				Dynamic
-			</button>
-		</div>
+		<ModeTabs activeMode="dynamic" {uid} />
 	</div>
 
 	<div>
@@ -568,71 +546,20 @@
 			</div>
 		{:else if template}
 			<!-- Progress Tabs -->
-			<!-- Step Indicator -->
-			<div class="flex gap-4 mb-8 px-1">
-				<div class="flex items-center gap-3">
-					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
-						{activeTab === 'datasource' ? 'bg-[#3b82f6] text-white -translate-y-1' : ['mapping', 'refresh', 'publish'].includes(activeTab) ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
-						{#if ['mapping', 'refresh', 'publish'].includes(activeTab)}
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
-						{:else}
-							1
-						{/if}
-					</div>
-					<div class="hidden sm:flex flex-col">
-						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 1</span>
-						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Data Source</span>
-					</div>
-				</div>
-				<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {['mapping', 'refresh', 'publish'].includes(activeTab) ? 'bg-gray-900' : ''}"></div>
-
-				<div class="flex items-center gap-3">
-					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
-						{activeTab === 'mapping' ? 'bg-[#3b82f6] text-white -translate-y-1' : ['refresh', 'publish'].includes(activeTab) ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
-						{#if ['refresh', 'publish'].includes(activeTab)}
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
-						{:else}
-							2
-						{/if}
-					</div>
-					<div class="hidden sm:flex flex-col">
-						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 2</span>
-						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Mapping</span>
-					</div>
-				</div>
-				<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {['refresh', 'publish'].includes(activeTab) ? 'bg-gray-900' : ''}"></div>
-
-				<div class="flex items-center gap-3">
-					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
-						{activeTab === 'refresh' ? 'bg-[#3b82f6] text-white -translate-y-1' : ['publish'].includes(activeTab) ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-400'}">
-						{#if ['publish'].includes(activeTab)}
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
-						{:else}
-							3
-						{/if}
-					</div>
-					<div class="hidden sm:flex flex-col">
-						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 3</span>
-						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Refresh</span>
-					</div>
-				</div>
-				<div class="flex-1 h-[3px] bg-gray-200 self-center rounded-full mx-2 {['publish'].includes(activeTab) ? 'bg-gray-900' : ''}"></div>
-
-				<div class="flex items-center gap-3">
-					<div class="w-10 h-10 rounded-xl border-[3px] border-gray-900 flex items-center justify-center font-black text-sm shadow-[3px_3px_0_0_#1f2937] transition-all
-						{activeTab === 'publish' ? 'bg-[#3b82f6] text-white -translate-y-1' : 'bg-white text-gray-400'}">
-						4
-					</div>
-					<div class="hidden sm:flex flex-col">
-						<span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">Step 4</span>
-						<span class="text-sm font-black capitalize text-gray-900 leading-tight">Publish</span>
-					</div>
-				</div>
-			</div>
+			<WizardStepper
+				steps={[
+					{ id: 'datasource', label: 'Data Source' },
+					{ id: 'mapping', label: 'Mapping' },
+					{ id: 'refresh', label: 'Refresh' },
+					{ id: 'publish', label: 'Publish' },
+				]}
+				currentStep={activeTab}
+				on:step={(e) => activeTab = e.detail}
+			/>
 
 			<!-- Tab Content -->
 			<!-- Tab Content -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] p-6 sm:p-8">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937]">
 				{#if activeTab === 'datasource'}
 					<DataSourceConfig
 						{dataSources}
@@ -691,8 +618,8 @@
 <!-- Delete Confirmation Modal -->
 <ConfirmModal
 	open={showDeleteModal}
-	title="Delete Dynamic Binding"
-	description="Are you sure you want to delete this dynamic binding? This will remove the live URL and cannot be undone."
+	title="Delete Live Binding"
+	description="Are you sure you want to delete this live binding? This will remove the live URL and cannot be undone."
 	confirmText="Delete Binding"
 	cancelText="Cancel"
 	variant="danger"
