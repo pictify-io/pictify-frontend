@@ -18,6 +18,97 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { formatRelativeDate, copyToClipboard } from '$lib/utils/format.js';
+	import { COUNTRIES } from '$lib/utils/countries.js';
+
+	// ============== Smart Link Rule Summary Helpers ==============
+
+	const PROPERTY_LABELS = {
+		'device.type': 'Device Type', 'device.os': 'Operating System',
+		'geo.country': 'Country', 'geo.continent': 'Continent',
+		'time.hour': 'Hour of Day (UTC)', 'time.dayOfWeek': 'Day of Week',
+		'browser.language': 'Browser Language',
+		'url.param': 'URL Parameter', 'referrer.domain': 'Referrer Domain',
+	};
+	const CONTINENT_LABELS = { NA: 'North America', EU: 'Europe', AS: 'Asia', AF: 'Africa', SA: 'South America', OC: 'Oceania' };
+	const LANGUAGE_LABELS = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', it: 'Italian', nl: 'Dutch', ja: 'Japanese', ko: 'Korean', zh: 'Chinese', ar: 'Arabic', hi: 'Hindi', ru: 'Russian' };
+	const DAY_LABELS = { '0': 'Sunday', '1': 'Monday', '2': 'Tuesday', '3': 'Wednesday', '4': 'Thursday', '5': 'Friday', '6': 'Saturday' };
+	const OP_LABELS = { eq: 'is', in: 'is one of', not_in: 'is not', gt: '>', lt: '<', gte: '>=', lte: '<=', contains: 'contains' };
+
+	function formatRuleValue(property, value) {
+		if (property === 'time.hour') {
+			if (!Array.isArray(value) || value.length === 0) return '';
+			const sorted = [...value].sort((a, b) => a - b);
+			const fmt = h => { const d = h === 0 ? 12 : (h > 12 ? h - 12 : h); return `${d}${h < 12 ? 'am' : 'pm'}`; };
+			return sorted.map(fmt).join(', ');
+		}
+		if (property === 'time.dayOfWeek') {
+			if (!Array.isArray(value)) return DAY_LABELS[value] || value;
+			return value.map(v => DAY_LABELS[v] || v).join(', ');
+		}
+		if (property === 'geo.continent') {
+			return Array.isArray(value) ? value.map(v => CONTINENT_LABELS[v] || v).join(', ') : (CONTINENT_LABELS[value] || value);
+		}
+		if (property === 'geo.country') {
+			const getName = c => COUNTRIES.find(cc => cc.code === c)?.name || c;
+			return Array.isArray(value) ? value.map(getName).join(', ') : getName(value);
+		}
+		if (property === 'browser.language') {
+			return Array.isArray(value) ? value.map(v => LANGUAGE_LABELS[v] || v).join(', ') : (LANGUAGE_LABELS[value] || value);
+		}
+		return Array.isArray(value) ? value.join(', ') : String(value ?? '');
+	}
+
+	function buildNodeSummary(node) {
+		if (!node) return null;
+		if (node.type === 'rule') {
+			if (!node.property) return null;
+			if (Array.isArray(node.value) ? node.value.length === 0 : (node.value === '' && node.value !== 0)) return null;
+			const label = PROPERTY_LABELS[node.property] || node.property;
+			const opLabel = OP_LABELS[node.operator] || node.operator;
+			const val = formatRuleValue(node.property, node.value);
+			if (node.paramName) return `${node.paramName} ${opLabel} "${val}"`;
+			return `${label} ${opLabel} ${val}`;
+		}
+		if (node.type === 'group') {
+			const childSummaries = (node.children || []).map(c => buildNodeSummary(c)).filter(Boolean);
+			if (childSummaries.length === 0) return null;
+			if (childSummaries.length === 1) return childSummaries[0];
+			const joiner = node.operator === 'OR' ? ' OR ' : ' AND ';
+			return `(${childSummaries.join(joiner)})`;
+		}
+		return null;
+	}
+
+	function getConditionSummary(conditions) {
+		if (!conditions) return null;
+		// Handle legacy flat format
+		let cond = conditions;
+		if (!cond.type && Array.isArray(cond.rules)) {
+			cond = { type: 'group', operator: cond.operator || 'AND', children: (cond.rules || []).map(r => ({ type: 'rule', ...r })) };
+		}
+		if (cond.type !== 'group' || !cond.children || cond.children.length === 0) return null;
+		const childSummaries = cond.children.map(c => buildNodeSummary(c)).filter(Boolean);
+		if (childSummaries.length === 0) return null;
+		if (childSummaries.length === 1) return childSummaries[0];
+		const joiner = cond.operator === 'OR' ? ' OR ' : ' AND ';
+		return childSummaries.join(joiner);
+	}
+
+	function getConditionRuleNodes(conditions) {
+		if (!conditions) return [];
+		let cond = conditions;
+		if (!cond.type && Array.isArray(cond.rules)) {
+			cond = { type: 'group', operator: cond.operator || 'AND', children: (cond.rules || []).map(r => ({ type: 'rule', ...r })) };
+		}
+		return flattenRules(cond);
+	}
+
+	function flattenRules(node) {
+		if (!node) return [];
+		if (node.type === 'rule') return [node];
+		if (node.type === 'group') return (node.children || []).flatMap(c => flattenRules(c));
+		return [];
+	}
 
 	// ============== State ==============
 	let exp = null;
@@ -73,7 +164,15 @@
 
 	$: maxImpressions = Math.max(...variants.map(v => v.impressions || 0), 1);
 
+	$: isSmartLink = exp?.type === 'smart_link';
+
 	$: isClickGoal = exp?.goalConfig?.type === 'click_through' || exp?.goalConfig?.type === 'ctr';
+
+	// Smart link: separate fallback from rule variants, sorted by priority
+	$: smartLinkFallback = isSmartLink ? variants.find(v => v.isDefault) : null;
+	$: smartLinkRuleVariants = isSmartLink
+		? variants.filter(v => !v.isDefault).sort((a, b) => (a.priority || 0) - (b.priority || 0))
+		: [];
 
 	$: publicUrl = exp?.slug
 		? `pictify.io/s/${exp.slug}.${exp?.outputConfig?.format || 'png'}`
@@ -355,21 +454,34 @@
 
 							<!-- Complete (if running) -->
 							{#if exp.status === 'running'}
-								<button
-									on:click={() => showDeclareWinner = true}
-									class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-								>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-									</svg>
-									Complete
-								</button>
+								{#if isSmartLink}
+									<button
+										on:click={handlePause}
+										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+										</svg>
+										Stop
+									</button>
+								{:else}
+									<button
+										on:click={() => showDeclareWinner = true}
+										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+										</svg>
+										Complete
+									</button>
+								{/if}
 							{/if}
 
 							<!-- Edit (draft or paused) -->
 							{#if exp.status === 'draft' || exp.status === 'paused'}
 								<button
-									on:click={() => goto(`/dashboard/experiments/create?edit=${uid}`)}
+									on:click={() => goto(exp.type === 'smart_link' ? `/dashboard/experiments/create/smart-link?edit=${uid}` : `/dashboard/experiments/create?edit=${uid}`)}
 									class="px-4 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -480,120 +592,295 @@
 			</div>
 
 			<!-- ==================== VARIANT CARDS ==================== -->
-			<div>
-				<div class="flex items-center gap-3 mb-6">
-					<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Variants</h2>
-					<span class="px-3 py-1 bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase">
-						{variants.length}
-					</span>
-				</div>
-
-				{#if variants.length === 0}
-					<div class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] text-center">
-						<p class="text-gray-500 font-bold uppercase tracking-widest text-xs">No variants configured yet.</p>
+			{#if isSmartLink}
+				<!-- ========== SMART LINK: Routing Rules View ========== -->
+				<div>
+					<div class="flex items-center gap-3 mb-6">
+						<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Routing Rules</h2>
+						<span class="px-3 py-1 bg-[#c084fc] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase">
+							{smartLinkRuleVariants.length} {smartLinkRuleVariants.length === 1 ? 'Rule' : 'Rules'}
+						</span>
 					</div>
-				{:else}
-					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						{#each variants as variant, idx}
-							<div class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden {variant.isWinner ? 'shadow-[8px_8px_0_0_#ffc480] -translate-y-1' : 'shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1'} transition-all duration-200">
-								<!-- Variant Header -->
-								<div class="px-5 py-4 border-b-[3px] border-gray-900 {variant.isWinner ? 'bg-[#ffc480]/20' : 'bg-[#FFFDF8]'} flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
-									<div class="flex items-center gap-4 min-w-0 w-full sm:w-auto">
-										<!-- Variant Index Badge -->
-										<div class="w-10 h-10 bg-gray-900 text-white rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0 relative overflow-hidden group">
-											<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
-											{String.fromCharCode(65 + idx)}
+
+					<!-- How it works callout -->
+					<div class="bg-[#c084fc]/10 border-[3px] border-gray-900 rounded-xl p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]">
+						<div class="flex items-start gap-3">
+							<div class="w-8 h-8 bg-[#c084fc] border-[2px] border-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+								<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+							</div>
+							<div>
+								<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">How Smart Link Routing Works</h3>
+								<p class="text-xs font-bold text-gray-600 mt-1 leading-relaxed">
+									Rules are evaluated top-to-bottom by priority. The first rule that matches the viewer's context (device, location, time, etc.) determines which image is served. If no rules match, the fallback image is shown.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Rule Variant Cards -->
+					{#if smartLinkRuleVariants.length === 0}
+						<div class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] text-center">
+							<p class="text-gray-500 font-bold uppercase tracking-widest text-xs">No routing rules configured yet.</p>
+						</div>
+					{:else}
+						<div class="space-y-5">
+							{#each smartLinkRuleVariants as variant, idx}
+								<div class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200">
+									<!-- Rule Header -->
+									<div class="px-5 py-4 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex items-center justify-between">
+										<div class="flex items-center gap-4 min-w-0">
+											<!-- Priority badge -->
+											<div class="w-10 h-10 bg-[#c084fc] text-gray-900 rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0">
+												#{idx + 1}
+											</div>
+											<div class="min-w-0">
+												<h3 class="font-black text-gray-900 text-base uppercase tracking-wide truncate">
+													{variant.name || `Rule ${idx + 1}`}
+												</h3>
+												<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+													Priority {variant.priority ?? idx + 1}
+												</span>
+											</div>
 										</div>
-										<div class="min-w-0">
-											<h3 class="font-black text-gray-900 text-base uppercase tracking-wide truncate">
-												{variant.name || `Variant ${String.fromCharCode(65 + idx)}`}
-											</h3>
-											<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-												Weight: {variant.weight || 0}%
-											</span>
+										<!-- Impressions count -->
+										<div class="flex items-center gap-3 shrink-0">
+											<div class="text-right">
+												<div class="text-lg font-black text-gray-900 tabular-nums">{(variant.impressions || 0).toLocaleString()}</div>
+												<div class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Served</div>
+											</div>
 										</div>
 									</div>
-									<div class="flex items-center gap-2 shrink-0">
-										{#if variant.isWinner}
-											<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1">
-												<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-													<path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
-												</svg>
-												Winner
-											</span>
-										{/if}
-										{#if variant.isDefault}
-											<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] border-gray-900 bg-gray-100 text-gray-900 shadow-[2px_2px_0_0_#1f2937]">
-												Default
-											</span>
+
+									<div class="flex flex-col lg:flex-row">
+										<!-- Rule Conditions -->
+										<div class="flex-1 p-5 space-y-4 {variant.preRenderedUrl ? 'lg:border-r-[3px] lg:border-gray-900' : ''}">
+											<div class="flex items-center gap-2 mb-3">
+												<svg class="w-4 h-4 text-[#c084fc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+												<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Conditions</span>
+											</div>
+
+											{#if getConditionSummary(variant.conditions)}
+												<!-- Individual rule pills -->
+												{@const rules = getConditionRuleNodes(variant.conditions)}
+												{@const rootOp = variant.conditions?.operator || 'AND'}
+												<div class="flex flex-wrap items-center gap-2">
+													{#each rules as rule, rIdx}
+														{#if rIdx > 0}
+															<span class="text-[9px] font-black text-gray-400 uppercase px-2 py-1 bg-gray-100 rounded border border-gray-200">
+																{rootOp}
+															</span>
+														{/if}
+														<div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-xs font-bold text-gray-800">
+															<span class="font-black text-gray-900">{PROPERTY_LABELS[rule.property] || rule.property}</span>
+															<span class="text-gray-400">{OP_LABELS[rule.operator] || rule.operator}</span>
+															<span class="font-black text-[#7c3aed]">{formatRuleValue(rule.property, rule.value)}</span>
+														</div>
+													{/each}
+												</div>
+
+												<!-- Natural language summary -->
+												<div class="mt-3 px-3 py-2 bg-gray-50 border-l-[3px] border-[#c084fc] rounded-r-lg">
+													<p class="text-xs font-bold text-gray-600 italic">
+														Show this image when: {getConditionSummary(variant.conditions)}
+													</p>
+												</div>
+											{:else}
+												<p class="text-xs font-bold text-gray-400 italic">No conditions configured</p>
+											{/if}
+
+											<!-- Stats row -->
+											{#if isClickGoal}
+												<div class="flex items-center gap-6 pt-3 border-t-[2px] border-gray-100">
+													<div class="flex items-center gap-2">
+														<span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Clicks</span>
+														<span class="text-sm font-black text-gray-900 tabular-nums">{(variant.clicks || 0).toLocaleString()}</span>
+													</div>
+													<div class="flex items-center gap-2">
+														<span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">CTR</span>
+														<span class="px-2 py-0.5 bg-[#10b981]/10 rounded border-[2px] border-gray-900 text-xs font-black text-gray-900 tabular-nums">{getVariantCtr(variant)}%</span>
+													</div>
+												</div>
+											{/if}
+										</div>
+
+										<!-- Image preview -->
+										{#if variant.preRenderedUrl}
+											<div class="lg:w-48 p-4 flex items-center justify-center bg-gray-50">
+												<div class="w-full h-32 lg:h-full bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
+													<img
+														src={variant.preRenderedUrl}
+														alt="{variant.name || 'Variant'} preview"
+														class="w-full h-full object-contain p-2"
+													/>
+												</div>
+											</div>
 										{/if}
 									</div>
 								</div>
+							{/each}
+						</div>
+					{/if}
 
-								<!-- Variant Body -->
-								<div class="p-6 space-y-5 bg-white">
-									<!-- Thumbnail Preview -->
-									{#if variant.preRenderedUrl}
-										<div class="w-full h-40 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] relative group">
+					<!-- Fallback Variant -->
+					{#if smartLinkFallback}
+						<div class="mt-6">
+							<div class="flex items-center gap-2 mb-4">
+								<svg class="w-5 h-5 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+								<h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">Fallback Image</h3>
+							</div>
+							<div class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]">
+								<div class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#ffc480]/10 flex items-center justify-between">
+									<div class="flex items-center gap-3">
+										<span class="text-sm font-black text-gray-900">{smartLinkFallback.name || 'Fallback'}</span>
+										<span class="px-2 py-0.5 rounded text-[9px] font-black uppercase border-[2px] border-gray-900 bg-gray-100 text-gray-900">Default</span>
+									</div>
+									<div class="text-right">
+										<span class="text-lg font-black text-gray-900 tabular-nums">{(smartLinkFallback.impressions || 0).toLocaleString()}</span>
+										<span class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Served</span>
+									</div>
+								</div>
+								<div class="p-5 flex items-center gap-5">
+									{#if smartLinkFallback.preRenderedUrl}
+										<div class="w-40 h-28 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0">
 											<img
-												src={variant.preRenderedUrl}
-												alt="{variant.name || 'Variant'} preview"
+												src={smartLinkFallback.preRenderedUrl}
+												alt="Fallback preview"
 												class="w-full h-full object-contain p-2"
 											/>
-											<div class="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-												<button class="px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-widest text-[10px] border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all">
-													Preview
-												</button>
-											</div>
 										</div>
 									{/if}
-
-									<!-- Stats Grid Inner -->
-									<div class="grid grid-cols-2 gap-4">
-										<!-- Impressions Block -->
-										<div>
-											<div class="flex items-center justify-between mb-2">
-												<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Impressions</span>
-												<span class="text-sm font-black text-gray-900">{(variant.impressions || 0).toLocaleString()}</span>
-											</div>
-											<div class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900">
-												<div
-													class="h-full bg-[#ffc480] border-r-[2px] border-gray-900 transition-all duration-500"
-													style="width: {getBarWidth(variant.impressions || 0, maxImpressions)}%"
-												></div>
-											</div>
-										</div>
-
-										<!-- Clicks Block -->
+									<div class="text-xs font-bold text-gray-500 leading-relaxed">
+										This image is shown when no routing rules match the viewer's context. It acts as the default experience.
 										{#if isClickGoal}
-											<div>
-												<div class="flex items-center justify-between mb-2">
-													<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Clicks</span>
-													<span class="text-sm font-black text-gray-900">{(variant.clicks || 0).toLocaleString()}</span>
-												</div>
-												<div class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900">
-													<div
-														class="h-full bg-[#fde047] border-r-[2px] border-gray-900 transition-all duration-500"
-														style="width: {getBarWidth(variant.clicks || 0, Math.max(...variants.map(v => v.clicks || 0), 1))}%"
-													></div>
-												</div>
+											<div class="flex items-center gap-4 mt-3">
+												<span class="text-[10px] font-black text-gray-400 uppercase">Clicks: <span class="text-gray-900">{(smartLinkFallback.clicks || 0).toLocaleString()}</span></span>
+												<span class="text-[10px] font-black text-gray-400 uppercase">CTR: <span class="text-gray-900">{getVariantCtr(smartLinkFallback)}%</span></span>
 											</div>
 										{/if}
-									</div>
-
-									<!-- CTR Footer -->
-									<div class="flex items-center justify-between pt-4 border-t-[3px] border-gray-900 border-dashed">
-										<span class="text-xs font-black text-gray-500 uppercase tracking-widest">Conversion Rate</span>
-										<div class="px-3 py-1 bg-[#10b981]/10 rounded border-[2px] border-gray-900 text-gray-900 font-black tabular-nums">
-											{getVariantCtr(variant)}%
-										</div>
 									</div>
 								</div>
 							</div>
-						{/each}
+						</div>
+					{/if}
+				</div>
+
+			{:else}
+				<!-- ========== A/B TEST: Original Variant Cards ========== -->
+				<div>
+					<div class="flex items-center gap-3 mb-6">
+						<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Variants</h2>
+						<span class="px-3 py-1 bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase">
+							{variants.length}
+						</span>
 					</div>
-				{/if}
-			</div>
+
+					{#if variants.length === 0}
+						<div class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] text-center">
+							<p class="text-gray-500 font-bold uppercase tracking-widest text-xs">No variants configured yet.</p>
+						</div>
+					{:else}
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							{#each variants as variant, idx}
+								<div class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden {variant.isWinner ? 'shadow-[8px_8px_0_0_#ffc480] -translate-y-1' : 'shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1'} transition-all duration-200">
+									<!-- Variant Header -->
+									<div class="px-5 py-4 border-b-[3px] border-gray-900 {variant.isWinner ? 'bg-[#ffc480]/20' : 'bg-[#FFFDF8]'} flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
+										<div class="flex items-center gap-4 min-w-0 w-full sm:w-auto">
+											<!-- Variant Index Badge -->
+											<div class="w-10 h-10 bg-gray-900 text-white rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0 relative overflow-hidden group">
+												<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+												{String.fromCharCode(65 + idx)}
+											</div>
+											<div class="min-w-0">
+												<h3 class="font-black text-gray-900 text-base uppercase tracking-wide truncate">
+													{variant.name || `Variant ${String.fromCharCode(65 + idx)}`}
+												</h3>
+												<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+													Weight: {variant.weight || 0}%
+												</span>
+											</div>
+										</div>
+										<div class="flex items-center gap-2 shrink-0">
+											{#if variant.isWinner}
+												<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1">
+													<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+														<path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+													</svg>
+													Winner
+												</span>
+											{/if}
+											{#if variant.isDefault}
+												<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] border-gray-900 bg-gray-100 text-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+													Default
+												</span>
+											{/if}
+										</div>
+									</div>
+
+									<!-- Variant Body -->
+									<div class="p-6 space-y-5 bg-white">
+										<!-- Thumbnail Preview -->
+										{#if variant.preRenderedUrl}
+											<div class="w-full h-40 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] relative group">
+												<img
+													src={variant.preRenderedUrl}
+													alt="{variant.name || 'Variant'} preview"
+													class="w-full h-full object-contain p-2"
+												/>
+												<div class="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+													<button class="px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-widest text-[10px] border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all">
+														Preview
+													</button>
+												</div>
+											</div>
+										{/if}
+
+										<!-- Stats Grid Inner -->
+										<div class="grid grid-cols-2 gap-4">
+											<!-- Impressions Block -->
+											<div>
+												<div class="flex items-center justify-between mb-2">
+													<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Impressions</span>
+													<span class="text-sm font-black text-gray-900">{(variant.impressions || 0).toLocaleString()}</span>
+												</div>
+												<div class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900">
+													<div
+														class="h-full bg-[#ffc480] border-r-[2px] border-gray-900 transition-all duration-500"
+														style="width: {getBarWidth(variant.impressions || 0, maxImpressions)}%"
+													></div>
+												</div>
+											</div>
+
+											<!-- Clicks Block -->
+											{#if isClickGoal}
+												<div>
+													<div class="flex items-center justify-between mb-2">
+														<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Clicks</span>
+														<span class="text-sm font-black text-gray-900">{(variant.clicks || 0).toLocaleString()}</span>
+													</div>
+													<div class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900">
+														<div
+															class="h-full bg-[#fde047] border-r-[2px] border-gray-900 transition-all duration-500"
+															style="width: {getBarWidth(variant.clicks || 0, Math.max(...variants.map(v => v.clicks || 0), 1))}%"
+														></div>
+													</div>
+												</div>
+											{/if}
+										</div>
+
+										<!-- CTR Footer -->
+										<div class="flex items-center justify-between pt-4 border-t-[3px] border-gray-900 border-dashed">
+											<span class="text-xs font-black text-gray-500 uppercase tracking-widest">Conversion Rate</span>
+											<div class="px-3 py-1 bg-[#10b981]/10 rounded border-[2px] border-gray-900 text-gray-900 font-black tabular-nums">
+												{getVariantCtr(variant)}%
+											</div>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{/if}
 
 			<!-- ==================== SMART URL SECTION ==================== -->
 			{#if exp.slug}
@@ -764,8 +1051,8 @@
 							</div>
 						{/if}
 
-						<!-- Significance Status -->
-						{#if analytics?.significance}
+						<!-- Significance Status (A/B tests only, not smart links) -->
+						{#if !isSmartLink && analytics?.significance}
 							<div class="pt-6 border-t-[3px] border-gray-900 border-dashed">
 								<div class="flex items-center gap-4 p-5 rounded-xl border-[3px] {analytics.significance.isSignificant ? 'border-gray-900 bg-[#4ade80]/10 shadow-[6px_6px_0_0_#1f2937]' : 'border-gray-900 bg-gray-50 shadow-[4px_4px_0_0_#e5e7eb]'} transition-all">
 									<div class="w-12 h-12 rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 {analytics.significance.isSignificant ? 'bg-[#4ade80] shadow-[2px_2px_0_0_#000]' : 'bg-gray-200'}">
@@ -842,7 +1129,8 @@
 							</div>
 						</div>
 
-						<!-- Statistical Configuration -->
+						<!-- Statistical Configuration (A/B tests only) -->
+						{#if !isSmartLink}
 						<div>
 							<h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b-2 border-gray-100 pb-2">Statistical Configuration</h3>
 							<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -866,6 +1154,8 @@
 								{/if}
 							</div>
 						</div>
+
+						{/if}
 
 						<!-- Bandit Config (if applicable) -->
 						{#if exp.type === 'bandit' && exp.banditConfig}
@@ -954,8 +1244,8 @@
 	{/if}
 </div>
 
-<!-- ==================== DECLARE WINNER MODAL ==================== -->
-{#if showDeclareWinner}
+<!-- ==================== DECLARE WINNER MODAL (A/B tests only) ==================== -->
+{#if !isSmartLink && showDeclareWinner}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"

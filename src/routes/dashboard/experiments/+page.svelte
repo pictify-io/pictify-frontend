@@ -29,6 +29,7 @@
 	let currentPlan = '';
 	let showDeleteConfirm = false;
 	let experimentToDelete = null;
+	let showCreateDropdown = false;
 
 	let unsubscribeUser = () => {};
 
@@ -108,7 +109,20 @@
 	}
 
 	function handleCreate() {
-		goto('/dashboard/experiments/create');
+		showCreateDropdown = !showCreateDropdown;
+	}
+
+	function handleCreateType(type) {
+		showCreateDropdown = false;
+		if (type === 'smart_link') {
+			goto('/dashboard/experiments/create/smart-link');
+		} else {
+			goto('/dashboard/experiments/create');
+		}
+	}
+
+	function closeCreateDropdown() {
+		showCreateDropdown = false;
 	}
 
 	function handleView(uid) {
@@ -238,14 +252,79 @@
 				</div>
 			</div>
 
-			<!-- Create Button -->
-			<button
-				on:click={handleCreate}
-				class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-				New Experiment
-			</button>
+			<!-- Create Button with Dropdown -->
+			<div class="relative">
+				<button
+					on:click={handleCreate}
+					class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+					New Experiment
+					<svg class="w-3 h-3 transition-transform {showCreateDropdown ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+				</button>
+
+				{#if showCreateDropdown}
+					<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+					<div class="fixed inset-0 z-40" on:click={closeCreateDropdown}></div>
+					<div class="absolute right-0 top-full mt-2 z-50 w-72 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden">
+						<div class="px-4 py-3 bg-gray-50 border-b-[2px] border-gray-200">
+							<span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Choose Type</span>
+						</div>
+						<div class="p-2">
+							<button
+								on:click={() => handleCreateType('ab_test')}
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#4ade80]/10 transition-colors flex items-start gap-3 group"
+							>
+								<div class="w-8 h-8 bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-[2px_2px_0_0_#1f2937] transition-all">
+									<span class="text-sm">&#9878;</span>
+								</div>
+								<div>
+									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">A/B Test</div>
+									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Split traffic randomly between variants</div>
+								</div>
+							</button>
+							<button
+								on:click={() => handleCreateType('smart_link')}
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#3b82f6]/10 transition-colors flex items-start gap-3 group"
+							>
+								<div class="w-8 h-8 bg-[#3b82f6]/20 border-[2px] border-[#3b82f6] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-[2px_2px_0_0_#1f2937] transition-all">
+									<svg class="w-4 h-4 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+								</div>
+								<div>
+									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">Smart Link</div>
+									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Route by device, geo, time, and more</div>
+								</div>
+							</button>
+							<button
+								on:click={() => handleCreateType('scheduled')}
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#f59e0b]/10 transition-colors flex items-start gap-3 group opacity-50 cursor-not-allowed"
+								disabled
+							>
+								<div class="w-8 h-8 bg-[#f59e0b]/20 border-[2px] border-[#f59e0b] rounded-lg flex items-center justify-center shrink-0">
+									<svg class="w-4 h-4 text-[#f59e0b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+								</div>
+								<div>
+									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">Scheduled <span class="text-[9px] font-black text-gray-400 ml-1">SOON</span></div>
+									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Time-based image rotation</div>
+								</div>
+							</button>
+							<button
+								on:click={() => handleCreateType('bandit')}
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#a855f7]/10 transition-colors flex items-start gap-3 group opacity-50 cursor-not-allowed"
+								disabled
+							>
+								<div class="w-8 h-8 bg-[#a855f7]/20 border-[2px] border-[#a855f7] rounded-lg flex items-center justify-center shrink-0">
+									<svg class="w-4 h-4 text-[#a855f7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+								</div>
+								<div>
+									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">Auto-Optimize <span class="text-[9px] font-black text-gray-400 ml-1">SOON</span></div>
+									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Auto-shift traffic to best performer</div>
+								</div>
+							</button>
+						</div>
+					</div>
+				{/if}
+			</div>
 		</div>
 
 		<!-- Feature Gated Content -->
@@ -273,7 +352,7 @@
 							Create A/B tests, smart links, and scheduled experiments to optimize your image performance and find the best performing variants.
 						</p>
 						<button
-							on:click={handleCreate}
+							on:click={() => handleCreateType('ab_test')}
 							class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
 						>
 							Create Your First Experiment

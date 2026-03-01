@@ -16,6 +16,7 @@
 	import { getTemplateById } from '../../../../api/template';
 	import { StaticCanvas } from 'fabric';
 	import WizardStepper from '$lib/components/dashboard/WizardStepper.svelte';
+	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
 
 	// ============== Wizard State ==============
 
@@ -43,8 +44,8 @@
 		outputConfig: { format: 'png', quality: 90 },
 		goalConfig: { type: 'impressions_only', destinationUrl: '' },
 		variants: [
-			{ id: 'control', name: 'Control', weight: 5000, isDefault: true, variables: {}, templateUid: '' },
-			{ id: 'variant-b', name: 'Variant B', weight: 5000, isDefault: false, variables: {}, templateUid: '' },
+			{ id: 'control', name: 'Control', weight: 5000, isDefault: true, variables: {}, templateUid: '', conditions: { operator: 'AND', rules: [] }, priority: 0 },
+			{ id: 'variant-b', name: 'Variant B', weight: 5000, isDefault: false, variables: {}, templateUid: '', conditions: { operator: 'AND', rules: [] }, priority: 1 },
 		],
 	};
 
@@ -134,12 +135,6 @@
 		});
 		await getTemplatesAction({ limit: 100 });
 
-		// Check if pre-selecting experiment type via URL param
-		const typeParam = $page.url.searchParams.get('type');
-		if (typeParam && ['ab_test', 'smart_link', 'scheduled', 'bandit'].includes(typeParam)) {
-			form.type = typeParam;
-		}
-
 		// Check if editing an existing experiment
 		const editUid = $page.url.searchParams.get('edit');
 		if (editUid) {
@@ -182,13 +177,15 @@
 				templateUid: exp.templateUid || '',
 				outputConfig: exp.outputConfig || { format: 'png', quality: 90 },
 				goalConfig: exp.goalConfig || { type: 'impressions_only', destinationUrl: '' },
-				variants: (exp.variants || []).map(v => ({
+				variants: (exp.variants || []).map((v, i) => ({
 					id: v.id,
 					name: v.name || '',
 					weight: v.weight || 5000,
 					isDefault: v.isDefault || false,
 					variables: v.variables || {},
 					templateUid: v.templateUid || '',
+					conditions: v.conditions || { operator: 'AND', rules: [] },
+					priority: v.priority ?? i,
 				})),
 			};
 
@@ -390,6 +387,8 @@
 			isDefault: false,
 			variables: {},
 			templateUid: '',
+			conditions: { operator: 'AND', rules: [] },
+			priority: form.variants.length,
 		}];
 		variantVarEditors = [...variantVarEditors, []];
 		distributeWeightsEqually();
@@ -715,10 +714,10 @@
 		<!-- Page Header -->
 		<div class="mb-6">
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				{isEditMode ? 'Edit Experiment' : 'Create Experiment'}
+				{isEditMode ? 'Edit A/B Test' : 'Create A/B Test'}
 			</h1>
 			<p class="mt-2 text-sm font-bold text-gray-500">
-				{isEditMode ? 'Update your A/B test configuration.' : 'Set up an A/B test to find your best-performing image.'}
+				{isEditMode ? 'Update your A/B test configuration.' : 'Split traffic randomly between variants to find the best performer.'}
 			</p>
 		</div>
 
@@ -892,25 +891,11 @@
 							<label for="template-select" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-3">
 								Base Template <span class="text-red-500">*</span>
 							</label>
-							{#if templateList.length === 0}
-								<div class="w-full px-4 py-3 border-[3px] border-dashed border-gray-300 rounded-xl text-sm font-bold text-gray-400 bg-gray-50 flex items-center gap-3">
-									<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-									Loading templates...
-								</div>
-							{:else}
-								<select
-									id="template-select"
-									bind:value={form.templateUid}
-									on:change={handleSharedTemplateSelect}
-									class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] transition-all cursor-pointer shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] appearance-none"
-									style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231f2937%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat, repeat; background-position: right .7em top 50%, 0 0; background-size: .65em auto, 100%;"
-								>
-									<option value="">Select a template to test variants on...</option>
-									{#each templateList as tpl}
-										<option value={tpl.uid}>{tpl.name || tpl.uid}</option>
-									{/each}
-								</select>
-							{/if}
+							<TemplateSelector
+								bind:value={form.templateUid}
+								placeholder="Select a template to test variants on..."
+								on:change={handleSharedTemplateSelect}
+							/>
 							{#if form.templateUid}
 								{@const sel = templateList.find(t => t.uid === form.templateUid)}
 								{#if sel}
@@ -1046,23 +1031,11 @@
 												<label class="block text-xs font-black uppercase tracking-widest text-gray-800 mb-2">
 													Template Selection <span class="text-red-500">*</span>
 												</label>
-												{#if templateList.length === 0}
-													<div class="w-full px-4 py-3 border-[2px] border-gray-300 rounded-lg text-sm font-bold text-gray-400 bg-white">
-														Loading...
-													</div>
-												{:else}
-													<select
-														bind:value={variant.templateUid}
-														on:change={() => handleVariantTemplateSelect(index)}
-														class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-base font-bold bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] transition-all cursor-pointer shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] appearance-none"
-														style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231f2937%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat, repeat; background-position: right .7em top 50%, 0 0; background-size: .65em auto, 100%;"
-													>
-														<option value="">Select template for Variant {String.fromCharCode(65 + index)}...</option>
-														{#each templateList as tpl}
-															<option value={tpl.uid}>{tpl.name || tpl.uid}</option>
-														{/each}
-													</select>
-												{/if}
+												<TemplateSelector
+													bind:value={variant.templateUid}
+													placeholder="Select template for this variant..."
+													on:change={() => handleVariantTemplateSelect(index)}
+												/>
 											</div>
 										{/if}
 
@@ -1116,6 +1089,7 @@
 												</div>
 											{/if}
 										</div>
+
 									</div>
 
 									<!-- Right: Live Preview -->
@@ -1558,7 +1532,7 @@
 												> Example Implementation
 											</div>
 											<div class="bg-black/50 p-4 rounded-lg border-[2px] border-gray-800 overflow-x-auto text-xs leading-loose">
-<span class="text-gray-500">&lt;!-- A/B Tested Hero Image --&gt;</span>
+<span class="text-gray-500">&lt;!-- A/B Tested Dynamic Image --&gt;</span>
 <span class="text-blue-400">&lt;img</span> <span class="text-green-400">src=</span><span class="text-amber-300">"{previewUrl}"</span> <span class="text-blue-400">/&gt;</span>
 
 <span class="text-gray-500">&lt;!-- Call to Action Button --&gt;</span>
@@ -1574,7 +1548,7 @@
 												> Example Implementation
 											</div>
 											<div class="bg-black/50 p-4 rounded-lg border-[2px] border-gray-800 overflow-x-auto text-xs leading-loose">
-<span class="text-gray-500">&lt;!-- A/B Tested Content --&gt;</span>
+<span class="text-gray-500">&lt;!-- A/B Tested Dynamic Image --&gt;</span>
 <span class="text-blue-400">&lt;img</span> <span class="text-green-400">src=</span><span class="text-amber-300">"{previewUrl}"</span> <span class="text-green-400">alt=</span><span class="text-amber-300">"Dynamic presentation"</span> <span class="text-blue-400">/&gt;</span>
 											</div>
 										</div>

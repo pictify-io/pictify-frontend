@@ -1,6 +1,8 @@
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
+
 /**
  * Server Hooks
- * Cache headers and server-side processing for PSEO pages
+ * Cache headers, server-side processing for PSEO pages, and /s/ proxy
  */
 
 /**
@@ -53,8 +55,46 @@ const NO_CACHE_PATTERNS = [
  * Handle function - runs for every request
  */
 export async function handle({ event, resolve }) {
-	const response = await resolve(event);
 	const pathname = event.url.pathname;
+
+	// Proxy /s/ experiment render routes to the backend API
+	if (pathname.startsWith('/s/')) {
+		const backendUrl = `${PUBLIC_BACKEND_URL}${pathname}${event.url.search}`;
+		try {
+			const backendRes = await fetch(backendUrl, {
+				method: event.request.method,
+				headers: {
+					'User-Agent': event.request.headers.get('user-agent') || '',
+					'X-Forwarded-For': event.getClientAddress(),
+					'Accept': event.request.headers.get('accept') || '*/*',
+					'Accept-Language': event.request.headers.get('accept-language') || '',
+				},
+				redirect: 'manual',
+			});
+
+			const headers = new Headers();
+			// Whitelist safe response headers from backend (avoid leaking internal headers)
+			const SAFE_RESPONSE_HEADERS = ['content-type', 'content-length', 'location', 'etag', 'last-modified', 'vary'];
+			for (const [key, val] of backendRes.headers.entries()) {
+				if (SAFE_RESPONSE_HEADERS.includes(key.toLowerCase())) {
+					headers.set(key, val);
+				}
+			}
+			// Ensure no-cache policy
+			headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+			headers.set('Pragma', 'no-cache');
+			headers.set('Expires', '0');
+
+			return new Response(backendRes.body, {
+				status: backendRes.status,
+				headers,
+			});
+		} catch {
+			return new Response('Service unavailable', { status: 502 });
+		}
+	}
+
+	const response = await resolve(event);
 
 	// Skip if response already has cache-control
 	if (response.headers.has('Cache-Control')) {
