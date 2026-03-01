@@ -5,6 +5,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
+	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
 	import {
 		createImage,
 		createGif
@@ -979,25 +980,11 @@
 										placeholder="Enter template UID manually"
 									/>
 								{:else}
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
-										on:change={(e) => selectTemplate('get-template', e.target.value)}
-										value={getTemplateParams.uid}
-									>
-										<option value="">Select a template...</option>
-										{#if loadingTemplates}
-											<option disabled>Loading templates...</option>
-										{:else}
-											{#each userTemplates as template}
-												<option value={template.uid}>
-													{template.name} ({template.uid.slice(0, 8)}...)
-												</option>
-											{/each}
-										{/if}
-										{#if userTemplates.length === 0 && !loadingTemplates}
-											<option disabled>No templates found</option>
-										{/if}
-									</select>
+									<TemplateSelector
+										bind:value={getTemplateParams.uid}
+										placeholder="Select a template..."
+										on:change={(e) => selectTemplate('get-template', e.detail.uid)}
+									/>
 								{/if}
 
 								{#if getTemplateParams.uid}
@@ -1029,25 +1016,11 @@
 										placeholder="Enter template UID to delete"
 									/>
 								{:else}
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
-										on:change={(e) => selectTemplate('delete-template', e.target.value)}
-										value={deleteTemplateParams.uid}
-									>
-										<option value="">Select a template to delete...</option>
-										{#if loadingTemplates}
-											<option disabled>Loading templates...</option>
-										{:else}
-											{#each userTemplates as template}
-												<option value={template.uid}>
-													{template.name} ({template.uid.slice(0, 8)}...)
-												</option>
-											{/each}
-										{/if}
-										{#if userTemplates.length === 0 && !loadingTemplates}
-											<option disabled>No templates found</option>
-										{/if}
-									</select>
+									<TemplateSelector
+										bind:value={deleteTemplateParams.uid}
+										placeholder="Select a template to delete..."
+										on:change={(e) => selectTemplate('delete-template', e.detail.uid)}
+									/>
 								{/if}
 
 								{#if deleteTemplateParams.uid}
@@ -1137,25 +1110,11 @@
 											placeholder="Enter template UID manually"
 										/>
 									{:else}
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
-											on:change={(e) => selectTemplate('render-template', e.target.value)}
-											value={renderTemplateParams.templateUid}
-										>
-											<option value="">Select a template...</option>
-											{#if loadingTemplates}
-												<option disabled>Loading templates...</option>
-											{:else}
-												{#each userTemplates as template}
-													<option value={template.uid}>
-														{template.name} ({template.uid.slice(0, 8)}...)
-													</option>
-												{/each}
-											{/if}
-											{#if userTemplates.length === 0 && !loadingTemplates}
-												<option disabled>No templates found</option>
-											{/if}
-										</select>
+										<TemplateSelector
+											bind:value={renderTemplateParams.templateUid}
+											placeholder="Select a template..."
+											on:change={(e) => selectTemplate('render-template', e.detail.uid)}
+										/>
 									{/if}
 								</div>
 
@@ -1254,25 +1213,11 @@
 											placeholder="Enter template UID"
 										/>
 									{:else}
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
-											on:change={(e) => selectTemplate('batch-render', e.target.value)}
-											value={batchRenderParams.templateUid}
-										>
-											<option value="">Select a template...</option>
-											{#if loadingTemplates}
-												<option disabled>Loading templates...</option>
-											{:else}
-												{#each userTemplates as template}
-													<option value={template.uid}>
-														{template.name} ({template.uid.slice(0, 8)}...)
-													</option>
-												{/each}
-											{/if}
-											{#if userTemplates.length === 0 && !loadingTemplates}
-												<option disabled>No templates found</option>
-											{/if}
-										</select>
+										<TemplateSelector
+											bind:value={batchRenderParams.templateUid}
+											placeholder="Select a template..."
+											on:change={(e) => selectTemplate('batch-render', e.detail.uid)}
+										/>
 									{/if}
 								</div>
 								<div>
@@ -1380,25 +1325,11 @@
 											placeholder="Enter template UID"
 										/>
 									{:else}
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
-											on:change={(e) => selectTemplate('batch-render-csv', e.target.value)}
-											value={batchRenderCsvParams.templateUid}
-										>
-											<option value="">Select a template...</option>
-											{#if loadingTemplates}
-												<option disabled>Loading templates...</option>
-											{:else}
-												{#each userTemplates as template}
-													<option value={template.uid}>
-														{template.name} ({template.uid.slice(0, 8)}...)
-													</option>
-												{/each}
-											{/if}
-											{#if userTemplates.length === 0 && !loadingTemplates}
-												<option disabled>No templates found</option>
-											{/if}
-										</select>
+										<TemplateSelector
+											bind:value={batchRenderCsvParams.templateUid}
+											placeholder="Select a template..."
+											on:change={(e) => selectTemplate('batch-render-csv', e.detail.uid)}
+										/>
 									{/if}
 								</div>
 								<div>
@@ -1534,25 +1465,11 @@
 										placeholder="Enter template UID"
 									/>
 								{:else}
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none cursor-pointer"
-										on:change={(e) => selectTemplate('get-variables', e.target.value)}
-										value={getVariablesParams.uid}
-									>
-										<option value="">Select a template...</option>
-										{#if loadingTemplates}
-											<option disabled>Loading templates...</option>
-										{:else}
-											{#each userTemplates as template}
-												<option value={template.uid}>
-													{template.name} ({template.uid.slice(0, 8)}...)
-												</option>
-											{/each}
-										{/if}
-										{#if userTemplates.length === 0 && !loadingTemplates}
-											<option disabled>No templates found</option>
-										{/if}
-									</select>
+									<TemplateSelector
+										bind:value={getVariablesParams.uid}
+										placeholder="Select a template..."
+										on:change={(e) => selectTemplate('get-variables', e.detail.uid)}
+									/>
 								{/if}
 							</div>
 						{:else if selectedEndpoint === 'gif'}
