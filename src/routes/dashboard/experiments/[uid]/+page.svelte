@@ -165,6 +165,7 @@
 	$: maxImpressions = Math.max(...variants.map(v => v.impressions || 0), 1);
 
 	$: isSmartLink = exp?.type === 'smart_link';
+	$: isScheduled = exp?.type === 'scheduled';
 
 	$: isClickGoal = exp?.goalConfig?.type === 'click_through' || exp?.goalConfig?.type === 'ctr';
 
@@ -207,6 +208,33 @@
 	function getVariantCtr(variant) {
 		if (!variant.impressions || variant.impressions === 0) return '0.00';
 		return ((variant.clicks || 0) / variant.impressions * 100).toFixed(2);
+	}
+
+	// ============== Scheduled Display Helpers ==============
+
+	const SCHEDULE_COLORS = [
+		{ bg: 'bg-[#ffc480]', border: 'border-[#e6a050]', text: 'text-gray-900' },
+		{ bg: 'bg-[#4ade80]', border: 'border-[#22c55e]', text: 'text-gray-900' },
+		{ bg: 'bg-[#a78bfa]', border: 'border-[#7c3aed]', text: 'text-white' },
+		{ bg: 'bg-[#f472b6]', border: 'border-[#ec4899]', text: 'text-white' },
+		{ bg: 'bg-[#38bdf8]', border: 'border-[#0284c7]', text: 'text-gray-900' },
+	];
+
+	function getScheduleColor(idx) { return SCHEDULE_COLORS[idx % SCHEDULE_COLORS.length]; }
+
+	function formatScheduleDate(isoStr) {
+		if (!isoStr) return null;
+		return new Date(isoStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+	}
+
+	function getScheduleStatus(variant) {
+		if (!variant.schedule?.startAt) return variant.isDefault ? 'default' : 'unscheduled';
+		const now = Date.now();
+		const start = new Date(variant.schedule.startAt).getTime();
+		const end = variant.schedule.endAt ? new Date(variant.schedule.endAt).getTime() : Infinity;
+		if (now < start) return 'upcoming';
+		if (now >= start && now < end) return 'active';
+		return 'ended';
 	}
 
 	// ============== Actions ==============
@@ -481,7 +509,7 @@
 							<!-- Edit (draft or paused) -->
 							{#if exp.status === 'draft' || exp.status === 'paused'}
 								<button
-									on:click={() => goto(exp.type === 'smart_link' ? `/dashboard/experiments/create/smart-link?edit=${uid}` : `/dashboard/experiments/create?edit=${uid}`)}
+									on:click={() => goto(exp.type === 'smart_link' ? `/dashboard/experiments/create/smart-link?edit=${uid}` : exp.type === 'scheduled' ? `/dashboard/experiments/create/scheduled?edit=${uid}` : `/dashboard/experiments/create?edit=${uid}`)}
 									class="px-4 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -763,6 +791,135 @@
 						</div>
 					{/if}
 				</div>
+
+
+		{:else if isScheduled}
+			<!-- ========== SCHEDULED: Timeline + Variant Cards ========== -->
+			<div>
+				<div class="flex items-center gap-3 mb-6">
+					<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Schedule</h2>
+					<span class="px-3 py-1 bg-[#f59e0b] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase">
+						{variants.length} Variants
+					</span>
+				</div>
+
+				<!-- Expiration & Fallback Info -->
+				{#if exp.expiresAt || exp.fallbackImageUrl}
+					<div class="bg-amber-50 border-[3px] border-gray-900 rounded-xl p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]">
+						<div class="flex items-start gap-3">
+							<div class="w-8 h-8 bg-amber-200 border-[2px] border-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+								<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+							</div>
+							<div class="space-y-1">
+								{#if exp.expiresAt}
+									<p class="text-xs font-black text-gray-900">Hard Expiration: <span class="font-bold text-gray-600">{formatScheduleDate(exp.expiresAt)}</span></p>
+								{/if}
+								{#if exp.fallbackImageUrl}
+									<p class="text-xs font-black text-gray-900">Fallback URL: <span class="font-bold text-gray-600 break-all">{exp.fallbackImageUrl}</span></p>
+								{/if}
+							</div>
+						</div>
+					</div>
+				{/if}
+
+				<!-- Scheduled Variant Cards -->
+				<div class="space-y-5">
+					{#each variants as variant, idx}
+						{@const color = getScheduleColor(idx)}
+						{@const status = getScheduleStatus(variant)}
+						<div class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden {status === 'active' ? 'shadow-[8px_8px_0_0_#f59e0b] -translate-y-1' : 'shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1'} transition-all duration-200">
+							<!-- Variant Header -->
+							<div class="px-5 py-4 border-b-[3px] border-gray-900 {status === 'active' ? 'bg-amber-50' : 'bg-[#FFFDF8]'} flex items-center justify-between">
+								<div class="flex items-center gap-4 min-w-0">
+									<div class="w-10 h-10 {color.bg} {color.text} rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0">
+										{String.fromCharCode(65 + idx)}
+									</div>
+									<div class="min-w-0">
+										<h3 class="font-black text-gray-900 text-base uppercase tracking-wide truncate">
+											{variant.name || `Variant ${String.fromCharCode(65 + idx)}`}
+										</h3>
+										{#if variant.isDefault}
+											<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Default / Fallback</span>
+										{/if}
+									</div>
+								</div>
+								<div class="flex items-center gap-2 shrink-0">
+									{#if status === 'active'}
+										<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#4ade80] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1.5">
+											<span class="w-2 h-2 bg-gray-900 rounded-full animate-pulse"></span>
+											Active Now
+										</span>
+									{:else if status === 'upcoming'}
+										<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+											Upcoming
+										</span>
+									{:else if status === 'ended'}
+										<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-gray-200 text-gray-600 border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+											Ended
+										</span>
+									{:else if status === 'default'}
+										<span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-gray-100 text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+											Default
+										</span>
+									{/if}
+								</div>
+							</div>
+
+							<!-- Variant Body -->
+							<div class="p-6 space-y-5 bg-white">
+								<!-- Schedule Info -->
+								{#if variant.schedule?.startAt}
+									<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+										<div class="p-4 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
+											<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Start</span>
+											<span class="text-sm font-black text-gray-900">{formatScheduleDate(variant.schedule.startAt)}</span>
+										</div>
+										<div class="p-4 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
+											<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">End</span>
+											<span class="text-sm font-black text-gray-900">{variant.schedule.endAt ? formatScheduleDate(variant.schedule.endAt) : 'No end date'}</span>
+										</div>
+									</div>
+								{:else if variant.isDefault}
+									<div class="px-4 py-3 bg-gray-50 border-[2px] border-dashed border-gray-300 rounded-lg">
+										<p class="text-xs font-bold text-gray-500 italic">Shown when no other variant is active</p>
+									</div>
+								{/if}
+
+								<!-- Preview + Stats -->
+								<div class="flex flex-col lg:flex-row gap-5">
+									{#if variant.preRenderedUrl}
+										<div class="w-full lg:w-48 h-32 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0">
+											<img src={variant.preRenderedUrl} alt="{variant.name} preview" class="w-full h-full object-contain p-2" />
+										</div>
+									{/if}
+									<div class="grid grid-cols-2 gap-4 flex-1">
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Impressions</span>
+												<span class="text-sm font-black text-gray-900">{(variant.impressions || 0).toLocaleString()}</span>
+											</div>
+											<div class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900">
+												<div class="h-full bg-[#ffc480] border-r-[2px] border-gray-900 transition-all duration-500" style="width: {getBarWidth(variant.impressions || 0, maxImpressions)}%"></div>
+											</div>
+										</div>
+										{#if isClickGoal}
+											<div>
+												<div class="flex items-center justify-between mb-2">
+													<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Clicks</span>
+													<span class="text-sm font-black text-gray-900">{(variant.clicks || 0).toLocaleString()}</span>
+												</div>
+												<div class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900">
+													<div class="h-full bg-[#4ade80] border-r-[2px] border-gray-900 transition-all duration-500" style="width: {getBarWidth(variant.clicks || 0, Math.max(...variants.map(v => v.clicks || 0), 1))}%"></div>
+												</div>
+											</div>
+										{/if}
+									</div>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
 
 			{:else}
 				<!-- ========== A/B TEST: Original Variant Cards ========== -->

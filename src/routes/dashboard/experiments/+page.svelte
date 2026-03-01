@@ -116,6 +116,8 @@
 		showCreateDropdown = false;
 		if (type === 'smart_link') {
 			goto('/dashboard/experiments/create/smart-link');
+		} else if (type === 'scheduled') {
+			goto('/dashboard/experiments/create/scheduled');
 		} else {
 			goto('/dashboard/experiments/create');
 		}
@@ -297,14 +299,13 @@
 							</button>
 							<button
 								on:click={() => handleCreateType('scheduled')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#f59e0b]/10 transition-colors flex items-start gap-3 group opacity-50 cursor-not-allowed"
-								disabled
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#f59e0b]/10 transition-colors flex items-start gap-3 group"
 							>
 								<div class="w-8 h-8 bg-[#f59e0b]/20 border-[2px] border-[#f59e0b] rounded-lg flex items-center justify-center shrink-0">
 									<svg class="w-4 h-4 text-[#f59e0b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 								</div>
 								<div>
-									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">Scheduled <span class="text-[9px] font-black text-gray-400 ml-1">SOON</span></div>
+									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">Scheduled</div>
 									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Time-based image rotation</div>
 								</div>
 							</button>
