@@ -5,16 +5,21 @@
 	import { plgStatus, PLAN_DISPLAY_NAMES } from '../../store/plg.store';
 	import { cdnStore, initCdnAnalytics } from '../../store/cdn.store';
 	import { teamStore, currentTeam } from '../../store/team.store';
-	import { onboardingStore, showOnboarding, initOnboarding, completeStepAction, dismissOnboardingAction, toggleOnboardingCollapse } from '../../store/onboarding.store';
+	import { onboardingStore, showOnboarding, initOnboarding, completeStepAction, dismissOnboardingAction, toggleOnboardingCollapse, personalization } from '../../store/onboarding.store';
 	import { fetchAuditLogs } from '../../api/audit';
 	import { getTemplates } from '../../api/template';
 	import { analytics } from '$lib/analytics.js';
+	import { getQuickActions, getWelcomeMessage, getEmptyStateMessage, getPrimaryCTA, STARTER_TEMPLATES } from '../../config/personalization.js';
+	import { evaluateNudges, getDismissedNudges, dismissNudge } from '$lib/utils/nudge-engine.js';
+	import NudgeBanner from '$lib/components/dashboard/NudgeBanner.svelte';
 
 	let isLoading = true;
 	let recentLogs = [];
 	let recentTemplates = [];
 	let totalTemplates = 0;
 	let cdnTimeRange = '30d';
+	let nudges = [];
+	let starterPreviews = {}; // templateId → { name, svgHtml }
 
 	// Filtered daily stats based on time range
 	$: filteredDailyStats = getFilteredStats($cdnStore.dailyStats, cdnTimeRange);
@@ -23,6 +28,17 @@
 	$: planName = PLAN_DISPLAY_NAMES[$plgStatus.plan] || 'Starter';
 	$: teamName = $currentTeam?.name || 'My Workspace';
 	$: memberCount = $teamStore?.members?.length || 1;
+
+	// Personalization
+	$: useCase = $personalization?.useCase;
+	$: isPersonalized = !!useCase;
+	$: welcomeMsg = useCase ? getWelcomeMessage(useCase) : null;
+	$: quickActions = getQuickActions(useCase);
+	$: emptyMsg = useCase ? getEmptyStateMessage(useCase) : null;
+	$: integrationMode = $personalization?.integrationMode;
+	$: primaryCTA = getPrimaryCTA(useCase, integrationMode);
+	$: isNewUser = isPersonalized && totalTemplates < 2;
+	$: starterTemplateIds = useCase ? (STARTER_TEMPLATES[useCase] || []) : [];
 
 	function getFilteredStats(dailyStats, range) {
 		if (!dailyStats || !dailyStats.length) return [];
@@ -100,6 +116,75 @@
 		return 'bg-[#ffc480]';
 	}
 
+	function handleDismissNudge(id) {
+		dismissNudge(id);
+		nudges = nudges.filter(n => n.id !== id);
+	}
+
+	/**
+	 * Generate an inline SVG preview from FabricJS template data.
+	 */
+	function fabricToSvg(tpl) {
+		const width = tpl.width || 1080;
+		const height = tpl.height || 1080;
+		const data = tpl.fabricJSData;
+		if (!data?.objects?.length) return null;
+
+		const els = [];
+		for (const obj of data.objects) {
+			if (!obj) continue;
+			const op = obj.opacity ?? 1;
+			const x = obj.left || 0;
+			const y = obj.top || 0;
+			if (obj.type === 'rect') {
+				const w = (obj.width || 0) * (obj.scaleX || 1);
+				const h = (obj.height || 0) * (obj.scaleY || 1);
+				els.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${obj.fill || '#ccc'}" opacity="${op}" rx="${obj.rx || 0}"/>`);
+			} else if (obj.type === 'circle') {
+				const r = (obj.radius || 0) * (obj.scaleX || 1);
+				els.push(`<circle cx="${x + r}" cy="${y + r}" r="${r}" fill="${obj.fill || '#ccc'}" stroke="${obj.stroke || 'none'}" stroke-width="${obj.strokeWidth || 0}" opacity="${op}"/>`);
+			} else if (['i-text','text','IText','Text','Textbox','textbox'].includes(obj.type)) {
+				const fs = (obj.fontSize || 16) * (obj.scaleX || 1);
+				const t = (obj.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+				els.push(`<text x="${x}" y="${y + fs * 0.85}" font-size="${fs}px" font-family="${obj.fontFamily || 'Arial'}" font-weight="${obj.fontWeight || 'normal'}" fill="${obj.fill || '#000'}" opacity="${op}">${t}</text>`);
+			} else if (obj.type === 'path' && obj.path) {
+				let d = '';
+				if (Array.isArray(obj.path)) d = obj.path.map(p => Array.isArray(p) ? p.join(' ') : p).join(' ');
+				else if (typeof obj.path === 'string') d = obj.path;
+				if (d) {
+					const sx = obj.scaleX || 1;
+					const sy = obj.scaleY || 1;
+					els.push(`<path d="${d}" fill="${obj.fill || 'none'}" stroke="${obj.stroke || 'none'}" opacity="${op}" transform="translate(${x},${y}) scale(${sx},${sy})"/>`);
+				}
+			}
+		}
+		const bg = data.background || '#ffffff';
+		return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><rect width="${width}" height="${height}" fill="${bg}"/>${els.join('')}</svg>`;
+	}
+
+	/**
+	 * Load starter template previews for the current use case.
+	 */
+	async function loadStarterPreviews(ids) {
+		if (!ids?.length) return;
+		try {
+			const { getTemplateForUseCase } = await import('$lib/pseo/useCaseTemplates.js');
+			const previews = {};
+			for (const id of ids.slice(0, 3)) {
+				const tpl = getTemplateForUseCase(id);
+				if (tpl) {
+					previews[id] = {
+						name: tpl.name || id.replace(/-/g, ' '),
+						svgHtml: fabricToSvg(tpl),
+					};
+				}
+			}
+			starterPreviews = previews;
+		} catch {
+			// Silently fall back to text-only cards
+		}
+	}
+
 	onMount(async () => {
 		analytics.page('Dashboard Home');
 
@@ -114,10 +199,28 @@
 			recentLogs = logsData?.logs || [];
 			recentTemplates = templatesData?.templates || [];
 			totalTemplates = templatesData?.pagination?.total || recentTemplates.length;
+
+			// Evaluate nudges
+			const onb = $onboardingStore;
+			const completedStepIds = (onb.steps || []).filter(s => s.completed).map(s => s.id);
+			nudges = evaluateNudges({
+				templateCount: totalTemplates,
+				experimentCount: 0, // We don't fetch this separately — nudge will fire conservatively
+				integrationMode: onb.personalization?.integrationMode || null,
+				hasApiKey: completedStepIds.includes('get_api_key'),
+				hasTracking: completedStepIds.includes('install_tracking'),
+				hasBulkRendered: false,
+			}, getDismissedNudges());
 		} catch (error) {
 			console.error('Failed to load dashboard data:', error);
 		} finally {
 			isLoading = false;
+		}
+
+		// Load starter template previews (non-blocking)
+		if ($personalization?.useCase) {
+			const ids = STARTER_TEMPLATES[$personalization.useCase] || [];
+			loadStarterPreviews(ids);
 		}
 	});
 </script>
@@ -137,20 +240,31 @@
 				<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-black"></span>
 				<span class="text-xs font-black text-black uppercase tracking-widest">Command Center</span>
 			</div>
-			<h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]">
-				Welcome back.
-			</h1>
+			{#if welcomeMsg && totalTemplates === 0}
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]">
+					{welcomeMsg.title}
+				</h1>
+				<p class="text-base sm:text-lg font-bold text-gray-500 mt-3 max-w-lg">{welcomeMsg.subtitle}</p>
+			{:else}
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]">
+					Welcome back.
+				</h1>
+			{/if}
 		</div>
 
 		<div class="flex items-center gap-4">
 			<a
-				href="/dashboard/template/create"
+				href={primaryCTA?.href || '/dashboard/template/create'}
 				class="group flex items-center gap-3 bg-[#ff6b6b] border-[3px] border-black shadow-[6px_6px_0_0_black] rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-[2px_2px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
 			>
-				<span class="text-white font-black text-lg uppercase tracking-wide">Create Template</span>
+				<span class="text-white font-black text-lg uppercase tracking-wide">{primaryCTA?.label || 'Create Template'}</span>
 				<div class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[2px_2px_0_0_black]">
 					<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/>
+						{#if integrationMode === 'api'}
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+						{:else}
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/>
+						{/if}
 					</svg>
 				</div>
 			</a>
@@ -163,7 +277,63 @@
 			<p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">Loading dashboard...</p>
 		</div>
 	{:else}
-		
+
+		<!-- Recommended For You (new personalized users only) -->
+		{#if isNewUser && starterTemplateIds.length > 0}
+			<div class="mb-12">
+				<div class="flex items-center gap-3 mb-6">
+					<h2 class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3">
+						<span class="w-3 h-3 bg-[#ffc480] rounded-full border-[2px] border-black"></span>
+						Recommended For You
+					</h2>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					{#each starterTemplateIds.slice(0, 3) as templateId}
+						{@const preview = starterPreviews[templateId]}
+						<a
+							href="/template-workspace/create?useCase={templateId}"
+							class="group bg-white rounded-2xl border-[3px] border-black shadow-[4px_4px_0_0_black] overflow-hidden hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						>
+							<!-- Template Preview -->
+							<div class="aspect-[4/3] bg-[radial-gradient(circle_at_30%_30%,#f8f8f8,#e8e8e8)] overflow-hidden relative">
+								{#if preview?.svgHtml}
+									<div class="w-full h-full p-3 group-hover:scale-105 transition-transform duration-500">
+										{@html preview.svgHtml}
+									</div>
+								{:else}
+									<div class="w-full h-full flex items-center justify-center">
+										<div class="w-14 h-14 bg-[#ffc480]/20 rounded-xl border-[2px] border-[#ffc480] flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform">
+											<svg class="w-7 h-7 text-[#ffc480]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"/>
+											</svg>
+										</div>
+									</div>
+								{/if}
+							</div>
+							<!-- Label -->
+							<div class="px-4 py-3 border-t-[3px] border-black">
+								<span class="text-sm font-black text-black capitalize">{preview?.name || templateId.replace(/-/g, ' ')}</span>
+								<span class="block text-xs font-bold text-gray-500 mt-0.5">Try this template</span>
+							</div>
+						</a>
+					{/each}
+				</div>
+			</div>
+		{/if}
+
+		<!-- Nudge Banners -->
+		{#if nudges.length > 0}
+			<div class="flex flex-col gap-3 mb-8">
+				{#each nudges as nudge (nudge.id)}
+					<NudgeBanner
+						message={nudge.message}
+						cta={nudge.cta}
+						href={nudge.href}
+						on:dismiss={() => handleDismissNudge(nudge.id)}
+					/>
+				{/each}
+			</div>
+		{/if}
 
 		<!-- 1. Pulse Metrics (Top Full-Width) -->
 		<!-- Performance Command Center -->
@@ -346,7 +516,7 @@
 				</div>
 			</div>
 			<div class="lg:col-span-4 flex flex-col justify-center">
-				<!-- Quick Actions — Feature Discovery -->
+				<!-- Quick Actions — Feature Discovery (personalized order) -->
 		<div class="flex flex-col mb-0">
 			<div class="flex items-center justify-between mb-6">
 				<h2 class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3">
@@ -356,71 +526,38 @@
 			</div>
 
 			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3">
-				<!-- Bulk Render -->
-				<a href="/dashboard/template" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#ff6b6b]/15 rounded-lg border-[2px] border-[#ff6b6b] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-						</svg>
-					</div>
-					<span class="text-xs font-black text-black uppercase tracking-wider">Bulk Render</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Generate 100s of images from a CSV</span>
-				</a>
-
-				<!-- Live Links -->
-				<a href="/dashboard/template" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#3b82f6]/15 rounded-lg border-[2px] border-[#3b82f6] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-						</svg>
-					</div>
-					<span class="text-xs font-black text-black uppercase tracking-wider">Live Links</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Live images that update via URL params</span>
-				</a>
-
-				<!-- A/B Test -->
-				<a href="/dashboard/experiments/create?type=ab_test" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#f59e0b]/15 rounded-lg border-[2px] border-[#f59e0b] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#f59e0b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-						</svg>
-					</div>
-					<span class="text-xs font-black text-black uppercase tracking-wider">A/B Test</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Test image variants to find the best</span>
-				</a>
-
-				<!-- Smart Links -->
-				<a href="/dashboard/experiments/create?type=smart_link" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#4ade80]/15 rounded-lg border-[2px] border-[#4ade80] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-						</svg>
-					</div>
-					<span class="text-xs font-black text-black uppercase tracking-wider">Smart Links</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Route viewers to the best-performing link</span>
-				</a>
-
-				<!-- Scheduled Images -->
-				<a href="/dashboard/experiments/create?type=scheduled" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#a78bfa]/15 rounded-lg border-[2px] border-[#a78bfa] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-						</svg>
-					</div>
-					<span class="text-xs font-black text-black uppercase tracking-wider">Scheduled</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Auto-swap images on a schedule</span>
-				</a>
-
-				<!-- Auto-Optimize (opt-in on A/B test) -->
-				<a href="/dashboard/experiments/create" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#a855f7]/15 rounded-lg border-[2px] border-[#a855f7] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#a855f7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-						</svg>
-					</div>
-					<span class="text-xs font-black text-black uppercase tracking-wider">Auto-Optimize</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Enable on any A/B test to auto-pick winners</span>
-				</a>
+				{#each quickActions as action}
+					<a href={action.href} class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
+						<div class="w-9 h-9 rounded-lg border-[2px] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform"
+							style="background-color: {action.color}15; border-color: {action.color}">
+							<svg class="w-5 h-5" style="color: {action.color}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								{#if action.icon === 'batch'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+								{:else if action.icon === 'link'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+								{:else if action.icon === 'chart'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+								{:else if action.icon === 'shield'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+								{:else if action.icon === 'clock'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+								{:else if action.icon === 'lightning'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+								{:else if action.icon === 'code'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+								{:else if action.icon === 'key'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+								{:else if action.icon === 'plus'}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+								{:else}
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+								{/if}
+							</svg>
+						</div>
+						<span class="text-xs font-black text-black uppercase tracking-wider">{action.label}</span>
+						<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">{action.desc}</span>
+					</a>
+				{/each}
 			</div>
 		</div>
 			</div>
@@ -478,7 +615,7 @@
 						</a>
 					{/each}
 				{:else}
-					<!-- Empty State -->
+					<!-- Empty State (personalized or generic) -->
 					<div class="col-span-full">
 						<div class="bg-white rounded-3xl border-[3px] border-black border-dashed p-12 text-center flex flex-col items-center justify-center">
 							<div class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-300 flex items-center justify-center mb-4 transform -rotate-3">
@@ -486,10 +623,10 @@
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"/>
 								</svg>
 							</div>
-							<p class="text-lg font-black text-black mb-2">No templates yet</p>
-							<p class="text-sm font-bold text-gray-500 mb-6 max-w-sm">Create your first template to start generating automated images and GIFs.</p>
+							<p class="text-lg font-black text-black mb-2">{emptyMsg?.heading || 'No templates yet'}</p>
+							<p class="text-sm font-bold text-gray-500 mb-6 max-w-sm">{emptyMsg?.subtitle || 'Create your first template to start generating automated images and GIFs.'}</p>
 							<a href="/dashboard/template/create" class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide hover:bg-gray-800 transition-colors">
-								Create Template
+								{emptyMsg?.cta || 'Create Template'}
 							</a>
 						</div>
 					</div>
