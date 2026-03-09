@@ -143,7 +143,7 @@
 					<div 
 						class="cursor-pointer group relative select-none"
 						on:click={() => { activeUseCase = i; activeVariation = 0; }}
-						on:keydown={() => { activeUseCase = i; activeVariation = 0; }}
+						on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && (() => { activeUseCase = i; activeVariation = 0; })()}
 						role="button"
 						tabindex="0"
 					>

@@ -133,14 +133,12 @@
 		ab_test: 'A/B Test',
 		smart_link: 'Smart Link',
 		scheduled: 'Scheduled',
-		bandit: 'Auto-Optimize'
 	};
 
 	$: typeColors = {
 		ab_test: 'bg-blue-100 text-blue-800 border-blue-800',
 		smart_link: 'bg-purple-100 text-purple-800 border-purple-800',
 		scheduled: 'bg-amber-100 text-amber-800 border-amber-800',
-		bandit: 'bg-emerald-100 text-emerald-800 border-emerald-800'
 	};
 
 	$: statusColors = {
@@ -193,9 +191,9 @@
 	}
 
 	function getRunningDuration(experiment) {
-		if (!experiment?.startedAt) return 'Not started';
-		const start = new Date(experiment.startedAt);
-		const end = experiment.completedAt ? new Date(experiment.completedAt) : new Date();
+		if (!experiment?.startAt) return 'Not started';
+		const start = new Date(experiment.startAt);
+		const end = experiment.winnerDeclaredAt ? new Date(experiment.winnerDeclaredAt) : new Date();
 		const diffMs = end - start;
 		const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 		const diffDays = Math.floor(diffHours / 24);
@@ -436,6 +434,12 @@
 								<span class="px-3 py-1 rounded-lg text-xs font-black uppercase border-[2px] {typeColors[exp.type] || 'bg-gray-100 text-gray-700 border-gray-700'}">
 									{typeLabels[exp.type] || exp.type}
 								</span>
+								{#if exp.banditConfig?.enabled}
+									<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-black uppercase border-[2px] bg-[#a855f7]/10 text-[#7c3aed] border-[#a855f7]">
+										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+										Auto-Optimize
+									</span>
+								{/if}
 								<!-- Status Badge -->
 								<span class="px-3 py-1 rounded-lg text-xs font-black uppercase border-[2px] {statusColors[exp.status] || 'bg-gray-100 text-gray-700 border-gray-700'} flex items-center gap-2">
 									{#if exp.status === 'running'}
@@ -608,9 +612,9 @@
 						<div class="text-3xl font-black text-gray-900 tracking-tighter tabular-nums">{runningDuration}</div>
 						<div class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mt-2">
 							{#if exp.status === 'running'}
-								Running since <span class="text-gray-900">{formatRelativeDate(exp.startedAt)}</span>
+								Running since <span class="text-gray-900">{formatRelativeDate(exp.startAt)}</span>
 							{:else if exp.status === 'completed'}
-								Completed <span class="text-gray-900">{formatRelativeDate(exp.completedAt)}</span>
+								Completed <span class="text-gray-900">{formatRelativeDate(exp.winnerDeclaredAt)}</span>
 							{:else}
 								{exp.status === 'draft' ? 'Not yet started' : 'Currently paused'}
 							{/if}
@@ -1314,25 +1318,25 @@
 
 						{/if}
 
-						<!-- Bandit Config (if applicable) -->
-						{#if exp.type === 'bandit' && exp.banditConfig}
+						<!-- Auto-Optimize Config (if enabled on A/B test) -->
+						{#if exp.banditConfig?.enabled}
 							<div>
-								<h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b-2 border-gray-100 pb-2">Auto-Optimize Configuration</h3>
+								<h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b-2 border-gray-100 pb-2">Auto-Optimize Settings</h3>
 								<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 									<div class="p-4 bg-emerald-50 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
-										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Algorithm</span>
+										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Method</span>
 										<span class="text-sm font-black text-emerald-900 uppercase">
-											{exp.banditConfig.algorithm?.replace(/_/g, ' ') || 'N/A'}
+											Smart Traffic
 										</span>
 									</div>
 									<div class="p-4 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
-										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Warmup Impressions</span>
+										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Min. Views Before Optimizing</span>
 										<span class="text-lg font-black text-gray-900 tabular-nums">
 											{exp.banditConfig.warmupImpressions || 0}
 										</span>
 									</div>
 									<div class="p-4 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
-										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Recompute Interval</span>
+										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Update Frequency</span>
 										<span class="text-lg font-black text-gray-900 tabular-nums">
 											{exp.banditConfig.recomputeIntervalMinutes || 0} <span class="text-sm text-gray-500 uppercase">min</span>
 										</span>
@@ -1368,16 +1372,16 @@
 									<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Updated</span>
 									<span class="text-xs font-bold text-gray-700">{exp.updatedAt ? formatRelativeDate(exp.updatedAt) : 'N/A'}</span>
 								</div>
-								{#if exp.startedAt}
+								{#if exp.startAt && exp.status !== 'draft'}
 									<div class="p-4 bg-[#60a5fa]/10 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
 										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Started</span>
-										<span class="text-xs font-bold text-gray-900">{formatRelativeDate(exp.startedAt)}</span>
+										<span class="text-xs font-bold text-gray-900">{formatRelativeDate(exp.startAt)}</span>
 									</div>
 								{/if}
-								{#if exp.completedAt}
+								{#if exp.winnerDeclaredAt}
 									<div class="p-4 bg-[#4ade80]/10 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]">
 										<span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Completed</span>
-										<span class="text-xs font-bold text-gray-900">{formatRelativeDate(exp.completedAt)}</span>
+										<span class="text-xs font-bold text-gray-900">{formatRelativeDate(exp.winnerDeclaredAt)}</span>
 									</div>
 								{/if}
 								{#if exp.startAt}

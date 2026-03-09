@@ -18,6 +18,8 @@
 	import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 	import { goto } from '$app/navigation';
 	import { pages, currentPageIndex, outputFormat, pdfPreset, pageActions } from '../../../../store/pages.store';
+	import { loadBrandFonts, isBrandFont } from '../../../utils/brand-fonts-loader';
+	import { preloadFont } from '../../../../api/fonts';
 	import AuthModal from '../../editor/AuthModal.svelte';
 
 	let fabricCanvas;
@@ -274,7 +276,10 @@
 			// Conditional logic properties
 			'showWhen', 'hideWhen',
 			// Loop/repeat properties
-			'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns'
+			'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns',
+			// Pattern fill properties
+			'isPatternFill', 'patternSourceJSON', 'patternBoundsWidth', 'patternBoundsHeight',
+			'patternSpacingX', 'patternSpacingY', 'patternStagger'
 		]);
 		
 		// Get actual canvas objects to read custom properties
@@ -330,7 +335,18 @@
 					result.qrData = canvasObj.qrData || '';
 					result.qrConfig = canvasObj.qrConfig || {};
 				}
-				
+
+				// Pattern fill properties
+				if (canvasObj.isPatternFill) {
+					result.isPatternFill = true;
+					result.patternSourceJSON = canvasObj.patternSourceJSON || null;
+					result.patternBoundsWidth = canvasObj.patternBoundsWidth || 400;
+					result.patternBoundsHeight = canvasObj.patternBoundsHeight || 400;
+					result.patternSpacingX = canvasObj.patternSpacingX || 0;
+					result.patternSpacingY = canvasObj.patternSpacingY || 0;
+					result.patternStagger = canvasObj.patternStagger || false;
+				}
+
 				return result;
 			});
 		}
@@ -636,11 +652,41 @@
 				// Force render the canvas
 				fabricCanvas.requestRenderAll();
 				fabricCanvas.renderAll();
-				
+
 				// Log variable count for debugging
 				const variableCount = objects.filter(o => o.isVariable).length;
 				console.log('Template loaded successfully with', objects.length, 'objects,', variableCount, 'variables');
-				
+
+				// Ensure all fonts used by text objects are fully loaded, then re-render
+				// This fixes brand fonts (and slow Google Fonts) showing as fallback on refresh
+				const textObjects = objects.filter(o => o.type === 'i-text' || o.type === 'text' || o.type === 'textbox');
+				if (textObjects.length > 0) {
+					const uniqueFonts = [...new Set(textObjects.map(o => o.fontFamily).filter(f => f && f !== 'Arial'))];
+					if (uniqueFonts.length > 0) {
+						loadBrandFonts().then((brandFamilies) => {
+							const brandSet = new Set((brandFamilies || []).map(f => f.toLowerCase()));
+							uniqueFonts.forEach(font => {
+								if (!brandSet.has(font.toLowerCase())) {
+									preloadFont(font);
+								}
+							});
+							const fontLoadPromises = uniqueFonts.map(font =>
+								document.fonts.load(`12px "${font}"`).catch(() => null)
+							);
+							Promise.all(fontLoadPromises).then(() => document.fonts.ready).then(() => {
+								textObjects.forEach(obj => {
+									if (obj._clearCache) obj._clearCache();
+									if (obj.initDimensions) obj.initDimensions();
+									if (obj.setCoords) obj.setCoords();
+									obj.dirty = true;
+								});
+								fabricCanvas.requestRenderAll();
+								console.log('Fonts re-rendered after load:', uniqueFonts);
+							});
+						});
+					}
+				}
+
 				// End history batch after load completes
 				setTimeout(() => {
 					if (typeof window !== 'undefined' && window.__historyBatchEnd) {
@@ -648,7 +694,7 @@
 					}
 					// One more render to be sure
 					fabricCanvas.requestRenderAll();
-					
+
 					// Fire a custom event to notify other components (like VariablesPanel)
 					// that the canvas content has been updated
 					fabricCanvas.fire('object:modified', { target: null });

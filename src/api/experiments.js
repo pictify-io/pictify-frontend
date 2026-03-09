@@ -145,6 +145,18 @@ const checkSlugAvailability = async (slug) => {
 	return response;
 };
 
+/**
+ * Get available context variables for smart link dynamic text
+ * @returns {Promise<Array>} - List of context variables with key, label, example, category
+ */
+const getContextVariables = async () => {
+	try {
+		return await backend.get('/experiments/context-variables');
+	} catch {
+		return [];
+	}
+};
+
 export {
 	createExperiment,
 	getExperiments,
@@ -157,5 +169,6 @@ export {
 	duplicateExperiment,
 	getExperimentAnalytics,
 	getExperimentQuota,
-	checkSlugAvailability
+	checkSlugAvailability,
+	getContextVariables
 };

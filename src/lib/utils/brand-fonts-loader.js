@@ -1,94 +1,87 @@
 /**
  * Brand Fonts Loader
  *
- * Loads custom fonts from brand assets into the page for use in canvas editor
+ * Loads custom fonts from brand assets into the page for use in canvas editor.
+ * Fetches @font-face CSS from the backend and injects it into the document head.
+ * The backend CSS uses proxy URLs for font files to avoid CORS issues with S3/CDN.
  */
 
-import { getBrandFontsCSS } from '../../api/brand-assets';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 let fontsLoaded = false;
 let loadedFontFamilies = [];
+
+/**
+ * Fetch brand fonts CSS directly (backend returns text/css, not JSON)
+ */
+async function fetchBrandFontsCSS() {
+	const response = await fetch(`${PUBLIC_BACKEND_URL}/brand-assets/fonts/css`, {
+		credentials: 'include',
+		headers: { 'Accept': 'text/css' }
+	});
+	if (!response.ok) return '';
+	return await response.text();
+}
 
 /**
  * Load brand fonts CSS into the page
  * @returns {Promise<Array>} List of loaded font families
  */
 export async function loadBrandFonts() {
-  if (fontsLoaded) {
-    return loadedFontFamilies;
-  }
+	if (fontsLoaded) {
+		return loadedFontFamilies;
+	}
 
-  try {
-    // Get CSS from backend
-    const css = await getBrandFontsCSS();
+	try {
+		const css = await fetchBrandFontsCSS();
 
-    if (!css || css.trim() === '' || css.includes('/* Custom Brand Fonts */\n')) {
-      // No custom fonts
-      fontsLoaded = true;
-      return [];
-    }
+		// Parse font families from CSS — check if there are actual @font-face rules
+		const fontFaceRegex = /@font-face\s*\{[^}]*font-family:\s*['"]([^'"]+)['"]/g;
+		const families = [];
+		let match;
 
-    // Check if style element already exists
-    let styleElement = document.getElementById('brand-fonts-css');
+		while ((match = fontFaceRegex.exec(css)) !== null) {
+			const family = match[1];
+			if (!families.includes(family)) {
+				families.push(family);
+			}
+		}
 
-    if (!styleElement) {
-      // Create and append style element
-      styleElement = document.createElement('style');
-      styleElement.id = 'brand-fonts-css';
-      document.head.appendChild(styleElement);
-    }
+		if (families.length === 0) {
+			fontsLoaded = true;
+			return [];
+		}
 
-    // Update CSS content
-    styleElement.textContent = css;
+		// Inject CSS into <head> — font URLs are backend proxy URLs with CORS headers
+		let styleElement = document.getElementById('brand-fonts-css');
+		if (!styleElement) {
+			styleElement = document.createElement('style');
+			styleElement.id = 'brand-fonts-css';
+			document.head.appendChild(styleElement);
+		}
+		styleElement.textContent = css;
 
-    // Parse font families from CSS
-    const fontFaceRegex = /@font-face\s*{[^}]*font-family:\s*['"]([^'"]+)['"]/g;
-    const families = [];
-    let match;
+		// Force-load each font at common weights so FabricJS can use them immediately
+		const weights = ['400', '700'];
+		const loadPromises = families.flatMap(family =>
+			weights.map(w => document.fonts.load(`${w} 12px "${family}"`).catch(() => null))
+		);
+		await Promise.all(loadPromises);
 
-    while ((match = fontFaceRegex.exec(css)) !== null) {
-      const family = match[1];
-      if (!families.includes(family)) {
-        families.push(family);
-      }
-    }
+		// Also wait for the global fonts.ready (covers all weights/styles)
+		await document.fonts.ready;
 
-    // Wait for fonts to load
-    if (families.length > 0 && 'fonts' in document) {
-      try {
-        await document.fonts.ready;
+		loadedFontFamilies = families;
+		fontsLoaded = true;
 
-        // Force load each font by creating invisible text elements
-        for (const family of families) {
-          const testEl = document.createElement('span');
-          testEl.style.fontFamily = `'${family}'`;
-          testEl.style.position = 'absolute';
-          testEl.style.left = '-9999px';
-          testEl.style.visibility = 'hidden';
-          testEl.textContent = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-          document.body.appendChild(testEl);
+		console.log('Brand fonts loaded:', families);
+		return families;
 
-          // Give browser time to load font
-          await new Promise(resolve => setTimeout(resolve, 50));
-
-          document.body.removeChild(testEl);
-        }
-      } catch (e) {
-        console.warn('Font loading API not fully supported, fonts may not be immediately available');
-      }
-    }
-
-    loadedFontFamilies = families;
-    fontsLoaded = true;
-
-    console.log('Loaded brand fonts:', families);
-    return families;
-
-  } catch (error) {
-    console.error('Error loading brand fonts:', error);
-    fontsLoaded = true;
-    return [];
-  }
+	} catch (error) {
+		console.error('Error loading brand fonts:', error);
+		fontsLoaded = true;
+		return [];
+	}
 }
 
 /**
@@ -96,7 +89,7 @@ export async function loadBrandFonts() {
  * @returns {Array} List of font family names
  */
 export function getBrandFontFamilies() {
-  return loadedFontFamilies;
+	return loadedFontFamilies;
 }
 
 /**
@@ -105,16 +98,16 @@ export function getBrandFontFamilies() {
  * @returns {boolean} True if it's a brand font
  */
 export function isBrandFont(fontFamily) {
-  return loadedFontFamilies.some(family =>
-    family.toLowerCase() === fontFamily.toLowerCase()
-  );
+	return loadedFontFamilies.some(family =>
+		family.toLowerCase() === fontFamily.toLowerCase()
+	);
 }
 
 /**
  * Reload brand fonts (useful after uploading new font)
  */
 export async function reloadBrandFonts() {
-  fontsLoaded = false;
-  loadedFontFamilies = [];
-  return await loadBrandFonts();
+	fontsLoaded = false;
+	loadedFontFamilies = [];
+	return await loadBrandFonts();
 }

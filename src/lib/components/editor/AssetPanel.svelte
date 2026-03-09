@@ -1,6 +1,6 @@
 <script>
 	import { activeSidebarTab, editor } from '../../../store/editor.store';
-	import { IText, Rect, Circle, FabricImage } from 'fabric';
+	import { IText, Textbox, Rect, Circle, FabricImage } from 'fabric';
 	import ShapesIconsLibrary from './ShapesIconsLibrary.svelte';
 	import TextPresetLibrary from './TextPresetLibrary.svelte';
 	import ChartTableLibrary from './ChartTableLibrary.svelte';
@@ -30,6 +30,16 @@
 				...defaultOptions,
 				fontSize: style['font-size'] ? parseInt(style['font-size']) : 20,
 				fill: '#000000'
+			});
+		} else if (type === 'textbox') {
+			object = new Textbox(content, {
+				...defaultOptions,
+				fontSize: style['font-size'] ? parseInt(style['font-size']) : 20,
+				fill: '#000000',
+				width: style.width ? parseInt(style.width) : 300,
+				splitByGrapheme: false,
+				textAlign: 'left',
+				lockScalingY: true
 			});
 		} else if (type === 'rect') {
 			object = new Rect({
@@ -119,6 +129,10 @@
 		addComponent('text', text, { 'font-size': fontSize });
 	}
 
+	function addTextArea(text, fontSize, width = 250) {
+		addComponent('textbox', text, { 'font-size': fontSize, width });
+	}
+
 	let displayTab = $activeSidebarTab;
 
 	$: if ($activeSidebarTab) {
@@ -178,6 +192,25 @@
 								Add a little bit of body text
 							</p>
 						</button>
+
+						<!-- Text Area (auto-wrapping) -->
+						<div class="pt-3 mt-3 border-t-[2px] border-gray-200">
+							<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Text Area (auto-wrap)</p>
+							<button
+								class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-1 transition-all group shadow-sm"
+								on:click={() => addTextArea('Type your paragraph text here. This text area will automatically wrap within its bounds.', '16px', 300)}
+							>
+								<div class="flex items-start gap-3">
+									<div class="w-8 h-8 rounded bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+										<i class="fa fa-align-left text-xs text-gray-900" />
+									</div>
+									<div>
+										<p class="text-sm font-bold text-gray-900 group-hover:text-black">Add a text area</p>
+										<p class="text-[10px] font-medium text-gray-500 mt-0.5">Auto-wraps text within a fixed width</p>
+									</div>
+								</div>
+							</button>
+						</div>
 					</div>
 				{:else}
 					<TextPresetLibrary />

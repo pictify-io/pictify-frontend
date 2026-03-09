@@ -12,7 +12,7 @@
 			cta_text: text,
 			location: location,
 		});
-		goto('/signup');
+		goto('/login');
 	}
 </script>
 

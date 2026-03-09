@@ -30,7 +30,7 @@
 	let recommendedPlanIndex = 0;
 	let selectedPlan = null;
 	let sliderIndex = 0;
-	let showAnnual = false;
+	let showAnnual = true;
 
 	const numberFormatter = new Intl.NumberFormat('en-US');
 	const popularPlanNames = ['Pro'];
@@ -75,9 +75,10 @@
 		]},
 	];
 
-	// Plans to show in comparison - 3-tier Good-Better-Best structure
-	// Free (entry) → Pro (recommended, best value) → Business (enterprise)
-	const comparisonPlans = [PLANS.STARTER, PLANS.STANDARD, PLANS.BUSINESS];
+	// Plans to show as pricing cards (paid only - Free is in comparison table)
+	const pricingCardPlans = [PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
+	// Plans to show in the feature comparison table (includes Free)
+	const comparisonPlans = [PLANS.STARTER, PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
 
 	const FAQs = [
 		{
@@ -93,7 +94,7 @@
 		},
 		{
 			question: 'What features are included in the free plan?',
-			answer: 'The Free plan includes 50 renders/month, 5 GIF renders, 3 saved templates, PNG/JPG output, and full API access with no rate limits. Perfect for testing and hobby projects.',
+			answer: 'The Free plan includes 50 renders/month, 5 GIF renders, 3 saved templates, PNG/JPG output, and full API access with no rate limits. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
 			isOpened: false
 		},
 		{
@@ -415,9 +416,16 @@
 					</div>
 				</div>
 
-				<!-- Plan Cards Grid --> 
+				<!-- Free Tier Note -->
+				<div class="text-center relative z-10">
+					<p class="text-base font-bold text-gray-500">
+						Just exploring? Start with our <button on:click={() => selectPlanHandler(PLANS.STARTER)} class="text-[#ff6b6b] underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black">Free plan — 50 renders/mo</button>. No credit card needed.
+					</p>
+				</div>
+
+				<!-- Plan Cards Grid -->
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-10 items-stretch justify-center relative z-10 max-w-5xl mx-auto">
-					{#each comparisonPlans as planId (planId + '-' + showAnnual)}
+					{#each pricingCardPlans as planId (planId + '-' + showAnnual)}
 						{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
 						{@const price = getPlanPrice(planId, showAnnual)}
 						{@const renders = PLAN_FEATURES[planId]?.[FEATURES.RENDERS]}
@@ -440,8 +448,8 @@
 								
 								<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{PLAN_DISPLAY_NAMES[planId]}</h3>
 								<p class="text-sm font-bold text-gray-500 mt-2 min-h-[40px] leading-snug">
-									{#if planId === PLANS.STARTER}
-										Perfect for experimenting and side projects.
+									{#if planId === PLANS.BASIC}
+										All features, lower volume. Great for solo devs & small projects.
 									{:else if planId === PLANS.STANDARD}
 										For teams & startups scaling their image generation.
 									{:else if planId === PLANS.BUSINESS}
@@ -551,7 +559,7 @@
 									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'}"
 								on:click={() => selectPlanHandler(planId)}
 							>
-								{planId === PLANS.STARTER ? 'Start Free' : planId === PLANS.BUSINESS ? 'Talk to Sales' : 'Get Started'}
+								{planId === PLANS.BUSINESS ? 'Talk to Sales' : 'Get Started'}
 							</button>
 						</div>
 					{/each}

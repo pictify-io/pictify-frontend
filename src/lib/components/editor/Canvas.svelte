@@ -19,6 +19,9 @@
 	let canvasContainer;
 	let fabricCanvas;
 
+	// Clipboard for copy/paste
+	let clipboardData = null;
+
 	// Page switching for multi-page PDF
 	let previousPageIndex = -1;
 	let pagesUnsubscribe;
@@ -61,7 +64,7 @@
 		historyStack = historyStack.slice(0, historyIndex + 1);
 
 		// Save the current state
-		const state = fabricCanvas.toJSON();
+		const state = fabricCanvas.toJSON(CUSTOM_PROPS);
 		historyStack.push(state);
 
 		// Limit history size
@@ -317,8 +320,21 @@
 			saveState();
 		});
 
+		// Textbox: only allow horizontal resize (convert scaleX to width), lock vertical scaling
+		fabricCanvas.on('object:scaling', (e) => {
+			const target = e.target;
+			if (target && target.type.toLowerCase() === 'textbox') {
+				const newWidth = target.width * target.scaleX;
+				target.set({
+					width: newWidth,
+					scaleX: 1,
+					scaleY: 1
+				});
+			}
+		});
+
 		// object:modified fires ONCE when transformation completes (not during drag/resize)
-		fabricCanvas.on('object:modified', (e) => {
+		fabricCanvas.on('object:modified', async (e) => {
 			console.log('🔧 Object modified:', e.target?.type);
 
 			// Don't save during undo/redo operations
@@ -328,6 +344,37 @@
 			}
 			if (isLoadingCanvas) {
 				console.log('🚫 object:modified ignored during loading');
+				return;
+			}
+
+			// Pattern fill: convert scale into new bounds and regenerate
+			const target = e.target;
+			if (target && target.isPatternFill && (target.scaleX !== 1 || target.scaleY !== 1)) {
+				// Use patternBounds * scale (not group.width which may be larger due to stagger)
+				const newBoundsW = Math.round((target.patternBoundsWidth || target.width) * target.scaleX);
+				const newBoundsH = Math.round((target.patternBoundsHeight || target.height) * target.scaleY);
+				const left = target.left;
+				const top = target.top;
+				const id = target.id;
+				const sourceJSON = JSON.parse(JSON.stringify(target.patternSourceJSON));
+
+				const { generatePatternGroup } = await import('../../utils/pattern-fill');
+				const { group } = await generatePatternGroup(sourceJSON, {
+					boundsWidth: newBoundsW,
+					boundsHeight: newBoundsH,
+					spacingX: target.patternSpacingX || 0,
+					spacingY: target.patternSpacingY || 0,
+					stagger: target.patternStagger || false
+				});
+				group.set({ left, top });
+				if (id) group.set('id', id);
+
+				fabricCanvas.remove(target);
+				fabricCanvas.add(group);
+				fabricCanvas.setActiveObject(group);
+				fabricCanvas.requestRenderAll();
+				editorActions.selectComponent(group);
+				saveState();
 				return;
 			}
 
@@ -368,6 +415,11 @@
 		fabricCanvas.on('mouse:dblclick', (e) => {
 			const target = e.target;
 			if (target && target.type === 'group') {
+				// Prevent ungrouping protected elements
+				if (target.isPatternFill || target.isQRCode || target.isChart || target.isTable) {
+					console.log('🔒 Protected group — double-click ungroup blocked');
+					return;
+				}
 				// Manual ungroup implementation since toActiveSelection is missing
 				// 1. Get items and restore their canvas coordinates
 				const items = target._objects.concat(); // Copy array
@@ -466,7 +518,94 @@
 		editorActions.clearSelection();
 	}
 
+	// Custom properties to preserve during copy/paste
+	const CUSTOM_PROPS = [
+		'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
+		'isChart', 'chartType', 'chartData', 'chartConfig',
+		'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
+		'isQRCode', 'qrData', 'qrConfig',
+		'showWhen', 'hideWhen',
+		'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns',
+		'isPatternFill', 'patternSourceJSON', 'patternBoundsWidth', 'patternBoundsHeight',
+		'patternSpacingX', 'patternSpacingY', 'patternStagger'
+	];
+
+	function copySelection() {
+		const active = fabricCanvas.getActiveObject();
+		if (!active) return;
+
+		// Serialize with custom props
+		if (active.type === 'activeselection' || active.type === 'ActiveSelection') {
+			clipboardData = active.getObjects().map(obj => obj.toObject(CUSTOM_PROPS));
+		} else {
+			clipboardData = [active.toObject(CUSTOM_PROPS)];
+		}
+	}
+
+	async function pasteSelection() {
+		if (!clipboardData || clipboardData.length === 0) return;
+
+		const { util } = await import('fabric');
+		const clones = await util.enlivenObjects(
+			clipboardData.map(d => JSON.parse(JSON.stringify(d)))
+		);
+
+		fabricCanvas.discardActiveObject();
+
+		const pastedObjects = [];
+		for (const clone of clones) {
+			// Offset so the paste is visible (not on top of original)
+			clone.set({
+				left: (clone.left || 0) + 20,
+				top: (clone.top || 0) + 20
+			});
+			// New element gets a fresh id
+			clone.set('id', undefined);
+
+			// Copy over custom props that enlivenObjects may not restore
+			const srcData = clipboardData[clones.indexOf(clone)];
+			for (const prop of CUSTOM_PROPS) {
+				if (prop === 'id') continue; // skip id — we want a new one
+				if (srcData[prop] !== undefined) {
+					clone.set(prop, srcData[prop]);
+				}
+			}
+
+			fabricCanvas.add(clone);
+			pastedObjects.push(clone);
+		}
+
+		// Select the pasted object(s)
+		if (pastedObjects.length === 1) {
+			fabricCanvas.setActiveObject(pastedObjects[0]);
+		} else if (pastedObjects.length > 1) {
+			const { ActiveSelection } = await import('fabric');
+			const sel = new ActiveSelection(pastedObjects, { canvas: fabricCanvas });
+			fabricCanvas.setActiveObject(sel);
+		}
+
+		fabricCanvas.requestRenderAll();
+
+		// Update clipboard offset so next paste goes further
+		clipboardData = clipboardData.map(d => ({
+			...d,
+			left: (d.left || 0) + 20,
+			top: (d.top || 0) + 20
+		}));
+	}
+
 	function handleKeyDown(e) {
+		// Skip shortcuts when user is editing text
+		const activeObject = fabricCanvas?.getActiveObject();
+		if (activeObject?.isEditing) {
+			// Still allow Cmd+Z for undo within text editing
+			if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+				// Let FabricJS handle text undo natively
+				return;
+			}
+			return;
+		}
+
 		// Handle undo/redo keyboard shortcuts
 		if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
 			e.preventDefault();
@@ -478,11 +617,32 @@
 			return;
 		}
 
+		// Copy: Cmd+C / Ctrl+C
+		if ((e.metaKey || e.ctrlKey) && e.key === 'c') {
+			e.preventDefault();
+			copySelection();
+			return;
+		}
+
+		// Paste: Cmd+V / Ctrl+V
+		if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
+			e.preventDefault();
+			pasteSelection();
+			return;
+		}
+
+		// Duplicate: Cmd+D / Ctrl+D
+		if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+			e.preventDefault();
+			copySelection();
+			pasteSelection();
+			return;
+		}
+
 		// Only use Delete key (not Backspace) for deleting objects
 		// On Mac, Backspace is for text editing, Delete (Fn+Delete) is for object deletion
 		if (e.key === 'Delete') {
-			const activeObject = fabricCanvas.getActiveObject();
-			if (activeObject && !activeObject.isEditing) {
+			if (activeObject) {
 				// Handle multi-selection (ActiveSelection contains multiple objects)
 				if (activeObject.type === 'activeselection' || activeObject.type === 'ActiveSelection') {
 					const objects = activeObject.getObjects().concat();
@@ -574,7 +734,9 @@
 						'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
 						'isQRCode', 'qrData', 'qrConfig',
 						'showWhen', 'hideWhen',
-						'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns'
+						'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns',
+					'isPatternFill', 'patternSourceJSON', 'patternBoundsWidth', 'patternBoundsHeight',
+					'patternSpacingX', 'patternSpacingY', 'patternStagger'
 					]);
 					// Pass previousPageIndex to ensure we save to the page we are LEAVING
 					pageActions.updateCurrentPageData(currentData, previousPageIndex);
@@ -659,7 +821,7 @@
 			historyIndex = saved.historyIndex;
 			savedHistoryIndex = saved.savedHistoryIndex;
 		} else {
-			historyStack = [fabricCanvas.toJSON()];
+			historyStack = [fabricCanvas.toJSON(CUSTOM_PROPS)];
 			historyIndex = 0;
 			savedHistoryIndex = 0;
 		}

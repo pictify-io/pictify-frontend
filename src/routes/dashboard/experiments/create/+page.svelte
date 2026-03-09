@@ -43,6 +43,7 @@
 		templateUid: '', // shared template (same_template mode)
 		outputConfig: { format: 'png', quality: 90 },
 		goalConfig: { type: 'impressions_only', destinationUrl: '' },
+		autoOptimize: false, // Enable Thompson Sampling auto-optimization
 		variants: [
 			{ id: 'control', name: 'Control', weight: 5000, isDefault: true, variables: {}, templateUid: '', conditions: { operator: 'AND', rules: [] }, priority: 0 },
 			{ id: 'variant-b', name: 'Variant B', weight: 5000, isDefault: false, variables: {}, templateUid: '', conditions: { operator: 'AND', rules: [] }, priority: 1 },
@@ -177,6 +178,7 @@
 				templateUid: exp.templateUid || '',
 				outputConfig: exp.outputConfig || { format: 'png', quality: 90 },
 				goalConfig: exp.goalConfig || { type: 'impressions_only', destinationUrl: '' },
+				autoOptimize: exp.banditConfig?.enabled || false,
 				variants: (exp.variants || []).map((v, i) => ({
 					id: v.id,
 					name: v.name || '',
@@ -624,8 +626,20 @@
 				payload.templateUid = form.templateUid;
 			}
 
+			// Auto-optimization (bandit config)
+			if (form.autoOptimize) {
+				payload.banditConfig = {
+					enabled: true,
+					algorithm: 'thompson_sampling',
+					warmupImpressions: 50,
+					recomputeIntervalMinutes: 15,
+				};
+			}
+
 			if (isEditMode && editExperimentUid) {
-				// Update existing experiment
+				// Update existing experiment — strip immutable fields
+				delete payload.type;
+				delete payload.templateUid;
 				const updated = await updateExperimentAction(editExperimentUid, payload);
 				if (updated?.uid) {
 					if (startAfterCreate) {
@@ -1274,6 +1288,26 @@
 								</p>
 							</div>
 						{/if}
+					</div>
+				</div>
+
+				<!-- Auto-Optimize Toggle -->
+				<div class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]">
+					<div class="px-6 py-5 flex items-start gap-4 bg-[#FFFDF8]">
+						<label class="relative inline-flex items-center cursor-pointer mt-0.5 shrink-0">
+							<input type="checkbox" bind:checked={form.autoOptimize} class="sr-only peer" />
+							<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-[2px] border-gray-900 peer-checked:bg-[#a855f7]"></div>
+						</label>
+						<div class="flex-1">
+							<div class="flex items-center gap-2">
+								<span class="text-xs font-black uppercase tracking-widest text-gray-900">Auto-Optimize</span>
+								<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-[2px] bg-[#a855f7]/10 text-[#7c3aed] border-[#a855f7]">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+									Smart Traffic
+								</span>
+							</div>
+							<p class="text-xs font-bold text-gray-500 mt-1">Let Pictify find the winner for you. Traffic starts split evenly, then automatically shifts toward the best-performing variant over time.</p>
+						</div>
 					</div>
 				</div>
 

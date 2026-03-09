@@ -180,6 +180,20 @@ export async function updateBillingPreferences({ allowOverages, spendingCapCents
 }
 
 /**
+ * Get overage invoices
+ * @returns {Promise<Object>} { invoices: Array, entityType: string }
+ */
+export async function getOverageInvoices() {
+  try {
+    const response = await backend.get('/api/billing-preferences/overage-invoices');
+    return response;
+  } catch (error) {
+    console.error('Failed to get overage invoices:', error);
+    return { invoices: [], entityType: 'user' };
+  }
+}
+
+/**
  * Get overage summary for current billing cycle
  * @returns {Promise<Object>} Overage summary
  */

@@ -47,7 +47,7 @@
 						<div
 							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-[2px_2px_0_0_#000] mb-8 transform -rotate-2"
 						>
-							<span class="text-gray-900 text-xs font-mono font-bold uppercase tracking-wider"
+							<span class="text-gray-900 text-sm font-bold uppercase tracking-wider"
 								>🚀 Free Tier Available</span
 							>
 						</div>
@@ -59,21 +59,21 @@
 							<span class="text-[#ff6b6b]">in Under 5 Minutes</span>
 						</h2>
 
-						<p class="text-xl text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed font-medium">
+						<p class="text-xl text-gray-700 max-w-xl mx-auto mb-8 font-medium">
 							Sign up, design a template, hit the API, and get a pixel-perfect PNG back. Free tier, no credit card.
 						</p>
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
 							<SignUpButton
 								class="w-full sm:w-auto px-8 py-4 bg-[#ffc480] text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
-								text="Try It Free"
+								text="Start Building Free"
 								location="cta_section"
 							/>
 
 							<a
 								href="https://docs.pictify.io"
 								target="_blank"
-								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-2 group"
+								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-2 group"
 								on:click={() => analytics.trackOutboundLink({ url: 'https://docs.pictify.io', link_text: 'View API Docs', location: 'cta_section' })}
 							>
 								<span>View API Docs</span>
@@ -94,22 +94,22 @@
 
 						<!-- Pricing hint -->
 						<p class="text-sm text-gray-500 mb-12">
-							Plans start at <span class="font-bold text-gray-700">$49/mo</span> after free tier
+							Plans start at <span class="font-bold text-gray-700">$39/mo</span> after free tier
 						</p>
 
 						<!-- Mini FAQ -->
-						<div class="grid sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
-							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-								<h4 class="font-bold text-gray-900 text-sm mb-1">How long to integrate?</h4>
-								<p class="text-xs text-gray-600">Most teams integrate in under 2 hours. One endpoint, JSON in, image out.</p>
+						<div class="grid sm:grid-cols-3 gap-5 text-left max-w-3xl mx-auto">
+							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+								<h4 class="font-black text-gray-900 text-base mb-2">How long to integrate?</h4>
+								<p class="text-sm text-gray-600 font-medium">Most teams integrate in under 2 hours. One endpoint, JSON in, image out.</p>
 							</div>
-							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-								<h4 class="font-bold text-gray-900 text-sm mb-1">What about my data?</h4>
-								<p class="text-xs text-gray-600">Your data is never stored. We render and return—that's it.</p>
+							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+								<h4 class="font-black text-gray-900 text-base mb-2">What about my data?</h4>
+								<p class="text-sm text-gray-600 font-medium">Your data is never stored. We render and return — that's it.</p>
 							</div>
-							<div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-								<h4 class="font-bold text-gray-900 text-sm mb-1">Can I cancel anytime?</h4>
-								<p class="text-xs text-gray-600">Yes. No contracts, no commitments. Cancel with one click.</p>
+							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+								<h4 class="font-black text-gray-900 text-base mb-2">Can I cancel anytime?</h4>
+								<p class="text-sm text-gray-600 font-medium">Yes. No contracts, no commitments. Cancel with one click.</p>
 							</div>
 						</div>
 					</div>

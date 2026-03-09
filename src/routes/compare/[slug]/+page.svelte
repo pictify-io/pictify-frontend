@@ -32,6 +32,29 @@ $: canonical = validComparison
 	? `https://pictify.io/compare/${slug}`
 	: 'https://pictify.io/compare';
 
+// Pricing tier display names and order
+const tierOrder = ['free', 'basic', 'starter', 'plus', 'pro', 'growth', 'scale', 'business', 'prime', 'enterprise', 'server', 'devops', 'advanced', 'delivery'];
+const tierDisplayNames = {
+	free: 'Free', basic: 'Basic', starter: 'Starter', plus: 'Plus', pro: 'Pro', growth: 'Growth',
+	scale: 'Scale', business: 'Business', prime: 'Prime', enterprise: 'Enterprise',
+	server: 'Server', devops: 'DevOps', advanced: 'Advanced', delivery: 'Delivery'
+};
+
+// Compute unified pricing rows from both sides
+$: pricingTiers = validComparison && comparison.pricing ? (() => {
+	const allKeys = new Set([
+		...Object.keys(comparison.pricing.pictify || {}),
+		...Object.keys(comparison.pricing.competitor || {})
+	]);
+	return tierOrder
+		.filter(k => allKeys.has(k))
+		.map(k => ({
+			name: tierDisplayNames[k] || k.charAt(0).toUpperCase() + k.slice(1),
+			pictify: comparison.pricing.pictify[k] || '-',
+			competitor: comparison.pricing.competitor[k] || '-'
+		}));
+})() : [];
+
 // Feature labels for display
 const featureLabels = {
 	htmlToImage: 'HTML to Image',
@@ -119,7 +142,10 @@ const featureLabels = {
 	figmaImport: 'Figma Import',
 	aiTemplates: 'AI Templates',
 	noCodeIntegrations: 'No-Code Integrations',
-	videoGeneration: 'Video Generation'
+	videoGeneration: 'Video Generation',
+	smartLinks: 'Smart Links',
+	scheduledExperiments: 'Scheduled Experiments',
+	experimentAnalytics: 'Experiment Analytics'
 };
 
 // Structured data with FAQ schema
@@ -409,21 +435,13 @@ $: structuredData = validComparison ? {
 								</tr>
 							</thead>
 							<tbody class="divide-y-[3px] divide-gray-100">
-								<tr>
-									<td class="px-6 py-4 font-black text-gray-900">Free</td>
-									<td class="px-6 py-4 font-bold text-[#4ade80] border-l-[3px] border-gray-100">{comparison.pricing.pictify.free}</td>
-									<td class="px-6 py-4 font-medium text-gray-600 border-l-[3px] border-gray-100">{comparison.pricing.competitor.free || comparison.pricing.competitor.server || 'None'}</td>
+								{#each pricingTiers as tier, i}
+								<tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
+									<td class="px-6 py-4 font-black text-gray-900">{tier.name}</td>
+									<td class="px-6 py-4 font-bold text-[#4ade80] border-l-[3px] border-gray-100">{tier.pictify}</td>
+									<td class="px-6 py-4 font-medium text-gray-600 border-l-[3px] border-gray-100">{tier.competitor}</td>
 								</tr>
-								<tr class="bg-gray-50">
-									<td class="px-6 py-4 font-black text-gray-900">Starter</td>
-									<td class="px-6 py-4 font-bold text-[#4ade80] border-l-[3px] border-gray-100">{comparison.pricing.pictify.starter}</td>
-									<td class="px-6 py-4 font-medium text-gray-600 border-l-[3px] border-gray-100">{comparison.pricing.competitor.starter || comparison.pricing.competitor.plus || comparison.pricing.competitor.pro || '-'}</td>
-								</tr>
-								<tr>
-									<td class="px-6 py-4 font-black text-gray-900">Pro</td>
-									<td class="px-6 py-4 font-bold text-[#4ade80] border-l-[3px] border-gray-100">{comparison.pricing.pictify.pro}</td>
-									<td class="px-6 py-4 font-medium text-gray-600 border-l-[3px] border-gray-100">{comparison.pricing.competitor.pro || comparison.pricing.competitor.advanced || comparison.pricing.competitor.growth || comparison.pricing.competitor.business || comparison.pricing.competitor.devops || '-'}</td>
-								</tr>
+								{/each}
 							</tbody>
 						</table>
 					</div>

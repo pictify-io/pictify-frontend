@@ -45,6 +45,20 @@
     ],
     "webhook": "https://your-app.com/callback"
   }'`
+		},
+		experiments: {
+			title: 'Experiments',
+			description: 'A/B test your images with built-in experiments',
+			code: `curl -X POST https://api.pictify.io/experiments \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d '{
+    "name": "hero-banner-test",
+    "type": "ab_test",
+    "variants": [
+      { "id": "control", "variables": { "headline": "Save 20%" } },
+      { "id": "variant-a", "variables": { "headline": "Get 20% Off Today" } }
+    ]
+  }'`
 		}
 	};
 
@@ -74,9 +88,9 @@
 				</div>
 
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-					Built for <br />
+					Developer-First API.<br />
 					<span class="relative inline-block">
-						Modern Teams
+						5 Minutes to Integrate
 						<svg
 							class="absolute w-full h-3 -bottom-1 left-0 text-[#4ade80] -z-10"
 							viewBox="0 0 100 10"
@@ -87,9 +101,8 @@
 					</span>
 				</h2>
 
-				<p class="text-xl text-gray-700 mb-10 leading-relaxed font-medium">
-					Designers own templates. Your product and marketing teams move faster. Developers
-					integrate once and render dynamic media reliably via API.
+				<p class="text-xl text-gray-700 max-w-2xl font-medium mb-10">
+					One endpoint. JSON in, image out. Under 200ms. Works with Node.js, Python, or just cURL.
 				</p>
 
 				<!-- Features List -->
@@ -113,9 +126,9 @@
 							</svg>
 						</div>
 						<div>
-							<h3 class="text-lg font-bold text-gray-900 mb-1">Predictable & Fast</h3>
-							<p class="text-gray-600 font-medium">
-								Standardized JSON responses with &lt;500ms average latency.
+							<h3 class="text-lg font-black text-gray-900 mb-1">Predictable & Fast</h3>
+							<p class="text-gray-700 font-medium">
+								Standardized JSON responses with &lt;200ms average latency.
 							</p>
 						</div>
 					</div>
@@ -139,8 +152,8 @@
 							</svg>
 						</div>
 						<div>
-							<h3 class="text-lg font-bold text-gray-900 mb-1">Async Webhooks</h3>
-							<p class="text-gray-600 font-medium">
+							<h3 class="text-lg font-black text-gray-900 mb-1">Async Webhooks</h3>
+							<p class="text-gray-700 font-medium">
 								Fire-and-forget batch generation with reliable webhook delivery.
 							</p>
 						</div>
@@ -160,8 +173,8 @@
 							</svg>
 						</div>
 						<div>
-							<h3 class="text-lg font-bold text-gray-900 mb-1">Typed SDKs</h3>
-							<p class="text-gray-600 font-medium">
+							<h3 class="text-lg font-black text-gray-900 mb-1">Typed SDKs</h3>
+							<p class="text-gray-700 font-medium">
 								First-class TypeScript support. Python and Go coming soon.
 							</p>
 						</div>
@@ -171,7 +184,7 @@
 				<a
 					href="https://docs.pictify.io"
 					target="_blank"
-					class="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white text-lg font-bold rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1 transition-all"
+					class="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white text-lg font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1 transition-all"
 				>
 					<span>View API Docs</span>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

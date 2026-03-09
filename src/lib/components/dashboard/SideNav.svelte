@@ -161,6 +161,21 @@
 			<!-- ═══ ANALYTICS Section ═══ -->
 			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Analytics</p>
 
+			<!-- Image Analytics -->
+			<a
+				href="/dashboard/analytics"
+				aria-current={isActive(currentPath, '/dashboard/analytics') ? 'page' : undefined}
+				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+					{isActive(currentPath, '/dashboard/analytics')
+						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+			>
+				<svg class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/analytics') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+				</svg>
+				<span>Image Analytics</span>
+			</a>
+
 			<!-- Activity Logs -->
 			<a
 				href="/dashboard/activity-logs"
@@ -171,7 +186,7 @@
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/activity-logs') ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
 				</svg>
 				<span>Activity Logs</span>
 			</a>

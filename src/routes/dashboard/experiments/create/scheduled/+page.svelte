@@ -399,6 +399,8 @@
 			};
 
 			if (isEditMode && editExperimentUid) {
+				// Strip immutable fields for updates
+				delete payload.type;
 				const updated = await updateExperimentAction(editExperimentUid, payload);
 				if (updated?.uid) {
 					if (startAfterCreate) {
