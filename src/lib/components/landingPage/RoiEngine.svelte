@@ -145,7 +145,7 @@
 							<div class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse"></div>
 							<span class="text-xs font-bold text-gray-900">Pictify API</span>
 						</div>
-						<span class="text-xs font-bold text-gray-900">$49/mo</span>
+						<span class="text-xs font-bold text-gray-900">$39/mo</span>
 					</div>
 				</div>
 			</div>

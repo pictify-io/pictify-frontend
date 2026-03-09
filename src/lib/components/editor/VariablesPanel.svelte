@@ -793,7 +793,14 @@
 				'loopIndexName',
 				'loopDirection',
 				'loopSpacing',
-				'loopColumns'
+				'loopColumns',
+				'isPatternFill',
+				'patternSourceJSON',
+				'patternBoundsWidth',
+				'patternBoundsHeight',
+				'patternSpacingX',
+				'patternSpacingY',
+				'patternStagger'
 			]);
 
 			const width = $editor.width || 1200;
@@ -1006,7 +1013,14 @@
 					'loopVariable',
 					'loopItemName',
 					'loopDirection',
-					'loopSpacing'
+					'loopSpacing',
+					'isPatternFill',
+					'patternSourceJSON',
+					'patternBoundsWidth',
+					'patternBoundsHeight',
+					'patternSpacingX',
+					'patternSpacingY',
+					'patternStagger'
 				]);
 				const draft = {
 					version: 1,

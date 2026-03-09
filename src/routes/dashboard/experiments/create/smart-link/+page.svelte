@@ -14,6 +14,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { getTemplatesAction, templates } from '../../../../../store/template.store';
 	import { getTemplateById } from '../../../../../api/template';
+	import { getContextVariables } from '../../../../../api/experiments';
 	import { StaticCanvas } from 'fabric';
 	import WizardStepper from '$lib/components/dashboard/WizardStepper.svelte';
 	import RuleBuilder from '$lib/components/experiments/RuleBuilder.svelte';
@@ -70,6 +71,64 @@
 
 	// Variable editor state per variant
 	let variantVarEditors = form.variants.map(() => []);
+
+	// Context variables for smart link dynamic text
+	let contextVariables = [];
+	let showContextVars = {};
+	let lastFocusedInput = {};  // { variantIndex, rowIndex }
+
+	// Context variable categories for grouped display
+	$: ctxVarsByCategory = {
+		location: contextVariables.filter(v => v.category === 'location'),
+		device: contextVariables.filter(v => v.category === 'device'),
+		time: contextVariables.filter(v => v.category === 'time'),
+		other: contextVariables.filter(v => v.category === 'other'),
+	};
+
+	const ctxCategoryLabels = { location: 'Location', device: 'Device', time: 'Time', other: 'Other' };
+	const ctxCategoryIcons = { location: '📍', device: '📱', time: '🕐', other: '🔗' };
+
+	// Track input element refs for cursor position insertion
+	let varInputRefs = {};
+
+	function getInputRefKey(variantIndex, rowIndex) {
+		return `${variantIndex}-${rowIndex}`;
+	}
+
+	function insertContextVar(variantIndex, rowIndex, ctxKey) {
+		const rows = variantVarEditors[variantIndex];
+		if (!rows || !rows[rowIndex]) return;
+		const tag = `{{${ctxKey}}}`;
+		const currentValue = rows[rowIndex].value || '';
+		const refKey = getInputRefKey(variantIndex, rowIndex);
+		const inputEl = varInputRefs[refKey];
+
+		if (inputEl && typeof inputEl.selectionStart === 'number') {
+			const start = inputEl.selectionStart;
+			const end = inputEl.selectionEnd;
+			rows[rowIndex].value = currentValue.substring(0, start) + tag + currentValue.substring(end);
+			variantVarEditors = variantVarEditors;
+			syncVarsFromEditor(variantIndex);
+			// Restore cursor position after the inserted tag
+			const newPos = start + tag.length;
+			// Use tick to let Svelte update the DOM first
+			setTimeout(() => {
+				inputEl.focus();
+				inputEl.setSelectionRange(newPos, newPos);
+			}, 0);
+		} else {
+			// Fallback: append at end
+			rows[rowIndex].value = currentValue + tag;
+			variantVarEditors = variantVarEditors;
+			syncVarsFromEditor(variantIndex);
+		}
+	}
+
+	function toggleContextVars(variantIndex, rowIndex) {
+		const key = `${variantIndex}-${rowIndex}`;
+		showContextVars[key] = !showContextVars[key];
+		showContextVars = showContextVars;
+	}
 
 	// Template variable definitions cache
 	let templateVarCache = {};
@@ -145,6 +204,7 @@
 			templateList = value || [];
 		});
 		await getTemplatesAction({ limit: 100 });
+		getContextVariables().then(vars => { contextVariables = vars || []; });
 
 		const editUid = $page.url.searchParams.get('edit');
 		if (editUid) {
@@ -556,6 +616,8 @@
 			};
 
 			if (isEditMode && editExperimentUid) {
+				// Strip immutable fields for updates
+				delete payload.type;
 				const updated = await updateExperimentAction(editExperimentUid, payload);
 				if (updated?.uid) {
 					if (startAfterCreate) {
@@ -907,17 +969,58 @@
 									{#if (variantVarEditors[fallbackIndex] || []).length > 0}
 										<div class="space-y-3">
 											{#each variantVarEditors[fallbackIndex] as row, rowIndex}
-												<div class="flex flex-col sm:flex-row sm:items-center gap-2">
-													<label class="sm:w-1/3 px-3 py-2 bg-gray-200 border-[2px] border-gray-300 rounded-lg text-xs font-black text-gray-700 truncate" title={row.key}>
-														{humanizeVarName(row.key)}
-													</label>
-													<input
-														type="text"
-														bind:value={row.value}
-														on:input={() => syncVarsFromEditor(fallbackIndex)}
-														placeholder="Override value"
-														class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
-													/>
+												<div class="space-y-1.5">
+													<div class="flex flex-col sm:flex-row sm:items-center gap-2">
+														<label class="sm:w-1/3 px-3 py-2 bg-gray-200 border-[2px] border-gray-300 rounded-lg text-xs font-black text-gray-700 truncate" title={row.key}>
+															{humanizeVarName(row.key)}
+														</label>
+														<div class="flex-1 flex gap-1.5">
+															<input
+																type="text"
+																bind:this={varInputRefs[getInputRefKey(fallbackIndex, rowIndex)]}
+																bind:value={row.value}
+																on:input={() => syncVarsFromEditor(fallbackIndex)}
+																placeholder="Override value or use dynamic tags →"
+																class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
+															/>
+															{#if contextVariables.length > 0}
+																<button
+																	type="button"
+																	on:click={() => toggleContextVars(fallbackIndex, rowIndex)}
+																	class="px-2 py-2 border-[2px] rounded-lg text-xs font-black transition-all shrink-0 {showContextVars[`${fallbackIndex}-${rowIndex}`] ? 'border-[#ffc480] bg-[#ffc480]/20 text-gray-900' : 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
+																	title="Insert dynamic context variable"
+																>
+																	<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+																</button>
+															{/if}
+														</div>
+													</div>
+													{#if showContextVars[`${fallbackIndex}-${rowIndex}`]}
+														<div class="ml-0 sm:ml-[calc(33.333%+0.5rem)] p-3 bg-gray-50 border-[2px] border-dashed border-[#ffc480] rounded-lg" transition:slide={{ duration: 150 }}>
+															<p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Insert Dynamic Tag</p>
+															<div class="space-y-2">
+																{#each Object.entries(ctxVarsByCategory) as [cat, vars]}
+																	{#if vars.length > 0}
+																		<div>
+																			<p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">{ctxCategoryIcons[cat]} {ctxCategoryLabels[cat]}</p>
+																			<div class="flex flex-wrap gap-1">
+																				{#each vars as cv}
+																					<button
+																						type="button"
+																						on:click={() => insertContextVar(fallbackIndex, rowIndex, cv.key)}
+																						class="px-2 py-1 bg-white border-[1.5px] border-gray-300 rounded-md text-[10px] font-bold text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all"
+																						title="{cv.label} — e.g. {cv.example}"
+																					>
+																						{cv.label}
+																					</button>
+																				{/each}
+																			</div>
+																		</div>
+																	{/if}
+																{/each}
+															</div>
+														</div>
+													{/if}
 												</div>
 											{/each}
 										</div>
@@ -1086,17 +1189,58 @@
 											{#if varEditors.length > 0}
 												<div class="space-y-2.5">
 													{#each variantVarEditors[index] as row, rowIndex}
-														<div class="flex flex-col sm:flex-row sm:items-center gap-2">
-															<label class="sm:w-1/3 px-3 py-2 bg-gray-200 border-[2px] border-gray-300 rounded-lg text-xs font-black text-gray-700 truncate" title={row.key}>
-																{humanizeVarName(row.key)}
-															</label>
-															<input
-																type="text"
-																bind:value={row.value}
-																on:input={() => syncVarsFromEditor(index)}
-																placeholder="Override value"
-																class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
-															/>
+														<div class="space-y-1.5">
+															<div class="flex flex-col sm:flex-row sm:items-center gap-2">
+																<label class="sm:w-1/3 px-3 py-2 bg-gray-200 border-[2px] border-gray-300 rounded-lg text-xs font-black text-gray-700 truncate" title={row.key}>
+																	{humanizeVarName(row.key)}
+																</label>
+																<div class="flex-1 flex gap-1.5">
+																	<input
+																		type="text"
+																		bind:this={varInputRefs[getInputRefKey(index, rowIndex)]}
+																		bind:value={row.value}
+																		on:input={() => syncVarsFromEditor(index)}
+																		placeholder="Override value or use dynamic tags →"
+																		class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
+																	/>
+																	{#if contextVariables.length > 0}
+																		<button
+																			type="button"
+																			on:click={() => toggleContextVars(index, rowIndex)}
+																			class="px-2 py-2 border-[2px] rounded-lg text-xs font-black transition-all shrink-0 {showContextVars[`${index}-${rowIndex}`] ? 'border-[#ffc480] bg-[#ffc480]/20 text-gray-900' : 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
+																			title="Insert dynamic context variable"
+																		>
+																			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+																		</button>
+																	{/if}
+																</div>
+															</div>
+															{#if showContextVars[`${index}-${rowIndex}`]}
+																<div class="ml-0 sm:ml-[calc(33.333%+0.5rem)] p-3 bg-gray-50 border-[2px] border-dashed border-[#ffc480] rounded-lg" transition:slide={{ duration: 150 }}>
+																	<p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Insert Dynamic Tag</p>
+																	<div class="space-y-2">
+																		{#each Object.entries(ctxVarsByCategory) as [cat, vars]}
+																			{#if vars.length > 0}
+																				<div>
+																					<p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">{ctxCategoryIcons[cat]} {ctxCategoryLabels[cat]}</p>
+																					<div class="flex flex-wrap gap-1">
+																						{#each vars as cv}
+																							<button
+																								type="button"
+																								on:click={() => insertContextVar(index, rowIndex, cv.key)}
+																								class="px-2 py-1 bg-white border-[1.5px] border-gray-300 rounded-md text-[10px] font-bold text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all"
+																								title="{cv.label} — e.g. {cv.example}"
+																							>
+																								{cv.label}
+																							</button>
+																						{/each}
+																					</div>
+																				</div>
+																			{/if}
+																		{/each}
+																	</div>
+																</div>
+															{/if}
 														</div>
 													{/each}
 												</div>

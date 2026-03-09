@@ -28,6 +28,13 @@
  * - Webhooks: Zapier, Make, n8n, Pipedream, custom
  * - Brand Assets: Logos, colors, fonts management
  *
+ * EXPERIMENTS & OPTIMIZATION:
+ * - A/B Testing (variant assignment, traffic splitting, analytics)
+ * - Smart Links (context-aware targeting: device, geo, time, language, referrer)
+ * - Scheduled Experiments (time-window variants, recurrence)
+ * - Auto-Optimization (Thompson Sampling - planned)
+ * - Experiment Analytics (click tracking, dimensional analytics)
+ *
  * API & DEVELOPER:
  * - REST API with SDKs
  * - CDN hosting included
@@ -51,7 +58,8 @@ export const comparisons = [
 			'Built-in background removal',
 			'Multi-page PDF support',
 			'QR code generation with custom styling',
-			'Batch processing up to 500 images'
+			'Batch processing up to 500 images',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Broader media management features',
@@ -65,7 +73,7 @@ export const comparisons = [
 			competitor: 'Enterprises requiring full DAM, video processing, and media management'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo (1,000 images)', pro: '$49/mo (5,000 images)' },
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
 			competitor: { free: '25 credits/mo', plus: '$99/mo', advanced: '$249/mo' }
 		},
 		features: {
@@ -76,7 +84,11 @@ export const comparisons = [
 			mediaManagement: { pictify: 2, competitor: 5 },
 			videoProcessing: { pictify: 2, competitor: 5 },
 			cdnDelivery: { pictify: 5, competitor: 5 },
-			backgroundRemoval: { pictify: 5, competitor: 4 }
+			backgroundRemoval: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 2 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -104,7 +116,8 @@ export const comparisons = [
 			'Multi-page PDF and GIF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
 			'Batch processing up to 500 images',
-			'QR code generation with custom styling'
+			'QR code generation with custom styling',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Straightforward single-purpose API',
@@ -117,8 +130,8 @@ export const comparisons = [
 			competitor: 'Developers who only need basic HTML to image API'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo (1,000 images)', pro: '$49/mo (5,000 images)' },
-			competitor: { free: '50 images/mo', starter: '$29/mo', pro: '$99/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '50 images/mo', starter: '$14/mo', pro: '$69/mo', growth: '$149/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 5 },
@@ -127,7 +140,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
 			batchProcessing: { pictify: 5, competitor: 3 },
-			cdnDelivery: { pictify: 5, competitor: 4 }
+			cdnDelivery: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -137,7 +154,8 @@ export const comparisons = [
 		faqs: [
 			{ q: 'Does Pictify have AI template generation?', a: 'Yes! AI Copilot generates complete templates from text prompts.' },
 			{ q: 'Can I use my existing HTML templates?', a: 'Yes, both accept raw HTML. Pictify also offers visual editing and AI generation.' },
-			{ q: 'Does Pictify support real-time data?', a: 'Yes—Dynamic Links connect to any API and auto-refresh images when data changes.' }
+			{ q: 'Does Pictify support real-time data?', a: 'Yes—Dynamic Links connect to any API and auto-refresh images when data changes.' },
+			{ q: 'Does Pictify support A/B testing for images?', a: 'Yes! Pictify has built-in A/B testing, smart links with context-aware targeting (device, geo, time), and scheduled experiments—all with analytics.' }
 		]
 	},
 	{
@@ -155,7 +173,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Powerful URL-based image transformations',
@@ -169,8 +188,8 @@ export const comparisons = [
 			competitor: 'Transforming and optimizing existing images via CDN'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'None', starter: '$100/mo', growth: '$500/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '1,000 origin images', starter: '$75/mo', growth: '$300/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 1 },
@@ -179,7 +198,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			imageTransformations: { pictify: 2, competitor: 5 },
 			cdnDelivery: { pictify: 5, competitor: 5 },
-			backgroundRemoval: { pictify: 5, competitor: 2 }
+			backgroundRemoval: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -207,7 +230,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Built-in social scheduling',
@@ -220,8 +244,8 @@ export const comparisons = [
 			competitor: 'Social media teams needing built-in scheduling'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '50 images/mo', starter: '$29/mo', pro: '$79/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Trial only', starter: '$19/mo', pro: '$39/mo', business: '$89/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -231,7 +255,11 @@ export const comparisons = [
 			backgroundRemoval: { pictify: 5, competitor: 3 },
 			socialIntegration: { pictify: 3, competitor: 5 },
 			batchProcessing: { pictify: 5, competitor: 4 },
-			pricing: { pictify: 5, competitor: 4 }
+			pricing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -260,7 +288,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'Instant setup, no DevOps required'
+			'Instant setup, no DevOps required',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Free and open source',
@@ -274,7 +303,7 @@ export const comparisons = [
 			competitor: 'Teams with DevOps capacity who need maximum control and customization'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
 			competitor: { free: 'Open source', server: '$50-500/mo for hosting', devops: 'Engineering time' }
 		},
 		features: {
@@ -284,7 +313,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			maintenance: { pictify: 5, competitor: 2 },
 			customization: { pictify: 3, competitor: 5 },
-			backgroundRemoval: { pictify: 5, competitor: 2 }
+			backgroundRemoval: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -312,7 +345,8 @@ export const comparisons = [
 			'Multi-page PDF generation',
 			'Background removal built-in',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Video generation support',
@@ -325,8 +359,8 @@ export const comparisons = [
 			competitor: 'Teams needing video generation with native Airtable/Zapier'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '30 images/mo', starter: '$49/mo', pro: '$149/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Trial (30 credits)', starter: '$49/mo', pro: '$149/mo', enterprise: '$299/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -336,7 +370,11 @@ export const comparisons = [
 			videoGeneration: { pictify: 2, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			multiPagePdf: { pictify: 5, competitor: 4 },
-			pricing: { pictify: 5, competitor: 3 }
+			pricing: { pictify: 5, competitor: 3 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 1 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -347,7 +385,7 @@ export const comparisons = [
 			{ q: 'Does Pictify have a visual editor like Bannerbear?', a: 'Yes! Pictify has a Canva-like drag-and-drop editor plus AI template generation from prompts.' },
 			{ q: 'Does Pictify support video generation?', a: 'Pictify focuses on images, GIFs, and PDFs. For video, Bannerbear has an advantage.' },
 			{ q: 'Can Pictify connect to live data?', a: 'Yes—Dynamic Links auto-refresh images from any API, webhook, or data source.' },
-			{ q: 'Which has better pricing?', a: 'Pictify is significantly more affordable—$19/mo vs $49/mo starter.' }
+			{ q: 'Which has better pricing?', a: 'Pictify offers a generous free tier and pro plans starting at $39/mo (billed annually).' }
 		]
 	},
 	{
@@ -365,7 +403,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Batch processing up to 500 images',
-			'Cloud storage integration (S3, GCS, Cloudinary)'
+			'Cloud storage integration (S3, GCS, Cloudinary)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'URL screenshot capture',
@@ -379,8 +418,8 @@ export const comparisons = [
 			competitor: 'Capturing screenshots of existing websites'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '100 screenshots/mo', starter: '$29/mo', pro: '$99/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '100 screenshots/mo', starter: '$7/mo', pro: '$35/mo', enterprise: '$180/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 2 },
@@ -389,7 +428,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			geoLocations: { pictify: 1, competitor: 5 }
+			geoLocations: { pictify: 1, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -417,7 +460,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Batch processing up to 500 images',
-			'Cloud storage integration (S3, GCS, Cloudinary)'
+			'Cloud storage integration (S3, GCS, Cloudinary)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'URL screenshot capture',
@@ -431,8 +475,8 @@ export const comparisons = [
 			competitor: 'Capturing screenshots of websites for monitoring, archiving, or previews'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '100 screenshots/mo', starter: '$19/mo', pro: '$79/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Trial (100)', starter: '$9/mo', pro: '$29/mo', business: '$175/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -441,7 +485,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			batchProcessing: { pictify: 5, competitor: 4 }
+			batchProcessing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -469,7 +517,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Simpler pricing model',
-			'Built-in CDN and caching'
+			'Built-in CDN and caching',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Full browser automation capabilities',
@@ -484,8 +533,8 @@ export const comparisons = [
 			competitor: 'Teams needing full browser automation with custom scripts'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '6 hours/mo', starter: '$40/mo', pro: '$200/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '1,000 units/mo', starter: '$25/mo', pro: '$140/mo', scale: '$350/mo' }
 		},
 		features: {
 			imageGeneration: { pictify: 5, competitor: 4 },
@@ -494,7 +543,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			browserAutomation: { pictify: 2, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			customScripts: { pictify: 2, competitor: 5 }
+			customScripts: { pictify: 2, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -522,7 +575,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Superior URL screenshot quality',
@@ -537,8 +591,8 @@ export const comparisons = [
 			competitor: 'High-quality screenshots of live websites'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'None', starter: '$39/mo', pro: '$99/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'None', starter: '$19/mo', pro: '$49/mo', business: '$99/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -547,7 +601,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			s3Integration: { pictify: 5, competitor: 5 }
+			s3Integration: { pictify: 5, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -575,7 +633,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'More intuitive for non-developers'
+			'More intuitive for non-developers',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Metadata extraction (link previews)',
@@ -590,8 +649,8 @@ export const comparisons = [
 			competitor: 'Developers needing browser automation, metadata extraction, and screenshots'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '50 requests/day', pro: '$24/mo', business: '$90/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '50 requests/day', pro: '$39/mo', enterprise: '$500+/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 4 },
@@ -600,7 +659,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			metadataExtraction: { pictify: 1, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			urlScreenshot: { pictify: 2, competitor: 5 }
+			urlScreenshot: { pictify: 2, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -628,7 +691,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Simpler layer-based editor',
@@ -642,8 +706,8 @@ export const comparisons = [
 			competitor: 'Non-technical users preferring simple layer-based editing'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '50 images/mo', starter: '$25/mo', pro: '$75/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '50 images/mo', starter: '$9/mo', pro: '$39/mo', scale: '$175/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -652,7 +716,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			designFlexibility: { pictify: 5, competitor: 3 },
-			pricing: { pictify: 5, competitor: 4 }
+			pricing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -680,7 +748,8 @@ export const comparisons = [
 			'Works with any framework, not just Next.js',
 			'Background removal built-in',
 			'Multi-page PDF and GIF support',
-			'Better typography and font support'
+			'Better typography and font support',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Edge runtime (very fast first byte)',
@@ -694,7 +763,7 @@ export const comparisons = [
 			competitor: 'Next.js apps wanting free, simple edge-based OG images'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
 			competitor: { free: 'Free with Vercel', pro: 'Included in Vercel plans', enterprise: 'Custom' }
 		},
 		features: {
@@ -705,7 +774,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			edgeRuntime: { pictify: 3, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			pricing: { pictify: 4, competitor: 5 }
+			pricing: { pictify: 4, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -725,7 +798,7 @@ export const comparisons = [
 		competitor: 'Flyyer',
 		competitorDescription: 'Dynamic image generation platform for social cards',
 		metaDescription: 'Compare Pictify and Flyyer for automated OG image generation. Features, pricing, and template approaches.',
-		tldr: 'Flyyer focuses on OG images with A/B testing. Pictify adds AI template generation, Dynamic Links for real-time data, and works for any image type—not just social.',
+		tldr: 'Flyyer focuses on OG images with A/B testing. Pictify matches with full A/B testing plus smart links, scheduled experiments, AI templates, Dynamic Links, and works for any image type—not just social.',
 		advantages: [
 			'Visual canvas editor (Canva-like drag-and-drop)',
 			'AI Copilot generates templates from prompts',
@@ -734,7 +807,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'Works for any image type (not just OG images)',
 			'QR code generation with custom styling',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Built-in A/B testing for OG images',
@@ -748,17 +822,20 @@ export const comparisons = [
 			competitor: 'Marketing teams focused specifically on OG image A/B testing'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '1,000 renders/mo', starter: '$39/mo', pro: '$99/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Unknown (possibly defunct)', pro: 'N/A' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 4 },
 			templateEditor: { pictify: 5, competitor: 3 },
 			aiTemplates: { pictify: 5, competitor: 2 },
 			dynamicLinks: { pictify: 5, competitor: 2 },
-			abTesting: { pictify: 1, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			pricing: { pictify: 5, competitor: 3 }
+			pricing: { pictify: 5, competitor: 3 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 3 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -786,7 +863,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'Built-in CDN hosting'
+			'Built-in CDN hosting',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Very fast screenshot capture',
@@ -801,8 +879,8 @@ export const comparisons = [
 			competitor: 'Fast, reliable screenshots of live websites'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '100 screenshots/mo', starter: '$9/mo', pro: '$49/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '100 screenshots/mo', starter: '$17/mo', pro: '$79/mo', scale: '$259/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -811,7 +889,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			reliability: { pictify: 5, competitor: 5 }
+			reliability: { pictify: 5, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -839,7 +921,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Much more affordable pricing',
-			'Purpose-built for image generation'
+			'Purpose-built for image generation',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Complete file upload solution',
@@ -854,8 +937,8 @@ export const comparisons = [
 			competitor: 'Apps needing full file handling, upload widgets, and transformations'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Limited', starter: '$59/mo', pro: '$249/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Limited', starter: '$69/mo', pro: '$199/mo', scale: '$379/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 2 },
@@ -864,7 +947,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			fileUpload: { pictify: 1, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 3 },
-			pricing: { pictify: 5, competitor: 2 }
+			pricing: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -874,7 +961,7 @@ export const comparisons = [
 		faqs: [
 			{ q: 'Does Pictify have AI template generation?', a: 'Yes! AI Copilot generates complete templates from text prompts.' },
 			{ q: 'Can Pictify connect to live data?', a: 'Yes—Dynamic Links auto-refresh images from any API or data source.' },
-			{ q: 'Which is more cost-effective for image generation?', a: 'Pictify is much cheaper—$19/mo vs $59/mo starter.' }
+			{ q: 'Which is more cost-effective for image generation?', a: 'Pictify offers a generous free tier and pro plans starting at $39/mo (billed annually).' }
 		]
 	},
 	{
@@ -892,7 +979,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'Cloud storage integration (S3, GCS, Cloudinary)'
+			'Cloud storage integration (S3, GCS, Cloudinary)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'File upload widget and API',
@@ -907,8 +995,8 @@ export const comparisons = [
 			competitor: 'File uploads with automatic optimization and transformations'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '3,000 uploads/mo', starter: '$25/mo', pro: '$75/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '1,000 ops/mo', pro: '$79/mo', business: '$199/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 1 },
@@ -917,7 +1005,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			fileUpload: { pictify: 1, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 3 },
-			cdnDelivery: { pictify: 5, competitor: 5 }
+			cdnDelivery: { pictify: 5, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -945,7 +1037,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'Template management dashboard'
+			'Template management dashboard',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Massive global edge network',
@@ -960,8 +1053,8 @@ export const comparisons = [
 			competitor: 'Storing and serving optimized images globally'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'None', starter: '$5/100k images', pro: 'Volume discounts' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'None', starter: '$5/100k stored', delivery: '$1/100k delivered' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 1 },
@@ -970,7 +1063,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			imageStorage: { pictify: 3, competitor: 5 },
 			edgeDelivery: { pictify: 4, competitor: 5 },
-			backgroundRemoval: { pictify: 5, competitor: 1 }
+			backgroundRemoval: { pictify: 5, competitor: 1 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -998,7 +1095,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'Instant setup, no DevOps required'
+			'Instant setup, no DevOps required',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Free and open source',
@@ -1013,7 +1111,7 @@ export const comparisons = [
 			competitor: 'Teams with DevOps capacity needing cross-browser automation'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
 			competitor: { free: 'Open source', server: '$50-500/mo hosting', devops: 'Engineering time' }
 		},
 		features: {
@@ -1023,7 +1121,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			crossBrowser: { pictify: 2, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			testing: { pictify: 1, competitor: 5 }
+			testing: { pictify: 1, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1051,7 +1153,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'Built-in CDN'
+			'Built-in CDN',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Simple URL-based API',
@@ -1066,8 +1169,8 @@ export const comparisons = [
 			competitor: 'Quick, affordable screenshots of websites'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '100 screenshots/mo', starter: '$8/mo', pro: '$38/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '100 screenshots/mo', starter: '~$10/mo', pro: '~$64/mo', enterprise: '~$107/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 2 },
@@ -1076,7 +1179,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			apiSimplicity: { pictify: 4, competitor: 5 }
+			apiSimplicity: { pictify: 4, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -1104,7 +1211,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Automated screenshot scheduling',
@@ -1119,17 +1227,20 @@ export const comparisons = [
 			competitor: 'Scheduled website archiving and visual monitoring'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Trial', starter: '$29/mo', pro: '$79/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '14-day trial', starter: '$29/mo', pro: '$79/mo', business: '$199/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 1 },
 			templateEditor: { pictify: 5, competitor: 1 },
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
-			scheduling: { pictify: 2, competitor: 5 },
+			scheduling: { pictify: 5, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			changeDetection: { pictify: 1, competitor: 5 }
+			changeDetection: { pictify: 1, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -1157,7 +1268,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multiple formats: PNG, JPG, WebP, GIF, PDF',
-			'Built-in CDN for delivery'
+			'Built-in CDN for delivery',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Full PDF document support',
@@ -1172,8 +1284,8 @@ export const comparisons = [
 			competitor: 'Complex PDF documents with precise print control'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Varies', starter: '$15-30/mo', pro: '$50-150/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '50 conversions/mo', starter: '$9/mo', pro: '$24/mo', growth: '$39/mo' }
 		},
 		features: {
 			imageGeneration: { pictify: 5, competitor: 3 },
@@ -1182,7 +1294,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			printReady: { pictify: 3, competitor: 5 },
-			backgroundRemoval: { pictify: 5, competitor: 1 }
+			backgroundRemoval: { pictify: 5, competitor: 1 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -1210,7 +1326,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'Faster rendering (under 500ms)'
+			'Faster rendering (under 500ms)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Screenshot and PDF support',
@@ -1225,8 +1342,8 @@ export const comparisons = [
 			competitor: 'Developers needing quick HTML/URL to image/PDF conversion'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '100 images/mo', starter: '$19/mo', pro: '$79/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Limited (watermarked)', pro: '$12/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 5 },
@@ -1235,7 +1352,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
 			urlScreenshot: { pictify: 3, competitor: 5 },
-			cdnDelivery: { pictify: 5, competitor: 4 }
+			cdnDelivery: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1263,7 +1384,8 @@ export const comparisons = [
 			'Brand assets management (logos, colors, fonts)',
 			'Background removal built-in',
 			'More affordable pricing',
-			'Faster rendering (under 500ms)'
+			'Faster rendering (under 500ms)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Built-in multi-format resizing',
@@ -1276,8 +1398,8 @@ export const comparisons = [
 			competitor: 'Marketing teams needing quick multi-format resizing with HubSpot integration'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '50 images/mo', starter: '$49/mo', pro: '$149/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Trial (30 credits)', starter: '$25/mo', business: '$75/mo', prime: '$125/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -1287,7 +1409,11 @@ export const comparisons = [
 			brandAssets: { pictify: 5, competitor: 4 },
 			marketingAutomation: { pictify: 3, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			pricing: { pictify: 5, competitor: 3 }
+			pricing: { pictify: 5, competitor: 3 },
+			abTesting: { pictify: 5, competitor: 2 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1298,7 +1424,7 @@ export const comparisons = [
 			{ q: 'Does Pictify have a visual editor like Abyssale?', a: 'Yes! Pictify has a Canva-like drag-and-drop canvas editor plus AI template generation.' },
 			{ q: 'Can Pictify connect to data sources?', a: 'Yes—Dynamic Links connect to any HTTP API, webhook, or static data with auto-refresh.' },
 			{ q: 'Does Pictify support brand assets?', a: 'Yes—manage logos, brand colors, and custom fonts in your account.' },
-			{ q: 'Which has better pricing?', a: 'Pictify is significantly more affordable—$19/mo vs $49/mo for starter plans.' }
+			{ q: 'Which has better pricing?', a: 'Pictify offers a generous free tier and pro plans starting at $39/mo (billed annually).' }
 		]
 	},
 	{
@@ -1316,7 +1442,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'More affordable pricing',
-			'Faster rendering (under 500ms)'
+			'Faster rendering (under 500ms)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Built-in stock photos and icons',
@@ -1330,8 +1457,8 @@ export const comparisons = [
 			competitor: 'Non-technical users wanting stock assets and Google Sheets integration'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '50 images/mo', starter: '$29/mo', pro: '$99/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Trial (25 credits)', starter: '$39/mo', pro: '$99/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -1340,7 +1467,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			stockAssets: { pictify: 2, competitor: 5 },
-			pricing: { pictify: 5, competitor: 4 }
+			pricing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1368,7 +1499,8 @@ export const comparisons = [
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Very simple API',
@@ -1382,8 +1514,8 @@ export const comparisons = [
 			competitor: 'Developers who only need basic HTML to image API'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '50 images/mo', starter: '$29/mo', pro: '$99/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '50 images/mo', starter: '$14/mo', pro: '$69/mo', growth: '$149/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 5 },
@@ -1392,7 +1524,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
 			cdnDelivery: { pictify: 5, competitor: 4 },
-			pricing: { pictify: 5, competitor: 4 }
+			pricing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1420,7 +1556,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'Works for any image type (not just OG)',
 			'QR code generation with custom styling',
-			'Multi-page PDF support'
+			'Multi-page PDF support',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Purpose-built for OG images',
@@ -1434,8 +1571,8 @@ export const comparisons = [
 			competitor: 'Projects needing quick, simple OG image generation only'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Limited', starter: '$12/mo', pro: '$39/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Unknown', pro: 'N/A (limited info available)' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 4 },
@@ -1444,7 +1581,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
 			ogImageFocus: { pictify: 4, competitor: 5 },
-			useCaseVariety: { pictify: 5, competitor: 2 }
+			useCaseVariety: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1472,7 +1613,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'Works for any image type (not just social)',
 			'QR code generation with custom styling',
-			'Multi-page PDF support'
+			'Multi-page PDF support',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Pre-built social templates',
@@ -1486,8 +1628,8 @@ export const comparisons = [
 			competitor: 'Social media managers wanting quick preset-based generation'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Limited', starter: '$19/mo', pro: '$49/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'N/A (service suspended)', pro: 'N/A' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -1496,7 +1638,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			socialOptimization: { pictify: 3, competitor: 5 },
-			designFlexibility: { pictify: 5, competitor: 3 }
+			designFlexibility: { pictify: 5, competitor: 3 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1524,7 +1670,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'Full layout control (not just overlays)',
 			'QR code generation with custom styling',
-			'Much more affordable pricing'
+			'Much more affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Excellent CDN performance',
@@ -1539,8 +1686,8 @@ export const comparisons = [
 			competitor: 'Transforming and optimizing existing images with overlays'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'None', starter: '$100/mo', growth: '$500/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '1,000 origin images', starter: '$75/mo', growth: '$300/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 2 },
@@ -1549,7 +1696,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			imageTransformations: { pictify: 2, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			pricing: { pictify: 5, competitor: 2 }
+			pricing: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -1577,7 +1728,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'Cloud storage integration (S3, GCS, Cloudinary)'
+			'Cloud storage integration (S3, GCS, Cloudinary)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Figma integration',
@@ -1591,8 +1743,8 @@ export const comparisons = [
 			competitor: 'Design teams wanting HTML to Figma conversion'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Limited', starter: '$15/mo', pro: '$45/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Limited imports', pro: 'Via Figma billing' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 4 },
@@ -1601,7 +1753,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			figmaIntegration: { pictify: 1, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			productionScale: { pictify: 5, competitor: 2 }
+			productionScale: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1629,7 +1785,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'More affordable pricing'
+			'More affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Layer-based template system',
@@ -1643,8 +1800,8 @@ export const comparisons = [
 			competitor: 'Users preferring layer-based editing with Zapier automation'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Trial', starter: '$25/mo', pro: '$65/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '20 renders/mo', starter: '$29/mo', enterprise: 'Custom' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -1653,7 +1810,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			zapierIntegration: { pictify: 3, competitor: 5 },
-			pricing: { pictify: 5, competitor: 4 }
+			pricing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1681,7 +1842,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
-			'Much more affordable pricing'
+			'Much more affordable pricing',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Excellent global CDN',
@@ -1696,8 +1858,8 @@ export const comparisons = [
 			competitor: 'Storing, optimizing, and transforming existing images'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '20GB bandwidth', starter: '$49/mo', pro: '$249/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '20GB bandwidth', pro: '$89/mo', enterprise: 'Custom' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 1 },
@@ -1706,7 +1868,11 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			imageCdn: { pictify: 4, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			imageOptimization: { pictify: 3, competitor: 5 }
+			imageOptimization: { pictify: 3, competitor: 5 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'N/A',
@@ -1734,7 +1900,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'Works for any image type (not just charts)',
 			'QR code generation with custom styling',
-			'Multi-page PDF support'
+			'Multi-page PDF support',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Purpose-built for charts',
@@ -1748,8 +1915,8 @@ export const comparisons = [
 			competitor: 'Simple chart image needs without HTML knowledge'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '500 charts/mo', starter: '$15/mo', pro: '$49/mo' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: 'Rate-limited API', pro: 'Not publicly listed' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 1 },
@@ -1758,7 +1925,11 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 1 },
 			backgroundRemoval: { pictify: 5, competitor: 1 },
-			useCaseVariety: { pictify: 5, competitor: 2 }
+			useCaseVariety: { pictify: 5, competitor: 2 },
+			abTesting: { pictify: 5, competitor: 0 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 0 }
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -1786,7 +1957,8 @@ export const comparisons = [
 			'Background removal built-in',
 			'Multi-page PDF generation',
 			'Cloud storage integration (S3, GCS, Cloudinary, ImageKit)',
-			'Faster rendering (under 500ms)'
+			'Faster rendering (under 500ms)',
+			'Built-in A/B testing, smart links, and scheduled experiments',
 		],
 		competitorAdvantages: [
 			'Import directly from Canva and Figma',
@@ -1800,8 +1972,8 @@ export const comparisons = [
 			competitor: 'Teams with existing Canva/Figma designs wanting quick automation'
 		},
 		pricing: {
-			pictify: { free: '100 images/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: '60 renders', starter: 'Pay per render', pro: 'Volume discounts' }
+			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
+			competitor: { free: '60 renders/mo', starter: '$30/mo', pro: '$75/mo', scale: '$160/mo' }
 		},
 		features: {
 			htmlToImage: { pictify: 5, competitor: 3 },
@@ -1813,7 +1985,11 @@ export const comparisons = [
 			noCodeIntegrations: { pictify: 4, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			videoGeneration: { pictify: 2, competitor: 4 },
-			pricing: { pictify: 5, competitor: 4 }
+			pricing: { pictify: 5, competitor: 4 },
+			abTesting: { pictify: 5, competitor: 1 },
+			smartLinks: { pictify: 5, competitor: 0 },
+			scheduledExperiments: { pictify: 5, competitor: 0 },
+			experimentAnalytics: { pictify: 5, competitor: 1 }
 		},
 		migration: {
 			difficulty: 'Easy',

@@ -22,7 +22,8 @@
 		updateOveragePreferences,
 		initOverageState,
 	} from '../../../store/plg.store';
-	import { SubscriptionCard, InvoiceHistory, ConfirmModal } from '$lib/components/billing';
+	import { SubscriptionCard, InvoiceHistory, OverageInvoices, ConfirmModal } from '$lib/components/billing';
+	import { getOverageInvoices } from '../../../api/billing';
 	import {
 		billingState,
 		billingActions,
@@ -39,6 +40,8 @@
 	let error = null;
 	let showAllPlans = false;
 	let showAnnual = false;
+	let overageInvoices = [];
+	let overageInvoicesLoading = false;
 
 	// Modal states
 	let showPauseModal = false;
@@ -57,6 +60,16 @@
 
 		// Initialize overage state
 		await initOverageState();
+
+		// Load overage invoices
+		overageInvoicesLoading = true;
+		getOverageInvoices()
+			.then((res) => {
+				overageInvoices = res.invoices || [];
+			})
+			.finally(() => {
+				overageInvoicesLoading = false;
+			});
 
 		// Always refresh billing state when viewing billing page to get latest data
 		// This bypasses the 5-minute server cache to ensure plan changes are reflected
@@ -335,6 +348,14 @@
 				<InvoiceHistory
 					invoices={$billingState.invoices}
 					loading={$billingState.loading && !$billingState.invoices.length}
+				/>
+			</section>
+
+			<!-- Overage Invoices -->
+			<section>
+				<OverageInvoices
+					invoices={overageInvoices}
+					loading={overageInvoicesLoading}
 				/>
 			</section>
 		</div>

@@ -411,15 +411,15 @@
 					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Auto-swap images on a schedule</span>
 				</a>
 
-				<!-- Auto-Optimize -->
-				<a href="/dashboard/experiments/create?type=bandit" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
-					<div class="w-9 h-9 bg-[#ff6b6b]/15 rounded-lg border-[2px] border-[#ff6b6b] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-						<svg class="w-5 h-5 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+				<!-- Auto-Optimize (opt-in on A/B test) -->
+				<a href="/dashboard/experiments/create" class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center">
+					<div class="w-9 h-9 bg-[#a855f7]/15 rounded-lg border-[2px] border-[#a855f7] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
+						<svg class="w-5 h-5 text-[#a855f7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
 						</svg>
 					</div>
 					<span class="text-xs font-black text-black uppercase tracking-wider">Auto-Optimize</span>
-					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">AI picks your best variant automatically</span>
+					<span class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block">Enable on any A/B test to auto-pick winners</span>
 				</a>
 			</div>
 		</div>

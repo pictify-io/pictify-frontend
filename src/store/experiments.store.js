@@ -29,7 +29,7 @@ export const createDefaultExperiment = () => ({
 	templateUid: null,
 	variants: [],
 	goalConfig: { type: 'impressions_only', destinationUrl: '' },
-	banditConfig: { algorithm: 'thompson_sampling', warmupImpressions: 50, recomputeIntervalMinutes: 15 },
+	banditConfig: { enabled: false, algorithm: 'thompson_sampling', warmupImpressions: 50, recomputeIntervalMinutes: 15 },
 	hypothesis: '',
 	minimumSampleSize: 1000,
 	confidenceThreshold: 0.95,

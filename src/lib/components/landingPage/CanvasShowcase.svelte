@@ -104,7 +104,7 @@
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Template Builder</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				Feels Like Figma. <br />
+				Feels Like Canva. <br />
 				<span class="relative inline-block text-[#ff6b6b]">
 					Ships Like Code.
 					<svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -147,7 +147,7 @@
 						>
 							<button
 								on:click={() => goto('/canvas/try')}
-								class="group relative px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg md:text-xl rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
+								class="group relative px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
 							>
 								<div class="flex items-center gap-3">
 									<span>Try Canvas Editor</span>
@@ -294,6 +294,19 @@
 						{/if}
 					</div>
 				</div>
+			</div>
+
+			<!-- Mobile CTA (no hover on touch devices) -->
+			<div class="md:hidden mt-6 flex justify-center">
+				<button
+					on:click={() => goto('/canvas/try')}
+					class="px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0_0_#1f2937] transition-all uppercase tracking-wider flex items-center gap-3"
+				>
+					<span>Try Canvas Editor</span>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+					</svg>
+				</button>
 			</div>
 
 			<!-- Decorative Elements -->

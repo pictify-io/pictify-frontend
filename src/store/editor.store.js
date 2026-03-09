@@ -150,8 +150,8 @@ export const editorActions = {
 		}
 
 		// Check if this is a protected element (QR code, chart, or table)
-		if (group.isQRCode || group.isChart || group.isTable) {
-			console.warn('Cannot ungroup protected elements (QR codes, charts, tables)');
+		if (group.isQRCode || group.isChart || group.isTable || group.isPatternFill) {
+			console.warn('Cannot ungroup protected elements (QR codes, charts, tables, pattern fills)');
 			return false;
 		}
 

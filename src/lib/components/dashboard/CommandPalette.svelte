@@ -13,7 +13,7 @@
 		{ type: 'nav', label: 'Home', description: 'Dashboard overview & analytics', path: '/dashboard', keywords: 'home dashboard overview stats analytics' },
 		{ type: 'nav', label: 'Templates', description: 'Manage your templates', path: '/dashboard/template', keywords: 'templates list manage create' },
 		{ type: 'nav', label: 'Brand Assets', description: 'Manage brand colors, logos, fonts', path: '/dashboard/brand-assets', keywords: 'brand assets logos fonts colors' },
-		{ type: 'nav', label: 'Experiments', description: 'A/B tests, smart links, scheduled images', path: '/dashboard/experiments', keywords: 'experiments ab test smart link scheduled bandit optimize' },
+		{ type: 'nav', label: 'Experiments', description: 'A/B tests, smart links, scheduled images', path: '/dashboard/experiments', keywords: 'experiments ab test smart link scheduled auto-optimize' },
 		{ type: 'nav', label: 'Images', description: 'Generated images library', path: '/dashboard/media/images', keywords: 'images media generated renders' },
 		{ type: 'nav', label: 'GIFs', description: 'Generated GIFs library', path: '/dashboard/media/gifs', keywords: 'gifs animated media generated' },
 		{ type: 'nav', label: 'PDFs', description: 'Generated PDFs library', path: '/dashboard/media/pdfs', keywords: 'pdfs documents media generated' },

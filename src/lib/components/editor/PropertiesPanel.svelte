@@ -13,6 +13,7 @@
 	import GradientColorPicker from './GradientColorPicker.svelte';
 	import ConditionBuilder from './ConditionBuilder.svelte';
 	import { getRoundedRectPath } from '../../utils/shape-utils';
+	import { generatePatternGroup, PATTERN_FILL_PROPS } from '../../utils/pattern-fill';
 	import {
 		BACKGROUND_REMOVER_CONFIG,
 		isBackgroundRemoverAvailable,
@@ -30,7 +31,7 @@
 		CATEGORY_ICONS
 	} from '../../../api/fonts';
 	import { outputFormat, pdfPreset, pageActions } from '../../../store/pages.store';
-	import { loadBrandFonts, getBrandFontFamilies } from '../../utils/brand-fonts-loader';
+	import { loadBrandFonts, getBrandFontFamilies, isBrandFont } from '../../utils/brand-fonts-loader';
 	import {
 		checkFeatureAccessSync,
 		FEATURES,
@@ -101,7 +102,7 @@
 	};
 	let showFiltersPanel = false;
 
-	// Text effects state
+	// Effects state (shadow, stroke — for text AND shapes)
 	let textEffects = {
 		shadow: {
 			enabled: false,
@@ -152,6 +153,17 @@
 	// Loop state
 	let isLoopElement = false;
 
+	// Pattern fill state
+	let isPatternFill = false;
+	let showPatternFillSection = true;
+	let patternBoundsWidth = 400;
+	let patternBoundsHeight = 400;
+	let patternSpacingX = 0;
+	let patternSpacingY = 0;
+	let patternStagger = false;
+	let patternCapped = false;
+	let patternRegenerateTimer = null;
+
 	// Panel mode: 'design' | 'logic'
 	let panelMode = 'design';
 
@@ -177,7 +189,7 @@
 	let pendingDestructiveAction = null;
 
 	// Check if element has any logic configured
-	$: hasLogicConfigured = isVariable || conditionType !== 'none' || isLoopElement;
+	$: hasLogicConfigured = isVariable || conditionType !== 'none' || isLoopElement || isPatternFill;
 
 	// Computed: available vars for condition builder
 	$: conditionAvailableVars = variableBindings.map((b) => b.variableName).filter(Boolean);
@@ -556,12 +568,15 @@
 	async function loadFont(font) {
 		if (font === 'Arial') return;
 
-		// The link tag is likely already added by onMount, but let's ensure we wait for it
-		// We can use document.fonts.load to wait for the font to be ready
+		// For brand fonts, ensure CSS is injected first
+		if (isBrandFont(font)) {
+			await loadBrandFonts();
+		}
+
 		try {
 			await document.fonts.load(`12px "${font}"`);
 		} catch (e) {
-			console.error(`Failed to load font ${font}`, e);
+			console.warn(`Font load warning for ${font}:`, e.message);
 		}
 	}
 
@@ -702,6 +717,8 @@
 			type = 'activeSelection';
 		} else if (lowerType === 'group') {
 			type = 'group';
+		} else if (lowerType === 'textbox') {
+			type = 'textbox';
 		} else {
 			type = rawType;
 		}
@@ -723,9 +740,10 @@
 			fontSize: obj.fontSize || 20,
 			fontFamily: obj.fontFamily || 'Arial',
 			fontWeight: obj.fontWeight || 'normal',
+			textAlign: obj.textAlign || 'left',
 			charSpacing: obj.charSpacing || 0,
-			width: Math.round(obj.getScaledWidth()) || 0,
-			height: Math.round(obj.getScaledHeight()) || 0,
+			width: obj.isPatternFill ? (obj.patternBoundsWidth || Math.round(obj.getScaledWidth())) : (Math.round(obj.getScaledWidth()) || 0),
+			height: obj.isPatternFill ? (obj.patternBoundsHeight || Math.round(obj.getScaledHeight())) : (Math.round(obj.getScaledHeight()) || 0),
 			radius: type === 'rect' ? obj.rx || 0 : obj.radius || 0,
 			backgroundColor: obj.backgroundColor || ''
 		};
@@ -750,8 +768,13 @@
 			showIndividualCorners = false;
 		}
 
-		if (type === 'i-text' || type === 'text') {
+		if (type === 'i-text' || type === 'text' || type === 'textbox') {
 			content = obj.text;
+			loadTextEffects();
+		}
+
+		// Load effects (shadow/stroke) for shapes
+		if (type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path') {
 			loadTextEffects();
 		}
 
@@ -903,6 +926,15 @@
 		loopDirection = $selectedComponent.loopDirection || 'vertical';
 		loopSpacing = $selectedComponent.loopSpacing || 50;
 		loopColumns = $selectedComponent.loopColumns || 3;
+
+		// Load pattern fill state
+		isPatternFill = $selectedComponent.isPatternFill || false;
+		patternBoundsWidth = $selectedComponent.patternBoundsWidth || 400;
+		patternBoundsHeight = $selectedComponent.patternBoundsHeight || 400;
+		patternSpacingX = $selectedComponent.patternSpacingX || 0;
+		patternSpacingY = $selectedComponent.patternSpacingY || 0;
+		patternStagger = $selectedComponent.patternStagger || false;
+		patternCapped = false;
 	}
 
 	function getDefaultVariableProperty() {
@@ -940,7 +972,7 @@
 				let defaultName = '';
 				const defaultProp = getDefaultVariableProperty();
 
-				if (type === 'i-text' || type === 'text') {
+				if (type === 'i-text' || type === 'text' || type === 'textbox') {
 					const text = $selectedComponent.text || '';
 					defaultName =
 						text
@@ -1299,6 +1331,202 @@
 		loopSpacing = parseInt(gap) || 0;
 		$selectedComponent.set('loopSpacing', loopSpacing);
 		debouncedPropertyChange($selectedComponent);
+	}
+
+	// --- Pattern Fill functions ---
+
+	async function togglePatternFill(enabled) {
+		if (!$selectedComponent || !$editor) return;
+
+		if (enabled) {
+			// Serialize current element as source
+			const sourceJSON = $selectedComponent.toObject(PATTERN_FILL_PROPS.concat(['id']));
+
+			// Remember position
+			const left = $selectedComponent.left;
+			const top = $selectedComponent.top;
+
+			// Generate the pattern group
+			const config = {
+				boundsWidth: patternBoundsWidth,
+				boundsHeight: patternBoundsHeight,
+				spacingX: patternSpacingX,
+				spacingY: patternSpacingY,
+				stagger: patternStagger
+			};
+			const { group, capped } = await generatePatternGroup(sourceJSON, config);
+			patternCapped = capped;
+
+			// Position group where source was
+			group.set({ left, top });
+
+			// Copy the id from original element
+			if ($selectedComponent.id) {
+				group.set('id', $selectedComponent.id);
+			}
+
+			// Remove original from canvas, add pattern group
+			$editor.remove($selectedComponent);
+			$editor.add(group);
+			$editor.setActiveObject(group);
+			$editor.requestRenderAll();
+
+			// Update store selection
+			editorActions.selectComponent(group);
+			isPatternFill = true;
+
+			debouncedPropertyChange(group);
+		} else {
+			// Disable — restore the source element
+			const sourceJSON = $selectedComponent.patternSourceJSON;
+			if (!sourceJSON) return;
+
+			const left = $selectedComponent.left;
+			const top = $selectedComponent.top;
+
+			// Save pattern config so it can be restored when re-enabling
+			const savedConfig = {
+				patternBoundsWidth: $selectedComponent.patternBoundsWidth || 400,
+				patternBoundsHeight: $selectedComponent.patternBoundsHeight || 400,
+				patternSpacingX: $selectedComponent.patternSpacingX || 0,
+				patternSpacingY: $selectedComponent.patternSpacingY || 0,
+				patternStagger: $selectedComponent.patternStagger || false
+			};
+
+			// Enliven the source object
+			const { util } = await import('fabric');
+			const [restored] = await util.enlivenObjects([structuredClone(sourceJSON)]);
+			restored.set({ left, top, originX: 'left', originY: 'top' });
+
+			// Store saved config on source so it persists if user re-enables
+			restored.set(savedConfig);
+
+			// Copy id
+			if ($selectedComponent.id) {
+				restored.set('id', $selectedComponent.id);
+			}
+
+			// Swap on canvas
+			$editor.remove($selectedComponent);
+			$editor.add(restored);
+			$editor.setActiveObject(restored);
+			$editor.requestRenderAll();
+
+			editorActions.selectComponent(restored);
+			isPatternFill = false;
+
+			debouncedPropertyChange(restored);
+		}
+	}
+
+	function debouncedRegeneratePattern() {
+		if (patternRegenerateTimer) clearTimeout(patternRegenerateTimer);
+		patternRegenerateTimer = setTimeout(() => {
+			regeneratePattern();
+		}, 300);
+	}
+
+	async function regeneratePattern() {
+		if (!$selectedComponent || !$selectedComponent.isPatternFill || !$editor) return;
+
+		const sourceJSON = $selectedComponent.patternSourceJSON;
+		if (!sourceJSON) return;
+
+		// Remember position and id
+		const left = $selectedComponent.left;
+		const top = $selectedComponent.top;
+		const id = $selectedComponent.id;
+
+		// Build a fresh group with current config
+		const config = {
+			boundsWidth: patternBoundsWidth,
+			boundsHeight: patternBoundsHeight,
+			spacingX: patternSpacingX,
+			spacingY: patternSpacingY,
+			stagger: patternStagger
+		};
+		const { group, capped } = await generatePatternGroup(sourceJSON, config);
+		patternCapped = capped;
+
+		group.set({ left, top });
+		if (id) group.set('id', id);
+
+		// Swap on canvas
+		$editor.remove($selectedComponent);
+		$editor.add(group);
+		$editor.setActiveObject(group);
+		$editor.requestRenderAll();
+
+		editorActions.selectComponent(group);
+		debouncedPropertyChange(group);
+	}
+
+	function updatePatternBoundsWidth(value) {
+		patternBoundsWidth = Math.max(10, parseInt(value) || 400);
+		debouncedRegeneratePattern();
+	}
+
+	function updatePatternBoundsHeight(value) {
+		patternBoundsHeight = Math.max(10, parseInt(value) || 400);
+		debouncedRegeneratePattern();
+	}
+
+	function updatePatternSpacingX(value) {
+		patternSpacingX = Math.max(0, parseInt(value) || 0);
+		debouncedRegeneratePattern();
+	}
+
+	function updatePatternSpacingY(value) {
+		patternSpacingY = Math.max(0, parseInt(value) || 0);
+		debouncedRegeneratePattern();
+	}
+
+	function updatePatternStagger(value) {
+		patternStagger = value;
+		debouncedRegeneratePattern();
+	}
+
+	async function editPatternSource() {
+		if (!$selectedComponent || !$selectedComponent.isPatternFill || !$editor) return;
+
+		const sourceJSON = $selectedComponent.patternSourceJSON;
+		if (!sourceJSON) return;
+
+		const left = $selectedComponent.left;
+		const top = $selectedComponent.top;
+
+		// Save pattern config so it can be restored when re-enabling
+		const savedConfig = {
+			patternBoundsWidth: $selectedComponent.patternBoundsWidth || 400,
+			patternBoundsHeight: $selectedComponent.patternBoundsHeight || 400,
+			patternSpacingX: $selectedComponent.patternSpacingX || 0,
+			patternSpacingY: $selectedComponent.patternSpacingY || 0,
+			patternStagger: $selectedComponent.patternStagger || false
+		};
+
+		// Enliven the source for editing
+		const { util } = await import('fabric');
+		const [source] = await util.enlivenObjects([structuredClone(sourceJSON)]);
+		source.set({ left, top, originX: 'left', originY: 'top' });
+
+		// Store saved config on the source element so loadVariableState can recover it
+		source.set(savedConfig);
+
+		// Copy id
+		if ($selectedComponent.id) {
+			source.set('id', $selectedComponent.id);
+		}
+
+		// Remove pattern group, add source
+		$editor.remove($selectedComponent);
+		$editor.add(source);
+		$editor.setActiveObject(source);
+		$editor.requestRenderAll();
+
+		editorActions.selectComponent(source);
+		isPatternFill = false;
+
+		debouncedPropertyChange(source);
 	}
 
 	// --- Validation helpers ---
@@ -2106,7 +2334,10 @@
 	}
 
 	function loadTextEffects() {
-		if (!$selectedComponent || (type !== 'i-text' && type !== 'text')) return;
+		if (!$selectedComponent) return;
+		const isText = type === 'i-text' || type === 'text' || type === 'textbox';
+		const isShape = type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path';
+		if (!isText && !isShape) return;
 
 		// Load shadow properties
 		if ($selectedComponent.shadow) {
@@ -2144,7 +2375,7 @@
 	}
 
 	function applyTextShadow(property, value) {
-		if (!$selectedComponent || !$editor || (type !== 'i-text' && type !== 'text')) return;
+		if (!$selectedComponent || !$editor) return;
 
 		// Update state
 		if (property === 'enabled') {
@@ -2169,7 +2400,7 @@
 	}
 
 	function applyTextStroke(property, value) {
-		if (!$selectedComponent || !$editor || (type !== 'i-text' && type !== 'text')) return;
+		if (!$selectedComponent || !$editor) return;
 
 		// Update state
 		if (property === 'enabled') {
@@ -2191,7 +2422,7 @@
 	}
 
 	function applyTextEffectPreset(preset) {
-		if (!$selectedComponent || !$editor || (type !== 'i-text' && type !== 'text')) return;
+		if (!$selectedComponent || !$editor) return;
 
 		const presets = {
 			none: {
@@ -2270,7 +2501,7 @@
 	}
 
 	function addTextBackground() {
-		if (!$selectedComponent || !$editor || (type !== 'i-text' && type !== 'text')) return;
+		if (!$selectedComponent || !$editor || (type !== 'i-text' && type !== 'text' && type !== 'textbox')) return;
 
 		const textObj = $selectedComponent;
 		const center = textObj.getCenterPoint();
@@ -2894,15 +3125,21 @@
 
 	async function updateProperty(prop, value) {
 		if (!$selectedComponent || !$editor) return;
-
 		if (prop === 'width' || prop === 'height') {
+			// Pattern fill groups: changing size means changing bounds and regenerating
+			if ($selectedComponent.isPatternFill) {
+				if (prop === 'width') {
+					patternBoundsWidth = Math.max(10, parseInt(value) || 400);
+				} else {
+					patternBoundsHeight = Math.max(10, parseInt(value) || 400);
+				}
+				debouncedRegeneratePattern();
+				return;
+			}
 			// For width/height, we might need to adjust scale
-			if (type === 'rect') {
+			if (type === 'rect' || type === 'textbox') {
 				$selectedComponent.set(prop, parseInt(value));
 			} else {
-				// For other objects, scaling might be better, but let's stick to simple setting for now
-				// or maybe just don't allow direct width/height edit for complex objects yet
-				// Fabric handles width/height via scale usually for text/images
 				if (prop === 'width') $selectedComponent.scaleToWidth(parseInt(value));
 				if (prop === 'height') $selectedComponent.scaleToHeight(parseInt(value));
 			}
@@ -2926,7 +3163,9 @@
 			$selectedComponent.set(prop, value);
 		}
 
-		$selectedComponent.setCoords();
+		const obj = $selectedComponent;
+		obj.dirty = true;
+		obj.setCoords();
 		$editor.renderAll();
 
 		// Use debounced event firing to prevent saving intermediate states
@@ -3213,7 +3452,7 @@
 
 			<!-- DESIGN MODE -->
 			{#if panelMode === 'design'}
-				{#if type === 'i-text' || type === 'text'}
+				{#if type === 'i-text' || type === 'text' || type === 'textbox'}
 					<!-- CONTENT SECTION -->
 					<div class="space-y-3">
 						{#if boundProperties.has('text')}<span class="text-[9px] text-green-500"
@@ -3387,13 +3626,15 @@
 														<button
 															class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between group"
 															on:click={() => {
-																const link = document.createElement('link');
-																link.href = `https://fonts.googleapis.com/css2?family=${font.family.replace(
-																	/ /g,
-																	'+'
-																)}:wght@${font.weights?.join(';') || '400;700'}&display=swap`;
-																link.rel = 'stylesheet';
-																document.head.appendChild(link);
+																if (!font.isBrandFont) {
+																	const link = document.createElement('link');
+																	link.href = `https://fonts.googleapis.com/css2?family=${font.family.replace(
+																		/ /g,
+																		'+'
+																	)}:wght@${font.weights?.join(';') || '400;700'}&display=swap`;
+																	link.rel = 'stylesheet';
+																	document.head.appendChild(link);
+																}
 
 																updateProperty('fontFamily', font.family);
 																isFontDropdownOpen = false;
@@ -3458,13 +3699,15 @@
 													<button
 														class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between group"
 														on:click={() => {
-															const link = document.createElement('link');
-															link.href = `https://fonts.googleapis.com/css2?family=${font.family.replace(
-																/ /g,
-																'+'
-															)}:wght@${font.weights?.join(';') || '400;700'}&display=swap`;
-															link.rel = 'stylesheet';
-															document.head.appendChild(link);
+															if (!font.isBrandFont) {
+																const link = document.createElement('link');
+																link.href = `https://fonts.googleapis.com/css2?family=${font.family.replace(
+																	/ /g,
+																	'+'
+																)}:wght@${font.weights?.join(';') || '400;700'}&display=swap`;
+																link.rel = 'stylesheet';
+																document.head.appendChild(link);
+															}
 
 															updateProperty('fontFamily', font.family);
 															isFontDropdownOpen = false;
@@ -3632,6 +3875,29 @@
 							{/if}
 						</div>
 					</div>
+
+					<!-- TEXT ALIGNMENT -->
+					{#if type === 'textbox'}
+						<div class="space-y-2 pt-4 border-t border-gray-200">
+							<label class={fieldLabelClass}>Text Align</label>
+							<div class="flex gap-1.5">
+								{#each [
+									{ value: 'left', icon: 'fa-align-left' },
+									{ value: 'center', icon: 'fa-align-center' },
+									{ value: 'right', icon: 'fa-align-right' }
+								] as align}
+									<button
+										class="flex-1 py-1.5 text-sm border-[2px] border-gray-900 rounded-lg transition-all {styles.textAlign === align.value
+											? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#ffc480]'
+											: 'bg-white text-gray-700 shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5'}"
+										on:click={() => updateProperty('textAlign', align.value)}
+									>
+										<i class="fa {align.icon}" />
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
 
 					<!-- COLOR SECTION -->
 					<div class="space-y-3 pt-4 border-t border-gray-200">
@@ -3846,7 +4112,7 @@
 					</CollapsibleSection>
 				{/if}
 
-				<!-- Universal Stroke & Fill Controls for All Shapes -->
+				<!-- Universal Fill Controls for All Shapes -->
 				{#if type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path'}
 					<CollapsibleSection title="Appearance" bind:open={showAppearanceSection}>
 							<div class="space-y-4">
@@ -3877,42 +4143,128 @@
 										</label>
 									</div>
 								{/if}
-
-								<!-- Stroke Color -->
-								{#if boundProperties.has('stroke')}<span
-										class="text-[9px] text-green-500 mb-[-4px] block"
-										><i class="fa fa-link" /> Bound to API variable</span
-									>{/if}
-								<GradientColorPicker
-									label="Stroke Color"
-									value={styles.stroke || '#333333'}
-									defaultColor="#333333"
-									supportsGradient={false}
-									onSolidChange={(color) => updateProperty('stroke', color)}
-								/>
-
-								<!-- Stroke Width -->
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class={fieldLabelClass}
-											>Stroke Width{#if boundProperties.has('strokeWidth')}<i
-													class="fa fa-link text-[9px] text-green-500 ml-1"
-													title="Bound to API variable"
-												/>{/if}</label
-										>
-										<span class="text-xs text-gray-500">{styles.strokeWidth}px</span>
-									</div>
-									<input
-										type="range"
-										min="0"
-										max="20"
-										step="0.5"
-										value={styles.strokeWidth}
-										class={rangeInputClass}
-										on:input={(e) => updateProperty('strokeWidth', parseFloat(e.target.value))}
-									/>
-								</div>
 							</div>
+					</CollapsibleSection>
+
+					<!-- Effects Section for Shapes (Shadow + Stroke) -->
+					<CollapsibleSection title="Effects" bind:open={showTextEffectsPanel}>
+						<div class="space-y-4 pt-2">
+							<!-- Shadow Controls -->
+							<div>
+								<div class="flex items-center justify-between mb-3">
+									<label class="{fieldLabelClass} mb-0">Shadow</label>
+									<label class="relative inline-flex items-center cursor-pointer">
+										<input
+											type="checkbox"
+											class="sr-only peer"
+											checked={textEffects.shadow.enabled}
+											on:change={(e) => applyTextShadow('enabled', e.target.checked)}
+										/>
+										<div class={toggleSwitchClass} />
+									</label>
+								</div>
+
+								{#if textEffects.shadow.enabled}
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
+										<GradientColorPicker
+											label="Color"
+											value={textEffects.shadow.color}
+											defaultColor="rgba(0, 0, 0, 0.5)"
+											supportsGradient={false}
+											onSolidChange={(color) => applyTextShadow('color', color)}
+										/>
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Blur</label>
+												<span class="text-xs text-gray-500">{textEffects.shadow.blur}px</span>
+											</div>
+											<input
+												type="range"
+												min="0"
+												max="30"
+												step="1"
+												value={textEffects.shadow.blur}
+												class={rangeInputClass}
+												on:input={(e) => applyTextShadow('blur', parseInt(e.target.value))}
+											/>
+										</div>
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Horizontal Offset</label>
+												<span class="text-xs text-gray-500">{textEffects.shadow.offsetX}px</span>
+											</div>
+											<input
+												type="range"
+												min="-30"
+												max="30"
+												step="1"
+												value={textEffects.shadow.offsetX}
+												class={rangeInputClass}
+												on:input={(e) => applyTextShadow('offsetX', parseInt(e.target.value))}
+											/>
+										</div>
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Vertical Offset</label>
+												<span class="text-xs text-gray-500">{textEffects.shadow.offsetY}px</span>
+											</div>
+											<input
+												type="range"
+												min="-30"
+												max="30"
+												step="1"
+												value={textEffects.shadow.offsetY}
+												class={rangeInputClass}
+												on:input={(e) => applyTextShadow('offsetY', parseInt(e.target.value))}
+											/>
+										</div>
+									</div>
+								{/if}
+							</div>
+
+							<!-- Stroke Controls -->
+							<div class="pt-3 border-t border-gray-200">
+								<div class="flex items-center justify-between mb-3">
+									<label class="{fieldLabelClass} mb-0">Stroke (Outline)</label>
+									<label class="relative inline-flex items-center cursor-pointer">
+										<input
+											type="checkbox"
+											class="sr-only peer"
+											checked={textEffects.stroke.enabled}
+											on:change={(e) => applyTextStroke('enabled', e.target.checked)}
+										/>
+										<div class={toggleSwitchClass} />
+									</label>
+								</div>
+
+								{#if textEffects.stroke.enabled}
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
+										<GradientColorPicker
+											label="Color"
+											value={textEffects.stroke.color}
+											defaultColor="#000000"
+											supportsGradient={false}
+											onSolidChange={(color) => applyTextStroke('color', color)}
+										/>
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Width</label>
+												<span class="text-xs text-gray-500">{textEffects.stroke.width}px</span>
+											</div>
+											<input
+												type="range"
+												min="0.5"
+												max="20"
+												step="0.5"
+												value={textEffects.stroke.width}
+												class={rangeInputClass}
+												on:input={(e) => applyTextStroke('width', parseFloat(e.target.value))}
+											/>
+										</div>
+									</div>
+								{/if}
+							</div>
+						</div>
 					</CollapsibleSection>
 				{/if}
 
@@ -5178,6 +5530,131 @@
 					</CollapsibleSection>
 				{/if}
 			{/if}
+
+				<!-- PATTERN FILL SECTION (Design tab) -->
+				{#if $selectedComponent && !$selectedComponent?.isQRCode && !$selectedComponent?.isChart && !$selectedComponent?.isTable}
+				<div class="pt-4 border-t border-gray-200">
+					<button
+						class="w-full flex items-center justify-between text-left group"
+						on:click={() => (showPatternFillSection = !showPatternFillSection)}
+						aria-expanded={showPatternFillSection}
+					>
+						<div class="flex items-center gap-2">
+							<span class={sectionHeaderClass}>Pattern Fill</span>
+							{#if isPatternFill}
+								<span
+									class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] rounded font-medium"
+									>Active</span
+								>
+							{/if}
+						</div>
+						<div class="flex items-center gap-2">
+							<label
+								class="relative inline-flex items-center cursor-pointer"
+								on:click|stopPropagation
+							>
+								<input
+									type="checkbox"
+									class="sr-only peer"
+									checked={isPatternFill}
+									on:change={(e) => togglePatternFill(e.target.checked)}
+									aria-label="Enable pattern fill"
+								/>
+								<div class={toggleSwitchClass} />
+							</label>
+							<i
+								class="fa fa-chevron-{showPatternFillSection
+									? 'up'
+									: 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"
+							/>
+						</div>
+					</button>
+
+					{#if showPatternFillSection}
+						<div class="space-y-3 mt-3" transition:slide={{ duration: 150 }}>
+							{#if !isPatternFill}
+								<p class="text-xs text-gray-500">Tile this element across a rectangular area to create a pattern</p>
+							{:else}
+								<div class="grid grid-cols-2 gap-2">
+									<div>
+										<label class={fieldLabelClass}>Area Width</label>
+										<input
+											type="number"
+											class={inputBaseClass}
+											min="10"
+											value={patternBoundsWidth}
+											on:input={(e) => updatePatternBoundsWidth(e.target.value)}
+										/>
+									</div>
+									<div>
+										<label class={fieldLabelClass}>Area Height</label>
+										<input
+											type="number"
+											class={inputBaseClass}
+											min="10"
+											value={patternBoundsHeight}
+											on:input={(e) => updatePatternBoundsHeight(e.target.value)}
+										/>
+									</div>
+								</div>
+
+								<div class="grid grid-cols-2 gap-2">
+									<div>
+										<label class={fieldLabelClass}>Gap X</label>
+										<input
+											type="number"
+											class={inputBaseClass}
+											min="0"
+											value={patternSpacingX}
+											on:input={(e) => updatePatternSpacingX(e.target.value)}
+										/>
+									</div>
+									<div>
+										<label class={fieldLabelClass}>Gap Y</label>
+										<input
+											type="number"
+											class={inputBaseClass}
+											min="0"
+											value={patternSpacingY}
+											on:input={(e) => updatePatternSpacingY(e.target.value)}
+										/>
+									</div>
+								</div>
+
+								<div class="flex items-center gap-2">
+									<label class="relative inline-flex items-center cursor-pointer" on:click|stopPropagation>
+										<input
+											type="checkbox"
+											class="sr-only peer"
+											checked={patternStagger}
+											on:change={(e) => updatePatternStagger(e.target.checked)}
+											aria-label="Stagger odd rows"
+										/>
+										<div class={toggleSwitchClass} />
+									</label>
+									<span class="text-xs text-gray-600">Stagger odd rows</span>
+								</div>
+
+								<button
+									class="w-full py-1.5 px-3 text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors font-medium border border-gray-300"
+									on:click={editPatternSource}
+								>
+									<i class="fa fa-pencil mr-1" />Edit Source Element
+								</button>
+
+								{#if patternCapped}
+									<div class="bg-amber-50 rounded-lg p-2 border border-amber-200">
+										<p class="text-[10px] text-amber-700">
+											<i class="fa fa-warning mr-1" />
+											Tile count capped at 500. Increase gap or reduce area size.
+										</p>
+									</div>
+								{/if}
+							{/if}
+						</div>
+					{/if}
+				</div>
+				{/if}
 			<!-- END DESIGN MODE -->
 
 			<!-- LOGIC MODE -->
@@ -5464,7 +5941,8 @@
 					{/if}
 				</div>
 
-				<!-- LOOP SECTION — accordion -->
+				<!-- LOOP SECTION — accordion (hidden when pattern fill is active) -->
+				{#if !isPatternFill}
 				<div class="pt-3 border-t border-gray-200">
 					<button
 						class="w-full flex items-center justify-between text-left group"
@@ -5602,6 +6080,7 @@
 						</div>
 					{/if}
 				</div>
+				{/if}
 
 				<!-- Destructive Action Confirmation Modal -->
 				{#if pendingDestructiveAction}
@@ -5645,7 +6124,7 @@
 						>
 							Group
 						</button>
-					{:else if type === 'group' && !$selectedComponent?.isQRCode && !$selectedComponent?.isChart && !$selectedComponent?.isTable}
+					{:else if type === 'group' && !$selectedComponent?.isQRCode && !$selectedComponent?.isChart && !$selectedComponent?.isTable && !$selectedComponent?.isPatternFill}
 						<button
 							class="py-1.5 px-3 text-[11px] bg-rose-500 hover:bg-rose-600 text-white rounded transition-colors font-medium"
 							on:click={ungroupSelectedElements}

@@ -4,6 +4,8 @@
 	import { goto } from '$app/navigation';
 	import { getUser } from '../../store/user.store';
 	import { completeOnboardingStep } from '../../api/onboarding';
+	import { initPLG } from '../../store/plg.store';
+	import { initializeTeamState } from '../../store/team.store';
 	import Loader from '$lib/components/Loader.svelte';
 
 	let isVerifying = true;
@@ -14,6 +16,12 @@
 			goto('/login');
 			return;
 		}
+
+		// Initialize team state and PLG in parallel (needed for feature gating like AI Copilot)
+		await Promise.all([
+			initializeTeamState().catch(() => {}),
+			initPLG().catch(() => {}),
+		]);
 
 		// Complete the try_editor onboarding step
 		completeOnboardingStep('try_editor').catch(() => {

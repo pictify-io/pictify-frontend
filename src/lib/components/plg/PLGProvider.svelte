@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import MilestoneCelebration from './MilestoneCelebration.svelte';
   import UpgradeModal from './UpgradeModal.svelte';
+  import OverageWarningModal from './OverageWarningModal.svelte';
   import {
     initPLG,
     refreshUsageWidget,
@@ -39,5 +40,6 @@
 {#if initialized}
   <MilestoneCelebration />
   <UpgradeModal />
+  <OverageWarningModal />
 {/if}
 

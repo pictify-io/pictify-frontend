@@ -4,6 +4,7 @@
 	import { toast } from '../../../store/toast.store';
 	import { FabricImage } from 'fabric';
 	import { getBrandAssets } from '../../../api/brand-assets';
+	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
 	import Loader from '../Loader.svelte';
 
 	let loading = true;
@@ -116,9 +117,9 @@
 		});
 	}
 
-	function applyFontToSelected(fontFamily) {
+	async function applyFontToSelected(fontFamily) {
 		if (!$editor) return;
-		
+
 		const activeObject = $editor.getActiveObject();
 		if (!activeObject) {
 			toast.set({ message: 'Select a text object first', type: 'warning', duration: 2000 });
@@ -130,8 +131,18 @@
 			return;
 		}
 
+		// Ensure brand font CSS is injected into the page, then trigger font binary download
+		await loadBrandFonts();
+		try {
+			await document.fonts.load(`12px "${fontFamily}"`);
+		} catch (e) {
+			console.warn(`Font load warning for ${fontFamily}:`, e);
+		}
+
 		activeObject.set('fontFamily', fontFamily);
-		$editor.renderAll();
+		activeObject.initDimensions();
+		activeObject.setCoords();
+		$editor.requestRenderAll();
 		toast.set({ message: `Applied ${fontFamily}`, type: 'success', duration: 2000 });
 	}
 

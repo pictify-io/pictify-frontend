@@ -54,15 +54,20 @@ export const OVERAGE_PRICING = {
   [PLANS.ENTERPRISE]: { eligible: true, ratePerRenderCents: null },   // Custom
 };
 
-// Normalize plan name to canonical form
-// Handles aliases: 'pro' -> 'standard', 'free' -> 'starter'
+/**
+ * Normalize plan name to canonical form.
+ * Mirrors backend util/plan.js normalizePlan — keep in sync.
+ * Handles: casing ("Starter"→"starter"), aliases ("pro"→"standard"),
+ * whitespace ("Pro Plus"→"pro-plus"), and nulls (→"starter").
+ */
 export function normalizePlan(plan) {
-  const normalized = plan?.toLowerCase();
+  if (!plan) return 'starter';
+  const slug = plan.toLowerCase().replace(/\s+/g, '-');
   const aliases = {
     pro: 'standard',
     free: 'starter',
   };
-  return aliases[normalized] || normalized || 'starter';
+  return aliases[slug] || slug || 'starter';
 }
 
 // Helper to format overage rate for display
@@ -167,7 +172,7 @@ export const PLAN_FEATURES = {
     [FEATURES.AB_TESTING]: 1,
     [FEATURES.SMART_LINKS]: false,
     [FEATURES.SCHEDULED_IMAGES]: false,
-    [FEATURES.AUTO_OPTIMIZATION]: false,
+    [FEATURES.AUTO_OPTIMIZATION]: false, // Auto-optimize is an opt-in toggle on A/B tests
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: false,
@@ -181,10 +186,10 @@ export const PLAN_FEATURES = {
 
   [PLANS.BASIC]: {
     // Renders
-    [FEATURES.RENDERS]: 500,
+    [FEATURES.RENDERS]: 1000,
 
     // Output formats
-    [FEATURES.GIF_OUTPUT]: 50,
+    [FEATURES.GIF_OUTPUT]: 25,
     [FEATURES.PDF_OUTPUT]: true,
 
     // Templates
@@ -192,26 +197,26 @@ export const PLAN_FEATURES = {
 
     // Batch processing
     [FEATURES.BATCH_RENDER]: true,
-    [FEATURES.BATCH_ITEMS_PER_REQUEST]: 10,
-    [FEATURES.BATCH_MONTHLY_LIMIT]: 100,
+    [FEATURES.BATCH_ITEMS_PER_REQUEST]: 50,
+    [FEATURES.BATCH_MONTHLY_LIMIT]: 500,
 
     // AI Features
-    [FEATURES.AI_BACKGROUND_REMOVER]: false,
-    [FEATURES.AI_COPILOT]: false,
+    [FEATURES.AI_BACKGROUND_REMOVER]: 25,
+    [FEATURES.AI_COPILOT]: 15,
 
     // Team
-    [FEATURES.TEAM_SEATS]: 1,
+    [FEATURES.TEAM_SEATS]: 2,
 
     // Integrations
-    [FEATURES.WEBHOOKS]: false,
-    [FEATURES.DYNAMIC_LINKS]: false,
-    [FEATURES.STORAGE_CONNECTORS]: false,
+    [FEATURES.WEBHOOKS]: true,
+    [FEATURES.DYNAMIC_LINKS]: true,
+    [FEATURES.STORAGE_CONNECTORS]: true,
 
     // Experiments
-    [FEATURES.AB_TESTING]: 3,
+    [FEATURES.AB_TESTING]: 2,
     [FEATURES.SMART_LINKS]: 1,
     [FEATURES.SCHEDULED_IMAGES]: 1,
-    [FEATURES.AUTO_OPTIMIZATION]: false,
+    [FEATURES.AUTO_OPTIMIZATION]: false, // Auto-optimize is an opt-in toggle on A/B tests
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
@@ -255,7 +260,7 @@ export const PLAN_FEATURES = {
     [FEATURES.AB_TESTING]: 5,
     [FEATURES.SMART_LINKS]: 3,
     [FEATURES.SCHEDULED_IMAGES]: 3,
-    [FEATURES.AUTO_OPTIMIZATION]: 1,
+    [FEATURES.AUTO_OPTIMIZATION]: true,
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
@@ -299,7 +304,7 @@ export const PLAN_FEATURES = {
     [FEATURES.AB_TESTING]: 10,
     [FEATURES.SMART_LINKS]: 5,
     [FEATURES.SCHEDULED_IMAGES]: 5,
-    [FEATURES.AUTO_OPTIMIZATION]: 1,
+    [FEATURES.AUTO_OPTIMIZATION]: true,
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
@@ -329,10 +334,10 @@ export const PLAN_FEATURES = {
 
     // AI Features
     [FEATURES.AI_BACKGROUND_REMOVER]: 500,
-    [FEATURES.AI_COPILOT]: null, // Unlimited
+    [FEATURES.AI_COPILOT]: 500,
 
     // Team
-    [FEATURES.TEAM_SEATS]: null, // Unlimited
+    [FEATURES.TEAM_SEATS]: 10,
 
     // Integrations
     [FEATURES.WEBHOOKS]: true,
@@ -343,7 +348,7 @@ export const PLAN_FEATURES = {
     [FEATURES.AB_TESTING]: null,
     [FEATURES.SMART_LINKS]: null,
     [FEATURES.SCHEDULED_IMAGES]: null,
-    [FEATURES.AUTO_OPTIMIZATION]: 5,
+    [FEATURES.AUTO_OPTIMIZATION]: true,
 
     // Enterprise
     [FEATURES.BRAND_ASSETS]: true,
@@ -365,7 +370,7 @@ export const PLAN_FEATURES = {
     [FEATURES.BATCH_ITEMS_PER_REQUEST]: null,
     [FEATURES.BATCH_MONTHLY_LIMIT]: null,
     [FEATURES.AI_BACKGROUND_REMOVER]: null,
-    [FEATURES.AI_COPILOT]: null,
+    [FEATURES.AI_COPILOT]: 1000,
     [FEATURES.TEAM_SEATS]: null,
     [FEATURES.WEBHOOKS]: true,
     [FEATURES.DYNAMIC_LINKS]: null,
@@ -374,7 +379,7 @@ export const PLAN_FEATURES = {
     [FEATURES.AB_TESTING]: null,
     [FEATURES.SMART_LINKS]: null,
     [FEATURES.SCHEDULED_IMAGES]: null,
-    [FEATURES.AUTO_OPTIMIZATION]: null,
+    [FEATURES.AUTO_OPTIMIZATION]: true,
     [FEATURES.BRAND_ASSETS]: true,
     [FEATURES.SSO_SAML]: true,
     [FEATURES.AUDIT_LOGS]: true,

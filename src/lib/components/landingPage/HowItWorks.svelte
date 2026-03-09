@@ -87,10 +87,10 @@
 						>
 							1
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Build Your Template</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Build Your Template</h3>
 					</div>
 					<p
-						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
+						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
 						Drag-and-drop canvas. Add <span
 							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
@@ -120,10 +120,10 @@
 						>
 							2
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Send Your Data</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Send Your Data</h3>
 					</div>
 					<p
-						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
+						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
 						Just send raw data — the template's logic handles the rest. <span
 							class="bg-red-100 px-1 border-b-2 border-red-300">200ms later</span
@@ -153,10 +153,10 @@
 						>
 							3
 						</div>
-						<h3 class="text-3xl font-bold text-gray-900">Get Your Output</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Get Your Output</h3>
 					</div>
 					<p
-						class="text-xl text-gray-700 leading-relaxed font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
+						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
 						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, PDF, or video.
 						{#if activeStep === 2 && !isPaused}
@@ -293,7 +293,7 @@
 								>
 									<img
 										src="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
-										alt="Generated Result"
+										alt="Example of a generated image output from Pictify API"
 										class="w-full h-auto object-cover border-b-[3px] border-gray-900"
 									/>
 									<div class="p-4 flex items-center justify-between bg-white">

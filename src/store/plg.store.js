@@ -34,6 +34,7 @@ import {
   meetsMinimumPlan,
   isOverageEligible,
   formatOverageRate,
+  normalizePlan,
 } from '../config/plan-features.js';
 import { getBillingPreferences, updateBillingPreferences, getOverageSummary } from '../api/billing.js';
 
@@ -59,6 +60,7 @@ export {
   meetsMinimumPlan,
   isOverageEligible,
   formatOverageRate,
+  normalizePlan,
 };
 
 // ============================================
@@ -237,14 +239,8 @@ const _doInitPLG = async () => {
     const percentage = limit > 0 ? Math.round((usage / limit) * 100) : 0;
     const remaining = Math.max(0, limit - usage);
     
-    // Determine plan from limit (maps to plan-features.js PLAN_FEATURES)
-    // Supports legacy Basic for grandfathered users
-    // New 3-tier: Free (starter), Pro (standard: 10k), Business (40k)
-    // Legacy standard (3.5k) and professional (7.5k) users map to Pro tier
-    let plan = PLANS.STARTER;
-    if (limit > 50) plan = PLANS.BASIC;        // Legacy: 500 renders
-    if (limit > 500) plan = PLANS.STANDARD;    // Pro: includes legacy 3.5k and new 10k
-    if (limit > 10000) plan = PLANS.BUSINESS;  // Business: 40,000 renders
+    // Use normalized plan from backend (single source of truth)
+    const plan = planDetails.plan ? normalizePlan(planDetails.plan) : PLANS.STARTER;
     
     const isPaidPlan = plan !== PLANS.STARTER;
     
@@ -334,14 +330,8 @@ export const refreshUsageWidget = async () => {
     const percentage = limit > 0 ? Math.round((usage / limit) * 100) : 0;
     const remaining = Math.max(0, limit - usage);
     
-    // Determine plan from limit (maps to plan-features.js PLAN_FEATURES)
-    // Supports legacy Basic for grandfathered users
-    // New 3-tier: Free (starter), Pro (standard: 10k), Business (40k)
-    // Legacy standard (3.5k) and professional (7.5k) users map to Pro tier
-    let plan = PLANS.STARTER;
-    if (limit > 50) plan = PLANS.BASIC;        // Legacy: 500 renders
-    if (limit > 500) plan = PLANS.STANDARD;    // Pro: includes legacy 3.5k and new 10k
-    if (limit > 10000) plan = PLANS.BUSINESS;  // Business: 40,000 renders
+    // Use normalized plan from backend (single source of truth)
+    const plan = planDetails.plan ? normalizePlan(planDetails.plan) : PLANS.STARTER;
     
     const isPaidPlan = plan !== PLANS.STARTER;
 

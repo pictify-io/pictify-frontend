@@ -43,7 +43,6 @@
 		ab_test: 'A/B Test',
 		smart_link: 'Smart Link',
 		scheduled: 'Scheduled',
-		bandit: 'Auto-Optimize'
 	};
 
 	// Type badge colors
@@ -51,7 +50,6 @@
 		ab_test: 'bg-[#ffc480] text-gray-900 border-gray-900',
 		smart_link: 'bg-[#4ade80] text-gray-900 border-gray-900',
 		scheduled: 'bg-[#a78bfa] text-gray-900 border-gray-900',
-		bandit: 'bg-[#ff6b6b] text-white border-gray-900'
 	};
 
 	// Status badge config
@@ -69,7 +67,6 @@
 		{ value: 'ab_test', label: 'A/B Test' },
 		{ value: 'smart_link', label: 'Smart Link' },
 		{ value: 'scheduled', label: 'Scheduled' },
-		{ value: 'bandit', label: 'Bandit' }
 	];
 
 	// Status filter options
@@ -309,20 +306,7 @@
 									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Time-based image rotation</div>
 								</div>
 							</button>
-							<button
-								on:click={() => handleCreateType('bandit')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#a855f7]/10 transition-colors flex items-start gap-3 group opacity-50 cursor-not-allowed"
-								disabled
-							>
-								<div class="w-8 h-8 bg-[#a855f7]/20 border-[2px] border-[#a855f7] rounded-lg flex items-center justify-center shrink-0">
-									<svg class="w-4 h-4 text-[#a855f7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-								</div>
-								<div>
-									<div class="text-xs font-black text-gray-900 uppercase tracking-wide">Auto-Optimize <span class="text-[9px] font-black text-gray-400 ml-1">SOON</span></div>
-									<div class="text-[10px] font-bold text-gray-500 mt-0.5">Auto-shift traffic to best performer</div>
-								</div>
-							</button>
-						</div>
+							</div>
 					</div>
 				{/if}
 			</div>
@@ -381,6 +365,12 @@
 										<span class="inline-flex items-center px-2 py-0.5 rounded shadow-[2px_2px_0_0_rgba(0,0,0,0.1)] text-[9px] font-black uppercase tracking-widest border-[2px] {typeColors[exp.type] || 'bg-gray-100 text-gray-700 border-gray-900'}">
 											{typeLabels[exp.type] || exp.type}
 										</span>
+										{#if exp.banditConfig?.enabled}
+											<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded shadow-[2px_2px_0_0_rgba(0,0,0,0.1)] text-[9px] font-black uppercase tracking-widest border-[2px] bg-[#a855f7]/20 text-[#7c3aed] border-[#a855f7]">
+												<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+												Auto-Optimize
+											</span>
+										{/if}
 										<!-- Status Badge -->
 										<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded shadow-[2px_2px_0_0_rgba(0,0,0,0.1)] text-[9px] font-black uppercase tracking-widest border-[2px] {statusConfig[exp.status]?.bg || 'bg-gray-100 text-gray-700 border-gray-900'}">
 											<span class="w-1.5 h-1.5 rounded-full {statusConfig[exp.status]?.dot || 'bg-gray-400'} {exp.status === 'running' ? 'animate-pulse' : ''}"></span>
