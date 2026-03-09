@@ -72,7 +72,7 @@
 			} else {
 				await signupAction(email, password);
 			}
-			if (isLoggedIn) {
+			if (isLoggedIn()) {
 				safeRedirect();
 			}
 		} catch (e) {
@@ -83,12 +83,12 @@
 	function handleGoogleLogin() {
 		let newWindow = window.open(PUBLIC_BACKEND_URL + '/login/google', '_blank') || { closed: true };
 
-		const interval = setInterval(() => {
+		const interval = setInterval(async () => {
 			if (newWindow.closed) {
 				clearInterval(interval);
 				newWindow = { closed: true };
-				getUser();
-				if (isLoggedIn) {
+				await getUser();
+				if (isLoggedIn()) {
 					safeRedirect();
 				}
 			}

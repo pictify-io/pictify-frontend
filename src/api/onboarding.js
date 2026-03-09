@@ -36,3 +36,25 @@ export const completeOnboardingStep = async (stepId) => {
 		throw new Error('Error completing step');
 	}
 };
+
+/**
+ * Save personalization preferences (welcome wizard)
+ */
+export const savePersonalization = async ({ useCase, integrationMode }) => {
+	try {
+		return await backend.post('/api/onboarding/personalization', { useCase, integrationMode });
+	} catch (error) {
+		throw new Error('Error saving personalization');
+	}
+};
+
+/**
+ * Skip the personalization wizard
+ */
+export const skipPersonalization = async () => {
+	try {
+		return await backend.post('/api/onboarding/personalization/skip');
+	} catch (error) {
+		throw new Error('Error skipping personalization');
+	}
+};

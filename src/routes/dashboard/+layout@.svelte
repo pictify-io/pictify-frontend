@@ -8,9 +8,10 @@
 	import UsageBanner from '$lib/components/plg/UsageBanner.svelte';
 	import ProactiveUpgradeModal from '$lib/components/plg/ProactiveUpgradeModal.svelte';
 	import OnboardingChecklist from '$lib/components/onboarding/OnboardingChecklist.svelte';
+	import WelcomeWizard from '$lib/components/onboarding/WelcomeWizard.svelte';
 
 	import { getUser } from '../../store/user.store';
-	import { initOnboarding } from '../../store/onboarding.store';
+	import { initOnboarding, showWelcomeWizard } from '../../store/onboarding.store';
 
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -58,11 +59,11 @@
 			return;
 		}
 
+		// Initialize onboarding checklist (before marking loaded, so wizard state is ready)
+		await initOnboarding();
+
 		// Mark user as loaded so child components can safely make API calls
 		isUserLoaded = true;
-
-		// Initialize onboarding checklist
-		initOnboarding();
 
 		// Home page now exists at /dashboard — no redirect needed
 
@@ -139,6 +140,11 @@
 	<!-- Onboarding Checklist -->
 	{#if isUserLoaded}
 		<OnboardingChecklist />
+	{/if}
+
+	<!-- Welcome Wizard (first-time personalization) -->
+	{#if isUserLoaded && $showWelcomeWizard}
+		<WelcomeWizard />
 	{/if}
 </div>
 

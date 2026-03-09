@@ -1,6 +1,7 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { personalization } from '../../../store/onboarding.store';
 
 	let isOpen = false;
 	let query = '';
@@ -32,9 +33,23 @@
 		{ type: 'action', label: 'Upgrade Plan', description: 'View plans and upgrade', path: '/dashboard/billing', keywords: 'upgrade plan pricing pro business enterprise' },
 	];
 
-	// Simple fuzzy search
+	// API-related paths for personalized boosting
+	const API_PATHS = new Set(['/dashboard/api-playground', '/dashboard/api-token']);
+	const EDITOR_PATHS = new Set(['/dashboard/template/create', '/dashboard/template']);
+
+	// Simple fuzzy search with personalization boost
 	function searchItems(q) {
-		if (!q.trim()) return allItems;
+		const mode = $personalization?.integrationMode;
+
+		if (!q.trim()) {
+			if (!mode) return allItems;
+			// Boost items relevant to integration mode when query is empty
+			return [...allItems].sort((a, b) => {
+				const aBoost = (mode === 'api' && API_PATHS.has(a.path)) || (mode === 'editor' && EDITOR_PATHS.has(a.path)) ? 1 : 0;
+				const bBoost = (mode === 'api' && API_PATHS.has(b.path)) || (mode === 'editor' && EDITOR_PATHS.has(b.path)) ? 1 : 0;
+				return bBoost - aBoost;
+			});
+		}
 
 		const terms = q.toLowerCase().split(/\s+/);
 		return allItems
