@@ -3,13 +3,17 @@
 	import { editor } from '../../../../store/editor.store';
 	import { onMount, onDestroy } from 'svelte';
 	import { getHTMLandCSS } from '../../../html-to-gif/create-media';
-	import { FabricImage } from 'fabric';
+	import { FabricImage, Group } from 'fabric';
 	import {
 		createTemplateAction,
 		updateTemplateAction,
 		template
 	} from '../../../../store/template.store';
-	import { extractVariablesFromExpression, generateSampleData, getVariableType as getExpressionVariableType } from '../../../utils/expression-parser';
+	import {
+		extractVariablesFromExpression,
+		generateSampleData,
+		getVariableType as getExpressionVariableType
+	} from '../../../utils/expression-parser';
 	import { get } from 'svelte/store';
 	import { variables as variablesStore, variableActions } from '../../../../store/variables.store';
 	import Toast from '$lib/components/Toast.svelte';
@@ -17,21 +21,31 @@
 	import { user, getUser } from '../../../../store/user.store';
 	import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
 	import { goto } from '$app/navigation';
-	import { pages, currentPageIndex, outputFormat, pdfPreset, pageActions } from '../../../../store/pages.store';
+	import {
+		pages,
+		currentPageIndex,
+		outputFormat,
+		pdfPreset,
+		pageActions
+	} from '../../../../store/pages.store';
 	import { loadBrandFonts, isBrandFont } from '../../../utils/brand-fonts-loader';
 	import { preloadFont } from '../../../../api/fonts';
 	import AuthModal from '../../editor/AuthModal.svelte';
+	import backend from '../../../../service/backend';
+	import { convertFigmaToFabric } from '../../../utils/figma-converter';
 
 	let fabricCanvas;
 
 	let templateName = '';
 	export let templateType = 'og-image'; // Default type
-    export let formatType = 'image'; // 'image' or 'pdf' (passed from parent route)
+	export let formatType = 'image'; // 'image' or 'pdf' (passed from parent route)
 	export let isEdit = false;
 	export let guestMode = false;
 	export let initialConfig = null; // { outputFormat, pdfPreset, width, height }
+	export let figmaImportId = null; // From ?figmaImport= query param (Figma plugin)
 
 	let editorTemplate = null;
+	let figmaImportHandled = false;
 	let hasLoadedTemplate = false; // Track if we've already loaded the template
 
 	let unsubscribe = () => {};
@@ -51,6 +65,97 @@
 		{ label: 'Social Media', value: 'social-media' }
 	];
 
+	async function handleFigmaAutoImport(canvas) {
+		if (!figmaImportId || figmaImportHandled || !canvas) return;
+		figmaImportHandled = true;
+
+		try {
+			toast.set({ message: 'Loading Figma import...', type: 'info', duration: 3000 });
+			const data = await backend.get(`/figma/plugin/import/${figmaImportId}`);
+			if (!data.nodeTree) return;
+
+			console.log(
+				'[FigmaAutoImport] Input nodeTree:',
+				data.nodeTree?.type,
+				data.nodeTree?.name,
+				'children:',
+				data.nodeTree?.children?.length
+			);
+			console.log('[FigmaAutoImport] Fallback images:', Object.keys(data.fallbackImages || {}));
+			console.log('[FigmaAutoImport] Metadata:', data.metadata);
+
+			const result = await convertFigmaToFabric(data.nodeTree, {
+				fallbackImages: data.fallbackImages || {},
+				metadata: data.metadata
+			});
+			const { objects, fonts, _debug } = result;
+
+			console.log('[FigmaAutoImport] Conversion result:', {
+				objectCount: objects.length,
+				fonts: [...fonts],
+				errors: _debug?.errors || [],
+				errorCount: _debug?.errorCount || 0,
+				elapsed: _debug?.elapsed
+			});
+
+			if (_debug?.errorCount > 0) {
+				console.warn(`[FigmaAutoImport] ${_debug.errorCount} conversion errors — check debug logs`);
+				console.log('[FigmaAutoImport] Debug dump:', JSON.stringify(_debug, null, 2));
+			}
+
+			if (objects.length === 0) return;
+
+			for (const fontFamily of fonts) {
+				try {
+					await document.fonts.load(`16px "${fontFamily}"`);
+				} catch {}
+			}
+
+			if (window.__historyBatchStart) window.__historyBatchStart();
+
+			const importGroup = new Group(objects, {
+				figmaImport: true,
+				name: data.metadata?.frameName || 'Figma Import'
+			});
+
+			const maxWidth = canvas.width * 0.9;
+			const maxHeight = canvas.height * 0.9;
+			const scale = Math.min(
+				maxWidth / (importGroup.width || 1),
+				maxHeight / (importGroup.height || 1),
+				1
+			);
+
+			importGroup.set({
+				left: canvas.width / 2,
+				top: canvas.height / 2,
+				originX: 'center',
+				originY: 'center',
+				scaleX: scale,
+				scaleY: scale
+			});
+
+			canvas.add(importGroup);
+			canvas.setActiveObject(importGroup);
+			canvas.renderAll();
+
+			if (window.__historyBatchEnd) window.__historyBatchEnd();
+			toast.set({
+				message: `Imported "${data.metadata?.frameName || 'design'}" from Figma`,
+				type: 'success',
+				duration: 3000
+			});
+		} catch (err) {
+			console.error('[FigmaAutoImport] Failed:', err);
+			console.error('[FigmaAutoImport] Stack:', err?.stack);
+			toast.set({
+				message: 'Failed to load Figma import: ' + (err.message || 'Unknown error'),
+				type: 'error',
+				duration: 5000
+			});
+		}
+	}
+
 	function copyToClipboard(text) {
 		navigator.clipboard.writeText(text).then(() => {
 			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
@@ -69,7 +174,7 @@
 
 		// Get current variables from store for type overrides
 		const storeVariables = get(variablesStore);
-		const storeVariableMap = new Map(storeVariables.map(v => [v.name, v]));
+		const storeVariableMap = new Map(storeVariables.map((v) => [v.name, v]));
 
 		// 1. Extract variables from variableBindings array (new format)
 		objects.forEach((obj) => {
@@ -81,7 +186,7 @@
 				}
 
 				// Process each binding
-				obj.variableBindings.forEach(binding => {
+				obj.variableBindings.forEach((binding) => {
 					const varName = binding.variableName;
 					if (varName && !variableMap.has(varName)) {
 						// Check if user has overridden the type in the variables store
@@ -93,7 +198,8 @@
 							// Use store type if available, otherwise infer from property
 							type: storeVar?.type || inferredType,
 							// Use store default value if available, otherwise infer from property
-							defaultValue: storeVar?.defaultValue ?? getDefaultValueForProperty(obj, binding.property),
+							defaultValue:
+								storeVar?.defaultValue ?? getDefaultValueForProperty(obj, binding.property),
 							description: storeVar?.description || binding.description || '',
 							elementId: obj.id,
 							property: binding.property,
@@ -106,7 +212,7 @@
 		});
 
 		// 2. Extract variables from conditional visibility (showWhen/hideWhen)
-		objects.forEach(obj => {
+		objects.forEach((obj) => {
 			const showWhen = obj.showWhen;
 			const hideWhen = obj.hideWhen;
 
@@ -114,7 +220,7 @@
 				const expression = showWhen || hideWhen;
 				const extractedVars = extractVariablesFromExpression(expression);
 
-				extractedVars.forEach(extractedVar => {
+				extractedVars.forEach((extractedVar) => {
 					if (!variableMap.has(extractedVar.name)) {
 						// Check if user has overridden the type in the variables store
 						const storeVar = storeVariableMap.get(extractedVar.name);
@@ -124,7 +230,8 @@
 							name: extractedVar.name,
 							type: storeVar?.type || inferredType,
 							defaultValue: storeVar?.defaultValue ?? generateSampleData(extractedVar, 'condition'),
-							description: storeVar?.description || `Used in ${showWhen ? 'show' : 'hide'} condition`,
+							description:
+								storeVar?.description || `Used in ${showWhen ? 'show' : 'hide'} condition`,
 							elementId: `condition_${extractedVar.name}`,
 							property: (storeVar?.type || inferredType) === 'object' ? 'data' : 'value',
 							validation: { required: storeVar?.required ?? false },
@@ -138,7 +245,7 @@
 		});
 
 		// 3. Extract variables from loop/repeat configurations
-		objects.forEach(obj => {
+		objects.forEach((obj) => {
 			const loopVariable = obj.loopVariable;
 
 			if (loopVariable && loopVariable !== null && loopVariable !== '') {
@@ -149,7 +256,8 @@
 					variableMap.set(loopVariable, {
 						name: loopVariable,
 						type: storeVar?.type || 'array',
-						defaultValue: storeVar?.defaultValue ?? generateSampleData({ name: loopVariable }, 'loop'),
+						defaultValue:
+							storeVar?.defaultValue ?? generateSampleData({ name: loopVariable }, 'loop'),
 						description: storeVar?.description || `Array variable for repeating element`,
 						elementId: `loop_${loopVariable}`,
 						property: 'items',
@@ -163,7 +271,7 @@
 		});
 
 		// 4. Include custom variables from store that aren't tied to canvas objects
-		storeVariables.forEach(storeVar => {
+		storeVariables.forEach((storeVar) => {
 			if (storeVar.source === 'custom' && !variableMap.has(storeVar.name)) {
 				variableMap.set(storeVar.name, {
 					name: storeVar.name,
@@ -207,7 +315,7 @@
 				return 'text';
 		}
 	}
-	
+
 	function getDefaultValueForProperty(obj, property) {
 		switch (property) {
 			case 'text':
@@ -245,7 +353,7 @@
 	 */
 	function ensureAllObjectsHaveIds() {
 		if (!fabricCanvas) return;
-		
+
 		const objects = fabricCanvas.getObjects();
 		objects.forEach((obj, index) => {
 			if (!obj.id) {
@@ -255,7 +363,7 @@
 			}
 		});
 	}
-	
+
 	/**
 	 * Serialize canvas to JSON with custom properties
 	 * Fabric.js v6 doesn't always include custom properties even when specified,
@@ -263,33 +371,57 @@
 	 */
 	function serializeCanvasWithCustomProps() {
 		if (!fabricCanvas) return null;
-		
+
 		// Get base JSON with all custom properties
 		const json = fabricCanvas.toJSON([
-			'id', 'isVariable', 'variableBindings',
+			'id',
+			'isVariable',
+			'variableBindings',
 			// Chart properties
-			'isChart', 'chartType', 'chartData', 'chartConfig',
+			'isChart',
+			'chartType',
+			'chartData',
+			'chartConfig',
 			// Table properties
-			'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
+			'isTable',
+			'tableType',
+			'tableHeaders',
+			'tableRows',
+			'tableData',
+			'tableConfig',
+			'tableStyle',
 			// QR Code properties
-			'isQRCode', 'qrData', 'qrConfig',
+			'isQRCode',
+			'qrData',
+			'qrConfig',
 			// Conditional logic properties
-			'showWhen', 'hideWhen',
+			'showWhen',
+			'hideWhen',
 			// Loop/repeat properties
-			'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns',
+			'loopVariable',
+			'loopItemName',
+			'loopIndexName',
+			'loopDirection',
+			'loopSpacing',
+			'loopColumns',
 			// Pattern fill properties
-			'isPatternFill', 'patternSourceJSON', 'patternBoundsWidth', 'patternBoundsHeight',
-			'patternSpacingX', 'patternSpacingY', 'patternStagger'
+			'isPatternFill',
+			'patternSourceJSON',
+			'patternBoundsWidth',
+			'patternBoundsHeight',
+			'patternSpacingX',
+			'patternSpacingY',
+			'patternStagger'
 		]);
-		
+
 		// Get actual canvas objects to read custom properties
 		const canvasObjects = fabricCanvas.getObjects();
-		
+
 		// Manually ensure custom properties are included
 		if (json.objects && canvasObjects.length === json.objects.length) {
 			json.objects = json.objects.map((objJson, index) => {
 				const canvasObj = canvasObjects[index];
-				
+
 				// Base custom properties
 				const result = {
 					...objJson,
@@ -297,11 +429,11 @@
 					isVariable: canvasObj.isVariable || false,
 					variableBindings: canvasObj.variableBindings || []
 				};
-				
+
 				// Conditional logic properties
 				if (canvasObj.showWhen !== undefined) result.showWhen = canvasObj.showWhen;
 				if (canvasObj.hideWhen !== undefined) result.hideWhen = canvasObj.hideWhen;
-				
+
 				// Loop/repeat properties
 				if (canvasObj.loopVariable !== undefined) result.loopVariable = canvasObj.loopVariable;
 				if (canvasObj.loopItemName !== undefined) result.loopItemName = canvasObj.loopItemName;
@@ -309,7 +441,7 @@
 				if (canvasObj.loopDirection !== undefined) result.loopDirection = canvasObj.loopDirection;
 				if (canvasObj.loopSpacing !== undefined) result.loopSpacing = canvasObj.loopSpacing;
 				if (canvasObj.loopColumns !== undefined) result.loopColumns = canvasObj.loopColumns;
-				
+
 				// Chart-specific properties
 				if (canvasObj.isChart) {
 					result.isChart = true;
@@ -317,7 +449,7 @@
 					result.chartData = canvasObj.chartData || [];
 					result.chartConfig = canvasObj.chartConfig || {};
 				}
-				
+
 				// Table-specific properties
 				if (canvasObj.isTable) {
 					result.isTable = true;
@@ -328,7 +460,7 @@
 					result.tableConfig = canvasObj.tableConfig || {};
 					result.tableStyle = canvasObj.tableStyle || 'modern';
 				}
-				
+
 				// QR Code properties
 				if (canvasObj.isQRCode) {
 					result.isQRCode = true;
@@ -350,7 +482,7 @@
 				return result;
 			});
 		}
-		
+
 		return json;
 	}
 
@@ -370,7 +502,10 @@
 
 			// Debug: Log what we're saving
 			console.log('Saving fabricJSData:', fabricJSData);
-			console.log('Objects with IDs:', fabricJSData?.objects?.map(o => ({ type: o.type, id: o.id, isVariable: o.isVariable })));
+			console.log(
+				'Objects with IDs:',
+				fabricJSData?.objects?.map((o) => ({ type: o.type, id: o.id, isVariable: o.isVariable }))
+			);
 
 			const width = fabricCanvas.width;
 			const height = fabricCanvas.height;
@@ -379,7 +514,9 @@
 			// Prepare multi-page data
 			const currentPages = get(pages);
 			const currentIndex = get(currentPageIndex);
-			const updatedPages = currentPages.map((p, i) => i === currentIndex ? { ...p, fabricJSData } : p);
+			const updatedPages = currentPages.map((p, i) =>
+				i === currentIndex ? { ...p, fabricJSData } : p
+			);
 
 			const templateData = {
 				...editorTemplate,
@@ -404,11 +541,12 @@
 				// Update the template store with the updated template
 				template.set(result);
 				editorTemplate = result;
-				
+
 				const varCount = variableDefinitions.length;
-				const message = varCount > 0
-					? `Template updated with ${varCount} variable${varCount > 1 ? 's' : ''}!`
-					: 'Template updated successfully!';
+				const message =
+					varCount > 0
+						? `Template updated with ${varCount} variable${varCount > 1 ? 's' : ''}!`
+						: 'Template updated successfully!';
 				toast.set({ message, type: 'success', duration: 2000 });
 			} else {
 				toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
@@ -441,7 +579,9 @@
 			// Prepare multi-page data
 			const currentPages = get(pages);
 			const currentIndex = get(currentPageIndex);
-			const updatedPages = currentPages.map((p, i) => i === currentIndex ? { ...p, fabricJSData } : p);
+			const updatedPages = currentPages.map((p, i) =>
+				i === currentIndex ? { ...p, fabricJSData } : p
+			);
 
 			const templateData = {
 				name: templateName,
@@ -466,13 +606,16 @@
 				// This allows the Variables panel to immediately test the API
 				template.set(result);
 				editorTemplate = result;
-				
+
 				const varCount = variableDefinitions.length;
-				const message = varCount > 0
-					? `Template created with ${varCount} variable${varCount > 1 ? 's' : ''}! You can now test the API.`
-					: 'Template created successfully!';
+				const message =
+					varCount > 0
+						? `Template created with ${varCount} variable${
+								varCount > 1 ? 's' : ''
+						  }! You can now test the API.`
+						: 'Template created successfully!';
 				toast.set({ message, type: 'success', duration: 2500 });
-				
+
 				// Redirect to the edit view for this template
 				// Use format-specific URL to ensure correct mode is preserved
 				const currentFormat = get(outputFormat);
@@ -508,7 +651,11 @@
 				}
 			} catch (e) {}
 
-			toast.set({ message: 'Create a free account to save templates and use the API.', type: 'default', duration: 2500 });
+			toast.set({
+				message: 'Create a free account to save templates and use the API.',
+				type: 'default',
+				duration: 2500
+			});
 			showAuthModal = true;
 			return;
 		}
@@ -536,13 +683,23 @@
 			return;
 		}
 
-		console.log('Loading template into canvas:', editorTemplate.uid, 'with', editorTemplate.fabricJSData?.objects?.length, 'objects');
+		console.log(
+			'Loading template into canvas:',
+			editorTemplate.uid,
+			'with',
+			editorTemplate.fabricJSData?.objects?.length,
+			'objects'
+		);
 		hasLoadedTemplate = true;
 
 		// Load saved variable definitions BEFORE canvas sync
 		// This ensures user-specified types are preserved when syncFromCanvas runs
 		if (editorTemplate.variableDefinitions && editorTemplate.variableDefinitions.length > 0) {
-			console.log('Loading variable definitions from template:', editorTemplate.variableDefinitions.length, 'variables');
+			console.log(
+				'Loading variable definitions from template:',
+				editorTemplate.variableDefinitions.length,
+				'variables'
+			);
 			variableActions.loadFromDefinitions(editorTemplate.variableDefinitions);
 		}
 
@@ -550,11 +707,11 @@
 		if (typeof window !== 'undefined' && window.__historyBatchStart) {
 			window.__historyBatchStart();
 		}
-		
+
 		// For Fabric.js v6, loadFromJSON returns a promise but also supports callback
 		// We need to ensure custom properties are properly restored
 		const fabricData = editorTemplate.fabricJSData;
-		
+
 		// Set canvas dimensions from template
 		if (editorTemplate.width && editorTemplate.height) {
 			fabricCanvas.setDimensions({
@@ -562,151 +719,181 @@
 				height: editorTemplate.height
 			});
 		}
-		
-		console.log('Loading template with variableBindings:', fabricData.objects?.map(o => ({ id: o.id, isVariable: o.isVariable, bindings: o.variableBindings })));
-		
+
+		console.log(
+			'Loading template with variableBindings:',
+			fabricData.objects?.map((o) => ({
+				id: o.id,
+				isVariable: o.isVariable,
+				bindings: o.variableBindings
+			}))
+		);
+
 		// Fabric.js v6 loadFromJSON returns a Promise
 		const loadPromise = fabricCanvas.loadFromJSON(fabricData);
-		
+
 		if (loadPromise && typeof loadPromise.then === 'function') {
-			loadPromise.then(() => {
-				console.log('loadFromJSON promise resolved');
-				
-				// Get all canvas objects
-				const objects = fabricCanvas.getObjects();
-				const fabricDataObjects = fabricData.objects || [];
-				
-				// Restore custom properties from fabricJSData
-				objects.forEach((obj, index) => {
-					const objData = fabricDataObjects[index];
-					if (objData) {
-						// Restore variable bindings
-						if (objData.isVariable && objData.variableBindings && Array.isArray(objData.variableBindings)) {
-							obj.set({
-								isVariable: true,
-								variableBindings: objData.variableBindings
-							});
-							console.log('Restored variable bindings to object:', obj.id, obj.type, objData.variableBindings);
-						}
-						
-						// Conditional logic properties
-						if (objData.showWhen !== undefined && objData.showWhen !== null) {
-							obj.set('showWhen', objData.showWhen);
-							console.log('Restored showWhen to object:', obj.id, objData.showWhen);
-						}
-						if (objData.hideWhen !== undefined && objData.hideWhen !== null) {
-							obj.set('hideWhen', objData.hideWhen);
-							console.log('Restored hideWhen to object:', obj.id, objData.hideWhen);
-						}
-						
-						// Loop/repeat properties
-						if (objData.loopVariable !== undefined && objData.loopVariable !== null) {
-							obj.set({
-								loopVariable: objData.loopVariable,
-								loopItemName: objData.loopItemName || 'item',
-								loopIndexName: objData.loopIndexName || 'index',
-								loopDirection: objData.loopDirection || 'vertical',
-								loopSpacing: objData.loopSpacing || 50,
-								loopColumns: objData.loopColumns || 3
-							});
-							console.log('Restored loop properties to object:', obj.id, objData.loopVariable);
-						}
-						
-						// Chart properties
-						if (objData.isChart) {
-							obj.set({
-								isChart: true,
-								chartType: objData.chartType || 'bar',
-								chartData: objData.chartData || [],
-								chartConfig: objData.chartConfig || {}
-							});
-							console.log('Restored chart properties to object:', obj.id, objData.chartType);
-						}
-						
-						// Table properties
-						if (objData.isTable) {
-							obj.set({
-								isTable: true,
-								tableType: objData.tableType || 'standard',
-								tableHeaders: objData.tableHeaders || [],
-								tableRows: objData.tableRows || [],
-								tableData: objData.tableData || null,
-								tableConfig: objData.tableConfig || {},
-								tableStyle: objData.tableStyle || 'modern'
-							});
-							console.log('Restored table properties to object:', obj.id, objData.tableType);
-						}
-						
-						// QR Code properties
-						if (objData.isQRCode) {
-							obj.set({
-								isQRCode: true,
-								qrData: objData.qrData || '',
-								qrConfig: objData.qrConfig || {}
-							});
-							console.log('Restored QR code properties to object:', obj.id, objData.qrData);
-						}
-					}
-				});
-				
-				// Force render the canvas
-				fabricCanvas.requestRenderAll();
-				fabricCanvas.renderAll();
+			loadPromise
+				.then(() => {
+					console.log('loadFromJSON promise resolved');
 
-				// Log variable count for debugging
-				const variableCount = objects.filter(o => o.isVariable).length;
-				console.log('Template loaded successfully with', objects.length, 'objects,', variableCount, 'variables');
+					// Get all canvas objects
+					const objects = fabricCanvas.getObjects();
+					const fabricDataObjects = fabricData.objects || [];
 
-				// Ensure all fonts used by text objects are fully loaded, then re-render
-				// This fixes brand fonts (and slow Google Fonts) showing as fallback on refresh
-				const textObjects = objects.filter(o => o.type === 'i-text' || o.type === 'text' || o.type === 'textbox');
-				if (textObjects.length > 0) {
-					const uniqueFonts = [...new Set(textObjects.map(o => o.fontFamily).filter(f => f && f !== 'Arial'))];
-					if (uniqueFonts.length > 0) {
-						loadBrandFonts().then((brandFamilies) => {
-							const brandSet = new Set((brandFamilies || []).map(f => f.toLowerCase()));
-							uniqueFonts.forEach(font => {
-								if (!brandSet.has(font.toLowerCase())) {
-									preloadFont(font);
-								}
-							});
-							const fontLoadPromises = uniqueFonts.map(font =>
-								document.fonts.load(`12px "${font}"`).catch(() => null)
-							);
-							Promise.all(fontLoadPromises).then(() => document.fonts.ready).then(() => {
-								textObjects.forEach(obj => {
-									if (obj._clearCache) obj._clearCache();
-									if (obj.initDimensions) obj.initDimensions();
-									if (obj.setCoords) obj.setCoords();
-									obj.dirty = true;
+					// Restore custom properties from fabricJSData
+					objects.forEach((obj, index) => {
+						const objData = fabricDataObjects[index];
+						if (objData) {
+							// Restore variable bindings
+							if (
+								objData.isVariable &&
+								objData.variableBindings &&
+								Array.isArray(objData.variableBindings)
+							) {
+								obj.set({
+									isVariable: true,
+									variableBindings: objData.variableBindings
 								});
-								fabricCanvas.requestRenderAll();
-								console.log('Fonts re-rendered after load:', uniqueFonts);
-							});
-						});
-					}
-				}
+								console.log(
+									'Restored variable bindings to object:',
+									obj.id,
+									obj.type,
+									objData.variableBindings
+								);
+							}
 
-				// End history batch after load completes
-				setTimeout(() => {
+							// Conditional logic properties
+							if (objData.showWhen !== undefined && objData.showWhen !== null) {
+								obj.set('showWhen', objData.showWhen);
+								console.log('Restored showWhen to object:', obj.id, objData.showWhen);
+							}
+							if (objData.hideWhen !== undefined && objData.hideWhen !== null) {
+								obj.set('hideWhen', objData.hideWhen);
+								console.log('Restored hideWhen to object:', obj.id, objData.hideWhen);
+							}
+
+							// Loop/repeat properties
+							if (objData.loopVariable !== undefined && objData.loopVariable !== null) {
+								obj.set({
+									loopVariable: objData.loopVariable,
+									loopItemName: objData.loopItemName || 'item',
+									loopIndexName: objData.loopIndexName || 'index',
+									loopDirection: objData.loopDirection || 'vertical',
+									loopSpacing: objData.loopSpacing || 50,
+									loopColumns: objData.loopColumns || 3
+								});
+								console.log('Restored loop properties to object:', obj.id, objData.loopVariable);
+							}
+
+							// Chart properties
+							if (objData.isChart) {
+								obj.set({
+									isChart: true,
+									chartType: objData.chartType || 'bar',
+									chartData: objData.chartData || [],
+									chartConfig: objData.chartConfig || {}
+								});
+								console.log('Restored chart properties to object:', obj.id, objData.chartType);
+							}
+
+							// Table properties
+							if (objData.isTable) {
+								obj.set({
+									isTable: true,
+									tableType: objData.tableType || 'standard',
+									tableHeaders: objData.tableHeaders || [],
+									tableRows: objData.tableRows || [],
+									tableData: objData.tableData || null,
+									tableConfig: objData.tableConfig || {},
+									tableStyle: objData.tableStyle || 'modern'
+								});
+								console.log('Restored table properties to object:', obj.id, objData.tableType);
+							}
+
+							// QR Code properties
+							if (objData.isQRCode) {
+								obj.set({
+									isQRCode: true,
+									qrData: objData.qrData || '',
+									qrConfig: objData.qrConfig || {}
+								});
+								console.log('Restored QR code properties to object:', obj.id, objData.qrData);
+							}
+						}
+					});
+
+					// Force render the canvas
+					fabricCanvas.requestRenderAll();
+					fabricCanvas.renderAll();
+
+					// Log variable count for debugging
+					const variableCount = objects.filter((o) => o.isVariable).length;
+					console.log(
+						'Template loaded successfully with',
+						objects.length,
+						'objects,',
+						variableCount,
+						'variables'
+					);
+
+					// Ensure all fonts used by text objects are fully loaded, then re-render
+					// This fixes brand fonts (and slow Google Fonts) showing as fallback on refresh
+					const textObjects = objects.filter(
+						(o) => o.type === 'i-text' || o.type === 'text' || o.type === 'textbox'
+					);
+					if (textObjects.length > 0) {
+						const uniqueFonts = [
+							...new Set(textObjects.map((o) => o.fontFamily).filter((f) => f && f !== 'Arial'))
+						];
+						if (uniqueFonts.length > 0) {
+							loadBrandFonts().then((brandFamilies) => {
+								const brandSet = new Set((brandFamilies || []).map((f) => f.toLowerCase()));
+								uniqueFonts.forEach((font) => {
+									if (!brandSet.has(font.toLowerCase())) {
+										preloadFont(font);
+									}
+								});
+								const fontLoadPromises = uniqueFonts.map((font) =>
+									document.fonts.load(`12px "${font}"`).catch(() => null)
+								);
+								Promise.all(fontLoadPromises)
+									.then(() => document.fonts.ready)
+									.then(() => {
+										textObjects.forEach((obj) => {
+											if (obj._clearCache) obj._clearCache();
+											if (obj.initDimensions) obj.initDimensions();
+											if (obj.setCoords) obj.setCoords();
+											obj.dirty = true;
+										});
+										fabricCanvas.requestRenderAll();
+										console.log('Fonts re-rendered after load:', uniqueFonts);
+									});
+							});
+						}
+					}
+
+					// End history batch after load completes
+					setTimeout(() => {
+						if (typeof window !== 'undefined' && window.__historyBatchEnd) {
+							window.__historyBatchEnd();
+						}
+						// One more render to be sure
+						fabricCanvas.requestRenderAll();
+
+						// Fire a custom event to notify other components (like VariablesPanel)
+						// that the canvas content has been updated
+						fabricCanvas.fire('object:modified', { target: null });
+					}, 100);
+				})
+				.catch((err) => {
+					console.error('Error loading template:', err);
+					hasLoadedTemplate = false; // Allow retry on error
+					// End history batch on error too
 					if (typeof window !== 'undefined' && window.__historyBatchEnd) {
 						window.__historyBatchEnd();
 					}
-					// One more render to be sure
-					fabricCanvas.requestRenderAll();
-
-					// Fire a custom event to notify other components (like VariablesPanel)
-					// that the canvas content has been updated
-					fabricCanvas.fire('object:modified', { target: null });
-				}, 100);
-			}).catch(err => {
-				console.error('Error loading template:', err);
-				hasLoadedTemplate = false; // Allow retry on error
-				// End history batch on error too
-				if (typeof window !== 'undefined' && window.__historyBatchEnd) {
-					window.__historyBatchEnd();
-				}
-			});
+				});
 		} else {
 			// Fallback for older Fabric.js versions
 			fabricCanvas.renderAll();
@@ -729,7 +916,7 @@
 			hasLoadedTemplate,
 			templateUid: editorTemplate?.uid
 		});
-		
+
 		if (isEdit && fabricCanvas && editorTemplate?.fabricJSData && !hasLoadedTemplate) {
 			console.log('Scheduling template load in 600ms...');
 			// Wait for canvas to be fully initialized (Canvas.svelte has a 500ms init delay)
@@ -762,80 +949,107 @@
 		// Check if we have full FabricJS data (pre-built template from use case)
 		if (pendingDraft.fabricJSData && pendingDraft.fabricJSData.objects) {
 			console.log('Loading FabricJS template from draft:', pendingDraft.name);
-			
+
 			// Start history batch to prevent saving during load
 			if (typeof window !== 'undefined' && window.__historyBatchStart) {
 				window.__historyBatchStart();
 			}
-			
+
 			const fabricData = pendingDraft.fabricJSData;
-			
+
 			// Load the full FabricJS template
 			const loadPromise = fabricCanvas.loadFromJSON(fabricData);
-			
+
 			if (loadPromise && typeof loadPromise.then === 'function') {
-				loadPromise.then(() => {
-					// Restore custom properties (variable bindings, etc.)
-					const objects = fabricCanvas.getObjects();
-					const fabricDataObjects = fabricData.objects || [];
-					
-					objects.forEach((obj, index) => {
-						const objData = fabricDataObjects[index];
-						if (objData) {
-							// Restore variable bindings
-							if (objData.isVariable && objData.variableBindings && Array.isArray(objData.variableBindings)) {
-								obj.set({
-									isVariable: true,
-									variableBindings: objData.variableBindings
-								});
-								console.log('Restored variable bindings to draft object:', obj.id, obj.type, objData.variableBindings);
+				loadPromise
+					.then(() => {
+						// Restore custom properties (variable bindings, etc.)
+						const objects = fabricCanvas.getObjects();
+						const fabricDataObjects = fabricData.objects || [];
+
+						objects.forEach((obj, index) => {
+							const objData = fabricDataObjects[index];
+							if (objData) {
+								// Restore variable bindings
+								if (
+									objData.isVariable &&
+									objData.variableBindings &&
+									Array.isArray(objData.variableBindings)
+								) {
+									obj.set({
+										isVariable: true,
+										variableBindings: objData.variableBindings
+									});
+									console.log(
+										'Restored variable bindings to draft object:',
+										obj.id,
+										obj.type,
+										objData.variableBindings
+									);
+								}
+
+								// Restore ID if present
+								if (objData.id) {
+									obj.set('id', objData.id);
+								}
+
+								// Conditional logic properties
+								if (objData.showWhen !== undefined) obj.set('showWhen', objData.showWhen);
+								if (objData.hideWhen !== undefined) obj.set('hideWhen', objData.hideWhen);
+
+								// Loop/repeat properties
+								if (objData.loopVariable !== undefined) {
+									obj.set({
+										loopVariable: objData.loopVariable,
+										loopItemName: objData.loopItemName || 'item',
+										loopDirection: objData.loopDirection || 'vertical',
+										loopSpacing: objData.loopSpacing || 50
+									});
+								}
 							}
-							
-							// Restore ID if present
-							if (objData.id) {
-								obj.set('id', objData.id);
+						});
+
+						fabricCanvas.requestRenderAll();
+						fabricCanvas.renderAll();
+
+						const variableCount = objects.filter((o) => o.isVariable).length;
+						console.log(
+							'Draft template loaded with',
+							objects.length,
+							'objects,',
+							variableCount,
+							'variables'
+						);
+
+						// End history batch after load completes
+						setTimeout(() => {
+							if (typeof window !== 'undefined' && window.__historyBatchEnd) {
+								window.__historyBatchEnd();
 							}
-							
-							// Conditional logic properties
-							if (objData.showWhen !== undefined) obj.set('showWhen', objData.showWhen);
-							if (objData.hideWhen !== undefined) obj.set('hideWhen', objData.hideWhen);
-							
-							// Loop/repeat properties
-							if (objData.loopVariable !== undefined) {
-								obj.set({
-									loopVariable: objData.loopVariable,
-									loopItemName: objData.loopItemName || 'item',
-									loopDirection: objData.loopDirection || 'vertical',
-									loopSpacing: objData.loopSpacing || 50
-								});
-							}
-						}
-					});
-					
-					fabricCanvas.requestRenderAll();
-					fabricCanvas.renderAll();
-					
-					const variableCount = objects.filter(o => o.isVariable).length;
-					console.log('Draft template loaded with', objects.length, 'objects,', variableCount, 'variables');
-					
-					// End history batch after load completes
-					setTimeout(() => {
+							fabricCanvas.requestRenderAll();
+							// Fire event to notify other components
+							fabricCanvas.fire('object:modified', { target: null });
+						}, 100);
+
+						toast.set({
+							message: `Template loaded with ${variableCount} variable${
+								variableCount !== 1 ? 's' : ''
+							}. Customize and save!`,
+							type: 'success',
+							duration: 2500
+						});
+					})
+					.catch((err) => {
+						console.error('Error loading draft template:', err);
 						if (typeof window !== 'undefined' && window.__historyBatchEnd) {
 							window.__historyBatchEnd();
 						}
-						fabricCanvas.requestRenderAll();
-						// Fire event to notify other components
-						fabricCanvas.fire('object:modified', { target: null });
-					}, 100);
-					
-					toast.set({ message: `Template loaded with ${variableCount} variable${variableCount !== 1 ? 's' : ''}. Customize and save!`, type: 'success', duration: 2500 });
-				}).catch(err => {
-					console.error('Error loading draft template:', err);
-					if (typeof window !== 'undefined' && window.__historyBatchEnd) {
-						window.__historyBatchEnd();
-					}
-					toast.set({ message: 'Could not load template. Try adding elements manually.', type: 'error', duration: 2500 });
-				});
+						toast.set({
+							message: 'Could not load template. Try adding elements manually.',
+							type: 'error',
+							duration: 2500
+						});
+					});
 			} else {
 				fabricCanvas.renderAll();
 			}
@@ -864,10 +1078,18 @@
 					fabricCanvas.sendToBack(img);
 					fabricCanvas.renderAll();
 
-					toast.set({ message: 'Imported your generated output as a background. Add variables on top →', type: 'success', duration: 2500 });
+					toast.set({
+						message: 'Imported your generated output as a background. Add variables on top →',
+						type: 'success',
+						duration: 2500
+					});
 				})
 				.catch(() => {
-					toast.set({ message: 'Could not import background image. You can add it from the Assets panel.', type: 'error', duration: 2500 });
+					toast.set({
+						message: 'Could not import background image. You can add it from the Assets panel.',
+						type: 'error',
+						duration: 2500
+					});
 				});
 		} else {
 			fabricCanvas.renderAll();
@@ -936,13 +1158,15 @@
 				pendingDraft = null;
 			}
 		}
-		
+
 		unsubscribe = editor.subscribe((e) => {
 			console.log('Editor subscribe fired, canvas:', !!e);
 			fabricCanvas = e;
 			applyDraftToCanvas();
 			// Try to load template when canvas becomes available
 			attemptTemplateLoad();
+			// Auto-import from Figma plugin if ?figmaImport= is present
+			if (e && figmaImportId) handleFigmaAutoImport(e);
 		});
 
 		templateUnsubscribe = template.subscribe((t) => {
@@ -953,21 +1177,21 @@
 				objectCount: t?.fabricJSData?.objects?.length,
 				outputFormat: t?.outputFormat
 			});
-			
+
 			// Debug: Check if objects have isVariable property
 			if (t?.fabricJSData?.objects) {
-				const varsInData = t.fabricJSData.objects.filter(o => o.isVariable);
+				const varsInData = t.fabricJSData.objects.filter((o) => o.isVariable);
 				console.log('Variables in loaded fabricJSData:', varsInData.length, varsInData);
 			}
-			
+
 			editorTemplate = t;
 			if (editorTemplate) {
 				templateName = editorTemplate.name || templateName;
 				templateType = editorTemplate.type || 'og-image';
-				
+
 				// Initialize pages from template data (handles multi-page PDF)
 				pageActions.initFromTemplate(editorTemplate);
-				
+
 				// Restore output format and PDF preset from template data
 				// This ensures PDF templates open in PDF mode when refreshed
 				if (editorTemplate.outputFormat) {
@@ -978,7 +1202,6 @@
 					pageActions.setPdfPreset(editorTemplate.pdfPreset);
 					console.log('Restored pdfPreset:', editorTemplate.pdfPreset);
 				}
-
 
 				// Try to load template when template data becomes available
 				attemptTemplateLoad();
@@ -998,17 +1221,9 @@
 	});
 </script>
 
-<EditorLayout 
-	bind:templateName 
-	{isSaving} 
-	{guestMode}
-	on:save={saveTemplate} 
-/>
+<EditorLayout bind:templateName {isSaving} {guestMode} on:save={saveTemplate} />
 
 <Toast />
 
 <!-- Auth Modal -->
-<AuthModal
-	bind:isOpen={showAuthModal}
-	onSuccess={handleAuthSuccess}
-/>
+<AuthModal bind:isOpen={showAuthModal} onSuccess={handleAuthSuccess} />
