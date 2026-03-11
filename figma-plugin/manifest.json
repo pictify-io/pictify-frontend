@@ -1,0 +1,13 @@
+{
+	"name": "Send to Pictify",
+	"id": "pictify-send-to-pictify",
+	"api": "1.0.0",
+	"main": "code.js",
+	"ui": "ui.html",
+	"editorType": ["figma"],
+	"networkAccess": {
+		"allowedDomains": ["https://pictify.io", "https://api.pictify.io"],
+		"devAllowedDomains": ["http://localhost:3000"],
+		"reasoning": "Send selected Figma frames to Pictify for editing and animation"
+	}
+}

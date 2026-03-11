@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+				background: #fffdf8;
+				color: #111;
+				font-size: 12px;
+				overflow-y: auto;
+			}
+			.container {
+				padding: 16px;
+			}
+
+			/* Buttons */
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				padding: 10px 16px;
+				border: 2px solid #111;
+				border-radius: 8px;
+				font-weight: 800;
+				font-size: 11px;
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				cursor: pointer;
+				transition: all 0.15s;
+			}
+			.btn:hover {
+				transform: translate(1px, 1px);
+				box-shadow: none !important;
+			}
+			.btn:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+				transform: none !important;
+			}
+			.btn-primary {
+				background: #a259ff;
+				color: white;
+				box-shadow: 3px 3px 0 0 #111;
+			}
+			.btn-secondary {
+				background: white;
+				color: #111;
+				box-shadow: 2px 2px 0 0 #111;
+			}
+			.btn-small {
+				padding: 6px 10px;
+				font-size: 10px;
+			}
+			.btn-full {
+				width: 100%;
+			}
+
+			/* Input */
+			.input {
+				width: 100%;
+				padding: 10px 12px;
+				border: 2px solid #111;
+				border-radius: 8px;
+				font-size: 12px;
+				font-weight: 500;
+				background: white;
+				outline: none;
+				font-family: inherit;
+			}
+			.input:focus {
+				box-shadow: 3px 3px 0 0 #a259ff;
+			}
+			.input::placeholder {
+				color: #aaa;
+			}
+
+			/* Labels */
+			.label {
+				font-size: 10px;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				color: #111;
+				margin-bottom: 6px;
+			}
+			.sublabel {
+				font-size: 10px;
+				font-weight: 500;
+				color: #888;
+				margin-top: 4px;
+			}
+
+			/* Frame card */
+			.frame-card {
+				background: white;
+				border: 2px solid #111;
+				border-radius: 8px;
+				overflow: hidden;
+				transition: all 0.15s;
+				cursor: pointer;
+			}
+			.frame-card.selected {
+				border-color: #a259ff;
+				box-shadow: 3px 3px 0 0 #a259ff;
+			}
+			.frame-card:hover:not(.selected) {
+				box-shadow: 2px 2px 0 0 #111;
+				transform: translate(-1px, -1px);
+			}
+			.frame-preview {
+				width: 100%;
+				height: 80px;
+				background: #f0f0f0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+			}
+			.frame-preview img {
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+			.frame-info {
+				padding: 8px;
+			}
+			.frame-name {
+				font-weight: 700;
+				font-size: 11px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.frame-dims {
+				font-size: 10px;
+				color: #888;
+				font-weight: 500;
+			}
+
+			/* Grid */
+			.grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+			}
+
+			/* Status */
+			.status-bar {
+				padding: 8px 12px;
+				border: 2px solid;
+				border-radius: 8px;
+				font-size: 11px;
+				font-weight: 600;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.status-success {
+				background: #f0fdf4;
+				border-color: #86efac;
+				color: #166534;
+			}
+			.status-error {
+				background: #fef2f2;
+				border-color: #fca5a5;
+				color: #991b1b;
+			}
+			.status-info {
+				background: #f0f4ff;
+				border-color: #93c5fd;
+				color: #1e40af;
+			}
+
+			/* Spinner */
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			.spinner {
+				width: 16px;
+				height: 16px;
+				border: 2px solid #ddd;
+				border-top-color: #a259ff;
+				border-radius: 50%;
+				animation: spin 0.6s linear infinite;
+				flex-shrink: 0;
+			}
+
+			/* Connected bar */
+			.user-bar {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 8px 12px;
+				background: #f0fdf4;
+				border: 2px solid #86efac;
+				border-radius: 8px;
+				margin-bottom: 12px;
+			}
+			.user-bar .name {
+				font-weight: 700;
+				font-size: 11px;
+			}
+			.user-bar .connected {
+				font-size: 10px;
+				color: #166534;
+				font-weight: 500;
+			}
+			.user-bar button {
+				background: none;
+				border: none;
+				color: #ef4444;
+				font-size: 10px;
+				font-weight: 700;
+				cursor: pointer;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			/* Empty state */
+			.empty {
+				text-align: center;
+				padding: 32px 16px;
+				color: #888;
+			}
+			.empty-icon {
+				width: 48px;
+				height: 48px;
+				background: #f3f4f6;
+				border: 2px solid #d1d5db;
+				border-radius: 12px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin: 0 auto 12px;
+				font-size: 20px;
+			}
+
+			.section {
+				margin-bottom: 16px;
+			}
+			.footer {
+				margin-top: 16px;
+			}
+			.hidden {
+				display: none;
+			}
+			.mb-2 {
+				margin-bottom: 8px;
+			}
+			.mb-3 {
+				margin-bottom: 12px;
+			}
+			.mb-4 {
+				margin-bottom: 16px;
+			}
+			.text-center {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<!-- Loading state -->
+			<div id="loading" class="empty">
+				<div class="spinner" style="margin: 0 auto 12px"></div>
+				<p style="font-weight: 600">Loading...</p>
+			</div>
+
+			<!-- Auth screen -->
+			<div id="auth-screen" class="hidden">
+				<div style="text-align: center; margin-bottom: 20px">
+					<div
+						style="
+							width: 56px;
+							height: 56px;
+							background: #a259ff;
+							border: 2px solid #111;
+							border-radius: 12px;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							margin: 0 auto 12px;
+							box-shadow: 3px 3px 0 0 #111;
+						"
+					>
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+							<path d="M13 3H4a2 2 0 0 0-2 2v6h2V5h9V3Z" fill="white" />
+							<path
+								d="M20 9h-9v2h7v8H11v-4H9v4a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2Z"
+								fill="white"
+							/>
+							<path d="m6 12 5 4v-3h4V9h-4V6L6 12Z" fill="white" />
+						</svg>
+					</div>
+					<div style="font-weight: 800; font-size: 14px; margin-bottom: 4px">
+						Connect to Pictify
+					</div>
+					<p class="sublabel">Enter your API token to send designs</p>
+				</div>
+				<div class="section">
+					<div class="label">API Token</div>
+					<input
+						id="token-input"
+						class="input mb-2"
+						type="password"
+						placeholder="Paste your Pictify API token"
+					/>
+					<p class="sublabel">Find it at Settings &gt; API Token in your Pictify dashboard</p>
+				</div>
+				<div class="footer">
+					<button id="connect-btn" class="btn btn-primary btn-full" onclick="connectToken()">
+						Connect
+					</button>
+				</div>
+				<div
+					id="auth-error"
+					class="status-bar status-error hidden mb-3"
+					style="margin-top: 12px"
+				></div>
+			</div>
+
+			<!-- Main screen (authenticated) -->
+			<div id="main-screen" class="hidden">
+				<div id="user-bar" class="user-bar">
+					<div>
+						<div class="name" id="user-name"></div>
+						<div class="connected">Connected to Pictify</div>
+					</div>
+					<button onclick="disconnect()">Disconnect</button>
+				</div>
+
+				<!-- Selection area -->
+				<div id="selection-area">
+					<div class="label mb-2">Selected Frames</div>
+
+					<!-- No selection -->
+					<div id="empty-selection" class="empty hidden">
+						<div class="empty-icon">&#9634;</div>
+						<p style="font-weight: 600; color: #111; margin-bottom: 4px">No frames selected</p>
+						<p class="sublabel">Select one or more frames in Figma</p>
+					</div>
+
+					<!-- Frame grid -->
+					<div id="frame-grid" class="grid mb-3"></div>
+
+					<!-- Exporting -->
+					<div id="exporting-state" class="hidden">
+						<div class="status-bar status-info">
+							<div class="spinner"></div>
+							<span id="export-status">Preparing export...</span>
+						</div>
+					</div>
+
+					<!-- Send button -->
+					<div id="send-section" class="footer hidden">
+						<button id="send-btn" class="btn btn-primary btn-full" onclick="sendToPictify()">
+							Send to Pictify
+						</button>
+					</div>
+				</div>
+
+				<!-- Success state -->
+				<div id="success-state" class="hidden">
+					<div style="text-align: center; padding: 20px 0">
+						<div
+							style="
+								width: 48px;
+								height: 48px;
+								background: #22c55e;
+								border: 2px solid #111;
+								border-radius: 50%;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								margin: 0 auto 12px;
+								box-shadow: 3px 3px 0 0 #111;
+								color: white;
+								font-size: 20px;
+							"
+						>
+							&#10003;
+						</div>
+						<div style="font-weight: 800; font-size: 14px; margin-bottom: 4px">
+							Sent successfully!
+						</div>
+						<p class="sublabel mb-3">Your design is ready in Pictify</p>
+						<button class="btn btn-primary btn-full mb-2" onclick="openInPictify()">
+							Open in Pictify
+						</button>
+						<button class="btn btn-secondary btn-full" onclick="resetToMain()">Send Another</button>
+					</div>
+				</div>
+
+				<!-- Error state -->
+				<div id="error-state" class="status-bar status-error hidden" style="margin-top: 12px"></div>
+			</div>
+		</div>
+
+		<script>
+			// State
+			let apiToken = null;
+			let userName = '';
+			let frames = [];
+			let selectedFrameIds = new Set();
+			let lastEditorUrl = '';
+			// Change to 'https://api.pictify.io' for production
+			const API_BASE = 'http://localhost:3000';
+
+			// Listen for messages from Figma sandbox
+			onmessage = (event) => {
+				const msg = event.data.pluginMessage;
+				if (!msg) return;
+
+				switch (msg.type) {
+					case 'token-loaded':
+						apiToken = msg.token;
+						if (apiToken) {
+							validateToken();
+						} else {
+							showScreen('auth');
+						}
+						break;
+
+					case 'selection':
+						frames = msg.frames || [];
+						renderFrames();
+						break;
+
+					case 'no-selection':
+						frames = [];
+						renderFrames();
+						break;
+				}
+			};
+
+			// Tell the sandbox we're ready
+			parent.postMessage({ pluginMessage: { type: 'ui-ready' } }, '*');
+
+			function showScreen(name) {
+				document.getElementById('loading').classList.add('hidden');
+				document.getElementById('auth-screen').classList.toggle('hidden', name !== 'auth');
+				document.getElementById('main-screen').classList.toggle('hidden', name !== 'main');
+			}
+
+			// Auth
+			async function validateToken() {
+				try {
+					const res = await fetch(`${API_BASE}/figma/plugin/auth-check`, {
+						headers: { Authorization: `Bearer ${apiToken}` }
+					});
+					if (!res.ok) throw new Error('Invalid token');
+					const data = await res.json();
+					userName = data.name || data.email;
+					document.getElementById('user-name').textContent = userName;
+					showScreen('main');
+				} catch {
+					apiToken = null;
+					parent.postMessage({ pluginMessage: { type: 'clear-token' } }, '*');
+					showScreen('auth');
+				}
+			}
+
+			async function connectToken() {
+				const input = document.getElementById('token-input');
+				const token = input.value.trim();
+				if (!token) return;
+
+				const btn = document.getElementById('connect-btn');
+				btn.disabled = true;
+				btn.textContent = 'Connecting...';
+				hideError('auth-error');
+
+				try {
+					const res = await fetch(`${API_BASE}/figma/plugin/auth-check`, {
+						headers: { Authorization: `Bearer ${token}` }
+					});
+					if (!res.ok) throw new Error('Invalid token');
+					const data = await res.json();
+
+					apiToken = token;
+					userName = data.name || data.email;
+					parent.postMessage({ pluginMessage: { type: 'save-token', token } }, '*');
+
+					document.getElementById('user-name').textContent = userName;
+					showScreen('main');
+				} catch {
+					showError('auth-error', 'Invalid API token. Check your token and try again.');
+				} finally {
+					btn.disabled = false;
+					btn.textContent = 'Connect';
+				}
+			}
+
+			function disconnect() {
+				apiToken = null;
+				parent.postMessage({ pluginMessage: { type: 'clear-token' } }, '*');
+				showScreen('auth');
+			}
+
+			// Frame rendering
+			function renderFrames() {
+				const grid = document.getElementById('frame-grid');
+				const empty = document.getElementById('empty-selection');
+				const sendSection = document.getElementById('send-section');
+
+				if (frames.length === 0) {
+					grid.innerHTML = '';
+					empty.classList.remove('hidden');
+					sendSection.classList.add('hidden');
+					return;
+				}
+
+				empty.classList.add('hidden');
+				selectedFrameIds = new Set(frames.map((f) => f.id));
+
+				grid.innerHTML = frames
+					.map((f) => {
+						const pngBlob = new Blob([new Uint8Array(f.pngData)], { type: 'image/png' });
+						const url = URL.createObjectURL(pngBlob);
+						return `
+      <div class="frame-card selected" data-id="${f.id}" onclick="toggleFrame('${f.id}')">
+        <div class="frame-preview"><img src="${url}" /></div>
+        <div class="frame-info">
+          <div class="frame-name">${escapeHtml(f.name)}</div>
+          <div class="frame-dims">${f.width} x ${f.height}</div>
+        </div>
+      </div>
+    `;
+					})
+					.join('');
+
+				sendSection.classList.remove('hidden');
+			}
+
+			function toggleFrame(id) {
+				if (selectedFrameIds.has(id)) {
+					selectedFrameIds.delete(id);
+				} else {
+					selectedFrameIds.add(id);
+				}
+				// Update card visuals
+				document.querySelectorAll('.frame-card').forEach((card) => {
+					card.classList.toggle('selected', selectedFrameIds.has(card.dataset.id));
+				});
+				// Update send button
+				document.getElementById('send-btn').disabled = selectedFrameIds.size === 0;
+			}
+
+			// Send to Pictify
+			async function sendToPictify() {
+				const selected = frames.filter((f) => selectedFrameIds.has(f.id));
+				if (selected.length === 0) return;
+
+				const btn = document.getElementById('send-btn');
+				btn.disabled = true;
+				document.getElementById('exporting-state').classList.remove('hidden');
+				document.getElementById('send-section').classList.add('hidden');
+				hideError('error-state');
+
+				try {
+					for (let i = 0; i < selected.length; i++) {
+						const frame = selected[i];
+						document.getElementById('export-status').textContent = `Sending ${i + 1} of ${
+							selected.length
+						}: ${frame.name}...`;
+
+						// Convert frame preview PNG to base64
+						const previewPng = `data:image/png;base64,${uint8ToBase64(
+							new Uint8Array(frame.pngData)
+						)}`;
+
+						// Convert fallback image PNGs to base64 data URLs
+						const fallbackImages = {};
+						if (frame.fallbackImages) {
+							for (const [nodeId, pngArray] of Object.entries(frame.fallbackImages)) {
+								fallbackImages[nodeId] = `data:image/png;base64,${uint8ToBase64(
+									new Uint8Array(pngArray)
+								)}`;
+							}
+						}
+
+						const res = await fetch(`${API_BASE}/figma/plugin/import`, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: `Bearer ${apiToken}`
+							},
+							body: JSON.stringify({
+								nodeTree: frame.jsonData,
+								fallbackImages,
+								metadata: {
+									frameName: frame.name,
+									frameId: frame.id,
+									width: frame.width,
+									height: frame.height
+								},
+								previewPng
+							})
+						});
+
+						if (!res.ok) {
+							const err = await res.json().catch(() => ({}));
+							throw new Error(err.message || `Upload failed (${res.status})`);
+						}
+
+						const result = await res.json();
+						lastEditorUrl = result.editorUrl;
+					}
+
+					// Success
+					document.getElementById('exporting-state').classList.add('hidden');
+					document.getElementById('selection-area').classList.add('hidden');
+					document.getElementById('success-state').classList.remove('hidden');
+
+					parent.postMessage(
+						{ pluginMessage: { type: 'notify', message: 'Design sent to Pictify!' } },
+						'*'
+					);
+				} catch (err) {
+					document.getElementById('exporting-state').classList.add('hidden');
+					document.getElementById('send-section').classList.remove('hidden');
+					showError('error-state', err.message);
+					btn.disabled = false;
+				}
+			}
+
+			function openInPictify() {
+				if (lastEditorUrl) {
+					parent.postMessage({ pluginMessage: { type: 'open-url', url: lastEditorUrl } }, '*');
+				}
+			}
+
+			function resetToMain() {
+				document.getElementById('success-state').classList.add('hidden');
+				document.getElementById('selection-area').classList.remove('hidden');
+				parent.postMessage({ pluginMessage: { type: 'refresh-selection' } }, '*');
+			}
+
+			// Safe base64 encoding for large Uint8Arrays (avoids stack overflow from spread)
+			function uint8ToBase64(bytes) {
+				let binary = '';
+				const len = bytes.byteLength;
+				for (let i = 0; i < len; i++) {
+					binary += String.fromCharCode(bytes[i]);
+				}
+				return btoa(binary);
+			}
+
+			// Helpers
+			function showError(id, msg) {
+				const el = document.getElementById(id);
+				el.textContent = msg;
+				el.classList.remove('hidden');
+			}
+			function hideError(id) {
+				document.getElementById(id).classList.add('hidden');
+			}
+			function escapeHtml(str) {
+				return str.replace(
+					/[&<>"']/g,
+					(c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+				);
+			}
+		</script>
+	</body>
+</html>
