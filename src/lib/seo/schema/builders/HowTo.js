@@ -94,7 +94,11 @@ export function buildStepSchema(step, position) {
  * @returns {Object|null} HowTo schema for migration
  */
 export function buildMigrationHowToSchema(comparison) {
-	if (!comparison.migration || !comparison.migration.steps || comparison.migration.steps.length === 0) {
+	if (
+		!comparison.migration ||
+		!comparison.migration.steps ||
+		comparison.migration.steps.length === 0
+	) {
 		return null;
 	}
 
@@ -102,7 +106,7 @@ export function buildMigrationHowToSchema(comparison) {
 		name: `How to Switch from ${comparison.competitor} to Pictify`,
 		description: `Step-by-step guide to migrate from ${comparison.competitor} to Pictify. Difficulty: ${comparison.migration.difficulty}. Estimated time: ${comparison.migration.timeEstimate}.`,
 		totalTime: estimateDuration(comparison.migration.timeEstimate),
-		steps: comparison.migration.steps.map(step => ({
+		steps: comparison.migration.steps.map((step) => ({
 			name: step,
 			text: step
 		}))

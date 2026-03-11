@@ -11,13 +11,12 @@ export { default as FeatureBadge } from './FeatureBadge.svelte';
 
 // Re-export plan features config for convenience
 export {
-  PLANS,
-  PLAN_DISPLAY_NAMES,
-  FEATURES,
-  PLAN_FEATURES,
-  FEATURE_METADATA,
-  getFeatureLimit,
-  hasFeatureAccess,
-  formatLimit,
+	PLANS,
+	PLAN_DISPLAY_NAMES,
+	FEATURES,
+	PLAN_FEATURES,
+	FEATURE_METADATA,
+	getFeatureLimit,
+	hasFeatureAccess,
+	formatLimit
 } from '../../../config/plan-features.js';
-

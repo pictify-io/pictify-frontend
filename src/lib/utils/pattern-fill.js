@@ -109,9 +109,22 @@ async function buildClones(sourceJSON, boundsWidth, boundsHeight, spacingX, spac
  * @returns {Promise<{group: Group, capped: boolean}>}
  */
 export async function generatePatternGroup(sourceJSON, config) {
-	const { boundsWidth = 400, boundsHeight = 400, spacingX = 0, spacingY = 0, stagger = false } = config;
+	const {
+		boundsWidth = 400,
+		boundsHeight = 400,
+		spacingX = 0,
+		spacingY = 0,
+		stagger = false
+	} = config;
 
-	const { clones, capped } = await buildClones(sourceJSON, boundsWidth, boundsHeight, spacingX, spacingY, stagger);
+	const { clones, capped } = await buildClones(
+		sourceJSON,
+		boundsWidth,
+		boundsHeight,
+		spacingX,
+		spacingY,
+		stagger
+	);
 
 	// Clip to exact bounds
 	const clipPath = new Rect({
@@ -200,11 +213,18 @@ export async function regeneratePatternContents(group) {
 
 	// Remove all existing children
 	const existing = group.getObjects();
-	existing.forEach(obj => group.remove(obj));
+	existing.forEach((obj) => group.remove(obj));
 
 	// Build new clones
-	const { clones, capped } = await buildClones(sourceJSON, boundsWidth, boundsHeight, spacingX, spacingY, stagger);
-	clones.forEach(obj => group.add(obj));
+	const { clones, capped } = await buildClones(
+		sourceJSON,
+		boundsWidth,
+		boundsHeight,
+		spacingX,
+		spacingY,
+		stagger
+	);
+	clones.forEach((obj) => group.add(obj));
 
 	// Update clipPath
 	if (group.clipPath) {

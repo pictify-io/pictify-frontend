@@ -14,15 +14,20 @@
 		PLAN_FEATURES,
 		formatLimit,
 		OVERAGE_PRICING,
-		isOverageEligible,
+		isOverageEligible
 	} from '../../../config/plan-features.js';
 	import OverageSettings from '$lib/components/plg/OverageSettings.svelte';
 	import {
 		overageState,
 		updateOveragePreferences,
-		initOverageState,
+		initOverageState
 	} from '../../../store/plg.store';
-	import { SubscriptionCard, InvoiceHistory, OverageInvoices, ConfirmModal } from '$lib/components/billing';
+	import {
+		SubscriptionCard,
+		InvoiceHistory,
+		OverageInvoices,
+		ConfirmModal
+	} from '$lib/components/billing';
 	import { getOverageInvoices } from '../../../api/billing';
 	import {
 		billingState,
@@ -31,7 +36,7 @@
 		doPauseSubscription,
 		doResumeSubscription,
 		doCancelSubscription,
-		doReactivateSubscription,
+		doReactivateSubscription
 	} from '../../../store/billing.store';
 	import { toast } from '../../../store/toast.store';
 
@@ -103,8 +108,10 @@
 	// Note: LemonSqueezy returns 'Standard', displayed as 'Pro' on pricing page
 	const featuredPlanNames = ['Standard', 'Business'];
 
-	$: featuredPlans = allPlans.filter(p => featuredPlanNames.includes(p.name));
-	$: otherPlans = allPlans.filter(p => !featuredPlanNames.includes(p.name) && p.name !== 'Starter');
+	$: featuredPlans = allPlans.filter((p) => featuredPlanNames.includes(p.name));
+	$: otherPlans = allPlans.filter(
+		(p) => !featuredPlanNames.includes(p.name) && p.name !== 'Starter'
+	);
 
 	// Get plan features from central config
 	function getQuotas(planName) {
@@ -116,7 +123,7 @@
 			aiCopilot: features[FEATURES.AI_COPILOT],
 			aiBackgroundRemover: features[FEATURES.AI_BACKGROUND_REMOVER],
 			batchRender: features[FEATURES.BATCH_RENDER],
-			teamSeats: features[FEATURES.TEAM_SEATS],
+			teamSeats: features[FEATURES.TEAM_SEATS]
 		};
 	}
 
@@ -134,7 +141,7 @@
 		analytics.track('overage_settings_changed', {
 			allowOverages,
 			spendingCapCents,
-			plan: currentPlan,
+			plan: currentPlan
 		});
 	}
 
@@ -142,7 +149,7 @@
 	async function handlePauseConfirm(event) {
 		const { resumeDate } = event.detail;
 		const result = await doPauseSubscription({
-			resumesAt: resumeDate ? new Date(resumeDate).toISOString() : null,
+			resumesAt: resumeDate ? new Date(resumeDate).toISOString() : null
 		});
 
 		showPauseModal = false;
@@ -172,7 +179,10 @@
 		showCancelModal = false;
 
 		if (result.success) {
-			toast.set({ message: 'Subscription cancelled. You\'ll have access until your billing period ends.', type: 'success' });
+			toast.set({
+				message: "Subscription cancelled. You'll have access until your billing period ends.",
+				type: 'success'
+			});
 			analytics.track('subscription_cancelled');
 		} else {
 			toast.set({ message: result.error || 'Failed to cancel subscription', type: 'error' });
@@ -206,9 +216,8 @@
 		if (!plan) return;
 
 		// Use annual URL if available and annual billing is selected
-		const purchaseUrl = showAnnual && plan.purchase_url_annual
-			? plan.purchase_url_annual
-			: plan.purchase_url;
+		const purchaseUrl =
+			showAnnual && plan.purchase_url_annual ? plan.purchase_url_annual : plan.purchase_url;
 
 		// Track upgrade started
 		analytics.trackUpgradeStarted({
@@ -267,15 +276,28 @@
 <section class="min-h-full">
 	<!-- Discount Banner -->
 	{#if discountCode}
-		<div class="mb-8 max-w-2xl p-4 bg-[#10b981]/10 border-[3px] border-[#10b981] rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]">
-			<div class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+		<div
+			class="mb-8 max-w-2xl p-4 bg-[#10b981]/10 border-[3px] border-[#10b981] rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
+		>
+			<div
+				class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+			>
 				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+					/>
 				</svg>
 			</div>
 			<div>
-				<p class="font-black text-gray-900 text-lg uppercase tracking-tight">Code Applied: <span class="text-[#10b981]">{discountCode}</span></p>
-				<p class="text-sm font-bold text-gray-600">Your discount will be applied at checkout automatically.</p>
+				<p class="font-black text-gray-900 text-lg uppercase tracking-tight">
+					Code Applied: <span class="text-[#10b981]">{discountCode}</span>
+				</p>
+				<p class="text-sm font-bold text-gray-600">
+					Your discount will be applied at checkout automatically.
+				</p>
 			</div>
 		</div>
 	{/if}
@@ -283,42 +305,70 @@
 	<!-- Page Header -->
 	<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
 		<div>
-			<div class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3">
-				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse"></span>
+			<div
+				class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
+			>
+				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse" />
 				Account
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				Plans & <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600">Billing</span>
+				Plans & <span
+					class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
+					>Billing</span
+				>
 			</h1>
 		</div>
 		<div class="flex items-center gap-4">
 			<div class="text-right">
-				<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Current Plan</div>
-				<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">{currentPlan || 'Starter'}</div>
+				<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
+					Current Plan
+				</div>
+				<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">
+					{currentPlan || 'Starter'}
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<!-- Layout Grid -->
 	<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-		
 		<!-- Left Column: Subscription & History -->
 		<div class="lg:col-span-8 space-y-8">
 			<!-- Current Subscription -->
 			<section>
 				{#if $billingState.loading && !$billingState.loaded}
-					<div class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]">
+					<div
+						class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+					>
 						<Loader size="10" show={true} />
-						<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">Loading details...</p>
+						<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">
+							Loading details...
+						</p>
 					</div>
 				{:else if $billingState.error}
-					<div class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]">
-						<div class="w-12 h-12 bg-[#ff6b6b]/20 rounded-xl border-[3px] border-[#ff6b6b] flex items-center justify-center mb-4">
-							<svg class="w-6 h-6 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+					<div
+						class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+					>
+						<div
+							class="w-12 h-12 bg-[#ff6b6b]/20 rounded-xl border-[3px] border-[#ff6b6b] flex items-center justify-center mb-4"
+						>
+							<svg
+								class="w-6 h-6 text-[#ff6b6b]"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+								/>
 							</svg>
 						</div>
-						<p class="text-gray-900 font-black text-lg uppercase tracking-tight mb-2">Failed to load</p>
+						<p class="text-gray-900 font-black text-lg uppercase tracking-tight mb-2">
+							Failed to load
+						</p>
 						<p class="text-gray-600 font-medium text-sm mb-6">{$billingState.error}</p>
 						<button
 							on:click={() => initBilling()}
@@ -335,9 +385,9 @@
 						resuming={$billingActions.resuming}
 						cancelling={$billingActions.cancelling}
 						reactivating={$billingActions.reactivating}
-						on:pause={() => showPauseModal = true}
+						on:pause={() => (showPauseModal = true)}
 						on:resume={handleResume}
-						on:cancel={() => showCancelModal = true}
+						on:cancel={() => (showCancelModal = true)}
 						on:reactivate={handleReactivate}
 					/>
 				{/if}
@@ -353,16 +403,12 @@
 
 			<!-- Overage Invoices -->
 			<section>
-				<OverageInvoices
-					invoices={overageInvoices}
-					loading={overageInvoicesLoading}
-				/>
+				<OverageInvoices invoices={overageInvoices} loading={overageInvoicesLoading} />
 			</section>
 		</div>
 
 		<!-- Right Column: Settings & Upgrade -->
 		<div class="lg:col-span-4 space-y-8 sticky top-8">
-			
 			<!-- Overage Settings -->
 			{#if canUseOverages && $billingState.subscription}
 				<OverageSettings
@@ -378,18 +424,36 @@
 
 			<!-- Upgrade Side Card (if not highest tier) -->
 			{#if $billingState.loaded && currentPlan !== 'business'}
-				<div class="bg-gray-900 rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ffc480] overflow-hidden flex flex-col">
+				<div
+					class="bg-gray-900 rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ffc480] overflow-hidden flex flex-col"
+				>
 					<!-- Header -->
 					<div class="bg-gray-800 border-b-[3px] border-gray-900 p-4">
 						<div class="flex items-center gap-3">
-							<div class="w-8 h-8 rounded-lg bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#000]">
-								<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+							<div
+								class="w-8 h-8 rounded-lg bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#000]"
+							>
+								<svg
+									class="w-4 h-4 text-gray-900"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2.5"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/>
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-xs font-black text-white uppercase tracking-widest">Upgrade Plan</h2>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Unlock more power</p>
+								<h2 class="text-xs font-black text-white uppercase tracking-widest">
+									Upgrade Plan
+								</h2>
+								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+									Unlock more power
+								</p>
 							</div>
 						</div>
 					</div>
@@ -397,9 +461,10 @@
 					<!-- Content -->
 					<div class="p-6 flex-1 flex flex-col">
 						<p class="text-gray-300 text-sm font-medium mb-6 leading-relaxed">
-							Need higher limits, team seats, or priority support? Upgrade to a plan that fits your scale.
+							Need higher limits, team seats, or priority support? Upgrade to a plan that fits your
+							scale.
 						</p>
-						
+
 						<a
 							href="/dashboard/upgrade"
 							class="w-full py-3 px-4 rounded-lg font-black text-xs uppercase tracking-widest transition-all bg-[#ffc480] text-gray-900 hover:bg-[#ffb360] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] text-center mt-auto"
@@ -423,7 +488,7 @@
 		loading={$billingActions.pausing}
 		showResumeDate={true}
 		on:confirm={handlePauseConfirm}
-		on:cancel={() => showPauseModal = false}
+		on:cancel={() => (showPauseModal = false)}
 	/>
 
 	<ConfirmModal
@@ -435,6 +500,6 @@
 		variant="danger"
 		loading={$billingActions.cancelling}
 		on:confirm={handleCancelConfirm}
-		on:cancel={() => showCancelModal = false}
+		on:cancel={() => (showCancelModal = false)}
 	/>
 </section>

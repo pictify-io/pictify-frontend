@@ -7,17 +7,22 @@
 
 // Developer Templates
 export const developerTemplates = [
-  {
-    id: 'dev-dark-terminal',
-    category: 'developer',
-    name: 'Dark Terminal',
-    popular: true,
-    variables: [
-      { id: 'template-badge', label: 'Badge', type: 'text', default: 'Open to Work' },
-      { id: 'template-heading', label: 'Name', type: 'text', default: 'Your Name' },
-      { id: 'template-subheading', label: 'Title', type: 'text', default: 'Full Stack Developer • React • Node.js' }
-    ],
-    html: `<html>
+	{
+		id: 'dev-dark-terminal',
+		category: 'developer',
+		name: 'Dark Terminal',
+		popular: true,
+		variables: [
+			{ id: 'template-badge', label: 'Badge', type: 'text', default: 'Open to Work' },
+			{ id: 'template-heading', label: 'Name', type: 'text', default: 'Your Name' },
+			{
+				id: 'template-subheading',
+				label: 'Title',
+				type: 'text',
+				default: 'Full Stack Developer • React • Node.js'
+			}
+		],
+		html: `<html>
 <head>
   <style>
     :root {
@@ -156,17 +161,22 @@ export const developerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'dev-gradient-tech',
-    category: 'developer',
-    name: 'Gradient Tech',
-    popular: false,
-    variables: [
-      { id: 'template-heading', label: 'Name', type: 'text', default: 'Your Name' },
-      { id: 'template-subheading', label: 'Title', type: 'text', default: 'Software Engineer | Building the Future' }
-    ],
-    html: `<html>
+	},
+	{
+		id: 'dev-gradient-tech',
+		category: 'developer',
+		name: 'Gradient Tech',
+		popular: false,
+		variables: [
+			{ id: 'template-heading', label: 'Name', type: 'text', default: 'Your Name' },
+			{
+				id: 'template-subheading',
+				label: 'Title',
+				type: 'text',
+				default: 'Software Engineer | Building the Future'
+			}
+		],
+		html: `<html>
 <head>
   <style>
     :root {
@@ -225,13 +235,13 @@ export const developerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'dev-minimal-code',
-    category: 'developer',
-    name: 'Minimal Code',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'dev-minimal-code',
+		category: 'developer',
+		name: 'Minimal Code',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -300,13 +310,13 @@ export const developerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'dev-blueprint',
-    category: 'developer',
-    name: 'Code Architect',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'dev-blueprint',
+		category: 'developer',
+		name: 'Code Architect',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -412,17 +422,17 @@ export const developerTemplates = [
   </div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Designer Templates
 export const designerTemplates = [
-  {
-    id: 'designer-creative',
-    category: 'designer',
-    name: 'Creative Bold',
-    popular: true,
-    html: `<html>
+	{
+		id: 'designer-creative',
+		category: 'designer',
+		name: 'Creative Bold',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -532,13 +542,13 @@ export const designerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'designer-minimal',
-    category: 'designer',
-    name: 'Minimal Elegance',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'designer-minimal',
+		category: 'designer',
+		name: 'Minimal Elegance',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -614,13 +624,13 @@ export const designerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'designer-dark-studio',
-    category: 'designer',
-    name: 'Dark Studio',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'designer-dark-studio',
+		category: 'designer',
+		name: 'Dark Studio',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -675,13 +685,13 @@ export const designerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'designer-bauhaus',
-    category: 'designer',
-    name: 'Bauhaus Studio',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'designer-bauhaus',
+		category: 'designer',
+		name: 'Bauhaus Studio',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -792,17 +802,17 @@ export const designerTemplates = [
   </div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Marketer Templates
 export const marketerTemplates = [
-  {
-    id: 'marketer-growth',
-    category: 'marketer',
-    name: 'Growth Focus',
-    popular: true,
-    html: `<html>
+	{
+		id: 'marketer-growth',
+		category: 'marketer',
+		name: 'Growth Focus',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -925,13 +935,13 @@ export const marketerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'marketer-brand',
-    category: 'marketer',
-    name: 'Brand Builder',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'marketer-brand',
+		category: 'marketer',
+		name: 'Brand Builder',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1014,13 +1024,13 @@ export const marketerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'marketer-data',
-    category: 'marketer',
-    name: 'Data Driven',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'marketer-data',
+		category: 'marketer',
+		name: 'Data Driven',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1106,13 +1116,13 @@ export const marketerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'marketer-analytics',
-    category: 'marketer',
-    name: 'Social Analytics',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'marketer-analytics',
+		category: 'marketer',
+		name: 'Social Analytics',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1230,17 +1240,17 @@ export const marketerTemplates = [
   </div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Recruiter Templates
 export const recruiterTemplates = [
-  {
-    id: 'recruiter-hiring',
-    category: 'recruiter',
-    name: 'We\'re Hiring',
-    popular: true,
-    html: `<html>
+	{
+		id: 'recruiter-hiring',
+		category: 'recruiter',
+		name: "We're Hiring",
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1333,13 +1343,13 @@ export const recruiterTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'recruiter-corporate',
-    category: 'recruiter',
-    name: 'Corporate Clean',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'recruiter-corporate',
+		category: 'recruiter',
+		name: 'Corporate Clean',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1415,13 +1425,13 @@ export const recruiterTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'recruiter-modern',
-    category: 'recruiter',
-    name: 'Modern Talent',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'recruiter-modern',
+		category: 'recruiter',
+		name: 'Modern Talent',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1485,13 +1495,13 @@ export const recruiterTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'recruiter-global',
-    category: 'recruiter',
-    name: 'Global Talent',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'recruiter-global',
+		category: 'recruiter',
+		name: 'Global Talent',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1599,17 +1609,17 @@ export const recruiterTemplates = [
   </div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Freelancer Templates
 export const freelancerTemplates = [
-  {
-    id: 'freelancer-modern',
-    category: 'freelancer',
-    name: 'Modern Pro',
-    popular: true,
-    html: `<html>
+	{
+		id: 'freelancer-modern',
+		category: 'freelancer',
+		name: 'Modern Pro',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1686,13 +1696,13 @@ export const freelancerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'freelancer-creative',
-    category: 'freelancer',
-    name: 'Creative Freelancer',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'freelancer-creative',
+		category: 'freelancer',
+		name: 'Creative Freelancer',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1761,13 +1771,13 @@ export const freelancerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'freelancer-minimal',
-    category: 'freelancer',
-    name: 'Clean Minimal',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'freelancer-minimal',
+		category: 'freelancer',
+		name: 'Clean Minimal',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1831,13 +1841,13 @@ export const freelancerTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'freelancer-workspace',
-    category: 'freelancer',
-    name: 'Creative Studio',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'freelancer-workspace',
+		category: 'freelancer',
+		name: 'Creative Studio',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -1927,17 +1937,17 @@ export const freelancerTemplates = [
   </div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Corporate Templates
 export const corporateTemplates = [
-  {
-    id: 'corporate-executive',
-    category: 'corporate',
-    name: 'Executive Suite',
-    popular: true,
-    html: `<html>
+	{
+		id: 'corporate-executive',
+		category: 'corporate',
+		name: 'Executive Suite',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2002,13 +2012,13 @@ export const corporateTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'corporate-minimal',
-    category: 'corporate',
-    name: 'Corporate Minimal',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'corporate-minimal',
+		category: 'corporate',
+		name: 'Corporate Minimal',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2066,13 +2076,13 @@ export const corporateTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'corporate-brand',
-    category: 'corporate',
-    name: 'Brand Forward',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'corporate-brand',
+		category: 'corporate',
+		name: 'Brand Forward',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2125,13 +2135,13 @@ export const corporateTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'corporate-glass',
-    category: 'corporate',
-    name: 'Glass Tower',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'corporate-glass',
+		category: 'corporate',
+		name: 'Glass Tower',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2227,18 +2237,17 @@ export const corporateTemplates = [
   </div>
 </body>
 </html> `
-  }
+	}
 ];
-
 
 // Neo-Brutalist Templates
 export const neoBrutalistTemplates = [
-  {
-    id: 'neo-bold',
-    category: 'neo-brutalist',
-    name: 'Neo Bold',
-    popular: true,
-    html: `<html>
+	{
+		id: 'neo-bold',
+		category: 'neo-brutalist',
+		name: 'Neo Bold',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2333,13 +2342,13 @@ export const neoBrutalistTemplates = [
   </div>
 </body>
 </html> `
-  },
-  {
-    id: 'neo-retro',
-    category: 'neo-brutalist',
-    name: 'Retro Pop',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'neo-retro',
+		category: 'neo-brutalist',
+		name: 'Retro Pop',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2414,13 +2423,13 @@ export const neoBrutalistTemplates = [
   </div>
 </body>
 </html> `
-  },
-  {
-    id: 'neo-acid',
-    category: 'neo-brutalist',
-    name: 'Acid GRAPHICS',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'neo-acid',
+		category: 'neo-brutalist',
+		name: 'Acid GRAPHICS',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2520,17 +2529,17 @@ export const neoBrutalistTemplates = [
   </div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Personal Brand Templates
 export const personalBrandTemplates = [
-  {
-    id: 'personal-influencer',
-    category: 'personal-brand',
-    name: 'Influencer Style',
-    popular: true,
-    html: `<html>
+	{
+		id: 'personal-influencer',
+		category: 'personal-brand',
+		name: 'Influencer Style',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2617,13 +2626,13 @@ export const personalBrandTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'personal-speaker',
-    category: 'personal-brand',
-    name: 'Keynote Speaker',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'personal-speaker',
+		category: 'personal-brand',
+		name: 'Keynote Speaker',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2687,13 +2696,13 @@ export const personalBrandTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'personal-author',
-    category: 'personal-brand',
-    name: 'Author & Writer',
-    popular: false,
-    html: `<html>
+	},
+	{
+		id: 'personal-author',
+		category: 'personal-brand',
+		name: 'Author & Writer',
+		popular: false,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2757,13 +2766,13 @@ export const personalBrandTemplates = [
   </div>
 </body>
 </html>`
-  },
-  {
-    id: 'personal-magazine',
-    category: 'personal-brand',
-    name: 'Editorial Magazine',
-    popular: true,
-    html: `<html>
+	},
+	{
+		id: 'personal-magazine',
+		category: 'personal-brand',
+		name: 'Editorial Magazine',
+		popular: true,
+		html: `<html>
 <head>
   <style>
     :root {
@@ -2860,32 +2869,32 @@ export const personalBrandTemplates = [
   <div class="issue-number" id="template-tagline">VOL. 24</div>
 </body>
 </html>`
-  }
+	}
 ];
 
 // Export all templates combined
 export const allTemplates = [
-  ...developerTemplates,
-  ...designerTemplates,
-  ...marketerTemplates,
-  ...recruiterTemplates,
-  ...freelancerTemplates,
-  ...corporateTemplates,
-  ...neoBrutalistTemplates,
-  ...personalBrandTemplates
+	...developerTemplates,
+	...designerTemplates,
+	...marketerTemplates,
+	...recruiterTemplates,
+	...freelancerTemplates,
+	...corporateTemplates,
+	...neoBrutalistTemplates,
+	...personalBrandTemplates
 ];
 
 // Get templates by category
 export function getTemplatesByCategory(categoryId) {
-  return allTemplates.filter(t => t.category === categoryId);
+	return allTemplates.filter((t) => t.category === categoryId);
 }
 
 // Get template by ID
 export function getTemplateById(templateId) {
-  return allTemplates.find(t => t.id === templateId);
+	return allTemplates.find((t) => t.id === templateId);
 }
 
 // Get popular templates
 export function getPopularTemplates() {
-  return allTemplates.filter(t => t.popular);
+	return allTemplates.filter((t) => t.popular);
 }

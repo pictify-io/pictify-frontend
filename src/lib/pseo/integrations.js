@@ -2,11 +2,27 @@
 // INTEGRATIONS - for /integrations/[slug] pages
 // =============================================================================
 export const integrationCategories = [
-	{ id: 'automation', label: 'Automation', description: 'Connect Pictify to your automation workflows' },
-	{ id: 'sdk', label: 'SDKs & Libraries', description: 'Official and community libraries for popular languages' },
+	{
+		id: 'automation',
+		label: 'Automation',
+		description: 'Connect Pictify to your automation workflows'
+	},
+	{
+		id: 'sdk',
+		label: 'SDKs & Libraries',
+		description: 'Official and community libraries for popular languages'
+	},
 	{ id: 'framework', label: 'Frameworks', description: 'Integrate with modern web frameworks' },
-	{ id: 'cms', label: 'CMS Platforms', description: 'Add dynamic images to your content management system' },
-	{ id: 'ecommerce', label: 'E-Commerce', description: 'Generate product images and social cards for your store' }
+	{
+		id: 'cms',
+		label: 'CMS Platforms',
+		description: 'Add dynamic images to your content management system'
+	},
+	{
+		id: 'ecommerce',
+		label: 'E-Commerce',
+		description: 'Generate product images and social cards for your store'
+	}
 ];
 
 export const integrations = [
@@ -16,37 +32,55 @@ export const integrations = [
 		name: 'Zapier',
 		category: 'automation',
 		description: 'Connect Pictify to 5,000+ apps without code using Zapier automations.',
-		longDescription: 'Zapier integration enables you to generate images automatically when events happen in other apps. Create OG images when a blog post is published, generate certificates when a course is completed, or produce social cards when a new product is added—all without writing code.',
-		features: ['Trigger-based image generation', 'Multi-step Zaps support', 'Template variable mapping', 'Webhook delivery'],
-		useCases: ['Auto-generate OG images for new blog posts', 'Create certificates on course completion', 'Generate social cards from CRM data'],
+		longDescription:
+			'Zapier integration enables you to generate images automatically when events happen in other apps. Create OG images when a blog post is published, generate certificates when a course is completed, or produce social cards when a new product is added—all without writing code.',
+		features: [
+			'Trigger-based image generation',
+			'Multi-step Zaps support',
+			'Template variable mapping',
+			'Webhook delivery'
+		],
+		useCases: [
+			'Auto-generate OG images for new blog posts',
+			'Create certificates on course completion',
+			'Generate social cards from CRM data'
+		],
 		docsUrl: 'https://docs.pictify.io/integrations/zapier',
 		icon: 'zapier',
 		tutorial: {
 			title: 'How to Connect Pictify with Zapier',
 			estimatedTime: '10 minutes',
-			prerequisites: ['A Pictify account with an API key', 'A Zapier account (free tier works)', 'A template created in Pictify'],
+			prerequisites: [
+				'A Pictify account with an API key',
+				'A Zapier account (free tier works)',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Get Your Pictify API Key',
-					description: 'Log into your Pictify dashboard and navigate to Settings → API Keys. Click "Create New Key" and copy it somewhere safe.',
+					description:
+						'Log into your Pictify dashboard and navigate to Settings → API Keys. Click "Create New Key" and copy it somewhere safe.',
 					code: null,
 					tip: 'Keep your API key secret. Never expose it in client-side code.'
 				},
 				{
 					title: 'Create a New Zap in Zapier',
-					description: 'Go to zapier.com and click "Create Zap". Choose your trigger app (e.g., Google Sheets, Airtable, Notion) and set up the trigger event.',
+					description:
+						'Go to zapier.com and click "Create Zap". Choose your trigger app (e.g., Google Sheets, Airtable, Notion) and set up the trigger event.',
 					code: null,
 					tip: 'For testing, use "New Row in Google Sheets" as a simple trigger.'
 				},
 				{
 					title: 'Add Webhooks by Zapier as Action',
-					description: 'For the action step, search for "Webhooks by Zapier" and select "POST" as the action event.',
+					description:
+						'For the action step, search for "Webhooks by Zapier" and select "POST" as the action event.',
 					code: null,
 					tip: null
 				},
 				{
 					title: 'Configure the Webhook Request',
-					description: 'Set up the webhook with Pictify\'s render endpoint. Use your template ID and map variables from your trigger.',
+					description:
+						"Set up the webhook with Pictify's render endpoint. Use your template ID and map variables from your trigger.",
 					code: `URL: https://api.pictify.io/v1/render
 
 Headers:
@@ -63,11 +97,12 @@ Body (JSON):
   },
   "format": "png"
 }`,
-					tip: 'Use Zapier\'s variable picker to map fields from your trigger to template variables.'
+					tip: "Use Zapier's variable picker to map fields from your trigger to template variables."
 				},
 				{
 					title: 'Test Your Zap',
-					description: 'Click "Test step" to send a test request. Pictify will return a URL to your generated image.',
+					description:
+						'Click "Test step" to send a test request. Pictify will return a URL to your generated image.',
 					code: `// Success Response
 {
   "success": true,
@@ -78,15 +113,27 @@ Body (JSON):
 				},
 				{
 					title: 'Use the Generated Image',
-					description: 'Add another action step to use the image URL. You can save it to Google Drive, post to Slack, update a CMS, or send via email.',
+					description:
+						'Add another action step to use the image URL. You can save it to Google Drive, post to Slack, update a CMS, or send via email.',
 					code: null,
 					tip: 'The imageUrl from step 5 is available as a variable in subsequent Zap steps.'
 				}
 			],
 			troubleshooting: [
-				{ issue: '401 Unauthorized', solution: 'Check that your API key is correct and has not expired. Ensure the Authorization header format is "Bearer YOUR_KEY".' },
-				{ issue: 'Template not found', solution: 'Verify the templateId exists in your Pictify dashboard. Template IDs are case-sensitive.' },
-				{ issue: 'Missing variables', solution: 'Ensure all required template variables are included in your request body.' }
+				{
+					issue: '401 Unauthorized',
+					solution:
+						'Check that your API key is correct and has not expired. Ensure the Authorization header format is "Bearer YOUR_KEY".'
+				},
+				{
+					issue: 'Template not found',
+					solution:
+						'Verify the templateId exists in your Pictify dashboard. Template IDs are case-sensitive.'
+				},
+				{
+					issue: 'Missing variables',
+					solution: 'Ensure all required template variables are included in your request body.'
+				}
 			]
 		}
 	},
@@ -95,37 +142,55 @@ Body (JSON):
 		name: 'Make (Integromat)',
 		category: 'automation',
 		description: 'Build advanced visual automation workflows with Make scenarios.',
-		longDescription: 'Make (formerly Integromat) provides powerful visual automation with advanced features like iterators, routers, and complex data mapping. Perfect for sophisticated image generation workflows that require conditional logic or multi-branch processing.',
-		features: ['Visual scenario builder', 'Advanced data mapping', 'Error handling', 'Scheduled operations'],
-		useCases: ['Batch generate images from spreadsheets', 'Multi-variant A/B test images', 'Complex conditional image generation'],
+		longDescription:
+			'Make (formerly Integromat) provides powerful visual automation with advanced features like iterators, routers, and complex data mapping. Perfect for sophisticated image generation workflows that require conditional logic or multi-branch processing.',
+		features: [
+			'Visual scenario builder',
+			'Advanced data mapping',
+			'Error handling',
+			'Scheduled operations'
+		],
+		useCases: [
+			'Batch generate images from spreadsheets',
+			'Multi-variant A/B test images',
+			'Complex conditional image generation'
+		],
 		docsUrl: 'https://docs.pictify.io/integrations/make',
 		icon: 'make',
 		tutorial: {
 			title: 'How to Generate Images with Make (Integromat)',
 			estimatedTime: '15 minutes',
-			prerequisites: ['A Pictify account with an API key', 'A Make account', 'A template created in Pictify'],
+			prerequisites: [
+				'A Pictify account with an API key',
+				'A Make account',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Create a New Scenario',
-					description: 'Log into Make and click "Create a new scenario". This will be your automation workflow.',
+					description:
+						'Log into Make and click "Create a new scenario". This will be your automation workflow.',
 					code: null,
 					tip: null
 				},
 				{
 					title: 'Add a Trigger Module',
-					description: 'Click the "+" button and add your trigger. For example, use Google Sheets "Watch Rows" to trigger when new data is added.',
+					description:
+						'Click the "+" button and add your trigger. For example, use Google Sheets "Watch Rows" to trigger when new data is added.',
 					code: null,
-					tip: 'Make\'s iterator module is perfect for batch processing multiple rows at once.'
+					tip: "Make's iterator module is perfect for batch processing multiple rows at once."
 				},
 				{
 					title: 'Add HTTP Module',
-					description: 'Click "+" after your trigger and search for "HTTP". Select "Make a request" to call the Pictify API.',
+					description:
+						'Click "+" after your trigger and search for "HTTP". Select "Make a request" to call the Pictify API.',
 					code: null,
 					tip: null
 				},
 				{
 					title: 'Configure HTTP Request',
-					description: 'Set up the HTTP module to call Pictify\'s render endpoint with your template and variables.',
+					description:
+						"Set up the HTTP module to call Pictify's render endpoint with your template and variables.",
 					code: `URL: https://api.pictify.io/v1/render
 Method: POST
 
@@ -148,11 +213,12 @@ Request content:
   "width": 1200,
   "height": 630
 }`,
-					tip: 'Use Make\'s variable picker (the small icon) to map data from previous modules.'
+					tip: "Use Make's variable picker (the small icon) to map data from previous modules."
 				},
 				{
 					title: 'Parse the JSON Response',
-					description: 'Add a "JSON > Parse JSON" module after the HTTP module to extract the image URL from Pictify\'s response.',
+					description:
+						'Add a "JSON > Parse JSON" module after the HTTP module to extract the image URL from Pictify\'s response.',
 					code: `// Pictify returns:
 {
   "success": true,
@@ -166,21 +232,34 @@ Request content:
 				},
 				{
 					title: 'Use the Generated Image',
-					description: 'Add destination modules to use your image. Save to Google Drive, update Airtable, post to social media, or send notifications.',
+					description:
+						'Add destination modules to use your image. Save to Google Drive, update Airtable, post to social media, or send notifications.',
 					code: null,
 					tip: 'Use a Router module to send the image to multiple destinations simultaneously.'
 				},
 				{
 					title: 'Enable Scheduling (Optional)',
-					description: 'Click the clock icon on your trigger to run the scenario on a schedule—every hour, daily, or when data changes.',
+					description:
+						'Click the clock icon on your trigger to run the scenario on a schedule—every hour, daily, or when data changes.',
 					code: null,
 					tip: 'Start with manual runs while testing, then enable scheduling once everything works.'
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Connection timeout', solution: 'Image generation can take a few seconds. Increase the HTTP module timeout to 60 seconds.' },
-				{ issue: 'Invalid JSON error', solution: 'Ensure your request body is valid JSON. Use Make\'s built-in JSON validator.' },
-				{ issue: 'Rate limit exceeded', solution: 'Add a Sleep module between iterations when batch processing to avoid hitting rate limits.' }
+				{
+					issue: 'Connection timeout',
+					solution:
+						'Image generation can take a few seconds. Increase the HTTP module timeout to 60 seconds.'
+				},
+				{
+					issue: 'Invalid JSON error',
+					solution: "Ensure your request body is valid JSON. Use Make's built-in JSON validator."
+				},
+				{
+					issue: 'Rate limit exceeded',
+					solution:
+						'Add a Sleep module between iterations when batch processing to avoid hitting rate limits.'
+				}
 			]
 		}
 	},
@@ -189,19 +268,29 @@ Request content:
 		name: 'n8n',
 		category: 'automation',
 		description: 'Self-hosted workflow automation with full control and privacy.',
-		longDescription: 'n8n is an open-source, self-hostable workflow automation tool. For teams that need to keep data on-premise or want maximum customization, n8n with Pictify provides powerful image generation while maintaining full control over your infrastructure.',
+		longDescription:
+			'n8n is an open-source, self-hostable workflow automation tool. For teams that need to keep data on-premise or want maximum customization, n8n with Pictify provides powerful image generation while maintaining full control over your infrastructure.',
 		features: ['Self-hosted option', 'Open source', 'Custom nodes support', 'Full data control'],
-		useCases: ['On-premise image generation', 'Custom workflow logic', 'Privacy-sensitive applications'],
+		useCases: [
+			'On-premise image generation',
+			'Custom workflow logic',
+			'Privacy-sensitive applications'
+		],
 		docsUrl: 'https://docs.pictify.io/integrations/n8n',
 		icon: 'n8n',
 		tutorial: {
 			title: 'How to Use Pictify with n8n',
 			estimatedTime: '15 minutes',
-			prerequisites: ['A Pictify account with an API key', 'n8n installed (cloud or self-hosted)', 'A template created in Pictify'],
+			prerequisites: [
+				'A Pictify account with an API key',
+				'n8n installed (cloud or self-hosted)',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Store Your API Key as a Credential',
-					description: 'In n8n, go to Settings → Credentials → Add Credential. Create a "Header Auth" credential with your Pictify API key.',
+					description:
+						'In n8n, go to Settings → Credentials → Add Credential. Create a "Header Auth" credential with your Pictify API key.',
 					code: `Name: Pictify API
 Header Auth:
   Name: Authorization
@@ -210,19 +299,22 @@ Header Auth:
 				},
 				{
 					title: 'Create a New Workflow',
-					description: 'Click "New Workflow" in n8n. Add a trigger node—use Manual Trigger for testing or Webhook/Schedule for production.',
+					description:
+						'Click "New Workflow" in n8n. Add a trigger node—use Manual Trigger for testing or Webhook/Schedule for production.',
 					code: null,
 					tip: null
 				},
 				{
 					title: 'Add an HTTP Request Node',
-					description: 'Add an "HTTP Request" node and connect it to your trigger. This will call the Pictify API.',
+					description:
+						'Add an "HTTP Request" node and connect it to your trigger. This will call the Pictify API.',
 					code: null,
 					tip: null
 				},
 				{
 					title: 'Configure the HTTP Request',
-					description: 'Set up the node to POST to Pictify\'s render endpoint with your template configuration.',
+					description:
+						"Set up the node to POST to Pictify's render endpoint with your template configuration.",
 					code: `Method: POST
 URL: https://api.pictify.io/v1/render
 
@@ -249,7 +341,8 @@ Body Parameters:
 				},
 				{
 					title: 'Test the Workflow',
-					description: 'Click "Execute Workflow" to run a test. The HTTP node output will contain the generated image URL.',
+					description:
+						'Click "Execute Workflow" to run a test. The HTTP node output will contain the generated image URL.',
 					code: `// Success output from HTTP node:
 {
   "success": true,
@@ -260,7 +353,8 @@ Body Parameters:
 				},
 				{
 					title: 'Process the Response',
-					description: 'Add subsequent nodes to use the image URL. Common options: save to disk, upload to S3, update database, or send notification.',
+					description:
+						'Add subsequent nodes to use the image URL. Common options: save to disk, upload to S3, update database, or send notification.',
 					code: `// Access the image URL in subsequent nodes:
 {{ $json.imageUrl }}
 
@@ -272,7 +366,8 @@ Response Format: File`,
 				},
 				{
 					title: 'Batch Processing with Loop',
-					description: 'For generating multiple images, use the SplitInBatches node to process items one at a time and avoid rate limits.',
+					description:
+						'For generating multiple images, use the SplitInBatches node to process items one at a time and avoid rate limits.',
 					code: `// Workflow structure for batch:
 Trigger → Get Data → SplitInBatches → HTTP Request (Pictify) → Merge → Save Results
 
@@ -283,9 +378,21 @@ Options: Add pause between batches (1 second)`,
 				}
 			],
 			troubleshooting: [
-				{ issue: 'ECONNREFUSED errors', solution: 'If self-hosted, ensure your n8n instance can reach external APIs. Check firewall and proxy settings.' },
-				{ issue: 'Expression not working', solution: 'Use the expression editor to verify your expressions. Make sure the data exists in the input.' },
-				{ issue: 'Workflow stops on error', solution: 'Enable "Continue On Fail" in the HTTP node settings to handle errors gracefully.' }
+				{
+					issue: 'ECONNREFUSED errors',
+					solution:
+						'If self-hosted, ensure your n8n instance can reach external APIs. Check firewall and proxy settings.'
+				},
+				{
+					issue: 'Expression not working',
+					solution:
+						'Use the expression editor to verify your expressions. Make sure the data exists in the input.'
+				},
+				{
+					issue: 'Workflow stops on error',
+					solution:
+						'Enable "Continue On Fail" in the HTTP node settings to handle errors gracefully.'
+				}
 			]
 		}
 	},
@@ -295,16 +402,31 @@ Options: Add pause between batches (1 second)`,
 		name: 'Node.js SDK',
 		category: 'sdk',
 		description: 'Official Node.js library for server-side image generation.',
-		longDescription: 'The official Pictify Node.js SDK provides a simple, typed interface for generating images from your Node.js applications. Supports both CommonJS and ES Modules, with full TypeScript definitions included.',
-		features: ['Full TypeScript support', 'Promise-based API', 'Automatic retries', 'Stream support'],
-		useCases: ['Next.js API routes', 'Express.js backends', 'Serverless functions', 'Build-time generation'],
+		longDescription:
+			'The official Pictify Node.js SDK provides a simple, typed interface for generating images from your Node.js applications. Supports both CommonJS and ES Modules, with full TypeScript definitions included.',
+		features: [
+			'Full TypeScript support',
+			'Promise-based API',
+			'Automatic retries',
+			'Stream support'
+		],
+		useCases: [
+			'Next.js API routes',
+			'Express.js backends',
+			'Serverless functions',
+			'Build-time generation'
+		],
 		docsUrl: 'https://docs.pictify.io/sdks/nodejs',
 		icon: 'nodejs',
 		installCommand: 'npm install @pictify/sdk',
 		tutorial: {
 			title: 'Getting Started with the Node.js SDK',
 			estimatedTime: '5 minutes',
-			prerequisites: ['Node.js 16 or higher', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Node.js 16 or higher',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the SDK',
@@ -321,7 +443,8 @@ pnpm add @pictify/sdk`,
 				},
 				{
 					title: 'Initialize the Client',
-					description: 'Create a Pictify client instance with your API key. Store your API key in environment variables for security.',
+					description:
+						'Create a Pictify client instance with your API key. Store your API key in environment variables for security.',
 					code: `// ES Modules
 import { Pictify } from '@pictify/sdk';
 
@@ -336,7 +459,8 @@ const pictify = new Pictify({
 				},
 				{
 					title: 'Generate Your First Image',
-					description: 'Call the render method with your template ID and variables to generate an image.',
+					description:
+						'Call the render method with your template ID and variables to generate an image.',
 					code: `const result = await pictify.render({
   templateId: 'your-template-id',
   variables: {
@@ -351,7 +475,7 @@ const pictify = new Pictify({
 
 console.log('Image URL:', result.imageUrl);
 // https://cdn.pictify.io/renders/abc123.png`,
-					tip: 'The imageUrl is permanently hosted on Pictify\'s CDN. No need to download and re-upload.'
+					tip: "The imageUrl is permanently hosted on Pictify's CDN. No need to download and re-upload."
 				},
 				{
 					title: 'Download Image as Buffer (Optional)',
@@ -398,7 +522,7 @@ results.forEach((result, i) => {
 				},
 				{
 					title: 'Error Handling',
-					description: 'Handle errors gracefully with try/catch and the SDK\'s error types.',
+					description: "Handle errors gracefully with try/catch and the SDK's error types.",
 					code: `import { Pictify, PictifyError } from '@pictify/sdk';
 
 try {
@@ -424,9 +548,20 @@ try {
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Module not found error', solution: 'Ensure you\'re using Node.js 16+. Run "node -v" to check your version.' },
-				{ issue: 'API key invalid', solution: 'Verify your API key in the Pictify dashboard. Check that the environment variable is set correctly.' },
-				{ issue: 'TypeScript errors', solution: 'The SDK includes types. If you see errors, update to the latest version: npm update @pictify/sdk' }
+				{
+					issue: 'Module not found error',
+					solution: 'Ensure you\'re using Node.js 16+. Run "node -v" to check your version.'
+				},
+				{
+					issue: 'API key invalid',
+					solution:
+						'Verify your API key in the Pictify dashboard. Check that the environment variable is set correctly.'
+				},
+				{
+					issue: 'TypeScript errors',
+					solution:
+						'The SDK includes types. If you see errors, update to the latest version: npm update @pictify/sdk'
+				}
 			]
 		}
 	},
@@ -435,16 +570,26 @@ try {
 		name: 'Python SDK',
 		category: 'sdk',
 		description: 'Official Python library for data science and backend applications.',
-		longDescription: 'The Pictify Python SDK enables image generation from Python applications, notebooks, and scripts. Perfect for data science workflows, Django/Flask backends, and automation scripts.',
+		longDescription:
+			'The Pictify Python SDK enables image generation from Python applications, notebooks, and scripts. Perfect for data science workflows, Django/Flask backends, and automation scripts.',
 		features: ['Async support', 'Type hints', 'Pandas integration', 'Jupyter-friendly'],
-		useCases: ['Django/Flask backends', 'Data visualization exports', 'Jupyter notebooks', 'Batch scripts'],
+		useCases: [
+			'Django/Flask backends',
+			'Data visualization exports',
+			'Jupyter notebooks',
+			'Batch scripts'
+		],
 		docsUrl: 'https://docs.pictify.io/sdks/python',
 		icon: 'python',
 		installCommand: 'pip install pictify',
 		tutorial: {
 			title: 'Getting Started with the Python SDK',
 			estimatedTime: '5 minutes',
-			prerequisites: ['Python 3.8 or higher', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Python 3.8 or higher',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the SDK',
@@ -461,7 +606,8 @@ pipenv install pictify`,
 				},
 				{
 					title: 'Initialize the Client',
-					description: 'Create a Pictify client with your API key. Use environment variables to keep credentials secure.',
+					description:
+						'Create a Pictify client with your API key. Use environment variables to keep credentials secure.',
 					code: `import os
 from pictify import Pictify
 
@@ -593,9 +739,20 @@ display(Image(data=image_bytes))`,
 				}
 			],
 			troubleshooting: [
-				{ issue: 'ImportError: No module named pictify', solution: 'Ensure you installed the package: pip install pictify. Check you\'re using the correct Python environment.' },
-				{ issue: 'SSL certificate errors', solution: 'Update your certificates: pip install --upgrade certifi' },
-				{ issue: 'Async errors in Jupyter', solution: 'Use nest_asyncio: pip install nest_asyncio, then import nest_asyncio; nest_asyncio.apply()' }
+				{
+					issue: 'ImportError: No module named pictify',
+					solution:
+						"Ensure you installed the package: pip install pictify. Check you're using the correct Python environment."
+				},
+				{
+					issue: 'SSL certificate errors',
+					solution: 'Update your certificates: pip install --upgrade certifi'
+				},
+				{
+					issue: 'Async errors in Jupyter',
+					solution:
+						'Use nest_asyncio: pip install nest_asyncio, then import nest_asyncio; nest_asyncio.apply()'
+				}
 			]
 		}
 	},
@@ -604,7 +761,8 @@ display(Image(data=image_bytes))`,
 		name: 'Go SDK',
 		category: 'sdk',
 		description: 'Official Go library for high-performance applications.',
-		longDescription: 'The Pictify Go SDK is designed for high-performance applications that need efficient image generation. Fully idiomatic Go with context support, proper error handling, and minimal dependencies.',
+		longDescription:
+			'The Pictify Go SDK is designed for high-performance applications that need efficient image generation. Fully idiomatic Go with context support, proper error handling, and minimal dependencies.',
 		features: ['Context support', 'Zero dependencies', 'Concurrent-safe', 'Efficient memory use'],
 		useCases: ['High-throughput APIs', 'Microservices', 'CLI tools', 'Backend services'],
 		docsUrl: 'https://docs.pictify.io/sdks/go',
@@ -613,7 +771,11 @@ display(Image(data=image_bytes))`,
 		tutorial: {
 			title: 'Getting Started with the Go SDK',
 			estimatedTime: '5 minutes',
-			prerequisites: ['Go 1.19 or higher', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Go 1.19 or higher',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the SDK',
@@ -646,7 +808,8 @@ func main() {
 				},
 				{
 					title: 'Generate an Image',
-					description: 'Use the Render method to generate images. Always pass a context for cancellation support.',
+					description:
+						'Use the Render method to generate images. Always pass a context for cancellation support.',
 					code: `import (
     "context"
     "fmt"
@@ -799,9 +962,21 @@ if err != nil {
 				}
 			],
 			troubleshooting: [
-				{ issue: 'go get fails', solution: 'Ensure you have Go 1.19+. Run "go version" to check. Also verify GOPROXY is accessible.' },
-				{ issue: 'Context deadline exceeded', solution: 'Increase timeout or check network connectivity. Image generation typically takes 1-3 seconds.' },
-				{ issue: 'Too many open files', solution: 'Close response bodies and limit concurrent requests. The SDK reuses connections when possible.' }
+				{
+					issue: 'go get fails',
+					solution:
+						'Ensure you have Go 1.19+. Run "go version" to check. Also verify GOPROXY is accessible.'
+				},
+				{
+					issue: 'Context deadline exceeded',
+					solution:
+						'Increase timeout or check network connectivity. Image generation typically takes 1-3 seconds.'
+				},
+				{
+					issue: 'Too many open files',
+					solution:
+						'Close response bodies and limit concurrent requests. The SDK reuses connections when possible.'
+				}
 			]
 		}
 	},
@@ -810,8 +985,14 @@ if err != nil {
 		name: 'Ruby SDK',
 		category: 'sdk',
 		description: 'Official Ruby gem for Rails and Ruby applications.',
-		longDescription: 'The Pictify Ruby gem provides a clean, Ruby-idiomatic interface for image generation. Includes Rails helpers and integrations for seamless use in Rails applications.',
-		features: ['Rails integration', 'ActiveJob support', 'Ruby-idiomatic API', 'Faraday-based HTTP'],
+		longDescription:
+			'The Pictify Ruby gem provides a clean, Ruby-idiomatic interface for image generation. Includes Rails helpers and integrations for seamless use in Rails applications.',
+		features: [
+			'Rails integration',
+			'ActiveJob support',
+			'Ruby-idiomatic API',
+			'Faraday-based HTTP'
+		],
 		useCases: ['Rails applications', 'Background jobs', 'Admin dashboards', 'API backends'],
 		docsUrl: 'https://docs.pictify.io/sdks/ruby',
 		icon: 'ruby',
@@ -819,7 +1000,11 @@ if err != nil {
 		tutorial: {
 			title: 'Getting Started with the Ruby SDK',
 			estimatedTime: '5 minutes',
-			prerequisites: ['Ruby 3.0 or higher', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Ruby 3.0 or higher',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the Gem',
@@ -925,7 +1110,7 @@ class PostsController < ApplicationController
     GenerateOgImageJob.perform_later(@post.id)
   end
 end`,
-					tip: 'Use ActiveJob for any render that doesn\'t need to block the request.'
+					tip: "Use ActiveJob for any render that doesn't need to block the request."
 				},
 				{
 					title: 'Batch Processing',
@@ -973,9 +1158,20 @@ end`,
 				}
 			],
 			troubleshooting: [
-				{ issue: 'LoadError: cannot load such file', solution: 'Run "bundle install" or "gem install pictify". Check your Gemfile includes the gem.' },
-				{ issue: 'Faraday::TimeoutError', solution: 'Increase timeout in configuration or check network. Default is 30 seconds.' },
-				{ issue: 'API key not found in Rails', solution: 'Ensure the initializer loads after environment variables. Check config/application.rb load order.' }
+				{
+					issue: 'LoadError: cannot load such file',
+					solution:
+						'Run "bundle install" or "gem install pictify". Check your Gemfile includes the gem.'
+				},
+				{
+					issue: 'Faraday::TimeoutError',
+					solution: 'Increase timeout in configuration or check network. Default is 30 seconds.'
+				},
+				{
+					issue: 'API key not found in Rails',
+					solution:
+						'Ensure the initializer loads after environment variables. Check config/application.rb load order.'
+				}
 			]
 		}
 	},
@@ -985,15 +1181,29 @@ end`,
 		name: 'Next.js',
 		category: 'framework',
 		description: 'Generate dynamic OG images in Next.js with API routes or edge functions.',
-		longDescription: 'Integrate Pictify with Next.js for dynamic OG image generation. Use API routes for server-side generation, or edge functions for low-latency image creation. Perfect for blogs, e-commerce, and SaaS applications built with Next.js.',
-		features: ['API route integration', 'Edge function support', 'ISR compatibility', 'App Router ready'],
-		useCases: ['Dynamic blog OG images', 'Product page social cards', 'User-generated content previews'],
+		longDescription:
+			'Integrate Pictify with Next.js for dynamic OG image generation. Use API routes for server-side generation, or edge functions for low-latency image creation. Perfect for blogs, e-commerce, and SaaS applications built with Next.js.',
+		features: [
+			'API route integration',
+			'Edge function support',
+			'ISR compatibility',
+			'App Router ready'
+		],
+		useCases: [
+			'Dynamic blog OG images',
+			'Product page social cards',
+			'User-generated content previews'
+		],
 		docsUrl: 'https://docs.pictify.io/frameworks/nextjs',
 		icon: 'nextjs',
 		tutorial: {
 			title: 'Dynamic OG Images with Next.js',
 			estimatedTime: '10 minutes',
-			prerequisites: ['Next.js 13+ project', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Next.js 13+ project',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the SDK',
@@ -1166,9 +1376,21 @@ export async function GET(request: NextRequest) {
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Environment variables undefined', solution: 'Ensure variables are in .env.local (not .env). Restart the dev server after changes.' },
-				{ issue: 'OG image not showing on social media', solution: 'Use the Facebook Sharing Debugger or Twitter Card Validator to clear cached images.' },
-				{ issue: 'Build fails with Pictify import', solution: 'The SDK is server-only. Ensure you\'re only importing it in API routes or server components.' }
+				{
+					issue: 'Environment variables undefined',
+					solution:
+						'Ensure variables are in .env.local (not .env). Restart the dev server after changes.'
+				},
+				{
+					issue: 'OG image not showing on social media',
+					solution:
+						'Use the Facebook Sharing Debugger or Twitter Card Validator to clear cached images.'
+				},
+				{
+					issue: 'Build fails with Pictify import',
+					solution:
+						"The SDK is server-only. Ensure you're only importing it in API routes or server components."
+				}
 			]
 		}
 	},
@@ -1177,15 +1399,25 @@ export async function GET(request: NextRequest) {
 		name: 'Nuxt',
 		category: 'framework',
 		description: 'Add dynamic image generation to Nuxt applications.',
-		longDescription: 'The Pictify Nuxt module provides seamless integration for Vue-based applications. Generate images from server routes, use composables for reactive image URLs, and leverage Nuxt\'s powerful rendering modes.',
-		features: ['Nuxt module available', 'Server routes integration', 'Composables included', 'SSR compatible'],
+		longDescription:
+			"The Pictify Nuxt module provides seamless integration for Vue-based applications. Generate images from server routes, use composables for reactive image URLs, and leverage Nuxt's powerful rendering modes.",
+		features: [
+			'Nuxt module available',
+			'Server routes integration',
+			'Composables included',
+			'SSR compatible'
+		],
 		useCases: ['Vue-based applications', 'SSR image generation', 'Jamstack sites'],
 		docsUrl: 'https://docs.pictify.io/frameworks/nuxt',
 		icon: 'nuxt',
 		tutorial: {
 			title: 'Dynamic OG Images with Nuxt',
 			estimatedTime: '10 minutes',
-			prerequisites: ['Nuxt 3 project', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Nuxt 3 project',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the SDK',
@@ -1281,7 +1513,7 @@ export function useOgImage(options: {
 				},
 				{
 					title: 'Use in Pages with useSeoMeta',
-					description: 'Set dynamic OG images using Nuxt\'s SEO composables.',
+					description: "Set dynamic OG images using Nuxt's SEO composables.",
 					code: `<!-- pages/blog/[slug].vue -->
 <script setup lang="ts">
 const route = useRoute();
@@ -1349,9 +1581,21 @@ export default defineNitroPlugin(async () => {
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Runtime config undefined', solution: 'Ensure you\'re accessing config on the server with useRuntimeConfig(). Check your nuxt.config.ts.' },
-				{ issue: 'CORS errors in development', solution: 'The API route handles redirects. If fetching directly, ensure the CDN allows your origin.' },
-				{ issue: 'OG image not updating', solution: 'Social platforms cache images aggressively. Add a version query param or use their debug tools.' }
+				{
+					issue: 'Runtime config undefined',
+					solution:
+						"Ensure you're accessing config on the server with useRuntimeConfig(). Check your nuxt.config.ts."
+				},
+				{
+					issue: 'CORS errors in development',
+					solution:
+						'The API route handles redirects. If fetching directly, ensure the CDN allows your origin.'
+				},
+				{
+					issue: 'OG image not updating',
+					solution:
+						'Social platforms cache images aggressively. Add a version query param or use their debug tools.'
+				}
 			]
 		}
 	},
@@ -1360,15 +1604,25 @@ export default defineNitroPlugin(async () => {
 		name: 'SvelteKit',
 		category: 'framework',
 		description: 'Generate images with SvelteKit server endpoints and load functions.',
-		longDescription: 'Use Pictify with SvelteKit for powerful image generation capabilities. Generate images in +server.js endpoints, prerender social cards at build time, or create dynamic images based on route parameters.',
-		features: ['Server endpoint integration', 'Prerendering support', 'Adapter-agnostic', 'TypeScript support'],
+		longDescription:
+			'Use Pictify with SvelteKit for powerful image generation capabilities. Generate images in +server.js endpoints, prerender social cards at build time, or create dynamic images based on route parameters.',
+		features: [
+			'Server endpoint integration',
+			'Prerendering support',
+			'Adapter-agnostic',
+			'TypeScript support'
+		],
 		useCases: ['Svelte applications', 'Static site generation', 'Dynamic server routes'],
 		docsUrl: 'https://docs.pictify.io/frameworks/sveltekit',
 		icon: 'svelte',
 		tutorial: {
 			title: 'Dynamic OG Images with SvelteKit',
 			estimatedTime: '10 minutes',
-			prerequisites: ['SvelteKit project', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'SvelteKit project',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the SDK',
@@ -1550,9 +1804,21 @@ return {
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Cannot find module $env/static/private', solution: 'Ensure your .env file exists and restart the dev server. SvelteKit loads env at startup.' },
-				{ issue: 'Redirect loop in API endpoint', solution: 'Make sure you\'re throwing the redirect, not returning it: throw redirect(302, url)' },
-				{ issue: 'Prerendering fails', solution: 'Ensure all data needed for rendering is available at build time. Check that API endpoints are reachable.' }
+				{
+					issue: 'Cannot find module $env/static/private',
+					solution:
+						'Ensure your .env file exists and restart the dev server. SvelteKit loads env at startup.'
+				},
+				{
+					issue: 'Redirect loop in API endpoint',
+					solution:
+						"Make sure you're throwing the redirect, not returning it: throw redirect(302, url)"
+				},
+				{
+					issue: 'Prerendering fails',
+					solution:
+						'Ensure all data needed for rendering is available at build time. Check that API endpoints are reachable.'
+				}
 			]
 		}
 	},
@@ -1562,19 +1828,34 @@ return {
 		name: 'WordPress',
 		category: 'cms',
 		description: 'Auto-generate featured images and OG graphics for WordPress.',
-		longDescription: 'The Pictify WordPress plugin automatically generates featured images and Open Graph graphics for your posts and pages. Define templates once, and every new post gets a professional social image automatically.',
-		features: ['Auto-generate on publish', 'Gutenberg block', 'Custom field support', 'Multisite compatible'],
-		useCases: ['Auto OG images for blog posts', 'Featured image generation', 'WooCommerce product images'],
+		longDescription:
+			'The Pictify WordPress plugin automatically generates featured images and Open Graph graphics for your posts and pages. Define templates once, and every new post gets a professional social image automatically.',
+		features: [
+			'Auto-generate on publish',
+			'Gutenberg block',
+			'Custom field support',
+			'Multisite compatible'
+		],
+		useCases: [
+			'Auto OG images for blog posts',
+			'Featured image generation',
+			'WooCommerce product images'
+		],
 		docsUrl: 'https://docs.pictify.io/cms/wordpress',
 		icon: 'wordpress',
 		tutorial: {
 			title: 'Auto-Generate OG Images in WordPress',
 			estimatedTime: '15 minutes',
-			prerequisites: ['WordPress 5.9 or higher', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'WordPress 5.9 or higher',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Install the Pictify Plugin',
-					description: 'Download and install the official Pictify plugin from the WordPress plugin directory.',
+					description:
+						'Download and install the official Pictify plugin from the WordPress plugin directory.',
 					code: `1. Go to Plugins → Add New in your WordPress admin
 2. Search for "Pictify"
 3. Click "Install Now" then "Activate"
@@ -1662,7 +1943,7 @@ Products → Use template: "product-card"`,
 - Facebook: https://developers.facebook.com/tools/debug/
 - Twitter: https://cards-dev.twitter.com/validator
 - LinkedIn: https://www.linkedin.com/post-inspector/`,
-					tip: 'If the image doesn\'t appear immediately, wait 30 seconds and refresh.'
+					tip: "If the image doesn't appear immediately, wait 30 seconds and refresh."
 				},
 				{
 					title: 'Bulk Generate for Existing Posts',
@@ -1685,9 +1966,21 @@ Products → Use template: "product-card"`,
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Images not generating on publish', solution: 'Check that auto-generate is enabled and your API key is valid. View the Pictify error log in Tools → Pictify → Logs.' },
-				{ issue: 'Wrong image showing on social media', solution: 'Social platforms cache images. Use their debug tools to clear the cache and re-fetch.' },
-				{ issue: 'Plugin conflicts', solution: 'Disable other SEO plugins\' OG image features (Yoast, RankMath) to avoid conflicts.' }
+				{
+					issue: 'Images not generating on publish',
+					solution:
+						'Check that auto-generate is enabled and your API key is valid. View the Pictify error log in Tools → Pictify → Logs.'
+				},
+				{
+					issue: 'Wrong image showing on social media',
+					solution:
+						'Social platforms cache images. Use their debug tools to clear the cache and re-fetch.'
+				},
+				{
+					issue: 'Plugin conflicts',
+					solution:
+						"Disable other SEO plugins' OG image features (Yoast, RankMath) to avoid conflicts."
+				}
 			]
 		}
 	},
@@ -1696,15 +1989,25 @@ Products → Use template: "product-card"`,
 		name: 'Ghost',
 		category: 'cms',
 		description: 'Dynamic social cards for Ghost publications.',
-		longDescription: 'Integrate Pictify with Ghost to automatically generate beautiful social preview images for your publications. Use Ghost webhooks to trigger image generation when posts are published or updated.',
-		features: ['Webhook integration', 'Feature image support', 'Custom code injection', 'Member data support'],
+		longDescription:
+			'Integrate Pictify with Ghost to automatically generate beautiful social preview images for your publications. Use Ghost webhooks to trigger image generation when posts are published or updated.',
+		features: [
+			'Webhook integration',
+			'Feature image support',
+			'Custom code injection',
+			'Member data support'
+		],
 		useCases: ['Publication social cards', 'Newsletter images', 'Member certificates'],
 		docsUrl: 'https://docs.pictify.io/cms/ghost',
 		icon: 'ghost',
 		tutorial: {
 			title: 'Auto-Generate OG Images in Ghost',
 			estimatedTime: '15 minutes',
-			prerequisites: ['Ghost 5.x publication', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Ghost 5.x publication',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Create a Custom Integration in Ghost',
@@ -1714,7 +2017,7 @@ Products → Use template: "product-card"`,
 3. Name it "Pictify OG Images"
 4. Note the Content API Key and Admin API Key
 5. Click "Save"`,
-					tip: 'You\'ll use the Admin API key to write images back to posts.'
+					tip: "You'll use the Admin API key to write images back to posts."
 				},
 				{
 					title: 'Configure the Webhook in Ghost',
@@ -1733,7 +2036,7 @@ Products → Use template: "product-card"`,
 				},
 				{
 					title: 'Configure Pictify Webhook Handler',
-					description: 'Set up variable mapping in Pictify to handle Ghost\'s webhook payload.',
+					description: "Set up variable mapping in Pictify to handle Ghost's webhook payload.",
 					code: `In Pictify Dashboard → Webhooks → Configure:
 
 // Ghost sends this payload when a post is published:
@@ -1803,11 +2106,11 @@ image       → post.current.feature_image`,
 
 // Upload your modified theme:
 // Ghost Admin → Design → Change theme → Upload`,
-					tip: 'Test locally first using Ghost\'s theme development tools.'
+					tip: "Test locally first using Ghost's theme development tools."
 				},
 				{
 					title: 'Alternative: Use Code Injection',
-					description: 'For a no-theme-edit approach, use Ghost\'s code injection.',
+					description: "For a no-theme-edit approach, use Ghost's code injection.",
 					code: `Go to Ghost Admin → Settings → Code Injection → Site Header:
 
 <script>
@@ -1846,9 +2149,21 @@ image       → post.current.feature_image`,
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Webhook not triggering', solution: 'Verify the webhook URL in Ghost settings. Check that your Ghost instance can make outbound HTTP requests.' },
-				{ issue: 'Image not updating in Ghost', solution: 'Verify your Admin API key is correct and has write permissions. Check Pictify webhook logs for errors.' },
-				{ issue: 'Social preview shows old image', solution: 'Social platforms cache images. Use their debug tools to force a re-fetch of your page metadata.' }
+				{
+					issue: 'Webhook not triggering',
+					solution:
+						'Verify the webhook URL in Ghost settings. Check that your Ghost instance can make outbound HTTP requests.'
+				},
+				{
+					issue: 'Image not updating in Ghost',
+					solution:
+						'Verify your Admin API key is correct and has write permissions. Check Pictify webhook logs for errors.'
+				},
+				{
+					issue: 'Social preview shows old image',
+					solution:
+						'Social platforms cache images. Use their debug tools to force a re-fetch of your page metadata.'
+				}
 			]
 		}
 	},
@@ -1857,19 +2172,30 @@ image       → post.current.feature_image`,
 		name: 'Webflow',
 		category: 'cms',
 		description: 'Generate dynamic images for Webflow CMS collections.',
-		longDescription: 'Connect Pictify to Webflow via webhooks or Zapier to generate images for CMS collection items. Perfect for blogs, portfolios, and directories that need consistent, branded social images.',
-		features: ['Webhook support', 'CMS collection integration', 'Custom field mapping', 'Zapier connection'],
+		longDescription:
+			'Connect Pictify to Webflow via webhooks or Zapier to generate images for CMS collection items. Perfect for blogs, portfolios, and directories that need consistent, branded social images.',
+		features: [
+			'Webhook support',
+			'CMS collection integration',
+			'Custom field mapping',
+			'Zapier connection'
+		],
 		useCases: ['Collection item images', 'Dynamic directories', 'Portfolio showcases'],
 		docsUrl: 'https://docs.pictify.io/cms/webflow',
 		icon: 'webflow',
 		tutorial: {
 			title: 'Auto-Generate OG Images for Webflow CMS',
 			estimatedTime: '20 minutes',
-			prerequisites: ['Webflow site with CMS', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Webflow site with CMS',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Add a CMS Field for OG Image',
-					description: 'First, add a field to your CMS collection to store the generated image URL.',
+					description:
+						'First, add a field to your CMS collection to store the generated image URL.',
 					code: `1. Go to your Webflow project → CMS Collections
 2. Select your collection (e.g., "Blog Posts")
 3. Click "Add New Field"
@@ -1902,7 +2228,7 @@ image       → post.current.feature_image`,
          "image": "{{featured_image}}"
        }
      }`,
-					tip: 'Use Zapier\'s variable picker to map Webflow fields to template variables.'
+					tip: "Use Zapier's variable picker to map Webflow fields to template variables."
 				},
 				{
 					title: 'Update Webflow with Generated Image',
@@ -1965,7 +2291,7 @@ image       → post.current.feature_image`,
    <meta property="og:image" content="{{wf {&quot;path&quot;:&quot;og-image-url&quot;,&quot;type&quot;:&quot;PlainText&quot;} }}" />
 
 6. Publish your site`,
-					tip: 'Webflow\'s OG settings automatically add the meta tags to your page head.'
+					tip: "Webflow's OG settings automatically add the meta tags to your page head."
 				},
 				{
 					title: 'Direct API Integration (Advanced)',
@@ -2030,9 +2356,21 @@ export default async function handler(req, res) {
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Zapier not triggering', solution: 'Ensure your Webflow site is published. Zapier only detects changes on published items.' },
-				{ issue: 'OG image not showing', solution: 'Verify the CMS field is properly connected in Webflow\'s OG settings. Check that the URL is valid.' },
-				{ issue: 'Rate limit errors', solution: 'Add delays between items when processing bulk updates. Both Webflow and Pictify have rate limits.' }
+				{
+					issue: 'Zapier not triggering',
+					solution:
+						'Ensure your Webflow site is published. Zapier only detects changes on published items.'
+				},
+				{
+					issue: 'OG image not showing',
+					solution:
+						"Verify the CMS field is properly connected in Webflow's OG settings. Check that the URL is valid."
+				},
+				{
+					issue: 'Rate limit errors',
+					solution:
+						'Add delays between items when processing bulk updates. Both Webflow and Pictify have rate limits.'
+				}
 			]
 		}
 	},
@@ -2042,15 +2380,25 @@ export default async function handler(req, res) {
 		name: 'Shopify',
 		category: 'ecommerce',
 		description: 'Generate product images, social cards, and promo graphics for Shopify.',
-		longDescription: 'The Pictify Shopify integration helps store owners automate product image generation, create consistent social cards for product shares, and generate promotional graphics for sales and campaigns.',
-		features: ['Product webhook integration', 'Liquid template support', 'Metafield storage', 'App embed blocks'],
+		longDescription:
+			'The Pictify Shopify integration helps store owners automate product image generation, create consistent social cards for product shares, and generate promotional graphics for sales and campaigns.',
+		features: [
+			'Product webhook integration',
+			'Liquid template support',
+			'Metafield storage',
+			'App embed blocks'
+		],
 		useCases: ['Product social cards', 'Sale promo graphics', 'Dynamic product badges'],
 		docsUrl: 'https://docs.pictify.io/ecommerce/shopify',
 		icon: 'shopify',
 		tutorial: {
 			title: 'Auto-Generate Product Images for Shopify',
 			estimatedTime: '20 minutes',
-			prerequisites: ['Shopify store (any plan)', 'A Pictify account with an API key', 'A template created in Pictify'],
+			prerequisites: [
+				'Shopify store (any plan)',
+				'A Pictify account with an API key',
+				'A template created in Pictify'
+			],
 			steps: [
 				{
 					title: 'Create Metafield for Generated Images',
@@ -2158,7 +2506,7 @@ Find the <head> section and add/modify OG tags:
 {% endif %}
 
 // Save and preview changes before publishing`,
-					tip: 'Use Shopify\'s theme editor preview to test before going live.'
+					tip: "Use Shopify's theme editor preview to test before going live."
 				},
 				{
 					title: 'Alternative: Use Shopify Flow',
@@ -2222,15 +2570,26 @@ Find the <head> section and add/modify OG tags:
 - Facebook: developers.facebook.com/tools/debug/
 - Twitter: cards-dev.twitter.com/validator
 - LinkedIn: linkedin.com/post-inspector/`,
-					tip: 'Check Pictify webhook logs if the image doesn\'t appear.'
+					tip: "Check Pictify webhook logs if the image doesn't appear."
 				}
 			],
 			troubleshooting: [
-				{ issue: 'Webhook not receiving events', solution: 'Verify the webhook URL in Shopify settings. Check that the endpoint is publicly accessible (not localhost).' },
-				{ issue: 'Metafield not updating', solution: 'Ensure your Shopify API token has write_products scope. Check the token hasn\'t expired.' },
-				{ issue: 'Wrong product data in image', solution: 'Check your variable mapping in Pictify. Shopify sends nested data—verify the path to each field.' }
+				{
+					issue: 'Webhook not receiving events',
+					solution:
+						'Verify the webhook URL in Shopify settings. Check that the endpoint is publicly accessible (not localhost).'
+				},
+				{
+					issue: 'Metafield not updating',
+					solution:
+						"Ensure your Shopify API token has write_products scope. Check the token hasn't expired."
+				},
+				{
+					issue: 'Wrong product data in image',
+					solution:
+						'Check your variable mapping in Pictify. Shopify sends nested data—verify the path to each field.'
+				}
 			]
 		}
 	}
 ];
-

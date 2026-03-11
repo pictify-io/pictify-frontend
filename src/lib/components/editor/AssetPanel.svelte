@@ -7,7 +7,10 @@
 	import QRCodeLibrary from './QRCodeLibrary.svelte';
 	import BrandAssetsLibrary from './BrandAssetsLibrary.svelte';
 	import CopilotPanel from './CopilotPanel.svelte';
+	import FigmaImportModal from './FigmaImportModal.svelte';
 	import PanelTabs from './ui/PanelTabs.svelte';
+
+	let showFigmaModal = false;
 
 	let imageUrlInput = '';
 	let textMode = 'presets'; // 'basic' or 'presets'
@@ -195,18 +198,31 @@
 
 						<!-- Text Area (auto-wrapping) -->
 						<div class="pt-3 mt-3 border-t-[2px] border-gray-200">
-							<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Text Area (auto-wrap)</p>
+							<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">
+								Text Area (auto-wrap)
+							</p>
 							<button
 								class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-1 transition-all group shadow-sm"
-								on:click={() => addTextArea('Type your paragraph text here. This text area will automatically wrap within its bounds.', '16px', 300)}
+								on:click={() =>
+									addTextArea(
+										'Type your paragraph text here. This text area will automatically wrap within its bounds.',
+										'16px',
+										300
+									)}
 							>
 								<div class="flex items-start gap-3">
-									<div class="w-8 h-8 rounded bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+									<div
+										class="w-8 h-8 rounded bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
+									>
 										<i class="fa fa-align-left text-xs text-gray-900" />
 									</div>
 									<div>
-										<p class="text-sm font-bold text-gray-900 group-hover:text-black">Add a text area</p>
-										<p class="text-[10px] font-medium text-gray-500 mt-0.5">Auto-wraps text within a fixed width</p>
+										<p class="text-sm font-bold text-gray-900 group-hover:text-black">
+											Add a text area
+										</p>
+										<p class="text-[10px] font-medium text-gray-500 mt-0.5">
+											Auto-wraps text within a fixed width
+										</p>
 									</div>
 								</div>
 							</button>
@@ -254,6 +270,57 @@
 							Add
 						</button>
 					</div>
+					<!-- Figma Import -->
+					<div class="pt-3 mt-3 border-t-[2px] border-gray-200">
+						<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">
+							Import from
+						</p>
+						<button
+							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#a259ff] hover:-translate-y-1 transition-all group shadow-sm"
+							on:click={() => (showFigmaModal = true)}
+						>
+							<div class="flex items-center gap-3">
+								<div
+									class="w-10 h-10 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937] group-hover:shadow-none group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all"
+								>
+									<svg
+										width="18"
+										height="18"
+										viewBox="0 0 38 57"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z"
+											fill="white"
+										/>
+										<path
+											d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z"
+											fill="white"
+										/>
+										<path
+											d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z"
+											fill="white"
+										/>
+										<path
+											d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z"
+											fill="white"
+										/>
+										<path
+											d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z"
+											fill="white"
+										/>
+									</svg>
+								</div>
+								<div>
+									<p class="text-sm font-bold text-gray-900 group-hover:text-black">Figma</p>
+									<p class="text-[10px] font-medium text-gray-500 mt-0.5">
+										Import frames as editable objects
+									</p>
+								</div>
+							</div>
+						</button>
+					</div>
 				</div>
 			{:else if displayTab === 'charts'}
 				<ChartTableLibrary />
@@ -276,3 +343,12 @@
 		</div>
 	{/if}
 </div>
+
+{#if showFigmaModal}
+	<FigmaImportModal
+		on:close={() => (showFigmaModal = false)}
+		on:imported={(e) => {
+			showFigmaModal = false;
+		}}
+	/>
+{/if}

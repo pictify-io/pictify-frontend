@@ -16,20 +16,20 @@ import backend from '../service/backend';
  * @returns {Promise<Object>} Complete billing dashboard data
  */
 export async function getBillingDashboard({ refresh = false } = {}) {
-  try {
-    const url = refresh ? '/api/billing/dashboard?refresh=true' : '/api/billing/dashboard';
-    const response = await backend.get(url);
-    return response;
-  } catch (error) {
-    console.error('Failed to get billing dashboard:', error);
-    return {
-      subscription: null,
-      invoices: [],
-      timeline: [],
-      usage: null,
-      customerPortalUrl: null,
-    };
-  }
+	try {
+		const url = refresh ? '/api/billing/dashboard?refresh=true' : '/api/billing/dashboard';
+		const response = await backend.get(url);
+		return response;
+	} catch (error) {
+		console.error('Failed to get billing dashboard:', error);
+		return {
+			subscription: null,
+			invoices: [],
+			timeline: [],
+			usage: null,
+			customerPortalUrl: null
+		};
+	}
 }
 
 // ============================================
@@ -41,13 +41,13 @@ export async function getBillingDashboard({ refresh = false } = {}) {
  * @returns {Promise<Object|null>} Subscription data or null
  */
 export async function getSubscription() {
-  try {
-    const response = await backend.get('/api/billing/subscription');
-    return response;
-  } catch (error) {
-    console.error('Failed to get subscription:', error);
-    return null;
-  }
+	try {
+		const response = await backend.get('/api/billing/subscription');
+		return response;
+	} catch (error) {
+		console.error('Failed to get subscription:', error);
+		return null;
+	}
 }
 
 /**
@@ -57,8 +57,8 @@ export async function getSubscription() {
  * @returns {Promise<Object>} Updated subscription
  */
 export async function pauseSubscription({ resumesAt } = {}) {
-  const response = await backend.post('/api/billing/subscription/pause', { resumesAt });
-  return response;
+	const response = await backend.post('/api/billing/subscription/pause', { resumesAt });
+	return response;
 }
 
 /**
@@ -66,8 +66,8 @@ export async function pauseSubscription({ resumesAt } = {}) {
  * @returns {Promise<Object>} Updated subscription
  */
 export async function resumeSubscription() {
-  const response = await backend.post('/api/billing/subscription/resume');
-  return response;
+	const response = await backend.post('/api/billing/subscription/resume');
+	return response;
 }
 
 /**
@@ -75,8 +75,8 @@ export async function resumeSubscription() {
  * @returns {Promise<Object>} Updated subscription (will be active until period end)
  */
 export async function cancelSubscription() {
-  const response = await backend.post('/api/billing/subscription/cancel');
-  return response;
+	const response = await backend.post('/api/billing/subscription/cancel');
+	return response;
 }
 
 /**
@@ -84,8 +84,8 @@ export async function cancelSubscription() {
  * @returns {Promise<Object>} Updated subscription
  */
 export async function reactivateSubscription() {
-  const response = await backend.post('/api/billing/subscription/reactivate');
-  return response;
+	const response = await backend.post('/api/billing/subscription/reactivate');
+	return response;
 }
 
 /**
@@ -95,8 +95,8 @@ export async function reactivateSubscription() {
  * @returns {Promise<Object>} { customerPortalUrl, updatePaymentMethodUrl }
  */
 export async function getPortalUrl() {
-  const response = await backend.get('/api/billing/portal-url');
-  return response;
+	const response = await backend.get('/api/billing/portal-url');
+	return response;
 }
 
 // ============================================
@@ -110,13 +110,13 @@ export async function getPortalUrl() {
  * @returns {Promise<Array>} List of invoices
  */
 export async function getInvoices({ limit = 10 } = {}) {
-  try {
-    const response = await backend.get('/api/billing/invoices', { params: { limit } });
-    return response.invoices || [];
-  } catch (error) {
-    console.error('Failed to get invoices:', error);
-    return [];
-  }
+	try {
+		const response = await backend.get('/api/billing/invoices', { params: { limit } });
+		return response.invoices || [];
+	} catch (error) {
+		console.error('Failed to get invoices:', error);
+		return [];
+	}
 }
 
 /**
@@ -126,13 +126,13 @@ export async function getInvoices({ limit = 10 } = {}) {
  * @returns {Promise<Array>} List of timeline events
  */
 export async function getTimeline({ limit = 20 } = {}) {
-  try {
-    const response = await backend.get('/api/billing/timeline', { params: { limit } });
-    return response.timeline || [];
-  } catch (error) {
-    console.error('Failed to get timeline:', error);
-    return [];
-  }
+	try {
+		const response = await backend.get('/api/billing/timeline', { params: { limit } });
+		return response.timeline || [];
+	} catch (error) {
+		console.error('Failed to get timeline:', error);
+		return [];
+	}
 }
 
 // ============================================
@@ -144,19 +144,19 @@ export async function getTimeline({ limit = 20 } = {}) {
  * @returns {Promise<Object>} Billing preferences
  */
 export async function getBillingPreferences() {
-  try {
-    const response = await backend.get('/api/billing-preferences');
-    return response;
-  } catch (error) {
-    console.error('Failed to get billing preferences:', error);
-    return {
-      allowOverages: false,
-      spendingCapCents: null,
-      currentCycleOverages: 0,
-      currentCycleOverageCostCents: 0,
-      overagePricing: { eligible: false },
-    };
-  }
+	try {
+		const response = await backend.get('/api/billing-preferences');
+		return response;
+	} catch (error) {
+		console.error('Failed to get billing preferences:', error);
+		return {
+			allowOverages: false,
+			spendingCapCents: null,
+			currentCycleOverages: 0,
+			currentCycleOverageCostCents: 0,
+			overagePricing: { eligible: false }
+		};
+	}
 }
 
 /**
@@ -167,16 +167,16 @@ export async function getBillingPreferences() {
  * @returns {Promise<Object>} Updated preferences
  */
 export async function updateBillingPreferences({ allowOverages, spendingCapCents }) {
-  try {
-    const response = await backend.put('/api/billing-preferences', {
-      allowOverages,
-      spendingCapCents,
-    });
-    return response;
-  } catch (error) {
-    console.error('Failed to update billing preferences:', error);
-    throw error;
-  }
+	try {
+		const response = await backend.put('/api/billing-preferences', {
+			allowOverages,
+			spendingCapCents
+		});
+		return response;
+	} catch (error) {
+		console.error('Failed to update billing preferences:', error);
+		throw error;
+	}
 }
 
 /**
@@ -184,13 +184,13 @@ export async function updateBillingPreferences({ allowOverages, spendingCapCents
  * @returns {Promise<Object>} { invoices: Array, entityType: string }
  */
 export async function getOverageInvoices() {
-  try {
-    const response = await backend.get('/api/billing-preferences/overage-invoices');
-    return response;
-  } catch (error) {
-    console.error('Failed to get overage invoices:', error);
-    return { invoices: [], entityType: 'user' };
-  }
+	try {
+		const response = await backend.get('/api/billing-preferences/overage-invoices');
+		return response;
+	} catch (error) {
+		console.error('Failed to get overage invoices:', error);
+		return { invoices: [], entityType: 'user' };
+	}
 }
 
 /**
@@ -198,18 +198,18 @@ export async function getOverageInvoices() {
  * @returns {Promise<Object>} Overage summary
  */
 export async function getOverageSummary() {
-  try {
-    const response = await backend.get('/api/billing-preferences/overage-summary');
-    return response;
-  } catch (error) {
-    console.error('Failed to get overage summary:', error);
-    return {
-      allowOverages: false,
-      currentCycleOverages: 0,
-      currentCycleOverageCostCents: 0,
-      spendingCapCents: null,
-      remainingBudgetCents: null,
-      capReached: false,
-    };
-  }
+	try {
+		const response = await backend.get('/api/billing-preferences/overage-summary');
+		return response;
+	} catch (error) {
+		console.error('Failed to get overage summary:', error);
+		return {
+			allowOverages: false,
+			currentCycleOverages: 0,
+			currentCycleOverageCostCents: 0,
+			spendingCapCents: null,
+			remainingBudgetCents: null,
+			capReached: false
+		};
+	}
 }

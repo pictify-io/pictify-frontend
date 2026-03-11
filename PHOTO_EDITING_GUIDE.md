@@ -18,26 +18,26 @@ Use this guide to master image filters, text effects, and background removal in 
 
 ### 8 Preset Filters
 
-| Filter | Best For | Effect |
-|--------|----------|--------|
-| **Original** | Reset | Removes all filters |
-| **B&W** | Classic photos | Pure black & white |
-| **Sepia** | Vintage look | Warm, aged tone |
-| **Vintage** | Retro style | Faded with slight blur |
-| **Cool** | Professional | Blue-tinted, crisp |
-| **Warm** | Cozy feel | Orange/red-tinted |
-| **Dramatic** | Impact | High contrast, bold |
-| **Fade** | Soft look | Washed out, dreamy |
+| Filter       | Best For       | Effect                 |
+| ------------ | -------------- | ---------------------- |
+| **Original** | Reset          | Removes all filters    |
+| **B&W**      | Classic photos | Pure black & white     |
+| **Sepia**    | Vintage look   | Warm, aged tone        |
+| **Vintage**  | Retro style    | Faded with slight blur |
+| **Cool**     | Professional   | Blue-tinted, crisp     |
+| **Warm**     | Cozy feel      | Orange/red-tinted      |
+| **Dramatic** | Impact         | High contrast, bold    |
+| **Fade**     | Soft look      | Washed out, dreamy     |
 
 ### 5 Manual Controls
 
-| Control | Range | Use For |
-|---------|-------|---------|
-| **Brightness** | -100% to +100% | Fix exposure |
-| **Contrast** | -100% to +100% | Make images pop |
-| **Saturation** | -100% to +100% | Color intensity |
-| **Blur** | 0% to 100% | Soft focus, backgrounds |
-| **Hue** | -180° to +180° | Color shifting, creative effects |
+| Control        | Range          | Use For                          |
+| -------------- | -------------- | -------------------------------- |
+| **Brightness** | -100% to +100% | Fix exposure                     |
+| **Contrast**   | -100% to +100% | Make images pop                  |
+| **Saturation** | -100% to +100% | Color intensity                  |
+| **Blur**       | 0% to 100%     | Soft focus, backgrounds          |
+| **Hue**        | -180° to +180° | Color shifting, creative effects |
 
 ---
 
@@ -53,34 +53,34 @@ Use this guide to master image filters, text effects, and background removal in 
 
 ### 8 Preset Effects
 
-| Effect | Best For | Look |
-|--------|----------|------|
-| **None** | Clean text | No effects |
-| **Soft Shadow** | Subtle depth | Gentle shadow |
-| **Hard Shadow** | Bold impact | Sharp shadow |
-| **Outline** | Readability | Black stroke |
-| **Outline + Shadow** | 3D effect | White outline + shadow |
-| **Glow** | Highlight | Radiant blur |
-| **Neon** | Modern | Electric cyan glow |
-| **Bold Outline** | Maximum impact | Thick black stroke |
+| Effect               | Best For       | Look                   |
+| -------------------- | -------------- | ---------------------- |
+| **None**             | Clean text     | No effects             |
+| **Soft Shadow**      | Subtle depth   | Gentle shadow          |
+| **Hard Shadow**      | Bold impact    | Sharp shadow           |
+| **Outline**          | Readability    | Black stroke           |
+| **Outline + Shadow** | 3D effect      | White outline + shadow |
+| **Glow**             | Highlight      | Radiant blur           |
+| **Neon**             | Modern         | Electric cyan glow     |
+| **Bold Outline**     | Maximum impact | Thick black stroke     |
 
 ### Shadow Controls
 
-| Control | Range | Effect |
-|---------|-------|--------|
-| **Enable/Disable** | Toggle | Turn shadow on/off |
-| **Color** | Any color | Shadow tint |
-| **Blur** | 0-30px | Soft to sharp |
+| Control               | Range        | Effect              |
+| --------------------- | ------------ | ------------------- |
+| **Enable/Disable**    | Toggle       | Turn shadow on/off  |
+| **Color**             | Any color    | Shadow tint         |
+| **Blur**              | 0-30px       | Soft to sharp       |
 | **Horizontal Offset** | -30 to +30px | Left/right position |
-| **Vertical Offset** | -30 to +30px | Up/down position |
+| **Vertical Offset**   | -30 to +30px | Up/down position    |
 
 ### Stroke Controls
 
-| Control | Range | Effect |
-|---------|-------|--------|
-| **Enable/Disable** | Toggle | Turn stroke on/off |
-| **Color** | Any color | Outline color |
-| **Width** | 1-20px | Thin to thick |
+| Control            | Range     | Effect             |
+| ------------------ | --------- | ------------------ |
+| **Enable/Disable** | Toggle    | Turn stroke on/off |
+| **Color**          | Any color | Outline color      |
+| **Width**          | 1-20px    | Thin to thick      |
 
 ---
 
@@ -154,14 +154,14 @@ Use this guide to master image filters, text effects, and background removal in 
 
 ## ⚡ Keyboard Shortcuts
 
-| Action | Shortcut | Location |
-|--------|----------|----------|
-| **Toggle filter panel** | Click header | Properties |
-| **Reset filters** | Click button | Filters panel |
-| **Toggle shadow** | Click toggle | Text effects |
-| **Toggle stroke** | Click toggle | Text effects |
-| **Undo** | Cmd/Ctrl + Z | Top bar |
-| **Redo** | Cmd/Ctrl + Shift + Z | Top bar |
+| Action                  | Shortcut             | Location      |
+| ----------------------- | -------------------- | ------------- |
+| **Toggle filter panel** | Click header         | Properties    |
+| **Reset filters**       | Click button         | Filters panel |
+| **Toggle shadow**       | Click toggle         | Text effects  |
+| **Toggle stroke**       | Click toggle         | Text effects  |
+| **Undo**                | Cmd/Ctrl + Z         | Top bar       |
+| **Redo**                | Cmd/Ctrl + Shift + Z | Top bar       |
 
 ---
 
@@ -193,6 +193,7 @@ Use this guide to master image filters, text effects, and background removal in 
 ## 🎯 Common Use Cases
 
 ### E-Commerce
+
 ```
 1. Product photo
 2. Remove background
@@ -202,6 +203,7 @@ Use this guide to master image filters, text effects, and background removal in 
 ```
 
 ### Social Media
+
 ```
 1. Stock photo from Unsplash
 2. Apply filter (Dramatic/Cool/Warm)
@@ -210,6 +212,7 @@ Use this guide to master image filters, text effects, and background removal in 
 ```
 
 ### Marketing
+
 ```
 1. Team photo
 2. Remove background
@@ -219,6 +222,7 @@ Use this guide to master image filters, text effects, and background removal in 
 ```
 
 ### Presentations
+
 ```
 1. Screenshot or photo
 2. Remove busy background
@@ -256,11 +260,13 @@ Use this guide to master image filters, text effects, and background removal in 
 ### Image Filters
 
 **Issue**: Filters not applying
+
 - ✅ Check image is selected
 - ✅ Expand filters panel
 - ✅ Try clicking preset first
 
 **Issue**: Filters look weird
+
 - ✅ Click "Reset All Filters"
 - ✅ Start with subtle adjustments
 - ✅ Try different presets
@@ -268,12 +274,14 @@ Use this guide to master image filters, text effects, and background removal in 
 ### Text Effects
 
 **Issue**: Shadow not visible
+
 - ✅ Check shadow is enabled (toggle)
 - ✅ Increase offset values
 - ✅ Increase blur amount
 - ✅ Try different shadow color
 
 **Issue**: Stroke too thick/thin
+
 - ✅ Adjust stroke width slider
 - ✅ Try preset first
 - ✅ Scale based on font size
@@ -281,12 +289,14 @@ Use this guide to master image filters, text effects, and background removal in 
 ### Background Removal
 
 **Issue**: Processing takes long
+
 - ✅ Normal for first image (3-5s)
 - ✅ Check internet connection
 - ✅ Subsequent images are faster
 - ✅ Server may be processing others
 
 **Issue**: Result not perfect
+
 - ✅ Try different source image
 - ✅ Use high-quality photos
 - ✅ Clear subject-background contrast helps
@@ -359,6 +369,7 @@ Before exporting, check:
 ## 🎬 Example Recipes
 
 ### Recipe 1: Instagram Post
+
 ```
 1. Start with 1080x1080 canvas
 2. Add Unsplash photo
@@ -370,6 +381,7 @@ Before exporting, check:
 ```
 
 ### Recipe 2: LinkedIn Banner
+
 ```
 1. Start with 1584x396 canvas
 2. Add professional photo
@@ -380,6 +392,7 @@ Before exporting, check:
 ```
 
 ### Recipe 3: Product Showcase
+
 ```
 1. Upload product photo
 2. Remove background
@@ -395,18 +408,23 @@ Before exporting, check:
 ## 🆘 Quick Help
 
 ### Can't find filters?
+
 → Select an **image** first
 
 ### Can't find text effects?
+
 → Select **text** first
 
 ### Background removal grayed out?
+
 → Make sure you're **logged in**
 
 ### Effects not saving?
+
 → Click **Save** button in top bar
 
 ### Want to start over?
+
 → Use **Reset** buttons or **Undo**
 
 ---
@@ -431,5 +449,4 @@ Before exporting, check:
 **Last Updated**: November 21, 2025  
 **Version**: 1.0.0  
 **Features**: Image Filters, Text Effects, Background Removal  
-**Status**: ✅ All Production Ready  
-
+**Status**: ✅ All Production Ready

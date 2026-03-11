@@ -24,20 +24,26 @@ const BASE_PATH = '/copilot-simple';
  * @param {number} height - Canvas height
  * @returns {Promise<object>} Generated design result
  */
-export const generateSimple = async (prompt, canvasState, brandAssets = null, width = 1080, height = 1080) => {
-  try {
-    const response = await backend.post(`${BASE_PATH}/generate`, {
-      prompt,
-      canvasState,
-      brandAssets,
-      width,
-      height
-    });
-    return response;
-  } catch (error) {
-    console.error('Error in generateSimple:', error);
-    throw error;
-  }
+export const generateSimple = async (
+	prompt,
+	canvasState,
+	brandAssets = null,
+	width = 1080,
+	height = 1080
+) => {
+	try {
+		const response = await backend.post(`${BASE_PATH}/generate`, {
+			prompt,
+			canvasState,
+			brandAssets,
+			width,
+			height
+		});
+		return response;
+	} catch (error) {
+		console.error('Error in generateSimple:', error);
+		throw error;
+	}
 };
 
 /**
@@ -54,112 +60,112 @@ export const generateSimple = async (prompt, canvasState, brandAssets = null, wi
  * @returns {Promise<{abort: function}>} Abort controller
  */
 export const streamSimpleGenerate = async ({
-  prompt,
-  canvasState,
-  brandAssets = null,
-  width = 1080,
-  height = 1080,
-  onStep,
-  onComplete,
-  onError
+	prompt,
+	canvasState,
+	brandAssets = null,
+	width = 1080,
+	height = 1080,
+	onStep,
+	onComplete,
+	onError
 }) => {
-  const controller = new AbortController();
-  const url = new URL(`${PUBLIC_BACKEND_URL}${BASE_PATH}/generate-stream`);
+	const controller = new AbortController();
+	const url = new URL(`${PUBLIC_BACKEND_URL}${BASE_PATH}/generate-stream`);
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream'
-      },
-      body: JSON.stringify({
-        prompt,
-        canvasState,
-        brandAssets,
-        width,
-        height
-      }),
-      signal: controller.signal
-    });
+	try {
+		const response = await fetch(url, {
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'text/event-stream'
+			},
+			body: JSON.stringify({
+				prompt,
+				canvasState,
+				brandAssets,
+				width,
+				height
+			}),
+			signal: controller.signal
+		});
 
-    if (!response.ok) {
-      throw new Error(`Failed to start copilot: ${response.statusText}`);
-    }
+		if (!response.ok) {
+			throw new Error(`Failed to start copilot: ${response.statusText}`);
+		}
 
-    if (!response.body) {
-      throw new Error('Streaming not supported in this browser.');
-    }
+		if (!response.body) {
+			throw new Error('Streaming not supported in this browser.');
+		}
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
+		const reader = response.body.getReader();
+		const decoder = new TextDecoder();
+		let buffer = '';
 
-    const processBuffer = () => {
-      let boundary = buffer.indexOf('\n\n');
-      while (boundary !== -1) {
-        const chunk = buffer.slice(0, boundary).trim();
-        buffer = buffer.slice(boundary + 2);
-        if (chunk.length > 0) {
-          let eventName = 'message';
-          let dataPayload = '';
-          chunk.split('\n').forEach(line => {
-            if (line.startsWith('event:')) {
-              eventName = line.slice(6).trim();
-            } else if (line.startsWith('data:')) {
-              dataPayload += line.slice(5).trim();
-            }
-          });
+		const processBuffer = () => {
+			let boundary = buffer.indexOf('\n\n');
+			while (boundary !== -1) {
+				const chunk = buffer.slice(0, boundary).trim();
+				buffer = buffer.slice(boundary + 2);
+				if (chunk.length > 0) {
+					let eventName = 'message';
+					let dataPayload = '';
+					chunk.split('\n').forEach((line) => {
+						if (line.startsWith('event:')) {
+							eventName = line.slice(6).trim();
+						} else if (line.startsWith('data:')) {
+							dataPayload += line.slice(5).trim();
+						}
+					});
 
-          if (dataPayload) {
-            try {
-              const parsed = JSON.parse(dataPayload);
-              if (eventName === 'step') {
-                onStep?.(parsed);
-              } else if (eventName === 'complete') {
-                onComplete?.(parsed);
-              } else if (eventName === 'error') {
-                onError?.(new Error(parsed.message || 'Unknown error'));
-              }
-            } catch (error) {
-              console.warn('Failed to parse SSE payload', error);
-            }
-          }
-        }
-        boundary = buffer.indexOf('\n\n');
-      }
-    };
+					if (dataPayload) {
+						try {
+							const parsed = JSON.parse(dataPayload);
+							if (eventName === 'step') {
+								onStep?.(parsed);
+							} else if (eventName === 'complete') {
+								onComplete?.(parsed);
+							} else if (eventName === 'error') {
+								onError?.(new Error(parsed.message || 'Unknown error'));
+							}
+						} catch (error) {
+							console.warn('Failed to parse SSE payload', error);
+						}
+					}
+				}
+				boundary = buffer.indexOf('\n\n');
+			}
+		};
 
-    (async () => {
-      try {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          processBuffer();
-        }
-        if (buffer.trim().length > 0) {
-          processBuffer();
-        }
-      } catch (error) {
-        if (controller.signal.aborted) {
-          return;
-        }
-        console.error('Copilot stream error:', error);
-        onError?.(error);
-      }
-    })();
+		(async () => {
+			try {
+				while (true) {
+					const { value, done } = await reader.read();
+					if (done) break;
+					buffer += decoder.decode(value, { stream: true });
+					processBuffer();
+				}
+				if (buffer.trim().length > 0) {
+					processBuffer();
+				}
+			} catch (error) {
+				if (controller.signal.aborted) {
+					return;
+				}
+				console.error('Copilot stream error:', error);
+				onError?.(error);
+			}
+		})();
 
-    return {
-      abort: () => controller.abort()
-    };
-  } catch (error) {
-    controller.abort();
-    console.error('Error starting copilot stream:', error);
-    onError?.(error);
-    throw error;
-  }
+		return {
+			abort: () => controller.abort()
+		};
+	} catch (error) {
+		controller.abort();
+		console.error('Error starting copilot stream:', error);
+		onError?.(error);
+		throw error;
+	}
 };
 
 // =============================================================================
@@ -185,203 +191,207 @@ export const streamSimpleGenerate = async ({
  * @returns {Promise<{abort: function, isAborted: function}>} Controller object
  */
 export const streamCopilotGenerate = async ({
-  messages,
-  canvasState,
-  brandAssets = null,
-  tools = COPILOT_TOOLS,
-  width = 1080,
-  height = 1080,
-  onToolCall,
-  onToolResult,
-  onText,
-  onStep,
-  onComplete,
-  onError
+	messages,
+	canvasState,
+	brandAssets = null,
+	tools = COPILOT_TOOLS,
+	width = 1080,
+	height = 1080,
+	onToolCall,
+	onToolResult,
+	onText,
+	onStep,
+	onComplete,
+	onError
 }) => {
-  const controller = new AbortController();
-  let isAborted = false;
+	const controller = new AbortController();
+	let isAborted = false;
 
-  // Mark as aborted when signal fires
-  controller.signal.addEventListener('abort', () => {
-    isAborted = true;
-  });
+	// Mark as aborted when signal fires
+	controller.signal.addEventListener('abort', () => {
+		isAborted = true;
+	});
 
-  const url = new URL(`${PUBLIC_BACKEND_URL}${BASE_PATH}/generate-stream`);
+	const url = new URL(`${PUBLIC_BACKEND_URL}${BASE_PATH}/generate-stream`);
 
-  try {
-    // Convert messages to the format expected by backend
-    const formattedMessages = messages.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
+	try {
+		// Convert messages to the format expected by backend
+		const formattedMessages = messages.map((msg) => ({
+			role: msg.role,
+			content: msg.content
+		}));
 
-    const response = await fetch(url, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream'
-      },
-      body: JSON.stringify({
-        messages: formattedMessages,
-        prompt: formattedMessages[formattedMessages.length - 1]?.content || '',
-        canvasState,
-        brandAssets,
-        tools: tools.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema })),
-        width,
-        height
-      }),
-      signal: controller.signal
-    });
+		const response = await fetch(url, {
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'text/event-stream'
+			},
+			body: JSON.stringify({
+				messages: formattedMessages,
+				prompt: formattedMessages[formattedMessages.length - 1]?.content || '',
+				canvasState,
+				brandAssets,
+				tools: tools.map((t) => ({
+					name: t.name,
+					description: t.description,
+					input_schema: t.input_schema
+				})),
+				width,
+				height
+			}),
+			signal: controller.signal
+		});
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => response.statusText);
-      throw new Error(`Failed to start copilot: ${errorText}`);
-    }
+		if (!response.ok) {
+			const errorText = await response.text().catch(() => response.statusText);
+			throw new Error(`Failed to start copilot: ${errorText}`);
+		}
 
-    if (!response.body) {
-      throw new Error('Streaming not supported in this browser.');
-    }
+		if (!response.body) {
+			throw new Error('Streaming not supported in this browser.');
+		}
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
+		const reader = response.body.getReader();
+		const decoder = new TextDecoder();
+		let buffer = '';
 
-    const processSSEEvent = (eventName, parsed) => {
-      switch (eventName) {
-        case 'tool_call':
-          // AI wants to use a tool
-          if (parsed.id && parsed.name) {
-            // Validate tool input
-            const validation = validateToolInput(parsed.name, parsed.input || {});
-            if (!validation.valid) {
-              console.warn(`Invalid tool input for ${parsed.name}:`, validation.errors);
-            }
-            // Check if confirmation needed
-            const needsConfirm = requiresConfirmation(parsed.name);
-            onToolCall?.({
-              ...parsed,
-              requiresConfirmation: needsConfirm,
-              validationErrors: validation.errors
-            });
-          }
-          break;
+		const processSSEEvent = (eventName, parsed) => {
+			switch (eventName) {
+				case 'tool_call':
+					// AI wants to use a tool
+					if (parsed.id && parsed.name) {
+						// Validate tool input
+						const validation = validateToolInput(parsed.name, parsed.input || {});
+						if (!validation.valid) {
+							console.warn(`Invalid tool input for ${parsed.name}:`, validation.errors);
+						}
+						// Check if confirmation needed
+						const needsConfirm = requiresConfirmation(parsed.name);
+						onToolCall?.({
+							...parsed,
+							requiresConfirmation: needsConfirm,
+							validationErrors: validation.errors
+						});
+					}
+					break;
 
-        case 'tool_result':
-          // Tool execution completed
-          onToolResult?.(parsed);
-          break;
+				case 'tool_result':
+					// Tool execution completed
+					onToolResult?.(parsed);
+					break;
 
-        case 'text':
-          // Text response chunk
-          onText?.(parsed.content || parsed.text || '');
-          break;
+				case 'text':
+					// Text response chunk
+					onText?.(parsed.content || parsed.text || '');
+					break;
 
-        case 'step':
-          // Legacy step update (canvas state change)
-          onStep?.(parsed);
-          break;
+				case 'step':
+					// Legacy step update (canvas state change)
+					onStep?.(parsed);
+					break;
 
-        case 'element_update':
-          // Partial canvas update (single element)
-          onStep?.({
-            type: 'element_update',
-            ...parsed
-          });
-          break;
+				case 'element_update':
+					// Partial canvas update (single element)
+					onStep?.({
+						type: 'element_update',
+						...parsed
+					});
+					break;
 
-        case 'complete':
-          onComplete?.(parsed);
-          break;
+				case 'complete':
+					onComplete?.(parsed);
+					break;
 
-        case 'error':
-          onError?.(new Error(parsed.message || 'Unknown error'));
-          break;
+				case 'error':
+					onError?.(new Error(parsed.message || 'Unknown error'));
+					break;
 
-        default:
-          // Unknown event type, log for debugging
-          console.debug('Unknown SSE event:', eventName, parsed);
-      }
-    };
+				default:
+					// Unknown event type, log for debugging
+					console.debug('Unknown SSE event:', eventName, parsed);
+			}
+		};
 
-    const processBuffer = () => {
-      let boundary = buffer.indexOf('\n\n');
-      while (boundary !== -1) {
-        const chunk = buffer.slice(0, boundary).trim();
-        buffer = buffer.slice(boundary + 2);
+		const processBuffer = () => {
+			let boundary = buffer.indexOf('\n\n');
+			while (boundary !== -1) {
+				const chunk = buffer.slice(0, boundary).trim();
+				buffer = buffer.slice(boundary + 2);
 
-        if (chunk.length > 0) {
-          let eventName = 'message';
-          let dataPayload = '';
+				if (chunk.length > 0) {
+					let eventName = 'message';
+					let dataPayload = '';
 
-          chunk.split('\n').forEach(line => {
-            if (line.startsWith('event:')) {
-              eventName = line.slice(6).trim();
-            } else if (line.startsWith('data:')) {
-              dataPayload += line.slice(5).trim();
-            }
-          });
+					chunk.split('\n').forEach((line) => {
+						if (line.startsWith('event:')) {
+							eventName = line.slice(6).trim();
+						} else if (line.startsWith('data:')) {
+							dataPayload += line.slice(5).trim();
+						}
+					});
 
-          if (dataPayload) {
-            try {
-              const parsed = JSON.parse(dataPayload);
-              processSSEEvent(eventName, parsed);
-            } catch (error) {
-              console.warn('Failed to parse SSE payload:', error, dataPayload);
-            }
-          }
-        }
-        boundary = buffer.indexOf('\n\n');
-      }
-    };
+					if (dataPayload) {
+						try {
+							const parsed = JSON.parse(dataPayload);
+							processSSEEvent(eventName, parsed);
+						} catch (error) {
+							console.warn('Failed to parse SSE payload:', error, dataPayload);
+						}
+					}
+				}
+				boundary = buffer.indexOf('\n\n');
+			}
+		};
 
-    // Process stream in background
-    (async () => {
-      try {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          if (isAborted) break;
+		// Process stream in background
+		(async () => {
+			try {
+				while (true) {
+					const { value, done } = await reader.read();
+					if (done) break;
+					if (isAborted) break;
 
-          buffer += decoder.decode(value, { stream: true });
-          processBuffer();
-        }
+					buffer += decoder.decode(value, { stream: true });
+					processBuffer();
+				}
 
-        // Process any remaining data
-        if (buffer.trim().length > 0 && !isAborted) {
-          processBuffer();
-        }
-      } catch (error) {
-        if (isAborted || controller.signal.aborted) {
-          console.debug('Stream aborted gracefully');
-          return;
-        }
-        console.error('Copilot stream error:', error);
-        onError?.(error);
-      } finally {
-        // Ensure reader is released
-        try {
-          reader.releaseLock();
-        } catch {
-          // Already released
-        }
-      }
-    })();
+				// Process any remaining data
+				if (buffer.trim().length > 0 && !isAborted) {
+					processBuffer();
+				}
+			} catch (error) {
+				if (isAborted || controller.signal.aborted) {
+					console.debug('Stream aborted gracefully');
+					return;
+				}
+				console.error('Copilot stream error:', error);
+				onError?.(error);
+			} finally {
+				// Ensure reader is released
+				try {
+					reader.releaseLock();
+				} catch {
+					// Already released
+				}
+			}
+		})();
 
-    return {
-      abort: () => {
-        isAborted = true;
-        controller.abort();
-      },
-      isAborted: () => isAborted
-    };
-  } catch (error) {
-    isAborted = true;
-    controller.abort();
-    console.error('Error starting copilot stream:', error);
-    onError?.(error);
-    throw error;
-  }
+		return {
+			abort: () => {
+				isAborted = true;
+				controller.abort();
+			},
+			isAborted: () => isAborted
+		};
+	} catch (error) {
+		isAborted = true;
+		controller.abort();
+		console.error('Error starting copilot stream:', error);
+		onError?.(error);
+		throw error;
+	}
 };
 
 // =============================================================================
@@ -398,17 +408,17 @@ export const streamCopilotGenerate = async ({
  * @returns {Promise<object>} Response from backend
  */
 export const sendToolResult = async (threadId, toolCallId, result) => {
-  try {
-    const response = await backend.post(`${BASE_PATH}/tool-result`, {
-      threadId,
-      toolCallId,
-      result
-    });
-    return response;
-  } catch (error) {
-    console.error('Error sending tool result:', error);
-    throw error;
-  }
+	try {
+		const response = await backend.post(`${BASE_PATH}/tool-result`, {
+			threadId,
+			toolCallId,
+			result
+		});
+		return response;
+	} catch (error) {
+		console.error('Error sending tool result:', error);
+		throw error;
+	}
 };
 
 /**
@@ -419,16 +429,16 @@ export const sendToolResult = async (threadId, toolCallId, result) => {
  * @returns {Promise<object>} Response from backend
  */
 export const continueWithToolResults = async (threadId, toolResults) => {
-  try {
-    const response = await backend.post(`${BASE_PATH}/continue`, {
-      threadId,
-      toolResults
-    });
-    return response;
-  } catch (error) {
-    console.error('Error continuing with tool results:', error);
-    throw error;
-  }
+	try {
+		const response = await backend.post(`${BASE_PATH}/continue`, {
+			threadId,
+			toolResults
+		});
+		return response;
+	} catch (error) {
+		console.error('Error continuing with tool results:', error);
+		throw error;
+	}
 };
 
 // =============================================================================

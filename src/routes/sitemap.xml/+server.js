@@ -25,88 +25,104 @@ export async function GET() {
       `;
 	});
 
-   // PSEO: html-to-[format] size variants (from config)
-   const popularFormats = formats.map((f) => f.id);
-   const today = new Date().toISOString().slice(0, 10);
-   const variantUrls = popularFormats.flatMap((fmt) =>
-      popularSizes.map((sz) => `
+	// PSEO: html-to-[format] size variants (from config)
+	const popularFormats = formats.map((f) => f.id);
+	const today = new Date().toISOString().slice(0, 10);
+	const variantUrls = popularFormats.flatMap((fmt) =>
+		popularSizes.map(
+			(sz) => `
 			<url>
 				<loc>https://pictify.io/tools/html-to-${fmt}/${sz}</loc>
 				<lastmod>${today}</lastmod>
 				<changefreq>weekly</changefreq>
 				<priority>0.7</priority>
 			</url>
-		`)
-   );
+		`
+		)
+	);
 
-   // OG platform pages
-   const ogPlatformUrls = ogPlatforms.map((p) => `
+	// OG platform pages
+	const ogPlatformUrls = ogPlatforms.map(
+		(p) => `
 		<url>
 			<loc>https://pictify.io/tools/og-image-generator/${p.id}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>weekly</changefreq>
 			<priority>0.7</priority>
 		</url>
-	`);
+	`
+	);
 
-   const useCaseUrls = useCases.map((useCase) => `
+	const useCaseUrls = useCases.map(
+		(useCase) => `
 		<url>
 			<loc>https://pictify.io/tools/${useCase.id}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>weekly</changefreq>
 			<priority>0.6</priority>
 		</url>
-	`);
+	`
+	);
 
-   // Template category pages
-   const templateCategoryUrls = templateCategories.map((cat) => `
+	// Template category pages
+	const templateCategoryUrls = templateCategories.map(
+		(cat) => `
 		<url>
 			<loc>https://pictify.io/templates/category/${cat.id}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>weekly</changefreq>
 			<priority>0.7</priority>
 		</url>
-	`);
+	`
+	);
 
-   // Comparison pages
-   const comparisonUrls = comparisons.map((comp) => `
+	// Comparison pages
+	const comparisonUrls = comparisons.map(
+		(comp) => `
 		<url>
 			<loc>https://pictify.io/compare/${comp.slug}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>monthly</changefreq>
 			<priority>0.6</priority>
 		</url>
-	`);
+	`
+	);
 
-   // Glossary term pages
-   const glossaryUrls = glossary.map((term) => `
+	// Glossary term pages
+	const glossaryUrls = glossary.map(
+		(term) => `
 		<url>
 			<loc>https://pictify.io/glossary/${term.term}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>monthly</changefreq>
 			<priority>0.5</priority>
 		</url>
-	`);
+	`
+	);
 
-   // Integration pages
-   const integrationUrls = integrations.map((int) => `
+	// Integration pages
+	const integrationUrls = integrations.map(
+		(int) => `
 		<url>
 			<loc>https://pictify.io/integrations/${int.slug}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>weekly</changefreq>
 			<priority>0.7</priority>
 		</url>
-	`);
+	`
+	);
 
-   // Persona pages
-   const personaUrls = personas.map((p) => `
+	// Persona pages
+	const personaUrls = personas.map(
+		(p) => `
 		<url>
 			<loc>https://pictify.io/for/${p.slug}</loc>
 			<lastmod>${today}</lastmod>
 			<changefreq>monthly</changefreq>
 			<priority>0.7</priority>
 		</url>
-	`);
+	`
+	);
 
 	return new Response(
 		`

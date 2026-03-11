@@ -1,9 +1,9 @@
 /**
  * Canvas Preview Engine
- * 
+ *
  * Client-side engine for previewing template behavior with test data.
  * Handles conditions, loops, and text interpolation without making API calls.
- * 
+ *
  * This allows users to see how their canvas will look with different
  * variable values before actually rendering via the API.
  */
@@ -52,7 +52,7 @@ const BUILT_IN_FUNCTIONS = {
 		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 	},
 	trim: (value) => String(value).trim(),
-	
+
 	// Number functions
 	round: (value, decimals = 0) => {
 		const factor = Math.pow(10, decimals);
@@ -63,12 +63,12 @@ const BUILT_IN_FUNCTIONS = {
 	abs: (value) => Math.abs(Number(value)),
 	min: (...args) => Math.min(...args.map(Number)),
 	max: (...args) => Math.max(...args.map(Number)),
-	
+
 	// Array functions
-	first: (arr) => Array.isArray(arr) ? arr[0] : undefined,
-	last: (arr) => Array.isArray(arr) ? arr[arr.length - 1] : undefined,
-	join: (arr, separator = ', ') => Array.isArray(arr) ? arr.join(separator) : String(arr),
-	
+	first: (arr) => (Array.isArray(arr) ? arr[0] : undefined),
+	last: (arr) => (Array.isArray(arr) ? arr[arr.length - 1] : undefined),
+	join: (arr, separator = ', ') => (Array.isArray(arr) ? arr.join(separator) : String(arr)),
+
 	// Formatting
 	currency: (value, currency = 'USD') => {
 		try {
@@ -81,12 +81,12 @@ const BUILT_IN_FUNCTIONS = {
 		return (Number(value) * 100).toFixed(decimals) + '%';
 	},
 	number: (value, decimals = 0) => {
-		return new Intl.NumberFormat('en-US', { 
-			minimumFractionDigits: decimals, 
-			maximumFractionDigits: decimals 
+		return new Intl.NumberFormat('en-US', {
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals
 		}).format(Number(value));
 	},
-	
+
 	// Date functions
 	date: (dateStr) => {
 		try {
@@ -97,14 +97,14 @@ const BUILT_IN_FUNCTIONS = {
 			return String(dateStr);
 		}
 	},
-	
+
 	// Default
 	default: (value, defaultValue) => {
 		if (value === null || value === undefined || value === '') {
 			return defaultValue;
 		}
 		return value;
-	},
+	}
 };
 
 /**
@@ -112,13 +112,13 @@ const BUILT_IN_FUNCTIONS = {
  */
 function getNestedValue(obj, path) {
 	if (!path || typeof path !== 'string') return undefined;
-	
+
 	const parts = path.split('.');
 	let current = obj;
-	
+
 	for (const part of parts) {
 		if (current === null || current === undefined) return undefined;
-		
+
 		// Handle array index notation like items[0]
 		const match = part.match(/^(\w+)\[(\d+)\]$/);
 		if (match) {
@@ -132,7 +132,7 @@ function getNestedValue(obj, path) {
 			current = current[part];
 		}
 	}
-	
+
 	return current;
 }
 
@@ -143,10 +143,10 @@ function evaluateExpression(expression, context) {
 	if (!expression || typeof expression !== 'string') {
 		return true;
 	}
-	
+
 	const expr = expression.trim();
 	if (!expr) return true;
-	
+
 	try {
 		// Handle function calls
 		const funcMatch = expr.match(/^(\w+)\((.+)\)$/);
@@ -159,7 +159,7 @@ function evaluateExpression(expression, context) {
 				return func(...args);
 			}
 		}
-		
+
 		// Handle negated function
 		const negatedFuncMatch = expr.match(/^!(\w+)\((.+)\)$/);
 		if (negatedFuncMatch) {
@@ -170,7 +170,7 @@ function evaluateExpression(expression, context) {
 				return !func(...args);
 			}
 		}
-		
+
 		// Handle comparison operators
 		const comparisonPatterns = [
 			{ pattern: /^(.+?)\s*===\s*(.+)$/, op: (a, b) => a === b },
@@ -180,9 +180,9 @@ function evaluateExpression(expression, context) {
 			{ pattern: /^(.+?)\s*>=\s*(.+)$/, op: (a, b) => Number(a) >= Number(b) },
 			{ pattern: /^(.+?)\s*<=\s*(.+)$/, op: (a, b) => Number(a) <= Number(b) },
 			{ pattern: /^(.+?)\s*>\s*(.+)$/, op: (a, b) => Number(a) > Number(b) },
-			{ pattern: /^(.+?)\s*<\s*(.+)$/, op: (a, b) => Number(a) < Number(b) },
+			{ pattern: /^(.+?)\s*<\s*(.+)$/, op: (a, b) => Number(a) < Number(b) }
 		];
-		
+
 		for (const { pattern, op } of comparisonPatterns) {
 			const match = expr.match(pattern);
 			if (match) {
@@ -191,27 +191,26 @@ function evaluateExpression(expression, context) {
 				return op(left, right);
 			}
 		}
-		
+
 		// Handle logical operators
 		if (expr.includes('&&') || expr.includes(' and ')) {
 			const parts = expr.split(/\s*(?:&&|and)\s*/);
-			return parts.every(part => evaluateExpression(part.trim(), context));
+			return parts.every((part) => evaluateExpression(part.trim(), context));
 		}
-		
+
 		if (expr.includes('||') || expr.includes(' or ')) {
 			const parts = expr.split(/\s*(?:\|\||or)\s*/);
-			return parts.some(part => evaluateExpression(part.trim(), context));
+			return parts.some((part) => evaluateExpression(part.trim(), context));
 		}
-		
+
 		// Handle negation
 		if (expr.startsWith('!') && !expr.startsWith('!=')) {
 			return !evaluateExpression(expr.slice(1).trim(), context);
 		}
-		
+
 		// Simple value - truthy check
 		const value = resolveValue(expr, context);
 		return Boolean(value);
-		
 	} catch (error) {
 		console.warn('Expression evaluation error:', error.message, 'Expression:', expression);
 		return true; // Default to showing on error
@@ -227,10 +226,10 @@ function parseArguments(argsStr, context) {
 	let depth = 0;
 	let inString = false;
 	let stringChar = '';
-	
+
 	for (let i = 0; i < argsStr.length; i++) {
 		const char = argsStr[i];
-		
+
 		if ((char === '"' || char === "'") && argsStr[i - 1] !== '\\') {
 			if (!inString) {
 				inString = true;
@@ -239,7 +238,7 @@ function parseArguments(argsStr, context) {
 				inString = false;
 			}
 		}
-		
+
 		if (!inString) {
 			if (char === '(') depth++;
 			if (char === ')') depth--;
@@ -249,14 +248,14 @@ function parseArguments(argsStr, context) {
 				continue;
 			}
 		}
-		
+
 		current += char;
 	}
-	
+
 	if (current.trim()) {
 		args.push(resolveValue(current.trim(), context));
 	}
-	
+
 	return args;
 }
 
@@ -265,25 +264,27 @@ function parseArguments(argsStr, context) {
  */
 function resolveValue(expr, context) {
 	if (!expr) return undefined;
-	
+
 	const trimmed = expr.trim();
-	
+
 	// String literal
-	if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || 
-	    (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+	if (
+		(trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+		(trimmed.startsWith("'") && trimmed.endsWith("'"))
+	) {
 		return trimmed.slice(1, -1);
 	}
-	
+
 	// Number
 	if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
 		return parseFloat(trimmed);
 	}
-	
+
 	// Boolean
 	if (trimmed === 'true') return true;
 	if (trimmed === 'false') return false;
 	if (trimmed === 'null' || trimmed === 'undefined') return null;
-	
+
 	// Variable lookup
 	return getNestedValue(context, trimmed);
 }
@@ -294,29 +295,29 @@ function resolveValue(expr, context) {
  */
 function processTextInterpolation(text, context) {
 	if (!text || typeof text !== 'string') return text;
-	
+
 	// Match {{ variable }} or {{ variable | filter }}
 	return text.replace(/\{\{\s*(.+?)\s*\}\}/g, (match, expr) => {
 		// Check for filter (pipe)
 		const filterMatch = expr.match(/^(.+?)\s*\|\s*(.+)$/);
-		
+
 		if (filterMatch) {
 			const [, varPath, filterExpr] = filterMatch;
 			let value = getNestedValue(context, varPath.trim());
-			
+
 			// Apply filter
-			const filterParts = filterExpr.split(':').map(s => s.trim());
+			const filterParts = filterExpr.split(':').map((s) => s.trim());
 			const filterName = filterParts[0];
 			const filterArg = filterParts[1];
-			
+
 			const filter = BUILT_IN_FUNCTIONS[filterName];
 			if (filter) {
 				value = filterArg ? filter(value, resolveValue(filterArg, context)) : filter(value);
 			}
-			
+
 			return value !== undefined && value !== null ? String(value) : '';
 		}
-		
+
 		// Simple variable
 		const value = getNestedValue(context, expr.trim());
 		return value !== undefined && value !== null ? String(value) : '';
@@ -328,7 +329,7 @@ function processTextInterpolation(text, context) {
  */
 function storeOriginalState(obj) {
 	if (!obj || !obj.id) return;
-	
+
 	if (!originalStates.has(obj.id)) {
 		originalStates.set(obj.id, {
 			visible: obj.visible,
@@ -342,7 +343,7 @@ function storeOriginalState(obj) {
 			strokeWidth: obj.strokeWidth,
 			fontSize: obj.fontSize,
 			fontFamily: obj.fontFamily,
-			fontWeight: obj.fontWeight,
+			fontWeight: obj.fontWeight
 		});
 	}
 }
@@ -352,7 +353,7 @@ function storeOriginalState(obj) {
  */
 function restoreOriginalState(obj) {
 	if (!obj || !obj.id) return;
-	
+
 	const original = originalStates.get(obj.id);
 	if (original) {
 		obj.set('visible', original.visible !== false);
@@ -392,83 +393,83 @@ export async function applyPreview(canvas, testValues) {
 
 	try {
 		isPreviewActive.set(true);
-	
-	// Clear previous loop clones
-	loopClones.forEach(clone => {
-		try {
-			canvas.remove(clone);
-		} catch (e) {
-			// Ignore if already removed
-		}
-	});
-	loopClones = [];
-	
-	const objects = canvas.getObjects();
-	const objectsToHide = [];
-	const loopObjectsProcessed = new Set();
-	const loopPromises = [];
-	
-	// First pass: evaluate conditions and prepare loops
-	for (const obj of objects) {
-		storeOriginalState(obj);
-		
-		// Handle conditional visibility
-		if (obj.showWhen) {
-			const shouldShow = evaluateExpression(obj.showWhen, testValues);
-			if (!shouldShow) {
-				objectsToHide.push(obj);
+
+		// Clear previous loop clones
+		loopClones.forEach((clone) => {
+			try {
+				canvas.remove(clone);
+			} catch (e) {
+				// Ignore if already removed
 			}
-		}
-		
-		if (obj.hideWhen) {
-			const shouldHide = evaluateExpression(obj.hideWhen, testValues);
-			if (shouldHide) {
-				objectsToHide.push(obj);
-			}
-		}
-		
-		// Handle loops
-		if (obj.loopVariable && !loopObjectsProcessed.has(obj.id)) {
-			const loopItems = getNestedValue(testValues, obj.loopVariable);
-			
-			if (Array.isArray(loopItems) && loopItems.length > 0) {
-				loopObjectsProcessed.add(obj.id);
-				loopPromises.push(processLoop(canvas, obj, loopItems, testValues));
-				// Hide original object (clones take its place)
-				objectsToHide.push(obj);
-			} else if (!loopItems || loopItems.length === 0) {
-				// No items, hide the loop element
-				objectsToHide.push(obj);
-			}
-		}
-		
-		// Handle text interpolation
-		if ((obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox') && obj.text) {
-			// Check if text contains interpolation
-			if (obj.text.includes('{{')) {
-				const processedText = processTextInterpolation(obj.text, testValues);
-				obj.set('text', processedText);
-			}
-		}
-		
-		// Handle variable replacement for isVariable objects (multi-binding)
-		if (obj.isVariable && obj.variableBindings && Array.isArray(obj.variableBindings)) {
-			obj.variableBindings.forEach(binding => {
-				if (binding.variableName) {
-					const value = getNestedValue(testValues, binding.variableName);
-					if (value !== undefined) {
-						applyVariableValueByProperty(obj, binding.property, value);
-					}
+		});
+		loopClones = [];
+
+		const objects = canvas.getObjects();
+		const objectsToHide = [];
+		const loopObjectsProcessed = new Set();
+		const loopPromises = [];
+
+		// First pass: evaluate conditions and prepare loops
+		for (const obj of objects) {
+			storeOriginalState(obj);
+
+			// Handle conditional visibility
+			if (obj.showWhen) {
+				const shouldShow = evaluateExpression(obj.showWhen, testValues);
+				if (!shouldShow) {
+					objectsToHide.push(obj);
 				}
-			});
+			}
+
+			if (obj.hideWhen) {
+				const shouldHide = evaluateExpression(obj.hideWhen, testValues);
+				if (shouldHide) {
+					objectsToHide.push(obj);
+				}
+			}
+
+			// Handle loops
+			if (obj.loopVariable && !loopObjectsProcessed.has(obj.id)) {
+				const loopItems = getNestedValue(testValues, obj.loopVariable);
+
+				if (Array.isArray(loopItems) && loopItems.length > 0) {
+					loopObjectsProcessed.add(obj.id);
+					loopPromises.push(processLoop(canvas, obj, loopItems, testValues));
+					// Hide original object (clones take its place)
+					objectsToHide.push(obj);
+				} else if (!loopItems || loopItems.length === 0) {
+					// No items, hide the loop element
+					objectsToHide.push(obj);
+				}
+			}
+
+			// Handle text interpolation
+			if ((obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox') && obj.text) {
+				// Check if text contains interpolation
+				if (obj.text.includes('{{')) {
+					const processedText = processTextInterpolation(obj.text, testValues);
+					obj.set('text', processedText);
+				}
+			}
+
+			// Handle variable replacement for isVariable objects (multi-binding)
+			if (obj.isVariable && obj.variableBindings && Array.isArray(obj.variableBindings)) {
+				obj.variableBindings.forEach((binding) => {
+					if (binding.variableName) {
+						const value = getNestedValue(testValues, binding.variableName);
+						if (value !== undefined) {
+							applyVariableValueByProperty(obj, binding.property, value);
+						}
+					}
+				});
+			}
 		}
-	}
-	
-	// Wait for all loop processing to complete
-	await Promise.all(loopPromises);
-	
+
+		// Wait for all loop processing to complete
+		await Promise.all(loopPromises);
+
 		// Apply visibility
-		objectsToHide.forEach(obj => {
+		objectsToHide.forEach((obj) => {
 			obj.set('visible', false);
 			obj.set('opacity', 0);
 		});
@@ -535,7 +536,9 @@ function applyVariableValueByProperty(obj, property, value) {
 			// Mark the object so users know dynamic data is not fully previewed
 			if (obj.isChart) {
 				obj.set('chartData', value);
-				console.log(`[Preview] Chart data bound to variable, full preview not supported — data stored for render`);
+				console.log(
+					`[Preview] Chart data bound to variable, full preview not supported — data stored for render`
+				);
 			}
 			break;
 		case 'tableData':
@@ -543,7 +546,9 @@ function applyVariableValueByProperty(obj, property, value) {
 			if (obj.isTable) {
 				if (value && value.headers) obj.set('tableHeaders', value.headers);
 				if (value && value.rows) obj.set('tableRows', value.rows);
-				console.log(`[Preview] Table data bound to variable, full preview not supported — data stored for render`);
+				console.log(
+					`[Preview] Table data bound to variable, full preview not supported — data stored for render`
+				);
 			}
 			break;
 		default:
@@ -579,7 +584,7 @@ async function processLoop(canvas, obj, items, baseContext) {
 
 	for (let index = 0; index < limitedItems.length; index++) {
 		const item = limitedItems[index];
-		
+
 		// Create context for this iteration
 		const loopContext = {
 			...baseContext,
@@ -587,17 +592,17 @@ async function processLoop(canvas, obj, items, baseContext) {
 			[indexName]: index,
 			__loopFirst: index === 0,
 			__loopLast: index === limitedItems.length - 1,
-			__loopLength: limitedItems.length,
+			__loopLength: limitedItems.length
 		};
-		
+
 		try {
 			// Clone the object (Fabric.js v6 returns a Promise)
 			const clone = await obj.clone();
-			
+
 			// Calculate position
 			let newLeft = obj.left || 0;
 			let newTop = obj.top || 0;
-			
+
 			if (direction === 'horizontal') {
 				newLeft += index * spacing;
 			} else if (direction === 'vertical') {
@@ -608,7 +613,7 @@ async function processLoop(canvas, obj, items, baseContext) {
 				newLeft += col * spacing;
 				newTop += row * spacing;
 			}
-			
+
 			clone.set({
 				left: newLeft,
 				top: newTop,
@@ -616,18 +621,21 @@ async function processLoop(canvas, obj, items, baseContext) {
 				// Remove loop properties from clone
 				loopVariable: null,
 				loopItemName: null,
-				loopIndexName: null,
+				loopIndexName: null
 			});
-			
+
 			// Apply text interpolation with loop context
-			if ((clone.type === 'i-text' || clone.type === 'text' || clone.type === 'textbox') && clone.text) {
+			if (
+				(clone.type === 'i-text' || clone.type === 'text' || clone.type === 'textbox') &&
+				clone.text
+			) {
 				const processedText = processTextInterpolation(clone.text, loopContext);
 				clone.set('text', processedText);
 			}
-			
+
 			// Apply variable values if it's a variable (multi-binding)
 			if (clone.isVariable && clone.variableBindings && Array.isArray(clone.variableBindings)) {
-				clone.variableBindings.forEach(binding => {
+				clone.variableBindings.forEach((binding) => {
 					if (binding.variableName) {
 						const value = getNestedValue(loopContext, binding.variableName);
 						if (value !== undefined) {
@@ -636,7 +644,7 @@ async function processLoop(canvas, obj, items, baseContext) {
 					}
 				});
 			}
-			
+
 			// Handle nested conditions within loop
 			if (clone.showWhen) {
 				const shouldShow = evaluateExpression(clone.showWhen, loopContext);
@@ -645,7 +653,7 @@ async function processLoop(canvas, obj, items, baseContext) {
 					clone.set('opacity', 0);
 				}
 			}
-			
+
 			if (clone.hideWhen) {
 				const shouldHide = evaluateExpression(clone.hideWhen, loopContext);
 				if (shouldHide) {
@@ -653,10 +661,10 @@ async function processLoop(canvas, obj, items, baseContext) {
 					clone.set('opacity', 0);
 				}
 			}
-			
+
 			// Mark as preview clone
 			clone._isPreviewClone = true;
-			
+
 			canvas.add(clone);
 			loopClones.push(clone);
 		} catch (err) {
@@ -677,7 +685,7 @@ export function clearPreview(canvas) {
 	isPreviewActive.set(false);
 
 	// Remove loop clones
-	loopClones.forEach(clone => {
+	loopClones.forEach((clone) => {
 		try {
 			canvas.remove(clone);
 		} catch (e) {
@@ -688,7 +696,7 @@ export function clearPreview(canvas) {
 
 	// Restore original states
 	const objects = canvas.getObjects();
-	objects.forEach(obj => {
+	objects.forEach((obj) => {
 		restoreOriginalState(obj);
 	});
 
@@ -711,18 +719,18 @@ export function isPreviewModeActive() {
  */
 export function getPreviewStats(canvas, testValues) {
 	if (!canvas) return null;
-	
+
 	const objects = canvas.getObjects();
 	let conditionsCount = 0;
 	let loopsCount = 0;
 	let variablesCount = 0;
 	let hiddenByCondition = 0;
 	let loopIterations = 0;
-	
-	objects.forEach(obj => {
+
+	objects.forEach((obj) => {
 		if (obj.showWhen || obj.hideWhen) {
 			conditionsCount++;
-			
+
 			// Check if would be hidden
 			if (obj.showWhen) {
 				const shouldShow = evaluateExpression(obj.showWhen, testValues);
@@ -733,7 +741,7 @@ export function getPreviewStats(canvas, testValues) {
 				if (shouldHide) hiddenByCondition++;
 			}
 		}
-		
+
 		if (obj.loopVariable) {
 			loopsCount++;
 			const items = getNestedValue(testValues, obj.loopVariable);
@@ -741,12 +749,12 @@ export function getPreviewStats(canvas, testValues) {
 				loopIterations += items.length;
 			}
 		}
-		
+
 		if (obj.isVariable) {
 			variablesCount++;
 		}
 	});
-	
+
 	return {
 		conditionsCount,
 		loopsCount,
@@ -763,15 +771,15 @@ export function validateTestValues(testValues) {
 	const vars = get(variablesStore);
 	const errors = [];
 	const warnings = [];
-	
-	vars.forEach(v => {
+
+	vars.forEach((v) => {
 		const value = testValues[v.name];
-		
+
 		// Check required
 		if (v.required && (value === undefined || value === null || value === '')) {
 			errors.push(`"${v.name}" is required`);
 		}
-		
+
 		// Type validation
 		if (value !== undefined && value !== null) {
 			switch (v.type) {
@@ -798,7 +806,7 @@ export function validateTestValues(testValues) {
 			}
 		}
 	});
-	
+
 	return { errors, warnings, isValid: errors.length === 0 };
 }
 
@@ -812,4 +820,3 @@ export default {
 	processTextInterpolation,
 	getNestedValue
 };
-

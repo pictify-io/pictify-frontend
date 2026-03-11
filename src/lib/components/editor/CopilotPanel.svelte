@@ -410,7 +410,9 @@
 				...messages,
 				{
 					role: 'system',
-					content: `Last AI generation for this month! ${!isPaidPlan ? 'Upgrade for more access.' : ''}`
+					content: `Last AI generation for this month! ${
+						!isPaidPlan ? 'Upgrade for more access.' : ''
+					}`
 				}
 			];
 		}
@@ -572,9 +574,7 @@
 		class="px-3 py-2.5 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex justify-between items-center shrink-0 z-10 relative"
 	>
 		<div class="flex items-center gap-1.5 min-w-0">
-			<div
-				class="w-5 h-5 rounded-md bg-gray-900 flex items-center justify-center shrink-0"
-			>
+			<div class="w-5 h-5 rounded-md bg-gray-900 flex items-center justify-center shrink-0">
 				<svg
 					width="12"
 					height="12"
@@ -761,9 +761,7 @@
 							/>
 						</svg>
 					</div>
-					<p class="text-xs font-black text-gray-900 uppercase tracking-tight">
-						How can I help?
-					</p>
+					<p class="text-xs font-black text-gray-900 uppercase tracking-tight">How can I help?</p>
 
 					<div class="flex flex-col gap-2 w-full px-1">
 						{#each QUICK_ACTIONS as action}
@@ -784,7 +782,9 @@
 					transition:fly={{ y: 8, duration: 150 }}
 				>
 					{#if msg.role === 'system'}
-						<div class="w-full text-[10px] text-gray-500 bg-gray-50 rounded px-2 py-1 border border-gray-200 leading-snug">
+						<div
+							class="w-full text-[10px] text-gray-500 bg-gray-50 rounded px-2 py-1 border border-gray-200 leading-snug"
+						>
 							{msg.content}
 						</div>
 					{:else}
@@ -865,13 +865,17 @@
 								class="bg-white border-[2px] border-gray-900 rounded-lg p-2 text-[11px] shadow-[1px_1px_0_0_#1f2937]"
 							>
 								<div class="flex items-start gap-1.5">
-									<span class="font-black text-gray-400 text-[10px] shrink-0">#{step.stepNumber || index + 1}</span>
+									<span class="font-black text-gray-400 text-[10px] shrink-0"
+										>#{step.stepNumber || index + 1}</span
+									>
 									<div class="flex-1 min-w-0">
 										<div class="font-black text-gray-900 uppercase text-[9px] tracking-wider">
 											{step.tool || 'Unknown'}
 										</div>
 										{#if step.reasoning}
-											<div class="text-gray-600 leading-tight text-[10px] truncate">{step.reasoning}</div>
+											<div class="text-gray-600 leading-tight text-[10px] truncate">
+												{step.reasoning}
+											</div>
 										{/if}
 									</div>
 									{#if step.success}
@@ -910,9 +914,7 @@
 			<!-- Quality strengths -->
 			{#if lastQualityStrengths.length > 0}
 				<div class="pt-2 space-y-1.5">
-					<p class="text-[9px] font-bold text-gray-500 uppercase tracking-wide">
-						Strengths
-					</p>
+					<p class="text-[9px] font-bold text-gray-500 uppercase tracking-wide">Strengths</p>
 					<div class="flex flex-wrap gap-1">
 						{#each lastQualityStrengths as strength}
 							<span
@@ -976,7 +978,9 @@
 			{/if}
 			<div class="mt-1.5 flex justify-between items-center px-0.5">
 				<span class="text-[9px] text-gray-400 flex items-center gap-1">
-					<kbd class="text-[8px] font-mono bg-gray-100 px-1 rounded border border-gray-200">Enter</kbd> to send
+					<kbd class="text-[8px] font-mono bg-gray-100 px-1 rounded border border-gray-200"
+						>Enter</kbd
+					> to send
 				</span>
 				<button
 					class="text-[9px] text-gray-400 hover:text-gray-600 transition-colors"

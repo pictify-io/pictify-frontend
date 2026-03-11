@@ -25,79 +25,115 @@ const createGifPublic = async ({ html, width, height, duration }) => {
 
 const createOgImage = async ({ template, heading, description, logo, apiKey }) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post('/image/og-image', {
-		template,
-		heading,
-		description,
-		logo
-	}, { headers });
+	const response = await backend.post(
+		'/image/og-image',
+		{
+			template,
+			heading,
+			description,
+			logo
+		},
+		{ headers }
+	);
 	return response;
 };
 
 const createImage = async ({ html, width, height, selector, url, fileExtension, apiKey }) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post('/image', {
-		html,
-		width,
-		height,
-		selector,
-		url,
-		fileExtension
-	}, { headers });
+	const response = await backend.post(
+		'/image',
+		{
+			html,
+			width,
+			height,
+			selector,
+			url,
+			fileExtension
+		},
+		{ headers }
+	);
 	return response;
 };
 
 const createGif = async ({ html, width, height, framesPerSecond, selector, apiKey }) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post('/gif', {
-		html,
-		width,
-		height,
-		framesPerSecond,
-		selector
-	}, { headers });
+	const response = await backend.post(
+		'/gif',
+		{
+			html,
+			width,
+			height,
+			framesPerSecond,
+			selector
+		},
+		{ headers }
+	);
 	return response;
 };
 
 const createAgentScreenshot = async ({ prompt, apiKey }) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post('/image/agent-screenshot', {
-		prompt
-	}, { headers });
+	const response = await backend.post(
+		'/image/agent-screenshot',
+		{
+			prompt
+		},
+		{ headers }
+	);
 	return response;
 };
 
-const createCanvasImage = async ({ fabricJSData, variables, variableDefinitions, width, height, fileExtension, apiKey }) => {
+const createCanvasImage = async ({
+	fabricJSData,
+	variables,
+	variableDefinitions,
+	width,
+	height,
+	fileExtension,
+	apiKey
+}) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post('/image/canvas', {
-		fabricJSData,
-		variables,
-		variableDefinitions,
-		width,
-		height,
-		fileExtension
-	}, { headers });
+	const response = await backend.post(
+		'/image/canvas',
+		{
+			fabricJSData,
+			variables,
+			variableDefinitions,
+			width,
+			height,
+			fileExtension
+		},
+		{ headers }
+	);
 	return response;
 };
 
 const captureGif = async ({ url, width, height, frameDurationSeconds, quality, apiKey }) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post('/gif/capture', {
-		url,
-		width,
-		height,
-		frameDurationSeconds,
-		quality
-	}, { headers });
+	const response = await backend.post(
+		'/gif/capture',
+		{
+			url,
+			width,
+			height,
+			frameDurationSeconds,
+			quality
+		},
+		{ headers }
+	);
 	return response;
 };
 
 const renderTemplate = async ({ templateUid, variables, outputFormat, apiKey }) => {
 	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-	const response = await backend.post(`/templates/${templateUid}/render`, {
-		variables,
-		outputFormat
-	}, { headers });
+	const response = await backend.post(
+		`/templates/${templateUid}/render`,
+		{
+			variables,
+			outputFormat
+		},
+		{ headers }
+	);
 	return response;
 };
 
@@ -131,7 +167,7 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 		const response = await fetch(apiUrl, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ prompt })
 		});

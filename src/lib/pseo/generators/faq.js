@@ -126,7 +126,7 @@ export function generateFAQs(pageType, data, count = null) {
 	const enrichedData = enrichDataForFAQs(pageType, data);
 
 	// Generate FAQs from templates
-	const faqs = templates.map(template => ({
+	const faqs = templates.map((template) => ({
 		q: interpolate(template.q, enrichedData),
 		a: interpolate(template.a, enrichedData)
 	}));
@@ -156,12 +156,10 @@ export function generateFAQsWithCustom(pageType, data, customFAQs = []) {
  */
 export function mergeFAQs(existingFAQs, pageType, data) {
 	const generated = generateFAQs(pageType, data);
-	const existingQuestions = new Set(existingFAQs.map(f => f.q.toLowerCase()));
+	const existingQuestions = new Set(existingFAQs.map((f) => f.q.toLowerCase()));
 
 	// Add generated FAQs that don't duplicate existing ones
-	const newFAQs = generated.filter(
-		faq => !existingQuestions.has(faq.q.toLowerCase())
-	);
+	const newFAQs = generated.filter((faq) => !existingQuestions.has(faq.q.toLowerCase()));
 
 	return [...existingFAQs, ...newFAQs];
 }

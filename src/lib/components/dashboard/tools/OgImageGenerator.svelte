@@ -3,8 +3,13 @@
 	import { getTemplate } from '../../../../api/tools/og-image';
 	import { user, getAPITokenAction } from '../../../../store/user.store';
 	import { toast } from '../../../../store/toast.store';
-	import { createImagePublic, createOgImage, checkApiHealth, getOgImageTemplates } from '../../../../api/image';
-	import { 
+	import {
+		createImagePublic,
+		createOgImage,
+		checkApiHealth,
+		getOgImageTemplates
+	} from '../../../../api/image';
+	import {
 		templates as templatesStore,
 		createTemplateAction,
 		updateTemplateAction,
@@ -25,7 +30,7 @@
 	let isEmailVerified = null;
 	let userEmail = '';
 
-	user.subscribe(userData => {
+	user.subscribe((userData) => {
 		isUserLoggedIn = !!userData.email;
 		isEmailVerified = userData.isEmailVerified;
 		userEmail = userData.email || '';
@@ -66,10 +71,10 @@
 
 	// Default templates
 	const defaultTemplates = [
-		'template-1', 
-		'template-2', 
-		'template-3', 
-		'template-4', 
+		'template-1',
+		'template-2',
+		'template-3',
+		'template-4',
 		'template-6',
 		'template-7',
 		'template-8',
@@ -82,7 +87,7 @@
 		'template-16',
 		'template-17',
 		'template-18',
-		'template-19',
+		'template-19'
 	];
 
 	// API documentation
@@ -237,10 +242,12 @@
 
 	const loadDefaultTemplates = async () => {
 		try {
-			defaultTemplatesList = await Promise.all(defaultTemplates.map(async(name) => {
-				const template = await getTemplate(name);
-				return template;
-			}));
+			defaultTemplatesList = await Promise.all(
+				defaultTemplates.map(async (name) => {
+					const template = await getTemplate(name);
+					return template;
+				})
+			);
 			isLoading = false;
 		} catch (error) {
 			console.error('Error loading templates:', error);
@@ -252,25 +259,25 @@
 
 	const loadSavedTemplates = async () => {
 		if (!isUserLoggedIn) return;
-		
+
 		isLoadingSaved = true;
 		try {
 			const response = await getTemplatesForTypeAction('og-image');
 			console.log('Loaded saved templates:', response);
-			
+
 			// Get templates from store as fallback
 			const storeTemplates = get(templatesStore) || [];
-			const ogImageTemplates = storeTemplates.filter(t => t.type === 'og-image');
-			
+			const ogImageTemplates = storeTemplates.filter((t) => t.type === 'og-image');
+
 			if (response?.templates) {
 				savedTemplates = response.templates;
-				templateOptions = response.templates.map(t => ({
+				templateOptions = response.templates.map((t) => ({
 					uid: t.uid,
 					name: t.name || 'Untitled Template'
 				}));
 			} else if (ogImageTemplates.length > 0) {
 				savedTemplates = ogImageTemplates;
-				templateOptions = ogImageTemplates.map(t => ({
+				templateOptions = ogImageTemplates.map((t) => ({
 					uid: t.uid,
 					name: t.name || 'Untitled Template'
 				}));
@@ -278,7 +285,7 @@
 				savedTemplates = [];
 				templateOptions = [];
 			}
-			
+
 			console.log('Final saved templates:', savedTemplates);
 		} catch (error) {
 			console.error('Error loading saved templates:', error);
@@ -346,7 +353,7 @@
 	const handleTemplateSelect = (template) => {
 		// Reset the selected template first
 		selectedTemplate = null;
-		
+
 		// Reset the editor state
 		if (showEditor) {
 			showEditor = false;
@@ -359,7 +366,7 @@
 			selectedTemplate = template;
 			showEditor = true;
 		}
-		
+
 		// Show signup prompt for free users after a few uses
 		if (!isUserLoggedIn && Math.random() > 0.7) {
 			showSignupPrompt = true;
@@ -368,14 +375,17 @@
 
 	const handleImageGenerated = (event) => {
 		const { imageUrl, template, settings } = event.detail;
-		
+
 		// Add to recent templates
-		recentTemplates = [{
-			imageUrl,
-			template,
-			settings,
-			timestamp: new Date()
-		}, ...recentTemplates].slice(0, 10);
+		recentTemplates = [
+			{
+				imageUrl,
+				template,
+				settings,
+				timestamp: new Date()
+			},
+			...recentTemplates
+		].slice(0, 10);
 
 		// Update metrics
 		totalImagesGenerated++;
@@ -411,7 +421,11 @@
 	// Add generateImage function for API testing
 	const generateImage = async () => {
 		if (!settings.template || !settings.heading) {
-			toast.set({ message: 'Please select a template and enter a heading', type: 'warning', duration: 1500 });
+			toast.set({
+				message: 'Please select a template and enter a heading',
+				type: 'warning',
+				duration: 1500
+			});
 			return;
 		}
 
@@ -426,13 +440,13 @@
 			});
 
 			imageUrl = data.url;
-			testResponse = { 
+			testResponse = {
 				status: 200,
 				data
 			};
 			totalImagesGenerated++;
 			isApiOperational = true;
-			
+
 			if (!isUserLoggedIn) {
 				showSignupPrompt = true;
 			}
@@ -533,7 +547,7 @@
 	// Handle both initial load and state changes
 	user.subscribe(async (userData) => {
 		isUserLoggedIn = !!userData.email;
-		
+
 		if (userData?.email && !initialLoadDone) {
 			initialLoadDone = true;
 			await loadApiTokens();
@@ -549,7 +563,7 @@
 	// Subscribe to templates store - only update if we have templates
 	templatesStore.subscribe((storeTemplates) => {
 		if (activeTab === 'saved' && storeTemplates && storeTemplates.length > 0) {
-			const ogImageTemplates = storeTemplates.filter(t => t.type === 'og-image');
+			const ogImageTemplates = storeTemplates.filter((t) => t.type === 'og-image');
 			if (ogImageTemplates.length > 0) {
 				savedTemplates = ogImageTemplates;
 			}
@@ -559,42 +573,57 @@
 
 <div class="min-h-screen w-full bg-[#FFFDF8] font-['Manrope']">
 	<div class="max-w-7xl mx-auto px-6 py-12">
-		
 		<!-- Header Section -->
 		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
 			<div>
 				<h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight mb-2">
 					OG Image <span class="text-[#ff6b6b] relative inline-block">
 						Generator
-						<svg class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
+						<svg
+							class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
+							viewBox="0 0 100 10"
+							preserveAspectRatio="none"
+						>
 							<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="4" fill="none" />
 						</svg>
 					</span>
 				</h1>
 				<p class="text-lg text-gray-600 font-medium max-w-xl">
-					Create pixel-perfect social media images instantly. Choose a template, customize it, and export.
+					Create pixel-perfect social media images instantly. Choose a template, customize it, and
+					export.
 				</p>
 			</div>
 
 			<!-- Navigation Tabs -->
-			<div class="flex gap-2 p-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-x-auto max-w-full">
+			<div
+				class="flex gap-2 p-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-x-auto max-w-full"
+			>
 				<button
-					class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab === 'templates' ? 'bg-gray-900 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}"
-					on:click={() => activeTab = 'templates'}
+					class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab ===
+					'templates'
+						? 'bg-gray-900 text-white shadow-md'
+						: 'text-gray-700 hover:bg-gray-100'}"
+					on:click={() => (activeTab = 'templates')}
 				>
 					Templates
 				</button>
 				{#if isUserLoggedIn}
 					<button
-						class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab === 'saved' ? 'bg-gray-900 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}"
-						on:click={() => activeTab = 'saved'}
+						class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab ===
+						'saved'
+							? 'bg-gray-900 text-white shadow-md'
+							: 'text-gray-700 hover:bg-gray-100'}"
+						on:click={() => (activeTab = 'saved')}
 					>
 						Saved
 					</button>
 				{/if}
 				<button
-					class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab === 'api' ? 'bg-gray-900 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}"
-					on:click={() => activeTab = 'api'}
+					class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab ===
+					'api'
+						? 'bg-gray-900 text-white shadow-md'
+						: 'text-gray-700 hover:bg-gray-100'}"
+					on:click={() => (activeTab = 'api')}
 				>
 					API Playground
 				</button>
@@ -614,7 +643,10 @@
 			<div class="animate-fade-in">
 				<!-- Editor Area -->
 				{#if showEditor && activeTab !== 'api'}
-					<div class="mb-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden" transition:slide>
+					<div
+						class="mb-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						transition:slide
+					>
 						<OgImageEditor
 							template={selectedTemplate}
 							{isUserLoggedIn}
@@ -634,37 +666,38 @@
 				{#if activeTab === 'templates'}
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 						{#each defaultTemplatesList as template}
-							<div class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative">
+							<div
+								class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative"
+							>
 								<div class="p-2 bg-gray-50 border-b-[3px] border-gray-900">
 									<div class="flex gap-1.5">
-										<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
-										<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
-										<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
+										<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400" />
+										<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400" />
+										<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400" />
 									</div>
 								</div>
 								<div class="relative aspect-[1.91/1] bg-gray-100">
-									<OgImageTemplate 
-										html={template} 
-										width={1200} 
-										height={630} 
-										scale={0.25} 
-									/>
-									
+									<OgImageTemplate html={template} width={1200} height={630} scale={0.25} />
+
 									{#if template === selectedTemplate}
-										<div class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10">
+										<div
+											class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
+										>
 											Selected
 										</div>
 									{/if}
 
 									<!-- Hover Overlay -->
-									<div 
+									<div
 										class="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center backdrop-blur-[2px] cursor-pointer"
 										on:click={() => handleTemplateSelect(template)}
 										on:keydown={(e) => e.key === 'Enter' && handleTemplateSelect(template)}
 										role="button"
 										tabindex="0"
 									>
-										<button class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:scale-105 transition-transform transform translate-y-4 group-hover:translate-y-0">
+										<button
+											class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:scale-105 transition-transform transform translate-y-4 group-hover:translate-y-0"
+										>
 											{template === selectedTemplate ? 'Edit Template' : 'Use Template'}
 										</button>
 									</div>
@@ -673,18 +706,35 @@
 						{/each}
 					</div>
 
-				<!-- Saved Templates Grid -->
+					<!-- Saved Templates Grid -->
 				{:else if activeTab === 'saved' && isUserLoggedIn}
 					{#if savedTemplates.length === 0}
-						<div class="flex flex-col items-center justify-center min-h-[400px] text-center bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] p-12">
-							<div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 border-[3px] border-gray-900">
-								<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+						<div
+							class="flex flex-col items-center justify-center min-h-[400px] text-center bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] p-12"
+						>
+							<div
+								class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 border-[3px] border-gray-900"
+							>
+								<svg
+									class="w-10 h-10 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+									/></svg
+								>
 							</div>
 							<h3 class="text-2xl font-black text-gray-900 mb-2">No Saved Templates</h3>
-							<p class="text-gray-600 max-w-md mb-8">Start by customizing one of our default templates and save it to reuse later.</p>
-							<button 
+							<p class="text-gray-600 max-w-md mb-8">
+								Start by customizing one of our default templates and save it to reuse later.
+							</p>
+							<button
 								class="px-6 py-3 bg-[#ff6b6b] text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
-								on:click={() => activeTab = 'templates'}
+								on:click={() => (activeTab = 'templates')}
 							>
 								Browse Templates
 							</button>
@@ -692,46 +742,60 @@
 					{:else}
 						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 							{#each savedTemplates as template}
-								<div class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative">
-									<div class="p-2 bg-gray-50 border-b-[3px] border-gray-900 flex justify-between items-center px-3">
+								<div
+									class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative"
+								>
+									<div
+										class="p-2 bg-gray-50 border-b-[3px] border-gray-900 flex justify-between items-center px-3"
+									>
 										<div class="flex gap-1.5">
-											<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
-											<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400"></div>
+											<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400" />
+											<div class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400" />
 										</div>
 										<button
 											class="text-gray-400 hover:text-red-500 transition-colors"
 											on:click|stopPropagation={() => handleDeleteTemplate(template.uid)}
 											title="Delete Template"
 										>
-											<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-4 w-4"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+												/>
 											</svg>
 										</button>
 									</div>
-									
+
 									<div class="relative aspect-[1.91/1] bg-gray-100">
-										<OgImageTemplate 
-											html={template.html} 
-											width={1200} 
-											height={630} 
-											scale={0.25} 
-										/>
-										
+										<OgImageTemplate html={template.html} width={1200} height={630} scale={0.25} />
+
 										{#if template === selectedTemplate}
-											<div class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10">
+											<div
+												class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
+											>
 												Selected
 											</div>
 										{/if}
 
 										<!-- Hover Overlay -->
-										<div 
+										<div
 											class="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center backdrop-blur-[2px] cursor-pointer"
 											on:click={() => handleTemplateSelect(template)}
 											on:keydown={(e) => e.key === 'Enter' && handleTemplateSelect(template)}
 											role="button"
 											tabindex="0"
 										>
-											<button class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:scale-105 transition-transform transform translate-y-4 group-hover:translate-y-0">
+											<button
+												class="px-6 py-3 bg-white text-gray-900 font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:scale-105 transition-transform transform translate-y-4 group-hover:translate-y-0"
+											>
 												Edit Template
 											</button>
 										</div>
@@ -744,25 +808,41 @@
 						</div>
 					{/if}
 
-				<!-- API Playground -->
+					<!-- API Playground -->
 				{:else if activeTab === 'api'}
-					<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div
+						class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					>
 						<div class="p-8 md:p-10">
 							<!-- API Header -->
-							<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pb-8 border-b-2 border-gray-100">
+							<div
+								class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pb-8 border-b-2 border-gray-100"
+							>
 								<div>
 									<h2 class="text-2xl font-black text-gray-900 mb-2">API Documentation</h2>
-									<p class="text-gray-600 font-medium">Generate beautiful OG images programmatically using our REST API.</p>
+									<p class="text-gray-600 font-medium">
+										Generate beautiful OG images programmatically using our REST API.
+									</p>
 								</div>
 								<div class="flex items-center gap-4">
-									<div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border-2 border-gray-200">
-										<div class={`h-3 w-3 rounded-full shadow-sm ${isApiOperational ? 'bg-[#4ade80]' : 'bg-[#ff6b6b]'}`}></div>
-										<span class="text-sm font-bold text-gray-700">System: {isApiOperational ? 'Operational' : 'Offline'}</span>
+									<div
+										class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border-2 border-gray-200"
+									>
+										<div
+											class={`h-3 w-3 rounded-full shadow-sm ${
+												isApiOperational ? 'bg-[#4ade80]' : 'bg-[#ff6b6b]'
+											}`}
+										/>
+										<span class="text-sm font-bold text-gray-700"
+											>System: {isApiOperational ? 'Operational' : 'Offline'}</span
+										>
 									</div>
 									{#if isUserLoggedIn}
 										<button
 											class="px-4 py-2 bg-[#ffc480] text-gray-900 font-bold rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
-											on:click={() => {/* Get API Key */}}
+											on:click={() => {
+												/* Get API Key */
+											}}
 										>
 											Get API Key
 										</button>
@@ -775,8 +855,17 @@
 								<div class="lg:col-span-4 space-y-8">
 									<!-- Authentication Box -->
 									<div class="space-y-3">
-										<h3 class="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+										<h3
+											class="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+												><path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+												/></svg
+											>
 											Authentication
 										</h3>
 										<div class="bg-gray-50 p-4 rounded-xl border-[3px] border-gray-900 shadow-sm">
@@ -790,22 +879,37 @@
 													/>
 													<button
 														class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
-														on:click={() => showApiKey = !showApiKey}
+														on:click={() => (showApiKey = !showApiKey)}
 													>
-														<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="h-5 w-5"
+															viewBox="0 0 20 20"
+															fill="currentColor"
+														>
 															{#if showApiKey}
-																<path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" />
-																<path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+																<path
+																	d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
+																/>
+																<path
+																	d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"
+																/>
 															{:else}
 																<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-																<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+																<path
+																	fill-rule="evenodd"
+																	d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+																	clip-rule="evenodd"
+																/>
 															{/if}
 														</svg>
 													</button>
 												</div>
 											{:else}
 												<div class="text-sm font-medium text-gray-600 text-center py-2">
-													Please <a href="/login" class="text-[#ff6b6b] hover:underline font-bold">login</a> to get your API key.
+													Please <a href="/login" class="text-[#ff6b6b] hover:underline font-bold"
+														>login</a
+													> to get your API key.
 												</div>
 											{/if}
 										</div>
@@ -813,21 +917,44 @@
 
 									<!-- Endpoints List -->
 									<div class="space-y-3">
-										<h3 class="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+										<h3
+											class="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+												><path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+												/></svg
+											>
 											Endpoints
 										</h3>
 										<div class="space-y-3">
 											{#each endpoints as endpoint}
 												<button
-													class="w-full p-4 rounded-xl border-[3px] text-left transition-all group {selectedEndpoint === endpoint.id ? 'border-gray-900 bg-gray-900 text-white shadow-[4px_4px_0_0_#ff6b6b]' : 'border-gray-200 bg-white hover:border-gray-900 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#gray-200]'}"
-													on:click={() => selectedEndpoint = endpoint.id}
+													class="w-full p-4 rounded-xl border-[3px] text-left transition-all group {selectedEndpoint ===
+													endpoint.id
+														? 'border-gray-900 bg-gray-900 text-white shadow-[4px_4px_0_0_#ff6b6b]'
+														: 'border-gray-200 bg-white hover:border-gray-900 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#gray-200]'}"
+													on:click={() => (selectedEndpoint = endpoint.id)}
 												>
 													<div class="flex items-center gap-3 mb-2">
-														<span class="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider {selectedEndpoint === endpoint.id ? 'bg-white text-gray-900' : 'bg-gray-100 text-gray-700'}">{endpoint.method}</span>
+														<span
+															class="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider {selectedEndpoint ===
+															endpoint.id
+																? 'bg-white text-gray-900'
+																: 'bg-gray-100 text-gray-700'}">{endpoint.method}</span
+														>
 														<span class="text-xs font-mono opacity-80">{endpoint.path}</span>
 													</div>
-													<p class="text-sm font-bold {selectedEndpoint === endpoint.id ? 'text-gray-100' : 'text-gray-700'}">{endpoint.description}</p>
+													<p
+														class="text-sm font-bold {selectedEndpoint === endpoint.id
+															? 'text-gray-100'
+															: 'text-gray-700'}"
+													>
+														{endpoint.description}
+													</p>
 												</button>
 											{/each}
 										</div>
@@ -837,24 +964,29 @@
 								<!-- Right Panel -->
 								<div class="lg:col-span-8 space-y-8">
 									{#if selectedEndpoint}
-										{@const endpoint = endpoints.find(e => e.id === selectedEndpoint)}
+										{@const endpoint = endpoints.find((e) => e.id === selectedEndpoint)}
 										{#if endpoint}
 											<!-- Parameters Card -->
-											<div class="bg-white rounded-xl border-[3px] border-gray-900 p-6 shadow-[4px_4px_0_0_#1f2937]">
+											<div
+												class="bg-white rounded-xl border-[3px] border-gray-900 p-6 shadow-[4px_4px_0_0_#1f2937]"
+											>
 												<h3 class="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-													<div class="w-2 h-6 bg-[#ff6b6b] rounded-full"></div>
+													<div class="w-2 h-6 bg-[#ff6b6b] rounded-full" />
 													Request Parameters
 												</h3>
 												<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 													{#each endpoint.parameters as param}
-															<div class="space-y-2">
-																<div class="flex items-center gap-2 text-sm font-bold text-gray-900">
-																	<span>{param.name}</span>
-																	{#if param.required}
-																		<span class="text-[10px] text-[#ff6b6b] bg-[#ff6b6b]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Required</span>
-																	{/if}
-																</div>
-															
+														<div class="space-y-2">
+															<div class="flex items-center gap-2 text-sm font-bold text-gray-900">
+																<span>{param.name}</span>
+																{#if param.required}
+																	<span
+																		class="text-[10px] text-[#ff6b6b] bg-[#ff6b6b]/10 px-2 py-0.5 rounded-full uppercase tracking-wider"
+																		>Required</span
+																	>
+																{/if}
+															</div>
+
 															{#if param.name === 'template'}
 																<select
 																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none transition-colors bg-white cursor-pointer"
@@ -881,23 +1013,38 @@
 											</div>
 
 											<!-- Request Preview -->
-											<div class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden">
-												<div class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center justify-between">
+											<div
+												class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+											>
+												<div
+													class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center justify-between"
+												>
 													<div class="flex items-center gap-2">
-														<div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-														<div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-														<div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-														<span class="ml-2 text-xs font-mono text-gray-500">REQUEST PREVIEW</span>
+														<div class="w-3 h-3 rounded-full bg-[#ff5f56]" />
+														<div class="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+														<div class="w-3 h-3 rounded-full bg-[#27c93f]" />
+														<span class="ml-2 text-xs font-mono text-gray-500">REQUEST PREVIEW</span
+														>
 													</div>
 													{#if selectedEndpoint === 'generate'}
 														<button
 															class="text-xs font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
 															on:click={() => {
-																navigator.clipboard.writeText(JSON.stringify(requestPayload, null, 2));
+																navigator.clipboard.writeText(
+																	JSON.stringify(requestPayload, null, 2)
+																);
 																toast.set({ message: 'Copied!', type: 'success', duration: 1500 });
 															}}
 														>
-															<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																class="h-4 w-4"
+																viewBox="0 0 20 20"
+																fill="currentColor"
+																><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path
+																	d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"
+																/></svg
+															>
 															Copy
 														</button>
 													{/if}
@@ -906,33 +1053,57 @@
 													{#if selectedEndpoint === 'generate'}
 														<pre class="text-sm font-mono text-gray-300 leading-relaxed">
 <span class="text-[#ff79c6]">curl</span> -X POST {apiEndpoint} \
-{#if apiKey}  -H <span class="text-[#f1fa8c]">"Authorization: Bearer {apiKey}"</span> \{/if}
+{#if apiKey} -H <span class="text-[#f1fa8c]">"Authorization: Bearer {apiKey}"</span> \{/if}
   -H <span class="text-[#f1fa8c]">"Content-Type: application/json"</span> \
   -d <span class="text-[#50fa7b]">{JSON.stringify(requestPayload, null, 2)}</span></pre>
 													{:else if selectedEndpoint === 'templates'}
 														<pre class="text-sm font-mono text-gray-300 leading-relaxed">
 <span class="text-[#ff79c6]">curl</span> -X GET /templates/type/og-image \
-{#if apiKey}  -H <span class="text-[#f1fa8c]">"Authorization: Bearer {apiKey}"</span>{/if}</pre>
+{#if apiKey} -H <span class="text-[#f1fa8c]">"Authorization: Bearer {apiKey}"</span>{/if}</pre>
 													{/if}
 												</div>
 											</div>
 
 											<!-- Email Verification Warning -->
 											{#if isUserLoggedIn && isEmailVerified === false}
-												<EmailVerificationRequired email={userEmail} feature="OG image generation API" />
+												<EmailVerificationRequired
+													email={userEmail}
+													feature="OG image generation API"
+												/>
 											{/if}
 
 											<!-- Action Button -->
 											<button
 												class="w-full py-4 bg-[#ff6b6b] text-white font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
 												on:click={handleTestEndpoint}
-												disabled={!apiKey || (selectedEndpoint === 'generate' && (!settings.template || !settings.heading)) || isImageGenerating || isLoadingTemplates || (isUserLoggedIn && isEmailVerified === false)}
+												disabled={!apiKey ||
+													(selectedEndpoint === 'generate' &&
+														(!settings.template || !settings.heading)) ||
+													isImageGenerating ||
+													isLoadingTemplates ||
+													(isUserLoggedIn && isEmailVerified === false)}
 											>
 												{#if isImageGenerating || isLoadingTemplates}
 													<span class="flex items-center justify-center gap-3">
-														<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-															<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-															<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+														<svg
+															class="animate-spin h-5 w-5"
+															xmlns="http://www.w3.org/2000/svg"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<circle
+																class="opacity-25"
+																cx="12"
+																cy="12"
+																r="10"
+																stroke="currentColor"
+																stroke-width="4"
+															/>
+															<path
+																class="opacity-75"
+																fill="currentColor"
+																d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+															/>
 														</svg>
 														Processing Request...
 													</span>
@@ -946,18 +1117,34 @@
 												<div class="space-y-4 animate-fade-in">
 													<div class="flex items-center justify-between">
 														<h3 class="text-lg font-black text-gray-900">Response</h3>
-														<span class={`px-3 py-1 text-xs font-bold rounded-full border-2 border-gray-900 ${testResponse.status >= 200 && testResponse.status < 300 ? 'bg-[#4ade80] text-gray-900' : 'bg-[#ff6b6b] text-white'}`}>
+														<span
+															class={`px-3 py-1 text-xs font-bold rounded-full border-2 border-gray-900 ${
+																testResponse.status >= 200 && testResponse.status < 300
+																	? 'bg-[#4ade80] text-gray-900'
+																	: 'bg-[#ff6b6b] text-white'
+															}`}
+														>
 															Status: {testResponse.status}
 														</span>
 													</div>
-													
-													<div class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-sm p-6 overflow-hidden">
-														<pre class="text-sm font-mono text-[#50fa7b] overflow-x-auto"><code>{JSON.stringify(testResponse.data || testResponse.error, null, 2)}</code></pre>
+
+													<div
+														class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-sm p-6 overflow-hidden"
+													>
+														<pre class="text-sm font-mono text-[#50fa7b] overflow-x-auto"><code
+																>{JSON.stringify(
+																	testResponse.data || testResponse.error,
+																	null,
+																	2
+																)}</code
+															></pre>
 													</div>
 
 													<!-- Generated Image Preview -->
 													{#if testResponse.status === 200 && imageUrl}
-														<div class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_0_#1f2937] space-y-4">
+														<div
+															class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_0_#1f2937] space-y-4"
+														>
 															<h4 class="font-bold text-gray-900">Generated Asset</h4>
 															<img
 																src={imageUrl}
@@ -965,17 +1152,21 @@
 																class="w-full rounded-lg border-2 border-gray-200"
 															/>
 															<div class="flex gap-2">
-																<input 
-																	type="text" 
-																	value={imageUrl} 
-																	readonly 
+																<input
+																	type="text"
+																	value={imageUrl}
+																	readonly
 																	class="flex-1 px-3 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-xs font-mono text-gray-600"
 																/>
 																<button
 																	class="px-4 py-2 bg-gray-900 text-white font-bold text-xs rounded-lg hover:bg-gray-800"
 																	on:click={() => {
 																		navigator.clipboard.writeText(imageUrl);
-																		toast.set({ message: 'URL Copied!', type: 'success', duration: 1500 });
+																		toast.set({
+																			message: 'URL Copied!',
+																			type: 'success',
+																			duration: 1500
+																		});
 																	}}
 																>
 																	Copy
@@ -999,25 +1190,43 @@
 
 <!-- Signup Prompt Modal -->
 {#if showSignupPrompt}
-	<div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-		<div class="bg-[#FFFDF8] rounded-3xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative">
+	<div
+		class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+	>
+		<div
+			class="bg-[#FFFDF8] rounded-3xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
+		>
 			<!-- Decorative elements -->
 			<div class="absolute -top-6 -right-6 text-6xl">✨</div>
-			
+
 			<h3 class="text-3xl font-black text-gray-900 mb-4">Unlock Creative Power</h3>
-			<p class="text-gray-600 font-medium text-lg mb-6">You've reached the limit for guest usage. Join thousands of creators making amazing content.</p>
-			
+			<p class="text-gray-600 font-medium text-lg mb-6">
+				You've reached the limit for guest usage. Join thousands of creators making amazing content.
+			</p>
+
 			<div class="space-y-3 mb-8">
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
-					<div class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs">✓</div>
+					<div
+						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+					>
+						✓
+					</div>
 					Save unlimited templates
 				</div>
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
-					<div class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs">✓</div>
+					<div
+						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+					>
+						✓
+					</div>
 					Remove watermarks
 				</div>
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
-					<div class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs">✓</div>
+					<div
+						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+					>
+						✓
+					</div>
 					API access
 				</div>
 			</div>
@@ -1031,7 +1240,7 @@
 				</a>
 				<button
 					class="block w-full py-3 text-gray-500 font-bold hover:text-gray-900"
-					on:click={() => showSignupPrompt = false}
+					on:click={() => (showSignupPrompt = false)}
 				>
 					Maybe Later
 				</button>
@@ -1044,6 +1253,6 @@
 
 <style>
 	:global(body) {
-		background-color: #FFFDF8;
+		background-color: #fffdf8;
 	}
 </style>

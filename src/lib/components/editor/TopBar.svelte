@@ -1,7 +1,14 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { selectedComponent, editor, editorActions } from '../../../store/editor.store';
-	import { canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved } from '../../../store/history.store';
+	import {
+		canUndo,
+		canRedo,
+		triggerUndo,
+		triggerRedo,
+		isDirty,
+		triggerMarkSaved
+	} from '../../../store/history.store';
 	import { outputFormat, pdfPreset, pageActions } from '../../../store/pages.store';
 	import { showToast } from '../../../store/toast.store';
 
@@ -48,7 +55,7 @@
 			if (active.type === 'activeselection' || active.type === 'ActiveSelection') {
 				const objects = active.getObjects().concat();
 				$editor.discardActiveObject();
-				objects.forEach(obj => $editor.remove(obj));
+				objects.forEach((obj) => $editor.remove(obj));
 			} else {
 				$editor.remove(active);
 				$editor.discardActiveObject();
@@ -59,11 +66,11 @@
 	}
 
 	function undo() {
-		triggerUndo.update(n => n + 1);
+		triggerUndo.update((n) => n + 1);
 	}
 
 	function redo() {
-		triggerRedo.update(n => n + 1);
+		triggerRedo.update((n) => n + 1);
 	}
 
 	function toggleOutputFormat() {
@@ -90,18 +97,23 @@
 	$: {
 		if (wasSaving && !isSaving) {
 			console.log('TopBar: Save completed, marking as clean');
-			triggerMarkSaved.update(n => n + 1);
+			triggerMarkSaved.update((n) => n + 1);
 		}
 		wasSaving = isSaving;
 	}
 </script>
 
-<div class="h-16 bg-[#FFFDF8] border-b-[3px] border-gray-900 flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 relative flex-shrink-0">
+<div
+	class="h-16 bg-[#FFFDF8] border-b-[3px] border-gray-900 flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 relative flex-shrink-0"
+>
 	<div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 mr-4">
-		<a href={guestMode ? '/tools#workflows' : backHref} class="flex items-center justify-center w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0_0_#1f2937] transition-all flex-shrink-0 group">
-			<i class="fa fa-arrow-left text-sm group-hover:-translate-x-0.5 transition-transform"></i>
+		<a
+			href={guestMode ? '/tools#workflows' : backHref}
+			class="flex items-center justify-center w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0_0_#1f2937] transition-all flex-shrink-0 group"
+		>
+			<i class="fa fa-arrow-left text-sm group-hover:-translate-x-0.5 transition-transform" />
 		</a>
-		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block flex-shrink-0 rounded-full"></div>
+		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block flex-shrink-0 rounded-full" />
 		<div class="flex-1 min-w-0 max-w-md relative group">
 			<input
 				type="text"
@@ -109,26 +121,37 @@
 				placeholder="UNTITLED DESIGN"
 				class="w-full text-sm sm:text-base font-black uppercase tracking-wider text-gray-900 border-2 border-transparent focus:border-gray-900 focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] p-2 bg-transparent rounded-lg transition-all placeholder-gray-400 hover:bg-white hover:border-gray-200"
 			/>
-			<i class="fa fa-pencil absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></i>
+			<i
+				class="fa fa-pencil absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+			/>
 		</div>
 
 		<!-- Output Format Toggle Removed (Moved to separate routes) -->
 	</div>
-<div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+	<div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
 		<!-- Status indicators -->
 		{#if $isDirty && !isSaving}
-			<div class="hidden sm:flex items-center px-3 py-1.5 bg-[#ffe066] border-[2px] border-gray-900 rounded-md shadow-[2px_2px_0_0_#1f2937] transform -rotate-1 hover:rotate-0 transition-all cursor-help" title="Don't forget to save!">
+			<div
+				class="hidden sm:flex items-center px-3 py-1.5 bg-[#ffe066] border-[2px] border-gray-900 rounded-md shadow-[2px_2px_0_0_#1f2937] transform -rotate-1 hover:rotate-0 transition-all cursor-help"
+				title="Don't forget to save!"
+			>
 				<div class="relative flex h-2.5 w-2.5 mr-2">
-					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b6b] opacity-75"></span>
-					<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff5252] border-[1.5px] border-gray-900"></span>
+					<span
+						class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b6b] opacity-75"
+					/>
+					<span
+						class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff5252] border-[1.5px] border-gray-900"
+					/>
 				</div>
 				<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest mt-[1px]">
 					Unsaved
 				</span>
 			</div>
 		{:else if showAutoSaved}
-			<div class="hidden sm:flex items-center px-3 py-1.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-md shadow-[2px_2px_0_0_#1f2937] transform rotate-1 hover:rotate-0 transition-all cursor-default">
-				<i class="fa fa-sparkles text-[10px] text-gray-900 mr-1.5"></i>
+			<div
+				class="hidden sm:flex items-center px-3 py-1.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-md shadow-[2px_2px_0_0_#1f2937] transform rotate-1 hover:rotate-0 transition-all cursor-default"
+			>
+				<i class="fa fa-sparkles text-[10px] text-gray-900 mr-1.5" />
 				<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest mt-[1px]">
 					Auto-saved
 				</span>
@@ -142,7 +165,7 @@
 				disabled={!$canUndo}
 				title="Undo (Cmd+Z)"
 			>
-				<i class="fa fa-undo text-xs"></i>
+				<i class="fa fa-undo text-xs" />
 			</button>
 			<button
 				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
@@ -150,47 +173,47 @@
 				disabled={!$canRedo}
 				title="Redo (Cmd+Shift+Z)"
 			>
-				<i class="fa fa-redo text-xs"></i>
+				<i class="fa fa-redo text-xs" />
 			</button>
 		</div>
 
 		{#if $selectedComponent}
-			<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full"></div>
+			<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full" />
 			<button
 				class="w-9 h-9 flex items-center justify-center bg-[#ff6b6b] border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
 				on:click={deleteSelected}
 				title="Delete selected element"
 			>
-				<i class="fa fa-trash text-xs"></i>
+				<i class="fa fa-trash text-xs" />
 			</button>
 		{/if}
 
-		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full"></div>
+		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full" />
 
 		<div class="relative">
 			<button
 				class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
 				{guestMode
 					? 'bg-[#ff6b6b] text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
-					: ($isDirty
-						? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
-						: 'bg-gray-100 text-gray-400 cursor-default')}"
+					: $isDirty
+					? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
+					: 'bg-gray-100 text-gray-400 cursor-default'}"
 				on:click={save}
-				disabled={guestMode ? isSaving : (isSaving || !$isDirty)}
+				disabled={guestMode ? isSaving : isSaving || !$isDirty}
 			>
 				{#if isSaving}
-					<i class="fa fa-spinner fa-spin"></i>
+					<i class="fa fa-spinner fa-spin" />
 					<span class="hidden sm:inline">Saving...</span>
 				{:else if guestMode}
-					<i class="fa fa-lock"></i>
+					<i class="fa fa-lock" />
 					<span class="hidden sm:inline">Save (free account)</span>
 					<span class="sm:hidden">Save</span>
 				{:else if $isDirty}
-					<i class="fa fa-save"></i>
+					<i class="fa fa-save" />
 					<span class="hidden sm:inline">Save</span>
 					<span class="sm:hidden">Save</span>
 				{:else}
-					<i class="fa fa-check"></i>
+					<i class="fa fa-check" />
 					<span class="hidden sm:inline">Saved</span>
 					<span class="sm:hidden">Saved</span>
 				{/if}

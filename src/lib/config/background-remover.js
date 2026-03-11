@@ -1,6 +1,6 @@
 /**
  * Background Remover Configuration
- * 
+ *
  * Uses backend API with powerful server-side AI processing
  * Better quality, faster, and works on all devices!
  */
@@ -11,13 +11,13 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export const BACKGROUND_REMOVER_CONFIG = {
 	// API endpoint
 	apiUrl: `${API_URL}/api/background-removal`,
-	
+
 	// Model configuration (processed on server)
 	model: 'medium', // 'small', 'medium' (recommended), or 'large'
-	
+
 	// Optimization settings
-	optimize: true, // Enable server-side optimization
-	
+	optimize: true // Enable server-side optimization
+
 	// Server processes with better models and faster performance
 };
 
@@ -49,7 +49,7 @@ export function getModelInfo() {
 			recommended: 'Professional work'
 		}
 	};
-	
+
 	return models[BACKGROUND_REMOVER_CONFIG.model] || models.medium;
 }
 
@@ -61,6 +61,5 @@ export const SERVER_SIDE_BENEFITS = {
 	betterQuality: 'Advanced models for superior quality',
 	allDevices: 'Works great on mobile and low-end devices',
 	noDownload: 'No model download needed - instant start',
-	optimized: 'Automatic image optimization',
+	optimized: 'Automatic image optimization'
 };
-

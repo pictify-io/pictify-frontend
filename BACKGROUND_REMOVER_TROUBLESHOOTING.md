@@ -18,11 +18,12 @@ curl http://localhost:3000/health
 ```
 
 **Expected Response**:
+
 ```json
 {
-  "status": "healthy",
-  "timestamp": "2025-11-21T20:02:33.659Z",
-  "uptime": 68.805577291
+	"status": "healthy",
+	"timestamp": "2025-11-21T20:02:33.659Z",
+	"uptime": 68.805577291
 }
 ```
 
@@ -35,13 +36,14 @@ curl http://localhost:3000/background-removal/health
 ```
 
 **Expected Response**:
+
 ```json
 {
-  "status": "ok",
-  "service": "background-removal",
-  "models": ["small", "medium", "large"],
-  "defaultModel": "large",
-  "timestamp": "2025-11-21T..."
+	"status": "ok",
+	"service": "background-removal",
+	"models": ["small", "medium", "large"],
+	"defaultModel": "large",
+	"timestamp": "2025-11-21T..."
 }
 ```
 
@@ -61,6 +63,7 @@ curl http://localhost:3000/background-removal/health
 ```
 
 **If you see errors**, check:
+
 - What's the error message?
 - What's the status code?
 - Is there a CORS error?
@@ -76,6 +79,7 @@ curl http://localhost:3000/background-removal/health
 **Fix**: We're now using cookie-based auth via `backend.post()` which handles this automatically.
 
 **Verify**:
+
 1. Check you're logged in
 2. Open DevTools → Application → Cookies
 3. Look for `auth-token` cookie
@@ -84,18 +88,21 @@ curl http://localhost:3000/background-removal/health
 ### Issue 2: 401 Unauthorized
 
 **Possible Causes**:
+
 1. Not logged in
 2. Session expired
 3. Cookie not being sent
 
 **Debug**:
+
 ```javascript
 // In browser console, check cookies
-document.cookie
+document.cookie;
 // Should see: "auth-token=..."
 ```
 
 **Fix**:
+
 1. Log out and log back in
 2. Clear browser cache and cookies
 3. Try in incognito mode (to rule out cached state)
@@ -107,6 +114,7 @@ document.cookie
 **Cause**: Frontend and backend on different domains without CORS setup
 
 **Check**: Are both on localhost?
+
 - Frontend: Usually http://localhost:5173 (Vite default)
 - Backend: http://localhost:3000
 
@@ -117,11 +125,13 @@ document.cookie
 **Symptom**: "Failed to fetch" or "Network error"
 
 **Causes**:
+
 1. Backend server not running
 2. Wrong port
 3. Firewall blocking
 
 **Debug**:
+
 ```bash
 # Check server is running
 curl http://localhost:3000/health
@@ -135,12 +145,14 @@ curl http://localhost:3000/background-removal/health
 **Cause**: Server-side processing error
 
 **Check Backend Logs**:
+
 ```bash
 # If running in terminal, check output
 # Look for error messages with "background_removal_error"
 ```
 
 **Common Server Errors**:
+
 - Out of memory (model too large for server)
 - Image URL unreachable
 - Invalid image format
@@ -153,6 +165,7 @@ curl http://localhost:3000/background-removal/health
 Run through this checklist:
 
 ### Frontend
+
 - [ ] Logged in to your account
 - [ ] Can see email in user menu/profile
 - [ ] DevTools shows `auth-token` cookie
@@ -161,6 +174,7 @@ Run through this checklist:
 - [ ] Button is not grayed out
 
 ### Backend
+
 - [ ] Server running (`curl http://localhost:3000/health`)
 - [ ] Route loaded (`curl http://localhost:3000/background-removal/health`)
 - [ ] Dependencies installed (`@imgly/background-removal`, `sharp`)
@@ -168,6 +182,7 @@ Run through this checklist:
 - [ ] No errors in server logs
 
 ### Network
+
 - [ ] Frontend can reach backend
 - [ ] CORS configured correctly
 - [ ] Cookies being sent (`credentials: 'include'`)
@@ -180,6 +195,7 @@ Run through this checklist:
 ### Test with curl (Authenticated Request)
 
 **First**, get your session cookie:
+
 1. Log in to your app in browser
 2. Open DevTools → Application → Cookies
 3. Copy the `auth-token` value
@@ -208,10 +224,10 @@ curl -X POST http://localhost:3000/background-removal \
 ### Successful Request:
 
 ```
-[Background Removal] Starting... 
+[Background Removal] Starting...
   { imageUrl: "https://...", model: "large", optimize: true }
 
-[Background Removal] Success! 
+[Background Removal] Success!
   { url: "https://bucket.s3.amazonaws.com/...", size: 123456, ... }
 
 [Background Removal] Complete!
@@ -222,11 +238,12 @@ curl -X POST http://localhost:3000/background-removal \
 ```
 [Background Removal] Error: <error object>
 
-[Background Removal] Error details: 
+[Background Removal] Error details:
   { status: 401, message: "Unauthorized", stack: "..." }
 ```
 
 **Look at**:
+
 - `status`: HTTP status code (401, 429, 500, etc.)
 - `message`: Error description
 - Check if it's network, auth, or server error
@@ -250,7 +267,7 @@ curl -X POST http://localhost:3000/background-removal \
 
 ```javascript
 // In browser console
-document.cookie
+document.cookie;
 // Should show: "auth-token=<uuid>"
 ```
 
@@ -260,15 +277,18 @@ document.cookie
 // In browser console
 import backend from '/src/service/backend.js';
 
-backend.post('/background-removal', {
-  imageUrl: 'https://picsum.photos/500',
-  model: 'large',
-  optimize: true
-}).then(result => {
-  console.log('Success:', result);
-}).catch(error => {
-  console.error('Error:', error);
-});
+backend
+	.post('/background-removal', {
+		imageUrl: 'https://picsum.photos/500',
+		model: 'large',
+		optimize: true
+	})
+	.then((result) => {
+		console.log('Success:', result);
+	})
+	.catch((error) => {
+		console.error('Error:', error);
+	});
 ```
 
 ---
@@ -311,12 +331,14 @@ PUBLIC_BACKEND_URL=http://localhost:3000
 ## 📝 What We Fixed
 
 ### Previous Issues
+
 1. ✅ Using wrong auth method (Bearer token instead of cookies)
 2. ✅ Trying to get `authToken` from user store (doesn't exist)
 3. ✅ Manual fetch instead of using `backend` service
 4. ✅ Duplicate plugin registration causing server errors
 
 ### Current Implementation
+
 1. ✅ Uses `backend.post()` service (handles cookies automatically)
 2. ✅ Proper route structure with `decorateUser`
 3. ✅ Health check endpoint working
@@ -337,6 +359,7 @@ PUBLIC_BACKEND_URL=http://localhost:3000
 6. **Share the exact error** for further debugging
 
 The console logs will show:
+
 - Exact error message
 - HTTP status code
 - Whether request even reached the server
@@ -365,5 +388,3 @@ When everything works correctly:
 ---
 
 **Please try now and let me know what you see in the browser console!** 🔍
-
-

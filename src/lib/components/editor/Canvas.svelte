@@ -3,10 +3,24 @@
 	import { Canvas as FabricCanvas, ActiveSelection } from 'fabric'; // v6 import
 	import { editor, editorActions } from '../../../store/editor.store';
 	import {
-	canUndo, canRedo, triggerUndo, triggerRedo, isDirty, triggerMarkSaved,
-	batchState, isBatching, setupLegacyGlobals, cleanupLegacyGlobals
-} from '../../../store/history.store';
-	import { currentPageIndex, pages, pageActions, outputFormat, pdfPreset } from '../../../store/pages.store';
+		canUndo,
+		canRedo,
+		triggerUndo,
+		triggerRedo,
+		isDirty,
+		triggerMarkSaved,
+		batchState,
+		isBatching,
+		setupLegacyGlobals,
+		cleanupLegacyGlobals
+	} from '../../../store/history.store';
+	import {
+		currentPageIndex,
+		pages,
+		pageActions,
+		outputFormat,
+		pdfPreset
+	} from '../../../store/pages.store';
 	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
 	import { isPreviewModeActive, clearPreview } from '../../utils/canvas-preview-engine';
 	import { showToast } from '../../../store/toast.store';
@@ -52,7 +66,13 @@
 		const isBatchingActive = $isBatching;
 
 		// Only log if blocked to reduce noise, or if successful
-		if (!fabricCanvas || isPerformingUndoRedo || isLoadingCanvas || isBatchingActive || isPageSwitching) {
+		if (
+			!fabricCanvas ||
+			isPerformingUndoRedo ||
+			isLoadingCanvas ||
+			isBatchingActive ||
+			isPageSwitching
+		) {
 			if (isPerformingUndoRedo) console.log('🚫 saveState blocked: performing undo/redo');
 			if (isLoadingCanvas) console.log('🚫 saveState blocked: loading canvas');
 			if (isBatchingActive) console.log('🚫 saveState blocked: batching operations');
@@ -76,7 +96,14 @@
 			historyIndex++;
 		}
 
-		console.log('📝 State saved. Index:', historyIndex, 'SavedIndex:', savedHistoryIndex, 'Stack length:', historyStack.length);
+		console.log(
+			'📝 State saved. Index:',
+			historyIndex,
+			'SavedIndex:',
+			savedHistoryIndex,
+			'Stack length:',
+			historyStack.length
+		);
 
 		// Update can undo/redo flags
 		updateHistoryFlags();
@@ -115,7 +142,12 @@
 	}
 
 	function performUndo() {
-		console.log('⏪ Undo called. Current index:', historyIndex, 'Stack length:', historyStack.length);
+		console.log(
+			'⏪ Undo called. Current index:',
+			historyIndex,
+			'Stack length:',
+			historyStack.length
+		);
 		if (!fabricCanvas || historyIndex <= 0 || isPerformingUndoRedo) {
 			if (isPerformingUndoRedo) console.log('❌ Cannot undo - operation already in progress');
 			else console.log('❌ Cannot undo - at beginning of history');
@@ -150,7 +182,12 @@
 	}
 
 	function performRedo() {
-		console.log('⏩ Redo called. Current index:', historyIndex, 'Stack length:', historyStack.length);
+		console.log(
+			'⏩ Redo called. Current index:',
+			historyIndex,
+			'Stack length:',
+			historyStack.length
+		);
 		if (!fabricCanvas || historyIndex >= historyStack.length - 1 || isPerformingUndoRedo) {
 			if (isPerformingUndoRedo) console.log('❌ Cannot redo - operation already in progress');
 			else console.log('❌ Cannot redo - at end of history');
@@ -234,16 +271,16 @@
 		if ($outputFormat === 'pdf') {
 			const preset = $pdfPreset || 'A4';
 			const pdfDimensions = {
-				'A4': { width: 595, height: 842 },
-				'A4_LANDSCAPE': { width: 842, height: 595 },
-				'LETTER': { width: 612, height: 792 },
-				'LETTER_LANDSCAPE': { width: 792, height: 612 },
-				'LEGAL': { width: 612, height: 1008 },
-				'LEGAL_LANDSCAPE': { width: 1008, height: 612 },
-				'A3': { width: 842, height: 1191 },
-				'A3_LANDSCAPE': { width: 1191, height: 842 },
-				'TABLOID': { width: 792, height: 1224 },
-				'TABLOID_LANDSCAPE': { width: 1224, height: 792 },
+				A4: { width: 595, height: 842 },
+				A4_LANDSCAPE: { width: 842, height: 595 },
+				LETTER: { width: 612, height: 792 },
+				LETTER_LANDSCAPE: { width: 792, height: 612 },
+				LEGAL: { width: 612, height: 1008 },
+				LEGAL_LANDSCAPE: { width: 1008, height: 612 },
+				A3: { width: 842, height: 1191 },
+				A3_LANDSCAPE: { width: 1191, height: 842 },
+				TABLOID: { width: 792, height: 1224 },
+				TABLOID_LANDSCAPE: { width: 1224, height: 792 }
 			};
 			const dims = pdfDimensions[preset] || pdfDimensions['A4'];
 			width = dims.width;
@@ -352,7 +389,9 @@
 			if (target && target.isPatternFill && (target.scaleX !== 1 || target.scaleY !== 1)) {
 				// Use patternBounds * scale (not group.width which may be larger due to stagger)
 				const newBoundsW = Math.round((target.patternBoundsWidth || target.width) * target.scaleX);
-				const newBoundsH = Math.round((target.patternBoundsHeight || target.height) * target.scaleY);
+				const newBoundsH = Math.round(
+					(target.patternBoundsHeight || target.height) * target.scaleY
+				);
 				const left = target.left;
 				const top = target.top;
 				const id = target.id;
@@ -437,7 +476,7 @@
 				fabricCanvas.remove(target);
 
 				// 3. Add items back to canvas
-				items.forEach(obj => {
+				items.forEach((obj) => {
 					fabricCanvas.add(obj);
 				});
 
@@ -460,7 +499,12 @@
 
 		// Subscribe to undo/redo triggers - track previous value to avoid firing on initial subscription
 		unsubscribeUndo = triggerUndo.subscribe((value) => {
-			console.log('🔔 triggerUndo subscription fired. Value:', value, 'Previous:', previousUndoValue);
+			console.log(
+				'🔔 triggerUndo subscription fired. Value:',
+				value,
+				'Previous:',
+				previousUndoValue
+			);
 			if (previousUndoValue !== undefined && value !== previousUndoValue) {
 				console.log('▶️ Triggering undo...');
 				performUndo();
@@ -469,7 +513,12 @@
 		});
 
 		unsubscribeRedo = triggerRedo.subscribe((value) => {
-			console.log('🔔 triggerRedo subscription fired. Value:', value, 'Previous:', previousRedoValue);
+			console.log(
+				'🔔 triggerRedo subscription fired. Value:',
+				value,
+				'Previous:',
+				previousRedoValue
+			);
 			if (previousRedoValue !== undefined && value !== previousRedoValue) {
 				console.log('▶️ Triggering redo...');
 				performRedo();
@@ -501,7 +550,6 @@
 
 		// Initial scale update
 		updateScale();
-
 	}
 
 	// ... (handleSelection, handleSelectionCleared, handleKeyDown remain same)
@@ -520,14 +568,40 @@
 
 	// Custom properties to preserve during copy/paste
 	const CUSTOM_PROPS = [
-		'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
-		'isChart', 'chartType', 'chartData', 'chartConfig',
-		'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
-		'isQRCode', 'qrData', 'qrConfig',
-		'showWhen', 'hideWhen',
-		'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns',
-		'isPatternFill', 'patternSourceJSON', 'patternBoundsWidth', 'patternBoundsHeight',
-		'patternSpacingX', 'patternSpacingY', 'patternStagger'
+		'id',
+		'isVariable',
+		'variableBindings',
+		'variableName',
+		'variableProperty',
+		'isChart',
+		'chartType',
+		'chartData',
+		'chartConfig',
+		'isTable',
+		'tableType',
+		'tableHeaders',
+		'tableRows',
+		'tableData',
+		'tableConfig',
+		'tableStyle',
+		'isQRCode',
+		'qrData',
+		'qrConfig',
+		'showWhen',
+		'hideWhen',
+		'loopVariable',
+		'loopItemName',
+		'loopIndexName',
+		'loopDirection',
+		'loopSpacing',
+		'loopColumns',
+		'isPatternFill',
+		'patternSourceJSON',
+		'patternBoundsWidth',
+		'patternBoundsHeight',
+		'patternSpacingX',
+		'patternSpacingY',
+		'patternStagger'
 	];
 
 	function copySelection() {
@@ -536,7 +610,7 @@
 
 		// Serialize with custom props
 		if (active.type === 'activeselection' || active.type === 'ActiveSelection') {
-			clipboardData = active.getObjects().map(obj => obj.toObject(CUSTOM_PROPS));
+			clipboardData = active.getObjects().map((obj) => obj.toObject(CUSTOM_PROPS));
 		} else {
 			clipboardData = [active.toObject(CUSTOM_PROPS)];
 		}
@@ -547,7 +621,7 @@
 
 		const { util } = await import('fabric');
 		const clones = await util.enlivenObjects(
-			clipboardData.map(d => JSON.parse(JSON.stringify(d)))
+			clipboardData.map((d) => JSON.parse(JSON.stringify(d)))
 		);
 
 		fabricCanvas.discardActiveObject();
@@ -587,7 +661,7 @@
 		fabricCanvas.requestRenderAll();
 
 		// Update clipboard offset so next paste goes further
-		clipboardData = clipboardData.map(d => ({
+		clipboardData = clipboardData.map((d) => ({
 			...d,
 			left: (d.left || 0) + 20,
 			top: (d.top || 0) + 20
@@ -647,7 +721,7 @@
 				if (activeObject.type === 'activeselection' || activeObject.type === 'ActiveSelection') {
 					const objects = activeObject.getObjects().concat();
 					fabricCanvas.discardActiveObject();
-					objects.forEach(obj => fabricCanvas.remove(obj));
+					objects.forEach((obj) => fabricCanvas.remove(obj));
 				} else {
 					fabricCanvas.remove(activeObject);
 					fabricCanvas.discardActiveObject();
@@ -729,14 +803,40 @@
 
 					// Save current page data before switching
 					const currentData = fabricCanvas.toJSON([
-						'id', 'isVariable', 'variableBindings', 'variableName', 'variableProperty',
-						'isChart', 'chartType', 'chartData', 'chartConfig',
-						'isTable', 'tableType', 'tableHeaders', 'tableRows', 'tableData', 'tableConfig', 'tableStyle',
-						'isQRCode', 'qrData', 'qrConfig',
-						'showWhen', 'hideWhen',
-						'loopVariable', 'loopItemName', 'loopIndexName', 'loopDirection', 'loopSpacing', 'loopColumns',
-					'isPatternFill', 'patternSourceJSON', 'patternBoundsWidth', 'patternBoundsHeight',
-					'patternSpacingX', 'patternSpacingY', 'patternStagger'
+						'id',
+						'isVariable',
+						'variableBindings',
+						'variableName',
+						'variableProperty',
+						'isChart',
+						'chartType',
+						'chartData',
+						'chartConfig',
+						'isTable',
+						'tableType',
+						'tableHeaders',
+						'tableRows',
+						'tableData',
+						'tableConfig',
+						'tableStyle',
+						'isQRCode',
+						'qrData',
+						'qrConfig',
+						'showWhen',
+						'hideWhen',
+						'loopVariable',
+						'loopItemName',
+						'loopIndexName',
+						'loopDirection',
+						'loopSpacing',
+						'loopColumns',
+						'isPatternFill',
+						'patternSourceJSON',
+						'patternBoundsWidth',
+						'patternBoundsHeight',
+						'patternSpacingX',
+						'patternSpacingY',
+						'patternStagger'
 					]);
 					// Pass previousPageIndex to ensure we save to the page we are LEAVING
 					pageActions.updateCurrentPageData(currentData, previousPageIndex);
@@ -750,27 +850,29 @@
 							const loadPromise = fabricCanvas.loadFromJSON(newPageData);
 
 							if (loadPromise && typeof loadPromise.then === 'function') {
-								loadPromise.then(() => {
-									fabricCanvas.renderAll();
-									fabricCanvas.requestRenderAll();
-									editorActions.clearSelection();
-									// Restore page-specific history or initialize fresh
-									restorePageHistory(newIndex);
-									isLoadingCanvas = false;
-									isPageSwitching = false;
-									updateEmptyState();
-									console.log('✅ Page loaded via Promise');
-
-									// Force another render after a short delay
-									setTimeout(() => {
+								loadPromise
+									.then(() => {
+										fabricCanvas.renderAll();
 										fabricCanvas.requestRenderAll();
-									}, 50);
-								}).catch(err => {
-									console.error('Error loading page:', err);
-									showToast('Failed to load page — staying on current page', 'error');
-									isLoadingCanvas = false;
-									isPageSwitching = false;
-								});
+										editorActions.clearSelection();
+										// Restore page-specific history or initialize fresh
+										restorePageHistory(newIndex);
+										isLoadingCanvas = false;
+										isPageSwitching = false;
+										updateEmptyState();
+										console.log('✅ Page loaded via Promise');
+
+										// Force another render after a short delay
+										setTimeout(() => {
+											fabricCanvas.requestRenderAll();
+										}, 50);
+									})
+									.catch((err) => {
+										console.error('Error loading page:', err);
+										showToast('Failed to load page — staying on current page', 'error');
+										isLoadingCanvas = false;
+										isPageSwitching = false;
+									});
 							} else {
 								// Fallback for older Fabric.js behavior
 								fabricCanvas.renderAll();
@@ -837,17 +939,22 @@
 	$: if ($editor && ($editor.width || $editor.height)) {
 		updateScale();
 	}
-
 </script>
 
-<div class="absolute inset-0 bg-[#e5e5e5] overflow-hidden flex items-center justify-center p-8"
-	style="padding-top: 80px; background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 20px 20px;">
+<div
+	class="absolute inset-0 bg-[#e5e5e5] overflow-hidden flex items-center justify-center p-8"
+	style="padding-top: 80px; background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 20px 20px;"
+>
 	<!-- Loading overlay -->
 	{#if isLoadingCanvas || isPageSwitching}
 		<div class="absolute inset-0 z-10 flex items-center justify-center bg-[#e5e5e5]/60">
 			<div class="flex flex-col items-center gap-3">
-				<div class="w-8 h-8 border-[3px] border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-				<span class="text-xs font-black uppercase tracking-widest text-gray-600">Loading canvas...</span>
+				<div
+					class="w-8 h-8 border-[3px] border-gray-900 border-t-transparent rounded-full animate-spin"
+				/>
+				<span class="text-xs font-black uppercase tracking-widest text-gray-600"
+					>Loading canvas...</span
+				>
 			</div>
 		</div>
 	{/if}
@@ -864,7 +971,8 @@
 		{#if showEmptyState && !isLoadingCanvas}
 			<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
 				<p class="text-gray-300 text-sm font-medium text-center px-8">
-					Click <span class="font-black">+</span> to add elements or use <span class="font-black">Cmd+K</span> for AI Copilot
+					Click <span class="font-black">+</span> to add elements or use
+					<span class="font-black">Cmd+K</span> for AI Copilot
 				</p>
 			</div>
 		{/if}

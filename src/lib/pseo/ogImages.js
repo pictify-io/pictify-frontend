@@ -141,7 +141,13 @@ export function getToolOgImage(format, size) {
  * @param {string} options.bg - Background color (optional)
  * @returns {string} OG image URL
  */
-export function getCustomOgImage({ title, subtitle, badge = 'PICTIFY', accent = '#ff6b6b', bg = '#FFFDF8' }) {
+export function getCustomOgImage({
+	title,
+	subtitle,
+	badge = 'PICTIFY',
+	accent = '#ff6b6b',
+	bg = '#FFFDF8'
+}) {
 	const params = new URLSearchParams({
 		title,
 		subtitle,

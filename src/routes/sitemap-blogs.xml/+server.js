@@ -14,12 +14,18 @@ export async function GET() {
 		const response = await getBlogLinks();
 		const { links } = response;
 
-		urls = links.map(link => `  <url>
+		urls = links.map(
+			(link) => `  <url>
     <loc>${baseUrl}/blogs/${link.slug}</loc>
-    <lastmod>${link.createdAt ? new Date(link.createdAt).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)}</lastmod>
+    <lastmod>${
+			link.createdAt
+				? new Date(link.createdAt).toISOString().slice(0, 10)
+				: new Date().toISOString().slice(0, 10)
+		}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`);
+  </url>`
+		);
 	} catch (error) {
 		console.error('Error fetching blog links for sitemap:', error);
 	}

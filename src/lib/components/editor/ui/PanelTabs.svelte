@@ -15,13 +15,13 @@
 	}
 </script>
 
-<div
-	class="flex gap-1 bg-[#FFFDF8] p-1 border-b-[2px] border-gray-300"
-	role="tablist"
->
+<div class="flex gap-1 bg-[#FFFDF8] p-1 border-b-[2px] border-gray-300" role="tablist">
 	{#each tabs as tab (tab.id)}
 		<button
-			class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs font-bold uppercase tracking-wide transition-colors relative {activeTab === tab.id ? tabActiveClass : tabInactiveClass}"
+			class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs font-bold uppercase tracking-wide transition-colors relative {activeTab ===
+			tab.id
+				? tabActiveClass
+				: tabInactiveClass}"
 			on:click={() => selectTab(tab.id)}
 			role="tab"
 			aria-selected={activeTab === tab.id}

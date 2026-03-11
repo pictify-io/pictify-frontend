@@ -1,749 +1,1072 @@
 <script>
-  import Nav from '$lib/components/landingPage/Nav.svelte';
-  import Footer from '$lib/components/landingPage/Footer.svelte';
-  import { onMount } from 'svelte';
-  import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
-  import { PUBLIC_BACKEND_URL } from '$env/static/public';
-  import { getShareResult, forkTemplate } from '../../../api/public-templates.js';
-  import { toast } from '../../../store/toast.store.js';
-  import { user } from '../../../store/user.store.js';
-  import backend from '../../../service/backend.js';
+	import Nav from '$lib/components/landingPage/Nav.svelte';
+	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getShareResult, forkTemplate } from '../../../api/public-templates.js';
+	import { toast } from '../../../store/toast.store.js';
+	import { user } from '../../../store/user.store.js';
+	import backend from '../../../service/backend.js';
 
-  // State
-  let result = null;
-  let template = null;
-  let loading = true;
-  let error = null;
-  let forking = false;
+	// State
+	let result = null;
+	let template = null;
+	let loading = true;
+	let error = null;
+	let forking = false;
 
-  // Embed codes state
-  let activeEmbedTab = 'img';
+	// Embed codes state
+	let activeEmbedTab = 'img';
 
-  // Download dropdown state
-  let downloadOpen = false;
-  let downloading = null;
+	// Download dropdown state
+	let downloadOpen = false;
+	let downloading = null;
 
-  // Analytics state
-  let analytics = null;
-  let analyticsLoading = false;
-  let analyticsFetched = false;
+	// Analytics state
+	let analytics = null;
+	let analyticsLoading = false;
+	let analyticsFetched = false;
 
-  $: id = $page.params.id;
-  $: isLoggedIn = !!$user?.email;
-  $: isCreator = isLoggedIn && result?.createdBy && $user?.email === result.createdBy;
+	$: id = $page.params.id;
+	$: isLoggedIn = !!$user?.email;
+	$: isCreator = isLoggedIn && result?.createdBy && $user?.email === result.createdBy;
 
-  // Reactively fetch analytics when logged-in user is available and result is loaded.
-  // Any team member (not just creator) can view analytics — the backend authorizes.
-  $: if (isLoggedIn && result?.uid && !analyticsFetched) {
-    analyticsFetched = true;
-    fetchAnalytics();
-  }
+	// Reactively fetch analytics when logged-in user is available and result is loaded.
+	// Any team member (not just creator) can view analytics — the backend authorizes.
+	$: if (isLoggedIn && result?.uid && !analyticsFetched) {
+		analyticsFetched = true;
+		fetchAnalytics();
+	}
 
-  // Tool slug map for context-aware CTA
-  const toolSlugMap = {
-    'Screenshot': 'screenshot',
-    'OG Image': 'og-image-generator',
-    'Banner': 'banner-generator',
-    'Social Media': 'social-media-generator',
-    'Certificate': 'certificate-generator',
-    'Invoice': 'invoice-generator',
-    'Meme': 'meme-generator',
-    'Quote': 'quote-image-generator',
-    'Thumbnail': 'thumbnail-generator',
-    'Mockup': 'mockup-generator',
-    'Chart': 'chart-image-generator',
-    'QR Code': 'qr-code-generator',
-  };
+	// Tool slug map for context-aware CTA
+	const toolSlugMap = {
+		Screenshot: 'screenshot',
+		'OG Image': 'og-image-generator',
+		Banner: 'banner-generator',
+		'Social Media': 'social-media-generator',
+		Certificate: 'certificate-generator',
+		Invoice: 'invoice-generator',
+		Meme: 'meme-generator',
+		Quote: 'quote-image-generator',
+		Thumbnail: 'thumbnail-generator',
+		Mockup: 'mockup-generator',
+		Chart: 'chart-image-generator',
+		'QR Code': 'qr-code-generator'
+	};
 
-  // Embed code snippets
-  $: embedSnippets = result ? {
-    img: `<img src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${result.width}" height="${result.height}" />`,
-    markdown: `![${result.title || 'Pictify image'}](${result.assetUrl})`,
-    html: `<picture><img src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${result.width}" height="${result.height}" style="max-width:100%;height:auto;" loading="lazy" /></picture>`,
-    bbcode: `[img]${result.assetUrl}[/img]`,
-  } : {};
+	// Embed code snippets
+	$: embedSnippets = result
+		? {
+				img: `<img src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${
+					result.width
+				}" height="${result.height}" />`,
+				markdown: `![${result.title || 'Pictify image'}](${result.assetUrl})`,
+				html: `<picture><img src="${result.assetUrl}" alt="${
+					result.title || 'Pictify image'
+				}" width="${result.width}" height="${
+					result.height
+				}" style="max-width:100%;height:auto;" loading="lazy" /></picture>`,
+				bbcode: `[img]${result.assetUrl}[/img]`
+		  }
+		: {};
 
-  // Source-aware CTA config
-  $: ctaConfig = getCtaConfig(result);
+	// Source-aware CTA config
+	$: ctaConfig = getCtaConfig(result);
 
-  function getCtaConfig(r) {
-    if (!r) return null;
-    const toolSlug = r.toolName ? (toolSlugMap[r.toolName] || r.toolName.toLowerCase().replace(/\s+/g, '-')) : 'tools';
-    switch (r.source) {
-      case 'tool':
-        return {
-          sidebar: { heading: `Made with ${r.toolName || 'Pictify Tools'}`, button: 'Try This Tool Free', link: `/tools/${toolSlug}` },
-          banner: { headline: 'LIKE THIS? MAKE HUNDREDS.', body: 'Turn this design into a template. Render variants via API.' },
-        };
-      case 'template':
-        return {
-          sidebar: { heading: 'Built from Template', button: 'Remix This Template', link: null },
-          banner: { headline: 'ONE TEMPLATE. INFINITE VARIANTS.', body: 'Remix it, change the variables, batch render at scale.' },
-        };
-      case 'api':
-        return {
-          sidebar: { heading: 'Generated via API', button: 'Get Your API Key', link: '/signup' },
-          banner: { headline: 'YOUR APP. AUTOMATED IMAGES.', body: 'Generated by a single API call. Ship it in your product.' },
-        };
-      default:
-        return {
-          sidebar: { heading: 'Created with Pictify', button: 'Try Pictify Free', link: '/signup' },
-          banner: { headline: 'DESIGN. AUTOMATE. SCALE.', body: 'Create images, GIFs, and PDFs. Automate with the API.' },
-        };
-    }
-  }
+	function getCtaConfig(r) {
+		if (!r) return null;
+		const toolSlug = r.toolName
+			? toolSlugMap[r.toolName] || r.toolName.toLowerCase().replace(/\s+/g, '-')
+			: 'tools';
+		switch (r.source) {
+			case 'tool':
+				return {
+					sidebar: {
+						heading: `Made with ${r.toolName || 'Pictify Tools'}`,
+						button: 'Try This Tool Free',
+						link: `/tools/${toolSlug}`
+					},
+					banner: {
+						headline: 'LIKE THIS? MAKE HUNDREDS.',
+						body: 'Turn this design into a template. Render variants via API.'
+					}
+				};
+			case 'template':
+				return {
+					sidebar: { heading: 'Built from Template', button: 'Remix This Template', link: null },
+					banner: {
+						headline: 'ONE TEMPLATE. INFINITE VARIANTS.',
+						body: 'Remix it, change the variables, batch render at scale.'
+					}
+				};
+			case 'api':
+				return {
+					sidebar: { heading: 'Generated via API', button: 'Get Your API Key', link: '/signup' },
+					banner: {
+						headline: 'YOUR APP. AUTOMATED IMAGES.',
+						body: 'Generated by a single API call. Ship it in your product.'
+					}
+				};
+			default:
+				return {
+					sidebar: { heading: 'Created with Pictify', button: 'Try Pictify Free', link: '/signup' },
+					banner: {
+						headline: 'DESIGN. AUTOMATE. SCALE.',
+						body: 'Create images, GIFs, and PDFs. Automate with the API.'
+					}
+				};
+		}
+	}
 
-  // Fetch result details
-  async function fetchResult() {
-    loading = true;
-    error = null;
+	// Fetch result details
+	async function fetchResult() {
+		loading = true;
+		error = null;
 
-    try {
-      const response = await getShareResult(id);
-      result = response.result;
-      template = response.template;
-    } catch (e) {
-      console.error('Failed to load result:', e);
-      error = e.message || 'Result not found';
-    } finally {
-      loading = false;
-    }
-  }
+		try {
+			const response = await getShareResult(id);
+			result = response.result;
+			template = response.template;
+		} catch (e) {
+			console.error('Failed to load result:', e);
+			error = e.message || 'Result not found';
+		} finally {
+			loading = false;
+		}
+	}
 
-  // Copy URL to clipboard
-  async function copyShareUrl() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.set({ message: 'Link copied!', type: 'success', duration: 1500 });
-    } catch (e) {
-      toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
-    }
-  }
+	// Copy URL to clipboard
+	async function copyShareUrl() {
+		try {
+			await navigator.clipboard.writeText(window.location.href);
+			toast.set({ message: 'Link copied!', type: 'success', duration: 1500 });
+		} catch (e) {
+			toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
+		}
+	}
 
-  // Copy embed code
-  async function copyEmbedCode(tab) {
-    const snippet = embedSnippets[tab];
-    if (!snippet) return;
-    try {
-      await navigator.clipboard.writeText(snippet);
-      toast.set({ message: 'Embed code copied!', type: 'success', duration: 1500 });
-    } catch (e) {
-      toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
-    }
-  }
+	// Copy embed code
+	async function copyEmbedCode(tab) {
+		const snippet = embedSnippets[tab];
+		if (!snippet) return;
+		try {
+			await navigator.clipboard.writeText(snippet);
+			toast.set({ message: 'Embed code copied!', type: 'success', duration: 1500 });
+		} catch (e) {
+			toast.set({ message: 'Failed to copy', type: 'error', duration: 2000 });
+		}
+	}
 
-  // Download asset in given format
-  function downloadAsset(format) {
-    if (!result?.assetUrl) return;
-    downloadOpen = false;
+	// Download asset in given format
+	function downloadAsset(format) {
+		if (!result?.assetUrl) return;
+		downloadOpen = false;
 
-    const originalFormat = (result.format || 'png').toLowerCase();
+		const originalFormat = (result.format || 'png').toLowerCase();
 
-    if (format === originalFormat || !format) {
-      // Direct download of original
-      const link = document.createElement('a');
-      link.href = result.assetUrl;
-      link.download = `pictify-${result.uid}.${originalFormat}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // Use conversion endpoint
-      downloading = format;
-      const downloadUrl = `${PUBLIC_BACKEND_URL}/public/results/${result.uid}/download?format=${format}&quality=90`;
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `pictify-${result.uid}.${format}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => { downloading = null; }, 2000);
-    }
-  }
+		if (format === originalFormat || !format) {
+			// Direct download of original
+			const link = document.createElement('a');
+			link.href = result.assetUrl;
+			link.download = `pictify-${result.uid}.${originalFormat}`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		} else {
+			// Use conversion endpoint
+			downloading = format;
+			const downloadUrl = `${PUBLIC_BACKEND_URL}/public/results/${result.uid}/download?format=${format}&quality=90`;
+			const link = document.createElement('a');
+			link.href = downloadUrl;
+			link.download = `pictify-${result.uid}.${format}`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			setTimeout(() => {
+				downloading = null;
+			}, 2000);
+		}
+	}
 
-  // Fork template (remix flow)
-  async function handleRemix() {
-    if (!template?.uid) return;
+	// Fork template (remix flow)
+	async function handleRemix() {
+		if (!template?.uid) return;
 
-    if (!isLoggedIn) {
-      sessionStorage.setItem('pictify_fork_template', template.uid);
-      goto(`/signup?return=/templates/${template.uid}`);
-      return;
-    }
+		if (!isLoggedIn) {
+			sessionStorage.setItem('pictify_fork_template', template.uid);
+			goto(`/signup?return=/templates/${template.uid}`);
+			return;
+		}
 
-    forking = true;
-    try {
-      const response = await forkTemplate(template.uid);
-      if (response.success && response.template) {
-        toast.set({ message: 'Template remixed! Opening editor...', type: 'success', duration: 2000 });
-        setTimeout(() => {
-          goto(`/template-workspace/${response.template.uid}`);
-        }, 500);
-      }
-    } catch (e) {
-      console.error('Failed to fork template:', e);
-      toast.set({ message: e.message || 'Failed to remix template', type: 'error', duration: 3000 });
-    } finally {
-      forking = false;
-    }
-  }
+		forking = true;
+		try {
+			const response = await forkTemplate(template.uid);
+			if (response.success && response.template) {
+				toast.set({
+					message: 'Template remixed! Opening editor...',
+					type: 'success',
+					duration: 2000
+				});
+				setTimeout(() => {
+					goto(`/template-workspace/${response.template.uid}`);
+				}, 500);
+			}
+		} catch (e) {
+			console.error('Failed to fork template:', e);
+			toast.set({
+				message: e.message || 'Failed to remix template',
+				type: 'error',
+				duration: 3000
+			});
+		} finally {
+			forking = false;
+		}
+	}
 
-  // Handle sidebar CTA click
-  function handleSidebarCta() {
-    if (result?.source === 'template' && template?.uid) {
-      handleRemix();
-    } else if (ctaConfig?.sidebar?.link) {
-      goto(ctaConfig.sidebar.link);
-    }
-  }
+	// Handle sidebar CTA click
+	function handleSidebarCta() {
+		if (result?.source === 'template' && template?.uid) {
+			handleRemix();
+		} else if (ctaConfig?.sidebar?.link) {
+			goto(ctaConfig.sidebar.link);
+		}
+	}
 
-  // Fetch creator analytics
-  async function fetchAnalytics() {
-    if (!result?.uid) return;
-    analyticsLoading = true;
-    try {
-      console.log('[Analytics] Fetching for result:', result.uid, 'createdBy:', result.createdBy, 'user:', $user?.email);
-      analytics = await backend.get(`/public/results/${result.uid}/analytics`);
-      console.log('[Analytics] Success:', analytics);
-    } catch (e) {
-      console.log('[Analytics] Error:', e.status, e.message);
-    } finally {
-      analyticsLoading = false;
-    }
-  }
+	// Fetch creator analytics
+	async function fetchAnalytics() {
+		if (!result?.uid) return;
+		analyticsLoading = true;
+		try {
+			console.log(
+				'[Analytics] Fetching for result:',
+				result.uid,
+				'createdBy:',
+				result.createdBy,
+				'user:',
+				$user?.email
+			);
+			analytics = await backend.get(`/public/results/${result.uid}/analytics`);
+			console.log('[Analytics] Success:', analytics);
+		} catch (e) {
+			console.log('[Analytics] Error:', e.status, e.message);
+		} finally {
+			analyticsLoading = false;
+		}
+	}
 
-  // Format source name
-  function formatSource(source) {
-    const sources = {
-      tool: 'Free Tool',
-      template: 'Template',
-      api: 'API',
-      dashboard: 'Dashboard',
-    };
-    return sources[source] || source;
-  }
+	// Format source name
+	function formatSource(source) {
+		const sources = {
+			tool: 'Free Tool',
+			template: 'Template',
+			api: 'API',
+			dashboard: 'Dashboard'
+		};
+		return sources[source] || source;
+	}
 
-  // Format date
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }
+	// Format date
+	function formatDate(dateStr) {
+		if (!dateStr) return '';
+		const date = new Date(dateStr);
+		return date.toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric'
+		});
+	}
 
-  // Format bytes to human-readable
-  function formatBytes(bytes) {
-    if (!bytes || bytes === 0) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
-  }
+	// Format bytes to human-readable
+	function formatBytes(bytes) {
+		if (!bytes || bytes === 0) return '0 B';
+		const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+		const i = Math.floor(Math.log(bytes) / Math.log(1024));
+		return (bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
+	}
 
-  // Close download dropdown on outside click
-  function handleClickOutside(event) {
-    if (downloadOpen && !event.target.closest('.download-dropdown')) {
-      downloadOpen = false;
-    }
-  }
+	// Close download dropdown on outside click
+	function handleClickOutside(event) {
+		if (downloadOpen && !event.target.closest('.download-dropdown')) {
+			downloadOpen = false;
+		}
+	}
 
-  // Simple syntax highlighter for embed snippets
-  function highlightSnippet(code) {
-    if (!code) return '';
-    return code
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-[#ffc480]">$1</span>=')
-      .replace(/"([^"]*)"/g, '"<span class="text-[#4ade80]">$1</span>"')
-      .replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-[#ff6b6b]">$2</span>')
-      .replace(/(\[\/?\w+\])/g, '<span class="text-[#ff6b6b]">$1</span>');
-  }
+	// Simple syntax highlighter for embed snippets
+	function highlightSnippet(code) {
+		if (!code) return '';
+		return code
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-[#ffc480]">$1</span>=')
+			.replace(/"([^"]*)"/g, '"<span class="text-[#4ade80]">$1</span>"')
+			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-[#ff6b6b]">$2</span>')
+			.replace(/(\[\/?\w+\])/g, '<span class="text-[#ff6b6b]">$1</span>');
+	}
 
-  onMount(() => {
-    fetchResult();
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  });
+	onMount(() => {
+		fetchResult();
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
+	});
 </script>
 
 <svelte:head>
-  {#if result}
-    <title>{result.title || 'Shared Image'} | Pictify</title>
-    <meta
-      name="description"
-      content="View and remix this image created with Pictify. Generate unlimited variants with our templates and API."
-    >
-    <link rel="canonical" href={`https://pictify.io/r/${result.uid}`}>
+	{#if result}
+		<title>{result.title || 'Shared Image'} | Pictify</title>
+		<meta
+			name="description"
+			content="View and remix this image created with Pictify. Generate unlimited variants with our templates and API."
+		/>
+		<link rel="canonical" href={`https://pictify.io/r/${result.uid}`} />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content={result.title || 'Created with Pictify'}>
-    <meta property="og:description" content="View and remix this image. Create your own with Pictify templates and API.">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Pictify">
-    <meta property="og:url" content={`https://pictify.io/r/${result.uid}`}>
-    <meta property="og:image" content={result.assetUrl}>
-    <meta property="og:image:width" content={result.width}>
-    <meta property="og:image:height" content={result.height}>
+		<!-- Open Graph -->
+		<meta property="og:title" content={result.title || 'Created with Pictify'} />
+		<meta
+			property="og:description"
+			content="View and remix this image. Create your own with Pictify templates and API."
+		/>
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Pictify" />
+		<meta property="og:url" content={`https://pictify.io/r/${result.uid}`} />
+		<meta property="og:image" content={result.assetUrl} />
+		<meta property="og:image:width" content={result.width} />
+		<meta property="og:image:height" content={result.height} />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content={result.title || 'Created with Pictify'}>
-    <meta name="twitter:description" content="View and remix this image with Pictify.">
-    <meta name="twitter:image" content={result.assetUrl}>
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={result.title || 'Created with Pictify'} />
+		<meta name="twitter:description" content="View and remix this image with Pictify." />
+		<meta name="twitter:image" content={result.assetUrl} />
 
-    <!-- JSON-LD Structured Data -->
-    {@html `<script type="application/ld+json">${JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "ImageObject",
-      "name": result.title || "Created with Pictify",
-      "contentUrl": result.assetUrl,
-      "url": `https://pictify.io/r/${result.uid}`,
-      "width": result.width,
-      "height": result.height,
-      "encodingFormat": result.format === 'gif' ? 'image/gif' : result.format === 'webp' ? 'image/webp' : result.format === 'jpg' ? 'image/jpeg' : 'image/png',
-      "dateCreated": result.createdAt,
-      "creator": {
-        "@type": "Organization",
-        "name": "Pictify",
-        "url": "https://pictify.io"
-      }
-    })}</script>`}
-  {:else}
-    <title>Shared Result | Pictify</title>
-  {/if}
+		<!-- JSON-LD Structured Data -->
+		{@html `<script type="application/ld+json">${JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'ImageObject',
+			name: result.title || 'Created with Pictify',
+			contentUrl: result.assetUrl,
+			url: `https://pictify.io/r/${result.uid}`,
+			width: result.width,
+			height: result.height,
+			encodingFormat:
+				result.format === 'gif'
+					? 'image/gif'
+					: result.format === 'webp'
+					? 'image/webp'
+					: result.format === 'jpg'
+					? 'image/jpeg'
+					: 'image/png',
+			dateCreated: result.createdAt,
+			creator: {
+				'@type': 'Organization',
+				name: 'Pictify',
+				url: 'https://pictify.io'
+			}
+		})}</script>`}
+	{:else}
+		<title>Shared Result | Pictify</title>
+	{/if}
 </svelte:head>
 
 <div class="bg-[#FFFDF8] min-h-screen flex flex-col relative overflow-hidden font-sans">
+	<!-- Background Elements -->
+	<div
+		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
+	/>
+	<div
+		class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+	/>
+	<div
+		class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+	/>
 
-  <!-- Background Elements -->
-  <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
-  <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-  <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+	<Nav />
 
-  <Nav />
+	<main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20 relative z-10">
+		{#if loading}
+			<!-- Loading state -->
+			<div class="flex flex-col items-center justify-center min-h-[400px]">
+				<div
+					class="w-16 h-16 border-[4px] border-gray-900 border-t-[#ff6b6b] rounded-full animate-spin"
+				/>
+				<p class="mt-6 text-xl font-black text-gray-900 uppercase tracking-widest animate-pulse">
+					Loading Asset...
+				</p>
+			</div>
+		{:else if error}
+			<!-- Error state -->
+			<div
+				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl p-12 relative overflow-hidden"
+			>
+				<div class="absolute inset-0 bg-red-50/50 -z-10" />
+				<div
+					class="inline-flex items-center justify-center w-20 h-20 bg-[#ff6b6b]/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-[#ff6b6b]"
+				>
+					<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+						/>
+					</svg>
+				</div>
+				<h2 class="text-3xl font-black text-gray-900 mb-4 uppercase tracking-wide">
+					Result not found
+				</h2>
+				<p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
+				<a
+					href="/tools"
+					class="inline-block px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+				>
+					Create your own
+				</a>
+			</div>
+		{:else if result}
+			<!-- Result content -->
+			<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+				<!-- Left Column: Asset Viewer + Embed Codes -->
+				<div class="lg:col-span-8 flex flex-col gap-8">
+					<!-- "Window" Card -->
+					<div
+						class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group"
+					>
+						<!-- Window Header -->
+						<div
+							class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
+						>
+							<div class="flex items-center gap-2">
+								<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+							</div>
+							<div
+								class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+									/></svg
+								>
+								{result.width} x {result.height}px
+							</div>
+						</div>
 
-  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20 relative z-10">
-    {#if loading}
-      <!-- Loading state -->
-      <div class="flex flex-col items-center justify-center min-h-[400px]">
-        <div class="w-16 h-16 border-[4px] border-gray-900 border-t-[#ff6b6b] rounded-full animate-spin"></div>
-        <p class="mt-6 text-xl font-black text-gray-900 uppercase tracking-widest animate-pulse">Loading Asset...</p>
-      </div>
-    {:else if error}
-      <!-- Error state -->
-      <div class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl p-12 relative overflow-hidden">
-        <div class="absolute inset-0 bg-red-50/50 -z-10"></div>
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-[#ff6b6b]/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-[#ff6b6b]">
-          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-        <h2 class="text-3xl font-black text-gray-900 mb-4 uppercase tracking-wide">Result not found</h2>
-        <p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
-        <a
-          href="/tools"
-          class="inline-block px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
-        >
-          Create your own
-        </a>
-      </div>
-    {:else if result}
-      <!-- Result content -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+						<!-- Image Container -->
+						<div
+							class="bg-gray-100 relative p-4 sm:p-8 flex items-center justify-center min-h-[400px]"
+						>
+							<!-- Checkerboard Pattern for transparency -->
+							<div
+								class="absolute inset-0 opacity-10"
+								style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
+							/>
 
-        <!-- Left Column: Asset Viewer + Embed Codes -->
-        <div class="lg:col-span-8 flex flex-col gap-8">
-           <!-- "Window" Card -->
-           <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group">
-              <!-- Window Header -->
-              <div class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between">
-                   <div class="flex items-center gap-2">
-                      <div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900"></div>
-                      <div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900"></div>
-                      <div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900"></div>
-                   </div>
-                   <div class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                      {result.width} x {result.height}px
-                   </div>
-              </div>
+							{#if result.contentType === 'gif'}
+								<img
+									src={result.assetUrl}
+									alt={result.title || 'Generated GIF'}
+									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
+								/>
+							{:else}
+								<img
+									src={result.assetUrl}
+									alt={result.title || 'Generated image'}
+									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
+								/>
+							{/if}
 
-              <!-- Image Container -->
-              <div class="bg-gray-100 relative p-4 sm:p-8 flex items-center justify-center min-h-[400px]">
-                  <!-- Checkerboard Pattern for transparency -->
-                  <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+							<!-- B3: Made with Pictify Badge -->
+							<a
+								href="https://pictify.io"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
+							>
+								<svg class="w-3.5 h-3.5 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"
+									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
+								>
+								Made with Pictify
+							</a>
+						</div>
+					</div>
 
-                  {#if result.contentType === 'gif'}
-                    <img
-                      src={result.assetUrl}
-                      alt={result.title || 'Generated GIF'}
-                      class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
-                    />
-                  {:else}
-                    <img
-                      src={result.assetUrl}
-                      alt={result.title || 'Generated image'}
-                      class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
-                    />
-                  {/if}
+					<!-- A2: Embed Codes Panel -->
+					<div
+						class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-2xl overflow-hidden"
+					>
+						<!-- Tab bar -->
+						<div class="flex border-b border-gray-700">
+							{#each [{ key: 'img', label: 'IMG TAG' }, { key: 'markdown', label: 'MARKDOWN' }, { key: 'html', label: 'HTML' }, { key: 'bbcode', label: 'BBCODE' }] as tab}
+								<button
+									on:click={() => (activeEmbedTab = tab.key)}
+									class="flex-1 px-4 py-3 text-[11px] font-black uppercase tracking-wider transition-colors {activeEmbedTab ===
+									tab.key
+										? 'bg-gray-800 text-[#4ade80] border-b-2 border-[#4ade80]'
+										: 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'}"
+								>
+									{tab.label}
+								</button>
+							{/each}
+						</div>
+						<!-- Code block -->
+						<div class="relative p-4">
+							<pre
+								class="text-sm font-mono text-gray-300 whitespace-pre-wrap break-all leading-relaxed"><code
+									>{@html highlightSnippet(embedSnippets[activeEmbedTab] || '')}</code
+								></pre>
+							<button
+								on:click={() => copyEmbedCode(activeEmbedTab)}
+								class="absolute top-3 right-3 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-xs font-bold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5"
+							>
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+									/></svg
+								>
+								Copy
+							</button>
+						</div>
+					</div>
+				</div>
 
-                  <!-- B3: Made with Pictify Badge -->
-                  <a
-                    href="https://pictify.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
-                  >
-                    <svg class="w-3.5 h-3.5 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    Made with Pictify
-                  </a>
-              </div>
-           </div>
+				<!-- Right Column: Details & Actions -->
+				<div class="lg:col-span-4 flex flex-col gap-6">
+					<!-- Header Info -->
+					<div
+						class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-6"
+					>
+						<div class="flex items-center gap-3 mb-4">
+							<div
+								class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-[2px_2px_0_0_#000]"
+							>
+								Shared Link
+							</div>
+							{#if result.format}
+								<div
+									class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-500"
+								>
+									{result.format}
+								</div>
+							{/if}
+						</div>
 
-           <!-- A2: Embed Codes Panel -->
-           <div class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-2xl overflow-hidden">
-              <!-- Tab bar -->
-              <div class="flex border-b border-gray-700">
-                {#each [
-                  { key: 'img', label: 'IMG TAG' },
-                  { key: 'markdown', label: 'MARKDOWN' },
-                  { key: 'html', label: 'HTML' },
-                  { key: 'bbcode', label: 'BBCODE' },
-                ] as tab}
-                  <button
-                    on:click={() => activeEmbedTab = tab.key}
-                    class="flex-1 px-4 py-3 text-[11px] font-black uppercase tracking-wider transition-colors {activeEmbedTab === tab.key ? 'bg-gray-800 text-[#4ade80] border-b-2 border-[#4ade80]' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'}"
-                  >
-                    {tab.label}
-                  </button>
-                {/each}
-              </div>
-              <!-- Code block -->
-              <div class="relative p-4">
-                <pre class="text-sm font-mono text-gray-300 whitespace-pre-wrap break-all leading-relaxed"><code>{@html highlightSnippet(embedSnippets[activeEmbedTab] || '')}</code></pre>
-                <button
-                  on:click={() => copyEmbedCode(activeEmbedTab)}
-                  class="absolute top-3 right-3 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-xs font-bold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                  Copy
-                </button>
-              </div>
-           </div>
-        </div>
+						<h1 class="text-3xl font-black text-gray-900 leading-tight mb-3">
+							{result.title || 'Untitled Creation'}
+						</h1>
 
-        <!-- Right Column: Details & Actions -->
-        <div class="lg:col-span-4 flex flex-col gap-6">
+						<div
+							class="flex flex-col gap-2 text-sm font-medium text-gray-600 border-t-2 border-dashed border-gray-200 pt-4"
+						>
+							<div class="flex items-center gap-2">
+								<svg
+									class="w-4 h-4 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+									/></svg
+								>
+								<span
+									>Created <span class="text-gray-900 font-bold"
+										>{formatDate(result.createdAt)}</span
+									></span
+								>
+							</div>
+							<div class="flex items-center gap-2">
+								<svg
+									class="w-4 h-4 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/></svg
+								>
+								<span
+									>Source: <span class="text-gray-900 font-bold">{formatSource(result.source)}</span
+									></span
+								>
+							</div>
+							<div class="flex items-center gap-2">
+								<svg
+									class="w-4 h-4 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+									/><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+									/></svg
+								>
+								<span class="flex items-center gap-1.5">
+									<span class="relative flex h-2 w-2">
+										<span
+											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75"
+										/>
+										<span class="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
+									</span>
+									<span class="text-gray-900 font-bold"
+										>{analytics?.totalHits
+											? analytics.totalHits.toLocaleString()
+											: result.viewCount || 0}</span
+									> views
+								</span>
+							</div>
+							<!-- B5: Social Proof -->
+							<div class="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-gray-100">
+								<svg class="w-4 h-4 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"
+									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
+								>
+								<span class="text-xs text-gray-400 font-medium"
+									>Powered by <a
+										href="https://pictify.io"
+										class="text-[#ff6b6b] font-bold hover:underline">Pictify</a
+									> &mdash; Join 10,000+ developers</span
+								>
+							</div>
+						</div>
+					</div>
 
-            <!-- Header Info -->
-            <div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-6">
-                <div class="flex items-center gap-3 mb-4">
-                  <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-[2px_2px_0_0_#000]">
-                    Shared Link
-                  </div>
-                  {#if result.format}
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-500">
-                      {result.format}
-                    </div>
-                  {/if}
-                </div>
+					<!-- Primary Actions -->
+					<div class="flex flex-col gap-4">
+						<button
+							on:click={copyShareUrl}
+							class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
+						>
+							<svg
+								class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+								/>
+							</svg>
+							Copy Link
+						</button>
 
-                <h1 class="text-3xl font-black text-gray-900 leading-tight mb-3">
-                    {result.title || 'Untitled Creation'}
-                </h1>
+						<div class="grid grid-cols-1 gap-4">
+							<!-- A3: Download Dropdown -->
+							<div class="relative download-dropdown">
+								<button
+									on:click={() => (downloadOpen = !downloadOpen)}
+									class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
+								>
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+										/>
+									</svg>
+									Download
+									<svg
+										class="w-3 h-3 ml-1 transition-transform {downloadOpen ? 'rotate-180' : ''}"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M19 9l-7 7-7-7"
+										/></svg
+									>
+								</button>
+								{#if downloadOpen}
+									<div
+										class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden z-30"
+									>
+										{#each ['png', 'jpg', 'webp'] as fmt}
+											{@const isOriginal = (result.format || 'png').toLowerCase() === fmt}
+											<button
+												on:click={() => downloadAsset(fmt)}
+												class="w-full px-4 py-3 text-left text-sm font-bold uppercase tracking-wider hover:bg-gray-50 flex items-center justify-between transition-colors {downloading ===
+												fmt
+													? 'opacity-50'
+													: ''}"
+											>
+												<span>{fmt.toUpperCase()}</span>
+												{#if isOriginal}
+													<span
+														class="text-[10px] font-black text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded"
+														>(Original)</span
+													>
+												{/if}
+											</button>
+										{/each}
+									</div>
+								{/if}
+							</div>
+						</div>
+					</div>
 
-                <div class="flex flex-col gap-2 text-sm font-medium text-gray-600 border-t-2 border-dashed border-gray-200 pt-4">
-                   <div class="flex items-center gap-2">
-                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                       <span>Created <span class="text-gray-900 font-bold">{formatDate(result.createdAt)}</span></span>
-                   </div>
-                   <div class="flex items-center gap-2">
-                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                       <span>Source: <span class="text-gray-900 font-bold">{formatSource(result.source)}</span></span>
-                   </div>
-                   <div class="flex items-center gap-2">
-                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                       <span class="flex items-center gap-1.5">
-                         <span class="relative flex h-2 w-2">
-                           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75"></span>
-                           <span class="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]"></span>
-                         </span>
-                         <span class="text-gray-900 font-bold">{analytics?.totalHits ? analytics.totalHits.toLocaleString() : (result.viewCount || 0)}</span> views
-                       </span>
-                   </div>
-                   <!-- B5: Social Proof -->
-                   <div class="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-gray-100">
-                       <svg class="w-4 h-4 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                       <span class="text-xs text-gray-400 font-medium">Powered by <a href="https://pictify.io" class="text-[#ff6b6b] font-bold hover:underline">Pictify</a> &mdash; Join 10,000+ developers</span>
-                   </div>
-                </div>
-            </div>
+					<!-- B1: Context-Aware Sidebar CTA (only for non-logged-in users) -->
+					{#if ctaConfig && !isLoggedIn}
+						<div
+							class="bg-gradient-to-br from-gray-900 to-gray-800 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] rounded-2xl p-5 relative overflow-hidden"
+						>
+							<div
+								class="absolute inset-0 bg-[radial-gradient(#fff_0.5px,transparent_0.5px)] [background-size:12px_12px] opacity-5"
+							/>
+							<div class="relative z-10">
+								<p class="text-[10px] font-black uppercase tracking-widest text-[#ffc480] mb-2">
+									{ctaConfig.sidebar.heading}
+								</p>
+								<p class="text-sm text-gray-400 font-medium mb-4">
+									{#if result.source === 'tool'}
+										Generate images like this one instantly with our free tool.
+									{:else if result.source === 'template'}
+										Customize this template with your own data and branding.
+									{:else if result.source === 'api'}
+										One API call. Any template. Infinite images.
+									{:else}
+										Create, customize, and automate image generation.
+									{/if}
+								</p>
+								<button
+									on:click={handleSidebarCta}
+									class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[2px] border-[#ff6b6b] hover:bg-[#ff5252] transition-all rounded-lg text-sm"
+								>
+									{ctaConfig.sidebar.button}
+								</button>
+							</div>
+						</div>
+					{/if}
 
-            <!-- Primary Actions -->
-            <div class="flex flex-col gap-4">
-                 <button
-                    on:click={copyShareUrl}
-                    class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
-                  >
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    Copy Link
-                 </button>
+					<!-- A4: Remix This Template (enhanced) -->
+					{#if template && template.isPublic}
+						<div
+							class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-5 relative overflow-hidden group transition-all"
+						>
+							<div class="absolute top-0 right-0 p-2 opacity-10">
+								<svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+									/></svg
+								>
+							</div>
 
-                 <div class="grid grid-cols-1 gap-4">
-                    <!-- A3: Download Dropdown -->
-                    <div class="relative download-dropdown">
-                      <button
-                          on:click={() => downloadOpen = !downloadOpen}
-                          class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
-                      >
-                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                          Download
-                          <svg class="w-3 h-3 ml-1 transition-transform {downloadOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                      </button>
-                      {#if downloadOpen}
-                        <div class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden z-30">
-                          {#each ['png', 'jpg', 'webp'] as fmt}
-                            {@const isOriginal = (result.format || 'png').toLowerCase() === fmt}
-                            <button
-                              on:click={() => downloadAsset(fmt)}
-                              class="w-full px-4 py-3 text-left text-sm font-bold uppercase tracking-wider hover:bg-gray-50 flex items-center justify-between transition-colors {downloading === fmt ? 'opacity-50' : ''}"
-                            >
-                              <span>{fmt.toUpperCase()}</span>
-                              {#if isOriginal}
-                                <span class="text-[10px] font-black text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded">(Original)</span>
-                              {/if}
-                            </button>
-                          {/each}
-                        </div>
-                      {/if}
-                    </div>
-                 </div>
-            </div>
+							<p class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">
+								Remix This Template
+							</p>
+							<h3 class="font-black text-gray-900 text-lg mb-2 truncate relative z-10">
+								{template.name}
+							</h3>
+							<p class="text-xs text-gray-500 font-medium mb-4">
+								{isLoggedIn
+									? 'Fork this template into your workspace and customize it.'
+									: 'Sign up to remix this template with your own data.'}
+							</p>
 
-            <!-- B1: Context-Aware Sidebar CTA (only for non-logged-in users) -->
-            {#if ctaConfig && !isLoggedIn}
-              <div class="bg-gradient-to-br from-gray-900 to-gray-800 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] rounded-2xl p-5 relative overflow-hidden">
-                <div class="absolute inset-0 bg-[radial-gradient(#fff_0.5px,transparent_0.5px)] [background-size:12px_12px] opacity-5"></div>
-                <div class="relative z-10">
-                  <p class="text-[10px] font-black uppercase tracking-widest text-[#ffc480] mb-2">{ctaConfig.sidebar.heading}</p>
-                  <p class="text-sm text-gray-400 font-medium mb-4">
-                    {#if result.source === 'tool'}
-                      Generate images like this one instantly with our free tool.
-                    {:else if result.source === 'template'}
-                      Customize this template with your own data and branding.
-                    {:else if result.source === 'api'}
-                      One API call. Any template. Infinite images.
-                    {:else}
-                      Create, customize, and automate image generation.
-                    {/if}
-                  </p>
-                  <button
-                    on:click={handleSidebarCta}
-                    class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[2px] border-[#ff6b6b] hover:bg-[#ff5252] transition-all rounded-lg text-sm"
-                  >
-                    {ctaConfig.sidebar.button}
-                  </button>
-                </div>
-              </div>
-            {/if}
+							<button
+								on:click={handleRemix}
+								disabled={forking}
+								class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
+							>
+								{#if forking}
+									<span class="flex items-center justify-center gap-2">
+										<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"
+											><circle
+												class="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												stroke-width="4"
+												fill="none"
+											/><path
+												class="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+											/></svg
+										>
+										Remixing...
+									</span>
+								{:else}
+									Remix Template
+								{/if}
+							</button>
+						</div>
+					{/if}
 
-            <!-- A4: Remix This Template (enhanced) -->
-            {#if template && template.isPublic}
-              <div class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-5 relative overflow-hidden group transition-all">
-                <div class="absolute top-0 right-0 p-2 opacity-10">
-                   <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-                </div>
+					<!-- A1: Analytics Card (visible to creator and team members) -->
+					{#if isLoggedIn && (analytics || analyticsLoading)}
+						<div
+							class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl overflow-hidden"
+						>
+							<div
+								class="bg-gray-50 border-b-[3px] border-gray-900 px-5 py-3 flex items-center gap-1.5"
+							>
+								<svg
+									class="w-3.5 h-3.5 text-purple-500"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/></svg
+								>
+								<span class="text-[10px] font-black uppercase tracking-widest text-purple-500"
+									>Analytics</span
+								>
+							</div>
+							<div class="p-5">
+								{#if analyticsLoading}
+									<div class="flex items-center gap-2 text-sm text-gray-400">
+										<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"
+											><circle
+												class="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												stroke-width="4"
+												fill="none"
+											/><path
+												class="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+											/></svg
+										>
+										Loading analytics...
+									</div>
+								{:else if analytics}
+									<div class="space-y-4">
+										<!-- Key metrics -->
+										<div class="grid grid-cols-2 gap-2">
+											<div
+												class="bg-orange-50 rounded-lg p-2.5 text-center border border-orange-100"
+											>
+												<div class="text-lg font-black text-gray-900">
+													{(analytics.totalHits || 0).toLocaleString()}
+												</div>
+												<div class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+													Total Hits
+												</div>
+											</div>
+											<div
+												class="bg-orange-50 rounded-lg p-2.5 text-center border border-orange-100"
+											>
+												<div class="text-lg font-black text-gray-900">
+													{formatBytes(analytics.totalBytes || 0)}
+												</div>
+												<div class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+													Bandwidth
+												</div>
+											</div>
+										</div>
 
-                <p class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">Remix This Template</p>
-                <h3 class="font-black text-gray-900 text-lg mb-2 truncate relative z-10">{template.name}</h3>
-                <p class="text-xs text-gray-500 font-medium mb-4">
-                  {isLoggedIn ? 'Fork this template into your workspace and customize it.' : 'Sign up to remix this template with your own data.'}
-                </p>
+										<!-- Status code breakdown -->
+										{#if analytics.statusCodes}
+											{@const sc = analytics.statusCodes}
+											{@const scTotal = (sc._200 || 0) + (sc._304 || 0) + (sc._other || 0)}
+											{#if scTotal > 0}
+												<div class="flex gap-2">
+													<div
+														class="flex-1 bg-green-50 border border-green-100 rounded-lg p-2 text-center"
+													>
+														<div class="text-xs font-black text-green-700">{sc._200 || 0}</div>
+														<div class="text-[9px] text-gray-400 font-bold uppercase">200 OK</div>
+													</div>
+													<div
+														class="flex-1 bg-blue-50 border border-blue-100 rounded-lg p-2 text-center"
+													>
+														<div class="text-xs font-black text-blue-700">{sc._304 || 0}</div>
+														<div class="text-[9px] text-gray-400 font-bold uppercase">
+															304 Cache
+														</div>
+													</div>
+													<div
+														class="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-2 text-center"
+													>
+														<div class="text-xs font-black text-gray-700">{sc._other || 0}</div>
+														<div class="text-[9px] text-gray-400 font-bold uppercase">Other</div>
+													</div>
+												</div>
+											{/if}
+										{/if}
 
-                <button
-                    on:click={handleRemix}
-                    disabled={forking}
-                    class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
-                >
-                    {#if forking}
-                      <span class="flex items-center justify-center gap-2">
-                        <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                        Remixing...
-                      </span>
-                    {:else}
-                      Remix Template
-                    {/if}
-                </button>
-              </div>
-            {/if}
+										<!-- Daily hits sparkline -->
+										{#if analytics.dailyStats?.length > 1}
+											{@const maxHits = Math.max(...analytics.dailyStats.map((d) => d.hits), 1)}
+											<div>
+												<p
+													class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5"
+												>
+													Hits (Last 14 Days)
+												</p>
+												<div class="h-14 flex items-end gap-0.5">
+													{#each analytics.dailyStats.slice(-14) as day}
+														<div
+															class="flex-1 bg-orange-200 hover:bg-orange-400 rounded-t transition-colors cursor-default"
+															style="height: {Math.max((day.hits / maxHits) * 100, 4)}%"
+															title="{day.date}: {day.hits} hits"
+														/>
+													{/each}
+												</div>
+											</div>
+										{/if}
 
-            <!-- A1: Analytics Card (visible to creator and team members) -->
-            {#if isLoggedIn && (analytics || analyticsLoading)}
-              <div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl overflow-hidden">
-                <div class="bg-gray-50 border-b-[3px] border-gray-900 px-5 py-3 flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-purple-500">Analytics</span>
-                </div>
-                <div class="p-5">
-                {#if analyticsLoading}
-                  <div class="flex items-center gap-2 text-sm text-gray-400">
-                    <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                    Loading analytics...
-                  </div>
-                {:else if analytics}
-                  <div class="space-y-4">
-                    <!-- Key metrics -->
-                    <div class="grid grid-cols-2 gap-2">
-                      <div class="bg-orange-50 rounded-lg p-2.5 text-center border border-orange-100">
-                        <div class="text-lg font-black text-gray-900">{(analytics.totalHits || 0).toLocaleString()}</div>
-                        <div class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Total Hits</div>
-                      </div>
-                      <div class="bg-orange-50 rounded-lg p-2.5 text-center border border-orange-100">
-                        <div class="text-lg font-black text-gray-900">{formatBytes(analytics.totalBytes || 0)}</div>
-                        <div class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Bandwidth</div>
-                      </div>
-                    </div>
+										<!-- Top referrers (sites embedding the image) -->
+										{#if analytics.topReferrers?.length}
+											<div class="pt-3 border-t border-dashed border-gray-200">
+												<p
+													class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1"
+												>
+													<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+														><path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+														/></svg
+													>
+													Referrers
+												</p>
+												{#each analytics.topReferrers.slice(0, 5) as ref}
+													<div class="flex items-center justify-between text-xs mb-1">
+														<span class="text-gray-600 truncate max-w-[160px]"
+															>{ref.referrer || 'Direct'}</span
+														>
+														<span class="font-bold text-gray-900">{ref.hits}</span>
+													</div>
+												{/each}
+											</div>
+										{/if}
 
-                    <!-- Status code breakdown -->
-                    {#if analytics.statusCodes}
-                      {@const sc = analytics.statusCodes}
-                      {@const scTotal = (sc._200 || 0) + (sc._304 || 0) + (sc._other || 0)}
-                      {#if scTotal > 0}
-                        <div class="flex gap-2">
-                          <div class="flex-1 bg-green-50 border border-green-100 rounded-lg p-2 text-center">
-                            <div class="text-xs font-black text-green-700">{sc._200 || 0}</div>
-                            <div class="text-[9px] text-gray-400 font-bold uppercase">200 OK</div>
-                          </div>
-                          <div class="flex-1 bg-blue-50 border border-blue-100 rounded-lg p-2 text-center">
-                            <div class="text-xs font-black text-blue-700">{sc._304 || 0}</div>
-                            <div class="text-[9px] text-gray-400 font-bold uppercase">304 Cache</div>
-                          </div>
-                          <div class="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-2 text-center">
-                            <div class="text-xs font-black text-gray-700">{sc._other || 0}</div>
-                            <div class="text-[9px] text-gray-400 font-bold uppercase">Other</div>
-                          </div>
-                        </div>
-                      {/if}
-                    {/if}
+										<!-- Geographic breakdown -->
+										{#if analytics.topCountries?.length}
+											<div class="pt-3 border-t border-dashed border-gray-200">
+												<p
+													class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1"
+												>
+													<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+														><path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+														/></svg
+													>
+													Geography
+												</p>
+												{#each analytics.topCountries.slice(0, 5) as geo}
+													{@const pct = Math.round((geo.hits / (analytics.totalHits || 1)) * 100)}
+													<div class="mb-1.5">
+														<div class="flex items-center justify-between text-xs mb-0.5">
+															<span class="text-gray-700 font-medium">{geo.country}</span>
+															<span class="font-bold text-gray-900"
+																>{geo.hits}
+																<span class="text-gray-400 font-normal">({pct}%)</span></span
+															>
+														</div>
+														<div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+															<div
+																class="h-full bg-orange-300 rounded-full"
+																style="width: {pct}%"
+															/>
+														</div>
+													</div>
+												{/each}
+											</div>
+										{/if}
 
-                    <!-- Daily hits sparkline -->
-                    {#if analytics.dailyStats?.length > 1}
-                      {@const maxHits = Math.max(...analytics.dailyStats.map(d => d.hits), 1)}
-                      <div>
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Hits (Last 14 Days)</p>
-                        <div class="h-14 flex items-end gap-0.5">
-                          {#each analytics.dailyStats.slice(-14) as day}
-                            <div
-                              class="flex-1 bg-orange-200 hover:bg-orange-400 rounded-t transition-colors cursor-default"
-                              style="height: {Math.max((day.hits / maxHits) * 100, 4)}%"
-                              title="{day.date}: {day.hits} hits"
-                            ></div>
-                          {/each}
-                        </div>
-                      </div>
-                    {/if}
+										<!-- Last processed -->
+										{#if analytics.lastProcessedAt}
+											<div
+												class="flex items-center justify-between text-xs pt-3 border-t border-dashed border-gray-200"
+											>
+												<span class="text-gray-400">Last updated</span>
+												<span class="text-gray-600 font-medium"
+													>{formatDate(analytics.lastProcessedAt)}</span
+												>
+											</div>
+										{/if}
+									</div>
+								{:else}
+									<div class="text-sm text-gray-400">
+										<p>Analytics will appear here once this asset gets traffic.</p>
+									</div>
+								{/if}
+							</div>
+						</div>
+					{/if}
+				</div>
+			</div>
 
-                    <!-- Top referrers (sites embedding the image) -->
-                    {#if analytics.topReferrers?.length}
-                      <div class="pt-3 border-t border-dashed border-gray-200">
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1">
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                          Referrers
-                        </p>
-                        {#each analytics.topReferrers.slice(0, 5) as ref}
-                          <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="text-gray-600 truncate max-w-[160px]">{ref.referrer || 'Direct'}</span>
-                            <span class="font-bold text-gray-900">{ref.hits}</span>
-                          </div>
-                        {/each}
-                      </div>
-                    {/if}
+			<!-- B2: Enhanced Bottom CTA Banner (only for non-logged-in users) -->
+			{#if !isLoggedIn}
+				<div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
+					<div
+						class="bg-[#ff6b6b] rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden"
+					>
+						<div
+							class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"
+						/>
+						<div class="relative z-10">
+							<h2
+								class="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight text-shadow-sm"
+							>
+								{ctaConfig?.banner?.headline || 'DESIGN. AUTOMATE. SCALE.'}
+							</h2>
+							<p class="text-white/90 font-bold text-lg max-w-2xl mx-auto mb-8">
+								{ctaConfig?.banner?.body || 'Create images, GIFs, and PDFs. Automate with the API.'}
+							</p>
+							<div class="flex flex-wrap justify-center gap-4">
+								<a
+									href="/signup"
+									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+								>
+									{result.source === 'api' ? 'Get API Key' : 'Start Free'}
+								</a>
+								<a
+									href="/templates"
+									class="px-8 py-4 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:bg-gray-800 transition-all rounded-xl"
+								>
+									Browse Templates
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
+		{/if}
+	</main>
 
-                    <!-- Geographic breakdown -->
-                    {#if analytics.topCountries?.length}
-                      <div class="pt-3 border-t border-dashed border-gray-200">
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1">
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                          Geography
-                        </p>
-                        {#each analytics.topCountries.slice(0, 5) as geo}
-                          {@const pct = Math.round((geo.hits / (analytics.totalHits || 1)) * 100)}
-                          <div class="mb-1.5">
-                            <div class="flex items-center justify-between text-xs mb-0.5">
-                              <span class="text-gray-700 font-medium">{geo.country}</span>
-                              <span class="font-bold text-gray-900">{geo.hits} <span class="text-gray-400 font-normal">({pct}%)</span></span>
-                            </div>
-                            <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-                              <div class="h-full bg-orange-300 rounded-full" style="width: {pct}%"></div>
-                            </div>
-                          </div>
-                        {/each}
-                      </div>
-                    {/if}
-
-                    <!-- Last processed -->
-                    {#if analytics.lastProcessedAt}
-                      <div class="flex items-center justify-between text-xs pt-3 border-t border-dashed border-gray-200">
-                        <span class="text-gray-400">Last updated</span>
-                        <span class="text-gray-600 font-medium">{formatDate(analytics.lastProcessedAt)}</span>
-                      </div>
-                    {/if}
-                  </div>
-                {:else}
-                  <div class="text-sm text-gray-400">
-                    <p>Analytics will appear here once this asset gets traffic.</p>
-                  </div>
-                {/if}
-                </div>
-              </div>
-            {/if}
-
-        </div>
-
-      </div>
-
-      <!-- B2: Enhanced Bottom CTA Banner (only for non-logged-in users) -->
-      {#if !isLoggedIn}
-      <div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
-        <div class="bg-[#ff6b6b] rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden">
-             <div class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
-             <div class="relative z-10">
-                 <h2 class="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight text-shadow-sm">
-                    {ctaConfig?.banner?.headline || 'DESIGN. AUTOMATE. SCALE.'}
-                 </h2>
-                 <p class="text-white/90 font-bold text-lg max-w-2xl mx-auto mb-8">
-                    {ctaConfig?.banner?.body || 'Create images, GIFs, and PDFs. Automate with the API.'}
-                 </p>
-                 <div class="flex flex-wrap justify-center gap-4">
-                    <a
-                      href="/signup"
-                      class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
-                    >
-                      {result.source === 'api' ? 'Get API Key' : 'Start Free'}
-                    </a>
-                    <a
-                      href="/templates"
-                      class="px-8 py-4 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:bg-gray-800 transition-all rounded-xl"
-                    >
-                      Browse Templates
-                    </a>
-                 </div>
-             </div>
-        </div>
-      </div>
-      {/if}
-
-    {/if}
-  </main>
-
-  <Footer />
+	<Footer />
 </div>
-

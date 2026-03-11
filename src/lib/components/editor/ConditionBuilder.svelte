@@ -18,7 +18,7 @@
 		{ value: 'is_false', label: 'is false', noValue: true },
 		{ value: 'is_empty', label: 'is empty', noValue: true },
 		{ value: 'is_not_empty', label: 'has value', noValue: true },
-		{ value: 'contains', label: 'contains' },
+		{ value: 'contains', label: 'contains' }
 	];
 
 	// State
@@ -36,12 +36,12 @@
 
 	// Get operator label - use function to ensure fresh lookup
 	function getOperatorLabel(opValue) {
-		const op = OPERATORS.find(o => o.value === opValue);
+		const op = OPERATORS.find((o) => o.value === opValue);
 		return op?.label || 'is';
 	}
 
 	function operatorNeedsValue(opValue) {
-		const op = OPERATORS.find(o => o.value === opValue);
+		const op = OPERATORS.find((o) => o.value === opValue);
 		return !op?.noValue;
 	}
 
@@ -138,16 +138,30 @@
 	function buildExpression() {
 		if (!selectedVariable) return '';
 		switch (selectedOperator) {
-			case 'equals': return isNaN(conditionValue) ? `${selectedVariable} == "${conditionValue}"` : `${selectedVariable} == ${conditionValue}`;
-			case 'not_equals': return isNaN(conditionValue) ? `${selectedVariable} != "${conditionValue}"` : `${selectedVariable} != ${conditionValue}`;
-			case 'greater_than': return `${selectedVariable} > ${conditionValue}`;
-			case 'less_than': return `${selectedVariable} < ${conditionValue}`;
-			case 'is_true': return `${selectedVariable} == true`;
-			case 'is_false': return `${selectedVariable} == false`;
-			case 'is_empty': return `isEmpty(${selectedVariable})`;
-			case 'is_not_empty': return `!isEmpty(${selectedVariable})`;
-			case 'contains': return `contains(${selectedVariable}, "${conditionValue}")`;
-			default: return `${selectedVariable} == "${conditionValue}"`;
+			case 'equals':
+				return isNaN(conditionValue)
+					? `${selectedVariable} == "${conditionValue}"`
+					: `${selectedVariable} == ${conditionValue}`;
+			case 'not_equals':
+				return isNaN(conditionValue)
+					? `${selectedVariable} != "${conditionValue}"`
+					: `${selectedVariable} != ${conditionValue}`;
+			case 'greater_than':
+				return `${selectedVariable} > ${conditionValue}`;
+			case 'less_than':
+				return `${selectedVariable} < ${conditionValue}`;
+			case 'is_true':
+				return `${selectedVariable} == true`;
+			case 'is_false':
+				return `${selectedVariable} == false`;
+			case 'is_empty':
+				return `isEmpty(${selectedVariable})`;
+			case 'is_not_empty':
+				return `!isEmpty(${selectedVariable})`;
+			case 'contains':
+				return `contains(${selectedVariable}, "${conditionValue}")`;
+			default:
+				return `${selectedVariable} == "${conditionValue}"`;
 		}
 	}
 
@@ -227,10 +241,15 @@
 				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all"
 				aria-expanded={showVarDropdown}
 				aria-label="Select variable"
-				on:click|stopPropagation={() => { showVarDropdown = !showVarDropdown; showOpDropdown = false; }}
+				on:click|stopPropagation={() => {
+					showVarDropdown = !showVarDropdown;
+					showOpDropdown = false;
+				}}
 			>
-				<span class={selectedVariable ? 'font-medium' : 'text-gray-400'}>{selectedVariable || 'choose variable'}</span>
-				<i class="fa fa-chevron-down text-[10px] text-gray-400 flex-shrink-0"></i>
+				<span class={selectedVariable ? 'font-medium' : 'text-gray-400'}
+					>{selectedVariable || 'choose variable'}</span
+				>
+				<i class="fa fa-chevron-down text-[10px] text-gray-400 flex-shrink-0" />
 			</button>
 
 			{#if showVarDropdown}
@@ -248,18 +267,24 @@
 								bind:value={customVarInput}
 								on:keydown={(e) => {
 									if (e.key === 'Enter') confirmCustom();
-									if (e.key === 'Escape') { e.stopPropagation(); cancelCustom(); }
+									if (e.key === 'Escape') {
+										e.stopPropagation();
+										cancelCustom();
+									}
 								}}
 							/>
 							<button
 								class="px-2.5 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-black transition-colors"
-								on:click|stopPropagation={confirmCustom}
-							>&#10003;</button>
+								on:click|stopPropagation={confirmCustom}>&#10003;</button
+							>
 						</div>
 					{:else}
 						{#each allVariables as v}
 							<button
-								class="block w-full px-3 py-2 text-left text-xs border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors {selectedVariable === v ? 'bg-amber-100 font-semibold text-gray-900' : 'text-gray-700 hover:bg-gray-50'}"
+								class="block w-full px-3 py-2 text-left text-xs border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors {selectedVariable ===
+								v
+									? 'bg-amber-100 font-semibold text-gray-900'
+									: 'text-gray-700 hover:bg-gray-50'}"
 								role="option"
 								aria-selected={selectedVariable === v}
 								on:click|stopPropagation={() => selectVar(v)}
@@ -268,7 +293,9 @@
 							</button>
 						{/each}
 						{#if allVariables.length === 0}
-							<div class="px-3 py-3 text-center text-[11px] text-gray-400">No variables on canvas</div>
+							<div class="px-3 py-3 text-center text-[11px] text-gray-400">
+								No variables on canvas
+							</div>
 						{/if}
 						<button
 							class="block w-full px-3 py-2 text-left text-xs font-semibold text-gray-700 border-t border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
@@ -289,10 +316,13 @@
 				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs font-medium text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all"
 				aria-expanded={showOpDropdown}
 				aria-label="Select operator"
-				on:click|stopPropagation={() => { showOpDropdown = !showOpDropdown; showVarDropdown = false; }}
+				on:click|stopPropagation={() => {
+					showOpDropdown = !showOpDropdown;
+					showVarDropdown = false;
+				}}
 			>
 				<span>{getOperatorLabel(selectedOperator)}</span>
-				<i class="fa fa-chevron-down text-[10px] text-gray-400 flex-shrink-0"></i>
+				<i class="fa fa-chevron-down text-[10px] text-gray-400 flex-shrink-0" />
 			</button>
 
 			{#if showOpDropdown}
@@ -303,7 +333,10 @@
 				>
 					{#each OPERATORS as op}
 						<button
-							class="block w-full px-3 py-2 text-left text-xs border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors {selectedOperator === op.value ? 'bg-amber-100 font-semibold text-gray-900' : 'text-gray-700 hover:bg-gray-50'}"
+							class="block w-full px-3 py-2 text-left text-xs border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors {selectedOperator ===
+							op.value
+								? 'bg-amber-100 font-semibold text-gray-900'
+								: 'text-gray-700 hover:bg-gray-50'}"
 							role="option"
 							aria-selected={selectedOperator === op.value}
 							on:click|stopPropagation={() => selectOp(op.value)}

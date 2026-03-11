@@ -66,15 +66,22 @@ export async function handle({ event, resolve }) {
 				headers: {
 					'User-Agent': event.request.headers.get('user-agent') || '',
 					'X-Forwarded-For': event.getClientAddress(),
-					'Accept': event.request.headers.get('accept') || '*/*',
-					'Accept-Language': event.request.headers.get('accept-language') || '',
+					Accept: event.request.headers.get('accept') || '*/*',
+					'Accept-Language': event.request.headers.get('accept-language') || ''
 				},
-				redirect: 'manual',
+				redirect: 'manual'
 			});
 
 			const headers = new Headers();
 			// Whitelist safe response headers from backend (avoid leaking internal headers)
-			const SAFE_RESPONSE_HEADERS = ['content-type', 'content-length', 'location', 'etag', 'last-modified', 'vary'];
+			const SAFE_RESPONSE_HEADERS = [
+				'content-type',
+				'content-length',
+				'location',
+				'etag',
+				'last-modified',
+				'vary'
+			];
 			for (const [key, val] of backendRes.headers.entries()) {
 				if (SAFE_RESPONSE_HEADERS.includes(key.toLowerCase())) {
 					headers.set(key, val);
@@ -87,7 +94,7 @@ export async function handle({ event, resolve }) {
 
 			return new Response(backendRes.body, {
 				status: backendRes.status,
-				headers,
+				headers
 			});
 		} catch {
 			return new Response('Service unavailable', { status: 502 });
@@ -121,7 +128,12 @@ export async function handle({ event, resolve }) {
 	}
 
 	// Default cache for static-ish pages
-	if (pathname === '/' || pathname === '/pricing' || pathname === '/tools' || pathname === '/templates') {
+	if (
+		pathname === '/' ||
+		pathname === '/pricing' ||
+		pathname === '/tools' ||
+		pathname === '/templates'
+	) {
 		response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
 	}
 

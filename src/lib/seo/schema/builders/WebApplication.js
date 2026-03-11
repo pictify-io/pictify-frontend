@@ -50,8 +50,8 @@ export function buildWebApplicationSchema(data) {
  * @returns {Object} SoftwareApplication schema
  */
 export function buildConverterToolSchema(format, dimensions = null) {
-	const formatUpper = (typeof format === 'string' ? format.toUpperCase() : 'IMAGE');
-	const formatLower = (typeof format === 'string' ? format.toLowerCase() : 'image');
+	const formatUpper = typeof format === 'string' ? format.toUpperCase() : 'IMAGE';
+	const formatLower = typeof format === 'string' ? format.toLowerCase() : 'image';
 	const name = dimensions
 		? `HTML to ${formatUpper} ${dimensions} Converter`
 		: `HTML to ${formatUpper} Converter`;
@@ -78,12 +78,12 @@ export function buildConverterToolSchema(format, dimensions = null) {
  * @returns {Object} SoftwareApplication schema
  */
 export function buildOGImageGeneratorSchema(platform = null) {
-	const name = platform
-		? `OG Image Generator for ${platform.name}`
-		: 'OG Image Generator';
+	const name = platform ? `OG Image Generator for ${platform.name}` : 'OG Image Generator';
 
 	const description = platform
-		? `Generate optimized OG images for ${platform.name}. Recommended size: ${platform.recommendedSize || '1200x630'}.`
+		? `Generate optimized OG images for ${platform.name}. Recommended size: ${
+				platform.recommendedSize || '1200x630'
+		  }.`
 		: 'Generate beautiful Open Graph images for social media. Free online tool with API access.';
 
 	const url = platform

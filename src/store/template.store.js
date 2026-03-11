@@ -13,7 +13,7 @@ export const template = writable({
 	uid: null,
 	name: null,
 	html: null,
-  fabricJSData: null,
+	fabricJSData: null,
 	width: null,
 	height: null,
 	variables: null,
@@ -39,7 +39,13 @@ export const templatesPagination = writable({
 });
 
 // Actions
-export const getTemplatesAction = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all', hasDynamicLink } = {}) => {
+export const getTemplatesAction = async ({
+	page = 1,
+	limit = 12,
+	sort = 'newest',
+	outputFormat = 'all',
+	hasDynamicLink
+} = {}) => {
 	try {
 		const response = await getTemplates({ page, limit, sort, outputFormat, hasDynamicLink });
 		if (!response?.templates) {
@@ -125,7 +131,7 @@ export const createTemplateAction = async (templateData) => {
 			return null;
 		}
 
-		templates.update(t => [...t, response.template]);
+		templates.update((t) => [...t, response.template]);
 		return response.template;
 	} catch (error) {
 		console.error('Error creating template:', error);
@@ -140,8 +146,8 @@ export const updateTemplateAction = async (templateData) => {
 			return null;
 		}
 
-		templates.update(t => {
-			const index = t.findIndex(temp => temp.uid === response.template.uid);
+		templates.update((t) => {
+			const index = t.findIndex((temp) => temp.uid === response.template.uid);
 			if (index !== -1) {
 				t[index] = response.template;
 			}
@@ -158,7 +164,7 @@ export const deleteTemplateAction = async (uid) => {
 	try {
 		const response = await deleteTemplate(uid);
 		if (response?.message) {
-			templates.update(t => t.filter(temp => temp.uid !== uid));
+			templates.update((t) => t.filter((temp) => temp.uid !== uid));
 			return true;
 		}
 		return false;

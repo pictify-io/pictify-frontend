@@ -117,9 +117,18 @@
 
 	// Status colors - neo-brutalist style
 	const statusConfig = {
-		success: { color: 'bg-green-100 text-green-800 border-2 border-green-800', dot: 'bg-green-500' },
-		failure: { color: 'bg-[#ff6b6b]/20 text-[#ff6b6b] border-2 border-[#ff6b6b]', dot: 'bg-[#ff6b6b]' },
-		pending: { color: 'bg-[#ffc480]/30 text-gray-900 border-2 border-gray-900', dot: 'bg-[#ffc480]' }
+		success: {
+			color: 'bg-green-100 text-green-800 border-2 border-green-800',
+			dot: 'bg-green-500'
+		},
+		failure: {
+			color: 'bg-[#ff6b6b]/20 text-[#ff6b6b] border-2 border-[#ff6b6b]',
+			dot: 'bg-[#ff6b6b]'
+		},
+		pending: {
+			color: 'bg-[#ffc480]/30 text-gray-900 border-2 border-gray-900',
+			dot: 'bg-[#ffc480]'
+		}
 	};
 
 	onMount(async () => {
@@ -186,7 +195,11 @@
 				document.body.removeChild(a);
 			}
 
-			toast.set({ message: `Audit logs exported as ${format.toUpperCase()}`, type: 'success', duration: 2000 });
+			toast.set({
+				message: `Audit logs exported as ${format.toUpperCase()}`,
+				type: 'success',
+				duration: 2000
+			});
 		} catch (err) {
 			toast.set({ message: 'Failed to export logs', type: 'error', duration: 2000 });
 		}
@@ -283,19 +296,27 @@
 		<!-- Summary Cards -->
 		{#if !isSummaryLoading && summary.totalLogs > 0}
 			<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-				<div class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_0_#1f293780]">
+				<div
+					class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_0_#1f293780]"
+				>
 					<div class="text-3xl font-bold text-gray-900">{summary.totalLogs || 0}</div>
 					<div class="text-sm font-medium text-gray-600">Total Activities</div>
 				</div>
-				<div class="bg-green-50 rounded-xl border-[3px] border-green-800 p-4 shadow-[4px_4px_0_0_#16653480]">
+				<div
+					class="bg-green-50 rounded-xl border-[3px] border-green-800 p-4 shadow-[4px_4px_0_0_#16653480]"
+				>
 					<div class="text-3xl font-bold text-green-700">{summary.byStatus?.success || 0}</div>
 					<div class="text-sm font-medium text-green-700">Successful</div>
 				</div>
-				<div class="bg-[#ff6b6b]/10 rounded-xl border-[3px] border-[#ff6b6b] p-4 shadow-[4px_4px_0_0_#ff6b6b80]">
+				<div
+					class="bg-[#ff6b6b]/10 rounded-xl border-[3px] border-[#ff6b6b] p-4 shadow-[4px_4px_0_0_#ff6b6b80]"
+				>
 					<div class="text-3xl font-bold text-[#ff6b6b]">{summary.byStatus?.failure || 0}</div>
 					<div class="text-sm font-medium text-[#ff6b6b]">Failed</div>
 				</div>
-				<div class="bg-blue-50 rounded-xl border-[3px] border-blue-800 p-4 shadow-[4px_4px_0_0_#1e40af80]">
+				<div
+					class="bg-blue-50 rounded-xl border-[3px] border-blue-800 p-4 shadow-[4px_4px_0_0_#1e40af80]"
+				>
 					<div class="text-3xl font-bold text-blue-700">{summary.byCategory?.image || 0}</div>
 					<div class="text-sm font-medium text-blue-700">Images Created</div>
 				</div>
@@ -304,10 +325,14 @@
 
 		<!-- Filters Panel -->
 		{#if showFilters}
-			<div class="bg-white rounded-xl border-[3px] border-gray-900 p-5 mb-6 shadow-[4px_4px_0_0_#1f293780] transition-all">
+			<div
+				class="bg-white rounded-xl border-[3px] border-gray-900 p-5 mb-6 shadow-[4px_4px_0_0_#1f293780] transition-all"
+			>
 				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 					<div>
-						<label for="category-filter" class="block text-sm font-bold text-gray-900 mb-2">Category</label>
+						<label for="category-filter" class="block text-sm font-bold text-gray-900 mb-2"
+							>Category</label
+						>
 						<select
 							id="category-filter"
 							bind:value={category}
@@ -320,7 +345,9 @@
 						</select>
 					</div>
 					<div>
-						<label for="status-filter" class="block text-sm font-bold text-gray-900 mb-2">Status</label>
+						<label for="status-filter" class="block text-sm font-bold text-gray-900 mb-2"
+							>Status</label
+						>
 						<select
 							id="status-filter"
 							bind:value={status}
@@ -333,7 +360,9 @@
 						</select>
 					</div>
 					<div>
-						<label for="start-date-filter" class="block text-sm font-bold text-gray-900 mb-2">Start Date</label>
+						<label for="start-date-filter" class="block text-sm font-bold text-gray-900 mb-2"
+							>Start Date</label
+						>
 						<input
 							id="start-date-filter"
 							type="date"
@@ -343,7 +372,9 @@
 						/>
 					</div>
 					<div>
-						<label for="end-date-filter" class="block text-sm font-bold text-gray-900 mb-2">End Date</label>
+						<label for="end-date-filter" class="block text-sm font-bold text-gray-900 mb-2"
+							>End Date</label
+						>
 						<input
 							id="end-date-filter"
 							type="date"
@@ -354,7 +385,10 @@
 					</div>
 				</div>
 				<div class="mt-4 flex justify-end">
-					<button class="text-sm font-bold text-[#ff6b6b] hover:underline" on:click={handleClearFilters}>
+					<button
+						class="text-sm font-bold text-[#ff6b6b] hover:underline"
+						on:click={handleClearFilters}
+					>
 						Clear all filters
 					</button>
 				</div>
@@ -362,7 +396,9 @@
 		{/if}
 
 		<!-- Logs Table -->
-		<div class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[4px_4px_0_0_#1f293780]">
+		<div
+			class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[4px_4px_0_0_#1f293780]"
+		>
 			{#if isLoading}
 				<div class="p-8 flex justify-center">
 					<Loader size="8" show={true} />
@@ -379,13 +415,27 @@
 				</div>
 			{:else if logs.length === 0}
 				<div class="p-8 text-center text-gray-600">
-					<div class="w-20 h-20 mx-auto mb-4 bg-[#ffc480]/30 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center shadow-[4px_4px_0_0_#1f293780]">
-						<svg class="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-					</svg>
+					<div
+						class="w-20 h-20 mx-auto mb-4 bg-[#ffc480]/30 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center shadow-[4px_4px_0_0_#1f293780]"
+					>
+						<svg
+							class="w-10 h-10 text-gray-700"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							/>
+						</svg>
 					</div>
 					<p class="text-xl font-bold text-gray-900">No activity logs found</p>
-					<p class="text-sm mt-2 text-gray-600">Your activity logs will appear here once you start using the API</p>
+					<p class="text-sm mt-2 text-gray-600">
+						Your activity logs will appear here once you start using the API
+					</p>
 				</div>
 			{:else}
 				<!-- Desktop Table -->
@@ -393,13 +443,33 @@
 					<table class="w-full">
 						<thead class="bg-[#ffc480]/20 border-b-[3px] border-gray-900">
 							<tr>
-								<th class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Activity</th>
-								<th class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Category</th>
-								<th class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Status</th>
-								<th class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Resource</th>
-								<th class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Duration</th>
-								<th class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Time</th>
-								<th class="px-4 py-4 text-right text-xs font-bold text-gray-900 uppercase tracking-wider"></th>
+								<th
+									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+									>Activity</th
+								>
+								<th
+									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+									>Category</th
+								>
+								<th
+									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+									>Status</th
+								>
+								<th
+									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+									>Resource</th
+								>
+								<th
+									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+									>Duration</th
+								>
+								<th
+									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+									>Time</th
+								>
+								<th
+									class="px-4 py-4 text-right text-xs font-bold text-gray-900 uppercase tracking-wider"
+								/>
 							</tr>
 						</thead>
 						<tbody class="divide-y-2 divide-gray-200">
@@ -408,10 +478,18 @@
 									<td class="px-4 py-4">
 										<div class="flex items-center gap-3">
 											<div
-												class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center {categoryConfig[log.category]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+												class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center {categoryConfig[
+													log.category
+												]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
 											>
 												<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={categoryConfig[log.category]?.iconPath || categoryConfig['other'].iconPath}/>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d={categoryConfig[log.category]?.iconPath ||
+															categoryConfig['other'].iconPath}
+													/>
 												</svg>
 											</div>
 											<div>
@@ -421,19 +499,32 @@
 										</div>
 									</td>
 									<td class="px-4 py-4">
-										<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {categoryConfig[log.category]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}">
+										<span
+											class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {categoryConfig[
+												log.category
+											]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+										>
 											{log.category}
 										</span>
 									</td>
 									<td class="px-4 py-4">
-										<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold {statusConfig[log.status]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}">
-											<span class="w-2 h-2 rounded-full {statusConfig[log.status]?.dot || 'bg-gray-500'}"></span>
+										<span
+											class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold {statusConfig[
+												log.status
+											]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+										>
+											<span
+												class="w-2 h-2 rounded-full {statusConfig[log.status]?.dot ||
+													'bg-gray-500'}"
+											/>
 											{log.status}
 										</span>
 									</td>
 									<td class="px-4 py-4 text-sm text-gray-600">
 										{#if log.resourceName}
-											<span class="truncate max-w-[150px] block font-medium">{log.resourceName}</span>
+											<span class="truncate max-w-[150px] block font-medium"
+												>{log.resourceName}</span
+											>
 										{:else if log.resourceId}
 											<span class="font-mono text-xs">{log.resourceId.substring(0, 12)}...</span>
 										{:else}
@@ -452,7 +543,12 @@
 											on:click={() => openLogDetail(log)}
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M9 5l7 7-7 7"
+												/>
 											</svg>
 										</button>
 									</td>
@@ -472,26 +568,51 @@
 							<div class="flex items-start justify-between gap-3">
 								<div class="flex items-start gap-3">
 									<div
-										class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center {categoryConfig[log.category]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+										class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center {categoryConfig[
+											log.category
+										]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
 									>
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={categoryConfig[log.category]?.iconPath || categoryConfig['other'].iconPath}/>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d={categoryConfig[log.category]?.iconPath ||
+													categoryConfig['other'].iconPath}
+											/>
 										</svg>
 									</div>
 									<div>
 										<div class="font-bold text-gray-900 text-sm">{log.action}</div>
 										<div class="text-xs text-gray-500 mt-1 line-clamp-2">{log.description}</div>
 										<div class="flex items-center gap-2 mt-2">
-											<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold {statusConfig[log.status]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}">
-												<span class="w-1.5 h-1.5 rounded-full {statusConfig[log.status]?.dot || 'bg-gray-500'}"></span>
+											<span
+												class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold {statusConfig[
+													log.status
+												]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+											>
+												<span
+													class="w-1.5 h-1.5 rounded-full {statusConfig[log.status]?.dot ||
+														'bg-gray-500'}"
+												/>
 												{log.status}
 											</span>
 											<span class="text-xs text-gray-500">{formatDate(log.createdAt)}</span>
 										</div>
 									</div>
 								</div>
-								<svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+								<svg
+									class="w-5 h-5 text-gray-400 flex-shrink-0"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 5l7 7-7 7"
+									/>
 								</svg>
 							</div>
 						</button>
@@ -500,7 +621,9 @@
 
 				<!-- Pagination -->
 				{#if totalPages > 1}
-					<div class="border-t-[3px] border-gray-900 px-4 py-4 flex items-center justify-between bg-[#ffc480]/10">
+					<div
+						class="border-t-[3px] border-gray-900 px-4 py-4 flex items-center justify-between bg-[#ffc480]/10"
+					>
 						<div class="text-sm font-medium text-gray-700">
 							Showing {offset + 1} to {Math.min(offset + limit, total)} of {total} results
 						</div>
@@ -548,11 +671,18 @@
 			on:keydown|stopPropagation
 			role="document"
 		>
-			<div class="sticky top-0 bg-[#ffc480] border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between">
+			<div
+				class="sticky top-0 bg-[#ffc480] border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
+			>
 				<h2 id="modal-title" class="text-lg font-bold text-gray-900">Activity Details</h2>
 				<button class="text-gray-900 hover:text-[#ff6b6b] p-1" on:click={closeLogDetail}>
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -560,20 +690,39 @@
 				<!-- Header Info -->
 				<div class="flex items-center gap-4">
 					<div
-						class="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center {categoryConfig[selectedLog.category]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+						class="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center {categoryConfig[
+							selectedLog.category
+						]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
 					>
 						<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={categoryConfig[selectedLog.category]?.iconPath || categoryConfig['other'].iconPath}/>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d={categoryConfig[selectedLog.category]?.iconPath ||
+									categoryConfig['other'].iconPath}
+							/>
 						</svg>
 					</div>
 					<div>
 						<div class="text-xl font-bold text-gray-900">{selectedLog.action}</div>
 						<div class="flex items-center gap-2 mt-1">
-							<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {categoryConfig[selectedLog.category]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}">
+							<span
+								class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {categoryConfig[
+									selectedLog.category
+								]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+							>
 								{selectedLog.category}
 							</span>
-							<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold {statusConfig[selectedLog.status]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}">
-								<span class="w-2 h-2 rounded-full {statusConfig[selectedLog.status]?.dot || 'bg-gray-500'}"></span>
+							<span
+								class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold {statusConfig[
+									selectedLog.status
+								]?.color || 'bg-gray-100 text-gray-800 border-2 border-gray-800'}"
+							>
+								<span
+									class="w-2 h-2 rounded-full {statusConfig[selectedLog.status]?.dot ||
+										'bg-gray-500'}"
+								/>
 								{selectedLog.status}
 							</span>
 						</div>
@@ -609,7 +758,9 @@
 					{#if selectedLog.duration}
 						<div class="bg-white rounded-xl border-[3px] border-gray-900 p-4">
 							<h3 class="text-sm font-bold text-gray-900 mb-1">Duration</h3>
-							<p class="text-gray-700 font-mono font-bold">{formatDuration(selectedLog.duration)}</p>
+							<p class="text-gray-700 font-mono font-bold">
+								{formatDuration(selectedLog.duration)}
+							</p>
 						</div>
 					{/if}
 					<div class="bg-white rounded-xl border-[3px] border-gray-900 p-4">
@@ -625,18 +776,23 @@
 						<div class="space-y-2 text-sm">
 							{#if selectedLog.request.method && selectedLog.request.endpoint}
 								<div class="flex items-center gap-2">
-									<span class="font-mono text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-lg border-2 border-blue-800 font-bold">{selectedLog.request.method}</span>
+									<span
+										class="font-mono text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-lg border-2 border-blue-800 font-bold"
+										>{selectedLog.request.method}</span
+									>
 									<span class="text-gray-700 font-mono">{selectedLog.request.endpoint}</span>
 								</div>
 							{/if}
 							{#if selectedLog.request.authMethod}
 								<div class="text-gray-700">
-									<span class="font-bold">Auth:</span> {selectedLog.request.authMethod}
+									<span class="font-bold">Auth:</span>
+									{selectedLog.request.authMethod}
 								</div>
 							{/if}
 							{#if selectedLog.request.ip}
 								<div class="text-gray-700">
-									<span class="font-bold">IP:</span> {selectedLog.request.ip}
+									<span class="font-bold">IP:</span>
+									{selectedLog.request.ip}
 								</div>
 							{/if}
 						</div>
@@ -650,40 +806,50 @@
 						<div class="space-y-2 text-sm">
 							{#if selectedLog.metadata.width && selectedLog.metadata.height}
 								<div class="text-gray-700">
-									<span class="font-bold">Dimensions:</span> {selectedLog.metadata.width} × {selectedLog.metadata.height}
+									<span class="font-bold">Dimensions:</span>
+									{selectedLog.metadata.width} × {selectedLog.metadata.height}
 								</div>
 							{/if}
 							{#if selectedLog.metadata.format}
 								<div class="text-gray-700">
-									<span class="font-bold">Format:</span> {selectedLog.metadata.format}
+									<span class="font-bold">Format:</span>
+									{selectedLog.metadata.format}
 								</div>
 							{/if}
 							{#if selectedLog.metadata.templateName}
 								<div class="text-gray-700">
-									<span class="font-bold">Template:</span> {selectedLog.metadata.templateName}
+									<span class="font-bold">Template:</span>
+									{selectedLog.metadata.templateName}
 								</div>
 							{/if}
 							{#if selectedLog.metadata.creditsUsed}
 								<div class="text-gray-700">
-									<span class="font-bold">Credits Used:</span> {selectedLog.metadata.creditsUsed}
+									<span class="font-bold">Credits Used:</span>
+									{selectedLog.metadata.creditsUsed}
 								</div>
 							{/if}
 							{#if selectedLog.metadata.url}
 								<div class="text-gray-700">
 									<span class="font-bold">URL:</span>
-									<a href={selectedLog.metadata.url} target="_blank" class="text-[#ff6b6b] hover:underline break-all font-bold">
+									<a
+										href={selectedLog.metadata.url}
+										target="_blank"
+										class="text-[#ff6b6b] hover:underline break-all font-bold"
+									>
 										{selectedLog.metadata.url}
 									</a>
 								</div>
 							{/if}
 							{#if selectedLog.metadata.batchSize}
 								<div class="text-gray-700">
-									<span class="font-bold">Batch Size:</span> {selectedLog.metadata.batchSize}
+									<span class="font-bold">Batch Size:</span>
+									{selectedLog.metadata.batchSize}
 								</div>
 							{/if}
 							{#if selectedLog.metadata.variablesUsed?.length}
 								<div class="text-gray-700">
-									<span class="font-bold">Variables:</span> {selectedLog.metadata.variablesUsed.join(', ')}
+									<span class="font-bold">Variables:</span>
+									{selectedLog.metadata.variablesUsed.join(', ')}
 								</div>
 							{/if}
 						</div>
@@ -695,9 +861,9 @@
 					<div class="bg-[#ff6b6b]/10 rounded-xl border-[3px] border-[#ff6b6b] p-4">
 						<h3 class="text-sm font-bold text-[#ff6b6b] mb-2">Error Details</h3>
 						<p class="text-[#ff6b6b] font-medium">{selectedLog.error.message}</p>
-							{#if selectedLog.error.code}
+						{#if selectedLog.error.code}
 							<p class="text-[#ff6b6b]/80 text-sm mt-1">Code: {selectedLog.error.code}</p>
-							{/if}
+						{/if}
 					</div>
 				{/if}
 			</div>

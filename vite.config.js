@@ -9,10 +9,7 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	resolve: {
 		alias: {
-			'@imgly/background-removal': resolve(
-				projectRoot,
-				'src/lib/shims/backgroundRemovalStub.js'
-			)
+			'@imgly/background-removal': resolve(projectRoot, 'src/lib/shims/backgroundRemovalStub.js')
 		}
 	},
 	optimizeDeps: {

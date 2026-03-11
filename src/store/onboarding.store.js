@@ -59,10 +59,7 @@ export const showOnboarding = derived(
 export const personalization = derived(onboardingStore, ($store) => $store.personalization);
 
 // Derived: Should show the welcome wizard
-export const showWelcomeWizard = derived(
-	onboardingStore,
-	($store) => $store.showWelcomeWizard
-);
+export const showWelcomeWizard = derived(onboardingStore, ($store) => $store.showWelcomeWizard);
 
 // Derived: Get the current (first incomplete) step
 export const currentStep = derived(onboardingStore, ($store) => {
@@ -264,7 +261,11 @@ export const savePersonalizationAction = async ({ useCase, integrationMode }) =>
 
 		onboardingStore.update((state) => ({
 			...state,
-			personalization: status.personalization || { useCase, integrationMode, completedAt: new Date().toISOString() },
+			personalization: status.personalization || {
+				useCase,
+				integrationMode,
+				completedAt: new Date().toISOString()
+			},
 			showWelcomeWizard: false
 		}));
 

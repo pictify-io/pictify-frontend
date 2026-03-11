@@ -1,5 +1,5 @@
 ---
-title: "fix: Dynamic Link Functionality Not Working in Local Setup"
+title: 'fix: Dynamic Link Functionality Not Working in Local Setup'
 type: fix
 date: 2026-01-31
 deepened: 2026-01-31
@@ -38,6 +38,7 @@ The Dynamic Link feature (internally called "Bindings") enables dynamic image ge
 5. Correct authentication flow between frontend and backend
 
 The frontend is attempting to call these API endpoints:
+
 - `GET /templates/{uid}` - Get template details
 - `GET /templates/{uid}/variables` - Get template variables
 - `GET /bindings?templateId={uid}` - Get existing bindings
@@ -65,6 +66,7 @@ logBindingRender(binding.userId, { ... })  // Lines 262, 291
 ```
 
 **Impact:**
+
 - All webhook events (`binding.failed`, `binding.updated`, `render.completed`) have `userId: undefined`
 - User storage uploads fail with undefined userId
 - Audit logging receives undefined userId
@@ -84,6 +86,7 @@ if (!authTokens && !authTokens['auth-token']) {
 ```
 
 **Problem:** This condition uses AND (`&&`) when it should use OR (`||`). The expression `!authTokens && !authTokens['auth-token']` will:
+
 - Never enter the block if `authTokens` is truthy (because `!authTokens` is false)
 - Throw an error if `authTokens` is falsy (can't access property of null/undefined)
 
@@ -113,10 +116,12 @@ const isCredentialsSupported = 'credentials' in Request.prototype;
 ### Issue 4: HIGH - Type Mismatch in `createdBy` Field
 
 **Files:**
+
 - `/Users/suyashthakur/html-to-gif/routes/bindings.js` (uses `user._id` directly)
 - `/Users/suyashthakur/html-to-gif/routes/data-sources.js` (uses `user._id.toString()`)
 
 **Examples:**
+
 ```javascript
 // bindings.js line 264 - ObjectId
 createdBy: user._id,
@@ -138,10 +143,10 @@ createdBy: user._id.toString(),
 
 ```javascript
 const [templateRes, variablesRes, bindingsRes, dataSourcesRes] = await Promise.all([
-    getTemplateById(uid),
-    getTemplateVariables(uid),
-    getBindingsForTemplate(uid),
-    getDataSources()
+	getTemplateById(uid),
+	getTemplateVariables(uid),
+	getBindingsForTemplate(uid),
+	getDataSources()
 ]);
 ```
 
@@ -157,9 +162,9 @@ const [templateRes, variablesRes, bindingsRes, dataSourcesRes] = await Promise.a
 **Line:** 14
 
 ```javascript
-const keyHex = process.env.CREDENTIAL_ENCRYPTION_KEY
+const keyHex = process.env.CREDENTIAL_ENCRYPTION_KEY;
 if (!keyHex) {
-  throw new Error('CREDENTIAL_ENCRYPTION_KEY environment variable is required')
+	throw new Error('CREDENTIAL_ENCRYPTION_KEY environment variable is required');
 }
 ```
 
@@ -174,12 +179,12 @@ if (!keyHex) {
 
 ```javascript
 try {
-  const data = await response.json();
-  if (data && data.message) {
-    message = data.message;
-  }
+	const data = await response.json();
+	if (data && data.message) {
+		message = data.message;
+	}
 } catch (e) {
-  // ignore  <-- SILENTLY SWALLOWS ERRORS!
+	// ignore  <-- SILENTLY SWALLOWS ERRORS!
 }
 ```
 
@@ -190,12 +195,13 @@ try {
 ### Issue 8: MEDIUM - Missing `active` Filter in List Queries
 
 **Files:**
+
 - `/Users/suyashthakur/html-to-gif/routes/data-sources.js` (line 126)
 - `/Users/suyashthakur/html-to-gif/routes/bindings.js` (line 311)
 
 ```javascript
-const dataSources = await DataSource.find(query)  // NO active filter
-const total = await DataSource.countDocuments({ ...query, active: true })  // HAS active filter
+const dataSources = await DataSource.find(query); // NO active filter
+const total = await DataSource.countDocuments({ ...query, active: true }); // HAS active filter
 ```
 
 **Impact:** Soft-deleted items appear in list results but aren't counted accurately. Pagination is broken.
@@ -211,6 +217,7 @@ const total = await DataSource.countDocuments({ ...query, active: true })  // HA
 **File:** `/Users/suyashthakur/html-to-gif/service/binding-renderer.js`
 
 Replace all 8 occurrences:
+
 - Line 127: `userId: binding.createdBy,`
 - Line 179: `await hasActiveStorageConnector(binding.createdBy)`
 - Line 182: `userId: binding.createdBy,`
@@ -268,6 +275,7 @@ const isCredentialsSupported = 'credentials' in Request.prototype;
 ```
 
 For all HTTP methods (get, post, put, delete, patch), change:
+
 ```javascript
 credentials: isCredentialsSupported ? 'include' : undefined,
 // To:
@@ -281,46 +289,47 @@ credentials: 'include',
 
 ```javascript
 const loadData = async () => {
-    const thisLoad = ++loadVersion;
-    isLoading = true;
+	const thisLoad = ++loadVersion;
+	isLoading = true;
 
-    try {
-        const [templateRes, variablesRes, bindingsRes, dataSourcesRes] = await Promise.allSettled([
-            getTemplateById(uid),
-            getTemplateVariables(uid),
-            getBindingsForTemplate(uid),
-            getDataSources()
-        ]);
+	try {
+		const [templateRes, variablesRes, bindingsRes, dataSourcesRes] = await Promise.allSettled([
+			getTemplateById(uid),
+			getTemplateVariables(uid),
+			getBindingsForTemplate(uid),
+			getDataSources()
+		]);
 
-        if (!mounted || thisLoad !== loadVersion) return;
+		if (!mounted || thisLoad !== loadVersion) return;
 
-        // Template is required
-        if (templateRes.status === 'rejected' || !templateRes.value?.template) {
-            toast.set({ message: 'Template not found', type: 'error', duration: 3000 });
-            goto('/dashboard/template');
-            return;
-        }
+		// Template is required
+		if (templateRes.status === 'rejected' || !templateRes.value?.template) {
+			toast.set({ message: 'Template not found', type: 'error', duration: 3000 });
+			goto('/dashboard/template');
+			return;
+		}
 
-        template = templateRes.value.template;
-        variables = variablesRes.status === 'fulfilled' ? (variablesRes.value?.variables || []) : [];
-        existingBindings = bindingsRes.status === 'fulfilled' ? (bindingsRes.value?.bindings || []) : [];
-        dataSources = dataSourcesRes.status === 'fulfilled' ? (dataSourcesRes.value?.dataSources || []) : [];
+		template = templateRes.value.template;
+		variables = variablesRes.status === 'fulfilled' ? variablesRes.value?.variables || [] : [];
+		existingBindings = bindingsRes.status === 'fulfilled' ? bindingsRes.value?.bindings || [] : [];
+		dataSources =
+			dataSourcesRes.status === 'fulfilled' ? dataSourcesRes.value?.dataSources || [] : [];
 
-        // Warn about partial failures
-        if (dataSourcesRes.status === 'rejected') {
-            console.error('Failed to load data sources:', dataSourcesRes.reason);
-        }
+		// Warn about partial failures
+		if (dataSourcesRes.status === 'rejected') {
+			console.error('Failed to load data sources:', dataSourcesRes.reason);
+		}
 
-        // ... rest of initialization
-    } catch (error) {
-        if (!mounted || thisLoad !== loadVersion) return;
-        console.error('Error loading data:', error);
-        toast.set({ message: 'Failed to load data', type: 'error', duration: 3000 });
-    } finally {
-        if (mounted && thisLoad === loadVersion) {
-            isLoading = false;
-        }
-    }
+		// ... rest of initialization
+	} catch (error) {
+		if (!mounted || thisLoad !== loadVersion) return;
+		console.error('Error loading data:', error);
+		toast.set({ message: 'Failed to load data', type: 'error', duration: 3000 });
+	} finally {
+		if (mounted && thisLoad === loadVersion) {
+			isLoading = false;
+		}
+	}
 };
 ```
 
@@ -331,6 +340,7 @@ const loadData = async () => {
 **File:** `/Users/suyashthakur/front-end-html-to-gif/src/service/backend.js`
 
 Add better error logging in catch blocks:
+
 ```javascript
 } catch (e) {
   console.error('Failed to parse error response:', e);
@@ -345,10 +355,10 @@ Add better error logging in catch blocks:
 
 ```javascript
 // Before
-const dataSources = await DataSource.find(query)
+const dataSources = await DataSource.find(query);
 
 // After
-const dataSources = await DataSource.find({ ...query, active: true })
+const dataSources = await DataSource.find({ ...query, active: true });
 ```
 
 Same for `/Users/suyashthakur/html-to-gif/routes/bindings.js` line 311.
@@ -372,20 +382,21 @@ Backend (Fastify @ localhost:3000)
 
 ### Key Files
 
-| Component | File Path | Issues Found |
-|-----------|-----------|--------------|
-| Frontend Dynamic Page | `src/routes/dashboard/template/[uid]/dynamic/+page.svelte` | Promise.all issue |
-| Frontend API Client | `src/api/binding.js` | No issues |
-| Frontend Backend Service | `src/service/backend.js` | Credentials bug, silent errors |
-| Backend Bindings Routes | `/html-to-gif/routes/bindings.js` | createdBy type, active filter |
-| Backend Data Sources Routes | `/html-to-gif/routes/data-sources.js` | createdBy type, active filter |
-| Backend Auth Plugin | `/html-to-gif/plugins/decorate_user.js` | Logic error line 27 |
-| Backend Binding Renderer | `/html-to-gif/service/binding-renderer.js` | userId → createdBy (8 places) |
-| Backend Encryption Service | `/html-to-gif/service/encryption-service.js` | Missing env var |
+| Component                   | File Path                                                  | Issues Found                   |
+| --------------------------- | ---------------------------------------------------------- | ------------------------------ |
+| Frontend Dynamic Page       | `src/routes/dashboard/template/[uid]/dynamic/+page.svelte` | Promise.all issue              |
+| Frontend API Client         | `src/api/binding.js`                                       | No issues                      |
+| Frontend Backend Service    | `src/service/backend.js`                                   | Credentials bug, silent errors |
+| Backend Bindings Routes     | `/html-to-gif/routes/bindings.js`                          | createdBy type, active filter  |
+| Backend Data Sources Routes | `/html-to-gif/routes/data-sources.js`                      | createdBy type, active filter  |
+| Backend Auth Plugin         | `/html-to-gif/plugins/decorate_user.js`                    | Logic error line 27            |
+| Backend Binding Renderer    | `/html-to-gif/service/binding-renderer.js`                 | userId → createdBy (8 places)  |
+| Backend Encryption Service  | `/html-to-gif/service/encryption-service.js`               | Missing env var                |
 
 ### Authentication Flow
 
 The Dynamic Link endpoints require cookie-based authentication:
+
 1. User must be logged in via Google OAuth
 2. Session cookie must be present
 3. Frontend must send `credentials: 'include'` with requests
@@ -396,17 +407,20 @@ The Dynamic Link endpoints require cookie-based authentication:
 ## Acceptance Criteria
 
 ### Must Fix (Critical)
+
 - [x] Replace `binding.userId` with `binding.createdBy` in binding-renderer.js (8 places)
 - [x] Fix `&&` to `||` in decorate_user.js line 27
 - [x] Add `CREDENTIAL_ENCRYPTION_KEY` to backend `.env`
 - [x] Always use `credentials: 'include'` in frontend backend.js
 
 ### Should Fix (High Priority)
+
 - [x] Use `user._id.toString()` consistently in bindings.js
 - [x] Use `Promise.allSettled` in dynamic page loadData
 - [x] Add `active: true` filter to list queries
 
 ### Nice to Have (Medium Priority)
+
 - [ ] Add better error logging instead of silent catch
 - [ ] Add request timeout to frontend fetch calls
 - [ ] Parallelize sequential DB queries in list endpoints
@@ -454,12 +468,14 @@ After starting services, the following code fixes are required for the feature t
 ### Research Insights from Security Sentinel
 
 **Well Implemented:**
+
 - SSRF protection with comprehensive IP range blocking
 - AES-256-GCM encryption for credentials
 - Proper toJSON transforms to hide sensitive data
 - Webhook signature validation with timing-safe comparison
 
 **Recommendations:**
+
 - Add URL format validation in JSON schemas
 - Implement key rotation mechanism for encryption
 - Add rate limiting to `/data-sources/test` endpoint
@@ -471,12 +487,14 @@ After starting services, the following code fixes are required for the feature t
 ### Research Insights from Performance Oracle
 
 **Issues Found:**
+
 - DNS resolution blocks sequentially (both IPv4 and IPv6)
 - No timeout on frontend fetch calls
 - Sequential DB queries in list endpoints
 - Browser pool initialization blocks server startup
 
 **Recommendations:**
+
 - Use Promise.allSettled for DNS resolution with timeout
 - Add AbortController with timeout to frontend fetch
 - Parallelize count and find queries

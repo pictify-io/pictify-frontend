@@ -22,7 +22,9 @@
 			{title}<slot name="title-extra" />
 		</span>
 		<i
-			class="fa fa-chevron-{open ? 'up' : 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"
+			class="fa fa-chevron-{open
+				? 'up'
+				: 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"
 		/>
 	</button>
 	{#if open}

@@ -1,35 +1,31 @@
 <script>
 	import { editor } from '../../../store/editor.store';
-	import { 
-		createQRCode, 
-		formatQRData, 
-		QR_CONTENT_TYPES
-	} from '../../utils/fabric-qr';
-	
+	import { createQRCode, formatQRData, QR_CONTENT_TYPES } from '../../utils/fabric-qr';
+
 	// QR code configuration state
 	let selectedContentType = 'url';
 	let qrContent = '';
-	
+
 	// WiFi-specific fields
 	let wifiSSID = '';
 	let wifiPassword = '';
 	let wifiEncryption = 'WPA';
 	let wifiHidden = false;
-	
+
 	// Email-specific fields
 	let emailAddress = '';
 	let emailSubject = '';
 	let emailBody = '';
-	
+
 	// SMS-specific fields
 	let smsPhone = '';
 	let smsBody = '';
-	
+
 	function getContentPlaceholder() {
-		const type = QR_CONTENT_TYPES.find(t => t.type === selectedContentType);
+		const type = QR_CONTENT_TYPES.find((t) => t.type === selectedContentType);
 		return type?.placeholder || 'Enter content...';
 	}
-	
+
 	function getFormattedData() {
 		switch (selectedContentType) {
 			case 'url':
@@ -58,7 +54,7 @@
 				return qrContent;
 		}
 	}
-	
+
 	async function addQRCode() {
 		if (!$editor) return;
 
@@ -100,18 +96,18 @@
 			alert('Failed to create QR code. Please try again.');
 		}
 	}
-	
+
 	function addQuickQR(type) {
 		selectedContentType = type;
 		const placeholders = {
-			'url': 'https://example.com',
-			'text': 'Hello World',
-			'email': 'hello@example.com',
-			'phone': '+1234567890',
-			'sms': '+1234567890',
-			'wifi': 'MyNetwork'
+			url: 'https://example.com',
+			text: 'Hello World',
+			email: 'hello@example.com',
+			phone: '+1234567890',
+			sms: '+1234567890',
+			wifi: 'MyNetwork'
 		};
-		
+
 		if (type === 'wifi') {
 			wifiSSID = placeholders.wifi;
 			wifiPassword = 'password123';
@@ -122,10 +118,10 @@
 		} else {
 			qrContent = placeholders[type] || '';
 		}
-		
+
 		addQRCode();
 	}
-	
+
 	function resetForm() {
 		qrContent = '';
 		wifiSSID = '';
@@ -136,7 +132,7 @@
 		smsPhone = '';
 		smsBody = '';
 	}
-	
+
 	function handleContentTypeChange() {
 		resetForm();
 	}
@@ -148,31 +144,31 @@
 		<h3 class="section-title">Quick Add</h3>
 		<div class="quick-grid">
 			{#each QR_CONTENT_TYPES as type}
-				<button 
+				<button
 					class="quick-item"
 					on:click={() => addQuickQR(type.type)}
 					title="Add {type.label} QR Code"
 				>
-					<i class="fa {type.icon} icon"></i>
+					<i class="fa {type.icon} icon" />
 					<span class="label">{type.label}</span>
 				</button>
 			{/each}
 		</div>
 		<p class="hint-text">
-			<i class="fa fa-info-circle"></i> 
+			<i class="fa fa-info-circle" />
 			Select a QR code to customize its design in the Properties panel
 		</p>
 	</div>
-	
+
 	<!-- Custom QR Code Section -->
 	<div class="section">
 		<h3 class="section-title">Custom Content</h3>
-		
+
 		<!-- Content Type Selector -->
 		<div class="input-group">
 			<label for="content-type">Type</label>
-			<select 
-				id="content-type" 
+			<select
+				id="content-type"
 				bind:value={selectedContentType}
 				on:change={handleContentTypeChange}
 			>
@@ -181,26 +177,16 @@
 				{/each}
 			</select>
 		</div>
-		
+
 		<!-- Dynamic Content Input -->
 		{#if selectedContentType === 'wifi'}
 			<div class="input-group">
 				<label for="wifi-ssid">Network Name</label>
-				<input 
-					id="wifi-ssid"
-					type="text" 
-					bind:value={wifiSSID}
-					placeholder="MyNetwork"
-				/>
+				<input id="wifi-ssid" type="text" bind:value={wifiSSID} placeholder="MyNetwork" />
 			</div>
 			<div class="input-group">
 				<label for="wifi-password">Password</label>
-				<input 
-					id="wifi-password"
-					type="text" 
-					bind:value={wifiPassword}
-					placeholder="password"
-				/>
+				<input id="wifi-password" type="text" bind:value={wifiPassword} placeholder="password" />
 			</div>
 			<div class="input-group">
 				<label for="wifi-encryption">Security</label>
@@ -213,56 +199,41 @@
 		{:else if selectedContentType === 'email'}
 			<div class="input-group">
 				<label for="email-address">Email</label>
-				<input 
+				<input
 					id="email-address"
-					type="email" 
+					type="email"
 					bind:value={emailAddress}
 					placeholder="hello@example.com"
 				/>
 			</div>
 			<div class="input-group">
 				<label for="email-subject">Subject</label>
-				<input 
-					id="email-subject"
-					type="text" 
-					bind:value={emailSubject}
-					placeholder="Optional"
-				/>
+				<input id="email-subject" type="text" bind:value={emailSubject} placeholder="Optional" />
 			</div>
 		{:else if selectedContentType === 'sms'}
 			<div class="input-group">
 				<label for="sms-phone">Phone</label>
-				<input 
-					id="sms-phone"
-					type="tel" 
-					bind:value={smsPhone}
-					placeholder="+1234567890"
-				/>
+				<input id="sms-phone" type="tel" bind:value={smsPhone} placeholder="+1234567890" />
 			</div>
 			<div class="input-group">
 				<label for="sms-body">Message</label>
-				<input 
-					id="sms-body"
-					type="text"
-					bind:value={smsBody}
-					placeholder="Optional"
-				/>
+				<input id="sms-body" type="text" bind:value={smsBody} placeholder="Optional" />
 			</div>
 		{:else}
 			<div class="input-group">
 				<label for="qr-content">{selectedContentType === 'url' ? 'URL' : 'Text'}</label>
-				<input 
+				<input
 					id="qr-content"
-					type="text" 
+					type="text"
 					bind:value={qrContent}
 					placeholder={getContentPlaceholder()}
 				/>
 			</div>
 		{/if}
-		
+
 		<!-- Add Button -->
 		<button class="add-btn" on:click={addQRCode}>
-			<i class="fa fa-plus"></i>
+			<i class="fa fa-plus" />
 			Add QR Code
 		</button>
 	</div>
@@ -275,13 +246,13 @@
 		flex-direction: column;
 		gap: 12px;
 	}
-	
+
 	.section {
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
 	}
-	
+
 	.section-title {
 		font-size: 10px;
 		font-weight: 700;
@@ -292,7 +263,7 @@
 		border-bottom: 2px solid #111827;
 		padding-bottom: 4px;
 	}
-	
+
 	.hint-text {
 		font-size: 10px;
 		color: #6b7280;
@@ -301,13 +272,13 @@
 		align-items: center;
 		gap: 4px;
 	}
-	
+
 	.quick-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
 		gap: 6px;
 	}
-	
+
 	.quick-item {
 		display: flex;
 		flex-direction: column;
@@ -321,17 +292,17 @@
 		transition: all 0.1s ease;
 		box-shadow: 2px 2px 0 0 #111827;
 	}
-	
+
 	.quick-item:hover {
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0 0 #ffc480;
 	}
-	
+
 	.quick-item .icon {
 		font-size: 16px;
 		color: #111827;
 	}
-	
+
 	.quick-item .label {
 		font-size: 9px;
 		font-weight: 700;
@@ -339,20 +310,20 @@
 		text-align: center;
 		text-transform: uppercase;
 	}
-	
+
 	.input-group {
 		display: flex;
 		flex-direction: column;
 		gap: 3px;
 	}
-	
+
 	.input-group label {
 		font-size: 10px;
 		font-weight: 700;
 		color: #111827;
 		text-transform: uppercase;
 	}
-	
+
 	.input-group input,
 	.input-group select {
 		padding: 6px 8px;
@@ -362,13 +333,13 @@
 		background: #fff;
 		box-shadow: 2px 2px 0 0 #111827;
 	}
-	
+
 	.input-group input:focus,
 	.input-group select:focus {
 		outline: none;
 		box-shadow: 2px 2px 0 0 #ffc480;
 	}
-	
+
 	.add-btn {
 		display: flex;
 		align-items: center;
@@ -387,7 +358,7 @@
 		transition: all 0.1s ease;
 		box-shadow: 2px 2px 0 0 #ffc480;
 	}
-	
+
 	.add-btn:hover {
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0 0 #ffc480;

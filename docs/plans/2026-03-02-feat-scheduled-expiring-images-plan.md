@@ -1,5 +1,5 @@
 ---
-title: "feat: Scheduled & Expiring Images (Phase 3)"
+title: 'feat: Scheduled & Expiring Images (Phase 3)'
 type: feat
 status: active
 date: 2026-03-02
@@ -43,29 +43,29 @@ Users want to schedule different images for different time periods — seasonal 
 ```javascript
 // service/schedule-resolver.js
 function resolveScheduledVariant(experiment) {
-  const now = new Date()
+	const now = new Date();
 
-  // Hard expiry check
-  if (experiment.expiresAt && now > new Date(experiment.expiresAt)) {
-    return { expired: true, fallbackUrl: experiment.fallbackImageUrl }
-  }
+	// Hard expiry check
+	if (experiment.expiresAt && now > new Date(experiment.expiresAt)) {
+		return { expired: true, fallbackUrl: experiment.fallbackImageUrl };
+	}
 
-  // Find variants with active time windows
-  const active = experiment.variants
-    .filter(v => {
-      if (!v.schedule?.startAt) return false
-      const start = new Date(v.schedule.startAt)
-      const end = v.schedule.endAt ? new Date(v.schedule.endAt) : null
-      return start <= now && (!end || end > now)
-    })
-    .sort((a, b) => new Date(b.schedule.startAt) - new Date(a.schedule.startAt))
+	// Find variants with active time windows
+	const active = experiment.variants
+		.filter((v) => {
+			if (!v.schedule?.startAt) return false;
+			const start = new Date(v.schedule.startAt);
+			const end = v.schedule.endAt ? new Date(v.schedule.endAt) : null;
+			return start <= now && (!end || end > now);
+		})
+		.sort((a, b) => new Date(b.schedule.startAt) - new Date(a.schedule.startAt));
 
-  // Latest startAt wins when multiple active
-  if (active.length > 0) return { variant: active[0], expired: false }
+	// Latest startAt wins when multiple active
+	if (active.length > 0) return { variant: active[0], expired: false };
 
-  // Fallback: default variant or first
-  const fallback = experiment.variants.find(v => v.isDefault) || experiment.variants[0]
-  return { variant: fallback, expired: false }
+	// Fallback: default variant or first
+	const fallback = experiment.variants.find((v) => v.isDefault) || experiment.variants[0];
+	return { variant: fallback, expired: false };
 }
 ```
 
@@ -89,25 +89,27 @@ case 'scheduled': {
 Pattern: copy `binding-refresh-queue.js` structure.
 
 **Two job types:**
+
 - `check-schedules` (repeatable, every 5 min): Queries MongoDB for scheduled experiments with variants starting within next 10 min that haven't been pre-rendered. Queues individual pre-render jobs.
 - `expire-experiments` (repeatable, every 5 min): Finds experiments with `expiresAt < now` that are still `active: true`, sets `status: 'completed'`.
 
 ```javascript
 // Scheduler query (find upcoming variants needing pre-render)
 const upcoming = await Experiment.find({
-  active: true,
-  type: 'scheduled',
-  status: 'running',
-  'variants.schedule.startAt': {
-    $lte: new Date(Date.now() + 10 * 60 * 1000), // Within 10 min
-    $gte: new Date() // Not in the past
-  }
-}).lean()
+	active: true,
+	type: 'scheduled',
+	status: 'running',
+	'variants.schedule.startAt': {
+		$lte: new Date(Date.now() + 10 * 60 * 1000), // Within 10 min
+		$gte: new Date() // Not in the past
+	}
+}).lean();
 ```
 
 ### 4. ScheduleEditor.svelte
 
 Per-variant schedule editing with:
+
 - Date/time inputs (native `<input type="datetime-local">`) per variant
 - Display in browser timezone, store as UTC ISO strings
 - Visual timeline showing variant windows on a horizontal axis
@@ -120,6 +122,7 @@ Per-variant schedule editing with:
 Route: `/dashboard/experiments/create/scheduled/+page.svelte`
 
 Wizard steps:
+
 1. **Setup** — Name, slug, template selection
 2. **Variants** — Add variants with template/variables
 3. **Schedule** — ScheduleEditor for time windows per variant + expiry
@@ -134,21 +137,21 @@ Wizard steps:
 
 ### Backend (`/Users/suyashthakur/html-to-gif`)
 
-| File | Action | Est. Lines |
-|------|--------|-----------|
-| `service/schedule-resolver.js` | CREATE | ~50 |
-| `service/experiment-scheduler.js` | CREATE | ~200 |
-| `routes/experiment-render.js` | MODIFY (replace scheduled stub) | ~15 |
-| `server.js` | MODIFY (register scheduler worker) | ~15 |
+| File                              | Action                             | Est. Lines |
+| --------------------------------- | ---------------------------------- | ---------- |
+| `service/schedule-resolver.js`    | CREATE                             | ~50        |
+| `service/experiment-scheduler.js` | CREATE                             | ~200       |
+| `routes/experiment-render.js`     | MODIFY (replace scheduled stub)    | ~15        |
+| `server.js`                       | MODIFY (register scheduler worker) | ~15        |
 
 ### Frontend (`/Users/suyashthakur/front-end-html-to-gif`)
 
-| File | Action | Est. Lines |
-|------|--------|-----------|
-| `src/lib/components/experiments/ScheduleEditor.svelte` | CREATE | ~500 |
-| `src/routes/dashboard/experiments/create/scheduled/+page.svelte` | CREATE | ~800 |
-| `src/routes/dashboard/experiments/+page.svelte` | MODIFY (enable button) | ~10 |
-| `src/routes/dashboard/experiments/[uid]/+page.svelte` | MODIFY (schedule display) | ~100 |
+| File                                                             | Action                    | Est. Lines |
+| ---------------------------------------------------------------- | ------------------------- | ---------- |
+| `src/lib/components/experiments/ScheduleEditor.svelte`           | CREATE                    | ~500       |
+| `src/routes/dashboard/experiments/create/scheduled/+page.svelte` | CREATE                    | ~800       |
+| `src/routes/dashboard/experiments/+page.svelte`                  | MODIFY (enable button)    | ~10        |
+| `src/routes/dashboard/experiments/[uid]/+page.svelte`            | MODIFY (schedule display) | ~100       |
 
 ## Acceptance Criteria
 

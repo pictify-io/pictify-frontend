@@ -38,7 +38,7 @@ export function getCanonicalOverride(pathname, params = {}) {
 
 	// Handle sort/filter params - canonical should point to unfiltered
 	const filterParams = ['sort', 'filter', 'order', 'q'];
-	const hasFilterParams = filterParams.some(p => params[p]);
+	const hasFilterParams = filterParams.some((p) => params[p]);
 	if (hasFilterParams) {
 		return generateCanonical(pathname);
 	}

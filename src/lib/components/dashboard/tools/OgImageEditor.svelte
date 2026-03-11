@@ -35,9 +35,9 @@
 		subHeadingColor: { r: 0, g: 0, b: 0 }
 	};
 
-	let backgroundColorRgb = {r: 255, g: 255, b: 255};
-	let headingColorRgb = {r: 0, g: 0, b: 0};
-	let subHeadingColorRgb = {r: 0, g: 0, b: 0};
+	let backgroundColorRgb = { r: 255, g: 255, b: 255 };
+	let headingColorRgb = { r: 0, g: 0, b: 0 };
+	let subHeadingColorRgb = { r: 0, g: 0, b: 0 };
 	let logoWidth = 150;
 
 	let previewFrame;
@@ -54,7 +54,7 @@
 			// Only update if width actually changed
 			if (containerWidth !== lastContainerWidth) {
 				lastContainerWidth = containerWidth;
-				const newScale = containerWidth / 1200 ;
+				const newScale = containerWidth / 1200;
 				if (newScale !== scale) {
 					scale = newScale;
 					if (previewFrame) {
@@ -111,8 +111,6 @@
 		}
 	}
 
-	
-
 	const editorConfig = {
 		basicSetup: true,
 		extensions: [EditorView.lineWrapping],
@@ -124,7 +122,7 @@
 
 	// Font options
 	const popularFonts = [
-		{id:'Arial', name: 'Arial', className: 'arial'},
+		{ id: 'Arial', name: 'Arial', className: 'arial' },
 		{ id: 'Roboto', name: 'Roboto', className: 'roboto' },
 		{ id: 'Open Sans', name: 'Open Sans', className: 'open-sans' },
 		{ id: 'Montserrat', name: 'Montserrat', className: 'montserrat' },
@@ -205,10 +203,16 @@
 			try {
 				// Update colors in the preview
 				const root = previewDoc.documentElement;
-				root.style.setProperty('--primary-color', `rgb(${backgroundColorRgb.r}, ${backgroundColorRgb.g}, ${backgroundColorRgb.b})`);
-				root.style.setProperty('--secondary-color', `rgb(${headingColorRgb.r}, ${headingColorRgb.g}, ${headingColorRgb.b})`);
+				root.style.setProperty(
+					'--primary-color',
+					`rgb(${backgroundColorRgb.r}, ${backgroundColorRgb.g}, ${backgroundColorRgb.b})`
+				);
+				root.style.setProperty(
+					'--secondary-color',
+					`rgb(${headingColorRgb.r}, ${headingColorRgb.g}, ${headingColorRgb.b})`
+				);
 				root.style.fontFamily = selectedFont.id;
-				
+
 				// Update codeHTML with the current state of the preview
 				codeHTML = previewDoc.documentElement.outerHTML;
 			} catch (error) {
@@ -221,7 +225,10 @@
 		try {
 			// Create a temporary DOM parser to extract values from HTML
 			const parser = new DOMParser();
-			const doc = parser.parseFromString(typeof template === 'string' ? template : template.html, 'text/html');
+			const doc = parser.parseFromString(
+				typeof template === 'string' ? template : template.html,
+				'text/html'
+			);
 
 			// Extract heading and subheading
 			const heading = doc.querySelector('#template-heading');
@@ -241,7 +248,7 @@
 			// Function to extract RGB values from different formats
 			const extractRGB = (colorString) => {
 				if (!colorString) return null;
-				
+
 				// Handle hex colors
 				if (colorString.startsWith('#')) {
 					const hex = colorString.replace('#', '');
@@ -251,7 +258,7 @@
 						b: parseInt(hex.substring(4, 6), 16)
 					};
 				}
-				
+
 				// Handle rgb/rgba colors
 				const rgbMatch = colorString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
 				if (rgbMatch) {
@@ -327,11 +334,12 @@
 				tempFrame.style.display = 'none';
 				document.body.appendChild(tempFrame);
 				tempFrame.contentDocument.write(doc.documentElement.outerHTML);
-				
+
 				try {
 					const computedContainer = tempFrame.contentDocument.querySelector('.container');
 					const computedHeading = tempFrame.contentDocument.querySelector('#template-heading');
-					const computedSubheading = tempFrame.contentDocument.querySelector('#template-subheading');
+					const computedSubheading =
+						tempFrame.contentDocument.querySelector('#template-subheading');
 
 					if (computedContainer) {
 						const bgColor = getComputedStyle(computedContainer).backgroundColor;
@@ -356,9 +364,11 @@
 			}
 
 			// Extract font family
-			const fontFamily = doc.documentElement.getAttribute('style')?.match(/font-family:\s*['"]([^'"]+)['"]/)?.[1];
+			const fontFamily = doc.documentElement
+				.getAttribute('style')
+				?.match(/font-family:\s*['"]([^'"]+)['"]/)?.[1];
 			if (fontFamily) {
-				const matchedFont = popularFonts.find(font => fontFamily.includes(font.id));
+				const matchedFont = popularFonts.find((font) => fontFamily.includes(font.id));
 				if (matchedFont) {
 					selectedFont = matchedFont;
 				}
@@ -389,7 +399,7 @@
 			return;
 		}
 
-		dispatch('save', { 
+		dispatch('save', {
 			template: codeHTML,
 			settings: {
 				...settings,
@@ -415,8 +425,8 @@
 		})
 			.then(({ image }) => {
 				imageUrl = image.url;
-				dispatch('generated', { 
-					imageUrl, 
+				dispatch('generated', {
+					imageUrl,
 					template: codeHTML,
 					settings: {
 						...settings,
@@ -444,21 +454,27 @@
 	<div class="border-b-2 border-gray-900">
 		<div class="flex bg-black p-2 justify-between items-center">
 			<div class="flex">
-					<button
-						on:click={() => currentTab = 'visual'}
-						class="px-4 py-2 rounded text-sm {currentTab === 'visual' ? 'bg-white text-black' : 'bg-gray-500 text-white'}"
-					>
-						Visual Editor
-					</button>
-					<button
-						on:click={() => currentTab = 'code'}
-						class="ml-4 px-4 py-2 rounded text-sm {currentTab === 'code' ? 'bg-white text-black' : 'bg-gray-500 text-white'}"
-					>
-						HTML
-					</button>
+				<button
+					on:click={() => (currentTab = 'visual')}
+					class="px-4 py-2 rounded text-sm {currentTab === 'visual'
+						? 'bg-white text-black'
+						: 'bg-gray-500 text-white'}"
+				>
+					Visual Editor
+				</button>
+				<button
+					on:click={() => (currentTab = 'code')}
+					class="ml-4 px-4 py-2 rounded text-sm {currentTab === 'code'
+						? 'bg-white text-black'
+						: 'bg-gray-500 text-white'}"
+				>
+					HTML
+				</button>
 			</div>
 			{#if isSavedTemplate && template?.uid}
-				<div class="ml-4 px-3 py-1 bg-gray-700 text-white rounded text-xs font-mono flex items-center gap-2">
+				<div
+					class="ml-4 px-3 py-1 bg-gray-700 text-white rounded text-xs font-mono flex items-center gap-2"
+				>
 					<span>UID: {template.uid}</span>
 					<button
 						class="hover:text-[#ff6b6b] transition-colors"
@@ -467,8 +483,19 @@
 							toast.set({ message: 'UID copied to clipboard', type: 'success', duration: 1500 });
 						}}
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+							/>
 						</svg>
 					</button>
 				</div>
@@ -528,7 +555,7 @@
 							bind:value={settings.subHeading}
 							on:input={updateSubHeading}
 							placeholder="Enter sub heading"
-						></textarea>
+						/>
 					</div>
 					<div>
 						<label class="block text-sm font-medium text-gray-700">Logo</label>
@@ -622,7 +649,16 @@
 					{#if isSavedTemplate}
 						<button
 							class="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-md hover:bg-gray-100"
-							on:click={() => dispatch('update', { template: currentTab === 'code' ? codeHTML : (typeof template === 'string' ? template : template.html), settings })}
+							on:click={() =>
+								dispatch('update', {
+									template:
+										currentTab === 'code'
+											? codeHTML
+											: typeof template === 'string'
+											? template
+											: template.html,
+									settings
+								})}
 						>
 							Update Template
 						</button>
@@ -657,7 +693,11 @@
 			<div class="mt-8 p-4 border-2 border-gray-900 rounded-md">
 				<h3 class="text-lg font-bold mb-4">Generated Image</h3>
 				<div class="flex items-start gap-4">
-					<img src={imageUrl} alt="Generated OG Image" class="w-48 rounded-md border-2 border-gray-900" />
+					<img
+						src={imageUrl}
+						alt="Generated OG Image"
+						class="w-48 rounded-md border-2 border-gray-900"
+					/>
 					<div class="flex-1">
 						<p class="text-sm font-bold mb-2">Image URL:</p>
 						<div class="flex items-center gap-2">
@@ -671,7 +711,11 @@
 								class="px-3 py-1 bg-black text-white rounded-md text-sm hover:bg-gray-900"
 								on:click={() => {
 									navigator.clipboard.writeText(imageUrl);
-									toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 1500 });
+									toast.set({
+										message: 'URL copied to clipboard',
+										type: 'success',
+										duration: 1500
+									});
 								}}
 							>
 								Copy URL
@@ -729,4 +773,4 @@
 		position: relative;
 		overflow: hidden;
 	}
-</style> 
+</style>

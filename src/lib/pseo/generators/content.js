@@ -88,13 +88,13 @@ export function generateOverview(pageType, data) {
 
 		tool: [
 			'Convert HTML and CSS to {format} images instantly with Pictify. Our free online converter handles modern web technologies including Flexbox, Grid, and custom fonts.',
-			'{format} is ideal for {formatBenefit}. Pictify\'s conversion engine produces high-quality results that look exactly like your HTML renders in a browser.',
+			"{format} is ideal for {formatBenefit}. Pictify's conversion engine produces high-quality results that look exactly like your HTML renders in a browser.",
 			'Use our API to generate {format} images programmatically, or try the online tool for quick one-off conversions.'
 		],
 
 		toolDimension: [
 			'Generate {dimensions} {format} images from HTML and CSS. This size is optimized for {context}.',
-			'Pictify\'s converter handles {dimensions} resolution perfectly, ensuring your images display correctly without quality loss.',
+			"Pictify's converter handles {dimensions} resolution perfectly, ensuring your images display correctly without quality loss.",
 			'Use our API for automated {dimensions} image generation, or try the online tool to test your designs.'
 		],
 
@@ -104,10 +104,7 @@ export function generateOverview(pageType, data) {
 			'This comparison will help you understand the key differences and choose the right tool for your needs.'
 		],
 
-		glossary: [
-			'{shortDefinition}',
-			'{longDefinition}'
-		],
+		glossary: ['{shortDefinition}', '{longDefinition}'],
 
 		integration: [
 			'Connect Pictify with {name} to automate your image generation workflows. This integration enables you to {integrationBenefit}.',
@@ -117,7 +114,7 @@ export function generateOverview(pageType, data) {
 	};
 
 	const templates = overviewTemplates[pageType] || [];
-	return templates.map(template => interpolate(template, enrichData(pageType, data)));
+	return templates.map((template) => interpolate(template, enrichData(pageType, data)));
 }
 
 /**
@@ -173,7 +170,7 @@ export function generateBenefits(pageType, data) {
 	};
 
 	const templates = benefitTemplates[pageType] || [];
-	return templates.map(template => interpolate(template, enrichData(pageType, data)));
+	return templates.map((template) => interpolate(template, enrichData(pageType, data)));
 }
 
 /**
@@ -188,7 +185,10 @@ export function generateWorkflow(pageType, data) {
 
 	const workflowTemplates = {
 		tool: [
-			{ title: 'Write HTML/CSS', description: 'Create your design using familiar web technologies' },
+			{
+				title: 'Write HTML/CSS',
+				description: 'Create your design using familiar web technologies'
+			},
 			{ title: 'Call the API', description: 'Send your HTML to our conversion endpoint' },
 			{ title: 'Get your {format}', description: 'Receive a URL to your generated image' }
 		],
@@ -204,7 +204,7 @@ export function generateWorkflow(pageType, data) {
 	const templates = workflowTemplates[pageType];
 	if (!templates) return null;
 
-	return templates.map(step => ({
+	return templates.map((step) => ({
 		title: interpolate(step.title, enrichData(pageType, data)),
 		description: interpolate(step.description, enrichData(pageType, data))
 	}));
@@ -230,7 +230,7 @@ export function validateContent(pageType, data) {
 		data.longDefinition || '',
 		data.shortDefinition || '',
 		...(data.benefits || []),
-		...(data.faqs || []).map(f => f.q + ' ' + f.a)
+		...(data.faqs || []).map((f) => f.q + ' ' + f.a)
 	].join(' ');
 
 	const wordCount = textContent.split(/\s+/).filter(Boolean).length;

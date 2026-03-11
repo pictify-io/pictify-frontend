@@ -39,7 +39,12 @@
 	// Escape HTML to prevent XSS in imperative DOM rendering
 	function escapeHtml(str) {
 		if (!str) return '';
-		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+		return String(str)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#039;');
 	}
 
 	// Keep displayTemplate in sync if selectedTemplate prop changes
@@ -49,7 +54,7 @@
 
 	// When value changes externally and we have templates loaded, try to find it
 	$: if (value && !displayTemplate && templates.length > 0) {
-		const found = templates.find(t => t.uid === value);
+		const found = templates.find((t) => t.uid === value);
 		if (found) displayTemplate = found;
 	}
 
@@ -258,7 +263,8 @@
 		portalEl.innerHTML = '';
 
 		const wrapper = document.createElement('div');
-		wrapper.className = 'bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden';
+		wrapper.className =
+			'bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden';
 		wrapper.style.fontFamily = 'inherit';
 
 		// Search bar
@@ -336,25 +342,33 @@
 			const btn = document.createElement('button');
 			btn.type = 'button';
 			btn.setAttribute('data-tpl-index', i);
-			btn.className = `w-full flex items-center gap-3 px-4 py-3 text-left transition-colors tpl-normal ${i < templates.length - 1 ? 'border-b border-gray-100' : ''}`;
+			btn.className = `w-full flex items-center gap-3 px-4 py-3 text-left transition-colors tpl-normal ${
+				i < templates.length - 1 ? 'border-b border-gray-100' : ''
+			}`;
 
 			const thumbHtml = tpl.thumbnail
-				? `<img src="${escapeHtml(tpl.thumbnail)}" alt="" class="w-12 h-9 object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100" />`
+				? `<img src="${escapeHtml(
+						tpl.thumbnail
+				  )}" alt="" class="w-12 h-9 object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100" />`
 				: `<div class="w-12 h-9 rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
 						<svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 						</svg>
 					</div>`;
 
-			const dimHtml = (tpl.width && tpl.height)
-				? `<p class="text-[10px] font-bold text-gray-400 mt-0.5">${escapeHtml(tpl.width)} x ${escapeHtml(tpl.height)}</p>`
-				: '';
+			const dimHtml =
+				tpl.width && tpl.height
+					? `<p class="text-[10px] font-bold text-gray-400 mt-0.5">${escapeHtml(
+							tpl.width
+					  )} x ${escapeHtml(tpl.height)}</p>`
+					: '';
 
-			const checkHtml = (value === tpl.uid)
-				? `<svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			const checkHtml =
+				value === tpl.uid
+					? `<svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
 					</svg>`
-				: '';
+					: '';
 
 			const name = escapeHtml(tpl.name || tpl.uid);
 			btn.innerHTML = `
@@ -381,15 +395,6 @@
 	}
 </script>
 
-<style>
-	:global(.tpl-highlighted) {
-		background-color: rgba(255, 196, 128, 0.2) !important;
-	}
-	:global(.tpl-normal:hover) {
-		background-color: rgb(249, 250, 251);
-	}
-</style>
-
 <!-- Trigger Button -->
 <button
 	bind:this={triggerEl}
@@ -398,10 +403,10 @@
 	{disabled}
 	class="w-full flex items-center gap-3 px-4 py-3 border-[3px] rounded-xl text-sm font-bold bg-white transition-all text-left
 		{disabled
-			? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-			: open
-				? 'border-[#ffc480] shadow-[4px_4px_0_0_#ffc480]'
-				: 'border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] cursor-pointer'}"
+		? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+		: open
+		? 'border-[#ffc480] shadow-[4px_4px_0_0_#ffc480]'
+		: 'border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] cursor-pointer'}"
 >
 	{#if displayTemplate}
 		{#if displayTemplate.thumbnail}
@@ -411,15 +416,24 @@
 				class="w-10 h-[30px] object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100"
 			/>
 		{:else}
-			<div class="w-10 h-[30px] rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
+			<div
+				class="w-10 h-[30px] rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center"
+			>
 				<svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.5"
+						d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+					/>
 				</svg>
 			</div>
 		{/if}
 		<span class="truncate flex-1 text-gray-900">{displayTemplate.name || displayTemplate.uid}</span>
 		{#if displayTemplate.width && displayTemplate.height}
-			<span class="shrink-0 text-[10px] font-black uppercase tracking-widest bg-gray-100 border-[1.5px] border-gray-200 text-gray-500 px-2 py-0.5 rounded-md">
+			<span
+				class="shrink-0 text-[10px] font-black uppercase tracking-widest bg-gray-100 border-[1.5px] border-gray-200 text-gray-500 px-2 py-0.5 rounded-md"
+			>
 				{displayTemplate.width}x{displayTemplate.height}
 			</span>
 		{/if}
@@ -430,8 +444,19 @@
 	<!-- Chevron -->
 	<svg
 		class="w-4 h-4 shrink-0 text-gray-400 transition-transform {open ? 'rotate-180' : ''}"
-		fill="none" stroke="currentColor" viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		viewBox="0 0 24 24"
 	>
 		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
 	</svg>
 </button>
+
+<style>
+	:global(.tpl-highlighted) {
+		background-color: rgba(255, 196, 128, 0.2) !important;
+	}
+	:global(.tpl-normal:hover) {
+		background-color: rgb(249, 250, 251);
+	}
+</style>

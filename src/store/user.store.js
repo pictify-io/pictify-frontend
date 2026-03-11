@@ -127,7 +127,7 @@ export const loginAction = async (email, password) => {
 		analytics.identify(userData.email, {
 			email: userData.email,
 			plan: userData.currentPlan || 'starter',
-			is_email_verified: userData.isEmailVerified,
+			is_email_verified: userData.isEmailVerified
 		});
 		analytics.trackLoginCompleted({ method: 'email' });
 
@@ -162,7 +162,7 @@ export const signupAction = async (email, password) => {
 				email: userData.email,
 				plan: 'starter',
 				signup_date: new Date().toISOString(),
-				is_email_verified: false,
+				is_email_verified: false
 			});
 			analytics.trackSignupCompleted({ method: 'email', plan: 'starter' });
 		}

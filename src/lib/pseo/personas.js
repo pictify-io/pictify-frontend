@@ -5,7 +5,8 @@ export const personas = [
 		slug: 'developers',
 		title: 'Pictify for Developers',
 		headline: 'Ship image generation without managing browsers',
-		description: 'Stop wrestling with Puppeteer infrastructure. Our API handles headless browsers, scaling, and caching so you can focus on building features.',
+		description:
+			'Stop wrestling with Puppeteer infrastructure. Our API handles headless browsers, scaling, and caching so you can focus on building features.',
 		benefits: [
 			'Simple REST API with SDKs for Node.js, Python, Go, Ruby',
 			'No browser infrastructure to manage or scale',
@@ -30,7 +31,8 @@ export const personas = [
 		slug: 'marketers',
 		title: 'Pictify for Marketers',
 		headline: 'Create on-brand visuals at scale',
-		description: 'Design once, generate thousands. Build templates in our visual editor and produce variations automatically for campaigns, social, and ads.',
+		description:
+			'Design once, generate thousands. Build templates in our visual editor and produce variations automatically for campaigns, social, and ads.',
 		benefits: [
 			'Visual template editor—no code required',
 			'Brand asset library for logos and fonts',
@@ -55,7 +57,8 @@ export const personas = [
 		slug: 'product-teams',
 		title: 'Pictify for Product Teams',
 		headline: 'Add image generation to your product',
-		description: 'Give your users the ability to generate, customize, and export images. White-label our engine or use the API to power in-app experiences.',
+		description:
+			'Give your users the ability to generate, customize, and export images. White-label our engine or use the API to power in-app experiences.',
 		benefits: [
 			'API-first for easy product integration',
 			'White-label options available',
@@ -80,7 +83,8 @@ export const personas = [
 		slug: 'agencies',
 		title: 'Pictify for Agencies',
 		headline: 'Scale creative production for clients',
-		description: 'Deliver more client work without hiring more designers. Build reusable templates and generate client-specific variations on demand.',
+		description:
+			'Deliver more client work without hiring more designers. Build reusable templates and generate client-specific variations on demand.',
 		benefits: [
 			'Manage multiple client workspaces',
 			'Template library for common formats',
@@ -105,7 +109,8 @@ export const personas = [
 		slug: 'saas-founders',
 		title: 'Pictify for SaaS Founders',
 		headline: 'Add a growth loop to your product',
-		description: 'Dynamic OG images increase social sharing and engagement. Auto-generate preview images for user content and watch your link clicks grow.',
+		description:
+			'Dynamic OG images increase social sharing and engagement. Auto-generate preview images for user content and watch your link clicks grow.',
 		benefits: [
 			'Increase social sharing with rich previews',
 			'Personalized images boost engagement',
@@ -130,7 +135,8 @@ export const personas = [
 		slug: 'e-commerce',
 		title: 'Pictify for E-Commerce',
 		headline: 'Automate product visuals',
-		description: 'Generate product social cards, promo graphics, and sale banners automatically. Connect to Shopify, WooCommerce, or your custom store.',
+		description:
+			'Generate product social cards, promo graphics, and sale banners automatically. Connect to Shopify, WooCommerce, or your custom store.',
 		benefits: [
 			'Product image automation',
 			'Sale and promo banner generation',

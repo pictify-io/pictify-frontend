@@ -1,6 +1,6 @@
 /**
  * Public Templates API
- * 
+ *
  * API functions for public template gallery and shared results
  */
 
@@ -18,17 +18,17 @@ import backend from '../service/backend';
  * @param {number} [options.limit] - Items per page (default: 12)
  */
 export async function getPublicTemplates(options = {}) {
-  const params = {};
-  
-  if (options.category) params.category = options.category;
-  if (options.type) params.type = options.type;
-  if (options.tag) params.tag = options.tag;
-  if (options.search) params.search = options.search;
-  if (options.sort) params.sort = options.sort;
-  if (options.page) params.page = options.page;
-  if (options.limit) params.limit = options.limit;
-  
-  return backend.get('/public/templates', { params });
+	const params = {};
+
+	if (options.category) params.category = options.category;
+	if (options.type) params.type = options.type;
+	if (options.tag) params.tag = options.tag;
+	if (options.search) params.search = options.search;
+	if (options.sort) params.sort = options.sort;
+	if (options.page) params.page = options.page;
+	if (options.limit) params.limit = options.limit;
+
+	return backend.get('/public/templates', { params });
 }
 
 /**
@@ -36,7 +36,7 @@ export async function getPublicTemplates(options = {}) {
  * @param {string} uid - Template UID
  */
 export async function getPublicTemplate(uid) {
-  return backend.get(`/public/templates/${uid}`);
+	return backend.get(`/public/templates/${uid}`);
 }
 
 /**
@@ -44,7 +44,7 @@ export async function getPublicTemplate(uid) {
  * @param {string} uid - Template UID to fork
  */
 export async function forkTemplate(uid) {
-  return backend.post(`/public/templates/${uid}/fork`);
+	return backend.post(`/public/templates/${uid}/fork`);
 }
 
 /**
@@ -62,7 +62,7 @@ export async function forkTemplate(uid) {
  * @param {string} [data.title] - Optional title
  */
 export async function createShareResult(data) {
-  return backend.post('/public/results', data);
+	return backend.post('/public/results', data);
 }
 
 /**
@@ -70,5 +70,5 @@ export async function createShareResult(data) {
  * @param {string} uid - Result UID
  */
 export async function getShareResult(uid) {
-  return backend.get(`/public/results/${uid}`);
+	return backend.get(`/public/results/${uid}`);
 }

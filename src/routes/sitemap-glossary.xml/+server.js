@@ -9,12 +9,14 @@ export async function GET() {
 	const baseUrl = 'https://pictify.io';
 	const today = new Date().toISOString().slice(0, 10);
 
-	const urls = glossary.map(term => `  <url>
+	const urls = glossary.map(
+		(term) => `  <url>
     <loc>${baseUrl}/glossary/${term.term}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-  </url>`);
+  </url>`
+	);
 
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

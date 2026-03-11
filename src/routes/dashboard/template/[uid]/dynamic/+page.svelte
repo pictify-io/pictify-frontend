@@ -135,9 +135,11 @@
 			}
 
 			template = templateRes.value.template;
-			variables = variablesRes.status === 'fulfilled' ? (variablesRes.value?.variables || []) : [];
-			existingBindings = bindingsRes.status === 'fulfilled' ? (bindingsRes.value?.bindings || []) : [];
-			dataSources = dataSourcesRes.status === 'fulfilled' ? (dataSourcesRes.value?.dataSources || []) : [];
+			variables = variablesRes.status === 'fulfilled' ? variablesRes.value?.variables || [] : [];
+			existingBindings =
+				bindingsRes.status === 'fulfilled' ? bindingsRes.value?.bindings || [] : [];
+			dataSources =
+				dataSourcesRes.status === 'fulfilled' ? dataSourcesRes.value?.dataSources || [] : [];
 
 			// Log warnings for partial failures
 			if (variablesRes.status === 'rejected') {
@@ -155,9 +157,10 @@
 				const binding = existingBindings[0];
 				publishedBinding = binding;
 				// Try to find matching data source by ID first, then by URL if binding has embedded dataSource
-				selectedDataSource = dataSources.find(ds => ds.uid === binding.dataSourceId)
-					|| dataSources.find(ds => ds.url === binding.dataSource?.url)
-					|| null;
+				selectedDataSource =
+					dataSources.find((ds) => ds.uid === binding.dataSourceId) ||
+					dataSources.find((ds) => ds.url === binding.dataSource?.url) ||
+					null;
 				// If no matching data source found but binding has embedded dataSource, use it directly
 				if (!selectedDataSource && binding.dataSource && binding.dataSource.url) {
 					// Create a virtual data source from the embedded config for editing
@@ -303,14 +306,16 @@
 			}
 
 			// Build dataSource object for the binding
-			const dataSourceForBinding = dataSourceToUse ? {
-				type: dataSourceToUse.type || 'http',
-				url: dataSourceToUse.url,
-				method: dataSourceToUse.method || 'GET',
-				headers: dataSourceToUse.headers || {}
-			} : {
-				type: 'static'
-			};
+			const dataSourceForBinding = dataSourceToUse
+				? {
+						type: dataSourceToUse.type || 'http',
+						url: dataSourceToUse.url,
+						method: dataSourceToUse.method || 'GET',
+						headers: dataSourceToUse.headers || {}
+				  }
+				: {
+						type: 'static'
+				  };
 
 			// Create binding with camelCase keys (matching backend API convention)
 			const bindingData = {
@@ -446,7 +451,7 @@
 			if (!mounted) return;
 
 			// Reset state - use captured uid for filtering
-			existingBindings = existingBindings.filter(b => b.uid !== bindingUid);
+			existingBindings = existingBindings.filter((b) => b.uid !== bindingUid);
 			publishedBinding = null;
 			selectedDataSource = null;
 			isEditing = false;
@@ -502,10 +507,17 @@
 				class="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 hover:underline flex items-center gap-1 transition-colors mb-2"
 				on:click={() => goto('/dashboard/template')}
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="3"
+						d="M15 19l-7-7 7-7"
+					/></svg
+				>
 				Back to Templates
 			</button>
-			
+
 			<div class="flex items-center gap-3">
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
 					{#if template}
@@ -514,7 +526,9 @@
 						Loading...
 					{/if}
 				</h1>
-				<div class="px-2 py-1 bg-[#3b82f6] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]">
+				<div
+					class="px-2 py-1 bg-[#3b82f6] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+				>
 					Live Mode
 				</div>
 			</div>
@@ -551,10 +565,10 @@
 					{ id: 'datasource', label: 'Data Source' },
 					{ id: 'mapping', label: 'Mapping' },
 					{ id: 'refresh', label: 'Refresh' },
-					{ id: 'publish', label: 'Publish' },
+					{ id: 'publish', label: 'Publish' }
 				]}
 				currentStep={activeTab}
-				on:step={(e) => activeTab = e.detail}
+				on:step={(e) => (activeTab = e.detail)}
 			/>
 
 			<!-- Tab Content -->
@@ -570,7 +584,7 @@
 						on:select={(e) => handleSelectDataSource(e.detail)}
 						on:test={handleTestDataSource}
 						on:create={handleCreateDataSource}
-						on:updateNew={(e) => newDataSource = { ...newDataSource, ...e.detail }}
+						on:updateNew={(e) => (newDataSource = { ...newDataSource, ...e.detail })}
 						on:next={() => goToTab('mapping')}
 					/>
 				{:else if activeTab === 'mapping'}

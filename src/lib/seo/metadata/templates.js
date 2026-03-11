@@ -69,43 +69,56 @@ export const descriptionTemplates = {
 	tool: 'Convert HTML to {format} images instantly. Free online {format} converter with API access. Perfect for social media images, marketing materials, and automated workflows.',
 
 	// Tool dimension pages
-	toolDimension: 'Generate {dimensions} {format} images from HTML. Perfect for {useCaseContext}. Free online tool with API access for automation.',
+	toolDimension:
+		'Generate {dimensions} {format} images from HTML. Perfect for {useCaseContext}. Free online tool with API access for automation.',
 
 	// Comparison pages
-	comparison: 'Compare Pictify and {competitor}. See pricing, features, and why teams choose Pictify for HTML to image generation. Updated {year}.',
+	comparison:
+		'Compare Pictify and {competitor}. See pricing, features, and why teams choose Pictify for HTML to image generation. Updated {year}.',
 
 	// Alternative pages
-	alternative: 'Looking for a {competitor} alternative? See why developers and marketers choose Pictify for HTML to image generation. Better pricing, simpler API.',
+	alternative:
+		'Looking for a {competitor} alternative? See why developers and marketers choose Pictify for HTML to image generation. Better pricing, simpler API.',
 
 	// Glossary pages
 	glossary: '{shortDefinition} Learn more about {title} and how it applies to image generation.',
 
 	// Integration pages
-	integration: 'Connect Pictify with {name}. {description} Set up in minutes with our easy integration guide.',
+	integration:
+		'Connect Pictify with {name}. {description} Set up in minutes with our easy integration guide.',
 
 	// Persona pages
-	persona: '{description} Pictify helps {persona} create beautiful images at scale with our HTML to image API.',
+	persona:
+		'{description} Pictify helps {persona} create beautiful images at scale with our HTML to image API.',
 
 	// Template category pages
-	templateCategory: 'Browse {count}+ professional {category} templates. Customize and generate images via API. Perfect for {useCase}.',
+	templateCategory:
+		'Browse {count}+ professional {category} templates. Customize and generate images via API. Perfect for {useCase}.',
 
 	// Individual template pages
 	template: '{description} Customize this template and generate images via API.',
 
 	// OG platform pages
-	ogPlatform: 'Generate perfect OG images for {platform}. Recommended size: {recommendedSize}. Free online tool with {platform} setup guide.',
+	ogPlatform:
+		'Generate perfect OG images for {platform}. Recommended size: {recommendedSize}. Free online tool with {platform} setup guide.',
 
 	// Blog pages
 	blog: '{excerpt}',
 
 	// Static pages
 	home: 'Design beautiful images with HTML/CSS and render them via API. Perfect for social media images, marketing materials, and automated workflows. Free to start.',
-	pricing: 'Simple, transparent pricing for Pictify HTML to Image API. Start free, scale as you grow. No credit card required.',
-	tools: 'Free online tools for image generation. Convert HTML to PNG, JPG, WebP. Generate OG images, social media graphics, and more.',
-	templates: 'Browse professional image templates. Customize and generate images via API. OG images, social media graphics, marketing materials.',
-	compare: 'Compare Pictify with alternatives like Cloudinary, imgix, and Placid. See why teams choose Pictify for HTML to image generation.',
-	glossaryHub: 'Learn image generation terminology. Definitions for OG images, Open Graph, social previews, and more.',
-	integrationsHub: 'Connect Pictify with your favorite tools. Zapier, Make, n8n, and more. Automate image generation in your workflow.'
+	pricing:
+		'Simple, transparent pricing for Pictify HTML to Image API. Start free, scale as you grow. No credit card required.',
+	tools:
+		'Free online tools for image generation. Convert HTML to PNG, JPG, WebP. Generate OG images, social media graphics, and more.',
+	templates:
+		'Browse professional image templates. Customize and generate images via API. OG images, social media graphics, marketing materials.',
+	compare:
+		'Compare Pictify with alternatives like Cloudinary, imgix, and Placid. See why teams choose Pictify for HTML to image generation.',
+	glossaryHub:
+		'Learn image generation terminology. Definitions for OG images, Open Graph, social previews, and more.',
+	integrationsHub:
+		'Connect Pictify with your favorite tools. Zapier, Make, n8n, and more. Automate image generation in your workflow.'
 };
 
 /**
@@ -113,7 +126,12 @@ export const descriptionTemplates = {
  */
 export const keywordTemplates = {
 	useCase: ['html to image', 'image api', 'automated image generation', '{keywords}'],
-	tool: ['html to {format}', '{format} converter', 'html to {format} api', 'convert html to {format}'],
+	tool: [
+		'html to {format}',
+		'{format} converter',
+		'html to {format} api',
+		'convert html to {format}'
+	],
 	toolDimension: ['html to {format} {dimensions}', '{dimensions} image', '{dimensions} {format}'],
 	comparison: ['{competitor} alternative', 'pictify vs {competitor}', '{competitor} comparison'],
 	glossary: ['{term}', 'what is {term}', '{term} definition', '{term} meaning'],
@@ -165,7 +183,7 @@ export function generateKeywords(pageType, data = {}) {
 	const template = keywordTemplates[pageType];
 	if (!template) return [];
 
-	return template.map(keyword => interpolate(keyword, data).toLowerCase());
+	return template.map((keyword) => interpolate(keyword, data).toLowerCase());
 }
 
 /**

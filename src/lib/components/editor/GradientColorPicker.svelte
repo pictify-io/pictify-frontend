@@ -2,7 +2,14 @@
 	import { onMount } from 'svelte';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import { editor } from '../../../store/editor.store';
-	import { clamp, gradientStopsToCss, normalizeStops, toGradientStops, isGradientValue, extractGradientAngle } from '../../utils/gradient';
+	import {
+		clamp,
+		gradientStopsToCss,
+		normalizeStops,
+		toGradientStops,
+		isGradientValue,
+		extractGradientAngle
+	} from '../../utils/gradient';
 	import { extractCanvasColors, generateCanvasPalette } from '../../utils/palette';
 
 	export let label = 'Color';
@@ -15,12 +22,12 @@
 
 	// Helper to generate IDs
 	const generateId = () => Math.random().toString(36).substr(2, 9);
-    const angleId = generateId();
+	const angleId = generateId();
 
 	// Ensure stops have unique IDs
 	const ensureIds = (stops) => {
 		const seenIds = new Set();
-		return stops.map(s => {
+		return stops.map((s) => {
 			// If no ID or duplicate ID, generate a new one
 			if (!s.id || seenIds.has(s.id)) {
 				const newId = generateId();
@@ -40,12 +47,12 @@
 	let pickerButton;
 	let modalPosition = { top: 0, left: 0 };
 	let supportsEyeDropper = false;
-	
+
 	// Canvas palette state
 	let canvasColors = [];
 	let generatedPalette = [];
 	let copiedColor = null;
-	
+
 	// Extract canvas colors reactively and clear generated palette when canvas changes
 	$: if ($editor) {
 		const newColors = extractCanvasColors($editor);
@@ -62,19 +69,21 @@
 	function updateLocalStopsFromValue(val) {
 		if (supportsGradient && isGradientValue(val)) {
 			const parsedStops = normalizeStops(toGradientStops(val, defaultColor));
-			
+
 			// Check if stops are effectively the same to avoid losing IDs/selection
 			// This prevents resetting activeStopId when value round-trips from parent
-			const isSame = localStops.length === parsedStops.length && localStops.every((s, i) => {
-				const p = parsedStops[i];
-				const offsetMatch = Math.abs(s.offset - p.offset) < 0.001;
-				const colorMatch = s.color === p.color;
-				return offsetMatch && colorMatch;
-			});
-			
+			const isSame =
+				localStops.length === parsedStops.length &&
+				localStops.every((s, i) => {
+					const p = parsedStops[i];
+					const offsetMatch = Math.abs(s.offset - p.offset) < 0.001;
+					const colorMatch = s.color === p.color;
+					return offsetMatch && colorMatch;
+				});
+
 			if (!draggingId && !isSame) {
 				localStops = ensureIds(parsedStops);
-				if (!activeStopId || !localStops.find(s => s.id === activeStopId)) {
+				if (!activeStopId || !localStops.find((s) => s.id === activeStopId)) {
 					activeStopId = localStops[0]?.id;
 				}
 				// Extract and restore gradient angle
@@ -83,19 +92,21 @@
 				}
 			}
 		} else if (!isGradientValue(val)) {
-            // Reset to default stops for solid colors
-            localStops = ensureIds(toGradientStops(val, defaultColor));
-            activeStopId = localStops[0]?.id;
-        }
+			// Reset to default stops for solid colors
+			localStops = ensureIds(toGradientStops(val, defaultColor));
+			activeStopId = localStops[0]?.id;
+		}
 	}
 
 	$: updateLocalStopsFromValue(value);
 
-	$: solidColor = typeof value === 'string' && value && !isGradientValue(value) ? value : defaultColor;
+	$: solidColor =
+		typeof value === 'string' && value && !isGradientValue(value) ? value : defaultColor;
 	$: mode = supportsGradient && isGradientValue(value) ? 'gradient' : 'solid';
-	
-	$: displayColor = mode === 'solid' ? solidColor : (localStops[0]?.color || defaultColor);
-	$: previewBackground = mode === 'gradient' ? gradientStopsToCss(localStops, gradientAngle) : solidColor;
+
+	$: displayColor = mode === 'solid' ? solidColor : localStops[0]?.color || defaultColor;
+	$: previewBackground =
+		mode === 'gradient' ? gradientStopsToCss(localStops, gradientAngle) : solidColor;
 
 	function handleSolidChange(e) {
 		const color = e.detail.hex;
@@ -109,12 +120,12 @@
 		localStops = ensureIds(normalized);
 		onGradientChange?.(normalized, gradientAngle);
 	}
-	
+
 	function handleAngleChange(e) {
 		gradientAngle = parseInt(e.target.value);
 		updateGradient();
 	}
-	
+
 	// Gradient presets
 	const gradientPresets = [
 		{ name: 'Sunset', colors: ['#FF512F', '#F09819'], angle: 90 },
@@ -124,12 +135,14 @@
 		{ name: 'Forest', colors: ['#134E5E', '#71B280'], angle: 90 },
 		{ name: 'Rose', colors: ['#ee0979', '#ff6a00'], angle: 90 }
 	];
-	
+
 	function applyPreset(preset) {
-		localStops = ensureIds(preset.colors.map((color, index) => ({
-			color,
-			offset: index / (preset.colors.length - 1)
-		})));
+		localStops = ensureIds(
+			preset.colors.map((color, index) => ({
+				color,
+				offset: index / (preset.colors.length - 1)
+			}))
+		);
 		activeStopId = localStops[0]?.id;
 		gradientAngle = preset.angle;
 		updateGradient();
@@ -138,25 +151,25 @@
 	function handleStopColorChange(e) {
 		if (!activeStopId) return;
 		const color = e.detail.hex;
-		localStops = localStops.map(s => s.id === activeStopId ? { ...s, color } : s);
+		localStops = localStops.map((s) => (s.id === activeStopId ? { ...s, color } : s));
 		updateGradient();
 	}
 
 	function switchToGradient() {
 		if (!supportsGradient) return;
 		if (!localStops.length || localStops.length < 2) {
-            localStops = ensureIds([
-                { color: solidColor, offset: 0 },
-                { color: solidColor, offset: 1 }
-            ]);
-        }
-        if (!activeStopId) activeStopId = localStops[0]?.id;
-        
+			localStops = ensureIds([
+				{ color: solidColor, offset: 0 },
+				{ color: solidColor, offset: 1 }
+			]);
+		}
+		if (!activeStopId) activeStopId = localStops[0]?.id;
+
 		updateGradient();
 	}
 
 	function switchToSolid() {
-        const color = mode === 'gradient' ? (localStops[0]?.color || defaultColor) : solidColor;
+		const color = mode === 'gradient' ? localStops[0]?.color || defaultColor : solidColor;
 		onSolidChange?.(color);
 	}
 
@@ -165,15 +178,15 @@
 		const rect = gradientBarElement.getBoundingClientRect();
 		const x = e.clientX - rect.left;
 		const offset = clamp(x / rect.width);
-		
+
 		const color = interpolateGradientColor(localStops, offset);
-		
+
 		const newStop = {
 			id: generateId(),
 			color,
 			offset
 		};
-		
+
 		localStops = [...localStops, newStop];
 		activeStopId = newStop.id;
 		draggingId = newStop.id;
@@ -183,12 +196,12 @@
 	function interpolateGradientColor(stops, offset) {
 		if (stops.length === 0) return '#ffffff';
 		if (stops.length === 1) return stops[0].color;
-		
+
 		const sorted = [...stops].sort((a, b) => a.offset - b.offset);
-		
+
 		let before = sorted[0];
 		let after = sorted[sorted.length - 1];
-		
+
 		for (let i = 0; i < sorted.length - 1; i++) {
 			if (sorted[i].offset <= offset && sorted[i + 1].offset >= offset) {
 				before = sorted[i];
@@ -196,7 +209,7 @@
 				break;
 			}
 		}
-		
+
 		return before.color;
 	}
 
@@ -205,27 +218,27 @@
 		activeStopId = id;
 		draggingId = id;
 	}
-    
-    function handleStopDelete(id) {
-        if (localStops.length <= 2) return;
-        localStops = localStops.filter(s => s.id !== id);
-        if (activeStopId === id) {
-            activeStopId = localStops[0].id;
-        }
-        updateGradient();
-    }
+
+	function handleStopDelete(id) {
+		if (localStops.length <= 2) return;
+		localStops = localStops.filter((s) => s.id !== id);
+		if (activeStopId === id) {
+			activeStopId = localStops[0].id;
+		}
+		updateGradient();
+	}
 
 	function handleWindowMouseMove(e) {
 		if (!draggingId) return;
-        
-        if (!gradientBarElement) return;
+
+		if (!gradientBarElement) return;
 		const rect = gradientBarElement.getBoundingClientRect();
-		
-        let x = e.clientX - rect.left;
-        let offset = clamp(x / rect.width);
-        
-        localStops = localStops.map(s => s.id === draggingId ? { ...s, offset } : s);
-        updateGradient();
+
+		let x = e.clientX - rect.left;
+		let offset = clamp(x / rect.width);
+
+		localStops = localStops.map((s) => (s.id === draggingId ? { ...s, offset } : s));
+		updateGradient();
 	}
 
 	let justFinishedDragging = false;
@@ -239,8 +252,8 @@
 		}
 		draggingId = null;
 	}
-    
-    $: activeStopColor = localStops.find(s => s.id === activeStopId)?.color || '#ffffff';
+
+	$: activeStopColor = localStops.find((s) => s.id === activeStopId)?.color || '#ffffff';
 
 	function toggleColorPicker() {
 		showColorPicker = !showColorPicker;
@@ -280,16 +293,16 @@
 
 	function handleClickOutside(e) {
 		if (!showColorPicker) return;
-		
+
 		// Ignore clicks on elements that were removed from DOM (e.g. due to re-render)
 		if (!e.target.isConnected) {
 			console.log('[ColorPicker] Ignoring click on detached element');
 			return;
 		}
-		
+
 		const isInsideButton = pickerButton && pickerButton.contains(e.target);
 		const isInsideModal = e.target.closest('.color-picker-modal');
-		
+
 		if (!isInsideButton && !isInsideModal) {
 			console.log('[ColorPicker] Click outside detected, closing');
 			showColorPicker = false;
@@ -301,17 +314,17 @@
 			alert('Eyedropper not supported in this browser. Please use Chrome or Edge.');
 			return;
 		}
-		
+
 		try {
 			const eyeDropper = new EyeDropper();
 			const result = await eyeDropper.open();
-			
+
 			if (result && result.sRGBHex) {
 				if (mode === 'solid') {
 					solidColor = result.sRGBHex;
 					onSolidChange?.(result.sRGBHex);
 				} else if (mode === 'gradient' && activeStopId) {
-					localStops = localStops.map(s => 
+					localStops = localStops.map((s) =>
 						s.id === activeStopId ? { ...s, color: result.sRGBHex } : s
 					);
 					updateGradient();
@@ -322,25 +335,23 @@
 			console.log('Eyedropper cancelled');
 		}
 	}
-	
+
 	// Generate smart palette from all canvas colors
 	function generateSmartPalette(type) {
 		generatedPalette = generateCanvasPalette(canvasColors, type);
 	}
-	
+
 	// Apply a palette color
 	function applyPaletteColor(color) {
 		if (mode === 'solid') {
 			solidColor = color;
 			onSolidChange?.(color);
 		} else if (mode === 'gradient' && activeStopId) {
-			localStops = localStops.map(s => 
-				s.id === activeStopId ? { ...s, color } : s
-			);
+			localStops = localStops.map((s) => (s.id === activeStopId ? { ...s, color } : s));
 			updateGradient();
 		}
 	}
-	
+
 	// Copy color to clipboard
 	async function copyColorToClipboard(color) {
 		try {
@@ -357,7 +368,7 @@
 	onMount(() => {
 		// Check if EyeDropper API is supported
 		supportsEyeDropper = 'EyeDropper' in window;
-		
+
 		window.addEventListener('click', handleClickOutside);
 		return () => {
 			window.removeEventListener('click', handleClickOutside);
@@ -387,54 +398,61 @@
 			bind:this={pickerButton}
 			type="button"
 			class="flex items-center gap-2 px-2 py-1 rounded-lg border-[2px] border-gray-300 hover:border-gray-400 transition-all bg-white"
-			on:click={(e) => { console.log('[ColorPicker] Button clicked!'); e.stopPropagation(); toggleColorPicker(); }}
+			on:click={(e) => {
+				console.log('[ColorPicker] Button clicked!');
+				e.stopPropagation();
+				toggleColorPicker();
+			}}
 		>
 			<!-- Color Preview Swatch -->
 			<div class="relative w-5 h-5 rounded overflow-hidden border border-gray-300">
 				<!-- Checkerboard background -->
-				<div class="absolute inset-0 opacity-30" 
-					 style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;">
-				</div>
-				<div class="absolute inset-0" style="background: {previewBackground}"></div>
+				<div
+					class="absolute inset-0 opacity-30"
+					style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;"
+				/>
+				<div class="absolute inset-0" style="background: {previewBackground}" />
 			</div>
-			<i class="fa fa-chevron-down text-[10px] text-gray-900"></i>
+			<i class="fa fa-chevron-down text-[10px] text-gray-900" />
 		</button>
 	</div>
 </div>
 
 <!-- Modal Color Picker -->
 {#if showColorPicker}
-	<div 
+	<div
 		use:portal
 		class="fixed color-picker-modal border-[3px] border-gray-900 rounded-lg shadow-[8px_8px_0_0_#1f2937] bg-white"
 		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px; max-height: calc(100vh - 20px); overflow-y: auto; z-index: 999999 !important;"
 	>
 		<div class="bg-white">
 			<!-- Header with close button -->
-		<div class="px-3 py-2 border-b-[2px] border-gray-900 flex items-center justify-between bg-[#FFFDF8]">
-			<span class="text-xs font-black text-gray-900 uppercase tracking-widest">{label}</span>
-			<div class="flex items-center gap-1">
-				<!-- Eyedropper Button -->
-				{#if supportsEyeDropper}
+			<div
+				class="px-3 py-2 border-b-[2px] border-gray-900 flex items-center justify-between bg-[#FFFDF8]"
+			>
+				<span class="text-xs font-black text-gray-900 uppercase tracking-widest">{label}</span>
+				<div class="flex items-center gap-1">
+					<!-- Eyedropper Button -->
+					{#if supportsEyeDropper}
+						<button
+							type="button"
+							class="p-1.5 rounded border-[2px] border-transparent hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+							on:click={handleEyedropper}
+							title="Pick color from screen"
+						>
+							<i class="fa fa-eye-dropper text-xs text-gray-900" />
+						</button>
+					{/if}
+					<!-- Close Button -->
 					<button
 						type="button"
-						class="p-1.5 rounded border-[2px] border-transparent hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
-						on:click={handleEyedropper}
-						title="Pick color from screen"
+						class="text-gray-900 hover:text-red-600 transition-colors p-1"
+						on:click={() => (showColorPicker = false)}
 					>
-						<i class="fa fa-eye-dropper text-xs text-gray-900"></i>
+						<i class="fa fa-times text-sm" />
 					</button>
-				{/if}
-				<!-- Close Button -->
-				<button
-					type="button"
-					class="text-gray-900 hover:text-red-600 transition-colors p-1"
-					on:click={() => showColorPicker = false}
-				>
-					<i class="fa fa-times text-sm"></i>
-				</button>
+				</div>
 			</div>
-		</div>
 
 			<!-- Mode Switcher (only if gradient supported) -->
 			{#if supportsGradient}
@@ -442,14 +460,20 @@
 					<div class="flex bg-gray-900 rounded-md p-1 border-[2px] border-gray-900">
 						<button
 							type="button"
-							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode === 'solid' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-white hover:text-[#ffc480]'}"
+							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode ===
+							'solid'
+								? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
+								: 'text-white hover:text-[#ffc480]'}"
 							on:click={switchToSolid}
 						>
 							Solid
 						</button>
 						<button
 							type="button"
-							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode === 'gradient' ? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]' : 'text-white hover:text-[#ffc480]'}"
+							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode ===
+							'gradient'
+								? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
+								: 'text-white hover:text-[#ffc480]'}"
 							on:click={switchToGradient}
 						>
 							Gradient
@@ -457,11 +481,13 @@
 					</div>
 				</div>
 			{/if}
-			
+
 			<!-- Gradient Presets (shown in gradient mode) -->
 			{#if mode === 'gradient'}
 				<div class="px-3 py-2 bg-[#FFFDF8] border-b-[2px] border-gray-900">
-					<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">Quick Presets</div>
+					<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">
+						Quick Presets
+					</div>
 					<div class="grid grid-cols-3 gap-1.5">
 						{#each gradientPresets as preset}
 							<button
@@ -484,12 +510,15 @@
 					<div class="text-[10px] text-gray-500 mb-2 font-bold uppercase">
 						Click to add • Drag to move • Dbl-click delete
 					</div>
-					<div class="relative h-8 w-full select-none rounded overflow-hidden mb-2 border-[2px] border-gray-900">
+					<div
+						class="relative h-8 w-full select-none rounded overflow-hidden mb-2 border-[2px] border-gray-900"
+					>
 						<!-- Checkerboard background -->
-						<div class="absolute inset-0 opacity-30" 
-							 style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;">
-						</div>
-						
+						<div
+							class="absolute inset-0 opacity-30"
+							style="background-image: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%); background-size: 8px 8px;"
+						/>
+
 						<!-- Gradient Preview -->
 						<div
 							role="button"
@@ -498,8 +527,8 @@
 							class="absolute inset-0 cursor-crosshair"
 							style="background: {gradientStopsToCss(localStops, gradientAngle)}"
 							on:mousedown={handleBarMouseDown}
-						></div>
-						
+						/>
+
 						<!-- Stops -->
 						{#each localStops as stop (stop.id)}
 							<button
@@ -509,22 +538,28 @@
 								on:mousedown={(e) => handleStopMouseDown(e, stop.id)}
 								on:dblclick={() => handleStopDelete(stop.id)}
 							>
-								<div 
-									class="w-5 h-5 rounded-full border-[2px] shadow-sm transition-all hover:scale-110 {activeStopId === stop.id ? 'border-gray-900 scale-110 shadow-[0_0_0_2px_#ffc480]' : 'border-white ring-1 ring-gray-900'}"
+								<div
+									class="w-5 h-5 rounded-full border-[2px] shadow-sm transition-all hover:scale-110 {activeStopId ===
+									stop.id
+										? 'border-gray-900 scale-110 shadow-[0_0_0_2px_#ffc480]'
+										: 'border-white ring-1 ring-gray-900'}"
 									style="background-color: {stop.color}"
-								></div>
+								/>
 							</button>
 						{/each}
 					</div>
-					
+
 					<!-- Gradient Angle Control -->
 					<div class="mt-3">
 						<div class="flex items-center justify-between mb-1.5">
-							<label for="{angleId}" class="text-xs text-gray-900 font-black uppercase">Angle</label>
-							<span class="text-xs text-gray-900 font-mono bg-gray-100 px-1 rounded border border-gray-900">{gradientAngle}°</span>
+							<label for={angleId} class="text-xs text-gray-900 font-black uppercase">Angle</label>
+							<span
+								class="text-xs text-gray-900 font-mono bg-gray-100 px-1 rounded border border-gray-900"
+								>{gradientAngle}°</span
+							>
 						</div>
 						<input
-                            id="{angleId}"
+							id={angleId}
 							type="range"
 							min="0"
 							max="360"
@@ -545,12 +580,12 @@
 			<!-- Gradient Stop Delete Button -->
 			{#if mode === 'gradient' && activeStopId && localStops.length > 2}
 				<div class="px-3 pb-2 bg-white border-b-[2px] border-gray-900 pt-2">
-					<button 
+					<button
 						type="button"
 						class="w-full text-xs font-black uppercase tracking-wider text-white bg-[#ff6b6b] px-2 py-1.5 rounded border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all flex items-center justify-center gap-1.5"
 						on:click={() => handleStopDelete(activeStopId)}
 					>
-						<i class="fa fa-trash"></i>
+						<i class="fa fa-trash" />
 						<span>Delete Stop</span>
 					</button>
 				</div>
@@ -560,21 +595,15 @@
 			<div class="bg-white p-3 flex justify-center">
 				<div class="w-full max-w-[254px]">
 					{#if mode === 'solid'}
-						<ColorPicker
-							hex={solidColor}
-							isDialog={false}
-							on:input={handleSolidChange}
-						/>
+						<ColorPicker hex={solidColor} isDialog={false} on:input={handleSolidChange} />
 					{:else if activeStopId}
-						<ColorPicker
-							hex={activeStopColor}
-							isDialog={false}
-							on:input={handleStopColorChange}
-						/>
+						<ColorPicker hex={activeStopColor} isDialog={false} on:input={handleStopColorChange} />
 					{/if}
-					
+
 					<!-- Canvas Palette Section -->
-					<div class="px-3 py-3 bg-[#FFFDF8] border-t-[2px] border-gray-900 space-y-3 mt-3 rounded border-[2px]">
+					<div
+						class="px-3 py-3 bg-[#FFFDF8] border-t-[2px] border-gray-900 space-y-3 mt-3 rounded border-[2px]"
+					>
 						<!-- Canvas Colors -->
 						{#if canvasColors.length > 0}
 							<div>
@@ -594,40 +623,40 @@
 								</div>
 							</div>
 						{/if}
-						
+
 						<!-- Generate Harmonies -->
 						<div>
 							<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">
 								Harmony
 							</div>
 							<div class="grid grid-cols-2 gap-1">
-								<button 
+								<button
 									type="button"
-									class="btn-harmony" 
+									class="btn-harmony"
 									on:click={() => generateSmartPalette('complementary')}
 									disabled={canvasColors.length === 0}
 								>
 									Complementary
 								</button>
-								<button 
+								<button
 									type="button"
-									class="btn-harmony" 
+									class="btn-harmony"
 									on:click={() => generateSmartPalette('analogous')}
 									disabled={canvasColors.length === 0}
 								>
 									Analogous
 								</button>
-								<button 
+								<button
 									type="button"
-									class="btn-harmony" 
+									class="btn-harmony"
 									on:click={() => generateSmartPalette('triadic')}
 									disabled={canvasColors.length === 0}
 								>
 									Triadic
 								</button>
-								<button 
+								<button
 									type="button"
-									class="btn-harmony" 
+									class="btn-harmony"
 									on:click={() => generateSmartPalette('tetradic')}
 									disabled={canvasColors.length === 0}
 								>
@@ -635,7 +664,7 @@
 								</button>
 							</div>
 						</div>
-						
+
 						<!-- Generated Palette -->
 						{#if generatedPalette.length > 0}
 							<div>
@@ -652,8 +681,10 @@
 											title="Click to apply {color}"
 										>
 											{#if copiedColor === color}
-												<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded">
-													<i class="fa fa-check text-white text-xs"></i>
+												<div
+													class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded"
+												>
+													<i class="fa fa-check text-white text-xs" />
 												</div>
 											{/if}
 										</button>
@@ -677,7 +708,7 @@
 		margin: 0 !important;
 		padding: 0 !important;
 	}
-	
+
 	:global(.color-picker canvas) {
 		max-width: 100% !important;
 		width: 100% !important;
@@ -685,24 +716,24 @@
 		margin: 0 auto !important;
 		display: block !important;
 	}
-	
+
 	:global(.color-picker .picker-wrapper) {
 		max-width: 100% !important;
 		border: none !important;
 		margin: 0 !important;
 		padding: 0 !important;
 	}
-	
+
 	:global(.color-picker-wrapper) {
 		border: none !important;
 		margin: 0 !important;
 		padding: 0 !important;
 	}
-	
-	:global(.color-picker input[type="text"]) {
+
+	:global(.color-picker input[type='text']) {
 		max-width: 100% !important;
 	}
-	
+
 	:global(.color-picker .slider-wrapper) {
 		max-width: 100% !important;
 		margin: 0 !important;
@@ -723,7 +754,7 @@
 	.color-picker-modal {
 		animation: slideIn 0.15s ease-out;
 	}
-	
+
 	@keyframes slideIn {
 		from {
 			opacity: 0;
@@ -734,29 +765,29 @@
 			transform: translateX(0);
 		}
 	}
-	
+
 	.btn-harmony {
 		padding: 0.375rem 0.5rem;
 		font-size: 10px;
 		font-weight: 800;
-        text-transform: uppercase;
+		text-transform: uppercase;
 		background-color: white;
 		border: 2px solid #111827;
 		border-radius: 0.375rem;
 		transition: all 0.2s;
 		cursor: pointer;
-        color: #111827;
+		color: #111827;
 	}
-	
+
 	.btn-harmony:hover:not(:disabled) {
 		background-color: #ffc480;
-        box-shadow: 2px 2px 0 0 #1f2937;
-        transform: translate(-1px, -1px);
+		box-shadow: 2px 2px 0 0 #1f2937;
+		transform: translate(-1px, -1px);
 	}
-	
+
 	.btn-harmony:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
-        border-color: #d1d5db;
+		border-color: #d1d5db;
 	}
 </style>

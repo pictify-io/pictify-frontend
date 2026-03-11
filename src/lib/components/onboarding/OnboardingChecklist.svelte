@@ -93,7 +93,9 @@
 							style="stroke-dasharray: {strokeDasharray}"
 						/>
 					</svg>
-					<span class="absolute inset-0 flex items-center justify-center text-xs font-black text-gray-900">
+					<span
+						class="absolute inset-0 flex items-center justify-center text-xs font-black text-gray-900"
+					>
 						{$onboardingStore.completedCount}/{$onboardingStore.totalSteps}
 					</span>
 				</div>
@@ -105,7 +107,9 @@
 
 			<div class="flex items-center gap-2">
 				<!-- Collapse/Expand icon -->
-				<div class="w-8 h-8 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]">
+				<div
+					class="w-8 h-8 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+				>
 					<svg
 						class="w-5 h-5 text-gray-900 transition-transform duration-300"
 						class:rotate-180={$onboardingStore.isCollapsed}
@@ -113,7 +117,12 @@
 						stroke="currentColor"
 						viewBox="0 0 24 24"
 					>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="3"
+							d="M19 9l-7 7-7-7"
+						/>
 					</svg>
 				</div>
 			</div>
@@ -126,10 +135,10 @@
 					type="button"
 					class="w-full text-left p-3 rounded-lg border-[3px] transition-all duration-200 flex items-start gap-3
 						{step.completed
-							? 'border-gray-200 bg-gray-50 opacity-60'
-							: step.href
-								? 'border-gray-900 bg-white hover:bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-[2px] cursor-pointer'
-								: 'border-gray-300 bg-gray-50'}"
+						? 'border-gray-200 bg-gray-50 opacity-60'
+						: step.href
+						? 'border-gray-900 bg-white hover:bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-[2px] cursor-pointer'
+						: 'border-gray-300 bg-gray-50'}"
 					on:click={() => handleStepClick(step)}
 					disabled={step.completed || !step.href}
 				>
@@ -137,12 +146,17 @@
 					<div
 						class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center border-[2px]
 							{step.completed
-								? 'bg-green-100 text-green-600 border-transparent'
-								: 'bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'}"
+							? 'bg-green-100 text-green-600 border-transparent'
+							: 'bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'}"
 					>
 						{#if step.completed}
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
 							</svg>
 						{:else}
 							{@html getIcon(step.icon)}
@@ -157,14 +171,26 @@
 						>
 							{step.title}
 						</h4>
-						<p class="text-xs font-medium text-gray-600 mt-1 leading-relaxed line-clamp-2">{step.description}</p>
+						<p class="text-xs font-medium text-gray-600 mt-1 leading-relaxed line-clamp-2">
+							{step.description}
+						</p>
 					</div>
 
 					<!-- Arrow for clickable steps -->
 					{#if !step.completed && step.href}
 						<div class="self-center">
-							<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+							<svg
+								class="w-5 h-5 text-gray-900"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M9 5l7 7-7 7"
+								/>
 							</svg>
 						</div>
 					{/if}

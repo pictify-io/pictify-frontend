@@ -4,4 +4,4 @@
 
 <div class="h-full w-full">
 	<OgImageGenerator />
-</div> 
+</div>

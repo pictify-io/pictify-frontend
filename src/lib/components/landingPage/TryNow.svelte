@@ -60,7 +60,8 @@
 						</h2>
 
 						<p class="text-xl text-gray-700 max-w-xl mx-auto mb-8 font-medium">
-							Sign up, design a template, hit the API, and get a pixel-perfect PNG back. Free tier, no credit card.
+							Sign up, design a template, hit the API, and get a pixel-perfect PNG back. Free tier,
+							no credit card.
 						</p>
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
@@ -74,7 +75,12 @@
 								href="https://docs.pictify.io"
 								target="_blank"
 								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-2 group"
-								on:click={() => analytics.trackOutboundLink({ url: 'https://docs.pictify.io', link_text: 'View API Docs', location: 'cta_section' })}
+								on:click={() =>
+									analytics.trackOutboundLink({
+										url: 'https://docs.pictify.io',
+										link_text: 'View API Docs',
+										location: 'cta_section'
+									})}
 							>
 								<span>View API Docs</span>
 								<svg
@@ -99,17 +105,29 @@
 
 						<!-- Mini FAQ -->
 						<div class="grid sm:grid-cols-3 gap-5 text-left max-w-3xl mx-auto">
-							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+							<div
+								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+							>
 								<h4 class="font-black text-gray-900 text-base mb-2">How long to integrate?</h4>
-								<p class="text-sm text-gray-600 font-medium">Most teams integrate in under 2 hours. One endpoint, JSON in, image out.</p>
+								<p class="text-sm text-gray-600 font-medium">
+									Most teams integrate in under 2 hours. One endpoint, JSON in, image out.
+								</p>
 							</div>
-							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+							<div
+								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+							>
 								<h4 class="font-black text-gray-900 text-base mb-2">What about my data?</h4>
-								<p class="text-sm text-gray-600 font-medium">Your data is never stored. We render and return — that's it.</p>
+								<p class="text-sm text-gray-600 font-medium">
+									Your data is never stored. We render and return — that's it.
+								</p>
 							</div>
-							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+							<div
+								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+							>
 								<h4 class="font-black text-gray-900 text-base mb-2">Can I cancel anytime?</h4>
-								<p class="text-sm text-gray-600 font-medium">Yes. No contracts, no commitments. Cancel with one click.</p>
+								<p class="text-sm text-gray-600 font-medium">
+									Yes. No contracts, no commitments. Cancel with one click.
+								</p>
 							</div>
 						</div>
 					</div>
@@ -197,6 +215,8 @@
 
 <style>
 	@keyframes shimmer {
-		100% { transform: translateX(100%); }
+		100% {
+			transform: translateX(100%);
+		}
 	}
 </style>

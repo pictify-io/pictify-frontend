@@ -160,9 +160,9 @@ export function detectCannibalization(pages) {
 	const issues = [];
 
 	// Build keyword -> pages mapping
-	pages.forEach(page => {
+	pages.forEach((page) => {
 		const keywords = page.seoKeywords || page.keywords || [];
-		keywords.forEach(keyword => {
+		keywords.forEach((keyword) => {
 			const normalizedKeyword = keyword.toLowerCase();
 			if (!keywordPages.has(normalizedKeyword)) {
 				keywordPages.set(normalizedKeyword, []);
@@ -244,7 +244,7 @@ export function suggestKeywords(pageType, pageData) {
 
 	// Filter out keywords that are canonical for other pages
 	const pagePath = getPagePath(pageType, pageData);
-	return baseKeywords.filter(keyword => {
+	return baseKeywords.filter((keyword) => {
 		const canonical = getCanonicalPageForKeyword(keyword);
 		return !canonical || canonical === pagePath;
 	});

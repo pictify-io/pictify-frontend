@@ -375,7 +375,7 @@
 				});
 				break;
 			}
-				
+
 			case 'polygon': {
 				const hexPoints = createPolygonPoints(6, 50);
 				shape = new Path(hexPoints, {

@@ -8,4 +8,4 @@
 
 <div class="h-full w-full">
 	<AgentScreenshot />
-</div> 
+</div>

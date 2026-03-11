@@ -1,35 +1,46 @@
 <script>
 	import { fade } from 'svelte/transition';
 
-	let activeTab = 'simple';
+	let activeTab = 'template';
 
 	const codeExamples = {
-		simple: {
-			title: 'Simple Request',
-			description: 'Generate an image with a single API call',
-			code: `curl -X POST https://api.pictify.io/image \\
+		template: {
+			title: 'Template + Data',
+			description: 'Send data, get a rendered image back',
+			code: `curl -X POST https://api.pictify.io/render \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "html": "<h1>Hello World</h1>",
-    "width": 1200,
-    "height": 630
-  }'`
-		},
-		template: {
-			title: 'Template Variables',
-			description: 'Inject dynamic data into reusable templates',
-			code: `curl -X POST https://api.pictify.io/image \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '{
     "template_id": "social-card-v1",
     "variables": {
-      "title": "{{article.title}}",
-      "author": "{{user.name}}",
-      "avatar": "{{user.avatar_url}}",
-      "date": "{{published_at}}"
+      "title": "How We Scaled to 10M Users",
+      "author": "Sarah Chen",
+      "avatar": "https://cdn.app.com/sarah.jpg",
+      "tag": "Engineering"
     }
-  }'`
+  }'
+
+# Response: { "url": "https://cdn.pictify.io/abc123.png" }`
+		},
+		node: {
+			title: 'Node.js SDK',
+			description: 'First-class TypeScript support with typed responses',
+			code: `import Pictify from '@pictify/sdk';
+
+const pictify = new Pictify('YOUR_API_KEY');
+
+const image = await pictify.render({
+  templateId: 'social-card-v1',
+  variables: {
+    title: article.title,
+    author: user.name,
+    avatar: user.avatarUrl,
+    tag: article.category
+  }
+});
+
+console.log(image.url);
+// https://cdn.pictify.io/abc123.png`
 		},
 		batch: {
 			title: 'Batch Generation',
@@ -46,18 +57,19 @@
     "webhook": "https://your-app.com/callback"
   }'`
 		},
-		experiments: {
-			title: 'Experiments',
-			description: 'A/B test your images with built-in experiments',
-			code: `curl -X POST https://api.pictify.io/experiments \\
+		simple: {
+			title: 'Raw HTML',
+			description: 'Or just render HTML directly — no template needed',
+			code: `curl -X POST https://api.pictify.io/image \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
   -d '{
-    "name": "hero-banner-test",
-    "type": "ab_test",
-    "variants": [
-      { "id": "control", "variables": { "headline": "Save 20%" } },
-      { "id": "variant-a", "variables": { "headline": "Get 20% Off Today" } }
-    ]
+    "html": "<div style=\\"padding:40px\\">
+      <h1>Hello World</h1>
+      <p>Rendered at {{now}}</p>
+    </div>",
+    "width": 1200,
+    "height": 630
   }'`
 		}
 	};
@@ -84,7 +96,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-4 py-2 bg-[#ff6b6b] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-8 transform -rotate-2"
 				>
-					<span class="text-sm font-bold text-white uppercase tracking-wider">Design → API</span>
+					<span class="text-sm font-bold text-white uppercase tracking-wider">Developer-First</span>
 				</div>
 
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -102,7 +114,8 @@
 				</h2>
 
 				<p class="text-xl text-gray-700 max-w-2xl font-medium mb-10">
-					One endpoint. JSON in, image out. Under 200ms. Works with Node.js, Python, or just cURL.
+					One endpoint. Template + JSON in, image out. Under 200ms. Works with Node.js, Python, or
+					just cURL.
 				</p>
 
 				<!-- Features List -->

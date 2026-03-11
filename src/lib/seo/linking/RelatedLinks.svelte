@@ -1,39 +1,39 @@
 <script>
-/**
- * RelatedLinks Component
- * Displays related content links for internal linking SEO
- *
- * @prop {Object[]} items - Array of related items
- * @prop {string} title - Section title
- * @prop {string} [layout] - Layout style: 'grid' | 'list' | 'pills'
- * @prop {string} [hubLink] - Optional link to hub/category page
- * @prop {string} [hubLabel] - Label for hub link
- */
+	/**
+	 * RelatedLinks Component
+	 * Displays related content links for internal linking SEO
+	 *
+	 * @prop {Object[]} items - Array of related items
+	 * @prop {string} title - Section title
+	 * @prop {string} [layout] - Layout style: 'grid' | 'list' | 'pills'
+	 * @prop {string} [hubLink] - Optional link to hub/category page
+	 * @prop {string} [hubLabel] - Label for hub link
+	 */
 
-export let items = [];
-export let title = 'Related';
-export let layout = 'grid';
-export let hubLink = null;
-export let hubLabel = 'View All';
+	export let items = [];
+	export let title = 'Related';
+	export let layout = 'grid';
+	export let hubLink = null;
+	export let hubLabel = 'View All';
 
-// Get link href for an item
-function getHref(item) {
-	if (item.href) return item.href;
-	if (item.slug) return `/${item.pageType || 'page'}/${item.slug}`;
-	if (item.term) return `/glossary/${item.term}`;
-	if (item.id) return `/tools/${item.id}`;
-	return '#';
-}
+	// Get link href for an item
+	function getHref(item) {
+		if (item.href) return item.href;
+		if (item.slug) return `/${item.pageType || 'page'}/${item.slug}`;
+		if (item.term) return `/glossary/${item.term}`;
+		if (item.id) return `/tools/${item.id}`;
+		return '#';
+	}
 
-// Get display title for an item
-function getTitle(item) {
-	return item.title || item.name || item.label || 'Untitled';
-}
+	// Get display title for an item
+	function getTitle(item) {
+		return item.title || item.name || item.label || 'Untitled';
+	}
 
-// Get description for an item
-function getDescription(item) {
-	return item.shortDefinition || item.description || item.metaDescription || '';
-}
+	// Get description for an item
+	function getDescription(item) {
+		return item.shortDefinition || item.description || item.metaDescription || '';
+	}
 </script>
 
 {#if items.length > 0}
@@ -60,7 +60,6 @@ function getDescription(item) {
 					</a>
 				{/each}
 			</div>
-
 		{:else if layout === 'list'}
 			<ul class="space-y-3">
 				{#each items as item}
@@ -69,7 +68,7 @@ function getDescription(item) {
 							href={getHref(item)}
 							class="flex items-center gap-3 p-3 bg-white border-[2px] border-gray-200 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group"
 						>
-							<div class="w-2 h-2 bg-[#ff6b6b] rounded-full flex-shrink-0"></div>
+							<div class="w-2 h-2 bg-[#ff6b6b] rounded-full flex-shrink-0" />
 							<span class="font-bold text-gray-900 group-hover:text-[#ff6b6b] transition-colors">
 								{getTitle(item)}
 							</span>
@@ -77,7 +76,6 @@ function getDescription(item) {
 					</li>
 				{/each}
 			</ul>
-
 		{:else if layout === 'pills'}
 			<div class="flex flex-wrap gap-3">
 				{#each items as item}
@@ -99,7 +97,12 @@ function getDescription(item) {
 				>
 					{hubLabel}
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17 8l4 4m0 0l-4 4m4-4H3"
+						/>
 					</svg>
 				</a>
 			</div>

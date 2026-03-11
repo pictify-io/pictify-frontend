@@ -98,7 +98,11 @@
 			await invalidateAll();
 		} catch (err) {
 			// Check if error has upgrade URL (team limit reached)
-			if (err.upgradeUrl || err.message?.includes('team limit') || err.message?.includes('Team limit')) {
+			if (
+				err.upgradeUrl ||
+				err.message?.includes('team limit') ||
+				err.message?.includes('Team limit')
+			) {
 				error = err.message || 'You can only own one team on the free plan.';
 				errorWithUpgrade = true;
 			} else {
@@ -161,14 +165,22 @@
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
 		aria-label="Switch team"
-		class="w-full flex items-center justify-between px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all {isOpen ? 'translate-x-[2px] translate-y-[2px] shadow-[2px_2px_0_0_#1f2937] bg-gray-50' : ''}"
+		class="w-full flex items-center justify-between px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all {isOpen
+			? 'translate-x-[2px] translate-y-[2px] shadow-[2px_2px_0_0_#1f2937] bg-gray-50'
+			: ''}"
 		disabled={loading}
 	>
 		<div class="flex items-center min-w-0">
 			<!-- Team Avatar/Icon -->
-			<div class="w-9 h-9 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+			<div
+				class="w-9 h-9 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+			>
 				{#if $currentTeam?.avatar}
-					<img src={$currentTeam.avatar} alt={$currentTeam.name} class="w-full h-full rounded-lg object-cover" />
+					<img
+						src={$currentTeam.avatar}
+						alt={$currentTeam.name}
+						class="w-full h-full rounded-lg object-cover"
+					/>
 				{:else}
 					<span class="text-sm font-black text-gray-900">
 						{$currentTeam?.name?.charAt(0)?.toUpperCase() || 'T'}
@@ -203,7 +215,9 @@
 			class="absolute left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top"
 			role="listbox"
 			aria-label="Teams"
-			on:keydown={(e) => { if (e.key === 'Escape') isOpen = false; }}
+			on:keydown={(e) => {
+				if (e.key === 'Escape') isOpen = false;
+			}}
 		>
 			<!-- Usage Bar (if current team) -->
 			{#if $currentTeam && $teamUsage}
@@ -214,9 +228,11 @@
 					</div>
 					<div class="w-full h-3 bg-white rounded-full overflow-hidden border-2 border-gray-900">
 						<div
-							class="h-full border-r-2 border-gray-900 transition-all duration-300 {getUsageColor($teamUsage)}"
+							class="h-full border-r-2 border-gray-900 transition-all duration-300 {getUsageColor(
+								$teamUsage
+							)}"
 							style="width: {getUsagePercentage($teamUsage)}%"
-						></div>
+						/>
 					</div>
 				</div>
 			{/if}
@@ -224,9 +240,7 @@
 			<!-- Migration prompt -->
 			{#if $needsMigration}
 				<div class="px-4 py-3 bg-yellow-50 border-b-[3px] border-gray-900">
-					<p class="text-xs font-bold text-yellow-800 mb-2">
-						Migrate to teams for shared quotas.
-					</p>
+					<p class="text-xs font-bold text-yellow-800 mb-2">Migrate to teams for shared quotas.</p>
 					<button
 						on:click={handleMigrate}
 						disabled={loading}
@@ -248,9 +262,15 @@
 							{teamItem.team?.uid === $currentTeam?.uid ? 'bg-[#FFFDF8]' : ''}"
 						disabled={loading}
 					>
-						<div class="w-8 h-8 rounded-lg bg-gray-100 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 group-hover:bg-[#ffc480] transition-colors">
+						<div
+							class="w-8 h-8 rounded-lg bg-gray-100 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 group-hover:bg-[#ffc480] transition-colors"
+						>
 							{#if teamItem.team?.avatar}
-								<img src={teamItem.team.avatar} alt={teamItem.team.name} class="w-full h-full rounded-lg object-cover" />
+								<img
+									src={teamItem.team.avatar}
+									alt={teamItem.team.name}
+									class="w-full h-full rounded-lg object-cover"
+								/>
 							{:else}
 								<span class="text-xs font-black text-gray-900">
 									{teamItem.team?.name?.charAt(0)?.toUpperCase() || 'T'}
@@ -258,23 +278,33 @@
 							{/if}
 						</div>
 						<div class="ml-3 min-w-0 flex-1">
-							<p class="text-sm font-black text-gray-900 truncate group-hover:text-[#ff6b6b] transition-colors">{teamItem.team?.name}</p>
-							<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">{teamItem.role?.name || 'Member'}</p>
+							<p
+								class="text-sm font-black text-gray-900 truncate group-hover:text-[#ff6b6b] transition-colors"
+							>
+								{teamItem.team?.name}
+							</p>
+							<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+								{teamItem.role?.name || 'Member'}
+							</p>
 						</div>
 						{#if teamItem.team?.uid === $currentTeam?.uid}
-							<div class="w-2 h-2 rounded-full bg-[#4ade80] border border-gray-900 shadow-[1px_1px_0_0_#1f2937]"></div>
+							<div
+								class="w-2 h-2 rounded-full bg-[#4ade80] border border-gray-900 shadow-[1px_1px_0_0_#1f2937]"
+							/>
 						{/if}
 					</button>
 				{/each}
 			</div>
 
 			<!-- Divider -->
-			<div class="h-[3px] bg-gray-900"></div>
+			<div class="h-[3px] bg-gray-900" />
 
 			<!-- Create Team / Team Settings -->
 			{#if isCreating}
 				<div class="px-4 py-3 bg-gray-50">
-					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">New Team Name</label>
+					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2"
+						>New Team Name</label
+					>
 					<input
 						type="text"
 						bind:value={newTeamName}
@@ -302,7 +332,11 @@
 							{loading ? '...' : 'Create'}
 						</button>
 						<button
-							on:click={() => { isCreating = false; error = null; errorWithUpgrade = false; }}
+							on:click={() => {
+								isCreating = false;
+								error = null;
+								errorWithUpgrade = false;
+							}}
 							class="px-3 py-2 text-xs font-black uppercase tracking-wider text-gray-600 bg-white border-2 border-gray-300 rounded-lg hover:border-gray-900 hover:text-gray-900 transition-colors"
 						>
 							Cancel
@@ -314,10 +348,14 @@
 					{#if $ownsTeam}
 						<!-- User already owns a team - show upgrade message -->
 						<div class="px-3 py-2 text-center">
-							<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">One free team limit</p>
+							<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">
+								One free team limit
+							</p>
 							<a
 								href="/dashboard/upgrade"
-								on:click={() => { isOpen = false; }}
+								on:click={() => {
+									isOpen = false;
+								}}
 								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-[#ff6b6b] rounded-lg border-2 border-gray-900 hover:bg-[#ff5252] shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
 							>
 								Upgrade
@@ -325,11 +363,18 @@
 						</div>
 					{:else}
 						<button
-							on:click={() => { isCreating = true; }}
+							on:click={() => {
+								isCreating = true;
+							}}
 							class="w-full flex items-center px-3 py-2 text-xs font-black text-gray-600 uppercase tracking-wider hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
 						>
 							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+								/>
 							</svg>
 							Create New Team
 						</button>
@@ -341,8 +386,18 @@
 							class="w-full flex items-center px-3 py-2 text-xs font-black text-gray-600 uppercase tracking-wider hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
 						>
 							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+								/>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+								/>
 							</svg>
 							Team Settings
 						</button>

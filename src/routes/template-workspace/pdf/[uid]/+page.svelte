@@ -17,7 +17,7 @@
 
 		// Set PDF mode immediately so UI shows correct panels
 		pageActions.setOutputFormat('pdf');
-		
+
 		await getTemplateAction($page.params.uid);
 		isLoading = false;
 	});

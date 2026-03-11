@@ -109,7 +109,7 @@ export const editorActions = {
 		canvas.discardActiveObject();
 
 		// Remove all objects from canvas
-		objects.forEach(obj => canvas.remove(obj));
+		objects.forEach((obj) => canvas.remove(obj));
 
 		// Create a new Group with the same objects
 		// FabricJS Group constructor automatically positions objects relative to group center
@@ -118,7 +118,7 @@ export const editorActions = {
 			id: `group_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 			// Custom properties for template logic
 			isConditionGroup: true,
-			subTargetCheck: true,
+			subTargetCheck: true
 		});
 
 		// Add group to canvas
@@ -168,7 +168,7 @@ export const editorActions = {
 		canvas.remove(group);
 
 		// Add each object back to canvas
-		objects.forEach(obj => {
+		objects.forEach((obj) => {
 			canvas.add(obj);
 		});
 

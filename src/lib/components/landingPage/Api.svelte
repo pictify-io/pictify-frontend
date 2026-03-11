@@ -138,7 +138,7 @@ $image = json_decode($response);
 </script>
 
 <div
-	class="w-full flex justify-center flex-col sm: px-6 max-w-4xl space-y-8 w-100 mx-auto  pt-10  md:pb-10"
+	class="w-full flex justify-center flex-col sm: px-6 max-w-4xl space-y-8 w-100 mx-auto pt-10 md:pb-10"
 >
 	<div class="">
 		<div>
@@ -146,9 +146,7 @@ $image = json_decode($response);
 				<p>A Clean API</p>
 			</div>
 			<div class="text-lg opacity-70 max-w-3xl text-left md:text-center my-8">
-				<p class="">
-					5-minute integration. Generate images and GIFs with a single POST request.
-				</p>
+				<p class="">5-minute integration. Generate images and GIFs with a single POST request.</p>
 			</div>
 		</div>
 		<div class="sm:block w-full my-10 md:my-8 overflow-x-auto">
