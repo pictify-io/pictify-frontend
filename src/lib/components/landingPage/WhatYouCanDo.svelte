@@ -100,7 +100,8 @@
 				</span>
 			</h2>
 			<p class="text-xl md:text-2xl text-gray-700 font-medium leading-relaxed">
-				Design in a visual editor. Render through a REST API. Scale to millions without config changes.
+				Design in a visual editor. Render through a REST API. Scale to millions without config
+				changes.
 			</p>
 		</div>
 
@@ -129,7 +130,8 @@
 						</div>
 						<h3 class="text-3xl font-black text-black mb-3 leading-tight">Build Visually.</h3>
 						<p class="text-black/70 font-medium text-lg">
-							Canvas editor with layers, a properties panel, and real-time preview. No code required to design.
+							Canvas editor with layers, a properties panel, and real-time preview. No code required
+							to design.
 						</p>
 					</div>
 					<div class="mt-6">
@@ -231,7 +233,8 @@
 
 					<h3 class="text-3xl font-black text-white mb-3">Integrate in Minutes.</h3>
 					<p class="text-gray-400 font-medium text-lg mb-8">
-						One API call, one JSON payload, one rendered image back. SDKs for Node, Python, and REST.
+						One API call, one JSON payload, one rendered image back. SDKs for Node, Python, and
+						REST.
 					</p>
 
 					<!-- Terminal -->

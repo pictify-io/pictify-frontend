@@ -1,61 +1,59 @@
 <script>
-import Nav from '$lib/components/landingPage/Nav.svelte';
-import Footer from '$lib/components/landingPage/Footer.svelte';
-import { page } from '$app/stores';
-import { goto } from '$app/navigation';
-import { browser } from '$app/environment';
-import { glossary } from '$lib/pseo/config.js';
+	import Nav from '$lib/components/landingPage/Nav.svelte';
+	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
+	import { glossary } from '$lib/pseo/config.js';
 
-$: termId = $page.params.term;
-$: term = glossary.find(t => t.term === termId);
-$: validTerm = !!term;
+	$: termId = $page.params.term;
+	$: term = glossary.find((t) => t.term === termId);
+	$: validTerm = !!term;
 
-// Redirect if not found
-$: if (browser && !validTerm && termId) {
-	goto('/glossary');
-}
-
-// Related terms
-$: relatedTerms = term?.relatedTerms
-	? term.relatedTerms
-		.map(t => glossary.find(g => g.term === t))
-		.filter(Boolean)
-	: [];
-
-// Other terms for navigation
-$: otherTerms = glossary.filter(t => t.term !== termId).slice(0, 4);
-
-// SEO
-$: title = validTerm
-	? `${term.title} | Image Generation Glossary | Pictify`
-	: 'Glossary | Pictify';
-$: description = validTerm
-	? term.shortDefinition
-	: 'Learn image generation terminology.';
-$: canonical = validTerm
-	? `https://pictify.io/glossary/${termId}`
-	: 'https://pictify.io/glossary';
-
-// Structured data (DefinedTerm)
-$: structuredData = validTerm ? {
-	'@context': 'https://schema.org',
-	'@type': 'DefinedTerm',
-	name: term.title,
-	description: term.longDefinition,
-	url: canonical,
-	inDefinedTermSet: {
-		'@type': 'DefinedTermSet',
-		name: 'Image Generation Glossary',
-		url: 'https://pictify.io/glossary'
+	// Redirect if not found
+	$: if (browser && !validTerm && termId) {
+		goto('/glossary');
 	}
-} : null;
+
+	// Related terms
+	$: relatedTerms = term?.relatedTerms
+		? term.relatedTerms.map((t) => glossary.find((g) => g.term === t)).filter(Boolean)
+		: [];
+
+	// Other terms for navigation
+	$: otherTerms = glossary.filter((t) => t.term !== termId).slice(0, 4);
+
+	// SEO
+	$: title = validTerm
+		? `${term.title} | Image Generation Glossary | Pictify`
+		: 'Glossary | Pictify';
+	$: description = validTerm ? term.shortDefinition : 'Learn image generation terminology.';
+	$: canonical = validTerm
+		? `https://pictify.io/glossary/${termId}`
+		: 'https://pictify.io/glossary';
+
+	// Structured data (DefinedTerm)
+	$: structuredData = validTerm
+		? {
+				'@context': 'https://schema.org',
+				'@type': 'DefinedTerm',
+				name: term.title,
+				description: term.longDefinition,
+				url: canonical,
+				inDefinedTermSet: {
+					'@type': 'DefinedTermSet',
+					name: 'Image Generation Glossary',
+					url: 'https://pictify.io/glossary'
+				}
+		  }
+		: null;
 </script>
 
 <svelte:head>
 	<title>{title}</title>
 	<meta name="description" content={description} />
 	<link rel="canonical" href={canonical} />
-	<meta name="keywords" content="{term?.seoKeywords?.join(', ') || term?.title}" />
+	<meta name="keywords" content={term?.seoKeywords?.join(', ') || term?.title} />
 
 	<!-- Open Graph -->
 	<meta property="og:title" content={title} />
@@ -78,10 +76,16 @@ $: structuredData = validTerm ? {
 	<Nav />
 
 	<!-- Background Elements -->
-	<div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
-	<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+	<div
+		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
+	/>
+	<div
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+	/>
 
-	<main class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10">
+	<main
+		class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10"
+	>
 		{#if validTerm}
 			<!-- Breadcrumb -->
 			<nav class="mb-8">
@@ -95,10 +99,14 @@ $: structuredData = validTerm ? {
 			</nav>
 
 			<!-- Main Content Card -->
-			<article class="bg-white border-[4px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-12">
+			<article
+				class="bg-white border-[4px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-12"
+			>
 				<!-- Header -->
 				<div class="bg-[#ffc480] border-b-[4px] border-gray-900 p-8">
-					<div class="inline-block px-3 py-1 bg-white border-[2px] border-gray-900 rounded-full text-xs font-black uppercase tracking-wide mb-4">
+					<div
+						class="inline-block px-3 py-1 bg-white border-[2px] border-gray-900 rounded-full text-xs font-black uppercase tracking-wide mb-4"
+					>
 						Definition
 					</div>
 					<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
@@ -136,7 +144,9 @@ $: structuredData = validTerm ? {
 								href="/glossary/{related.term}"
 								class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 							>
-								<h3 class="font-black text-gray-900 mb-1 group-hover:text-[#ff6b6b] transition-colors">
+								<h3
+									class="font-black text-gray-900 mb-1 group-hover:text-[#ff6b6b] transition-colors"
+								>
 									{related.title}
 								</h3>
 								<p class="text-sm text-gray-500 font-medium line-clamp-1">
@@ -149,10 +159,10 @@ $: structuredData = validTerm ? {
 			{/if}
 
 			<!-- CTA Section -->
-			<section class="mb-12 bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center">
-				<h2 class="text-2xl font-black text-gray-900 mb-3">
-					Put it into practice
-				</h2>
+			<section
+				class="mb-12 bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center"
+			>
+				<h2 class="text-2xl font-black text-gray-900 mb-3">Put it into practice</h2>
 				<p class="text-gray-600 font-bold mb-6">
 					Now that you understand {term.title.toLowerCase()}, try it yourself with Pictify.
 				</p>
@@ -186,12 +196,19 @@ $: structuredData = validTerm ? {
 					</a>
 				</div>
 			</section>
-
 		{:else}
 			<!-- Not Found State -->
-			<div class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4">
-				<div class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]">?</div>
-				<h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-gray-900">Term not found</h1>
+			<div
+				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
+			>
+				<div
+					class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+				>
+					?
+				</div>
+				<h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-gray-900">
+					Term not found
+				</h1>
 				<a
 					href="/glossary"
 					class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"

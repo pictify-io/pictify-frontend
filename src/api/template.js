@@ -6,7 +6,13 @@ const getTemplate = async ({ type, variables }) => {
 	return response;
 };
 
-const getTemplates = async ({ page = 1, limit = 12, sort = 'newest', outputFormat = 'all', hasDynamicLink } = {}) => {
+const getTemplates = async ({
+	page = 1,
+	limit = 12,
+	sort = 'newest',
+	outputFormat = 'all',
+	hasDynamicLink
+} = {}) => {
 	try {
 		const params = new URLSearchParams({
 			page: page.toString(),
@@ -64,7 +70,9 @@ const deleteTemplate = async (uid) => {
 
 const searchTemplates = async (search, { page = 1, limit = 12 } = {}) => {
 	try {
-		const response = await backend.get(`/templates/search?q=${encodeURIComponent(search)}&page=${page}&limit=${limit}`);
+		const response = await backend.get(
+			`/templates/search?q=${encodeURIComponent(search)}&page=${page}&limit=${limit}`
+		);
 		return response;
 	} catch (error) {
 		return null;
@@ -134,14 +142,18 @@ const renderTemplateMultiSize = async (uid, variables = {}, sizes = [], options 
 			headers['Authorization'] = `Bearer ${options.apiKey}`;
 		}
 
-		const response = await backend.post(`/templates/${uid}/multi-size-render`, {
-			variables,
-			sizes,
-			format: options.format || 'png',
-			quality: options.quality || 0.9
-		}, {
-			headers
-		});
+		const response = await backend.post(
+			`/templates/${uid}/multi-size-render`,
+			{
+				variables,
+				sizes,
+				format: options.format || 'png',
+				quality: options.quality || 0.9
+			},
+			{
+				headers
+			}
+		);
 		return response;
 	} catch (error) {
 		console.error('Error multi-size rendering template:', error);
@@ -173,14 +185,18 @@ const getTemplateVariables = async (uid) => {
  */
 const batchRenderTemplate = async (uid, variableSets, options = {}) => {
 	try {
-		const response = await backend.post(`/templates/${uid}/batch-render`, {
-			variableSets,
-			format: options.format || 'png',
-			quality: options.quality || 0.9,
-			concurrency: options.concurrency || 5
-		}, {
-			headers: options.headers || {}
-		});
+		const response = await backend.post(
+			`/templates/${uid}/batch-render`,
+			{
+				variableSets,
+				format: options.format || 'png',
+				quality: options.quality || 0.9,
+				concurrency: options.concurrency || 5
+			},
+			{
+				headers: options.headers || {}
+			}
+		);
 		return response;
 	} catch (error) {
 		console.error('Error batch rendering template:', error);
@@ -225,15 +241,19 @@ const cancelBatchJob = async (batchId) => {
  */
 const batchRenderFromCsv = async (uid, csvUrl, mappings, options = {}) => {
 	try {
-		const response = await backend.post(`/templates/${uid}/batch-render`, {
-			csvUrl,
-			mappings,
-			format: options.format || 'png',
-			quality: options.quality || 0.9,
-			concurrency: options.concurrency || 5
-		}, {
-			headers: options.headers || {}
-		});
+		const response = await backend.post(
+			`/templates/${uid}/batch-render`,
+			{
+				csvUrl,
+				mappings,
+				format: options.format || 'png',
+				quality: options.quality || 0.9,
+				concurrency: options.concurrency || 5
+			},
+			{
+				headers: options.headers || {}
+			}
+		);
 		return response;
 	} catch (error) {
 		console.error('Error batch rendering from CSV:', error);
@@ -371,13 +391,17 @@ const forkTemplate = async (uid) => {
 // PDF Operations
 const renderPdf = async (templateUid, variables = {}, options = {}) => {
 	try {
-		const response = await backend.post('/pdf/render', {
-			templateUid,
-			variables,
-			options
-		}, {
-			headers: options.headers || {}
-		});
+		const response = await backend.post(
+			'/pdf/render',
+			{
+				templateUid,
+				variables,
+				options
+			},
+			{
+				headers: options.headers || {}
+			}
+		);
 		return response;
 	} catch (error) {
 		console.error('Error rendering PDF:', error);
@@ -387,13 +411,17 @@ const renderPdf = async (templateUid, variables = {}, options = {}) => {
 
 const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) => {
 	try {
-		const response = await backend.post('/pdf/multi-page', {
-			templateUid,
-			variableSets,
-			options
-		}, {
-			headers: options.headers || {}
-		});
+		const response = await backend.post(
+			'/pdf/multi-page',
+			{
+				templateUid,
+				variableSets,
+				options
+			},
+			{
+				headers: options.headers || {}
+			}
+		);
 		return response;
 	} catch (error) {
 		console.error('Error rendering multi-page PDF:', error);

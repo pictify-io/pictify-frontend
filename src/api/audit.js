@@ -15,19 +15,19 @@ import backend from '../service/backend';
  * @returns {Promise<Object>} - Logs and pagination info
  */
 export async function fetchAuditLogs(options = {}) {
-  const params = {};
-  
-  if (options.category) params.category = options.category;
-  if (options.action) params.action = options.action;
-  if (options.status) params.status = options.status;
-  if (options.resourceType) params.resourceType = options.resourceType;
-  if (options.resourceId) params.resourceId = options.resourceId;
-  if (options.startDate) params.startDate = options.startDate;
-  if (options.endDate) params.endDate = options.endDate;
-  if (options.limit) params.limit = options.limit;
-  if (options.offset) params.offset = options.offset;
+	const params = {};
 
-  return backend.get('/audit/logs', { params });
+	if (options.category) params.category = options.category;
+	if (options.action) params.action = options.action;
+	if (options.status) params.status = options.status;
+	if (options.resourceType) params.resourceType = options.resourceType;
+	if (options.resourceId) params.resourceId = options.resourceId;
+	if (options.startDate) params.startDate = options.startDate;
+	if (options.endDate) params.endDate = options.endDate;
+	if (options.limit) params.limit = options.limit;
+	if (options.offset) params.offset = options.offset;
+
+	return backend.get('/audit/logs', { params });
 }
 
 /**
@@ -38,12 +38,12 @@ export async function fetchAuditLogs(options = {}) {
  * @returns {Promise<Object>} - Summary statistics
  */
 export async function fetchAuditSummary(options = {}) {
-  const params = {};
-  
-  if (options.startDate) params.startDate = options.startDate;
-  if (options.endDate) params.endDate = options.endDate;
+	const params = {};
 
-  return backend.get('/audit/summary', { params });
+	if (options.startDate) params.startDate = options.startDate;
+	if (options.endDate) params.endDate = options.endDate;
+
+	return backend.get('/audit/summary', { params });
 }
 
 /**
@@ -52,7 +52,7 @@ export async function fetchAuditSummary(options = {}) {
  * @returns {Promise<Object>} - Audit log entry
  */
 export async function fetchAuditLogById(logId) {
-  return backend.get(`/audit/logs/${logId}`);
+	return backend.get(`/audit/logs/${logId}`);
 }
 
 /**
@@ -62,12 +62,12 @@ export async function fetchAuditLogById(logId) {
  * @returns {Promise<Object>} - Logs for the resource
  */
 export async function fetchResourceLogs(resourceId, options = {}) {
-  const params = {};
-  
-  if (options.limit) params.limit = options.limit;
-  if (options.offset) params.offset = options.offset;
+	const params = {};
 
-  return backend.get(`/audit/resource/${resourceId}`, { params });
+	if (options.limit) params.limit = options.limit;
+	if (options.offset) params.offset = options.offset;
+
+	return backend.get(`/audit/resource/${resourceId}`, { params });
 }
 
 /**
@@ -83,16 +83,15 @@ export async function fetchResourceLogs(resourceId, options = {}) {
  * @returns {Promise<Object|string>} - Exported data
  */
 export async function exportAuditLogs(options = {}) {
-  const params = {};
-  
-  if (options.format) params.format = options.format;
-  if (options.category) params.category = options.category;
-  if (options.action) params.action = options.action;
-  if (options.status) params.status = options.status;
-  if (options.startDate) params.startDate = options.startDate;
-  if (options.endDate) params.endDate = options.endDate;
-  if (options.limit) params.limit = options.limit;
+	const params = {};
 
-  return backend.get('/audit/export', { params });
+	if (options.format) params.format = options.format;
+	if (options.category) params.category = options.category;
+	if (options.action) params.action = options.action;
+	if (options.status) params.status = options.status;
+	if (options.startDate) params.startDate = options.startDate;
+	if (options.endDate) params.endDate = options.endDate;
+	if (options.limit) params.limit = options.limit;
+
+	return backend.get('/audit/export', { params });
 }
-

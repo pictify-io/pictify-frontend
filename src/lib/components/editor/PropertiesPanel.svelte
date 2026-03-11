@@ -31,7 +31,11 @@
 		CATEGORY_ICONS
 	} from '../../../api/fonts';
 	import { outputFormat, pdfPreset, pageActions } from '../../../store/pages.store';
-	import { loadBrandFonts, getBrandFontFamilies, isBrandFont } from '../../utils/brand-fonts-loader';
+	import {
+		loadBrandFonts,
+		getBrandFontFamilies,
+		isBrandFont
+	} from '../../utils/brand-fonts-loader';
 	import {
 		checkFeatureAccessSync,
 		FEATURES,
@@ -742,8 +746,12 @@
 			fontWeight: obj.fontWeight || 'normal',
 			textAlign: obj.textAlign || 'left',
 			charSpacing: obj.charSpacing || 0,
-			width: obj.isPatternFill ? (obj.patternBoundsWidth || Math.round(obj.getScaledWidth())) : (Math.round(obj.getScaledWidth()) || 0),
-			height: obj.isPatternFill ? (obj.patternBoundsHeight || Math.round(obj.getScaledHeight())) : (Math.round(obj.getScaledHeight()) || 0),
+			width: obj.isPatternFill
+				? obj.patternBoundsWidth || Math.round(obj.getScaledWidth())
+				: Math.round(obj.getScaledWidth()) || 0,
+			height: obj.isPatternFill
+				? obj.patternBoundsHeight || Math.round(obj.getScaledHeight())
+				: Math.round(obj.getScaledHeight()) || 0,
 			radius: type === 'rect' ? obj.rx || 0 : obj.radius || 0,
 			backgroundColor: obj.backgroundColor || ''
 		};
@@ -774,7 +782,13 @@
 		}
 
 		// Load effects (shadow/stroke) for shapes
-		if (type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path') {
+		if (
+			type === 'rect' ||
+			type === 'circle' ||
+			type === 'triangle' ||
+			type === 'polygon' ||
+			type === 'path'
+		) {
 			loadTextEffects();
 		}
 
@@ -2336,7 +2350,12 @@
 	function loadTextEffects() {
 		if (!$selectedComponent) return;
 		const isText = type === 'i-text' || type === 'text' || type === 'textbox';
-		const isShape = type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path';
+		const isShape =
+			type === 'rect' ||
+			type === 'circle' ||
+			type === 'triangle' ||
+			type === 'polygon' ||
+			type === 'path';
 		if (!isText && !isShape) return;
 
 		// Load shadow properties
@@ -2501,7 +2520,12 @@
 	}
 
 	function addTextBackground() {
-		if (!$selectedComponent || !$editor || (type !== 'i-text' && type !== 'text' && type !== 'textbox')) return;
+		if (
+			!$selectedComponent ||
+			!$editor ||
+			(type !== 'i-text' && type !== 'text' && type !== 'textbox')
+		)
+			return;
 
 		const textObj = $selectedComponent;
 		const center = textObj.getCenterPoint();
@@ -3881,13 +3905,10 @@
 						<div class="space-y-2 pt-4 border-t border-gray-200">
 							<label class={fieldLabelClass}>Text Align</label>
 							<div class="flex gap-1.5">
-								{#each [
-									{ value: 'left', icon: 'fa-align-left' },
-									{ value: 'center', icon: 'fa-align-center' },
-									{ value: 'right', icon: 'fa-align-right' }
-								] as align}
+								{#each [{ value: 'left', icon: 'fa-align-left' }, { value: 'center', icon: 'fa-align-center' }, { value: 'right', icon: 'fa-align-right' }] as align}
 									<button
-										class="flex-1 py-1.5 text-sm border-[2px] border-gray-900 rounded-lg transition-all {styles.textAlign === align.value
+										class="flex-1 py-1.5 text-sm border-[2px] border-gray-900 rounded-lg transition-all {styles.textAlign ===
+										align.value
 											? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#ffc480]'
 											: 'bg-white text-gray-700 shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5'}"
 										on:click={() => updateProperty('textAlign', align.value)}
@@ -3915,235 +3936,235 @@
 
 					<!-- EFFECTS SECTION -->
 					<CollapsibleSection title="Effects" bind:open={showTextEffectsPanel}>
-							<div class="space-y-4 pt-2">
-								<!-- Quick Presets -->
-								<div>
-									<label class={fieldLabelClass}>Presets</label>
-									<div class="grid grid-cols-4 gap-1.5">
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyTextEffectPreset('none')}
-											title="None"
-										>
-											None
-										</button>
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyTextEffectPreset('soft-shadow')}
-											title="Soft Shadow"
-										>
-											Soft
-										</button>
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyTextEffectPreset('hard-shadow')}
-											title="Hard Shadow"
-										>
-											Hard
-										</button>
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyTextEffectPreset('outline')}
-											title="Outline"
-										>
-											Outline
-										</button>
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyTextEffectPreset('glow')}
-											title="Glow"
-										>
-											Glow
-										</button>
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyTextEffectPreset('neon')}
-											title="Neon"
-										>
-											Neon
-										</button>
-										<button
-											class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium col-span-2"
-											on:click={() => applyTextEffectPreset('bold-outline')}
-											title="Bold Outline"
-										>
-											Bold Outline
-										</button>
-									</div>
-								</div>
-
-								<!-- Shadow Controls -->
-								<div class="pt-3 border-t border-gray-200">
-									<div class="flex items-center justify-between mb-3">
-										<label class="{fieldLabelClass} mb-0">Shadow</label>
-										<label class="relative inline-flex items-center cursor-pointer">
-											<input
-												type="checkbox"
-												class="sr-only peer"
-												checked={textEffects.shadow.enabled}
-												on:change={(e) => applyTextShadow('enabled', e.target.checked)}
-											/>
-											<div class={toggleSwitchClass} />
-										</label>
-									</div>
-
-									{#if textEffects.shadow.enabled}
-										<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
-											<!-- Shadow Color -->
-											<GradientColorPicker
-												label="Color"
-												value={textEffects.shadow.color}
-												defaultColor="rgba(0, 0, 0, 0.5)"
-												supportsGradient={false}
-												onSolidChange={(color) => applyTextShadow('color', color)}
-											/>
-
-											<!-- Shadow Blur -->
-											<div>
-												<div class="flex items-center justify-between mb-2">
-													<label class="{fieldLabelClass} mb-0">Blur</label>
-													<span class="text-xs text-gray-500">{textEffects.shadow.blur}px</span>
-												</div>
-												<input
-													type="range"
-													min="0"
-													max="30"
-													step="1"
-													value={textEffects.shadow.blur}
-													class={rangeInputClass}
-													on:input={(e) => applyTextShadow('blur', parseInt(e.target.value))}
-												/>
-											</div>
-
-											<!-- Shadow Offset X -->
-											<div>
-												<div class="flex items-center justify-between mb-2">
-													<label class="{fieldLabelClass} mb-0">Horizontal Offset</label>
-													<span class="text-xs text-gray-500">{textEffects.shadow.offsetX}px</span>
-												</div>
-												<input
-													type="range"
-													min="-30"
-													max="30"
-													step="1"
-													value={textEffects.shadow.offsetX}
-													class={rangeInputClass}
-													on:input={(e) => applyTextShadow('offsetX', parseInt(e.target.value))}
-												/>
-											</div>
-
-											<!-- Shadow Offset Y -->
-											<div>
-												<div class="flex items-center justify-between mb-2">
-													<label class="{fieldLabelClass} mb-0">Vertical Offset</label>
-													<span class="text-xs text-gray-500">{textEffects.shadow.offsetY}px</span>
-												</div>
-												<input
-													type="range"
-													min="-30"
-													max="30"
-													step="1"
-													value={textEffects.shadow.offsetY}
-													class={rangeInputClass}
-													on:input={(e) => applyTextShadow('offsetY', parseInt(e.target.value))}
-												/>
-											</div>
-										</div>
-									{/if}
-								</div>
-
-								<!-- Stroke Controls -->
-								<div class="pt-3 border-t border-gray-200">
-									<div class="flex items-center justify-between mb-3">
-										<label class="{fieldLabelClass} mb-0">Stroke (Outline)</label>
-										<label class="relative inline-flex items-center cursor-pointer">
-											<input
-												type="checkbox"
-												class="sr-only peer"
-												checked={textEffects.stroke.enabled}
-												on:change={(e) => applyTextStroke('enabled', e.target.checked)}
-											/>
-											<div class={toggleSwitchClass} />
-										</label>
-									</div>
-
-									{#if textEffects.stroke.enabled}
-										<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
-											<!-- Stroke Color -->
-											<GradientColorPicker
-												label="Color"
-												value={textEffects.stroke.color}
-												defaultColor="#000000"
-												supportsGradient={false}
-												onSolidChange={(color) => applyTextStroke('color', color)}
-											/>
-
-											<!-- Stroke Width -->
-											<div>
-												<div class="flex items-center justify-between mb-2">
-													<label class="{fieldLabelClass} mb-0">Width</label>
-													<span class="text-xs text-gray-500">{textEffects.stroke.width}px</span>
-												</div>
-												<input
-													type="range"
-													min="1"
-													max="20"
-													step="0.5"
-													value={textEffects.stroke.width}
-													class={rangeInputClass}
-													on:input={(e) => applyTextStroke('width', parseFloat(e.target.value))}
-												/>
-											</div>
-										</div>
-									{/if}
-								</div>
-
-								<!-- Background Button -->
-								<div class="pt-3 border-t border-gray-200">
+						<div class="space-y-4 pt-2">
+							<!-- Quick Presets -->
+							<div>
+								<label class={fieldLabelClass}>Presets</label>
+								<div class="grid grid-cols-4 gap-1.5">
 									<button
-										class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium text-xs flex items-center justify-center gap-2"
-										on:click={addTextBackground}
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyTextEffectPreset('none')}
+										title="None"
 									>
-										<i class="fa fa-plus-square" />
-										Add Background Shape
+										None
+									</button>
+									<button
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyTextEffectPreset('soft-shadow')}
+										title="Soft Shadow"
+									>
+										Soft
+									</button>
+									<button
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyTextEffectPreset('hard-shadow')}
+										title="Hard Shadow"
+									>
+										Hard
+									</button>
+									<button
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyTextEffectPreset('outline')}
+										title="Outline"
+									>
+										Outline
+									</button>
+									<button
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyTextEffectPreset('glow')}
+										title="Glow"
+									>
+										Glow
+									</button>
+									<button
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyTextEffectPreset('neon')}
+										title="Neon"
+									>
+										Neon
+									</button>
+									<button
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium col-span-2"
+										on:click={() => applyTextEffectPreset('bold-outline')}
+										title="Bold Outline"
+									>
+										Bold Outline
 									</button>
 								</div>
 							</div>
+
+							<!-- Shadow Controls -->
+							<div class="pt-3 border-t border-gray-200">
+								<div class="flex items-center justify-between mb-3">
+									<label class="{fieldLabelClass} mb-0">Shadow</label>
+									<label class="relative inline-flex items-center cursor-pointer">
+										<input
+											type="checkbox"
+											class="sr-only peer"
+											checked={textEffects.shadow.enabled}
+											on:change={(e) => applyTextShadow('enabled', e.target.checked)}
+										/>
+										<div class={toggleSwitchClass} />
+									</label>
+								</div>
+
+								{#if textEffects.shadow.enabled}
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
+										<!-- Shadow Color -->
+										<GradientColorPicker
+											label="Color"
+											value={textEffects.shadow.color}
+											defaultColor="rgba(0, 0, 0, 0.5)"
+											supportsGradient={false}
+											onSolidChange={(color) => applyTextShadow('color', color)}
+										/>
+
+										<!-- Shadow Blur -->
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Blur</label>
+												<span class="text-xs text-gray-500">{textEffects.shadow.blur}px</span>
+											</div>
+											<input
+												type="range"
+												min="0"
+												max="30"
+												step="1"
+												value={textEffects.shadow.blur}
+												class={rangeInputClass}
+												on:input={(e) => applyTextShadow('blur', parseInt(e.target.value))}
+											/>
+										</div>
+
+										<!-- Shadow Offset X -->
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Horizontal Offset</label>
+												<span class="text-xs text-gray-500">{textEffects.shadow.offsetX}px</span>
+											</div>
+											<input
+												type="range"
+												min="-30"
+												max="30"
+												step="1"
+												value={textEffects.shadow.offsetX}
+												class={rangeInputClass}
+												on:input={(e) => applyTextShadow('offsetX', parseInt(e.target.value))}
+											/>
+										</div>
+
+										<!-- Shadow Offset Y -->
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Vertical Offset</label>
+												<span class="text-xs text-gray-500">{textEffects.shadow.offsetY}px</span>
+											</div>
+											<input
+												type="range"
+												min="-30"
+												max="30"
+												step="1"
+												value={textEffects.shadow.offsetY}
+												class={rangeInputClass}
+												on:input={(e) => applyTextShadow('offsetY', parseInt(e.target.value))}
+											/>
+										</div>
+									</div>
+								{/if}
+							</div>
+
+							<!-- Stroke Controls -->
+							<div class="pt-3 border-t border-gray-200">
+								<div class="flex items-center justify-between mb-3">
+									<label class="{fieldLabelClass} mb-0">Stroke (Outline)</label>
+									<label class="relative inline-flex items-center cursor-pointer">
+										<input
+											type="checkbox"
+											class="sr-only peer"
+											checked={textEffects.stroke.enabled}
+											on:change={(e) => applyTextStroke('enabled', e.target.checked)}
+										/>
+										<div class={toggleSwitchClass} />
+									</label>
+								</div>
+
+								{#if textEffects.stroke.enabled}
+									<div class="space-y-3 ml-2 pl-3 border-l-2 border-gray-200">
+										<!-- Stroke Color -->
+										<GradientColorPicker
+											label="Color"
+											value={textEffects.stroke.color}
+											defaultColor="#000000"
+											supportsGradient={false}
+											onSolidChange={(color) => applyTextStroke('color', color)}
+										/>
+
+										<!-- Stroke Width -->
+										<div>
+											<div class="flex items-center justify-between mb-2">
+												<label class="{fieldLabelClass} mb-0">Width</label>
+												<span class="text-xs text-gray-500">{textEffects.stroke.width}px</span>
+											</div>
+											<input
+												type="range"
+												min="1"
+												max="20"
+												step="0.5"
+												value={textEffects.stroke.width}
+												class={rangeInputClass}
+												on:input={(e) => applyTextStroke('width', parseFloat(e.target.value))}
+											/>
+										</div>
+									</div>
+								{/if}
+							</div>
+
+							<!-- Background Button -->
+							<div class="pt-3 border-t border-gray-200">
+								<button
+									class="w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium text-xs flex items-center justify-center gap-2"
+									on:click={addTextBackground}
+								>
+									<i class="fa fa-plus-square" />
+									Add Background Shape
+								</button>
+							</div>
+						</div>
 					</CollapsibleSection>
 				{/if}
 
 				<!-- Universal Fill Controls for All Shapes -->
 				{#if type === 'rect' || type === 'circle' || type === 'triangle' || type === 'polygon' || type === 'path'}
 					<CollapsibleSection title="Appearance" bind:open={showAppearanceSection}>
-							<div class="space-y-4">
-								<!-- Fill Color -->
-								{#if boundProperties.has('fill')}<span
-										class="text-[9px] text-green-500 mb-[-4px] block"
-										><i class="fa fa-link" /> Bound to API variable</span
-									>{/if}
-								<GradientColorPicker
-									label="Fill Color"
-									value={styles.fill || '#000000'}
-									defaultColor="#000000"
-									onSolidChange={(color) => updateProperty('fill', color)}
-									onGradientChange={applyGradientToSelection}
-								/>
+						<div class="space-y-4">
+							<!-- Fill Color -->
+							{#if boundProperties.has('fill')}<span
+									class="text-[9px] text-green-500 mb-[-4px] block"
+									><i class="fa fa-link" /> Bound to API variable</span
+								>{/if}
+							<GradientColorPicker
+								label="Fill Color"
+								value={styles.fill || '#000000'}
+								defaultColor="#000000"
+								onSolidChange={(color) => updateProperty('fill', color)}
+								onGradientChange={applyGradientToSelection}
+							/>
 
-								{#if type !== 'path' || styles.fill}
-									<div class="flex items-center justify-between">
-										<span class="text-xs text-gray-600">Fill Enabled</span>
-										<label class="relative inline-flex items-center cursor-pointer">
-											<input
-												type="checkbox"
-												class="sr-only peer"
-												checked={styles.fill !== '' && styles.fill !== null}
-												on:change={(e) => updateProperty('fill', e.target.checked ? '#3b82f6' : '')}
-											/>
-											<div class={toggleSwitchClass} />
-										</label>
-									</div>
-								{/if}
-							</div>
+							{#if type !== 'path' || styles.fill}
+								<div class="flex items-center justify-between">
+									<span class="text-xs text-gray-600">Fill Enabled</span>
+									<label class="relative inline-flex items-center cursor-pointer">
+										<input
+											type="checkbox"
+											class="sr-only peer"
+											checked={styles.fill !== '' && styles.fill !== null}
+											on:change={(e) => updateProperty('fill', e.target.checked ? '#3b82f6' : '')}
+										/>
+										<div class={toggleSwitchClass} />
+									</label>
+								</div>
+							{/if}
+						</div>
 					</CollapsibleSection>
 
 					<!-- Effects Section for Shapes (Shadow + Stroke) -->
@@ -4275,160 +4296,160 @@
 
 				<!-- Position & Size Section (collapsible) -->
 				<CollapsibleSection title="Size & Position" bind:open={showPositionSection}>
-						<div class="mt-0">
-							<div class="grid grid-cols-2 gap-2">
-								<div>
-									<label class={fieldLabelClass}>Width</label>
-									<input
-										type="number"
-										class={inputNumberClass}
-										value={styles.width}
-										min="1"
-										max="5000"
-										on:change={(e) =>
-											updateProperty('width', clampNumber(e.target.value, 1, 5000, 100))}
-									/>
-								</div>
-								<div>
-									<label class={fieldLabelClass}>Height</label>
-									<input
-										type="number"
-										class={inputNumberClass}
-										value={styles.height}
-										min="1"
-										max="5000"
-										on:change={(e) =>
-											updateProperty('height', clampNumber(e.target.value, 1, 5000, 100))}
-									/>
-								</div>
+					<div class="mt-0">
+						<div class="grid grid-cols-2 gap-2">
+							<div>
+								<label class={fieldLabelClass}>Width</label>
+								<input
+									type="number"
+									class={inputNumberClass}
+									value={styles.width}
+									min="1"
+									max="5000"
+									on:change={(e) =>
+										updateProperty('width', clampNumber(e.target.value, 1, 5000, 100))}
+								/>
 							</div>
+							<div>
+								<label class={fieldLabelClass}>Height</label>
+								<input
+									type="number"
+									class={inputNumberClass}
+									value={styles.height}
+									min="1"
+									max="5000"
+									on:change={(e) =>
+										updateProperty('height', clampNumber(e.target.value, 1, 5000, 100))}
+								/>
+							</div>
+						</div>
 
-							{#if type === 'rect' || ($selectedComponent && $selectedComponent.isRoundedRect)}
-								<div class="pt-2">
-									<div class="flex items-center justify-between mb-2">
-										<label class={fieldLabelClass}>Corner Radius</label>
-										<button
-											class="text-gray-500 hover:text-black focus:outline-none"
-											title="Individual Corners"
-											on:click={() => (showIndividualCorners = !showIndividualCorners)}
-										>
-											{#if showIndividualCorners}
-												<i class="fa fa-compress" />
-											{:else}
-												<i class="fa fa-expand" />
-											{/if}
-										</button>
+						{#if type === 'rect' || ($selectedComponent && $selectedComponent.isRoundedRect)}
+							<div class="pt-2">
+								<div class="flex items-center justify-between mb-2">
+									<label class={fieldLabelClass}>Corner Radius</label>
+									<button
+										class="text-gray-500 hover:text-black focus:outline-none"
+										title="Individual Corners"
+										on:click={() => (showIndividualCorners = !showIndividualCorners)}
+									>
+										{#if showIndividualCorners}
+											<i class="fa fa-compress" />
+										{:else}
+											<i class="fa fa-expand" />
+										{/if}
+									</button>
+								</div>
+
+								{#if !showIndividualCorners}
+									<div class="flex items-center gap-2 mb-1">
+										<span class="text-xs text-gray-500 w-8">All</span>
+										<input
+											type="range"
+											min="0"
+											max="100"
+											value={styles.radius}
+											class={'flex-1 ' + rangeInputClass}
+											on:input={(e) => {
+												const val = parseInt(e.target.value);
+												if ($selectedComponent.isRoundedRect) {
+													updateProperty('cornerRadii', { tl: val, tr: val, br: val, bl: val });
+												} else {
+													updateProperty('radius', val);
+												}
+											}}
+										/>
+										<input
+											type="number"
+											class="w-14 text-sm border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
+											value={styles.radius}
+											min="0"
+											max="500"
+											on:input={(e) => {
+												const val = clampNumber(e.target.value, 0, 500, 0);
+												if ($selectedComponent.isRoundedRect) {
+													updateProperty('cornerRadii', { tl: val, tr: val, br: val, bl: val });
+												} else {
+													updateProperty('radius', val);
+												}
+											}}
+										/>
 									</div>
-
-									{#if !showIndividualCorners}
-										<div class="flex items-center gap-2 mb-1">
-											<span class="text-xs text-gray-500 w-8">All</span>
-											<input
-												type="range"
-												min="0"
-												max="100"
-												value={styles.radius}
-												class={'flex-1 ' + rangeInputClass}
-												on:input={(e) => {
-													const val = parseInt(e.target.value);
-													if ($selectedComponent.isRoundedRect) {
-														updateProperty('cornerRadii', { tl: val, tr: val, br: val, bl: val });
-													} else {
-														updateProperty('radius', val);
-													}
-												}}
-											/>
+								{:else}
+									<div class="grid grid-cols-2 gap-2">
+										<!-- Top Left -->
+										<div class="flex items-center gap-2">
+											<i class="fa fa-border-top-left text-gray-400 text-xs" />
 											<input
 												type="number"
-												class="w-14 text-sm border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
-												value={styles.radius}
+												class={inputNumberClass}
+												placeholder="TL"
+												value={cornerRadii.tl}
 												min="0"
 												max="500"
-												on:input={(e) => {
-													const val = clampNumber(e.target.value, 0, 500, 0);
-													if ($selectedComponent.isRoundedRect) {
-														updateProperty('cornerRadii', { tl: val, tr: val, br: val, bl: val });
-													} else {
-														updateProperty('radius', val);
-													}
-												}}
+												on:input={(e) =>
+													updateProperty('cornerRadii', {
+														...cornerRadii,
+														tl: clampNumber(e.target.value, 0, 500, 0)
+													})}
 											/>
 										</div>
-									{:else}
-										<div class="grid grid-cols-2 gap-2">
-											<!-- Top Left -->
-											<div class="flex items-center gap-2">
-												<i class="fa fa-border-top-left text-gray-400 text-xs" />
-												<input
-													type="number"
-													class={inputNumberClass}
-													placeholder="TL"
-													value={cornerRadii.tl}
-													min="0"
-													max="500"
-													on:input={(e) =>
-														updateProperty('cornerRadii', {
-															...cornerRadii,
-															tl: clampNumber(e.target.value, 0, 500, 0)
-														})}
-												/>
-											</div>
-											<!-- Top Right -->
-											<div class="flex items-center gap-2">
-												<i class="fa fa-border-top-right text-gray-400 text-xs" />
-												<input
-													type="number"
-													class={inputNumberClass}
-													placeholder="TR"
-													value={cornerRadii.tr}
-													min="0"
-													max="500"
-													on:input={(e) =>
-														updateProperty('cornerRadii', {
-															...cornerRadii,
-															tr: clampNumber(e.target.value, 0, 500, 0)
-														})}
-												/>
-											</div>
-											<!-- Bottom Left -->
-											<div class="flex items-center gap-2">
-												<i class="fa fa-border-bottom-left text-gray-400 text-xs" />
-												<input
-													type="number"
-													class={inputNumberClass}
-													placeholder="BL"
-													value={cornerRadii.bl}
-													min="0"
-													max="500"
-													on:input={(e) =>
-														updateProperty('cornerRadii', {
-															...cornerRadii,
-															bl: clampNumber(e.target.value, 0, 500, 0)
-														})}
-												/>
-											</div>
-											<!-- Bottom Right -->
-											<div class="flex items-center gap-2">
-												<i class="fa fa-border-bottom-right text-gray-400 text-xs" />
-												<input
-													type="number"
-													class={inputNumberClass}
-													placeholder="BR"
-													value={cornerRadii.br}
-													min="0"
-													max="500"
-													on:input={(e) =>
-														updateProperty('cornerRadii', {
-															...cornerRadii,
-															br: clampNumber(e.target.value, 0, 500, 0)
-														})}
-												/>
-											</div>
+										<!-- Top Right -->
+										<div class="flex items-center gap-2">
+											<i class="fa fa-border-top-right text-gray-400 text-xs" />
+											<input
+												type="number"
+												class={inputNumberClass}
+												placeholder="TR"
+												value={cornerRadii.tr}
+												min="0"
+												max="500"
+												on:input={(e) =>
+													updateProperty('cornerRadii', {
+														...cornerRadii,
+														tr: clampNumber(e.target.value, 0, 500, 0)
+													})}
+											/>
 										</div>
-									{/if}
-								</div>
-							{/if}
-						</div>
+										<!-- Bottom Left -->
+										<div class="flex items-center gap-2">
+											<i class="fa fa-border-bottom-left text-gray-400 text-xs" />
+											<input
+												type="number"
+												class={inputNumberClass}
+												placeholder="BL"
+												value={cornerRadii.bl}
+												min="0"
+												max="500"
+												on:input={(e) =>
+													updateProperty('cornerRadii', {
+														...cornerRadii,
+														bl: clampNumber(e.target.value, 0, 500, 0)
+													})}
+											/>
+										</div>
+										<!-- Bottom Right -->
+										<div class="flex items-center gap-2">
+											<i class="fa fa-border-bottom-right text-gray-400 text-xs" />
+											<input
+												type="number"
+												class={inputNumberClass}
+												placeholder="BR"
+												value={cornerRadii.br}
+												min="0"
+												max="500"
+												on:input={(e) =>
+													updateProperty('cornerRadii', {
+														...cornerRadii,
+														br: clampNumber(e.target.value, 0, 500, 0)
+													})}
+											/>
+										</div>
+									</div>
+								{/if}
+							</div>
+						{/if}
+					</div>
 				</CollapsibleSection>
 				<!-- End of collapsible Position & Size section -->
 
@@ -4678,171 +4699,168 @@
 
 					<!-- Filters & Effects -->
 					<CollapsibleSection title="Filters & Effects" bind:open={showFiltersPanel}>
-							<div class="space-y-4">
-								<!-- Preset Filters -->
-								<div>
-									<label class={fieldLabelClass}>Quick Filters</label>
-									<div class="grid grid-cols-2 gap-2">
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('none')}
-										>
-											Original
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('grayscale')}
-										>
-											B&W
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('sepia')}
-										>
-											Sepia
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('vintage')}
-										>
-											Vintage
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('cool')}
-										>
-											Cool
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('warm')}
-										>
-											Warm
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('dramatic')}
-										>
-											Dramatic
-										</button>
-										<button
-											class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
-											on:click={() => applyPresetFilter('fade')}
-										>
-											Fade
-										</button>
-									</div>
-								</div>
-
-								<div class="pt-3 border-t border-gray-200">
-									<label class={fieldLabelClass}>Adjust</label>
-
-									<!-- Brightness -->
-									<div class="mb-4">
-										<div class="flex items-center justify-between mb-2">
-											<label class="{fieldLabelClass} mb-0">Brightness</label>
-											<span class="text-xs text-gray-500"
-												>{Math.round(imageFilters.brightness * 100)}%</span
-											>
-										</div>
-										<input
-											type="range"
-											min="-1"
-											max="1"
-											step="0.01"
-											value={imageFilters.brightness}
-											class={rangeInputClass}
-											on:input={(e) => applyImageFilter('brightness', parseFloat(e.target.value))}
-										/>
-									</div>
-
-									<!-- Contrast -->
-									<div class="mb-4">
-										<div class="flex items-center justify-between mb-2">
-											<label class="{fieldLabelClass} mb-0">Contrast</label>
-											<span class="text-xs text-gray-500"
-												>{Math.round(imageFilters.contrast * 100)}%</span
-											>
-										</div>
-										<input
-											type="range"
-											min="-1"
-											max="1"
-											step="0.01"
-											value={imageFilters.contrast}
-											class={rangeInputClass}
-											on:input={(e) => applyImageFilter('contrast', parseFloat(e.target.value))}
-										/>
-									</div>
-
-									<!-- Saturation -->
-									<div class="mb-4">
-										<div class="flex items-center justify-between mb-2">
-											<label class="{fieldLabelClass} mb-0">Saturation</label>
-											<span class="text-xs text-gray-500"
-												>{Math.round(imageFilters.saturation * 100)}%</span
-											>
-										</div>
-										<input
-											type="range"
-											min="-1"
-											max="1"
-											step="0.01"
-											value={imageFilters.saturation}
-											class={rangeInputClass}
-											on:input={(e) => applyImageFilter('saturation', parseFloat(e.target.value))}
-										/>
-									</div>
-
-									<!-- Blur -->
-									<div class="mb-4">
-										<div class="flex items-center justify-between mb-2">
-											<label class="{fieldLabelClass} mb-0">Blur</label>
-											<span class="text-xs text-gray-500"
-												>{Math.round(imageFilters.blur * 100)}%</span
-											>
-										</div>
-										<input
-											type="range"
-											min="0"
-											max="1"
-											step="0.01"
-											value={imageFilters.blur}
-											class={rangeInputClass}
-											on:input={(e) => applyImageFilter('blur', parseFloat(e.target.value))}
-										/>
-									</div>
-
-									<!-- Hue Rotation -->
-									<div class="mb-4">
-										<div class="flex items-center justify-between mb-2">
-											<label class="{fieldLabelClass} mb-0">Hue Rotation</label>
-											<span class="text-xs text-gray-500"
-												>{Math.round(imageFilters.hue * 360)}°</span
-											>
-										</div>
-										<input
-											type="range"
-											min="-0.5"
-											max="0.5"
-											step="0.01"
-											value={imageFilters.hue}
-											class={rangeInputClass +
-												' !bg-gradient-to-r !from-red-500 !via-green-500 !to-blue-500'}
-											on:input={(e) => applyImageFilter('hue', parseFloat(e.target.value))}
-										/>
-									</div>
-
-									<!-- Reset Filters Button -->
+						<div class="space-y-4">
+							<!-- Preset Filters -->
+							<div>
+								<label class={fieldLabelClass}>Quick Filters</label>
+								<div class="grid grid-cols-2 gap-2">
 									<button
-										class="w-full py-2 px-3 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('none')}
 									>
-										<i class="fa fa-undo mr-1" />
-										Reset All Filters
+										Original
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('grayscale')}
+									>
+										B&W
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('sepia')}
+									>
+										Sepia
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('vintage')}
+									>
+										Vintage
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('cool')}
+									>
+										Cool
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('warm')}
+									>
+										Warm
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('dramatic')}
+									>
+										Dramatic
+									</button>
+									<button
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										on:click={() => applyPresetFilter('fade')}
+									>
+										Fade
 									</button>
 								</div>
 							</div>
+
+							<div class="pt-3 border-t border-gray-200">
+								<label class={fieldLabelClass}>Adjust</label>
+
+								<!-- Brightness -->
+								<div class="mb-4">
+									<div class="flex items-center justify-between mb-2">
+										<label class="{fieldLabelClass} mb-0">Brightness</label>
+										<span class="text-xs text-gray-500"
+											>{Math.round(imageFilters.brightness * 100)}%</span
+										>
+									</div>
+									<input
+										type="range"
+										min="-1"
+										max="1"
+										step="0.01"
+										value={imageFilters.brightness}
+										class={rangeInputClass}
+										on:input={(e) => applyImageFilter('brightness', parseFloat(e.target.value))}
+									/>
+								</div>
+
+								<!-- Contrast -->
+								<div class="mb-4">
+									<div class="flex items-center justify-between mb-2">
+										<label class="{fieldLabelClass} mb-0">Contrast</label>
+										<span class="text-xs text-gray-500"
+											>{Math.round(imageFilters.contrast * 100)}%</span
+										>
+									</div>
+									<input
+										type="range"
+										min="-1"
+										max="1"
+										step="0.01"
+										value={imageFilters.contrast}
+										class={rangeInputClass}
+										on:input={(e) => applyImageFilter('contrast', parseFloat(e.target.value))}
+									/>
+								</div>
+
+								<!-- Saturation -->
+								<div class="mb-4">
+									<div class="flex items-center justify-between mb-2">
+										<label class="{fieldLabelClass} mb-0">Saturation</label>
+										<span class="text-xs text-gray-500"
+											>{Math.round(imageFilters.saturation * 100)}%</span
+										>
+									</div>
+									<input
+										type="range"
+										min="-1"
+										max="1"
+										step="0.01"
+										value={imageFilters.saturation}
+										class={rangeInputClass}
+										on:input={(e) => applyImageFilter('saturation', parseFloat(e.target.value))}
+									/>
+								</div>
+
+								<!-- Blur -->
+								<div class="mb-4">
+									<div class="flex items-center justify-between mb-2">
+										<label class="{fieldLabelClass} mb-0">Blur</label>
+										<span class="text-xs text-gray-500">{Math.round(imageFilters.blur * 100)}%</span
+										>
+									</div>
+									<input
+										type="range"
+										min="0"
+										max="1"
+										step="0.01"
+										value={imageFilters.blur}
+										class={rangeInputClass}
+										on:input={(e) => applyImageFilter('blur', parseFloat(e.target.value))}
+									/>
+								</div>
+
+								<!-- Hue Rotation -->
+								<div class="mb-4">
+									<div class="flex items-center justify-between mb-2">
+										<label class="{fieldLabelClass} mb-0">Hue Rotation</label>
+										<span class="text-xs text-gray-500">{Math.round(imageFilters.hue * 360)}°</span>
+									</div>
+									<input
+										type="range"
+										min="-0.5"
+										max="0.5"
+										step="0.01"
+										value={imageFilters.hue}
+										class={rangeInputClass +
+											' !bg-gradient-to-r !from-red-500 !via-green-500 !to-blue-500'}
+										on:input={(e) => applyImageFilter('hue', parseFloat(e.target.value))}
+									/>
+								</div>
+
+								<!-- Reset Filters Button -->
+								<button
+									class="w-full py-2 px-3 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium"
+									on:click={() => applyPresetFilter('none')}
+								>
+									<i class="fa fa-undo mr-1" />
+									Reset All Filters
+								</button>
+							</div>
+						</div>
 					</CollapsibleSection>
 				{/if}
 
@@ -4851,263 +4869,265 @@
 					<div class="space-y-3 pt-4 border-t border-gray-200">
 						<!-- Chart Data Editor -->
 						<CollapsibleSection title="Chart Data" bind:open={showChartDataEditor} border={false}>
-							<svelte:fragment slot="title-extra">{#if boundProperties.has('chartData')}<i
-											class="fa fa-link text-[9px] text-green-500 ml-1"
-											title="Bound to API variable"
-										/>{/if}</svelte:fragment>
-								<div class="space-y-3">
-									<!-- Format Toggle + Maximize -->
-									<div class="flex items-center gap-2">
-										<div class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg flex-1 shadow-[1px_1px_0_0_#e5e5e5]">
-											<button
-												class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat ===
-												'json'
-													? 'bg-white text-gray-900 shadow-sm'
-													: 'text-gray-600 hover:text-gray-900'}"
-												on:click={() => {
-													chartDataFormat = 'json';
-													loadSampleChartData();
-												}}
-											>
-												<i class="fa fa-code mr-1" />JSON
-											</button>
-											<button
-												class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat ===
-												'csv'
-													? 'bg-white text-gray-900 shadow-sm'
-													: 'text-gray-600 hover:text-gray-900'}"
-												on:click={() => {
-													chartDataFormat = 'csv';
-													loadSampleChartData();
-												}}
-											>
-												<i class="fa fa-file-csv mr-1" />CSV
-											</button>
-										</div>
-										{#if chartDataFormat === 'csv'}
-											<button
-												class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-												on:click={formatChartCSV}
-												title="Format CSV"
-											>
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M4 6h16M4 12h16m-7 6h7"
-													/></svg
-												>
-											</button>
-										{/if}
+							<svelte:fragment slot="title-extra"
+								>{#if boundProperties.has('chartData')}<i
+										class="fa fa-link text-[9px] text-green-500 ml-1"
+										title="Bound to API variable"
+									/>{/if}</svelte:fragment
+							>
+							<div class="space-y-3">
+								<!-- Format Toggle + Maximize -->
+								<div class="flex items-center gap-2">
+									<div
+										class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg flex-1 shadow-[1px_1px_0_0_#e5e5e5]"
+									>
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat ===
+											'json'
+												? 'bg-white text-gray-900 shadow-sm'
+												: 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => {
+												chartDataFormat = 'json';
+												loadSampleChartData();
+											}}
+										>
+											<i class="fa fa-code mr-1" />JSON
+										</button>
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat ===
+											'csv'
+												? 'bg-white text-gray-900 shadow-sm'
+												: 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => {
+												chartDataFormat = 'csv';
+												loadSampleChartData();
+											}}
+										>
+											<i class="fa fa-file-csv mr-1" />CSV
+										</button>
+									</div>
+									{#if chartDataFormat === 'csv'}
 										<button
 											class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-											on:click={() => (maximizeChartEditor = true)}
-											title="Maximize editor"
+											on:click={formatChartCSV}
+											title="Format CSV"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 												><path
 													stroke-linecap="round"
 													stroke-linejoin="round"
 													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+													d="M4 6h16M4 12h16m-7 6h7"
 												/></svg
 											>
 										</button>
-									</div>
-
-									{#if chartDataFormat === 'json'}
-										<div
-											class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1"
-										>
-											<CodeMirror
-												bind:value={chartDataInput}
-												lang={json()}
-												styles={{
-													'&': {
-														height: '144px',
-														fontSize: '12px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '8px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '30px'
-													}
-												}}
-											/>
-										</div>
-									{:else}
-										<textarea
-											class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all p-2"
-											placeholder="label,value\nJan,30\nFeb,45"
-											bind:value={chartDataInput}
-										/>
 									{/if}
-
-									{#if chartDataError}
-										<p class="text-xs text-red-600">
-											<i class="fa fa-exclamation-circle mr-1" />{chartDataError}
-										</p>
-									{/if}
-
-									<div class="flex gap-2">
-										<button
-											class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
-											on:click={loadSampleChartData}
-										>
-											<i class="fa fa-undo mr-1" />Load Current
-										</button>
-										<button
-											class="flex-1 px-3 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors"
-											on:click={applyChartDataFromInput}
-										>
-											<i class="fa fa-check mr-1" />Apply
-										</button>
-									</div>
-
-									<!-- Format Examples -->
-									<div
-										class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-500"
+									<button
+										class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+										on:click={() => (maximizeChartEditor = true)}
+										title="Maximize editor"
 									>
-										{#if chartDataFormat === 'csv'}
-											<p class="font-medium mb-1 text-gray-600">CSV Format:</p>
-											<code class="block text-gray-400">label,value<br />Jan,30<br />Feb,45</code>
-										{:else}
-											<p class="font-medium mb-1 text-gray-600">JSON Format:</p>
-											<code class="block text-gray-400"
-												>[{'{'}"label": "Jan", "value": 30{'}'}]</code
-											>
-										{/if}
-									</div>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+											/></svg
+										>
+									</button>
 								</div>
+
+								{#if chartDataFormat === 'json'}
+									<div
+										class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1"
+									>
+										<CodeMirror
+											bind:value={chartDataInput}
+											lang={json()}
+											styles={{
+												'&': {
+													height: '144px',
+													fontSize: '12px',
+													fontFamily:
+														'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+												},
+												'.cm-content': { padding: '8px' },
+												'.cm-line': { padding: '0' },
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '30px'
+												}
+											}}
+										/>
+									</div>
+								{:else}
+									<textarea
+										class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all p-2"
+										placeholder="label,value\nJan,30\nFeb,45"
+										bind:value={chartDataInput}
+									/>
+								{/if}
+
+								{#if chartDataError}
+									<p class="text-xs text-red-600">
+										<i class="fa fa-exclamation-circle mr-1" />{chartDataError}
+									</p>
+								{/if}
+
+								<div class="flex gap-2">
+									<button
+										class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+										on:click={loadSampleChartData}
+									>
+										<i class="fa fa-undo mr-1" />Load Current
+									</button>
+									<button
+										class="flex-1 px-3 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors"
+										on:click={applyChartDataFromInput}
+									>
+										<i class="fa fa-check mr-1" />Apply
+									</button>
+								</div>
+
+								<!-- Format Examples -->
+								<div
+									class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-500"
+								>
+									{#if chartDataFormat === 'csv'}
+										<p class="font-medium mb-1 text-gray-600">CSV Format:</p>
+										<code class="block text-gray-400">label,value<br />Jan,30<br />Feb,45</code>
+									{:else}
+										<p class="font-medium mb-1 text-gray-600">JSON Format:</p>
+										<code class="block text-gray-400">[{'{'}"label": "Jan", "value": 30{'}'}]</code>
+									{/if}
+								</div>
+							</div>
 						</CollapsibleSection>
 
 						<!-- Chart Appearance -->
 						<CollapsibleSection title="Appearance" bind:open={showChartAppearance}>
-								<div class="space-y-4">
-									<!-- Font Family -->
-									<div>
-										<label class={fieldLabelClass}>Font Family</label>
-										<select
-											class={selectClass}
-											bind:value={chartFontFamily}
-											on:change={updateChartAppearance}
-										>
-											{#each CHART_FONT_OPTIONS as font}
-												<option value={font}>{font}</option>
-											{/each}
-										</select>
-									</div>
+							<div class="space-y-4">
+								<!-- Font Family -->
+								<div>
+									<label class={fieldLabelClass}>Font Family</label>
+									<select
+										class={selectClass}
+										bind:value={chartFontFamily}
+										on:change={updateChartAppearance}
+									>
+										{#each CHART_FONT_OPTIONS as font}
+											<option value={font}>{font}</option>
+										{/each}
+									</select>
+								</div>
 
-									<!-- Color Palette Presets -->
-									<div>
-										<label class={fieldLabelClass}>Color Palette</label>
-										<div class="flex gap-2 flex-wrap">
-											{#each Object.entries(CHART_PALETTES) as [key, palette]}
-												<button
-													class="flex flex-col items-center gap-1 group"
-													on:click={() => {
-														chartColors = [...palette.colors, ...chartColors.slice(5)];
-														updateChartAppearance();
-													}}
-													title={palette.name}
+								<!-- Color Palette Presets -->
+								<div>
+									<label class={fieldLabelClass}>Color Palette</label>
+									<div class="flex gap-2 flex-wrap">
+										{#each Object.entries(CHART_PALETTES) as [key, palette]}
+											<button
+												class="flex flex-col items-center gap-1 group"
+												on:click={() => {
+													chartColors = [...palette.colors, ...chartColors.slice(5)];
+													updateChartAppearance();
+												}}
+												title={palette.name}
+											>
+												<div
+													class="w-12 h-4 rounded border-[2px] border-gray-900 flex overflow-hidden hover:shadow-[1px_1px_0_0_#ffc480] transition-all"
 												>
-													<div
-														class="w-12 h-4 rounded border-[2px] border-gray-900 flex overflow-hidden hover:shadow-[1px_1px_0_0_#ffc480] transition-all"
-													>
-														{#each palette.colors as color}
-															<div class="flex-1" style="background: {color};" />
-														{/each}
-													</div>
-													<span class="text-[9px] text-gray-400 group-hover:text-gray-600"
-														>{palette.name}</span
-													>
-												</button>
-											{/each}
-										</div>
-									</div>
-
-									<!-- Individual Color Swatches -->
-									<div>
-										<label class={fieldLabelClass}>Data Colors</label>
-										<div class="flex gap-2 flex-wrap">
-											{#each chartColors.slice(0, chartData.length || 5) as color, i}
-												<div class="relative">
-													<GradientColorPicker
-														label=""
-														value={color}
-														defaultColor={color}
-														supportsGradient={false}
-														onSolidChange={(newColor) => {
-															chartColors = chartColors.map((c, idx) => (idx === i ? newColor : c));
-															updateChartAppearance();
-														}}
-													/>
+													{#each palette.colors as color}
+														<div class="flex-1" style="background: {color};" />
+													{/each}
 												</div>
-											{/each}
-										</div>
-									</div>
-
-									<!-- Accent Colors -->
-									<div class="space-y-3 pt-3 border-t border-gray-100">
-										<label class={fieldLabelClass}>Accent Colors</label>
-										<GradientColorPicker
-											label="Title Color"
-											value={chartTitleColor}
-											defaultColor="#333333"
-											supportsGradient={false}
-											onSolidChange={(color) => {
-												chartTitleColor = color;
-												updateChartAppearance();
-											}}
-										/>
-										<GradientColorPicker
-											label="Label Color"
-											value={chartLabelColor}
-											defaultColor="#666666"
-											supportsGradient={false}
-											onSolidChange={(color) => {
-												chartLabelColor = color;
-												updateChartAppearance();
-											}}
-										/>
-										<GradientColorPicker
-											label="Grid Color"
-											value={chartGridColor}
-											defaultColor="#eeeeee"
-											supportsGradient={false}
-											onSolidChange={(color) => {
-												chartGridColor = color;
-												updateChartAppearance();
-											}}
-										/>
-										<GradientColorPicker
-											label="Background"
-											value={chartBackgroundColor}
-											defaultColor="#ffffff"
-											supportsGradient={false}
-											onSolidChange={(color) => {
-												chartBackgroundColor = color;
-												updateChartAppearance();
-											}}
-										/>
-										<GradientColorPicker
-											label="Border Color"
-											value={chartBorderColor}
-											defaultColor="#e5e5e5"
-											supportsGradient={false}
-											onSolidChange={(color) => {
-												chartBorderColor = color;
-												updateChartAppearance();
-											}}
-										/>
+												<span class="text-[9px] text-gray-400 group-hover:text-gray-600"
+													>{palette.name}</span
+												>
+											</button>
+										{/each}
 									</div>
 								</div>
+
+								<!-- Individual Color Swatches -->
+								<div>
+									<label class={fieldLabelClass}>Data Colors</label>
+									<div class="flex gap-2 flex-wrap">
+										{#each chartColors.slice(0, chartData.length || 5) as color, i}
+											<div class="relative">
+												<GradientColorPicker
+													label=""
+													value={color}
+													defaultColor={color}
+													supportsGradient={false}
+													onSolidChange={(newColor) => {
+														chartColors = chartColors.map((c, idx) => (idx === i ? newColor : c));
+														updateChartAppearance();
+													}}
+												/>
+											</div>
+										{/each}
+									</div>
+								</div>
+
+								<!-- Accent Colors -->
+								<div class="space-y-3 pt-3 border-t border-gray-100">
+									<label class={fieldLabelClass}>Accent Colors</label>
+									<GradientColorPicker
+										label="Title Color"
+										value={chartTitleColor}
+										defaultColor="#333333"
+										supportsGradient={false}
+										onSolidChange={(color) => {
+											chartTitleColor = color;
+											updateChartAppearance();
+										}}
+									/>
+									<GradientColorPicker
+										label="Label Color"
+										value={chartLabelColor}
+										defaultColor="#666666"
+										supportsGradient={false}
+										onSolidChange={(color) => {
+											chartLabelColor = color;
+											updateChartAppearance();
+										}}
+									/>
+									<GradientColorPicker
+										label="Grid Color"
+										value={chartGridColor}
+										defaultColor="#eeeeee"
+										supportsGradient={false}
+										onSolidChange={(color) => {
+											chartGridColor = color;
+											updateChartAppearance();
+										}}
+									/>
+									<GradientColorPicker
+										label="Background"
+										value={chartBackgroundColor}
+										defaultColor="#ffffff"
+										supportsGradient={false}
+										onSolidChange={(color) => {
+											chartBackgroundColor = color;
+											updateChartAppearance();
+										}}
+									/>
+									<GradientColorPicker
+										label="Border Color"
+										value={chartBorderColor}
+										defaultColor="#e5e5e5"
+										supportsGradient={false}
+										onSolidChange={(color) => {
+											chartBorderColor = color;
+											updateChartAppearance();
+										}}
+									/>
+								</div>
+							</div>
 						</CollapsibleSection>
 					</div>
 				{/if}
@@ -5254,156 +5274,160 @@
 
 						<!-- Table Data Editor -->
 						<CollapsibleSection title="Table Data" bind:open={showTableDataEditor}>
-							<svelte:fragment slot="title-extra">{#if boundProperties.has('tableData')}<i
-											class="fa fa-link text-[9px] text-green-500 ml-1"
-											title="Bound to API variable"
-										/>{/if}</svelte:fragment>
-								<div class="space-y-3">
-									<!-- Format Toggle + Maximize -->
-									<div class="flex items-center gap-2">
-										<div class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg flex-1 shadow-[1px_1px_0_0_#e5e5e5]">
-											<button
-												class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat ===
-												'json'
-													? 'bg-white text-gray-900 shadow-sm'
-													: 'text-gray-600 hover:text-gray-900'}"
-												on:click={() => {
-													tableDataFormat = 'json';
-													loadSampleTableData();
-												}}
-											>
-												<i class="fa fa-code mr-1" />JSON
-											</button>
-											<button
-												class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat ===
-												'csv'
-													? 'bg-white text-gray-900 shadow-sm'
-													: 'text-gray-600 hover:text-gray-900'}"
-												on:click={() => {
-													tableDataFormat = 'csv';
-													loadSampleTableData();
-												}}
-											>
-												<i class="fa fa-file-csv mr-1" />CSV
-											</button>
-										</div>
-										{#if tableDataFormat === 'csv'}
-											<button
-												class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-												on:click={formatTableCSV}
-												title="Format CSV"
-											>
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M4 6h16M4 12h16m-7 6h7"
-													/></svg
-												>
-											</button>
-										{/if}
+							<svelte:fragment slot="title-extra"
+								>{#if boundProperties.has('tableData')}<i
+										class="fa fa-link text-[9px] text-green-500 ml-1"
+										title="Bound to API variable"
+									/>{/if}</svelte:fragment
+							>
+							<div class="space-y-3">
+								<!-- Format Toggle + Maximize -->
+								<div class="flex items-center gap-2">
+									<div
+										class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg flex-1 shadow-[1px_1px_0_0_#e5e5e5]"
+									>
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat ===
+											'json'
+												? 'bg-white text-gray-900 shadow-sm'
+												: 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => {
+												tableDataFormat = 'json';
+												loadSampleTableData();
+											}}
+										>
+											<i class="fa fa-code mr-1" />JSON
+										</button>
+										<button
+											class="flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat ===
+											'csv'
+												? 'bg-white text-gray-900 shadow-sm'
+												: 'text-gray-600 hover:text-gray-900'}"
+											on:click={() => {
+												tableDataFormat = 'csv';
+												loadSampleTableData();
+											}}
+										>
+											<i class="fa fa-file-csv mr-1" />CSV
+										</button>
+									</div>
+									{#if tableDataFormat === 'csv'}
 										<button
 											class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-											on:click={() => (maximizeTableEditor = true)}
-											title="Maximize editor"
+											on:click={formatTableCSV}
+											title="Format CSV"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 												><path
 													stroke-linecap="round"
 													stroke-linejoin="round"
 													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+													d="M4 6h16M4 12h16m-7 6h7"
 												/></svg
 											>
 										</button>
-									</div>
-
-									{#if tableDataFormat === 'json'}
-										<div
-											class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1"
-										>
-											<CodeMirror
-												bind:value={tableDataInput}
-												lang={json()}
-												styles={{
-													'&': {
-														height: '144px',
-														fontSize: '12px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '8px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '30px'
-													}
-												}}
-											/>
-										</div>
-									{:else}
-										<textarea
-											class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all p-2"
-											placeholder="Header1,Header2,Header3\nValue1,Value2,Value3"
-											bind:value={tableDataInput}
-										/>
 									{/if}
-
-									{#if tableDataError}
-										<p class="text-xs text-red-600">
-											<i class="fa fa-exclamation-circle mr-1" />{tableDataError}
-										</p>
-									{/if}
-
-									<div class="flex gap-2">
-										<button
-											class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
-											on:click={loadSampleTableData}
-										>
-											<i class="fa fa-undo mr-1" />Load Current
-										</button>
-										<button
-											class="flex-1 px-3 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors"
-											on:click={applyTableDataFromInput}
-										>
-											<i class="fa fa-check mr-1" />Apply
-										</button>
-									</div>
-
-									<!-- Format Examples -->
-									<div
-										class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-500"
+									<button
+										class="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+										on:click={() => (maximizeTableEditor = true)}
+										title="Maximize editor"
 									>
-										<p class="font-medium mb-1 text-gray-600">
-											{tableDataFormat === 'csv' ? 'CSV' : 'JSON'} Format:
-										</p>
-										{#if tableDataFormat === 'csv'}
-											{#if tableType === 'stats'}
-												<code class="block text-gray-500"
-													>Metric,Value,Change<br />Revenue,$45k,+12%<br />Users,2345,+8%</code
-												>
-											{:else if tableType === 'comparison'}
-												<code class="block text-gray-500"
-													>Feature,Basic,Pro<br />Price,$9,$29<br />Storage,10GB,100GB</code
-												>
-											{:else}
-												<code class="block text-gray-500"
-													>Product,Price,Stock<br />Widget A,$29,150</code
-												>
-											{/if}
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+											/></svg
+										>
+									</button>
+								</div>
+
+								{#if tableDataFormat === 'json'}
+									<div
+										class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1"
+									>
+										<CodeMirror
+											bind:value={tableDataInput}
+											lang={json()}
+											styles={{
+												'&': {
+													height: '144px',
+													fontSize: '12px',
+													fontFamily:
+														'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+												},
+												'.cm-content': { padding: '8px' },
+												'.cm-line': { padding: '0' },
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '30px'
+												}
+											}}
+										/>
+									</div>
+								{:else}
+									<textarea
+										class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all p-2"
+										placeholder="Header1,Header2,Header3\nValue1,Value2,Value3"
+										bind:value={tableDataInput}
+									/>
+								{/if}
+
+								{#if tableDataError}
+									<p class="text-xs text-red-600">
+										<i class="fa fa-exclamation-circle mr-1" />{tableDataError}
+									</p>
+								{/if}
+
+								<div class="flex gap-2">
+									<button
+										class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+										on:click={loadSampleTableData}
+									>
+										<i class="fa fa-undo mr-1" />Load Current
+									</button>
+									<button
+										class="flex-1 px-3 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors"
+										on:click={applyTableDataFromInput}
+									>
+										<i class="fa fa-check mr-1" />Apply
+									</button>
+								</div>
+
+								<!-- Format Examples -->
+								<div
+									class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-[10px] text-gray-500"
+								>
+									<p class="font-medium mb-1 text-gray-600">
+										{tableDataFormat === 'csv' ? 'CSV' : 'JSON'} Format:
+									</p>
+									{#if tableDataFormat === 'csv'}
+										{#if tableType === 'stats'}
+											<code class="block text-gray-500"
+												>Metric,Value,Change<br />Revenue,$45k,+12%<br />Users,2345,+8%</code
+											>
+										{:else if tableType === 'comparison'}
+											<code class="block text-gray-500"
+												>Feature,Basic,Pro<br />Price,$9,$29<br />Storage,10GB,100GB</code
+											>
 										{:else}
 											<code class="block text-gray-500"
-												>{'{'}"headers": [...], "rows": [[...]]{'}'}</code
+												>Product,Price,Stock<br />Widget A,$29,150</code
 											>
 										{/if}
-										<p class="text-[9px] text-gray-500 mt-1">
-											Same format works for all table types via API
-										</p>
-									</div>
+									{:else}
+										<code class="block text-gray-500"
+											>{'{'}"headers": [...], "rows": [[...]]{'}'}</code
+										>
+									{/if}
+									<p class="text-[9px] text-gray-500 mt-1">
+										Same format works for all table types via API
+									</p>
 								</div>
+							</div>
 						</CollapsibleSection>
 
 						<!-- Table Info -->
@@ -5438,101 +5462,100 @@
 				{#if isQRCode}
 					<!-- Appearance -->
 					<CollapsibleSection title="Appearance" bind:open={showQRAppearance}>
-							<div class="space-y-4">
-								<GradientColorPicker
-									label="Foreground Color"
-									value={qrConfig.fgColor || '#000000'}
-									defaultColor="#000000"
-									supportsGradient={false}
-									onSolidChange={(color) => updateQRCodeConfig('fgColor', color)}
-								/>
-								<GradientColorPicker
-									label="Background Color"
-									value={qrConfig.bgColor || '#ffffff'}
-									defaultColor="#ffffff"
-									supportsGradient={false}
-									onSolidChange={(color) => updateQRCodeConfig('bgColor', color)}
-								/>
+						<div class="space-y-4">
+							<GradientColorPicker
+								label="Foreground Color"
+								value={qrConfig.fgColor || '#000000'}
+								defaultColor="#000000"
+								supportsGradient={false}
+								onSolidChange={(color) => updateQRCodeConfig('fgColor', color)}
+							/>
+							<GradientColorPicker
+								label="Background Color"
+								value={qrConfig.bgColor || '#ffffff'}
+								defaultColor="#ffffff"
+								supportsGradient={false}
+								onSolidChange={(color) => updateQRCodeConfig('bgColor', color)}
+							/>
 
-								<!-- Data Pattern -->
-								<div>
-									<label class={fieldLabelClass}>Data Pattern</label>
-									<div class="grid grid-cols-3 gap-1.5">
-										{#each PATTERN_STYLES as style}
-											<button
-												class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.patternStyle ===
-												style.type
-													? 'border-gray-900 bg-gray-50 shadow-sm'
-													: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-600'}"
-												on:click={() => updateQRCodeConfig('patternStyle', style.type)}
-											>
-												<span class="text-base">{style.preview}</span>
-												<span class="text-[9px] text-gray-400">{style.label}</span>
-											</button>
-										{/each}
-									</div>
-								</div>
-
-								<!-- Corner Pattern -->
-								<div>
-									<label class={fieldLabelClass}>Corner Pattern</label>
-									<div class="grid grid-cols-3 gap-1.5">
-										{#each PATTERN_STYLES as style}
-											<button
-												class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.cornerStyle ===
-												style.type
-													? 'border-gray-900 bg-gray-50 shadow-sm'
-													: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-600'}"
-												on:click={() => updateQRCodeConfig('cornerStyle', style.type)}
-											>
-												<span class="text-base">{style.preview}</span>
-												<span class="text-[9px] text-gray-400">{style.label}</span>
-											</button>
-										{/each}
-									</div>
+							<!-- Data Pattern -->
+							<div>
+								<label class={fieldLabelClass}>Data Pattern</label>
+								<div class="grid grid-cols-3 gap-1.5">
+									{#each PATTERN_STYLES as style}
+										<button
+											class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.patternStyle ===
+											style.type
+												? 'border-gray-900 bg-gray-50 shadow-sm'
+												: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-600'}"
+											on:click={() => updateQRCodeConfig('patternStyle', style.type)}
+										>
+											<span class="text-base">{style.preview}</span>
+											<span class="text-[9px] text-gray-400">{style.label}</span>
+										</button>
+									{/each}
 								</div>
 							</div>
+
+							<!-- Corner Pattern -->
+							<div>
+								<label class={fieldLabelClass}>Corner Pattern</label>
+								<div class="grid grid-cols-3 gap-1.5">
+									{#each PATTERN_STYLES as style}
+										<button
+											class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.cornerStyle ===
+											style.type
+												? 'border-gray-900 bg-gray-50 shadow-sm'
+												: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-600'}"
+											on:click={() => updateQRCodeConfig('cornerStyle', style.type)}
+										>
+											<span class="text-base">{style.preview}</span>
+											<span class="text-[9px] text-gray-400">{style.label}</span>
+										</button>
+									{/each}
+								</div>
+							</div>
+						</div>
 					</CollapsibleSection>
 
 					<!-- Content -->
 					<CollapsibleSection title="Content" bind:open={showQRContent}>
-							<div>
-								<label class={fieldLabelClass}>URL or Text</label>
-								<input
-									type="text"
-									class={inputBaseClass}
-									placeholder="https://example.com"
-									value={qrData}
-									on:change={(e) => updateQRCodeContent(e.target.value)}
-								/>
-							</div>
+						<div>
+							<label class={fieldLabelClass}>URL or Text</label>
+							<input
+								type="text"
+								class={inputBaseClass}
+								placeholder="https://example.com"
+								value={qrData}
+								on:change={(e) => updateQRCodeContent(e.target.value)}
+							/>
+						</div>
 					</CollapsibleSection>
 
 					<!-- Error Correction -->
 					<CollapsibleSection title="Error Correction" bind:open={showQRErrorCorrection}>
-							<div>
-								<div class="flex items-center justify-between">
-									<label class={fieldLabelClass}>Level</label>
-									<span class="text-[10px] text-gray-500"
-										>{qrConfig.errorCorrectionLevel || 'M'}</span
-									>
-								</div>
-								<select
-									class={selectClass}
-									value={qrConfig.errorCorrectionLevel || 'M'}
-									on:change={(e) => updateQRCodeConfig('errorCorrectionLevel', e.target.value)}
+						<div>
+							<div class="flex items-center justify-between">
+								<label class={fieldLabelClass}>Level</label>
+								<span class="text-[10px] text-gray-500">{qrConfig.errorCorrectionLevel || 'M'}</span
 								>
-									{#each ERROR_CORRECTION_OPTIONS as option}
-										<option value={option.level}>{option.label} - {option.description}</option>
-									{/each}
-								</select>
 							</div>
+							<select
+								class={selectClass}
+								value={qrConfig.errorCorrectionLevel || 'M'}
+								on:change={(e) => updateQRCodeConfig('errorCorrectionLevel', e.target.value)}
+							>
+								{#each ERROR_CORRECTION_OPTIONS as option}
+									<option value={option.level}>{option.label} - {option.description}</option>
+								{/each}
+							</select>
+						</div>
 					</CollapsibleSection>
 				{/if}
 			{/if}
 
-				<!-- PATTERN FILL SECTION (Design tab) -->
-				{#if $selectedComponent && !$selectedComponent?.isQRCode && !$selectedComponent?.isChart && !$selectedComponent?.isTable}
+			<!-- PATTERN FILL SECTION (Design tab) -->
+			{#if $selectedComponent && !$selectedComponent?.isQRCode && !$selectedComponent?.isChart && !$selectedComponent?.isTable}
 				<div class="pt-4 border-t border-gray-200">
 					<button
 						class="w-full flex items-center justify-between text-left group"
@@ -5573,7 +5596,9 @@
 					{#if showPatternFillSection}
 						<div class="space-y-3 mt-3" transition:slide={{ duration: 150 }}>
 							{#if !isPatternFill}
-								<p class="text-xs text-gray-500">Tile this element across a rectangular area to create a pattern</p>
+								<p class="text-xs text-gray-500">
+									Tile this element across a rectangular area to create a pattern
+								</p>
 							{:else}
 								<div class="grid grid-cols-2 gap-2">
 									<div>
@@ -5622,7 +5647,10 @@
 								</div>
 
 								<div class="flex items-center gap-2">
-									<label class="relative inline-flex items-center cursor-pointer" on:click|stopPropagation>
+									<label
+										class="relative inline-flex items-center cursor-pointer"
+										on:click|stopPropagation
+									>
 										<input
 											type="checkbox"
 											class="sr-only peer"
@@ -5654,7 +5682,7 @@
 						</div>
 					{/if}
 				</div>
-				{/if}
+			{/if}
 			<!-- END DESIGN MODE -->
 
 			<!-- LOGIC MODE -->
@@ -5943,143 +5971,145 @@
 
 				<!-- LOOP SECTION — accordion (hidden when pattern fill is active) -->
 				{#if !isPatternFill}
-				<div class="pt-3 border-t border-gray-200">
-					<button
-						class="w-full flex items-center justify-between text-left group"
-						on:click={() => (showLoopSection = !showLoopSection)}
-						aria-expanded={showLoopSection}
-					>
-						<div class="flex items-center gap-2">
-							<span class={sectionHeaderClass}>Loop</span>
-							{#if isLoopElement}
-								<span
-									class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-medium"
-									>Active</span
+					<div class="pt-3 border-t border-gray-200">
+						<button
+							class="w-full flex items-center justify-between text-left group"
+							on:click={() => (showLoopSection = !showLoopSection)}
+							aria-expanded={showLoopSection}
+						>
+							<div class="flex items-center gap-2">
+								<span class={sectionHeaderClass}>Loop</span>
+								{#if isLoopElement}
+									<span
+										class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-medium"
+										>Active</span
+									>
+								{/if}
+							</div>
+							<div class="flex items-center gap-2">
+								<label
+									class="relative inline-flex items-center cursor-pointer"
+									on:click|stopPropagation
 								>
-							{/if}
-						</div>
-						<div class="flex items-center gap-2">
-							<label
-								class="relative inline-flex items-center cursor-pointer"
-								on:click|stopPropagation
-							>
-								<input
-									type="checkbox"
-									class="sr-only peer"
-									checked={isLoopElement}
-									on:change={(e) => toggleLoop(e.target.checked)}
-									aria-label="Enable loop"
+									<input
+										type="checkbox"
+										class="sr-only peer"
+										checked={isLoopElement}
+										on:change={(e) => toggleLoop(e.target.checked)}
+										aria-label="Enable loop"
+									/>
+									<div class={toggleSwitchClass} />
+								</label>
+								<i
+									class="fa fa-chevron-{showLoopSection
+										? 'up'
+										: 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"
 								/>
-								<div class={toggleSwitchClass} />
-							</label>
-							<i
-								class="fa fa-chevron-{showLoopSection
-									? 'up'
-									: 'down'} text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors"
-							/>
-						</div>
-					</button>
+							</div>
+						</button>
 
-					{#if showLoopSection}
-						<div class="space-y-3 mt-3" transition:slide={{ duration: 150 }}>
-							{#if !isLoopElement}
-								<p class="text-xs text-gray-500">Repeat this element for each item in an array</p>
-							{:else}
-								<div class="grid grid-cols-2 gap-2">
-									<div>
-										<label class={fieldLabelClass}>Array Variable</label>
-										<input
-											type="text"
-											class={inputBaseClass}
-											placeholder="items"
-											value={loopVariable}
-											on:input={(e) => {
-												updateLoopVariable(e.target.value);
-												validateLoopVariable(e.target.value);
-											}}
-											aria-required="true"
-											aria-invalid={!!loopVariableError}
-										/>
-										{#if loopVariableError}
-											<p class="text-[10px] text-red-500 mt-1" role="alert">{loopVariableError}</p>
-										{/if}
-									</div>
-									<div>
-										<label class={fieldLabelClass}>Item Alias</label>
-										<input
-											type="text"
-											class={inputBaseClass}
-											placeholder="item"
-											value={loopItemName}
-											on:input={(e) => updateLoopItemName(e.target.value)}
-										/>
-									</div>
-								</div>
-
-								<div class="grid grid-cols-2 gap-2">
-									<div>
-										<label class={fieldLabelClass}>Layout</label>
-										<select
-											class={selectClass}
-											value={loopDirection}
-											on:change={(e) => updateLoopDirection(e.target.value)}
-										>
-											<option value="vertical">Vertical</option>
-											<option value="horizontal">Horizontal</option>
-											<option value="grid">Grid</option>
-										</select>
-									</div>
-									<div>
-										<label class={fieldLabelClass}
-											>{loopDirection === 'grid' ? 'Columns' : 'Gap (px)'}</label
-										>
-										{#if loopDirection === 'grid'}
+						{#if showLoopSection}
+							<div class="space-y-3 mt-3" transition:slide={{ duration: 150 }}>
+								{#if !isLoopElement}
+									<p class="text-xs text-gray-500">Repeat this element for each item in an array</p>
+								{:else}
+									<div class="grid grid-cols-2 gap-2">
+										<div>
+											<label class={fieldLabelClass}>Array Variable</label>
 											<input
-												type="number"
+												type="text"
 												class={inputBaseClass}
-												min="1"
-												max="10"
-												value={loopColumns}
-												on:input={(e) => updateLoopColumns(e.target.value)}
+												placeholder="items"
+												value={loopVariable}
+												on:input={(e) => {
+													updateLoopVariable(e.target.value);
+													validateLoopVariable(e.target.value);
+												}}
+												aria-required="true"
+												aria-invalid={!!loopVariableError}
 											/>
-										{:else}
+											{#if loopVariableError}
+												<p class="text-[10px] text-red-500 mt-1" role="alert">
+													{loopVariableError}
+												</p>
+											{/if}
+										</div>
+										<div>
+											<label class={fieldLabelClass}>Item Alias</label>
+											<input
+												type="text"
+												class={inputBaseClass}
+												placeholder="item"
+												value={loopItemName}
+												on:input={(e) => updateLoopItemName(e.target.value)}
+											/>
+										</div>
+									</div>
+
+									<div class="grid grid-cols-2 gap-2">
+										<div>
+											<label class={fieldLabelClass}>Layout</label>
+											<select
+												class={selectClass}
+												value={loopDirection}
+												on:change={(e) => updateLoopDirection(e.target.value)}
+											>
+												<option value="vertical">Vertical</option>
+												<option value="horizontal">Horizontal</option>
+												<option value="grid">Grid</option>
+											</select>
+										</div>
+										<div>
+											<label class={fieldLabelClass}
+												>{loopDirection === 'grid' ? 'Columns' : 'Gap (px)'}</label
+											>
+											{#if loopDirection === 'grid'}
+												<input
+													type="number"
+													class={inputBaseClass}
+													min="1"
+													max="10"
+													value={loopColumns}
+													on:input={(e) => updateLoopColumns(e.target.value)}
+												/>
+											{:else}
+												<input
+													type="number"
+													class={inputBaseClass}
+													min="0"
+													value={loopSpacing}
+													on:input={(e) => updateLoopSpacing(e.target.value)}
+												/>
+											{/if}
+										</div>
+									</div>
+
+									{#if loopDirection === 'grid'}
+										<div>
+											<label class={fieldLabelClass}>Gap (px)</label>
 											<input
 												type="number"
 												class={inputBaseClass}
 												min="0"
 												value={loopSpacing}
-												on:input={(e) => updateLoopSpacing(e.target.value)}
+												on:input={(e) => updateLoopGap(e.target.value)}
 											/>
-										{/if}
-									</div>
-								</div>
+										</div>
+									{/if}
 
-								{#if loopDirection === 'grid'}
-									<div>
-										<label class={fieldLabelClass}>Gap (px)</label>
-										<input
-											type="number"
-											class={inputBaseClass}
-											min="0"
-											value={loopSpacing}
-											on:input={(e) => updateLoopGap(e.target.value)}
-										/>
+									<div class="bg-gray-50 rounded-lg p-2 border border-gray-200">
+										<p class="text-[10px] text-gray-600">
+											<i class="fa fa-info-circle mr-1 text-gray-400" />
+											Use
+											<code class="bg-gray-200 px-1 rounded text-gray-700"
+												>{'{{' + (loopItemName || 'item') + '.field}}'}</code
+											> in text elements
+										</p>
 									</div>
 								{/if}
-
-								<div class="bg-gray-50 rounded-lg p-2 border border-gray-200">
-									<p class="text-[10px] text-gray-600">
-										<i class="fa fa-info-circle mr-1 text-gray-400" />
-										Use
-										<code class="bg-gray-200 px-1 rounded text-gray-700"
-											>{'{{' + (loopItemName || 'item') + '.field}}'}</code
-										> in text elements
-									</p>
-								</div>
-							{/if}
-						</div>
-					{/if}
-				</div>
+							</div>
+						{/if}
+					</div>
 				{/if}
 
 				<!-- Destructive Action Confirmation Modal -->
@@ -6382,7 +6412,9 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<!-- Format Toggle -->
-					<div class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#e5e5e5]">
+					<div
+						class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#e5e5e5]"
+					>
 						<button
 							class="px-3 py-1.5 text-xs font-medium rounded-md transition-all {chartDataFormat ===
 							'json'
@@ -6544,7 +6576,9 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<!-- Format Toggle -->
-					<div class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#e5e5e5]">
+					<div
+						class="flex gap-1 p-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#e5e5e5]"
+					>
 						<button
 							class="px-3 py-1.5 text-xs font-medium rounded-md transition-all {tableDataFormat ===
 							'json'

@@ -1,28 +1,32 @@
 <script>
-import Nav from '$lib/components/landingPage/Nav.svelte';
-import Footer from '$lib/components/landingPage/Footer.svelte';
-import { glossary } from '$lib/pseo/config.js';
+	import Nav from '$lib/components/landingPage/Nav.svelte';
+	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import { glossary } from '$lib/pseo/config.js';
 
-const title = 'Image Generation Glossary | Pictify';
-const description = 'Learn about OG images, Open Graph protocol, HTML to image conversion, and other key concepts in programmatic image generation.';
-const canonical = 'https://pictify.io/glossary';
+	const title = 'Image Generation Glossary | Pictify';
+	const description =
+		'Learn about OG images, Open Graph protocol, HTML to image conversion, and other key concepts in programmatic image generation.';
+	const canonical = 'https://pictify.io/glossary';
 
-// Group terms by first letter
-$: groupedTerms = glossary.reduce((acc, term) => {
-	const letter = term.title.charAt(0).toUpperCase();
-	if (!acc[letter]) acc[letter] = [];
-	acc[letter].push(term);
-	return acc;
-}, {});
+	// Group terms by first letter
+	$: groupedTerms = glossary.reduce((acc, term) => {
+		const letter = term.title.charAt(0).toUpperCase();
+		if (!acc[letter]) acc[letter] = [];
+		acc[letter].push(term);
+		return acc;
+	}, {});
 
-$: letters = Object.keys(groupedTerms).sort();
+	$: letters = Object.keys(groupedTerms).sort();
 </script>
 
 <svelte:head>
 	<title>{title}</title>
 	<meta name="description" content={description} />
 	<link rel="canonical" href={canonical} />
-	<meta name="keywords" content="og image glossary, open graph terms, image generation terminology, html to image terms" />
+	<meta
+		name="keywords"
+		content="og image glossary, open graph terms, image generation terminology, html to image terms"
+	/>
 
 	<!-- Open Graph -->
 	<meta property="og:title" content={title} />
@@ -41,10 +45,16 @@ $: letters = Object.keys(groupedTerms).sort();
 	<Nav />
 
 	<!-- Background Elements -->
-	<div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
-	<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+	<div
+		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
+	/>
+	<div
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+	/>
 
-	<main class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10">
+	<main
+		class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10"
+	>
 		<!-- Breadcrumb -->
 		<nav class="mb-8">
 			<ol class="flex items-center gap-2 text-sm font-bold">
@@ -57,21 +67,31 @@ $: letters = Object.keys(groupedTerms).sort();
 		<!-- Hero Section -->
 		<div class="relative flex flex-col items-center justify-center text-center mb-16 pt-4 sm:pt-8">
 			<!-- Icon -->
-			<div class="w-20 h-20 bg-[#ffc480] border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8">
+			<div
+				class="w-20 h-20 bg-[#ffc480] border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
+			>
 				<svg class="w-10 h-10 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+					/>
 				</svg>
 			</div>
 
 			<!-- Title -->
-			<h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
+			<h1
+				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
+			>
 				Image Generation
 				<span class="block text-[#ff6b6b]">Glossary</span>
 			</h1>
 
 			<!-- Description -->
 			<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl">
-				Learn the key terms and concepts behind programmatic image generation, OG images, and social previews.
+				Learn the key terms and concepts behind programmatic image generation, OG images, and social
+				previews.
 			</p>
 		</div>
 
@@ -92,7 +112,9 @@ $: letters = Object.keys(groupedTerms).sort();
 			{#each letters as letter}
 				<div id="letter-{letter}">
 					<h2 class="text-3xl font-black text-gray-900 mb-6 flex items-center gap-4">
-						<span class="w-12 h-12 bg-gray-900 text-white rounded-xl flex items-center justify-center">
+						<span
+							class="w-12 h-12 bg-gray-900 text-white rounded-xl flex items-center justify-center"
+						>
 							{letter}
 						</span>
 					</h2>
@@ -103,7 +125,9 @@ $: letters = Object.keys(groupedTerms).sort();
 								href="/glossary/{term.term}"
 								class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 							>
-								<h3 class="text-xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors">
+								<h3
+									class="text-xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors"
+								>
 									{term.title}
 								</h3>
 								<p class="text-gray-600 font-medium text-sm line-clamp-2">
@@ -117,10 +141,10 @@ $: letters = Object.keys(groupedTerms).sort();
 		</section>
 
 		<!-- Bottom CTA -->
-		<section class="mt-20 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]">
-			<h2 class="text-3xl md:text-4xl font-black text-white mb-4">
-				Start Generating Images
-			</h2>
+		<section
+			class="mt-20 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
+		>
+			<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Start Generating Images</h2>
 			<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
 				Put your knowledge into practice. Create OG images, social cards, and more with Pictify.
 			</p>

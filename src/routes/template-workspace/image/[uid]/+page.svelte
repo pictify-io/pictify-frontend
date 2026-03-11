@@ -17,7 +17,7 @@
 
 		// Set image mode immediately so UI shows correct panels
 		pageActions.setOutputFormat('image');
-		
+
 		await getTemplateAction($page.params.uid);
 		isLoading = false;
 	});

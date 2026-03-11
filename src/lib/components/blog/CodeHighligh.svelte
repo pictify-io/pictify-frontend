@@ -37,9 +37,9 @@
 <div class="code-block-container">
 	<div class="code-header">
 		<div class="traffic-lights">
-			<div class="dot red"></div>
-			<div class="dot yellow"></div>
-			<div class="dot green"></div>
+			<div class="dot red" />
+			<div class="dot yellow" />
+			<div class="dot green" />
 		</div>
 		<span class="lang-label">{lang || 'CODE'}</span>
 	</div>
@@ -77,12 +77,18 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
-		border: 1px solid rgba(0,0,0,0.3);
+		border: 1px solid rgba(0, 0, 0, 0.3);
 	}
 
-	.dot.red { background: #ff6b6b; }
-	.dot.yellow { background: #ffc480; }
-	.dot.green { background: #4ade80; }
+	.dot.red {
+		background: #ff6b6b;
+	}
+	.dot.yellow {
+		background: #ffc480;
+	}
+	.dot.green {
+		background: #4ade80;
+	}
 
 	.lang-label {
 		font-size: 11px;

@@ -1,5 +1,5 @@
 ---
-title: "feat: Update comparison pages with experiments features"
+title: 'feat: Update comparison pages with experiments features'
 type: feat
 status: active
 date: 2026-03-07
@@ -26,6 +26,7 @@ Pictify now has a robust experiments platform (A/B testing, smart links, schedul
 ## Files to Modify
 
 ### `src/lib/pseo/comparisons.js`
+
 - Add feature keys: `abTesting`, `smartLinks`, `scheduledVariants`, `autoOptimization`, `contextTargeting`, `experimentAnalytics`
 - Update `featureGroups` to include an "Experiments" category
 - Update Pictify scores: `abTesting: 5`, `smartLinks: 5`, `scheduledVariants: 5`, `autoOptimization: 3` (TODO/planned), `contextTargeting: 5`, `experimentAnalytics: 5`
@@ -33,6 +34,7 @@ Pictify now has a robust experiments platform (A/B testing, smart links, schedul
 - Add experiments-related advantages to each competitor comparison
 
 ### `src/routes/compare/[slug]/+page.svelte`
+
 - Add feature labels for new keys in the `featureLabels` map
 - Ensure new features render correctly in the comparison table
 

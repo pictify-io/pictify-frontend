@@ -36,14 +36,16 @@
 			starter: 'Starter',
 			free: 'Starter',
 			basic: 'Basic',
-			standard: 'Pro',     // LemonSqueezy 'Standard' = marketing 'Pro'
-			pro: 'Pro',          // Alias
+			standard: 'Pro', // LemonSqueezy 'Standard' = marketing 'Pro'
+			pro: 'Pro', // Alias
 			professional: 'Professional',
 			business: 'Business',
 			enterprise: 'Enterprise',
 			unlimited: 'Unlimited'
 		};
-		return planNames[plan?.toLowerCase()] || plan?.charAt(0).toUpperCase() + plan?.slice(1) || 'Unknown';
+		return (
+			planNames[plan?.toLowerCase()] || plan?.charAt(0).toUpperCase() + plan?.slice(1) || 'Unknown'
+		);
 	}
 
 	function formatDate(dateString) {
@@ -51,7 +53,7 @@
 		return new Date(dateString).toLocaleDateString('en-US', {
 			month: 'long',
 			day: 'numeric',
-			year: 'numeric',
+			year: 'numeric'
 		});
 	}
 
@@ -125,12 +127,14 @@
 	}
 </script>
 
-<div class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden relative group">
+<div
+	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden relative group"
+>
 	<!-- Header -->
 	<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-3">
-				<div class="w-2 h-2 rounded-full bg-gray-900 animate-pulse"></div>
+				<div class="w-2 h-2 rounded-full bg-gray-900 animate-pulse" />
 				<h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">
 					{#if hasLemonSqueezySubscription}
 						Manage Subscription
@@ -141,13 +145,19 @@
 					{/if}
 				</h2>
 			</div>
-			
+
 			{#if hasLemonSqueezySubscription}
-				<div class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 {getStatusColor(subscription.status)}">
+				<div
+					class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 {getStatusColor(
+						subscription.status
+					)}"
+				>
 					{getStatusLabel(subscription.status)}
 				</div>
 			{:else if isPaidPlanWithoutLS}
-				<div class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 bg-[#10b981] text-gray-900">
+				<div
+					class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 bg-[#10b981] text-gray-900"
+				>
 					Active
 				</div>
 			{/if}
@@ -160,13 +170,21 @@
 			<!-- Plan Name & Price -->
 			<div class="flex items-start justify-between">
 				<div>
-					<p class="text-3xl font-black text-gray-900 uppercase tracking-tight">{subscription.productName || 'Pro'}</p>
-					<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">{subscription.variantName || 'Monthly'}</p>
+					<p class="text-3xl font-black text-gray-900 uppercase tracking-tight">
+						{subscription.productName || 'Pro'}
+					</p>
+					<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">
+						{subscription.variantName || 'Monthly'}
+					</p>
 				</div>
 				{#if subscription.price}
 					<div class="text-right">
-						<p class="text-2xl font-black text-gray-900 tracking-tight">{formatCurrency(subscription.price)}</p>
-						<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">/ {subscription.interval || 'month'}</p>
+						<p class="text-2xl font-black text-gray-900 tracking-tight">
+							{formatCurrency(subscription.price)}
+						</p>
+						<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+							/ {subscription.interval || 'month'}
+						</p>
 					</div>
 				{/if}
 			</div>
@@ -175,21 +193,49 @@
 			<div class="p-4 bg-white rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#e5e7eb]">
 				{#if subscription.endsAt}
 					<div class="flex items-center gap-3">
-						<div class="w-8 h-8 rounded-lg bg-red-100 border-2 border-red-200 flex items-center justify-center flex-shrink-0">
-							<svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+						<div
+							class="w-8 h-8 rounded-lg bg-red-100 border-2 border-red-200 flex items-center justify-center flex-shrink-0"
+						>
+							<svg
+								class="w-4 h-4 text-red-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+								/>
 							</svg>
 						</div>
 						<div>
-							<p class="text-xs font-black text-gray-900 uppercase tracking-wide">Cancellation scheduled</p>
-							<p class="text-xs font-medium text-gray-500">Access until {formatDate(subscription.endsAt)}</p>
+							<p class="text-xs font-black text-gray-900 uppercase tracking-wide">
+								Cancellation scheduled
+							</p>
+							<p class="text-xs font-medium text-gray-500">
+								Access until {formatDate(subscription.endsAt)}
+							</p>
 						</div>
 					</div>
 				{:else if subscription.renewsAt}
 					<div class="flex items-center gap-3">
-						<div class="w-8 h-8 rounded-lg bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
-							<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+						<div
+							class="w-8 h-8 rounded-lg bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+						>
+							<svg
+								class="w-4 h-4 text-gray-900"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+								/>
 							</svg>
 						</div>
 						<div>
@@ -201,14 +247,25 @@
 
 				{#if isPaused && subscription.resumesAt}
 					<div class="flex items-center gap-3 mt-3 pt-3 border-t-2 border-dashed border-gray-200">
-						<div class="w-8 h-8 rounded-lg bg-[#f59e0b] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]">
+						<div
+							class="w-8 h-8 rounded-lg bg-[#f59e0b] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+						>
 							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
 							</svg>
 						</div>
 						<div>
-							<p class="text-xs font-black text-gray-900 uppercase tracking-wide">Subscription Paused</p>
-							<p class="text-xs font-medium text-gray-500">Resumes on {formatDate(subscription.resumesAt)}</p>
+							<p class="text-xs font-black text-gray-900 uppercase tracking-wide">
+								Subscription Paused
+							</p>
+							<p class="text-xs font-medium text-gray-500">
+								Resumes on {formatDate(subscription.resumesAt)}
+							</p>
 						</div>
 					</div>
 				{/if}
@@ -216,10 +273,14 @@
 
 			<!-- Payment Method -->
 			{#if subscription.cardBrand || subscription.paymentProcessor}
-				<div class="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#e5e7eb]">
+				<div
+					class="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#e5e7eb]"
+				>
 					<div class="flex items-center gap-3">
 						{#if subscription.cardBrand}
-							<div class="w-10 h-7 bg-gray-100 rounded border-2 border-gray-900 flex items-center justify-center">
+							<div
+								class="w-10 h-7 bg-gray-100 rounded border-2 border-gray-900 flex items-center justify-center"
+							>
 								{#if subscription.cardBrand === 'visa'}
 									<span class="text-[10px] font-black text-blue-800 uppercase">VISA</span>
 								{:else if subscription.cardBrand === 'mastercard'}
@@ -227,22 +288,32 @@
 								{:else if subscription.cardBrand === 'amex'}
 									<span class="text-[10px] font-black text-blue-600 uppercase">AMEX</span>
 								{:else}
-									<span class="text-[10px] font-black text-gray-600 uppercase">{subscription.cardBrand.slice(0, 3)}</span>
+									<span class="text-[10px] font-black text-gray-600 uppercase"
+										>{subscription.cardBrand.slice(0, 3)}</span
+									>
 								{/if}
 							</div>
 							<div>
 								<div class="flex items-center gap-2">
-									<p class="text-xs font-black text-gray-900 uppercase">Card ending in {subscription.cardLastFour}</p>
+									<p class="text-xs font-black text-gray-900 uppercase">
+										Card ending in {subscription.cardLastFour}
+									</p>
 								</div>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{subscription.cardBrand}</p>
+								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+									{subscription.cardBrand}
+								</p>
 							</div>
 						{:else if subscription.paymentProcessor === 'paypal'}
-							<div class="w-10 h-7 bg-[#003087] rounded border-2 border-gray-900 flex items-center justify-center">
+							<div
+								class="w-10 h-7 bg-[#003087] rounded border-2 border-gray-900 flex items-center justify-center"
+							>
 								<span class="text-[10px] font-black text-white uppercase">PP</span>
 							</div>
 							<div>
 								<p class="text-xs font-black text-gray-900 uppercase">PayPal</p>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Connected</p>
+								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+									Connected
+								</p>
 							</div>
 						{/if}
 					</div>
@@ -254,8 +325,19 @@
 						{#if loadingPortalUrl}
 							<span class="inline-flex items-center gap-1">
 								<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									/>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									/>
 								</svg>
 								Opening...
 							</span>
@@ -277,8 +359,19 @@
 						{#if pausing}
 							<span class="inline-flex items-center gap-2">
 								<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									/>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									/>
 								</svg>
 								Pausing...
 							</span>
@@ -297,8 +390,19 @@
 						{#if resuming}
 							<span class="inline-flex items-center gap-2">
 								<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									/>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									/>
 								</svg>
 								Resuming...
 							</span>
@@ -317,8 +421,19 @@
 						{#if reactivating}
 							<span class="inline-flex items-center gap-2">
 								<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									/>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									/>
 								</svg>
 								Reactivating...
 							</span>
@@ -337,8 +452,19 @@
 						{#if cancelling}
 							<span class="inline-flex items-center gap-2">
 								<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									/>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									/>
 								</svg>
 								Cancelling...
 							</span>
@@ -356,12 +482,34 @@
 					>
 						{#if loadingPortalUrl}
 							<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								/>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								/>
 							</svg>
 						{:else}
 							Manage on LemonSqueezy
-							<svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+							<svg
+								class="w-3 h-3 group-hover:translate-x-0.5 transition-transform"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+								/></svg
+							>
 						{/if}
 					</button>
 				{/if}
@@ -379,12 +527,23 @@
 			<!-- Plan Name -->
 			<div class="flex items-start justify-between">
 				<div>
-					<p class="text-3xl font-black text-gray-900 uppercase tracking-tight">{formatPlanName(currentPlan)}</p>
-					<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">Your current plan</p>
+					<p class="text-3xl font-black text-gray-900 uppercase tracking-tight">
+						{formatPlanName(currentPlan)}
+					</p>
+					<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">
+						Your current plan
+					</p>
 				</div>
-				<div class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center shadow-[3px_3px_0_0_#1f2937]">
+				<div
+					class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center shadow-[3px_3px_0_0_#1f2937]"
+				>
 					<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="M5 13l4 4L19 7"
+						/>
 					</svg>
 				</div>
 			</div>
@@ -392,14 +551,30 @@
 			<!-- Plan Info -->
 			<div class="p-4 bg-white rounded-xl border-2 border-gray-900 shadow-[4px_4px_0_0_#e5e7eb]">
 				<div class="flex items-center gap-3">
-					<div class="w-8 h-8 rounded-lg bg-blue-100 border-2 border-blue-200 flex items-center justify-center flex-shrink-0">
-						<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					<div
+						class="w-8 h-8 rounded-lg bg-blue-100 border-2 border-blue-200 flex items-center justify-center flex-shrink-0"
+					>
+						<svg
+							class="w-4 h-4 text-blue-600"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
 						</svg>
 					</div>
 					<div>
-						<p class="text-xs font-black text-gray-900 uppercase tracking-wide">Externally Managed</p>
-						<p class="text-xs font-medium text-gray-500">Subscription set up outside billing portal.</p>
+						<p class="text-xs font-black text-gray-900 uppercase tracking-wide">
+							Externally Managed
+						</p>
+						<p class="text-xs font-medium text-gray-500">
+							Subscription set up outside billing portal.
+						</p>
 					</div>
 				</div>
 			</div>
@@ -417,9 +592,16 @@
 	{:else}
 		<!-- Free Plan -->
 		<div class="p-8 text-center">
-			<div class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-4 shadow-[4px_4px_0_0_#1f2937]">
+			<div
+				class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-4 shadow-[4px_4px_0_0_#1f2937]"
+			>
 				<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
 				</svg>
 			</div>
 			<h3 class="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">Starter Plan</h3>
@@ -432,7 +614,12 @@
 			>
 				Upgrade to Pro
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2.5"
+						d="M13 7l5 5m0 0l-5 5m5-5H6"
+					/>
 				</svg>
 			</a>
 		</div>

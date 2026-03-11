@@ -17,7 +17,7 @@ let loadedFontFamilies = [];
 async function fetchBrandFontsCSS() {
 	const response = await fetch(`${PUBLIC_BACKEND_URL}/brand-assets/fonts/css`, {
 		credentials: 'include',
-		headers: { 'Accept': 'text/css' }
+		headers: { Accept: 'text/css' }
 	});
 	if (!response.ok) return '';
 	return await response.text();
@@ -63,8 +63,8 @@ export async function loadBrandFonts() {
 
 		// Force-load each font at common weights so FabricJS can use them immediately
 		const weights = ['400', '700'];
-		const loadPromises = families.flatMap(family =>
-			weights.map(w => document.fonts.load(`${w} 12px "${family}"`).catch(() => null))
+		const loadPromises = families.flatMap((family) =>
+			weights.map((w) => document.fonts.load(`${w} 12px "${family}"`).catch(() => null))
 		);
 		await Promise.all(loadPromises);
 
@@ -76,7 +76,6 @@ export async function loadBrandFonts() {
 
 		console.log('Brand fonts loaded:', families);
 		return families;
-
 	} catch (error) {
 		console.error('Error loading brand fonts:', error);
 		fontsLoaded = true;
@@ -98,9 +97,7 @@ export function getBrandFontFamilies() {
  * @returns {boolean} True if it's a brand font
  */
 export function isBrandFont(fontFamily) {
-	return loadedFontFamilies.some(family =>
-		family.toLowerCase() === fontFamily.toLowerCase()
-	);
+	return loadedFontFamilies.some((family) => family.toLowerCase() === fontFamily.toLowerCase());
 }
 
 /**

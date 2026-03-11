@@ -13,8 +13,8 @@ export async function GET() {
 	const urls = [];
 
 	// Generate URLs for each format × size combination
-	formats.forEach(format => {
-		popularSizes.forEach(size => {
+	formats.forEach((format) => {
+		popularSizes.forEach((size) => {
 			urls.push(`  <url>
     <loc>${baseUrl}/tools/html-to-${format.id}/${size}</loc>
     <lastmod>${today}</lastmod>

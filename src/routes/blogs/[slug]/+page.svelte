@@ -77,51 +77,65 @@
 	</script>
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black">
+<div
+	class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black"
+>
 	<Nav />
-	
+
 	{#if blog && blog.title}
 		<div class="w-full flex flex-col-reverse md:flex-row border-b-[3px] border-gray-900">
 			<!-- Hero Image -->
-			<div class="flex-1 bg-white md:border-r-[3px] border-t-[3px] md:border-t-0 border-gray-900 relative overflow-hidden min-h-[400px] md:min-h-[500px]">
-				<img 
-					src={blog?.heroImage} 
-					class="object-cover w-full h-full absolute inset-0" 
-					alt={blog?.title} 
+			<div
+				class="flex-1 bg-white md:border-r-[3px] border-t-[3px] md:border-t-0 border-gray-900 relative overflow-hidden min-h-[400px] md:min-h-[500px]"
+			>
+				<img
+					src={blog?.heroImage}
+					class="object-cover w-full h-full absolute inset-0"
+					alt={blog?.title}
 				/>
-				<div class="absolute inset-0 bg-black/10"></div>
+				<div class="absolute inset-0 bg-black/10" />
 			</div>
 
 			<!-- Title & Info -->
-			<div class="flex-1 flex flex-col w-full bg-[#FFFDF8] justify-center p-8 md:p-16 relative pattern-grid">
+			<div
+				class="flex-1 flex flex-col w-full bg-[#FFFDF8] justify-center p-8 md:p-16 relative pattern-grid"
+			>
 				<div class="relative z-10">
 					{#if blog?.tags?.length > 0}
 						<div class="mb-6">
-							<span class="bg-[#ff6b6b] text-white border-[3px] border-gray-900 px-4 py-1.5 font-black uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#1f2937] inline-block transform -rotate-1">
+							<span
+								class="bg-[#ff6b6b] text-white border-[3px] border-gray-900 px-4 py-1.5 font-black uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#1f2937] inline-block transform -rotate-1"
+							>
 								{blog?.tags[0]}
 							</span>
 						</div>
 					{/if}
 
-					<h1 class="font-black text-3xl md:text-5xl lg:text-6xl leading-tight mb-8 uppercase tracking-tight">
+					<h1
+						class="font-black text-3xl md:text-5xl lg:text-6xl leading-tight mb-8 uppercase tracking-tight"
+					>
 						{blog?.title}
 					</h1>
 
-					<div class="flex flex-wrap items-center gap-6 text-sm font-bold uppercase tracking-wide border-t-[3px] border-gray-900 pt-6 mb-8">
+					<div
+						class="flex flex-wrap items-center gap-6 text-sm font-bold uppercase tracking-wide border-t-[3px] border-gray-900 pt-6 mb-8"
+					>
 						<div class="flex items-center gap-2">
-							<div class="w-8 h-8 bg-gray-900 rounded-full text-white flex items-center justify-center">
-								<i class="fa fa-user text-xs"></i>
+							<div
+								class="w-8 h-8 bg-gray-900 rounded-full text-white flex items-center justify-center"
+							>
+								<i class="fa fa-user text-xs" />
 							</div>
 							<span>{blog?.author}</span>
 						</div>
-						<div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+						<div class="w-2 h-2 bg-gray-300 rounded-full" />
 						<div class="flex items-center gap-2">
-							<i class="fa fa-calendar text-gray-400"></i>
+							<i class="fa fa-calendar text-gray-400" />
 							<span>{formattedDate}</span>
 						</div>
-						<div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+						<div class="w-2 h-2 bg-gray-300 rounded-full" />
 						<div class="flex items-center gap-2">
-							<i class="fa fa-clock text-gray-400"></i>
+							<i class="fa fa-clock text-gray-400" />
 							<span>{blog?.readingTime} min read</span>
 						</div>
 					</div>
@@ -133,14 +147,14 @@
 							target="_blank"
 							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-none transition-all rounded-lg"
 						>
-							<i class="fa-brands fa-twitter text-xl"></i>
+							<i class="fa-brands fa-twitter text-xl" />
 						</a>
 						<a
 							href={`https://www.linkedin.com/shareArticle?mini=true&url=https://pictify.io/blogs/${$page.params.slug}`}
 							target="_blank"
 							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-none transition-all rounded-lg"
 						>
-							<i class="fa-brands fa-linkedin-in text-xl"></i>
+							<i class="fa-brands fa-linkedin-in text-xl" />
 						</a>
 						<button
 							type="button"
@@ -151,7 +165,7 @@
 							aria-label="Copy link to clipboard"
 							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-none transition-all rounded-lg"
 						>
-							<i class="fa fa-link text-xl"></i>
+							<i class="fa fa-link text-xl" />
 						</button>
 					</div>
 				</div>
@@ -264,7 +278,7 @@
 	:global(.blog-content blockquote) {
 		margin: 2rem 0;
 		padding: 1.5rem 2rem;
-		background: #FFFDF8;
+		background: #fffdf8;
 		border-left: 6px solid #111827;
 		border-radius: 0 12px 12px 0;
 		box-shadow: 4px 4px 0 0 #1f2937;

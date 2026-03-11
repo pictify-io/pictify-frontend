@@ -50,9 +50,10 @@ export function buildDefinedTermSetSchema(terms) {
 	return {
 		'@type': 'DefinedTermSet',
 		name: 'Image Generation Glossary',
-		description: 'Comprehensive glossary of image generation terminology including OG images, Open Graph, social previews, and more.',
+		description:
+			'Comprehensive glossary of image generation terminology including OG images, Open Graph, social previews, and more.',
 		url: `${BASE_URL}/glossary`,
-		hasDefinedTerm: terms.map(term => ({
+		hasDefinedTerm: terms.map((term) => ({
 			'@type': 'DefinedTerm',
 			name: term.title,
 			termCode: term.term,
@@ -81,7 +82,7 @@ export function buildEducationalContentSchema(contentData, referencedTerms = [])
 	};
 
 	if (referencedTerms.length > 0) {
-		schema.about = referencedTerms.map(term => ({
+		schema.about = referencedTerms.map((term) => ({
 			'@type': 'DefinedTerm',
 			name: term.title,
 			url: `${BASE_URL}/glossary/${term.term}`

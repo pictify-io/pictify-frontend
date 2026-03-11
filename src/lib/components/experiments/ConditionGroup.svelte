@@ -33,7 +33,7 @@
 		const child = {
 			type: 'group',
 			operator: group.operator === 'AND' ? 'OR' : 'AND',
-			children: [],
+			children: []
 		};
 		assignKey(child);
 		group.children = [...group.children, child];
@@ -46,7 +46,7 @@
 			property: '',
 			operator: 'eq',
 			value: '',
-			paramName: '',
+			paramName: ''
 		};
 		assignKey(child);
 		group.children = [...group.children, child];
@@ -77,7 +77,11 @@
 	$: canAddGroup = depth < maxDepth - 1;
 </script>
 
-<div class="rounded-xl border-[3px] {borderColor} {bgColor} {isRoot ? 'p-6' : 'ml-3 sm:ml-5 p-6 shadow-[4px_4px_0_0_black]'}">
+<div
+	class="rounded-xl border-[3px] {borderColor} {bgColor} {isRoot
+		? 'p-6'
+		: 'ml-3 sm:ml-5 p-6 shadow-[4px_4px_0_0_black]'}"
+>
 	<!-- Group header -->
 	<div class="flex items-center justify-between {isRoot ? 'mb-1' : 'mb-3 px-1'}">
 		<div class="flex items-center gap-2.5">
@@ -106,7 +110,12 @@
 					title="Remove group"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			{/if}
@@ -138,7 +147,9 @@
 
 				{#if index < group.children.length - 1}
 					<div class="flex items-center justify-center py-2">
-						<span class="px-3 py-1 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-md text-[9px] font-black uppercase tracking-widest bg-white text-black">
+						<span
+							class="px-3 py-1 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-md text-[9px] font-black uppercase tracking-widest bg-white text-black"
+						>
 							{group.operator || 'AND'}
 						</span>
 					</div>
@@ -158,7 +169,12 @@
 				transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest cursor-pointer"
 		>
 			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2.5"
+					d="M12 4v16m8-8H4"
+				/>
 			</svg>
 			Condition
 		</button>
@@ -173,7 +189,12 @@
 					transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest cursor-pointer"
 			>
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2.5"
+						d="M12 4v16m8-8H4"
+					/>
 				</svg>
 				Group
 			</button>

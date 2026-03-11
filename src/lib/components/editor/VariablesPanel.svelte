@@ -1658,7 +1658,9 @@
 				<!-- Preview Stats (inline with preview control — #3, #14, #15) -->
 				{#if previewStats && $isPreviewActive}
 					<div class="grid grid-cols-2 gap-2" aria-live="polite" aria-label="Preview statistics">
-						<div class="bg-white border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#e5e5e5]">
+						<div
+							class="bg-white border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#e5e5e5]"
+						>
 							<div class="flex items-center gap-1.5 mb-0.5">
 								<i class="fa fa-eye-slash text-gray-400 text-[10px]" />
 								<span class="text-[10px] font-black text-gray-500 uppercase">Hidden</span>
@@ -1671,7 +1673,9 @@
 							</div>
 							<div class="text-[9px] font-medium text-gray-400">elements hidden by conditions</div>
 						</div>
-						<div class="bg-white border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#e5e5e5]">
+						<div
+							class="bg-white border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#e5e5e5]"
+						>
 							<div class="flex items-center gap-1.5 mb-0.5">
 								<i class="fa fa-layer-group text-gray-400 text-[10px]" />
 								<span class="text-[10px] font-black text-gray-500 uppercase">Loops</span>
@@ -2159,7 +2163,9 @@
 							</div>
 
 							<!-- URL Display -->
-							<div class="bg-white border-[2px] border-gray-900 rounded-lg p-2 mb-3 shadow-[2px_2px_0_0_#e5e5e5]">
+							<div
+								class="bg-white border-[2px] border-gray-900 rounded-lg p-2 mb-3 shadow-[2px_2px_0_0_#e5e5e5]"
+							>
 								<p class="text-[10px] font-bold text-gray-500 uppercase mb-1">PDF URL</p>
 								<p class="text-xs font-mono text-gray-700 break-all select-all">{renderedPdfUrl}</p>
 							</div>
@@ -2250,7 +2256,9 @@
 									></pre>
 							</div>
 
-							<div class="bg-gray-100 border-[2px] border-gray-900 rounded-lg p-2 shadow-[2px_2px_0_0_#e5e5e5]">
+							<div
+								class="bg-gray-100 border-[2px] border-gray-900 rounded-lg p-2 shadow-[2px_2px_0_0_#e5e5e5]"
+							>
 								<p class="text-[10px] text-gray-600 mb-1 font-bold uppercase tracking-wide">
 									Request Body:
 								</p>

@@ -1,5 +1,5 @@
 ---
-title: "feat: A/B Test Images, Smart Links, Expiring/Scheduled Images & Variant Auto-Optimization"
+title: 'feat: A/B Test Images, Smart Links, Expiring/Scheduled Images & Variant Auto-Optimization'
 type: feat
 status: active
 date: 2026-02-28
@@ -16,6 +16,7 @@ Add four interconnected features to Pictify.io that transform static image gener
 ## Problem Statement / Motivation
 
 Currently, Pictify generates static images. Once rendered, an image never changes. Users who want to:
+
 - Test which banner converts better → must manually create two images, split traffic themselves
 - Show different images to mobile vs desktop → must create separate URLs and handle routing
 - Run a limited-time promotion → must remember to manually swap images
@@ -130,110 +131,123 @@ The foundation that all other features build on.
 
 ```javascript
 const experimentSchema = new mongoose.Schema({
-  uid: { type: String, unique: true },
-  active: { type: Boolean, default: true },
-  slug: { type: String, unique: true, sparse: true, index: true },
-  type: {
-    type: String,
-    enum: ['ab_test', 'smart_link', 'scheduled', 'bandit'],
-    required: true,
-  },
-  name: { type: String, required: true, maxlength: 255 },
-  status: {
-    type: String,
-    enum: ['draft', 'running', 'paused', 'completed', 'archived'],
-    default: 'draft',
-  },
-  templateUid: { type: String, ref: 'Template', required: true, index: true },
-  team: { type: String, ref: 'Team', index: true },
-  createdBy: { type: String, ref: 'User', required: true },
+	uid: { type: String, unique: true },
+	active: { type: Boolean, default: true },
+	slug: { type: String, unique: true, sparse: true, index: true },
+	type: {
+		type: String,
+		enum: ['ab_test', 'smart_link', 'scheduled', 'bandit'],
+		required: true
+	},
+	name: { type: String, required: true, maxlength: 255 },
+	status: {
+		type: String,
+		enum: ['draft', 'running', 'paused', 'completed', 'archived'],
+		default: 'draft'
+	},
+	templateUid: { type: String, ref: 'Template', required: true, index: true },
+	team: { type: String, ref: 'Team', index: true },
+	createdBy: { type: String, ref: 'User', required: true },
 
-  // Variants (embedded for atomic reads on hot path)
-  variants: [{
-    id: { type: String, required: true },
-    name: { type: String },
-    variables: { type: mongoose.Schema.Types.Mixed, default: {} },
-    weight: { type: Number, default: 5000 }, // basis points (50%)
-    preRenderedUrl: { type: String },
-    preRenderedKey: { type: String },
-    isDefault: { type: Boolean, default: false },
+	// Variants (embedded for atomic reads on hot path)
+	variants: [
+		{
+			id: { type: String, required: true },
+			name: { type: String },
+			variables: { type: mongoose.Schema.Types.Mixed, default: {} },
+			weight: { type: Number, default: 5000 }, // basis points (50%)
+			preRenderedUrl: { type: String },
+			preRenderedKey: { type: String },
+			isDefault: { type: Boolean, default: false },
 
-    // Smart Link conditions (only for type=smart_link)
-    conditions: {
-      operator: { type: String, enum: ['AND', 'OR'], default: 'AND' },
-      rules: [{
-        property: { type: String },
-        operator: { type: String },
-        value: { type: mongoose.Schema.Types.Mixed },
-        paramName: { type: String },
-      }],
-    },
-    priority: { type: Number, default: 0 },
+			// Smart Link conditions (only for type=smart_link)
+			conditions: {
+				operator: { type: String, enum: ['AND', 'OR'], default: 'AND' },
+				rules: [
+					{
+						property: { type: String },
+						operator: { type: String },
+						value: { type: mongoose.Schema.Types.Mixed },
+						paramName: { type: String }
+					}
+				]
+			},
+			priority: { type: Number, default: 0 },
 
-    // Schedule (only for type=scheduled)
-    schedule: {
-      startAt: { type: Date },
-      endAt: { type: Date },
-      recurrence: {
-        type: { type: String, enum: ['none', 'daily', 'weekly', 'cron'] },
-        cronExpression: { type: String },
-        timezone: { type: String, default: 'UTC' },
-      },
-    },
+			// Schedule (only for type=scheduled)
+			schedule: {
+				startAt: { type: Date },
+				endAt: { type: Date },
+				recurrence: {
+					type: { type: String, enum: ['none', 'daily', 'weekly', 'cron'] },
+					cronExpression: { type: String },
+					timezone: { type: String, default: 'UTC' }
+				}
+			},
 
-    // Stats (updated by periodic BullMQ job from Redis)
-    impressions: { type: Number, default: 0 },
-    clicks: { type: Number, default: 0 },
-    alphaSuccesses: { type: Number, default: 1 },
-    betaFailures: { type: Number, default: 1 },
-  }],
+			// Stats (updated by periodic BullMQ job from Redis)
+			impressions: { type: Number, default: 0 },
+			clicks: { type: Number, default: 0 },
+			alphaSuccesses: { type: Number, default: 1 },
+			betaFailures: { type: Number, default: 1 }
+		}
+	],
 
-  // Goal tracking
-  goalConfig: {
-    type: { type: String, enum: ['impressions_only', 'click_through'], default: 'impressions_only' },
-    destinationUrl: { type: String },
-  },
+	// Goal tracking
+	goalConfig: {
+		type: {
+			type: String,
+			enum: ['impressions_only', 'click_through'],
+			default: 'impressions_only'
+		},
+		destinationUrl: { type: String }
+	},
 
-  // Bandit config (only for type=bandit)
-  banditConfig: {
-    algorithm: { type: String, enum: ['thompson_sampling', 'epsilon_greedy'], default: 'thompson_sampling' },
-    warmupImpressions: { type: Number, default: 50 },
-    recomputeIntervalMinutes: { type: Number, default: 15 },
-  },
+	// Bandit config (only for type=bandit)
+	banditConfig: {
+		algorithm: {
+			type: String,
+			enum: ['thompson_sampling', 'epsilon_greedy'],
+			default: 'thompson_sampling'
+		},
+		warmupImpressions: { type: Number, default: 50 },
+		recomputeIntervalMinutes: { type: Number, default: 15 }
+	},
 
-  // Statistical config
-  minimumSampleSize: { type: Number, default: 100 },
-  confidenceThreshold: { type: Number, default: 0.95 },
-  minimumRunDays: { type: Number, default: 7 },
+	// Statistical config
+	minimumSampleSize: { type: Number, default: 100 },
+	confidenceThreshold: { type: Number, default: 0.95 },
+	minimumRunDays: { type: Number, default: 7 },
 
-  // Winner
-  winnerVariantId: { type: String },
-  winnerDeclaredAt: { type: Date },
+	// Winner
+	winnerVariantId: { type: String },
+	winnerDeclaredAt: { type: Date },
 
-  // Scheduling
-  startAt: { type: Date },
-  endAt: { type: Date },
-  expiresAt: { type: Date, index: true },
-  fallbackImageUrl: { type: String },
+	// Scheduling
+	startAt: { type: Date },
+	endAt: { type: Date },
+	expiresAt: { type: Date, index: true },
+	fallbackImageUrl: { type: String },
 
-  // Output config
-  outputConfig: {
-    format: { type: String, enum: ['png', 'jpeg', 'webp'], default: 'png' },
-    quality: { type: Number, default: 90 },
-  },
+	// Output config
+	outputConfig: {
+		format: { type: String, enum: ['png', 'jpeg', 'webp'], default: 'png' },
+		quality: { type: Number, default: 90 }
+	},
 
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-})
+	createdAt: { type: Date, default: Date.now },
+	updatedAt: { type: Date, default: Date.now }
+});
 ```
 
 **Indexes:**
+
 ```javascript
-experimentSchema.index({ slug: 1, active: 1 })
-experimentSchema.index({ team: 1, active: 1, type: 1 })
-experimentSchema.index({ team: 1, templateUid: 1, active: 1 })
-experimentSchema.index({ status: 1, type: 1 }) // for scheduler queries
-experimentSchema.index({ expiresAt: 1 }, { sparse: true }) // for expiration checks
+experimentSchema.index({ slug: 1, active: 1 });
+experimentSchema.index({ team: 1, active: 1, type: 1 });
+experimentSchema.index({ team: 1, templateUid: 1, active: 1 });
+experimentSchema.index({ status: 1, type: 1 }); // for scheduler queries
+experimentSchema.index({ expiresAt: 1 }, { sparse: true }); // for expiration checks
 ```
 
 Follow existing patterns: `uid` prefix `exp_`, soft-delete with `filterActive`, `pre('save')` for uid generation.
@@ -252,6 +266,7 @@ GET /s/:slug/pixel.gif     → 1x1 tracking pixel for impression counting
 ```
 
 **Implementation pattern:** Mirror `binding-render.js` architecture:
+
 - Redis LRU cache for experiment config (60s TTL)
 - Request coalescing via `inflightRequests` map
 - Quota check (team-first, user-fallback)
@@ -260,18 +275,17 @@ GET /s/:slug/pixel.gif     → 1x1 tracking pixel for impression counting
 - Fire-and-forget S3 upload with deterministic key
 
 **Variant assignment (A/B mode):**
+
 ```javascript
 function assignVariant(viewerKey, experiment) {
-  const hash = crypto.createHash('md5')
-    .update(`${experiment.uid}:${viewerKey}`)
-    .digest('hex')
-  const bucket = parseInt(hash.substring(0, 8), 16) % 10000
-  let cumulative = 0
-  for (const variant of experiment.variants) {
-    cumulative += variant.weight
-    if (bucket < cumulative) return variant
-  }
-  return experiment.variants[experiment.variants.length - 1]
+	const hash = crypto.createHash('md5').update(`${experiment.uid}:${viewerKey}`).digest('hex');
+	const bucket = parseInt(hash.substring(0, 8), 16) % 10000;
+	let cumulative = 0;
+	for (const variant of experiment.variants) {
+		cumulative += variant.weight;
+		if (bucket < cumulative) return variant;
+	}
+	return experiment.variants[experiment.variants.length - 1];
 }
 ```
 
@@ -324,18 +338,19 @@ Cold path (BullMQ repeatable job, every 15 min):
 **Modify:** `/Users/suyashthakur/html-to-gif/config/planLimits.js`
 
 Add feature limits:
+
 ```javascript
 const EXPERIMENT_LIMITS = {
-  starter: { ab_test: 0, smart_link: 0, scheduled: 0, bandit: 0, maxVariants: 0 },
-  basic: { ab_test: 1, smart_link: 0, scheduled: 0, bandit: 0, maxVariants: 2 },
-  standard: { ab_test: 5, smart_link: 3, scheduled: 3, bandit: 0, maxVariants: 5 },
-  professional: { ab_test: 5, smart_link: 3, scheduled: 3, bandit: 0, maxVariants: 5 },
-  business: { ab_test: 20, smart_link: 10, scheduled: 10, bandit: 5, maxVariants: 10 },
-  'business-plus': { ab_test: 50, smart_link: 25, scheduled: 25, bandit: 10, maxVariants: 10 },
-  premium: { ab_test: null, smart_link: null, scheduled: null, bandit: null, maxVariants: 10 },
-  enterprise: { ab_test: null, smart_link: null, scheduled: null, bandit: null, maxVariants: 10 },
-  ultimate: { ab_test: null, smart_link: null, scheduled: null, bandit: null, maxVariants: 10 },
-}
+	starter: { ab_test: 0, smart_link: 0, scheduled: 0, bandit: 0, maxVariants: 0 },
+	basic: { ab_test: 1, smart_link: 0, scheduled: 0, bandit: 0, maxVariants: 2 },
+	standard: { ab_test: 5, smart_link: 3, scheduled: 3, bandit: 0, maxVariants: 5 },
+	professional: { ab_test: 5, smart_link: 3, scheduled: 3, bandit: 0, maxVariants: 5 },
+	business: { ab_test: 20, smart_link: 10, scheduled: 10, bandit: 5, maxVariants: 10 },
+	'business-plus': { ab_test: 50, smart_link: 25, scheduled: 25, bandit: 10, maxVariants: 10 },
+	premium: { ab_test: null, smart_link: null, scheduled: null, bandit: null, maxVariants: 10 },
+	enterprise: { ab_test: null, smart_link: null, scheduled: null, bandit: null, maxVariants: 10 },
+	ultimate: { ab_test: null, smart_link: null, scheduled: null, bandit: null, maxVariants: 10 }
+};
 ```
 
 `null` = unlimited. Starter gets 0 (upgrade prompt). Basic gets 1 A/B test to taste the feature.
@@ -343,11 +358,13 @@ const EXPERIMENT_LIMITS = {
 #### 1.6 Frontend: Experiment Dashboard
 
 **New route:** `/dashboard/experiments/`
+
 - List all experiments with status, type, impressions, winner
 - Filter by type (A/B Test, Smart Link, Scheduled, Bandit)
 - Create new experiment flow
 
 **New route:** `/dashboard/experiments/[uid]/`
+
 - Experiment detail: config, variants, analytics
 - Live chart: impressions/clicks per variant over time
 - Statistical significance indicator (for A/B mode)
@@ -355,10 +372,12 @@ const EXPERIMENT_LIMITS = {
 - Actions: start, pause, complete, duplicate
 
 **New route:** `/dashboard/template/[uid]/experiments/`
+
 - Experiments linked to this template
 - Quick create from template context
 
 **New components:**
+
 ```
 src/lib/components/experiments/
   ExperimentList.svelte
@@ -394,16 +413,16 @@ Builds on the Experiment model with `type: 'smart_link'`.
 
 ```javascript
 function evaluateRules(experiment, requestContext) {
-  const sortedVariants = experiment.variants
-    .filter(v => !v.isDefault && v.conditions?.rules?.length > 0)
-    .sort((a, b) => a.priority - b.priority)
+	const sortedVariants = experiment.variants
+		.filter((v) => !v.isDefault && v.conditions?.rules?.length > 0)
+		.sort((a, b) => a.priority - b.priority);
 
-  for (const variant of sortedVariants) {
-    if (evaluateConditionGroup(variant.conditions, requestContext)) {
-      return variant
-    }
-  }
-  return experiment.variants.find(v => v.isDefault) || experiment.variants[0]
+	for (const variant of sortedVariants) {
+		if (evaluateConditionGroup(variant.conditions, requestContext)) {
+			return variant;
+		}
+	}
+	return experiment.variants.find((v) => v.isDefault) || experiment.variants[0];
 }
 ```
 
@@ -425,6 +444,7 @@ function evaluateRules(experiment, requestContext) {
 **New file:** `/Users/suyashthakur/html-to-gif/service/request-context.js`
 
 Extracts viewer context from HTTP request. Uses:
+
 - CloudFront headers (`CloudFront-Is-Mobile-Viewer`, `CloudFront-Viewer-Country`) when available
 - `geoip-lite` package as fallback for geo
 - User-Agent parsing for device/OS detection
@@ -438,6 +458,7 @@ Extracts viewer context from HTTP request. Uses:
 **New component:** `src/lib/components/experiments/RuleBuilder.svelte`
 
 Visual rule builder UI:
+
 - Add condition rows (property dropdown → operator dropdown → value input)
 - AND/OR toggle per rule group
 - Drag-to-reorder rules for priority
@@ -454,20 +475,20 @@ Integrated into the smart URL router. When `experiment.type === 'scheduled'`:
 
 ```javascript
 function resolveScheduledVariant(experiment) {
-  const now = new Date()
+	const now = new Date();
 
-  // Check hard expiry
-  if (experiment.expiresAt && now > experiment.expiresAt) {
-    return { expired: true, fallbackUrl: experiment.fallbackImageUrl }
-  }
+	// Check hard expiry
+	if (experiment.expiresAt && now > experiment.expiresAt) {
+		return { expired: true, fallbackUrl: experiment.fallbackImageUrl };
+	}
 
-  // Find active time window
-  const activeVariant = experiment.variants
-    .filter(v => v.schedule?.startAt && v.schedule.startAt <= now)
-    .filter(v => !v.schedule.endAt || v.schedule.endAt > now)
-    .sort((a, b) => b.schedule.startAt - a.schedule.startAt)[0]
+	// Find active time window
+	const activeVariant = experiment.variants
+		.filter((v) => v.schedule?.startAt && v.schedule.startAt <= now)
+		.filter((v) => !v.schedule.endAt || v.schedule.endAt > now)
+		.sort((a, b) => b.schedule.startAt - a.schedule.startAt)[0];
 
-  return activeVariant || experiment.variants.find(v => v.isDefault)
+	return activeVariant || experiment.variants.find((v) => v.isDefault);
 }
 ```
 
@@ -476,6 +497,7 @@ function resolveScheduledVariant(experiment) {
 **New file:** `/Users/suyashthakur/html-to-gif/service/experiment-scheduler.js`
 
 Jobs:
+
 1. **Pre-render job:** Render variant images 5 minutes before their scheduled `startAt`. Delayed BullMQ job.
 2. **Expiration check:** Repeatable job (every 5 min) finds experiments with `expiresAt < now + 5min` and updates status.
 3. **Cache invalidation:** At each schedule transition, invalidate the CloudFront path `/s/{slug}*` (first 1000/month free).
@@ -511,66 +533,78 @@ Builds on Phase 1's A/B testing with `type: 'bandit'`.
 **New file:** `/Users/suyashthakur/html-to-gif/service/bandit-engine.js`
 
 ```javascript
-const { betaSample } = require('./statistics')
+const { betaSample } = require('./statistics');
 
 function thompsonSampleVariant(variants) {
-  let best = null, bestSample = -1
-  for (const v of variants) {
-    const sample = betaSample(v.alphaSuccesses || 1, v.betaFailures || 1)
-    if (sample > bestSample) {
-      bestSample = sample
-      best = v
-    }
-  }
-  return best
+	let best = null,
+		bestSample = -1;
+	for (const v of variants) {
+		const sample = betaSample(v.alphaSuccesses || 1, v.betaFailures || 1);
+		if (sample > bestSample) {
+			bestSample = sample;
+			best = v;
+		}
+	}
+	return best;
 }
 
 function recomputeBanditWeights(variants) {
-  const SIMULATIONS = 10000
-  const wins = Object.fromEntries(variants.map(v => [v.id, 0]))
+	const SIMULATIONS = 10000;
+	const wins = Object.fromEntries(variants.map((v) => [v.id, 0]));
 
-  for (let i = 0; i < SIMULATIONS; i++) {
-    let bestId = null, bestSample = -1
-    for (const v of variants) {
-      const s = betaSample(v.alphaSuccesses, v.betaFailures)
-      if (s > bestSample) { bestSample = s; bestId = v.id }
-    }
-    wins[bestId]++
-  }
+	for (let i = 0; i < SIMULATIONS; i++) {
+		let bestId = null,
+			bestSample = -1;
+		for (const v of variants) {
+			const s = betaSample(v.alphaSuccesses, v.betaFailures);
+			if (s > bestSample) {
+				bestSample = s;
+				bestId = v.id;
+			}
+		}
+		wins[bestId]++;
+	}
 
-  return variants.map(v => ({
-    ...v,
-    weight: Math.round((wins[v.id] / SIMULATIONS) * 10000),
-  }))
+	return variants.map((v) => ({
+		...v,
+		weight: Math.round((wins[v.id] / SIMULATIONS) * 10000)
+	}));
 }
 
 function checkConvergence(variants, threshold = 0.95) {
-  const SIMULATIONS = 50000
-  const wins = Object.fromEntries(variants.map(v => [v.id, 0]))
-  for (let i = 0; i < SIMULATIONS; i++) {
-    let bestId = null, bestSample = -1
-    for (const v of variants) {
-      const s = betaSample(v.alphaSuccesses, v.betaFailures)
-      if (s > bestSample) { bestSample = s; bestId = v.id }
-    }
-    wins[bestId]++
-  }
-  for (const v of variants) {
-    const prob = wins[v.id] / SIMULATIONS
-    if (prob >= threshold) return { converged: true, winnerId: v.id, probability: prob }
-  }
-  return { converged: false }
+	const SIMULATIONS = 50000;
+	const wins = Object.fromEntries(variants.map((v) => [v.id, 0]));
+	for (let i = 0; i < SIMULATIONS; i++) {
+		let bestId = null,
+			bestSample = -1;
+		for (const v of variants) {
+			const s = betaSample(v.alphaSuccesses, v.betaFailures);
+			if (s > bestSample) {
+				bestSample = s;
+				bestId = v.id;
+			}
+		}
+		wins[bestId]++;
+	}
+	for (const v of variants) {
+		const prob = wins[v.id] / SIMULATIONS;
+		if (prob >= threshold) return { converged: true, winnerId: v.id, probability: prob };
+	}
+	return { converged: false };
 }
 ```
 
 **Beta distribution sampling** (no external dependency):
+
 ```javascript
 // Marsaglia and Tsang's method for Gamma distribution
-function gammaSample(alpha) { /* ... */ }
+function gammaSample(alpha) {
+	/* ... */
+}
 function betaSample(alpha, beta) {
-  const x = gammaSample(alpha)
-  const y = gammaSample(beta)
-  return x / (x + y)
+	const x = gammaSample(alpha);
+	const y = gammaSample(beta);
+	return x / (x + y);
 }
 ```
 
@@ -579,6 +613,7 @@ function betaSample(alpha, beta) {
 **Added to:** `service/experiment-analytics.js`
 
 BullMQ repeatable job (every 15 minutes for active bandit experiments):
+
 1. Read Redis impression/click counters per variant
 2. Update `alphaSuccesses = 1 + clicks`, `betaFailures = 1 + (impressions - clicks)`
 3. Run `recomputeBanditWeights()` — update variant weights in MongoDB
@@ -650,13 +685,13 @@ BullMQ periodic job (every 15 min)
 
 ### API Surface Parity
 
-| Feature | Dashboard UI | REST API | Notes |
-|---------|-------------|----------|-------|
-| Create experiment | `/dashboard/experiments/` | `POST /experiments` | Both supported |
-| View analytics | `/dashboard/experiments/[uid]` | `GET /experiments/:uid/analytics` | Both supported |
-| Start/pause/complete | UI buttons | `POST /experiments/:uid/{action}` | Both supported |
-| Serve variant image | N/A (visitor-facing) | `GET /s/:slug.:format` | Public, no auth |
-| Track click | N/A (visitor-facing) | `GET /s/:slug/click` | Public, no auth |
+| Feature              | Dashboard UI                   | REST API                          | Notes           |
+| -------------------- | ------------------------------ | --------------------------------- | --------------- |
+| Create experiment    | `/dashboard/experiments/`      | `POST /experiments`               | Both supported  |
+| View analytics       | `/dashboard/experiments/[uid]` | `GET /experiments/:uid/analytics` | Both supported  |
+| Start/pause/complete | UI buttons                     | `POST /experiments/:uid/{action}` | Both supported  |
+| Serve variant image  | N/A (visitor-facing)           | `GET /s/:slug.:format`            | Public, no auth |
+| Track click          | N/A (visitor-facing)           | `GET /s/:slug/click`              | Public, no auth |
 
 ### Integration Test Scenarios
 
@@ -704,49 +739,52 @@ BullMQ periodic job (every 15 min)
 ## Dependencies & Risks
 
 ### Dependencies
+
 - `geoip-lite` npm package for geo-IP lookups (or CloudFront headers)
 - CloudFront behavior configuration for `/s/*` path pattern (short TTL, forwarded headers)
 - Redis available for impression counting and config caching
 
 ### Risks
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Redis outage | Lost impressions, slower config reads | Fall back to MongoDB; impressions are best-effort |
-| CloudFront caching routing endpoint | Wrong variant served to visitors | Ensure `/s/*` behavior has `no-cache` origin response |
-| Abuse of public `/s/` endpoint | DDoS vector, resource exhaustion | Request coalescing (existing pattern), rate limiting by IP |
-| Bot traffic skewing analytics | False conclusions from A/B tests | UA-based bot detection, exclude from stats |
-| Thompson Sampling with tiny samples | Premature exploitation | Warm-up period (50 impressions/variant) with equal split |
-| Template change mid-experiment | Stale renders | Warn user, offer re-render action |
+
+| Risk                                | Impact                                | Mitigation                                                 |
+| ----------------------------------- | ------------------------------------- | ---------------------------------------------------------- |
+| Redis outage                        | Lost impressions, slower config reads | Fall back to MongoDB; impressions are best-effort          |
+| CloudFront caching routing endpoint | Wrong variant served to visitors      | Ensure `/s/*` behavior has `no-cache` origin response      |
+| Abuse of public `/s/` endpoint      | DDoS vector, resource exhaustion      | Request coalescing (existing pattern), rate limiting by IP |
+| Bot traffic skewing analytics       | False conclusions from A/B tests      | UA-based bot detection, exclude from stats                 |
+| Thompson Sampling with tiny samples | Premature exploitation                | Warm-up period (50 impressions/variant) with equal split   |
+| Template change mid-experiment      | Stale renders                         | Warn user, offer re-render action                          |
 
 ## Implementation Order
 
-| Step | What | Files | Depends On |
-|------|------|-------|------------|
-| 1 | Experiment model | `models/Experiment.js` | — |
-| 2 | Experiment CRUD routes | `routes/experiments.js` | Step 1 |
-| 3 | Smart URL router | `routes/experiment-render.js` | Step 1 |
-| 4 | Variant pre-render service | `service/experiment-renderer.js` | Step 1, 3 |
-| 5 | A/B variant assignment (hash) | `service/ab-router.js` | Step 3 |
-| 6 | Impression/click tracking | `service/experiment-analytics.js` | Step 3 |
-| 7 | Plan gating | `config/planLimits.js` (modify) | Step 2 |
-| 8 | Frontend: store + API client | `store/experiment.store.js`, `api/experiments.js` | Step 2 |
-| 9 | Frontend: experiment list/detail | `routes/dashboard/experiments/` | Step 8 |
-| 10 | Frontend: A/B test creation | `components/experiments/ExperimentCreate.svelte` | Step 9 |
-| 11 | Frontend: analytics charts | `components/experiments/AnalyticsChart.svelte` | Step 9 |
-| 12 | Smart Link rule engine | `service/smart-link-engine.js` | Step 3 |
-| 13 | Request context extractor | `service/request-context.js` | Step 12 |
-| 14 | Frontend: rule builder | `components/experiments/RuleBuilder.svelte` | Step 10 |
-| 15 | Schedule resolver | integrated into Step 3 | Step 3 |
-| 16 | Schedule BullMQ jobs | `service/experiment-scheduler.js` | Step 4, 15 |
-| 17 | Frontend: schedule editor | `components/experiments/ScheduleEditor.svelte` | Step 10 |
-| 18 | Thompson Sampling engine | `service/bandit-engine.js` | Step 6 |
-| 19 | Bandit recompute BullMQ job | integrated into Step 6 | Step 18 |
-| 20 | Frontend: bandit dashboard | `components/experiments/BanditDashboard.svelte` | Step 11 |
-| 21 | Significance calculator | `service/statistics.js` | Step 6 |
+| Step | What                             | Files                                             | Depends On |
+| ---- | -------------------------------- | ------------------------------------------------- | ---------- |
+| 1    | Experiment model                 | `models/Experiment.js`                            | —          |
+| 2    | Experiment CRUD routes           | `routes/experiments.js`                           | Step 1     |
+| 3    | Smart URL router                 | `routes/experiment-render.js`                     | Step 1     |
+| 4    | Variant pre-render service       | `service/experiment-renderer.js`                  | Step 1, 3  |
+| 5    | A/B variant assignment (hash)    | `service/ab-router.js`                            | Step 3     |
+| 6    | Impression/click tracking        | `service/experiment-analytics.js`                 | Step 3     |
+| 7    | Plan gating                      | `config/planLimits.js` (modify)                   | Step 2     |
+| 8    | Frontend: store + API client     | `store/experiment.store.js`, `api/experiments.js` | Step 2     |
+| 9    | Frontend: experiment list/detail | `routes/dashboard/experiments/`                   | Step 8     |
+| 10   | Frontend: A/B test creation      | `components/experiments/ExperimentCreate.svelte`  | Step 9     |
+| 11   | Frontend: analytics charts       | `components/experiments/AnalyticsChart.svelte`    | Step 9     |
+| 12   | Smart Link rule engine           | `service/smart-link-engine.js`                    | Step 3     |
+| 13   | Request context extractor        | `service/request-context.js`                      | Step 12    |
+| 14   | Frontend: rule builder           | `components/experiments/RuleBuilder.svelte`       | Step 10    |
+| 15   | Schedule resolver                | integrated into Step 3                            | Step 3     |
+| 16   | Schedule BullMQ jobs             | `service/experiment-scheduler.js`                 | Step 4, 15 |
+| 17   | Frontend: schedule editor        | `components/experiments/ScheduleEditor.svelte`    | Step 10    |
+| 18   | Thompson Sampling engine         | `service/bandit-engine.js`                        | Step 6     |
+| 19   | Bandit recompute BullMQ job      | integrated into Step 6                            | Step 18    |
+| 20   | Frontend: bandit dashboard       | `components/experiments/BanditDashboard.svelte`   | Step 11    |
+| 21   | Significance calculator          | `service/statistics.js`                           | Step 6     |
 
 ## Sources & References
 
 ### Internal References
+
 - Binding model (closest analog): `models/Binding.js`
 - Binding renderer (architecture to mirror): `service/binding-renderer.js`
 - Template renderer (core render function): `service/template-renderer.js`
@@ -757,6 +795,7 @@ BullMQ periodic job (every 15 min)
 - SharedResult view tracking: `models/SharedResult.js`
 
 ### External References
+
 - [Optimizely MAB Optimization](https://support.optimizely.com/hc/en-us/articles/4410289035405)
 - [Thompson Sampling - Wikipedia](https://en.wikipedia.org/wiki/Thompson_sampling)
 - [LaunchDarkly Percentage Rollouts](https://launchdarkly.com/docs/home/releases/percentage-rollouts)

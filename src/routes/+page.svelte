@@ -48,21 +48,21 @@
 </script>
 
 <svelte:head>
-	<title>Pictify.io: Ship Personalized Images at API Speed | A/B Test & Auto-Optimize</title>
+	<title>Pictify.io | Dynamic Image Generation API — No Puppeteer, No Infra</title>
 	<meta
 		name="description"
-		content="The programmable image engine for SaaS teams. Design with expressions + logic, render via API in <200ms. A/B test images, target by geo/device/time, auto-optimize with Thompson Sampling."
+		content="Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available."
 	/>
 	<meta
 		name="keywords"
-		content="programmable image API, image generation with logic, template expressions, dynamic image API, data-driven visuals, conditional image generation, AI image templates, A/B test images, image experiments, Pictify.io"
+		content="image generation API, dynamic image API, template image rendering, OG image generator, social card API, replace puppeteer, image automation API, programmatic image generation, Pictify.io"
 	/>
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta property="og:title" content="Pictify.io: Ship Personalized Images at API Speed" />
+	<meta property="og:title" content="Pictify.io | Dynamic Image Generation API" />
 	<meta
 		property="og:description"
-		content="The programmable image engine for SaaS teams. Design with expressions + logic, render via API in <200ms. A/B test images, target by geo/device/time, auto-optimize with Thompson Sampling."
+		content="Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
 	/>
 	<meta
 		property="og:image"
@@ -73,10 +73,10 @@
 	<meta property="og:site_name" content="Pictify.io" />
 	<meta property="og:locale" content="en_US" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Pictify.io: Ship Personalized Images at API Speed" />
+	<meta name="twitter:title" content="Pictify.io | Dynamic Image Generation API" />
 	<meta
 		name="twitter:description"
-		content="The programmable image engine for SaaS teams. Design with expressions + logic, render via API in <200ms. A/B test images, target by geo/device/time, auto-optimize with Thompson Sampling."
+		content="Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
 	/>
 	<meta
 		name="twitter:image"
@@ -85,35 +85,37 @@
 	<meta name="twitter:site" content="@pictify_io" />
 	<link rel="canonical" href="https://pictify.io/" />
 	<script type="application/ld+json">
-		{JSON.stringify({
-			'@context': 'https://schema.org',
-			'@type': 'SoftwareApplication',
-			name: 'Pictify.io',
-			url: 'https://pictify.io',
-			image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
-			description:
-				'The programmable image engine for SaaS teams. Design with expressions + logic, render via API in <200ms. A/B test images, target by geo/device/time, auto-optimize with Thompson Sampling.',
-			applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
-			operatingSystem: 'Web',
-			featureList: [
-				'Expression engine with 50+ functions',
-				'Visual template editor with drag-and-drop',
-				'A/B testing with Thompson Sampling',
-				'Smart links with geo/device targeting',
-				'Scheduled image variants',
-				'REST API with <200ms latency',
-				'Webhooks and storage connectors',
-				'AI copilot for template generation',
-				'Background removal',
-				'Batch image generation'
-			],
-			offers: {
-				'@type': 'Offer',
-				price: '0',
-				priceCurrency: 'USD',
-				availability: 'https://schema.org/InStock'
-			}
-		})}
+		{
+			JSON.stringify({
+				'@context': 'https://schema.org',
+				'@type': 'SoftwareApplication',
+				name: 'Pictify.io',
+				url: 'https://pictify.io',
+				image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
+				description:
+					'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
+				applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
+				operatingSystem: 'Web',
+				featureList: [
+					'Expression engine with 50+ functions',
+					'Visual template editor with drag-and-drop',
+					'A/B testing with Thompson Sampling',
+					'Smart links with geo/device targeting',
+					'Scheduled image variants',
+					'REST API with <200ms latency',
+					'Webhooks and storage connectors',
+					'AI copilot for template generation',
+					'Background removal',
+					'Batch image generation'
+				],
+				offers: {
+					'@type': 'Offer',
+					price: '0',
+					priceCurrency: 'USD',
+					availability: 'https://schema.org/InStock'
+				}
+			});
+		}
 	</script>
 </svelte:head>
 
@@ -122,36 +124,36 @@
 >
 	<Nav />
 
-	<!-- 1. Hero Section -->
+	<!-- 1. Hero: Problem + Solution -->
 	<Hero />
 	<SectionSeparator icon="arrow" />
 
-	<!-- 2. How It Works Pipeline -->
-	<HowItWorks />
-
-	<!-- 3. Contextual CTA after How It Works -->
-	<MidSectionCta />
+	<!-- 2. Use Cases: Recognition Moments -->
+	<ScaleUseCases />
 	<SectionSeparator icon="hash" />
 
-	<!-- 4. Canvas Editor Showcase -->
-	<CanvasShowcase />
+	<!-- 3. Core Workflow: Template → Data → Image -->
+	<HowItWorks />
+
+	<!-- 4. Contextual CTA -->
+	<MidSectionCta />
 	<SectionSeparator icon="bolt" />
 
-	<!-- 5. Experiments Showcase (Killer Differentiator) -->
-	<ExperimentsShowcase />
+	<!-- 5. API Integration: Code First -->
+	<ApiShowcase />
+	<SectionSeparator icon="hash" />
+
+	<!-- 6. Template Builder: Visual Editor -->
+	<CanvasShowcase />
 	<SectionSeparator icon="star" />
 
-	<!-- 6. Integrations Ecosystem -->
+	<!-- 7. Infrastructure & Integrations -->
 	<IntegrationsEcosystem />
 	<SectionSeparator icon="arrow" />
 
-	<!-- 7. Scale-Focused Use Cases -->
-	<ScaleUseCases />
+	<!-- 8. Advanced: Experiments & Optimization -->
+	<ExperimentsShowcase />
 	<SectionSeparator icon="bolt" />
-
-	<!-- 8. API Showcase (Developer-Focused) -->
-	<ApiShowcase />
-	<SectionSeparator icon="hash" />
 
 	<!-- 9. Final CTA -->
 	<div class="w-full bg-[#FFFDF8]">

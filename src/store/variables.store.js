@@ -1,15 +1,19 @@
 import { writable, derived, get } from 'svelte/store';
-import { extractVariablesFromExpression, generateSampleData, getVariableType as getExpressionVariableType } from '../lib/utils/expression-parser';
+import {
+	extractVariablesFromExpression,
+	generateSampleData,
+	getVariableType as getExpressionVariableType
+} from '../lib/utils/expression-parser';
 
 /**
  * Centralized Variable Store
- * 
+ *
  * This store manages all template variables in one place, providing:
  * - Single source of truth for all variables
  * - CRUD operations (Create, Read, Update, Delete)
  * - Automatic sync with canvas objects
  * - Support for different variable sources (property, condition, loop, custom)
- * 
+ *
  * Variable Types:
  * - text: String values (from text elements)
  * - image: Image URLs (from image elements)
@@ -20,7 +24,7 @@ import { extractVariablesFromExpression, generateSampleData, getVariableType as 
  * - object: Object data (from complex conditions)
  * - chart: Chart data arrays
  * - table: Table data objects
- * 
+ *
  * Variable Sources:
  * - property: Directly marked as variable on canvas object
  * - condition: Extracted from showWhen/hideWhen expressions
@@ -73,10 +77,10 @@ function createVariable({
 		defaultValue: defaultValue !== null ? defaultValue : getDefaultValueForType(type),
 		description,
 		required,
-		objectId,      // ID of canvas object (if tied to one)
-		objectType,    // Type of canvas object (i-text, image, etc.)
-		property,      // Property being controlled (text, src, fill, etc.)
-		metadata,      // Additional info (isObject, properties for objects, etc.)
+		objectId, // ID of canvas object (if tied to one)
+		objectType, // Type of canvas object (i-text, image, etc.)
+		property, // Property being controlled (text, src, fill, etc.)
+		metadata, // Additional info (isObject, properties for objects, etc.)
 		createdAt: Date.now(),
 		updatedAt: Date.now()
 	};
@@ -132,7 +136,7 @@ let canvasRef = null;
 /**
  * Derived store: Get variables as array
  */
-export const variables = derived(variablesMap, $map => {
+export const variables = derived(variablesMap, ($map) => {
 	return Array.from($map.values()).sort((a, b) => {
 		// Sort by source priority: property > loop > condition > custom
 		const sourceOrder = { property: 0, loop: 1, condition: 2, custom: 3 };
@@ -146,63 +150,63 @@ export const variables = derived(variablesMap, $map => {
 /**
  * Derived store: Get variables grouped by source
  */
-export const variablesBySource = derived(variablesMap, $map => {
+export const variablesBySource = derived(variablesMap, ($map) => {
 	const grouped = {
 		property: [],
 		condition: [],
 		loop: [],
 		custom: []
 	};
-	
-	$map.forEach(v => {
+
+	$map.forEach((v) => {
 		if (grouped[v.source]) {
 			grouped[v.source].push(v);
 		}
 	});
-	
+
 	return grouped;
 });
 
 /**
  * Derived store: Get variables grouped by type
  */
-export const variablesByType = derived(variablesMap, $map => {
+export const variablesByType = derived(variablesMap, ($map) => {
 	const grouped = {};
-	
-	$map.forEach(v => {
+
+	$map.forEach((v) => {
 		if (!grouped[v.type]) {
 			grouped[v.type] = [];
 		}
 		grouped[v.type].push(v);
 	});
-	
+
 	return grouped;
 });
 
 /**
  * Derived store: Get variable names for quick lookup
  */
-export const variableNames = derived(variablesMap, $map => {
+export const variableNames = derived(variablesMap, ($map) => {
 	return Array.from($map.keys());
 });
 
 /**
  * Derived store: Statistics
  */
-export const variableStats = derived(variablesMap, $map => {
+export const variableStats = derived(variablesMap, ($map) => {
 	const stats = {
 		total: $map.size,
 		byType: {},
 		bySource: {},
 		required: 0
 	};
-	
-	$map.forEach(v => {
+
+	$map.forEach((v) => {
 		stats.byType[v.type] = (stats.byType[v.type] || 0) + 1;
 		stats.bySource[v.source] = (stats.bySource[v.source] || 0) + 1;
 		if (v.required) stats.required++;
 	});
-	
+
 	return stats;
 });
 
@@ -243,32 +247,32 @@ export const variableActions = {
 	 */
 	create(variableData) {
 		const { name } = variableData;
-		
+
 		// Validate name
 		if (!name || typeof name !== 'string') {
 			return null;
 		}
-		
+
 		// Sanitize name
 		const sanitizedName = name.replace(/[^a-zA-Z0-9_]/g, '_');
-		
+
 		// Check for duplicates
 		if (get(variablesMap).has(sanitizedName)) {
 			return get(variablesMap).get(sanitizedName);
 		}
-		
+
 		const variable = createVariable({
 			...variableData,
 			name: sanitizedName
 		});
-		
+
 		// Copy-before-mutate pattern for proper Svelte reactivity
-		variablesMap.update(map => {
+		variablesMap.update((map) => {
 			const newMap = new Map(map);
 			newMap.set(sanitizedName, variable);
 			return newMap;
 		});
-		
+
 		return variable;
 	},
 
@@ -277,7 +281,7 @@ export const variableActions = {
 	 */
 	update(name, updates) {
 		// Copy-before-mutate pattern for proper Svelte reactivity
-		variablesMap.update(map => {
+		variablesMap.update((map) => {
 			if (!map.has(name)) {
 				return map;
 			}
@@ -306,7 +310,7 @@ export const variableActions = {
 
 				// Update canvas object if exists
 				if (canvasRef && existing.objectId) {
-					const obj = canvasRef.getObjects().find(o => o.id === existing.objectId);
+					const obj = canvasRef.getObjects().find((o) => o.id === existing.objectId);
 					if (obj) {
 						obj.set('variableName', newName);
 						canvasRef.renderAll();
@@ -325,7 +329,7 @@ export const variableActions = {
 	 */
 	delete(name) {
 		// Copy-before-mutate pattern for proper Svelte reactivity
-		variablesMap.update(map => {
+		variablesMap.update((map) => {
 			const variable = map.get(name);
 
 			if (!variable) {
@@ -334,7 +338,7 @@ export const variableActions = {
 
 			// If tied to canvas object, remove variable properties from object
 			if (canvasRef && variable.objectId && variable.source === VARIABLE_SOURCES.PROPERTY) {
-				const obj = canvasRef.getObjects().find(o => o.id === variable.objectId);
+				const obj = canvasRef.getObjects().find((o) => o.id === variable.objectId);
 				if (obj) {
 					obj.set('isVariable', false);
 					obj.set('variableName', '');
@@ -377,8 +381,10 @@ export const variableActions = {
 
 		// 1. Extract property-based variables (isVariable = true with variableBindings)
 		objects
-			.filter(obj => obj.isVariable && obj.variableBindings && Array.isArray(obj.variableBindings))
-			.forEach(obj => {
+			.filter(
+				(obj) => obj.isVariable && obj.variableBindings && Array.isArray(obj.variableBindings)
+			)
+			.forEach((obj) => {
 				obj.variableBindings.forEach((binding, bindingIndex) => {
 					const varName = binding.variableName;
 					if (varName && !newVariables.has(varName)) {
@@ -386,33 +392,37 @@ export const variableActions = {
 						const existingVar = currentMap.get(varName);
 						const inferredType = inferTypeFromProperty(obj, binding.property);
 
-						newVariables.set(varName, createVariable({
-							id: `${obj.id}_binding_${bindingIndex}`,
-							name: varName,
-							// Preserve user-specified type if it differs from inferred
-							type: existingVar?.type || inferredType,
-							source: VARIABLE_SOURCES.PROPERTY,
-							// Preserve user-specified default value if type was overridden
-							defaultValue: existingVar?.defaultValue ?? getValueFromObjectProperty(obj, binding.property),
-							description: existingVar?.description || binding.description || '',
-							required: existingVar?.required ?? binding.required ?? false,
-							objectId: obj.id,
-							objectType: obj.type,
-							property: binding.property || 'text',
-							metadata: {
-								isChart: obj.isChart || false,
-								isTable: obj.isTable || false,
-								chartType: obj.chartType,
-								tableType: obj.tableType,
-								bindingIndex
-							}
-						}));
+						newVariables.set(
+							varName,
+							createVariable({
+								id: `${obj.id}_binding_${bindingIndex}`,
+								name: varName,
+								// Preserve user-specified type if it differs from inferred
+								type: existingVar?.type || inferredType,
+								source: VARIABLE_SOURCES.PROPERTY,
+								// Preserve user-specified default value if type was overridden
+								defaultValue:
+									existingVar?.defaultValue ?? getValueFromObjectProperty(obj, binding.property),
+								description: existingVar?.description || binding.description || '',
+								required: existingVar?.required ?? binding.required ?? false,
+								objectId: obj.id,
+								objectType: obj.type,
+								property: binding.property || 'text',
+								metadata: {
+									isChart: obj.isChart || false,
+									isTable: obj.isTable || false,
+									chartType: obj.chartType,
+									tableType: obj.tableType,
+									bindingIndex
+								}
+							})
+						);
 					}
 				});
 			});
 
 		// 2. Extract condition variables (showWhen/hideWhen)
-		objects.forEach(obj => {
+		objects.forEach((obj) => {
 			const showWhen = obj.showWhen;
 			const hideWhen = obj.hideWhen;
 
@@ -420,36 +430,42 @@ export const variableActions = {
 				const expression = showWhen || hideWhen;
 				const extractedVars = extractVariablesFromExpression(expression);
 
-				extractedVars.forEach(extractedVar => {
+				extractedVars.forEach((extractedVar) => {
 					if (!newVariables.has(extractedVar.name)) {
 						// Check for existing variable with user-specified type
 						const existingVar = currentMap.get(extractedVar.name);
 						const inferredType = getExpressionVariableType(extractedVar, 'condition');
 
-						newVariables.set(extractedVar.name, createVariable({
-							id: `condition_${extractedVar.name}`,
-							name: extractedVar.name,
-							// Preserve user-specified type if it differs from inferred
-							type: existingVar?.type || inferredType,
-							source: VARIABLE_SOURCES.CONDITION,
-							// Preserve user-specified default value if type was overridden
-							defaultValue: existingVar?.defaultValue ?? generateSampleData(extractedVar, 'condition'),
-							description: existingVar?.description || `Used in ${showWhen ? 'show' : 'hide'} condition: "${expression}"`,
-							property: (existingVar?.type || inferredType) === 'object' ? 'data' : 'value',
-							metadata: {
-								isObject: extractedVar.isObject,
-								properties: extractedVar.properties,
-								conditionType: showWhen ? 'showWhen' : 'hideWhen',
-								expression
-							}
-						}));
+						newVariables.set(
+							extractedVar.name,
+							createVariable({
+								id: `condition_${extractedVar.name}`,
+								name: extractedVar.name,
+								// Preserve user-specified type if it differs from inferred
+								type: existingVar?.type || inferredType,
+								source: VARIABLE_SOURCES.CONDITION,
+								// Preserve user-specified default value if type was overridden
+								defaultValue:
+									existingVar?.defaultValue ?? generateSampleData(extractedVar, 'condition'),
+								description:
+									existingVar?.description ||
+									`Used in ${showWhen ? 'show' : 'hide'} condition: "${expression}"`,
+								property: (existingVar?.type || inferredType) === 'object' ? 'data' : 'value',
+								metadata: {
+									isObject: extractedVar.isObject,
+									properties: extractedVar.properties,
+									conditionType: showWhen ? 'showWhen' : 'hideWhen',
+									expression
+								}
+							})
+						);
 					}
 				});
 			}
 		});
 
 		// 3. Extract loop variables
-		objects.forEach(obj => {
+		objects.forEach((obj) => {
 			const loopVariable = obj.loopVariable;
 
 			if (loopVariable && loopVariable !== null && loopVariable !== '') {
@@ -457,21 +473,29 @@ export const variableActions = {
 					// Check for existing variable with user-specified type
 					const existingVar = currentMap.get(loopVariable);
 
-					newVariables.set(loopVariable, createVariable({
-						id: `loop_${loopVariable}`,
-						name: loopVariable,
-						// Preserve user-specified type (usually stays as array)
-						type: existingVar?.type || VARIABLE_TYPES.ARRAY,
-						source: VARIABLE_SOURCES.LOOP,
-						defaultValue: existingVar?.defaultValue ?? generateSampleData({ name: loopVariable }, 'loop'),
-						description: existingVar?.description || `Array variable for repeating element${obj.loopItemName ? ` (item: ${obj.loopItemName})` : ''}`,
-						property: 'items',
-						metadata: {
-							loopItemName: obj.loopItemName,
-							loopIndexName: obj.loopIndexName,
-							loopDirection: obj.loopDirection
-						}
-					}));
+					newVariables.set(
+						loopVariable,
+						createVariable({
+							id: `loop_${loopVariable}`,
+							name: loopVariable,
+							// Preserve user-specified type (usually stays as array)
+							type: existingVar?.type || VARIABLE_TYPES.ARRAY,
+							source: VARIABLE_SOURCES.LOOP,
+							defaultValue:
+								existingVar?.defaultValue ?? generateSampleData({ name: loopVariable }, 'loop'),
+							description:
+								existingVar?.description ||
+								`Array variable for repeating element${
+									obj.loopItemName ? ` (item: ${obj.loopItemName})` : ''
+								}`,
+							property: 'items',
+							metadata: {
+								loopItemName: obj.loopItemName,
+								loopIndexName: obj.loopIndexName,
+								loopDirection: obj.loopDirection
+							}
+						})
+					);
 				}
 			}
 		});
@@ -496,24 +520,27 @@ export const variableActions = {
 
 		const newMap = new Map();
 
-		definitions.forEach(def => {
+		definitions.forEach((def) => {
 			if (def.name) {
-				newMap.set(def.name, createVariable({
-					id: def.elementId || `loaded_${def.name}`,
-					name: def.name,
-					type: def.type || VARIABLE_TYPES.TEXT,
-					source: def.source || VARIABLE_SOURCES.PROPERTY,
-					defaultValue: def.defaultValue,
-					description: def.description || '',
-					required: def.validation?.required ?? false,
-					property: def.property || 'value',
-					metadata: {
-						isObject: def.isObject,
-						properties: def.properties,
-						loopItemName: def.loopItemName,
-						loopDirection: def.loopDirection
-					}
-				}));
+				newMap.set(
+					def.name,
+					createVariable({
+						id: def.elementId || `loaded_${def.name}`,
+						name: def.name,
+						type: def.type || VARIABLE_TYPES.TEXT,
+						source: def.source || VARIABLE_SOURCES.PROPERTY,
+						defaultValue: def.defaultValue,
+						description: def.description || '',
+						required: def.validation?.required ?? false,
+						property: def.property || 'value',
+						metadata: {
+							isObject: def.isObject,
+							properties: def.properties,
+							loopItemName: def.loopItemName,
+							loopDirection: def.loopDirection
+						}
+					})
+				);
 			}
 		});
 
@@ -539,7 +566,7 @@ export const variableActions = {
 	generateApiExample() {
 		const vars = get(variablesMap);
 		const example = {};
-		
+
 		vars.forEach((v, name) => {
 			if (v.type === VARIABLE_TYPES.TEXT) {
 				example[name] = v.defaultValue || 'Your text here';
@@ -574,7 +601,7 @@ export const variableActions = {
 				};
 			}
 		});
-		
+
 		return example;
 	},
 
@@ -614,7 +641,7 @@ export const variableActions = {
 	 */
 	findByType(type) {
 		const vars = get(variablesMap);
-		return Array.from(vars.values()).filter(v => v.type === type);
+		return Array.from(vars.values()).filter((v) => v.type === type);
 	},
 
 	/**
@@ -622,7 +649,7 @@ export const variableActions = {
 	 */
 	findBySource(source) {
 		const vars = get(variablesMap);
-		return Array.from(vars.values()).filter(v => v.source === source);
+		return Array.from(vars.values()).filter((v) => v.source === source);
 	}
 };
 
@@ -632,7 +659,7 @@ export const variableActions = {
 function inferTypeFromProperty(obj, property) {
 	if (obj.isChart && property === 'chartData') return VARIABLE_TYPES.CHART;
 	if (obj.isTable && property === 'tableData') return VARIABLE_TYPES.TABLE;
-	
+
 	switch (property) {
 		case 'text':
 			return VARIABLE_TYPES.TEXT;
@@ -658,34 +685,39 @@ function inferTypeFromProperty(obj, property) {
  */
 function getValueFromObjectProperty(obj, property) {
 	if (obj.isChart && property === 'chartData') {
-		return obj.chartData || [
-			{ label: 'Jan', value: 30 },
-			{ label: 'Feb', value: 45 },
-			{ label: 'Mar', value: 60 }
-		];
+		return (
+			obj.chartData || [
+				{ label: 'Jan', value: 30 },
+				{ label: 'Feb', value: 45 },
+				{ label: 'Mar', value: 60 }
+			]
+		);
 	}
-	
+
 	if (obj.isTable && property === 'tableData') {
 		if (obj.tableType === 'stats') {
 			return {
 				headers: ['Metric', 'Value', 'Change'],
-				rows: (obj.tableData || []).map(stat => [stat.label, stat.value, stat.change || ''])
+				rows: (obj.tableData || []).map((stat) => [stat.label, stat.value, stat.change || ''])
 			};
 		} else if (obj.tableType === 'comparison') {
 			const features = obj.tableFeatures || [];
 			const plans = obj.tablePlans || [];
-			const headers = ['Feature', ...plans.map(p => p.name)];
-			const priceRow = ['Price', ...plans.map(p => p.price)];
-			const featureRows = features.map((f, idx) => [f, ...plans.map(p => p.values?.[idx] || '')]);
+			const headers = ['Feature', ...plans.map((p) => p.name)];
+			const priceRow = ['Price', ...plans.map((p) => p.price)];
+			const featureRows = features.map((f, idx) => [f, ...plans.map((p) => p.values?.[idx] || '')]);
 			return { headers, rows: [priceRow, ...featureRows] };
 		} else {
 			return {
 				headers: obj.tableHeaders || ['Product', 'Price', 'Stock'],
-				rows: obj.tableRows || [['Item A', '$10', '100'], ['Item B', '$20', '50']]
+				rows: obj.tableRows || [
+					['Item A', '$10', '100'],
+					['Item B', '$20', '50']
+				]
 			};
 		}
 	}
-	
+
 	switch (property) {
 		case 'text':
 			return obj.text || '';
@@ -709,7 +741,6 @@ function getValueFromObjectProperty(obj, property) {
 			return obj[property] || '';
 	}
 }
-
 
 /**
  * Helper: Infer type from a value
@@ -751,4 +782,3 @@ export default {
 	TYPES: VARIABLE_TYPES,
 	SOURCES: VARIABLE_SOURCES
 };
-

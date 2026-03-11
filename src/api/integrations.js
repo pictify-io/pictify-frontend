@@ -207,10 +207,22 @@ const getCredentialRequirements = async (type) => {
  * Available webhook events
  */
 const WEBHOOK_EVENTS = [
-	{ value: 'render.completed', label: 'Render Completed', description: 'When a template render completes successfully' },
+	{
+		value: 'render.completed',
+		label: 'Render Completed',
+		description: 'When a template render completes successfully'
+	},
 	{ value: 'render.failed', label: 'Render Failed', description: 'When a template render fails' },
-	{ value: 'binding.updated', label: 'Binding Updated', description: 'When a binding is refreshed with new data' },
-	{ value: 'binding.failed', label: 'Binding Failed', description: 'When a binding fails to refresh' },
+	{
+		value: 'binding.updated',
+		label: 'Binding Updated',
+		description: 'When a binding is refreshed with new data'
+	},
+	{
+		value: 'binding.failed',
+		label: 'Binding Failed',
+		description: 'When a binding fails to refresh'
+	}
 ];
 
 /**
@@ -221,7 +233,7 @@ const PLATFORMS = [
 	{ value: 'make', label: 'Make (Integromat)' },
 	{ value: 'n8n', label: 'n8n' },
 	{ value: 'pipedream', label: 'Pipedream' },
-	{ value: 'custom', label: 'Custom Webhook' },
+	{ value: 'custom', label: 'Custom Webhook' }
 ];
 
 /**
@@ -231,7 +243,7 @@ const STORAGE_PROVIDERS = [
 	{ value: 's3', label: 'Amazon S3', description: 'AWS S3 or S3-compatible storage' },
 	{ value: 'gcs', label: 'Google Cloud Storage', description: 'Google Cloud Storage buckets' },
 	{ value: 'cloudinary', label: 'Cloudinary', description: 'Cloudinary media management' },
-	{ value: 'imagekit', label: 'ImageKit', description: 'ImageKit.io CDN' },
+	{ value: 'imagekit', label: 'ImageKit', description: 'ImageKit.io CDN' }
 ];
 
 export {
@@ -256,5 +268,5 @@ export {
 	// Constants
 	WEBHOOK_EVENTS,
 	PLATFORMS,
-	STORAGE_PROVIDERS,
+	STORAGE_PROVIDERS
 };

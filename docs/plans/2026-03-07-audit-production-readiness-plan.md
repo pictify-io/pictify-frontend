@@ -1,5 +1,5 @@
 ---
-title: "audit: Full Platform Production Readiness"
+title: 'audit: Full Platform Production Readiness'
 type: audit
 status: active
 date: 2026-03-07
@@ -21,22 +21,22 @@ Comprehensive audit of Pictify.io (frontend + backend) treating the platform as 
 
 ## User Flow Status
 
-| Flow | Status | Notes |
-|------|--------|-------|
-| Signup/Login | COMPLETE | OAuth + email + password reset + verification + abuse monitoring |
-| Template Editor | COMPLETE | Fabric.js v6, multi-page, auto-save, undo/redo |
-| API Usage | COMPLETE | Token management + playground + batch rendering |
-| Billing/Subscription | COMPLETE | LemonSqueezy, plan tiers, overages, portal |
-| Team/Collaboration | COMPLETE | Invitations, RBAC, seat limits, team switching |
-| Experiments (A/B) | COMPLETE | Create, manage, analytics, public URL routing |
-| Experiments (Smart Links) | COMPLETE | Rule engine, context extraction, rule builder |
-| Experiments (Scheduled) | COMPLETE | Schedule resolver, pre-rendering, expiry |
-| Experiments (Bandit) | TODO | Thompson Sampling not yet implemented |
-| Dashboard | COMPLETE | Home, templates, analytics, activity logs |
-| CDN/Share | COMPLETE | Public URLs, embed codes, view tracking |
-| Brand Assets | COMPLETE | Upload, manage, library |
-| Integrations | COMPLETE | Webhooks, storage connectors |
-| PLG System | COMPLETE | Feature gating, milestones, usage prompts, overage billing |
+| Flow                      | Status   | Notes                                                            |
+| ------------------------- | -------- | ---------------------------------------------------------------- |
+| Signup/Login              | COMPLETE | OAuth + email + password reset + verification + abuse monitoring |
+| Template Editor           | COMPLETE | Fabric.js v6, multi-page, auto-save, undo/redo                   |
+| API Usage                 | COMPLETE | Token management + playground + batch rendering                  |
+| Billing/Subscription      | COMPLETE | LemonSqueezy, plan tiers, overages, portal                       |
+| Team/Collaboration        | COMPLETE | Invitations, RBAC, seat limits, team switching                   |
+| Experiments (A/B)         | COMPLETE | Create, manage, analytics, public URL routing                    |
+| Experiments (Smart Links) | COMPLETE | Rule engine, context extraction, rule builder                    |
+| Experiments (Scheduled)   | COMPLETE | Schedule resolver, pre-rendering, expiry                         |
+| Experiments (Bandit)      | TODO     | Thompson Sampling not yet implemented                            |
+| Dashboard                 | COMPLETE | Home, templates, analytics, activity logs                        |
+| CDN/Share                 | COMPLETE | Public URLs, embed codes, view tracking                          |
+| Brand Assets              | COMPLETE | Upload, manage, library                                          |
+| Integrations              | COMPLETE | Webhooks, storage connectors                                     |
+| PLG System                | COMPLETE | Feature gating, milestones, usage prompts, overage billing       |
 
 **All critical user flows are complete end-to-end with no dead ends.**
 
@@ -51,9 +51,9 @@ Comprehensive audit of Pictify.io (frontend + backend) treating the platform as 
 ```js
 // CURRENT - VULNERABLE
 const hash = async (password) => {
-  const { sha256 } = await import('crypto-hash')
-  return await sha256(password)
-}
+	const { sha256 } = await import('crypto-hash');
+	return await sha256(password);
+};
 ```
 
 SHA-256 is fast, unsalted, and vulnerable to rainbow tables. Must replace with bcrypt (cost 12+) or argon2id.
@@ -62,26 +62,26 @@ SHA-256 is fast, unsalted, and vulnerable to rainbow tables. Must replace with b
 
 ```js
 // FIXED
-const bcrypt = require('bcrypt')
-const SALT_ROUNDS = 12
+const bcrypt = require('bcrypt');
+const SALT_ROUNDS = 12;
 
 const hash = async (password) => {
-  return bcrypt.hash(password, SALT_ROUNDS)
-}
+	return bcrypt.hash(password, SALT_ROUNDS);
+};
 
 const verify = async (password, storedHash) => {
-  // Support migration from SHA-256
-  if (!storedHash.startsWith('$2b$')) {
-    const { sha256 } = await import('crypto-hash')
-    const sha256Hash = await sha256(password)
-    if (sha256Hash === storedHash) {
-      // Re-hash with bcrypt on successful login
-      return { match: true, needsRehash: true }
-    }
-    return { match: false }
-  }
-  return { match: await bcrypt.compare(password, storedHash) }
-}
+	// Support migration from SHA-256
+	if (!storedHash.startsWith('$2b$')) {
+		const { sha256 } = await import('crypto-hash');
+		const sha256Hash = await sha256(password);
+		if (sha256Hash === storedHash) {
+			// Re-hash with bcrypt on successful login
+			return { match: true, needsRehash: true };
+		}
+		return { match: false };
+	}
+	return { match: await bcrypt.compare(password, storedHash) };
+};
 ```
 
 ### CRITICAL-2: Cookie Missing `sameSite` Attribute
@@ -99,23 +99,24 @@ No `sameSite` attribute on the auth cookie enables CSRF attacks.
 Any website can make authenticated requests to the backend.
 
 **Fix**: Whitelist specific origins:
+
 ```js
 const ALLOWED_ORIGINS = [
-  process.env.FRONTEND_URL,
-  'https://pictify.io',
-  'https://www.pictify.io',
-].filter(Boolean)
+	process.env.FRONTEND_URL,
+	'https://pictify.io',
+	'https://www.pictify.io'
+].filter(Boolean);
 
 fastify.register(cors, {
-  origin: (origin, cb) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-      cb(null, origin || true)
-    } else {
-      cb(new Error('Not allowed'), false)
-    }
-  },
-  credentials: true,
-})
+	origin: (origin, cb) => {
+		if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+			cb(null, origin || true);
+		} else {
+			cb(new Error('Not allowed'), false);
+		}
+	},
+	credentials: true
+});
 ```
 
 ### CRITICAL-4: /metrics and /admin/queues Exposed Without Auth
@@ -141,8 +142,9 @@ All use direct `!==` comparison. Use `crypto.timingSafeEqual()` instead.
 **Files**: `routes/public-templates.js`, `routes/template.js`, `routes/admin/contacts.js`
 
 User search input passed directly to `$regex`. Escape special characters:
+
 ```js
-const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 ```
 
 ### HIGH-3: Impersonation Endpoint Lacks Rate Limiting and Audit Logging
@@ -214,33 +216,42 @@ Should use Pino logger (`config/logger.js`) instead.
 ## LOW Issues (Fix Within 1 Month)
 
 ### LOW-1: Backup Files in Repository
+
 - `Hero.svelte.bak`, `PropertiesPanel.svelte.bak` - Remove.
 
 ### LOW-2: Weak Email Validation
+
 `/\S+@\S+\.\S+/` accepts many invalid inputs. Use a robust validator.
 
 ### LOW-3: No API Versioning
+
 No `/api/v1/` prefix. Breaking changes affect all clients.
 
 ### LOW-4: No OpenAPI/Swagger Documentation
+
 Routes have no machine-readable API docs.
 
 ### LOW-5: No Integration Tests
+
 Jest configured but no test files visible.
 
 ### LOW-6: Missing Request Tracing
+
 No request IDs for log correlation across services.
 
 ### LOW-7: Incomplete TODO Routes (Non-Critical)
+
 - `tools/code-to-image` - Placeholder
 - `tools/url-to-image-generator` - Placeholder
 - `tools/online-invoice-generator` - Placeholder
 - These can be removed from navigation if not shipping.
 
 ### LOW-8: API Token Scoping Missing
+
 All tokens have full permissions. Consider read-only or template-only scopes.
 
 ### LOW-9: Missing File Upload Size Limits
+
 CSV upload and template creation accept multipart with no explicit size limit.
 
 ---
@@ -248,6 +259,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 ## Frontend-Specific Findings
 
 ### Production Ready
+
 - All 79+ routes have proper page files
 - Dashboard layout with SideNav consistent across all pages
 - PLG system fully integrated (feature gates, upgrade prompts, milestones)
@@ -256,15 +268,17 @@ CSV upload and template creation accept multipart with no explicit size limit.
 - SEO: Sitemaps, meta tags, structured data, breadcrumbs
 
 ### Needs Attention
+
 - 3 new components (ExperimentsShowcase, IntegrationsEcosystem, SocialProofBar) - verify integration
 - `pattern-fill.js` utility - verify usage
-- `.env.local` contains `PUBLIC_ADMIN_SECRET` (PUBLIC_ prefix exposes to client)
+- `.env.local` contains `PUBLIC_ADMIN_SECRET` (PUBLIC\_ prefix exposes to client)
 
 ---
 
 ## Backend-Specific Findings
 
 ### Production Ready
+
 - Authentication: JWT sessions + API tokens + OAuth2
 - Authorization: Role-based access, team context, quota guard
 - Rate limiting on public render endpoints (30/min/IP)
@@ -277,6 +291,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 - BullMQ queues with proper scheduling
 
 ### Needs Attention
+
 - `.env` may contain real secrets (rotate all immediately)
 - Admin routes use header-only auth (no user verification)
 - Cache invalidation incomplete for experiments and templates
@@ -287,6 +302,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 ## Acceptance Criteria
 
 ### Phase 1: Critical Security (Before Any Production Deploy)
+
 - [ ] Replace SHA-256 password hashing with bcrypt (CRITICAL-1)
 - [ ] Add `sameSite: 'Lax'` to auth cookie (CRITICAL-2)
 - [ ] Whitelist CORS origins (CRITICAL-3)
@@ -294,6 +310,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 - [ ] Rotate all secrets if .env was ever committed
 
 ### Phase 2: High Priority (Week 1)
+
 - [ ] Use `timingSafeEqual` for admin secret comparisons (HIGH-1)
 - [ ] Escape regex in search queries (HIGH-2)
 - [ ] Add rate limiting + audit logging to impersonation (HIGH-3)
@@ -301,6 +318,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 - [ ] Fix AuthToken validTill default (HIGH-5)
 
 ### Phase 3: Medium Priority (Week 2)
+
 - [ ] Add global security headers via @fastify/helmet (MEDIUM-1)
 - [ ] Fix error response leaking, especially stack traces (MEDIUM-2)
 - [ ] Audit and fix all {@html} usages with DOMPurify (MEDIUM-3)
@@ -311,6 +329,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 - [ ] Remove console.log statements from both codebases (MEDIUM-8, MEDIUM-9)
 
 ### Phase 4: Low Priority (Month 1)
+
 - [ ] Remove .bak files from repository (LOW-1)
 - [ ] Improve email validation (LOW-2)
 - [ ] Add API versioning strategy (LOW-3)
@@ -325,26 +344,26 @@ CSV upload and template creation accept multipart with no explicit size limit.
 
 ## Production Deployment Checklist
 
-| Category | Status | Action Required |
-|----------|--------|-----------------|
-| User Flows | PASS | All complete (except Bandit - optional) |
-| Authentication | PASS | OAuth, sessions, API tokens all working |
-| Authorization | WARN | Fix admin route auth |
-| Password Security | FAIL | Replace SHA-256 with bcrypt |
-| CSRF Protection | FAIL | Fix cookie sameSite + CORS |
-| Input Validation | WARN | Fix regex injection, template injection |
-| Error Handling | WARN | Stop leaking error details |
-| Rate Limiting | WARN | Add to auth endpoints |
-| Security Headers | FAIL | Add via @fastify/helmet |
-| Secrets Management | WARN | Rotate if .env was committed |
-| Monitoring | PASS | GlitchTip + Prometheus configured |
-| Logging | WARN | Replace console.log with Pino |
-| Feature Completeness | PASS | All major features shipped |
-| Billing | PASS | LemonSqueezy fully integrated |
-| Team Management | PASS | Invites, roles, seats working |
-| Experiments | PASS | A/B, Smart Links, Scheduled complete |
-| SEO | PASS | Sitemaps, meta, schema, comparisons |
-| PLG | PASS | Feature gating, milestones, prompts |
+| Category             | Status | Action Required                         |
+| -------------------- | ------ | --------------------------------------- |
+| User Flows           | PASS   | All complete (except Bandit - optional) |
+| Authentication       | PASS   | OAuth, sessions, API tokens all working |
+| Authorization        | WARN   | Fix admin route auth                    |
+| Password Security    | FAIL   | Replace SHA-256 with bcrypt             |
+| CSRF Protection      | FAIL   | Fix cookie sameSite + CORS              |
+| Input Validation     | WARN   | Fix regex injection, template injection |
+| Error Handling       | WARN   | Stop leaking error details              |
+| Rate Limiting        | WARN   | Add to auth endpoints                   |
+| Security Headers     | FAIL   | Add via @fastify/helmet                 |
+| Secrets Management   | WARN   | Rotate if .env was committed            |
+| Monitoring           | PASS   | GlitchTip + Prometheus configured       |
+| Logging              | WARN   | Replace console.log with Pino           |
+| Feature Completeness | PASS   | All major features shipped              |
+| Billing              | PASS   | LemonSqueezy fully integrated           |
+| Team Management      | PASS   | Invites, roles, seats working           |
+| Experiments          | PASS   | A/B, Smart Links, Scheduled complete    |
+| SEO                  | PASS   | Sitemaps, meta, schema, comparisons     |
+| PLG                  | PASS   | Feature gating, milestones, prompts     |
 
 ---
 
@@ -353,6 +372,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 **The platform is feature-complete and architecturally sound.** All critical user flows work end-to-end. The main blockers for production are **4 critical security issues** that can be fixed in 1-2 days of focused work. After those, the high/medium issues should be addressed over the following 2 weeks.
 
 **Recommended deployment path:**
+
 1. Fix CRITICAL-1 through CRITICAL-4 (1-2 days)
 2. Fix HIGH-1 through HIGH-5 (2-3 days)
 3. Deploy to staging, smoke test all flows
@@ -362,6 +382,7 @@ CSV upload and template creation accept multipart with no explicit size limit.
 ## Sources & References
 
 ### Internal References
+
 - Frontend config: `src/config/plan-features.js`
 - Backend plan limits: `config/planLimits.js`
 - Backend PLG: `config/plg.js`

@@ -1,5 +1,5 @@
 ---
-title: "fix: LemonSqueezy Billing Integration Security & Reliability"
+title: 'fix: LemonSqueezy Billing Integration Security & Reliability'
 type: fix
 date: 2026-02-15
 deepened: 2026-02-15
@@ -13,12 +13,14 @@ deepened: 2026-02-15
 **Review agents used:** security-sentinel, architecture-strategist, data-integrity-guardian, code-simplicity-reviewer, performance-oracle
 
 ### Key Improvements from Research
+
 1. **Atomic idempotency** - Use upsert instead of find-then-create to prevent race conditions
 2. **Simplified approach** - Remove unnecessary SubscriptionWebhookEvent model, use existing SubscriptionEvent
 3. **Parallel queries** - Reduce webhook latency by parallelizing User/Team lookups
 4. **Signed custom_data** - Add HMAC signature to prevent custom_data tampering
 
 ### Critical Issues Discovered
+
 - Race condition in proposed idempotency check (TOCTOU vulnerability)
 - Missing transaction boundaries around multi-document updates
 - N+1 query pattern in webhook handler (up to 4 sequential queries)
@@ -35,6 +37,7 @@ Critical security and reliability issues have been identified in the LemonSqueez
 ### Critical Security Issues
 
 1. **No Webhook Signature Verification** (`routes/lemon-squeezy.js:404-407`)
+
    - The webhook endpoint accepts any payload without verifying the `X-Signature` header
    - An attacker could forge webhook events to upgrade/downgrade any account
    - LemonSqueezy sends signatures via HMAC-SHA256, but we don't verify them
@@ -50,11 +53,11 @@ Critical security and reliability issues have been identified in the LemonSqueez
 ### High Priority Issues
 
 3. **Overage Reporting Broken for Individual Users** (`service/overage-billing.js:136-138`)
+
    ```javascript
-   const subscriptionId = isTeam
-     ? billingEntity.lemonSqueezySubscriptionId
-     : null // User subscriptions need different lookup  // BUG
+   const subscriptionId = isTeam ? billingEntity.lemonSqueezySubscriptionId : null; // User subscriptions need different lookup  // BUG
    ```
+
    - Individual users have no `lemonSqueezySubscriptionId` stored
    - Overage usage is never reported to LemonSqueezy for non-team users
 
@@ -82,45 +85,47 @@ Critical security and reliability issues have been identified in the LemonSqueez
 **File:** `routes/lemon-squeezy.js`
 
 ```javascript
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 const verifyWebhookSignature = (rawBody, signature, secret) => {
-  if (!signature || !rawBody || !secret) {
-    return false
-  }
+	if (!signature || !rawBody || !secret) {
+		return false;
+	}
 
-  const hmac = crypto.createHmac('sha256', secret)
-  const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8')
-  const signatureBuffer = Buffer.from(signature, 'utf8')
+	const hmac = crypto.createHmac('sha256', secret);
+	const digest = Buffer.from(hmac.update(rawBody).digest('hex'), 'utf8');
+	const signatureBuffer = Buffer.from(signature, 'utf8');
 
-  if (digest.length !== signatureBuffer.length) {
-    return false
-  }
+	if (digest.length !== signatureBuffer.length) {
+		return false;
+	}
 
-  return crypto.timingSafeEqual(digest, signatureBuffer)
-}
+	return crypto.timingSafeEqual(digest, signatureBuffer);
+};
 
 // In webhook handler (MUST use raw body, not parsed JSON)
 const webhook = async (req, res) => {
-  const signature = req.headers['x-signature']
-  const rawBody = req.rawBody // Need to configure Fastify to preserve raw body
+	const signature = req.headers['x-signature'];
+	const rawBody = req.rawBody; // Need to configure Fastify to preserve raw body
 
-  if (!verifyWebhookSignature(rawBody, signature, process.env.LEMONSQUEEZY_WEBHOOK_SECRET)) {
-    console.error('[LemonSqueezy] Invalid webhook signature')
-    return res.status(401).send({ error: 'Invalid signature' })
-  }
+	if (!verifyWebhookSignature(rawBody, signature, process.env.LEMONSQUEEZY_WEBHOOK_SECRET)) {
+		console.error('[LemonSqueezy] Invalid webhook signature');
+		return res.status(401).send({ error: 'Invalid signature' });
+	}
 
-  // Continue with processing...
-}
+	// Continue with processing...
+};
 ```
 
 #### Research Insights: Signature Verification
 
 **Security Best Practices:**
+
 - Uses `crypto.timingSafeEqual()` to prevent timing attacks ✅
 - Length check before `timingSafeEqual()` (required since it throws on mismatched lengths) ✅
 
 **Additional Recommendations:**
+
 - Add rate limiting on webhook endpoint to prevent DoS
 - Consider adding replay protection (reject webhooks older than 5 minutes)
 - Never log the actual signature value in error messages
@@ -129,19 +134,26 @@ const webhook = async (req, res) => {
 
 ```javascript
 // In server setup - register ONLY for webhook route
-fastify.register(async (webhookRoutes) => {
-  webhookRoutes.addContentTypeParser('application/json', { parseAs: 'buffer' }, (req, body, done) => {
-    try {
-      req.rawBody = body.toString()
-      const json = JSON.parse(body.toString())
-      done(null, json)
-    } catch (err) {
-      done(err)
-    }
-  })
+fastify.register(
+	async (webhookRoutes) => {
+		webhookRoutes.addContentTypeParser(
+			'application/json',
+			{ parseAs: 'buffer' },
+			(req, body, done) => {
+				try {
+					req.rawBody = body.toString();
+					const json = JSON.parse(body.toString());
+					done(null, json);
+				} catch (err) {
+					done(err);
+				}
+			}
+		);
 
-  webhookRoutes.post('/webhook', webhook)
-}, { prefix: '/lemon-squeezy' })
+		webhookRoutes.post('/webhook', webhook);
+	},
+	{ prefix: '/lemon-squeezy' }
+);
 ```
 
 #### 1.2 Fix Email Mismatch with custom_data
@@ -151,24 +163,23 @@ fastify.register(async (webhookRoutes) => {
 ```javascript
 // When generating checkout URL - ADD THESE PARAMETERS
 function handlePurchase(plan) {
-  const purchaseUrl = showAnnual && plan.purchase_url_annual
-    ? plan.purchase_url_annual
-    : plan.purchase_url;
+	const purchaseUrl =
+		showAnnual && plan.purchase_url_annual ? plan.purchase_url_annual : plan.purchase_url;
 
-  // Build checkout URL with custom_data
-  const params = new URLSearchParams({
-    'checkout[email]': $user.email,
-    'checkout[name]': $user.name || '',
-    'checkout[custom][user_id]': $user.uid,
-    'checkout[custom][team_uid]': $team?.uid || '',
-  });
+	// Build checkout URL with custom_data
+	const params = new URLSearchParams({
+		'checkout[email]': $user.email,
+		'checkout[name]': $user.name || '',
+		'checkout[custom][user_id]': $user.uid,
+		'checkout[custom][team_uid]': $team?.uid || ''
+	});
 
-  if (discountCode) {
-    params.set('checkout[discount_code]', discountCode);
-  }
+	if (discountCode) {
+		params.set('checkout[discount_code]', discountCode);
+	}
 
-  const separator = purchaseUrl.includes('?') ? '&' : '?';
-  window.location.href = `${purchaseUrl}${separator}${params.toString()}`;
+	const separator = purchaseUrl.includes('?') ? '&' : '?';
+	window.location.href = `${purchaseUrl}${separator}${params.toString()}`;
 }
 ```
 
@@ -176,34 +187,34 @@ function handlePurchase(plan) {
 
 ```javascript
 const webhook = async (req, res) => {
-  // ... signature verification ...
+	// ... signature verification ...
 
-  const payload = req.body
-  const customData = payload.meta?.custom_data || {}
-  const userId = customData.user_id
-  const teamUid = customData.team_uid
+	const payload = req.body;
+	const customData = payload.meta?.custom_data || {};
+	const userId = customData.user_id;
+	const teamUid = customData.team_uid;
 
-  // SIMPLIFIED: Require user_id, fail if missing (no legacy fallback)
-  if (!userId) {
-    console.error('[LemonSqueezy] Missing user_id in custom_data', {
-      email: payload.data.attributes.user_email
-    })
-    return res.status(400).send({ error: 'Missing user_id in custom_data' })
-  }
+	// SIMPLIFIED: Require user_id, fail if missing (no legacy fallback)
+	if (!userId) {
+		console.error('[LemonSqueezy] Missing user_id in custom_data', {
+			email: payload.data.attributes.user_email
+		});
+		return res.status(400).send({ error: 'Missing user_id in custom_data' });
+	}
 
-  // Parallel lookup for performance
-  const [user, team] = await Promise.all([
-    User.findOne({ uid: userId }).lean(),
-    teamUid ? Team.findOne({ uid: teamUid }).lean() : null,
-  ])
+	// Parallel lookup for performance
+	const [user, team] = await Promise.all([
+		User.findOne({ uid: userId }).lean(),
+		teamUid ? Team.findOne({ uid: teamUid }).lean() : null
+	]);
 
-  if (!user) {
-    console.error('[LemonSqueezy] User not found', { userId, teamUid })
-    return res.status(400).send({ error: 'User not found' })
-  }
+	if (!user) {
+		console.error('[LemonSqueezy] User not found', { userId, teamUid });
+		return res.status(400).send({ error: 'User not found' });
+	}
 
-  // Continue processing with verified user...
-}
+	// Continue processing with verified user...
+};
 ```
 
 #### Research Insights: custom_data Security
@@ -211,30 +222,32 @@ const webhook = async (req, res) => {
 **Security Gap Identified:** The custom_data could be tampered with by an attacker who modifies the checkout URL.
 
 **Optional Enhancement - Signed custom_data:**
+
 ```javascript
 // Frontend: Sign the custom_data
 const signCheckoutData = (userId, teamUid) => {
-  const timestamp = Math.floor(Date.now() / 1000)
-  const dataToSign = `${userId}:${teamUid || ''}:${timestamp}`
-  // Use a backend endpoint to get signature (don't expose secret to frontend)
-  return fetch('/api/sign-checkout', {
-    method: 'POST',
-    body: JSON.stringify({ userId, teamUid, timestamp })
-  }).then(r => r.json())
-}
+	const timestamp = Math.floor(Date.now() / 1000);
+	const dataToSign = `${userId}:${teamUid || ''}:${timestamp}`;
+	// Use a backend endpoint to get signature (don't expose secret to frontend)
+	return fetch('/api/sign-checkout', {
+		method: 'POST',
+		body: JSON.stringify({ userId, teamUid, timestamp })
+	}).then((r) => r.json());
+};
 
 // Backend: Verify the signature
 const verifyCustomDataSignature = (customData) => {
-  const { user_id, team_uid, ts, sig } = customData
-  if (!ts || Date.now() / 1000 - parseInt(ts) > 86400) return false // 24h window
+	const { user_id, team_uid, ts, sig } = customData;
+	if (!ts || Date.now() / 1000 - parseInt(ts) > 86400) return false; // 24h window
 
-  const expected = crypto.createHmac('sha256', process.env.CHECKOUT_SIGNING_SECRET)
-    .update(`${user_id}:${team_uid || ''}:${ts}`)
-    .digest('hex')
-    .substring(0, 16)
+	const expected = crypto
+		.createHmac('sha256', process.env.CHECKOUT_SIGNING_SECRET)
+		.update(`${user_id}:${team_uid || ''}:${ts}`)
+		.digest('hex')
+		.substring(0, 16);
 
-  return crypto.timingSafeEqual(Buffer.from(sig || ''), Buffer.from(expected))
-}
+	return crypto.timingSafeEqual(Buffer.from(sig || ''), Buffer.from(expected));
+};
 ```
 
 **Note:** This is optional for MVP. The signature verification prevents URL manipulation attacks but adds complexity. Implement if dealing with high-value plans or seeing abuse.
@@ -260,16 +273,16 @@ lemonSqueezySubscriptionId: {
 ```javascript
 // In subscription_created handler
 if (!isTeam) {
-  user.lemonSqueezySubscriptionId = String(subscriptionId)
-  user.lemonSqueezyCustomerId = String(lemonSqueezyCustomerId)
-  await user.save()
+	user.lemonSqueezySubscriptionId = String(subscriptionId);
+	user.lemonSqueezyCustomerId = String(lemonSqueezyCustomerId);
+	await user.save();
 }
 ```
 
 **Fix overage-billing.js:**
 
 ```javascript
-const subscriptionId = billingEntity.lemonSqueezySubscriptionId // Works for both now
+const subscriptionId = billingEntity.lemonSqueezySubscriptionId; // Works for both now
 ```
 
 #### Research Insights: Data Types
@@ -287,44 +300,45 @@ const subscriptionId = billingEntity.lemonSqueezySubscriptionId // Works for bot
 ```javascript
 // SIMPLIFIED: Use atomic upsert with existing SubscriptionEvent
 const processWebhookIdempotently = async (payload, processor) => {
-  const subscriptionId = payload.data.id
-  const eventName = payload.meta.event_name
-  const updatedAt = payload.data.attributes.updated_at
+	const subscriptionId = payload.data.id;
+	const eventName = payload.meta.event_name;
+	const updatedAt = payload.data.attributes.updated_at;
 
-  // Simple idempotency key
-  const idempotencyKey = `${eventName}:${subscriptionId}:${updatedAt}`
+	// Simple idempotency key
+	const idempotencyKey = `${eventName}:${subscriptionId}:${updatedAt}`;
 
-  // Atomic check-and-insert using SubscriptionEvent (already exists!)
-  try {
-    const existing = await SubscriptionEvent.findOne({
-      idempotencyKey,
-      createdAt: { $gt: new Date(Date.now() - 60000) } // Within last minute
-    })
+	// Atomic check-and-insert using SubscriptionEvent (already exists!)
+	try {
+		const existing = await SubscriptionEvent.findOne({
+			idempotencyKey,
+			createdAt: { $gt: new Date(Date.now() - 60000) } // Within last minute
+		});
 
-    if (existing) {
-      console.log(`[LemonSqueezy] Duplicate webhook ignored: ${idempotencyKey}`)
-      return { duplicate: true }
-    }
+		if (existing) {
+			console.log(`[LemonSqueezy] Duplicate webhook ignored: ${idempotencyKey}`);
+			return { duplicate: true };
+		}
 
-    // Process the event
-    await processor(payload)
+		// Process the event
+		await processor(payload);
 
-    // Record for idempotency (SubscriptionEvent.createEvent already exists)
-    await SubscriptionEvent.createEvent({
-      type: eventName,
-      lemonSqueezySubscriptionId: subscriptionId,
-      idempotencyKey, // Add this field to existing model
-      // ... other fields
-    })
+		// Record for idempotency (SubscriptionEvent.createEvent already exists)
+		await SubscriptionEvent.createEvent({
+			type: eventName,
+			lemonSqueezySubscriptionId: subscriptionId,
+			idempotencyKey // Add this field to existing model
+			// ... other fields
+		});
 
-    return { duplicate: false }
-  } catch (error) {
-    if (error.code === 11000) { // Duplicate key
-      return { duplicate: true }
-    }
-    throw error
-  }
-}
+		return { duplicate: false };
+	} catch (error) {
+		if (error.code === 11000) {
+			// Duplicate key
+			return { duplicate: true };
+		}
+		throw error;
+	}
+};
 ```
 
 #### Research Insights: Idempotency
@@ -332,6 +346,7 @@ const processWebhookIdempotently = async (payload, processor) => {
 **Critical Bug in Original Plan:** The find-then-create pattern has a TOCTOU race condition.
 
 **Simplification:**
+
 - Don't create a new `SubscriptionWebhookEvent` model
 - Add `idempotencyKey` field to existing `SubscriptionEvent` model
 - Use atomic operations to prevent race conditions
@@ -384,6 +399,7 @@ case 'subscription_expired': {
 #### Research Insights: Grace Period
 
 **Simplification Rationale:**
+
 - LemonSqueezy already manages the grace period
 - `subscription_cancelled` = user cancelled, still has access until `ends_at`
 - `subscription_expired` = access period ended, revoke now
@@ -424,23 +440,23 @@ case 'subscription_expired': {
 
 ### Backend (html-to-gif)
 
-| File | Changes |
-|------|---------|
-| `routes/lemon-squeezy.js` | Add signature verification, require custom_data.user_id, parallel lookups, idempotency, subscription_expired handler |
-| `service/overage-billing.js` | Fix subscriptionId lookup (use billingEntity.lemonSqueezySubscriptionId) |
-| `models/User.js` | Add `lemonSqueezySubscriptionId: String` field |
-| `models/SubscriptionEvent.js` | Add `idempotencyKey` field with unique index |
+| File                          | Changes                                                                                                              |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `routes/lemon-squeezy.js`     | Add signature verification, require custom_data.user_id, parallel lookups, idempotency, subscription_expired handler |
+| `service/overage-billing.js`  | Fix subscriptionId lookup (use billingEntity.lemonSqueezySubscriptionId)                                             |
+| `models/User.js`              | Add `lemonSqueezySubscriptionId: String` field                                                                       |
+| `models/SubscriptionEvent.js` | Add `idempotencyKey` field with unique index                                                                         |
 
 ### Frontend (front-end-html-to-gif)
 
-| File | Changes |
-|------|---------|
+| File                                        | Changes                                                               |
+| ------------------------------------------- | --------------------------------------------------------------------- |
 | `src/routes/dashboard/upgrade/+page.svelte` | Pass `custom_data.user_id` and `custom_data.team_uid` in checkout URL |
 
 ### NOT Creating (Simplified)
 
-| File | Reason |
-|------|--------|
+| File                                     | Reason                                 |
+| ---------------------------------------- | -------------------------------------- |
 | ~~`models/SubscriptionWebhookEvent.js`~~ | Use existing SubscriptionEvent instead |
 
 ---
@@ -451,30 +467,32 @@ case 'subscription_expired': {
 
 ```javascript
 // Add to User model
-userSchema.index({ uid: 1 })  // For custom_data.user_id lookup
-userSchema.index({ lemonSqueezySubscriptionId: 1 })
+userSchema.index({ uid: 1 }); // For custom_data.user_id lookup
+userSchema.index({ lemonSqueezySubscriptionId: 1 });
 
 // Add to SubscriptionEvent model
-subscriptionEventSchema.index({ idempotencyKey: 1 }, { unique: true })
-subscriptionEventSchema.index({ createdAt: 1 })  // For TTL cleanup
+subscriptionEventSchema.index({ idempotencyKey: 1 }, { unique: true });
+subscriptionEventSchema.index({ createdAt: 1 }); // For TTL cleanup
 ```
 
 ### Query Optimization
 
 **Before (4 sequential queries):**
+
 ```javascript
-team = await Team.findOne({ uid: teamUid })
-user = await User.findOne({ activeTeam: teamUid })
-user = await User.findOne({ uid: userId })
-user = await User.findOne({ email })
+team = await Team.findOne({ uid: teamUid });
+user = await User.findOne({ activeTeam: teamUid });
+user = await User.findOne({ uid: userId });
+user = await User.findOne({ email });
 ```
 
 **After (2 parallel queries):**
+
 ```javascript
 const [user, team] = await Promise.all([
-  User.findOne({ uid: userId }),
-  teamUid ? Team.findOne({ uid: teamUid }) : null,
-])
+	User.findOne({ uid: userId }),
+	teamUid ? Team.findOne({ uid: teamUid }) : null
+]);
 ```
 
 **Expected improvement:** 50% reduction in webhook latency.
@@ -507,24 +525,24 @@ Before deploying:
 ```javascript
 // scripts/backfill-subscription-ids.js
 const backfillSubscriptionIds = async () => {
-  const users = await User.find({
-    lemonSqueezyCustomerId: { $ne: null },
-    lemonSqueezySubscriptionId: null
-  })
+	const users = await User.find({
+		lemonSqueezyCustomerId: { $ne: null },
+		lemonSqueezySubscriptionId: null
+	});
 
-  for (const user of users) {
-    // Fetch from LemonSqueezy API
-    const subscriptions = await lemonsqueezy.getSubscriptions({
-      filter: { customer_id: user.lemonSqueezyCustomerId }
-    })
+	for (const user of users) {
+		// Fetch from LemonSqueezy API
+		const subscriptions = await lemonsqueezy.getSubscriptions({
+			filter: { customer_id: user.lemonSqueezyCustomerId }
+		});
 
-    if (subscriptions.data?.length) {
-      user.lemonSqueezySubscriptionId = String(subscriptions.data[0].id)
-      await user.save()
-      console.log(`Backfilled subscription for ${user.email}`)
-    }
-  }
-}
+		if (subscriptions.data?.length) {
+			user.lemonSqueezySubscriptionId = String(subscriptions.data[0].id);
+			await user.save();
+			console.log(`Backfilled subscription for ${user.email}`);
+		}
+	}
+};
 ```
 
 ---

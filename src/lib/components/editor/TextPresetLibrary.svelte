@@ -473,7 +473,9 @@
 		// Load fonts first
 		for (const element of preset.elements) {
 			try {
-				await document.fonts.load(`${element.fontWeight} ${element.fontSize}px "${element.fontFamily}"`);
+				await document.fonts.load(
+					`${element.fontWeight} ${element.fontSize}px "${element.fontFamily}"`
+				);
 			} catch (e) {
 				console.error(`Failed to load font ${element.fontFamily}`, e);
 			}
@@ -508,7 +510,7 @@
 			}
 
 			const textObj = new IText(element.text, textOptions);
-			
+
 			// If element has background, create background rect behind text
 			if (element.background) {
 				// Create text first to measure it
@@ -520,16 +522,16 @@
 				// Measure text bounds
 				const textWidth = textObj.width;
 				const textHeight = textObj.height;
-				
+
 				// Calculate positions
 				const textLeft = center.left + (element.offsetX || 0);
 				const textTop = center.top + element.offsetY;
-				
+
 				// Create background rectangle with padding
 				const padding = 8;
 				const rectWidth = textWidth + padding * 2;
 				const rectHeight = textHeight + padding * 1.5;
-				
+
 				const bgRect = new Rect({
 					width: rectWidth,
 					height: rectHeight,
@@ -553,7 +555,7 @@
 				// Add rect first so it's behind
 				allObjects.push(bgRect);
 				$editor.add(bgRect);
-				
+
 				allObjects.push(textObj);
 				$editor.add(textObj);
 			} else {
@@ -595,11 +597,11 @@
 				on:click={() => applyPreset(preset)}
 			>
 				<!-- Preset Preview -->
-			<div class="mb-2 min-h-[80px] py-2 relative">
-				{#each preset.elements as element, idx}
-					<div
-						class="transition-transform group-hover:scale-105 absolute"
-						style="
+				<div class="mb-2 min-h-[80px] py-2 relative">
+					{#each preset.elements as element, idx}
+						<div
+							class="transition-transform group-hover:scale-105 absolute"
+							style="
 							font-family: {element.fontFamily};
 							font-size: {element.fontSize / 4}px;
 							color: {element.fill === 'transparent' ? '#000' : element.fill};
@@ -607,25 +609,35 @@
 							letter-spacing: {(element.letterSpacing || 0) / 100}px;
 							line-height: {element.lineHeight || 1.16};
 							{element.fontStyle ? `font-style: ${element.fontStyle};` : ''}
-							{element.stroke && element.fill === 'transparent' ? `-webkit-text-stroke: ${element.strokeWidth / 2}px ${element.stroke};` : ''}
-							{element.shadow ? `text-shadow: ${element.shadow.offsetX / 3}px ${element.shadow.offsetY / 3}px ${element.shadow.blur / 3}px ${element.shadow.color};` : ''}
-							{element.background ? `background-color: ${element.background}; padding: 2px 8px; border-radius: 4px;` : ''}
-							top: {(element.offsetY / 6) + 40}px;
+							{element.stroke && element.fill === 'transparent'
+								? `-webkit-text-stroke: ${element.strokeWidth / 2}px ${element.stroke};`
+								: ''}
+							{element.shadow
+								? `text-shadow: ${element.shadow.offsetX / 3}px ${element.shadow.offsetY / 3}px ${
+										element.shadow.blur / 3
+								  }px ${element.shadow.color};`
+								: ''}
+							{element.background
+								? `background-color: ${element.background}; padding: 2px 8px; border-radius: 4px;`
+								: ''}
+							top: {element.offsetY / 6 + 40}px;
 							left: {50 + (element.offsetX || 0) / 6}%;
 							transform: translateX(-50%);
 						"
-					>
-						{element.text}
-					</div>
-				{/each}
-			</div>
+						>
+							{element.text}
+						</div>
+					{/each}
+				</div>
 
 				<!-- Preset Name & Category -->
 				<div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
 					<span class="text-sm font-semibold text-gray-700 group-hover:text-[#ff6b6b]">
 						{preset.name}
 					</span>
-					<span class="text-xs px-2 py-1 bg-white text-gray-900 border border-gray-900 rounded-md font-bold uppercase tracking-wide group-hover:bg-gray-900 group-hover:text-white">
+					<span
+						class="text-xs px-2 py-1 bg-white text-gray-900 border border-gray-900 rounded-md font-bold uppercase tracking-wide group-hover:bg-gray-900 group-hover:text-white"
+					>
 						{preset.category}
 					</span>
 				</div>

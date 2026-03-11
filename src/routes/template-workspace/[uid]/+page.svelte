@@ -15,7 +15,7 @@
 		}
 
 		const loadedTemplate = await getTemplateAction($page.params.uid);
-		
+
 		// Redirect to format-specific route based on template's output format
 		// This ensures PDF templates open in PDF mode
 		if (loadedTemplate?.outputFormat === 'pdf') {
@@ -25,7 +25,7 @@
 			goto(`/template-workspace/image/${$page.params.uid}`, { replaceState: true });
 			return;
 		}
-		
+
 		// Fallback: show editor if redirect didn't happen
 		isLoading = false;
 	});

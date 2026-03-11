@@ -10,9 +10,10 @@ const NUDGES = [
 		id: 'suggest-experiment',
 		priority: 1,
 		condition: (ctx) => ctx.templateCount >= 3 && ctx.experimentCount === 0,
-		message: "You've created {templateCount} templates — try A/B testing to find which performs best.",
+		message:
+			"You've created {templateCount} templates — try A/B testing to find which performs best.",
 		cta: 'Create Experiment',
-		href: '/dashboard/experiments/create?type=ab_test',
+		href: '/dashboard/experiments/create?type=ab_test'
 	},
 	{
 		id: 'suggest-api-key',
@@ -20,7 +21,7 @@ const NUDGES = [
 		condition: (ctx) => ctx.integrationMode === 'api' && !ctx.hasApiKey,
 		message: 'Get your API key to start generating images programmatically.',
 		cta: 'Get API Key',
-		href: '/dashboard/api-token',
+		href: '/dashboard/api-token'
 	},
 	{
 		id: 'suggest-tracking',
@@ -28,7 +29,7 @@ const NUDGES = [
 		condition: (ctx) => ctx.experimentCount > 0 && !ctx.hasTracking,
 		message: 'Install the tracking script to measure experiment performance.',
 		cta: 'Install Tracking',
-		href: '/dashboard/install',
+		href: '/dashboard/install'
 	},
 	{
 		id: 'suggest-bulk-render',
@@ -36,8 +37,8 @@ const NUDGES = [
 		condition: (ctx) => ctx.templateCount >= 1 && !ctx.hasBulkRendered,
 		message: 'Generate images at scale — try bulk rendering from a CSV or API.',
 		cta: 'Try Bulk Render',
-		href: '/dashboard/template',
-	},
+		href: '/dashboard/template'
+	}
 ];
 
 /**
@@ -55,15 +56,14 @@ const NUDGES = [
 export function evaluateNudges(context, dismissedIds = []) {
 	const dismissed = new Set(dismissedIds);
 
-	return NUDGES
-		.filter((nudge) => !dismissed.has(nudge.id) && nudge.condition(context))
+	return NUDGES.filter((nudge) => !dismissed.has(nudge.id) && nudge.condition(context))
 		.sort((a, b) => a.priority - b.priority)
 		.slice(0, 2)
 		.map((nudge) => ({
 			id: nudge.id,
 			message: nudge.message.replace('{templateCount}', context.templateCount || 0),
 			cta: nudge.cta,
-			href: nudge.href,
+			href: nudge.href
 		}));
 }
 

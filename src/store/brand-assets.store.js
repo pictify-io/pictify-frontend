@@ -1,17 +1,17 @@
 /**
  * Brand Assets Store
- * 
+ *
  * Svelte store for managing brand assets state
  */
 
 import { writable, derived } from 'svelte/store';
-import { 
-	getBrandAssets, 
-	uploadBrandAsset, 
-	addBrandColor, 
-	updateBrandAsset, 
+import {
+	getBrandAssets,
+	uploadBrandAsset,
+	addBrandColor,
+	updateBrandAsset,
 	deleteBrandAsset,
-	deleteBrandAssets 
+	deleteBrandAssets
 } from '../api/brand-assets';
 
 // Main brand assets store
@@ -26,41 +26,41 @@ export const brandAssets = writable({
 });
 
 // Derived stores for filtered assets
-export const logos = derived(brandAssets, $store => 
-	$store.assets.filter(a => a.type === 'logo')
+export const logos = derived(brandAssets, ($store) =>
+	$store.assets.filter((a) => a.type === 'logo')
 );
 
-export const fonts = derived(brandAssets, $store => 
-	$store.assets.filter(a => a.type === 'font')
+export const fonts = derived(brandAssets, ($store) =>
+	$store.assets.filter((a) => a.type === 'font')
 );
 
-export const colors = derived(brandAssets, $store => 
-	$store.assets.filter(a => a.type === 'color')
+export const colors = derived(brandAssets, ($store) =>
+	$store.assets.filter((a) => a.type === 'color')
 );
 
-export const images = derived(brandAssets, $store => 
-	$store.assets.filter(a => a.type === 'image')
+export const images = derived(brandAssets, ($store) =>
+	$store.assets.filter((a) => a.type === 'image')
 );
 
-export const icons = derived(brandAssets, $store => 
-	$store.assets.filter(a => a.type === 'icon')
+export const icons = derived(brandAssets, ($store) =>
+	$store.assets.filter((a) => a.type === 'icon')
 );
 
 // Primary assets (featured)
-export const primaryAssets = derived(brandAssets, $store => 
-	$store.assets.filter(a => a.isPrimary)
+export const primaryAssets = derived(brandAssets, ($store) =>
+	$store.assets.filter((a) => a.isPrimary)
 );
 
 /**
  * Fetch brand assets from API
  */
 export async function fetchBrandAssets({ type, tag, limit = 50, offset = 0 } = {}) {
-	brandAssets.update(s => ({ ...s, loading: true, error: null }));
-	
+	brandAssets.update((s) => ({ ...s, loading: true, error: null }));
+
 	try {
 		const response = await getBrandAssets({ type, tag, limit, offset });
-		
-		brandAssets.update(s => ({
+
+		brandAssets.update((s) => ({
 			...s,
 			assets: response.assets || [],
 			pagination: response.pagination || { total: 0, limit, offset, hasMore: false },
@@ -69,10 +69,10 @@ export async function fetchBrandAssets({ type, tag, limit = 50, offset = 0 } = {
 			loading: false,
 			selectedType: type || null
 		}));
-		
+
 		return response;
 	} catch (error) {
-		brandAssets.update(s => ({
+		brandAssets.update((s) => ({
 			...s,
 			loading: false,
 			error: error.message || 'Failed to load brand assets'
@@ -87,9 +87,9 @@ export async function fetchBrandAssets({ type, tag, limit = 50, offset = 0 } = {
 export async function uploadAsset(file, options) {
 	try {
 		const response = await uploadBrandAsset(file, options);
-		
+
 		if (response.success && response.asset) {
-			brandAssets.update(s => ({
+			brandAssets.update((s) => ({
 				...s,
 				assets: [response.asset, ...s.assets],
 				counts: {
@@ -102,7 +102,7 @@ export async function uploadAsset(file, options) {
 				}
 			}));
 		}
-		
+
 		return response;
 	} catch (error) {
 		throw error;
@@ -115,9 +115,9 @@ export async function uploadAsset(file, options) {
 export async function addColor(colorData) {
 	try {
 		const response = await addBrandColor(colorData);
-		
+
 		if (response.success && response.asset) {
-			brandAssets.update(s => ({
+			brandAssets.update((s) => ({
 				...s,
 				assets: [response.asset, ...s.assets],
 				counts: {
@@ -130,7 +130,7 @@ export async function addColor(colorData) {
 				}
 			}));
 		}
-		
+
 		return response;
 	} catch (error) {
 		throw error;
@@ -143,14 +143,14 @@ export async function addColor(colorData) {
 export async function updateAsset(uid, updates) {
 	try {
 		const response = await updateBrandAsset(uid, updates);
-		
+
 		if (response.success && response.asset) {
-			brandAssets.update(s => ({
+			brandAssets.update((s) => ({
 				...s,
-				assets: s.assets.map(a => a.uid === uid ? response.asset : a)
+				assets: s.assets.map((a) => (a.uid === uid ? response.asset : a))
 			}));
 		}
-		
+
 		return response;
 	} catch (error) {
 		throw error;
@@ -163,17 +163,19 @@ export async function updateAsset(uid, updates) {
 export async function deleteAsset(uid) {
 	try {
 		const response = await deleteBrandAsset(uid);
-		
+
 		if (response.success) {
-			brandAssets.update(s => {
-				const deletedAsset = s.assets.find(a => a.uid === uid);
+			brandAssets.update((s) => {
+				const deletedAsset = s.assets.find((a) => a.uid === uid);
 				return {
 					...s,
-					assets: s.assets.filter(a => a.uid !== uid),
-					counts: deletedAsset ? {
-						...s.counts,
-						[deletedAsset.type]: Math.max(0, (s.counts[deletedAsset.type] || 1) - 1)
-					} : s.counts,
+					assets: s.assets.filter((a) => a.uid !== uid),
+					counts: deletedAsset
+						? {
+								...s.counts,
+								[deletedAsset.type]: Math.max(0, (s.counts[deletedAsset.type] || 1) - 1)
+						  }
+						: s.counts,
 					pagination: {
 						...s.pagination,
 						total: Math.max(0, s.pagination.total - 1)
@@ -181,7 +183,7 @@ export async function deleteAsset(uid) {
 				};
 			});
 		}
-		
+
 		return response;
 	} catch (error) {
 		throw error;
@@ -194,18 +196,18 @@ export async function deleteAsset(uid) {
 export async function deleteAssets(uids) {
 	try {
 		const response = await deleteBrandAssets(uids);
-		
+
 		if (response.success) {
-			brandAssets.update(s => {
-				const remainingAssets = s.assets.filter(a => !uids.includes(a.uid));
-				const deletedAssets = s.assets.filter(a => uids.includes(a.uid));
-				
+			brandAssets.update((s) => {
+				const remainingAssets = s.assets.filter((a) => !uids.includes(a.uid));
+				const deletedAssets = s.assets.filter((a) => uids.includes(a.uid));
+
 				// Update counts
 				const newCounts = { ...s.counts };
-				deletedAssets.forEach(a => {
+				deletedAssets.forEach((a) => {
 					newCounts[a.type] = Math.max(0, (newCounts[a.type] || 1) - 1);
 				});
-				
+
 				return {
 					...s,
 					assets: remainingAssets,
@@ -217,7 +219,7 @@ export async function deleteAssets(uids) {
 				};
 			});
 		}
-		
+
 		return response;
 	} catch (error) {
 		throw error;
@@ -238,4 +240,3 @@ export function resetBrandAssets() {
 		selectedType: null
 	});
 }
-

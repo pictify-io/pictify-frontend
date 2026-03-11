@@ -262,13 +262,11 @@
 				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Only on Pictify</span
+					>Advanced Capabilities</span
 				>
 			</div>
 
-			<h2
-				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight"
-			>
+			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Optimize Every <br />
 				<span class="relative inline-block text-[#ff6b6b] transform rotate-1 mt-2">
 					Visual
@@ -769,9 +767,7 @@
 							>
 						</div>
 
-						<h3 class="text-3xl md:text-4xl font-black text-gray-900 mb-6">
-							Target Context
-						</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900 mb-6">Target Context</h3>
 						<p class="text-lg text-gray-700 font-medium mb-10 max-w-lg">
 							Serve tailored images based on device, location, or time. One URL, infinite
 							personalized variations.

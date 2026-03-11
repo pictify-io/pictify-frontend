@@ -2,7 +2,12 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getTemplateById, getTemplateVariables, renderTemplate, renderTemplateMultiSize } from '../../../../../api/template';
+	import {
+		getTemplateById,
+		getTemplateVariables,
+		renderTemplate,
+		renderTemplateMultiSize
+	} from '../../../../../api/template';
 	import { createShareResult } from '../../../../../api/public-templates.js';
 	import { getApiToken, createApiToken } from '../../../../../api/user';
 	import { user } from '../../../../../store/user.store';
@@ -37,10 +42,10 @@
 		{ id: 'twitter-post', width: 1024, height: 512, label: 'Twitter/X Post' },
 		{ id: 'youtube-thumbnail', width: 1280, height: 720, label: 'YouTube Thumbnail' },
 		{ id: 'og-image', width: 1200, height: 630, label: 'OG Image' },
-		{ id: 'pinterest-pin', width: 1000, height: 1500, label: 'Pinterest Pin' },
+		{ id: 'pinterest-pin', width: 1000, height: 1500, label: 'Pinterest Pin' }
 	];
 
-	$: activePreset = PLATFORM_PRESETS.find(p => p.id === selectedPreset);
+	$: activePreset = PLATFORM_PRESETS.find((p) => p.id === selectedPreset);
 
 	// API Key state
 	let apiTokens = [];
@@ -166,7 +171,7 @@
 			// Track successful template render
 			analytics.trackTemplateRendered({
 				template_id: uid,
-				format,
+				format
 			});
 		} catch (error) {
 			// Check if this render is still current
@@ -179,7 +184,7 @@
 			// Track render error
 			analytics.trackRenderError({
 				template_id: uid,
-				error_message: renderError,
+				error_message: renderError
 			});
 		} finally {
 			if (thisRenderVersion === currentRenderVersion) {
@@ -232,7 +237,7 @@
 		analytics.trackDownload({
 			content_type: 'rendered_image',
 			format: renderResult.format || 'png',
-			template_id: uid,
+			template_id: uid
 		});
 	};
 
@@ -255,7 +260,7 @@
 					format: renderResult.format || 'png',
 					source: 'template',
 					templateUid: uid,
-					title: template?.name || '',
+					title: template?.name || ''
 				});
 				if (response.success && response.shareUrl) {
 					cachedShareUrl = `${window.location.origin}${response.shareUrl}`;
@@ -298,7 +303,9 @@
 		const queryParts = Object.entries(variableValues)
 			.filter(([, v]) => v !== '' && v !== undefined)
 			.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
-		const urlParamUrl = `${backendUrl}/r/${uid}.${format}?token=YOUR_API_TOKEN${queryParts.length ? '&' + queryParts.join('&') : ''}`;
+		const urlParamUrl = `${backendUrl}/r/${uid}.${format}?token=YOUR_API_TOKEN${
+			queryParts.length ? '&' + queryParts.join('&') : ''
+		}`;
 
 		const code = `// === Option 1: POST API (full control) ===
 const response = await fetch('${backendUrl}/templates/${uid}/render', {
@@ -334,7 +341,6 @@ console.log(result.url); // CDN URL of rendered image
 </script>
 
 <section class="min-h-full pb-12">
-	
 	<!-- Page Header -->
 	<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
 		<div>
@@ -342,10 +348,17 @@ console.log(result.url); // CDN URL of rendered image
 				class="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 hover:underline flex items-center gap-1 transition-colors mb-2"
 				on:click={() => goto('/dashboard/template')}
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="3"
+						d="M15 19l-7-7 7-7"
+					/></svg
+				>
 				Back to Templates
 			</button>
-			
+
 			<div class="flex items-center gap-3">
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
 					{#if template}
@@ -354,7 +367,9 @@ console.log(result.url); // CDN URL of rendered image
 						Loading...
 					{/if}
 				</h1>
-				<div class="px-2 py-1 bg-[#4ecdc4] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]">
+				<div
+					class="px-2 py-1 bg-[#4ecdc4] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+				>
 					Render Mode
 				</div>
 			</div>
@@ -374,14 +389,19 @@ console.log(result.url); // CDN URL of rendered image
 			</div>
 		{:else if template}
 			<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-				
 				<!-- Left: Variable Form -->
 				<div class="lg:col-span-5 flex flex-col gap-6">
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					>
 						<!-- Card Header -->
-						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between">
-							<h2 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-								<span class="w-3 h-3 bg-[#ffc480] border-2 border-gray-900 rounded-full"></span>
+						<div
+							class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
+						>
+							<h2
+								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
+							>
+								<span class="w-3 h-3 bg-[#ffc480] border-2 border-gray-900 rounded-full" />
 								Variables
 							</h2>
 						</div>
@@ -397,22 +417,31 @@ console.log(result.url); // CDN URL of rendered image
 					</div>
 
 					<!-- Output Options -->
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					>
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
-							<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-								<span class="w-3 h-3 bg-[#a78bfa] border-2 border-gray-900 rounded-full"></span>
+							<h3
+								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
+							>
+								<span class="w-3 h-3 bg-[#a78bfa] border-2 border-gray-900 rounded-full" />
 								Output Options
 							</h3>
 						</div>
 						<div class="p-6 space-y-5">
 							<!-- Format selector -->
 							<div class="space-y-2">
-								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Format</label>
+								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+									>Format</label
+								>
 								<div class="flex gap-2">
 									{#each ['png', 'jpeg', 'webp'] as fmt}
 										<button
-											class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {selectedFormat === fmt ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-											on:click={() => selectedFormat = fmt}
+											class="flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {selectedFormat ===
+											fmt
+												? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
+												: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+											on:click={() => (selectedFormat = fmt)}
 										>
 											{fmt}
 										</button>
@@ -422,23 +451,42 @@ console.log(result.url); // CDN URL of rendered image
 
 							<!-- Size mode -->
 							<div class="space-y-2">
-								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Size</label>
+								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+									>Size</label
+								>
 								<div class="flex gap-2">
 									<button
-										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode === 'original' ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-										on:click={() => { sizeMode = 'original'; selectedPreset = ''; }}
+										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode ===
+										'original'
+											? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
+											: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+										on:click={() => {
+											sizeMode = 'original';
+											selectedPreset = '';
+										}}
 									>
 										Original
 									</button>
 									<button
-										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode === 'preset' ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-										on:click={() => { sizeMode = 'preset'; }}
+										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode ===
+										'preset'
+											? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
+											: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+										on:click={() => {
+											sizeMode = 'preset';
+										}}
 									>
 										Preset
 									</button>
 									<button
-										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode === 'custom' ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-										on:click={() => { sizeMode = 'custom'; selectedPreset = ''; }}
+										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode ===
+										'custom'
+											? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
+											: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
+										on:click={() => {
+											sizeMode = 'custom';
+											selectedPreset = '';
+										}}
 									>
 										Custom
 									</button>
@@ -450,11 +498,18 @@ console.log(result.url); // CDN URL of rendered image
 								<div class="grid grid-cols-2 gap-2">
 									{#each PLATFORM_PRESETS as preset}
 										<button
-											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedPreset === preset.id ? 'bg-[#4ecdc4]/10 border-[#4ecdc4] shadow-[2px_2px_0_0_#0d9488]' : 'bg-white border-gray-200 hover:border-gray-900'}"
-											on:click={() => selectedPreset = preset.id}
+											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedPreset ===
+											preset.id
+												? 'bg-[#4ecdc4]/10 border-[#4ecdc4] shadow-[2px_2px_0_0_#0d9488]'
+												: 'bg-white border-gray-200 hover:border-gray-900'}"
+											on:click={() => (selectedPreset = preset.id)}
 										>
-											<span class="block text-xs font-black text-gray-900 leading-tight">{preset.label}</span>
-											<span class="block text-[10px] font-bold text-gray-500 font-mono">{preset.width}x{preset.height}</span>
+											<span class="block text-xs font-black text-gray-900 leading-tight"
+												>{preset.label}</span
+											>
+											<span class="block text-[10px] font-bold text-gray-500 font-mono"
+												>{preset.width}x{preset.height}</span
+											>
 										</button>
 									{/each}
 								</div>
@@ -481,20 +536,26 @@ console.log(result.url); // CDN URL of rendered image
 										class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#a78bfa] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
 									/>
 								</div>
-								<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Min 10px, Max 4096px</p>
+								<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+									Min 10px, Max 4096px
+								</p>
 							{/if}
 						</div>
 					</div>
 
 					<!-- API Key Selection -->
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+					<div
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					>
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
-							<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-								<span class="w-3 h-3 bg-[#60a5fa] border-2 border-gray-900 rounded-full"></span>
+							<h3
+								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
+							>
+								<span class="w-3 h-3 bg-[#60a5fa] border-2 border-gray-900 rounded-full" />
 								Authentication
 							</h3>
 						</div>
-						
+
 						<div class="p-6">
 							{#if apiTokens.length > 0}
 								<div class="flex flex-col gap-4">
@@ -511,7 +572,18 @@ console.log(result.url); // CDN URL of rendered image
 												{/each}
 											</select>
 											<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-												<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+												<svg
+													class="w-4 h-4 text-gray-900"
+													fill="none"
+													stroke="currentColor"
+													viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="3"
+														d="M19 9l-7 7-7-7"
+													/></svg
+												>
 											</div>
 										</div>
 										<button
@@ -523,12 +595,28 @@ console.log(result.url); // CDN URL of rendered image
 										>
 											{#if isCreatingToken}
 												<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-													<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-													<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+													<circle
+														class="opacity-25"
+														cx="12"
+														cy="12"
+														r="10"
+														stroke="currentColor"
+														stroke-width="4"
+													/>
+													<path
+														class="opacity-75"
+														fill="currentColor"
+														d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+													/>
 												</svg>
 											{:else}
 												<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="3"
+														d="M12 4v16m8-8H4"
+													/>
 												</svg>
 											{/if}
 										</button>
@@ -541,32 +629,55 @@ console.log(result.url); // CDN URL of rendered image
 											class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
 											on:click={handleRender}
 											disabled={isRendering || !selectedApiKey}
-									>
-										{#if isRendering}
-											<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-											</svg>
-											Generating...
-										{:else}
-											<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-											</svg>
-											Render Image
-										{/if}
-									</button>
+										>
+											{#if isRendering}
+												<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+													<circle
+														class="opacity-25"
+														cx="12"
+														cy="12"
+														r="10"
+														stroke="currentColor"
+														stroke-width="4"
+													/>
+													<path
+														class="opacity-75"
+														fill="currentColor"
+														d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+													/>
+												</svg>
+												Generating...
+											{:else}
+												<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2.5"
+														d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+													/>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2.5"
+														d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+													/>
+												</svg>
+												Render Image
+											{/if}
+										</button>
 
-									<button
-										class="text-xs font-bold text-gray-500 hover:text-gray-900 underline uppercase tracking-wider text-center"
-										on:click={generateApiCode}
-									>
-										View API Request Code
-									</button>
+										<button
+											class="text-xs font-bold text-gray-500 hover:text-gray-900 underline uppercase tracking-wider text-center"
+											on:click={generateApiCode}
+										>
+											View API Request Code
+										</button>
 									{/if}
 								</div>
 							{:else}
-								<div class="bg-amber-50 border-[3px] border-amber-200 border-dashed rounded-lg p-6 text-center">
+								<div
+									class="bg-amber-50 border-[3px] border-amber-200 border-dashed rounded-lg p-6 text-center"
+								>
 									<p class="text-sm font-bold text-amber-800 mb-4">
 										An API key is required to render images.
 									</p>
@@ -578,13 +689,29 @@ console.log(result.url); // CDN URL of rendered image
 									>
 										{#if isCreatingToken}
 											<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+												<circle
+													class="opacity-25"
+													cx="12"
+													cy="12"
+													r="10"
+													stroke="currentColor"
+													stroke-width="4"
+												/>
+												<path
+													class="opacity-75"
+													fill="currentColor"
+													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+												/>
 											</svg>
 											Creating...
 										{:else}
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2.5"
+													d="M12 4v16m8-8H4"
+												/>
 											</svg>
 											Create New API Key
 										{/if}
@@ -597,16 +724,22 @@ console.log(result.url); // CDN URL of rendered image
 
 				<!-- Right: Preview -->
 				<div class="lg:col-span-7">
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden sticky top-32">
-						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between">
-							<h2 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-								<span class="w-3 h-3 bg-[#4ade80] border-2 border-gray-900 rounded-full"></span>
+					<div
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden sticky top-32"
+					>
+						<div
+							class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
+						>
+							<h2
+								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
+							>
+								<span class="w-3 h-3 bg-[#4ade80] border-2 border-gray-900 rounded-full" />
 								Live Preview
 							</h2>
 							<div class="flex gap-1">
-								<div class="w-2 h-2 rounded-full bg-gray-300"></div>
-								<div class="w-2 h-2 rounded-full bg-gray-300"></div>
-								<div class="w-2 h-2 rounded-full bg-gray-300"></div>
+								<div class="w-2 h-2 rounded-full bg-gray-300" />
+								<div class="w-2 h-2 rounded-full bg-gray-300" />
+								<div class="w-2 h-2 rounded-full bg-gray-300" />
 							</div>
 						</div>
 

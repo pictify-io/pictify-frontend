@@ -14,13 +14,13 @@
 	let isEmailVerified = null;
 	let userEmail = '';
 
-	user.subscribe(userData => {
+	user.subscribe((userData) => {
 		isUserLoggedIn = !!userData.email;
 		isEmailVerified = userData.isEmailVerified;
 		userEmail = userData.email || '';
 	});
-	
-	activeApiToken.subscribe(token => {
+
+	activeApiToken.subscribe((token) => {
 		currentApiToken = token;
 	});
 
@@ -77,28 +77,35 @@
 		finalResult = null;
 
 		try {
-			await createAgentScreenshotStream(prompt, (message) => {
-				streamingLogs = [...streamingLogs, message];
-				
-				// If this is the saved event, capture the final result
-				if (message.type === 'saved' && message.data) {
-					finalResult = message.data;
-				}
-			}, currentApiToken.token);
+			await createAgentScreenshotStream(
+				prompt,
+				(message) => {
+					streamingLogs = [...streamingLogs, message];
+
+					// If this is the saved event, capture the final result
+					if (message.type === 'saved' && message.data) {
+						finalResult = message.data;
+					}
+				},
+				currentApiToken.token
+			);
 
 			toast.set({ message: 'Screenshot generated successfully!', type: 'success', duration: 1500 });
 		} catch (error) {
 			console.error('Error generating screenshot:', error);
 			toast.set({ message: 'Failed to generate screenshot', type: 'error', duration: 1500 });
-			streamingLogs = [...streamingLogs, {
-				type: 'error',
-				data: {
-					step: 'error',
-					message: 'Screenshot generation failed',
-					error: error.message,
-					timestamp: new Date().toISOString()
+			streamingLogs = [
+				...streamingLogs,
+				{
+					type: 'error',
+					data: {
+						step: 'error',
+						message: 'Screenshot generation failed',
+						error: error.message,
+						timestamp: new Date().toISOString()
+					}
 				}
-			}];
+			];
 		} finally {
 			isGenerating = false;
 		}
@@ -177,8 +184,8 @@
 			<div class="text-center">
 				<h1 class="text-3xl font-bold mb-4">AI Agent Screenshot</h1>
 				<p class="text-gray-600 max-w-2xl mx-auto">
-					Generate screenshots using natural language prompts. Our AI agent will navigate to websites 
-					and capture the content you need automatically.
+					Generate screenshots using natural language prompts. Our AI agent will navigate to
+					websites and capture the content you need automatically.
 				</p>
 			</div>
 		</div>
@@ -188,23 +195,19 @@
 			<div class="max-w-4xl mx-auto">
 				<div class="space-y-6">
 					<div>
-						<label class="block text-sm font-medium text-gray-900 mb-2">
-							Screenshot Prompt
-						</label>
+						<label class="block text-sm font-medium text-gray-900 mb-2"> Screenshot Prompt </label>
 						<textarea
 							class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-[#ff6b6b] focus:border-transparent"
 							rows="3"
 							placeholder="Enter a natural language description of what you want to screenshot..."
 							bind:value={prompt}
 							disabled={isGenerating}
-						></textarea>
+						/>
 					</div>
 
 					<!-- Example Prompts -->
 					<div>
-						<label class="block text-sm font-medium text-gray-900 mb-2">
-							Example Prompts
-						</label>
+						<label class="block text-sm font-medium text-gray-900 mb-2"> Example Prompts </label>
 						<div class="flex flex-wrap gap-2">
 							{#each examplePrompts as example}
 								<button
@@ -230,12 +233,30 @@
 						<button
 							class="bg-[#ff6b6b] text-white px-8 py-3 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 							on:click={generateScreenshot}
-							disabled={isGenerating || !prompt.trim() || (isUserLoggedIn && isEmailVerified === false)}
+							disabled={isGenerating ||
+								!prompt.trim() ||
+								(isUserLoggedIn && isEmailVerified === false)}
 						>
 							{#if isGenerating}
-								<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								<svg
+									class="animate-spin h-4 w-4"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									/>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									/>
 								</svg>
 								Generating...
 							{:else}
@@ -249,14 +270,14 @@
 
 		<!-- Results -->
 		{#if streamingLogs.length > 0 || finalResult}
-			<div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8" transition:slide>
+			<div
+				class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8"
+				transition:slide
+			>
 				<div class="max-w-4xl mx-auto">
 					<div class="flex items-center justify-between mb-6">
 						<h2 class="text-2xl font-bold">Generation Progress</h2>
-						<button
-							class="text-sm text-gray-500 hover:text-gray-700"
-							on:click={clearResults}
-						>
+						<button class="text-sm text-gray-500 hover:text-gray-700" on:click={clearResults}>
 							Clear Results
 						</button>
 					</div>
@@ -319,12 +340,19 @@
 									</div>
 									<div>
 										<span class="font-medium">Created:</span>
-										<span class="text-gray-600">{new Date(finalResult.createdAt).toLocaleString()}</span>
+										<span class="text-gray-600"
+											>{new Date(finalResult.createdAt).toLocaleString()}</span
+										>
 									</div>
 									{#if finalResult.metadata?.url}
 										<div class="col-span-2">
 											<span class="font-medium">Source URL:</span>
-											<a href={finalResult.metadata.url} target="_blank" rel="noopener noreferrer" class="text-[#ff6b6b] hover:text-[#ff5252]">
+											<a
+												href={finalResult.metadata.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="text-[#ff6b6b] hover:text-[#ff5252]"
+											>
 												{finalResult.metadata.url}
 											</a>
 										</div>
@@ -357,7 +385,11 @@
 										class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
 										on:click={() => {
 											navigator.clipboard.writeText(finalResult.url);
-											toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 1500 });
+											toast.set({
+												message: 'URL copied to clipboard',
+												type: 'success',
+												duration: 1500
+											});
 										}}
 									>
 										Copy URL
@@ -378,7 +410,8 @@
 		<div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
 			<h3 class="text-lg font-semibold mb-4">Login Required</h3>
 			<p class="text-gray-600 mb-6">
-				You need to be logged in to use the AI Agent Screenshot feature. Please login or create an account to continue.
+				You need to be logged in to use the AI Agent Screenshot feature. Please login or create an
+				account to continue.
 			</p>
 			<div class="flex gap-3">
 				<a
@@ -389,7 +422,7 @@
 				</a>
 				<button
 					class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-					on:click={() => showSignupPrompt = false}
+					on:click={() => (showSignupPrompt = false)}
 				>
 					Cancel
 				</button>
@@ -398,4 +431,4 @@
 	</div>
 {/if}
 
-<Toast /> 
+<Toast />

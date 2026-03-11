@@ -40,11 +40,15 @@
 		<!-- TTL Configuration -->
 		<div class="space-y-6">
 			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
-				<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black"></span>
-				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Cache Duration (TTL)</h3>
+				<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black" />
+				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">
+					Cache Duration (TTL)
+				</h3>
 			</div>
-			
-			<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
+
+			<div
+				class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+			>
 				<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-4">Select Duration</p>
 
 				<!-- Presets -->
@@ -53,8 +57,8 @@
 						<button
 							class="px-3 py-2 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] transition-all hover:-translate-y-0.5 active:translate-y-0
 								{refreshPolicy.ttlSeconds === preset.value
-									? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
-									: 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
+								? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
+								: 'bg-white text-gray-500 border-gray-200 hover:border-gray-900 hover:text-gray-900'}"
 							on:click={() => handleRefreshChange({ ttlSeconds: preset.value })}
 						>
 							{preset.label}
@@ -64,7 +68,9 @@
 
 				<!-- Custom Input -->
 				<div>
-					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Custom Duration (seconds)</label>
+					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+						>Custom Duration (seconds)</label
+					>
 					<div class="flex items-center gap-3">
 						<input
 							type="number"
@@ -75,7 +81,9 @@
 							on:input={(e) => handleRefreshChange({ ttlSeconds: parseInt(e.target.value) || 300 })}
 						/>
 						<div class="px-4 py-3 bg-gray-100 border-[3px] border-gray-200 rounded-lg">
-							<span class="text-sm font-bold text-gray-600 font-mono">= {formatTtl(refreshPolicy.ttlSeconds)}</span>
+							<span class="text-sm font-bold text-gray-600 font-mono"
+								>= {formatTtl(refreshPolicy.ttlSeconds)}</span
+							>
 						</div>
 					</div>
 				</div>
@@ -85,13 +93,17 @@
 		<!-- Error Policy -->
 		<div class="space-y-6">
 			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
-				<span class="w-3 h-3 bg-red-400 rounded-full border-2 border-black"></span>
+				<span class="w-3 h-3 bg-red-400 rounded-full border-2 border-black" />
 				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Error Handling</h3>
 			</div>
 
 			<div class="space-y-3">
-				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
-					{refreshPolicy.onError === 'serve_stale' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+				<label
+					class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
+					{refreshPolicy.onError === 'serve_stale'
+						? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50'
+						: 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}"
+				>
 					<div class="relative flex items-center justify-center">
 						<input
 							type="radio"
@@ -101,16 +113,29 @@
 							on:change={() => handleRefreshChange({ onError: 'serve_stale' })}
 							class="appearance-none w-6 h-6 border-[3px] border-gray-900 rounded-full checked:bg-gray-900 transition-colors cursor-pointer"
 						/>
-						<div class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError === 'serve_stale' ? 'opacity-100' : ''}"></div>
+						<div
+							class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError ===
+							'serve_stale'
+								? 'opacity-100'
+								: ''}"
+						/>
 					</div>
 					<div>
-						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Serve Stale Content</p>
-						<p class="text-xs font-medium text-gray-500 mt-1">If refresh fails, show the last successful image (Recommended)</p>
+						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">
+							Serve Stale Content
+						</p>
+						<p class="text-xs font-medium text-gray-500 mt-1">
+							If refresh fails, show the last successful image (Recommended)
+						</p>
 					</div>
 				</label>
 
-				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
-					{refreshPolicy.onError === 'serve_default' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+				<label
+					class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
+					{refreshPolicy.onError === 'serve_default'
+						? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50'
+						: 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}"
+				>
 					<div class="relative flex items-center justify-center">
 						<input
 							type="radio"
@@ -120,16 +145,29 @@
 							on:change={() => handleRefreshChange({ onError: 'serve_default' })}
 							class="appearance-none w-6 h-6 border-[3px] border-gray-900 rounded-full checked:bg-gray-900 transition-colors cursor-pointer"
 						/>
-						<div class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError === 'serve_default' ? 'opacity-100' : ''}"></div>
+						<div
+							class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError ===
+							'serve_default'
+								? 'opacity-100'
+								: ''}"
+						/>
 					</div>
 					<div>
-						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Serve Default Template</p>
-						<p class="text-xs font-medium text-gray-500 mt-1">Render with fallback/default values defined in mapping</p>
+						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">
+							Serve Default Template
+						</p>
+						<p class="text-xs font-medium text-gray-500 mt-1">
+							Render with fallback/default values defined in mapping
+						</p>
 					</div>
 				</label>
 
-				<label class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
-					{refreshPolicy.onError === 'error' ? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}">
+				<label
+					class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
+					{refreshPolicy.onError === 'error'
+						? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50'
+						: 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}"
+				>
 					<div class="relative flex items-center justify-center">
 						<input
 							type="radio"
@@ -139,11 +177,18 @@
 							on:change={() => handleRefreshChange({ onError: 'error' })}
 							class="appearance-none w-6 h-6 border-[3px] border-gray-900 rounded-full checked:bg-gray-900 transition-colors cursor-pointer"
 						/>
-						<div class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError === 'error' ? 'opacity-100' : ''}"></div>
+						<div
+							class="absolute w-2 h-2 bg-white rounded-full pointer-events-none opacity-0 {refreshPolicy.onError ===
+							'error'
+								? 'opacity-100'
+								: ''}"
+						/>
 					</div>
 					<div>
 						<p class="font-black text-gray-900 text-sm uppercase tracking-wide">Return Error</p>
-						<p class="text-xs font-medium text-gray-500 mt-1">Fail the request with a 500 status code</p>
+						<p class="text-xs font-medium text-gray-500 mt-1">
+							Fail the request with a 500 status code
+						</p>
 					</div>
 				</label>
 			</div>
@@ -153,14 +198,16 @@
 	<!-- Output Configuration -->
 	<div class="mt-8 pt-8 border-t-[3px] border-gray-200 border-dashed">
 		<div class="flex items-center gap-2 pb-4">
-			<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black"></span>
+			<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black" />
 			<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Output Format</h3>
 		</div>
 
 		<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 				<div>
-					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">Image Format</label>
+					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+						>Image Format</label
+					>
 					<div class="relative">
 						<select
 							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#3b82f6] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all bg-white appearance-none"
@@ -173,14 +220,30 @@
 							<option value="pdf">PDF (Document)</option>
 						</select>
 						<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-							<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+							<svg
+								class="w-4 h-4 text-gray-900"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M19 9l-7 7-7-7"
+								/></svg
+							>
 						</div>
 					</div>
 				</div>
 				<div>
 					<div class="flex justify-between mb-2">
-						<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Quality</label>
-						<span class="text-xs font-black text-[#3b82f6] bg-blue-50 px-2 rounded border border-blue-100">{outputConfig.quality}%</span>
+						<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+							>Quality</label
+						>
+						<span
+							class="text-xs font-black text-[#3b82f6] bg-blue-50 px-2 rounded border border-blue-100"
+							>{outputConfig.quality}%</span
+						>
 					</div>
 					<input
 						type="range"
@@ -213,7 +276,18 @@
 			on:click={handleNext}
 		>
 			Next: Publish
-			<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+			<svg
+				class="w-4 h-4 transition-transform group-hover:translate-x-1"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				><path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="3"
+					d="M14 5l7 7m0 0l-7 7m7-7H3"
+				/></svg
+			>
 		</button>
 	</div>
 </div>

@@ -1,7 +1,8 @@
 const DEFAULT_FALLBACK_COLOR = '#000000';
 const GRADIENT_ANGLE = 90;
 
-const numberOr = (value, fallback = 0) => (typeof value === 'number' && !Number.isNaN(value) ? value : fallback);
+const numberOr = (value, fallback = 0) =>
+	typeof value === 'number' && !Number.isNaN(value) ? value : fallback;
 
 const defaultStops = (color = DEFAULT_FALLBACK_COLOR) => [
 	{ color, offset: 0 },
@@ -113,7 +114,7 @@ export function toGradientStops(value, defaultColor = DEFAULT_FALLBACK_COLOR) {
 				defaultColor
 			);
 		}
-		
+
 		// Handle gradient objects with 'type' property (alternate format)
 		if (typeof value.type === 'string' && value.type.toLowerCase().includes('gradient')) {
 			// If it's a gradient but colorStops not found, try to extract from other properties
@@ -157,20 +158,20 @@ export function extractGradientAngle(gradient) {
 	if (!gradient || typeof gradient !== 'object' || !gradient.coords) {
 		return GRADIENT_ANGLE; // Default
 	}
-	
+
 	const { x1, y1, x2, y2 } = gradient.coords;
-	
+
 	// Calculate angle from coordinates
 	const dx = x2 - x1;
 	const dy = y2 - y1;
-	
+
 	// Convert to degrees (0 = top to bottom, 90 = left to right)
-	let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+	let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 	angle = (angle + 90) % 360;
-	
+
 	// Normalize to 0-360
 	if (angle < 0) angle += 360;
-	
+
 	return Math.round(angle);
 }
 
@@ -265,4 +266,3 @@ function parseCssGradientStop(part, index, totalParts) {
 		offset: clamp(offset)
 	};
 }
-

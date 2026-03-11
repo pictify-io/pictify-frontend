@@ -12,18 +12,18 @@ This checklist covers the deployment of the storage connector feature which enab
 
 ### Current Production Readiness
 
-| Component | Status | Blocker Level |
-|-----------|--------|---------------|
-| ConnectorConfig CRUD | COMPLETE | - |
-| WebhookSubscription CRUD | COMPLETE | - |
-| Credential Encryption (AES-256-GCM) | COMPLETE | - |
-| SSRF Protection | COMPLETE | - |
-| Webhook Delivery (BullMQ) | COMPLETE | - |
-| Circuit Breaker | PARTIAL | P2 (in-memory only) |
-| Storage Upload Integration | NOT IMPLEMENTED | P0 BLOCKER |
-| Event Emission (all codepaths) | PARTIAL | P0 BLOCKER |
-| Test Coverage | MINIMAL | P1 |
-| Rate Limiting | NOT IMPLEMENTED | P2 |
+| Component                           | Status          | Blocker Level       |
+| ----------------------------------- | --------------- | ------------------- |
+| ConnectorConfig CRUD                | COMPLETE        | -                   |
+| WebhookSubscription CRUD            | COMPLETE        | -                   |
+| Credential Encryption (AES-256-GCM) | COMPLETE        | -                   |
+| SSRF Protection                     | COMPLETE        | -                   |
+| Webhook Delivery (BullMQ)           | COMPLETE        | -                   |
+| Circuit Breaker                     | PARTIAL         | P2 (in-memory only) |
+| Storage Upload Integration          | NOT IMPLEMENTED | P0 BLOCKER          |
+| Event Emission (all codepaths)      | PARTIAL         | P0 BLOCKER          |
+| Test Coverage                       | MINIMAL         | P1                  |
+| Rate Limiting                       | NOT IMPLEMENTED | P2                  |
 
 ---
 
@@ -34,6 +34,7 @@ This checklist covers the deployment of the storage connector feature which enab
 **Current State:** ConnectorConfigs can be created and tested, but NO CODE actually uploads rendered images to user-configured storage. The `binding-renderer.js` uploads to Pictify's S3 bucket only.
 
 **Required Files to Implement:**
+
 - `/Users/suyashthakur/html-to-gif/connectors/drivers/storage/S3Adapter.js`
 - `/Users/suyashthakur/html-to-gif/connectors/drivers/storage/GCSAdapter.js`
 - `/Users/suyashthakur/html-to-gif/connectors/drivers/storage/CloudinaryAdapter.js`
@@ -41,6 +42,7 @@ This checklist covers the deployment of the storage connector feature which enab
 - `/Users/suyashthakur/html-to-gif/connectors/universal/actions/uploadAsset.js`
 
 **Acceptance Criteria:**
+
 - [ ] `UploadAsset` action implemented in Universal Core
 - [ ] All 4 storage adapters implemented and tested
 - [ ] Integration with render pipeline to optionally upload to user storage
@@ -49,23 +51,28 @@ This checklist covers the deployment of the storage connector feature which enab
 ### 2. Event Emission - INCOMPLETE
 
 **Current State:** `render.completed` and `render.failed` events are ONLY emitted from:
+
 - `/Users/suyashthakur/html-to-gif/service/binding-renderer.js` (binding.updated, binding.failed)
 
 Events are NOT emitted from:
+
 - Dashboard render endpoints (direct API)
 - Template render routes (non-binding renders)
 - Universal Core actions (these do emit but bypass main render routes)
 
 **Required Changes:**
+
 - Add `emitEvent('render.completed', payload)` to main render routes
 - Add `emitEvent('render.failed', payload)` on render failures
 - Include templateId, renderId, and output URL in payload
 
 **Files to Modify:**
+
 - `/Users/suyashthakur/html-to-gif/routes/media.js` (or equivalent render route)
 - `/Users/suyashthakur/html-to-gif/service/template-renderer.js`
 
 **Acceptance Criteria:**
+
 - [ ] Events emit for dashboard renders
 - [ ] Events emit for API renders
 - [ ] Events emit for binding renders (already working)
@@ -92,6 +99,7 @@ WEBHOOK_TIMEOUT_MS=10000
 ```
 
 **Pre-Deploy Verification:**
+
 ```bash
 # Verify encryption key is set and correct length
 echo $CREDENTIAL_ENCRYPTION_KEY | wc -c
@@ -107,9 +115,10 @@ redis-cli -u $REDIS_URL ping
 The following indexes should be created by Mongoose on first model load, but verify they exist:
 
 **ConnectorConfig Collection:**
+
 ```javascript
 // Run in MongoDB shell
-db.connectorconfigs.getIndexes()
+db.connectorconfigs.getIndexes();
 
 // Expected indexes:
 // - uid_1 (unique)
@@ -120,9 +129,10 @@ db.connectorconfigs.getIndexes()
 ```
 
 **WebhookSubscription Collection:**
+
 ```javascript
 // Run in MongoDB shell
-db.webhooksubscriptions.getIndexes()
+db.webhooksubscriptions.getIndexes();
 
 // Expected indexes:
 // - uid_1 (unique)
@@ -147,16 +157,17 @@ npm ls @aws-sdk/client-s3 @google-cloud/storage cloudinary imagekit bullmq iored
 ```
 
 **Expected packages in package.json:**
+
 ```json
 {
-  "@aws-sdk/client-s3": "^3.500.0",
-  "@aws-sdk/s3-request-presigner": "^3.500.0",
-  "@google-cloud/storage": "^7.7.0",
-  "cloudinary": "^2.0.0",
-  "imagekit": "^5.0.0",
-  "bullmq": "^4.0.0",
-  "ioredis": "^5.0.0",
-  "zod": "^3.22.0"
+	"@aws-sdk/client-s3": "^3.500.0",
+	"@aws-sdk/s3-request-presigner": "^3.500.0",
+	"@google-cloud/storage": "^7.7.0",
+	"cloudinary": "^2.0.0",
+	"imagekit": "^5.0.0",
+	"bullmq": "^4.0.0",
+	"ioredis": "^5.0.0",
+	"zod": "^3.22.0"
 }
 ```
 
@@ -170,17 +181,17 @@ Run these queries BEFORE deployment and save the results:
 
 ```javascript
 // 1. Count existing documents (should be 0 for new collections)
-db.connectorconfigs.countDocuments()
-db.webhooksubscriptions.countDocuments()
+db.connectorconfigs.countDocuments();
+db.webhooksubscriptions.countDocuments();
 
 // 2. Check for any orphaned data
-db.connectorconfigs.countDocuments({ createdBy: { $exists: false } })
-db.webhooksubscriptions.countDocuments({ createdBy: { $exists: false } })
+db.connectorconfigs.countDocuments({ createdBy: { $exists: false } });
+db.webhooksubscriptions.countDocuments({ createdBy: { $exists: false } });
 // Expected: 0
 
 // 3. Verify soft delete works (no deleted records visible)
-db.connectorconfigs.countDocuments({ active: false })
-db.webhooksubscriptions.countDocuments({ active: false })
+db.connectorconfigs.countDocuments({ active: false });
+db.webhooksubscriptions.countDocuments({ active: false });
 // Expected: 0 (or matches known deleted count)
 ```
 
@@ -190,24 +201,24 @@ Run within 5 minutes of deployment:
 
 ```javascript
 // 1. Verify indexes created
-db.connectorconfigs.getIndexes().length
+db.connectorconfigs.getIndexes().length;
 // Expected: >= 5
 
-db.webhooksubscriptions.getIndexes().length
+db.webhooksubscriptions.getIndexes().length;
 // Expected: >= 9
 
 // 2. Test connector creation works (create test, then delete)
 // This should be done via API, not direct DB insert
 
 // 3. Check for encryption issues (encrypted field format)
-db.connectorconfigs.findOne({}, { encryptedCredentials: 1 })
+db.connectorconfigs.findOne({}, { encryptedCredentials: 1 });
 // Expected: encryptedCredentials matches format: "hex:hex:hex" (iv:authTag:ciphertext)
 
 // 4. Verify webhook subscription secrets are generated
-db.webhooksubscriptions.countDocuments({ secret: { $exists: false } })
+db.webhooksubscriptions.countDocuments({ secret: { $exists: false } });
 // Expected: 0
 
-db.webhooksubscriptions.countDocuments({ secret: null })
+db.webhooksubscriptions.countDocuments({ secret: null });
 // Expected: 0
 ```
 
@@ -217,14 +228,14 @@ db.webhooksubscriptions.countDocuments({ secret: null })
 
 ### Step-by-Step Deployment
 
-| Step | Command/Action | Estimated Time | Rollback |
-|------|---------------|----------------|----------|
-| 1 | Set environment variables | 5 min | Remove vars |
-| 2 | Deploy backend code | 10 min | `git revert HEAD` |
-| 3 | Start webhook worker | 1 min | Stop worker |
-| 4 | Run index verification | 2 min | N/A (read-only) |
-| 5 | Deploy frontend code | 10 min | `git revert HEAD` |
-| 6 | Enable feature flag (if any) | 1 min | Disable flag |
+| Step | Command/Action               | Estimated Time | Rollback          |
+| ---- | ---------------------------- | -------------- | ----------------- |
+| 1    | Set environment variables    | 5 min          | Remove vars       |
+| 2    | Deploy backend code          | 10 min         | `git revert HEAD` |
+| 3    | Start webhook worker         | 1 min          | Stop worker       |
+| 4    | Run index verification       | 2 min          | N/A (read-only)   |
+| 5    | Deploy frontend code         | 10 min         | `git revert HEAD` |
+| 6    | Enable feature flag (if any) | 1 min          | Disable flag      |
 
 ### Deployment Commands
 
@@ -294,25 +305,25 @@ redis-cli -u $REDIS_URL
 
 ```javascript
 // In Node.js REPL connected to production
-const { getQueueStats } = require('./service/webhook-delivery')
-const stats = await getQueueStats()
-console.log(stats)
+const { getQueueStats } = require('./service/webhook-delivery');
+const stats = await getQueueStats();
+console.log(stats);
 // Expected: { waiting: 0, active: 0, completed: >=0, failed: 0, delayed: 0, deadLetter: 0 }
 
 // Test encryption service
-const { encrypt, decrypt } = require('./service/encryption-service')
-const test = encrypt('test-credential')
-console.log(decrypt(test) === 'test-credential')
+const { encrypt, decrypt } = require('./service/encryption-service');
+const test = encrypt('test-credential');
+console.log(decrypt(test) === 'test-credential');
 // Expected: true
 
 // Test SSRF protection
-const { validateUrl } = require('./service/ssrf-protection')
-const result = await validateUrl('https://example.com')
-console.log(result.valid)
+const { validateUrl } = require('./service/ssrf-protection');
+const result = await validateUrl('https://example.com');
+console.log(result.valid);
 // Expected: true
 
-const blocked = await validateUrl('http://169.254.169.254/latest/meta-data/')
-console.log(blocked.valid)
+const blocked = await validateUrl('http://169.254.169.254/latest/meta-data/');
+console.log(blocked.valid);
 // Expected: false
 ```
 
@@ -322,22 +333,24 @@ console.log(blocked.valid)
 
 ### Can We Roll Back?
 
-| Scenario | Rollback Possible | Data Impact |
-|----------|-------------------|-------------|
-| Code deployment only | YES | None |
-| After connector configs created | YES | Connectors orphaned but harmless |
-| After webhook subscriptions created | YES | Subscriptions orphaned but harmless |
-| After webhooks delivered | PARTIAL | Delivered webhooks cannot be recalled |
+| Scenario                            | Rollback Possible | Data Impact                           |
+| ----------------------------------- | ----------------- | ------------------------------------- |
+| Code deployment only                | YES               | None                                  |
+| After connector configs created     | YES               | Connectors orphaned but harmless      |
+| After webhook subscriptions created | YES               | Subscriptions orphaned but harmless   |
+| After webhooks delivered            | PARTIAL           | Delivered webhooks cannot be recalled |
 
 ### Rollback Steps
 
 1. **Disable Feature Flag** (if applicable)
+
    ```bash
    # Set environment variable or config
    FEATURE_CONNECTORS_ENABLED=false
    ```
 
 2. **Deploy Previous Commit**
+
    ```bash
    cd /Users/suyashthakur/html-to-gif
    git revert HEAD
@@ -349,18 +362,20 @@ console.log(blocked.valid)
    ```
 
 3. **Stop Webhook Worker**
+
    ```javascript
-   const { stopWorker } = require('./service/webhook-delivery')
-   await stopWorker()
+   const { stopWorker } = require('./service/webhook-delivery');
+   await stopWorker();
    ```
 
 4. **Data Cleanup (if needed)**
+
    ```javascript
    // Soft-delete all connector configs (preserves data for debugging)
-   db.connectorconfigs.updateMany({}, { $set: { active: false, deletedAt: new Date() } })
+   db.connectorconfigs.updateMany({}, { $set: { active: false, deletedAt: new Date() } });
 
    // Soft-delete all webhook subscriptions
-   db.webhooksubscriptions.updateMany({}, { $set: { active: false, deletedAt: new Date() } })
+   db.webhooksubscriptions.updateMany({}, { $set: { active: false, deletedAt: new Date() } });
    ```
 
 5. **Verify Rollback**
@@ -375,14 +390,14 @@ console.log(blocked.valid)
 
 ### Metrics to Monitor (First 24 Hours)
 
-| Metric | Alert Condition | Dashboard |
-|--------|-----------------|-----------|
-| Webhook delivery error rate | > 5% for 5 min | /dashboard/webhooks |
-| Queue depth (waiting) | > 100 for 10 min | /dashboard/queues |
-| Dead letter queue count | > 0 | /dashboard/queues |
-| Connector test failures | > 20% for 5 min | /dashboard/connectors |
-| Encryption errors | > 0 | /dashboard/errors |
-| SSRF blocked requests | Log only | /dashboard/security |
+| Metric                      | Alert Condition  | Dashboard             |
+| --------------------------- | ---------------- | --------------------- |
+| Webhook delivery error rate | > 5% for 5 min   | /dashboard/webhooks   |
+| Queue depth (waiting)       | > 100 for 10 min | /dashboard/queues     |
+| Dead letter queue count     | > 0              | /dashboard/queues     |
+| Connector test failures     | > 20% for 5 min  | /dashboard/connectors |
+| Encryption errors           | > 0              | /dashboard/errors     |
+| SSRF blocked requests       | Log only         | /dashboard/security   |
 
 ### Log Patterns to Watch
 
@@ -402,11 +417,11 @@ grep "Circuit breaker open" /var/log/app.log
 
 ### Monitoring Checkpoints
 
-| Time | Actions |
-|------|---------|
-| +15 min | Check error rates, verify queue processing |
-| +1 hour | Run console verification queries |
-| +4 hours | Review webhook delivery success rate |
+| Time      | Actions                                      |
+| --------- | -------------------------------------------- |
+| +15 min   | Check error rates, verify queue processing   |
+| +1 hour   | Run console verification queries             |
+| +4 hours  | Review webhook delivery success rate         |
 | +24 hours | Full metrics review, close deployment ticket |
 
 ---
@@ -441,16 +456,16 @@ grep "Circuit breaker open" /var/log/app.log
 
 ## Security Checklist
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Credentials encrypted at rest (AES-256-GCM) | PASS | `/Users/suyashthakur/html-to-gif/service/encryption-service.js` |
-| SSRF protection for webhook URLs | PASS | `/Users/suyashthakur/html-to-gif/service/ssrf-protection.js` |
-| HMAC-SHA256 signed webhook payloads | PASS | `/Users/suyashthakur/html-to-gif/service/webhook-delivery.js` |
-| Timing-safe signature comparison | PASS | Uses `crypto.timingSafeEqual` with length padding |
-| Soft delete support | PASS | Active flag filtering in models |
-| No hardcoded secrets | PASS | Environment variables used |
-| Credentials never logged | VERIFY | Check log statements |
-| Credentials never in API response | PASS | Transform in toJSON removes encryptedCredentials |
+| Item                                        | Status | Notes                                                           |
+| ------------------------------------------- | ------ | --------------------------------------------------------------- |
+| Credentials encrypted at rest (AES-256-GCM) | PASS   | `/Users/suyashthakur/html-to-gif/service/encryption-service.js` |
+| SSRF protection for webhook URLs            | PASS   | `/Users/suyashthakur/html-to-gif/service/ssrf-protection.js`    |
+| HMAC-SHA256 signed webhook payloads         | PASS   | `/Users/suyashthakur/html-to-gif/service/webhook-delivery.js`   |
+| Timing-safe signature comparison            | PASS   | Uses `crypto.timingSafeEqual` with length padding               |
+| Soft delete support                         | PASS   | Active flag filtering in models                                 |
+| No hardcoded secrets                        | PASS   | Environment variables used                                      |
+| Credentials never logged                    | VERIFY | Check log statements                                            |
+| Credentials never in API response           | PASS   | Transform in toJSON removes encryptedCredentials                |
 
 ---
 
@@ -459,6 +474,7 @@ grep "Circuit breaker open" /var/log/app.log
 ### Current Status: NO-GO
 
 **Blocking Issues:**
+
 1. Storage upload integration not implemented (P0)
 2. Event emission incomplete (P0)
 
@@ -467,6 +483,7 @@ grep "Circuit breaker open" /var/log/app.log
 ### After P0 Resolution: CONDITIONAL GO
 
 Once P0 blockers are fixed, deployment can proceed with:
+
 - Risk acceptance for P1/P2 items
 - Enhanced monitoring during first 24 hours
 - On-call engineer available for rollback
@@ -482,13 +499,13 @@ Once P0 blockers are fixed, deployment can proceed with:
 
 ### Key Implementation Files
 
-| Component | File Path |
-|-----------|-----------|
-| Connector Config Model | `/Users/suyashthakur/html-to-gif/models/ConnectorConfig.js` |
+| Component                  | File Path                                                       |
+| -------------------------- | --------------------------------------------------------------- |
+| Connector Config Model     | `/Users/suyashthakur/html-to-gif/models/ConnectorConfig.js`     |
 | Webhook Subscription Model | `/Users/suyashthakur/html-to-gif/models/WebhookSubscription.js` |
-| Connector Config Routes | `/Users/suyashthakur/html-to-gif/routes/connector-configs.js` |
-| Webhook Delivery Service | `/Users/suyashthakur/html-to-gif/service/webhook-delivery.js` |
-| Encryption Service | `/Users/suyashthakur/html-to-gif/service/encryption-service.js` |
-| SSRF Protection | `/Users/suyashthakur/html-to-gif/service/ssrf-protection.js` |
-| Binding Renderer | `/Users/suyashthakur/html-to-gif/service/binding-renderer.js` |
-| Universal Core | `/Users/suyashthakur/html-to-gif/connectors/universal/index.js` |
+| Connector Config Routes    | `/Users/suyashthakur/html-to-gif/routes/connector-configs.js`   |
+| Webhook Delivery Service   | `/Users/suyashthakur/html-to-gif/service/webhook-delivery.js`   |
+| Encryption Service         | `/Users/suyashthakur/html-to-gif/service/encryption-service.js` |
+| SSRF Protection            | `/Users/suyashthakur/html-to-gif/service/ssrf-protection.js`    |
+| Binding Renderer           | `/Users/suyashthakur/html-to-gif/service/binding-renderer.js`   |
+| Universal Core             | `/Users/suyashthakur/html-to-gif/connectors/universal/index.js` |

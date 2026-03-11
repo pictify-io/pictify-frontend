@@ -4,7 +4,8 @@ export const templateCategories = [
 	{
 		id: 'og-image',
 		label: 'OG Images',
-		description: 'Open Graph images for social media sharing. Perfect for blog posts, articles, and landing pages.',
+		description:
+			'Open Graph images for social media sharing. Perfect for blog posts, articles, and landing pages.',
 		icon: 'share',
 		keywords: ['og image', 'open graph', 'social preview', 'meta image', 'link preview'],
 		recommendedSizes: ['1200x630', '1200x675'],
@@ -13,7 +14,8 @@ export const templateCategories = [
 	{
 		id: 'social-media',
 		label: 'Social Media',
-		description: 'Templates optimized for Instagram, Twitter, LinkedIn, and other social platforms.',
+		description:
+			'Templates optimized for Instagram, Twitter, LinkedIn, and other social platforms.',
 		icon: 'users',
 		keywords: ['social media', 'instagram', 'twitter', 'linkedin', 'facebook', 'tiktok'],
 		recommendedSizes: ['1080x1080', '1080x1350', '1080x1920', '1200x675'],
@@ -70,14 +72,16 @@ export const dimensionContexts = {
 	'1200x630': {
 		label: 'OG Image Standard',
 		platforms: ['Facebook', 'LinkedIn', 'Twitter', 'Slack', 'Discord'],
-		description: 'The universal Open Graph image size. Works perfectly across Facebook, LinkedIn, Twitter, and most messaging apps.',
+		description:
+			'The universal Open Graph image size. Works perfectly across Facebook, LinkedIn, Twitter, and most messaging apps.',
 		useCases: ['Blog post previews', 'Landing page shares', 'Article cards'],
 		aspectRatio: '1.91:1'
 	},
 	'1200x675': {
 		label: 'X (Twitter) Large Image',
 		platforms: ['X (Twitter)'],
-		description: "Optimized for Twitter's large image card format. Slightly taller than standard OG for better Twitter display.",
+		description:
+			"Optimized for Twitter's large image card format. Slightly taller than standard OG for better Twitter display.",
 		useCases: ['Twitter cards', 'Tweet images', 'Thread headers'],
 		aspectRatio: '16:9'
 	},
@@ -112,7 +116,8 @@ export const dimensionContexts = {
 	'1600x900': {
 		label: '16:9 Standard',
 		platforms: ['YouTube', 'Presentations', 'Webinars'],
-		description: 'Widescreen format perfect for presentations, YouTube thumbnails, and webinar graphics.',
+		description:
+			'Widescreen format perfect for presentations, YouTube thumbnails, and webinar graphics.',
 		useCases: ['YouTube thumbnails', 'Slide decks', 'Webinar banners'],
 		aspectRatio: '16:9'
 	},
@@ -126,7 +131,8 @@ export const dimensionContexts = {
 	'1920x1080': {
 		label: '16:9 Full HD',
 		platforms: ['YouTube', 'Desktop Wallpapers', 'Presentations'],
-		description: 'Full HD widescreen resolution for high-quality presentations and desktop graphics.',
+		description:
+			'Full HD widescreen resolution for high-quality presentations and desktop graphics.',
 		useCases: ['HD presentations', 'Desktop backgrounds', 'Report covers'],
 		aspectRatio: '16:9'
 	},
@@ -140,7 +146,8 @@ export const dimensionContexts = {
 	'1024x512': {
 		label: 'Twitter Legacy',
 		platforms: ['Twitter (Legacy)', 'Blog Headers'],
-		description: 'Legacy Twitter card size, still used for some blog headers and older integrations.',
+		description:
+			'Legacy Twitter card size, still used for some blog headers and older integrations.',
 		useCases: ['Legacy Twitter cards', 'Blog headers', 'Newsletter banners'],
 		aspectRatio: '2:1'
 	}

@@ -6,13 +6,30 @@
 
 	const modes = [
 		{ id: 'editor', label: 'Editor', disabled: true },
-		{ id: 'render', label: 'Render', color: '#4ecdc4', href: (uid) => `/dashboard/template/${uid}/render` },
-		{ id: 'bulk', label: 'Bulk', color: '#ff6b6b', href: (uid) => `/dashboard/template/${uid}/bulk-render` },
-		{ id: 'dynamic', label: 'Live', color: '#3b82f6', href: (uid) => `/dashboard/template/${uid}/dynamic` },
+		{
+			id: 'render',
+			label: 'Render',
+			color: '#4ecdc4',
+			href: (uid) => `/dashboard/template/${uid}/render`
+		},
+		{
+			id: 'bulk',
+			label: 'Bulk',
+			color: '#ff6b6b',
+			href: (uid) => `/dashboard/template/${uid}/bulk-render`
+		},
+		{
+			id: 'dynamic',
+			label: 'Live',
+			color: '#3b82f6',
+			href: (uid) => `/dashboard/template/${uid}/dynamic`
+		}
 	];
 </script>
 
-<div class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]">
+<div
+	class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+>
 	{#each modes as mode}
 		{#if mode.disabled}
 			<button

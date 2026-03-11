@@ -1,6 +1,6 @@
 /**
  * Brand Assets API
- * 
+ *
  * API functions for managing user's brand assets (logos, fonts, colors, images)
  */
 
@@ -21,13 +21,13 @@ export async function getBrandAssets({ type, tag, limit = 50, offset = 0 } = {})
 		if (tag) params.append('tag', tag);
 		params.append('limit', limit);
 		params.append('offset', offset);
-		
+
 		const response = await backend.get(`/brand-assets?${params.toString()}`);
 		return response;
 	} catch (error) {
 		console.error('Error fetching brand assets:', error);
-		return { 
-			assets: [], 
+		return {
+			assets: [],
 			pagination: { total: 0, limit, offset, hasMore: false },
 			counts: {},
 			limits: {}
@@ -59,7 +59,10 @@ export async function getBrandAsset(uid) {
  * @param {string[]} options.tags - Asset tags
  * @param {boolean} options.isPrimary - Is primary asset
  */
-export async function uploadBrandAsset(file, { type = 'image', name, description, tags = [], isPrimary = false } = {}) {
+export async function uploadBrandAsset(
+	file,
+	{ type = 'image', name, description, tags = [], isPrimary = false } = {}
+) {
 	try {
 		const formData = new FormData();
 		formData.append('file', file);
@@ -68,7 +71,7 @@ export async function uploadBrandAsset(file, { type = 'image', name, description
 		if (description) formData.append('description', description);
 		if (tags.length) formData.append('tags', JSON.stringify(tags));
 		formData.append('isPrimary', isPrimary.toString());
-		
+
 		const response = await backend.postFormData('/brand-assets/upload', formData);
 		return response;
 	} catch (error) {
@@ -151,8 +154,8 @@ export async function deleteBrandAssets(uids) {
  */
 export async function getBrandFontsCSS() {
 	try {
-		const response = await backend.get('/brand-assets/fonts/css', { 
-			responseType: 'text' 
+		const response = await backend.get('/brand-assets/fonts/css', {
+			responseType: 'text'
 		});
 		return response;
 	} catch (error) {
@@ -215,4 +218,3 @@ export function getAcceptString(assetType) {
 	}
 	return ALLOWED_FILE_TYPES[assetType]?.join(',') || 'image/*';
 }
-

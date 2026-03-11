@@ -119,7 +119,8 @@
 						</div>
 						<h3 class="text-3xl font-bold text-gray-900 mb-3">API-First Design</h3>
 						<p class="text-gray-600 mb-6">
-							Designers create reusable templates with the visual editor. Developers integrate once and render variants with JSON.
+							Designers create reusable templates with the visual editor. Developers integrate once
+							and render variants with JSON.
 						</p>
 						<div class="flex gap-2">
 							<span class="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs font-mono"

@@ -9,7 +9,7 @@
 
 	// Set up auto-dismiss for each toast
 	$: {
-		$visibleToasts.forEach(t => {
+		$visibleToasts.forEach((t) => {
 			if (!timers[t.id]) {
 				timers[t.id] = setTimeout(() => {
 					dismissToast(t.id);
@@ -60,17 +60,35 @@
 </script>
 
 {#if $visibleToasts.length > 0}
-	<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse gap-3 items-center">
+	<div
+		class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse gap-3 items-center"
+	>
 		{#each $visibleToasts as t (t.id)}
 			<div
 				transition:fly={{ y: 50, duration: 300, easing: quadOut }}
 				class="flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] rounded-xl overflow-hidden"
 			>
 				<!-- Color Strip / Icon Area -->
-				<div class="{TYPE_CONFIG[t.type]?.bg || TYPE_CONFIG.default.bg} w-12 flex items-center justify-center border-r-[3px] border-gray-900 flex-shrink-0">
-					<div class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-[2px_2px_0_0_#000]">
-						<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d={TYPE_CONFIG[t.type]?.icon || TYPE_CONFIG.default.icon} />
+				<div
+					class="{TYPE_CONFIG[t.type]?.bg ||
+						TYPE_CONFIG.default
+							.bg} w-12 flex items-center justify-center border-r-[3px] border-gray-900 flex-shrink-0"
+				>
+					<div
+						class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+					>
+						<svg
+							class="w-5 h-5 text-gray-900"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="3"
+								d={TYPE_CONFIG[t.type]?.icon || TYPE_CONFIG.default.icon}
+							/>
 						</svg>
 					</div>
 				</div>
@@ -90,8 +108,18 @@
 					on:click={() => handleDismiss(t.id)}
 					class="px-3 hover:bg-gray-100 border-l-[3px] border-gray-900 transition-colors flex items-center justify-center group"
 				>
-					<svg class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+					<svg
+						class="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="3"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>

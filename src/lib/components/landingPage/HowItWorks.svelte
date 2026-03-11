@@ -92,11 +92,13 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Drag-and-drop canvas. Add <span
-							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
+						Drag-and-drop canvas. Add <span class="bg-blue-100 px-1 border-b-2 border-blue-300"
+							>variables</span
 						>, conditions, and formatting rules. Save and you're ready to render.
 						{#if activeStep === 0 && !isPaused}
-							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
+							<span
+								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
+							/>
 						{/if}
 					</p>
 				</div>
@@ -129,7 +131,9 @@
 							class="bg-red-100 px-1 border-b-2 border-red-300">200ms later</span
 						>, your visual is ready.
 						{#if activeStep === 1 && !isPaused}
-							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
+							<span
+								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
+							/>
 						{/if}
 					</p>
 				</div>
@@ -160,7 +164,9 @@
 					>
 						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, PDF, or video.
 						{#if activeStep === 2 && !isPaused}
-							<span class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]" />
+							<span
+								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
+							/>
 						{/if}
 					</p>
 				</div>
@@ -330,7 +336,11 @@
 
 <style>
 	@keyframes progress {
-		0% { height: 0%; }
-		100% { height: 100%; }
+		0% {
+			height: 0%;
+		}
+		100% {
+			height: 100%;
+		}
 	}
 </style>

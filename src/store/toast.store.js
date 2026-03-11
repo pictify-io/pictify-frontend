@@ -10,7 +10,7 @@ const toastQueue = writable([]);
  * @param {number} duration - Auto-dismiss duration in ms (default 3000)
  */
 export function showToast(message, type = 'default', duration = 3000) {
-	toastQueue.update(q => {
+	toastQueue.update((q) => {
 		const newQueue = [...q, { id: Date.now() + Math.random(), message, type, duration }];
 		// Keep max 5 in queue, oldest get dropped
 		return newQueue.slice(-5);
@@ -21,7 +21,7 @@ export function showToast(message, type = 'default', duration = 3000) {
  * Dismiss a specific toast by ID
  */
 export function dismissToast(id) {
-	toastQueue.update(q => q.filter(t => t.id !== id));
+	toastQueue.update((q) => q.filter((t) => t.id !== id));
 }
 
 /**
@@ -32,7 +32,7 @@ export function clearToasts() {
 }
 
 // Visible toasts - max 3 shown at once
-export const visibleToasts = derived(toastQueue, $q => $q.slice(-3));
+export const visibleToasts = derived(toastQueue, ($q) => $q.slice(-3));
 
 // Backward compatibility: single-slot toast store
 // Writing to this store adds to the queue

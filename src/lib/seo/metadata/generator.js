@@ -3,7 +3,13 @@
  * Generates complete SEO metadata objects for different page types
  */
 
-import { generateTitle, generateDescription, generateKeywords, BASE_URL, SITE_NAME } from './templates.js';
+import {
+	generateTitle,
+	generateDescription,
+	generateKeywords,
+	BASE_URL,
+	SITE_NAME
+} from './templates.js';
 
 /**
  * @typedef {Object} SEOMetadata
@@ -59,11 +65,15 @@ export function generateMetadata(pageType, pageData, pathname) {
  * @returns {SEOMetadata}
  */
 export function generateUseCaseMetadata(useCase) {
-	return generateMetadata('useCase', {
-		label: useCase.label,
-		description: useCase.description,
-		keywords: useCase.seoKeywords?.join(', ') || ''
-	}, `/tools/${useCase.id}`);
+	return generateMetadata(
+		'useCase',
+		{
+			label: useCase.label,
+			description: useCase.description,
+			keywords: useCase.seoKeywords?.join(', ') || ''
+		},
+		`/tools/${useCase.id}`
+	);
 }
 
 /**
@@ -73,10 +83,15 @@ export function generateUseCaseMetadata(useCase) {
  */
 export function generateToolFormatMetadata(format) {
 	const formatId = format?.id || 'image';
-	const formatName = format?.name || (typeof formatId === 'string' ? formatId.toUpperCase() : 'Image');
-	return generateMetadata('tool', {
-		format: formatName
-	}, `/tools/html-to-${formatId}`);
+	const formatName =
+		format?.name || (typeof formatId === 'string' ? formatId.toUpperCase() : 'Image');
+	return generateMetadata(
+		'tool',
+		{
+			format: formatName
+		},
+		`/tools/html-to-${formatId}`
+	);
 }
 
 /**
@@ -86,14 +101,23 @@ export function generateToolFormatMetadata(format) {
  * @param {string} useCaseContext - Context for the dimension (e.g., "OG images, social previews")
  * @returns {SEOMetadata}
  */
-export function generateToolDimensionMetadata(format, dimensions, useCaseContext = 'social media, marketing') {
+export function generateToolDimensionMetadata(
+	format,
+	dimensions,
+	useCaseContext = 'social media, marketing'
+) {
 	const formatId = format?.id || 'image';
-	const formatName = format?.name || (typeof formatId === 'string' ? formatId.toUpperCase() : 'Image');
-	return generateMetadata('toolDimension', {
-		format: formatName,
-		dimensions,
-		useCaseContext
-	}, `/tools/html-to-${formatId}/${dimensions}`);
+	const formatName =
+		format?.name || (typeof formatId === 'string' ? formatId.toUpperCase() : 'Image');
+	return generateMetadata(
+		'toolDimension',
+		{
+			format: formatName,
+			dimensions,
+			useCaseContext
+		},
+		`/tools/html-to-${formatId}/${dimensions}`
+	);
 }
 
 /**
@@ -102,12 +126,16 @@ export function generateToolDimensionMetadata(format, dimensions, useCaseContext
  * @returns {SEOMetadata}
  */
 export function generateComparisonMetadata(comparison) {
-	return generateMetadata('comparison', {
-		title: comparison.title,
-		competitor: comparison.competitor,
-		description: comparison.metaDescription,
-		year: new Date().getFullYear()
-	}, `/compare/${comparison.slug}`);
+	return generateMetadata(
+		'comparison',
+		{
+			title: comparison.title,
+			competitor: comparison.competitor,
+			description: comparison.metaDescription,
+			year: new Date().getFullYear()
+		},
+		`/compare/${comparison.slug}`
+	);
 }
 
 /**
@@ -116,12 +144,16 @@ export function generateComparisonMetadata(comparison) {
  * @returns {SEOMetadata}
  */
 export function generateGlossaryMetadata(term) {
-	return generateMetadata('glossary', {
-		title: term.title,
-		term: term.term,
-		shortDefinition: term.shortDefinition,
-		keywords: term.seoKeywords?.join(', ') || ''
-	}, `/glossary/${term.term}`);
+	return generateMetadata(
+		'glossary',
+		{
+			title: term.title,
+			term: term.term,
+			shortDefinition: term.shortDefinition,
+			keywords: term.seoKeywords?.join(', ') || ''
+		},
+		`/glossary/${term.term}`
+	);
 }
 
 /**
@@ -130,10 +162,14 @@ export function generateGlossaryMetadata(term) {
  * @returns {SEOMetadata}
  */
 export function generateIntegrationMetadata(integration) {
-	return generateMetadata('integration', {
-		name: integration.name,
-		description: integration.description || `Integrate Pictify with ${integration.name}`
-	}, `/integrations/${integration.slug}`);
+	return generateMetadata(
+		'integration',
+		{
+			name: integration.name,
+			description: integration.description || `Integrate Pictify with ${integration.name}`
+		},
+		`/integrations/${integration.slug}`
+	);
 }
 
 /**
@@ -142,10 +178,14 @@ export function generateIntegrationMetadata(integration) {
  * @returns {SEOMetadata}
  */
 export function generatePersonaMetadata(persona) {
-	return generateMetadata('persona', {
-		persona: persona.title,
-		description: persona.description
-	}, `/for/${persona.slug}`);
+	return generateMetadata(
+		'persona',
+		{
+			persona: persona.title,
+			description: persona.description
+		},
+		`/for/${persona.slug}`
+	);
 }
 
 /**
@@ -154,10 +194,14 @@ export function generatePersonaMetadata(persona) {
  * @returns {SEOMetadata}
  */
 export function generateOGPlatformMetadata(platform) {
-	return generateMetadata('ogPlatform', {
-		platform: platform.name,
-		recommendedSize: platform.recommendedSize || '1200x630'
-	}, `/tools/og-image-generator/${platform.id}`);
+	return generateMetadata(
+		'ogPlatform',
+		{
+			platform: platform.name,
+			recommendedSize: platform.recommendedSize || '1200x630'
+		},
+		`/tools/og-image-generator/${platform.id}`
+	);
 }
 
 /**
@@ -167,11 +211,15 @@ export function generateOGPlatformMetadata(platform) {
  * @returns {SEOMetadata}
  */
 export function generateTemplateCategoryMetadata(category, templateCount = 0) {
-	return generateMetadata('templateCategory', {
-		category: category.name || category.label,
-		count: templateCount,
-		useCase: category.useCase || 'marketing materials and social media'
-	}, `/templates/category/${category.id}`);
+	return generateMetadata(
+		'templateCategory',
+		{
+			category: category.name || category.label,
+			count: templateCount,
+			useCase: category.useCase || 'marketing materials and social media'
+		},
+		`/templates/category/${category.id}`
+	);
 }
 
 /**

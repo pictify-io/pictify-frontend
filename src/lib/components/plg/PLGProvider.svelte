@@ -1,36 +1,36 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
-  import MilestoneCelebration from './MilestoneCelebration.svelte';
-  import UpgradeModal from './UpgradeModal.svelte';
-  import OverageWarningModal from './OverageWarningModal.svelte';
-  import {
-    initPLG,
-    refreshUsageWidget,
-    plgStatus,
-    checkRenderMilestone,
-  } from '../../../store/plg.store';
+	import { onMount, onDestroy } from 'svelte';
+	import MilestoneCelebration from './MilestoneCelebration.svelte';
+	import UpgradeModal from './UpgradeModal.svelte';
+	import OverageWarningModal from './OverageWarningModal.svelte';
+	import {
+		initPLG,
+		refreshUsageWidget,
+		plgStatus,
+		checkRenderMilestone
+	} from '../../../store/plg.store';
 
-  let refreshInterval;
-  let initialized = false;
+	let refreshInterval;
+	let initialized = false;
 
-  onMount(async () => {
-    await initPLG();
-    initialized = true;
-    
-    // Refresh usage widget every 2 minutes
-    refreshInterval = setInterval(refreshUsageWidget, 120000);
-  });
+	onMount(async () => {
+		await initPLG();
+		initialized = true;
 
-  onDestroy(() => {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-    }
-  });
+		// Refresh usage widget every 2 minutes
+		refreshInterval = setInterval(refreshUsageWidget, 120000);
+	});
 
-  // Expose methods for child components
-  export function triggerMilestoneCheck(count) {
-    checkRenderMilestone(count);
-  }
+	onDestroy(() => {
+		if (refreshInterval) {
+			clearInterval(refreshInterval);
+		}
+	});
+
+	// Expose methods for child components
+	export function triggerMilestoneCheck(count) {
+		checkRenderMilestone(count);
+	}
 </script>
 
 <!-- Main slot for app content -->
@@ -38,8 +38,7 @@
 
 <!-- Global PLG components -->
 {#if initialized}
-  <MilestoneCelebration />
-  <UpgradeModal />
-  <OverageWarningModal />
+	<MilestoneCelebration />
+	<UpgradeModal />
+	<OverageWarningModal />
 {/if}
-

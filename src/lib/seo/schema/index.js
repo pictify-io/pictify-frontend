@@ -23,11 +23,7 @@ export {
 } from './builders/Article.js';
 
 // HowTo Schema
-export {
-	buildHowToSchema,
-	buildStepSchema,
-	buildMigrationHowToSchema
-} from './builders/HowTo.js';
+export { buildHowToSchema, buildStepSchema, buildMigrationHowToSchema } from './builders/HowTo.js';
 
 // Breadcrumb Schema
 export { buildBreadcrumbSchema, getBreadcrumbItems } from './builders/Breadcrumb.js';
@@ -77,7 +73,8 @@ export function buildPageSchema(pageType, pageData) {
 		buildMigrationHowToSchema: require('./builders/HowTo.js').buildMigrationHowToSchema,
 		buildDefinedTermSchema: require('./builders/DefinedTerm.js').buildDefinedTermSchema,
 		buildConverterToolSchema: require('./builders/WebApplication.js').buildConverterToolSchema,
-		buildOGImageGeneratorSchema: require('./builders/WebApplication.js').buildOGImageGeneratorSchema,
+		buildOGImageGeneratorSchema: require('./builders/WebApplication.js')
+			.buildOGImageGeneratorSchema,
 		buildUseCaseToolSchema: require('./builders/WebApplication.js').buildUseCaseToolSchema
 	};
 

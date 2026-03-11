@@ -7,12 +7,14 @@
 **Review agents used:** architecture-strategist, performance-oracle, code-simplicity-reviewer, julik-frontend-races-reviewer, kieran-typescript-reviewer, pattern-recognition-specialist
 
 ### Key Improvements from Research
+
 1. **Simplified architecture**: Keep `isPreviewActive` as single writable store in engine file (not a full new store file)
 2. **Race condition mitigations**: Add operation locking, abort controllers, and proper cleanup
 3. **Performance optimizations**: Batch rendering, RAF-aligned debouncing, version counter for Map updates
 4. **Svelte 5 patterns**: Use `SvelteMap` for reactive Maps or version counter pattern
 
 ### Critical Findings
+
 - The plan can be **significantly simplified** - only `isPreviewActive` needs to be reactive
 - Race conditions identified in preview toggle, debounced updates, and page switching
 - Map immutability fix is essential but should use version counter pattern for O(1) reactivity
@@ -27,6 +29,7 @@ The canvas editor has store reactivity problems where variable changes are not r
 ## Problem Statement
 
 **Symptoms:**
+
 - Variable test value changes don't immediately update the preview
 - Toggling preview mode doesn't always reflect current variable values
 - Adding/modifying canvas objects with variables requires manual refresh to sync
@@ -35,21 +38,24 @@ The canvas editor has store reactivity problems where variable changes are not r
 **Root Causes Identified:**
 
 1. **Module-level non-reactive state** in `canvas-preview-engine.js` (lines 14-17):
+
    ```javascript
-   let originalStates = new Map();  // NOT a Svelte store
-   let loopClones = [];              // NOT a Svelte store
-   let isPreviewActive = false;      // NOT a Svelte store
+   let originalStates = new Map(); // NOT a Svelte store
+   let loopClones = []; // NOT a Svelte store
+   let isPreviewActive = false; // NOT a Svelte store
    ```
 
 2. **Dual `isPreviewActive` sources of truth**:
+
    - `VariablesPanel.svelte:62` has `let isPreviewActive = false` (local)
    - `canvas-preview-engine.js:17` has `let isPreviewActive = false` (module-level)
 
 3. **Map mutation before copying** in `variables.store.js:267-269`:
+
    ```javascript
-   variablesMap.update(map => {
-       map.set(sanitizedName, variable);  // Mutates THEN copies
-       return new Map(map);
+   variablesMap.update((map) => {
+   	map.set(sanitizedName, variable); // Mutates THEN copies
+   	return new Map(map);
    });
    ```
 
@@ -119,31 +125,31 @@ let loopClones = [];
 
 // Update applyPreview to use store
 export async function applyPreview(canvas, testValues) {
-    if (get(isPreviewActive)) {
-        await clearPreview(canvas);
-    }
+	if (get(isPreviewActive)) {
+		await clearPreview(canvas);
+	}
 
-    // ... existing logic for storing original states ...
+	// ... existing logic for storing original states ...
 
-    isPreviewActive.set(true);  // Use store.set()
-    canvas.requestRenderAll();
+	isPreviewActive.set(true); // Use store.set()
+	canvas.requestRenderAll();
 }
 
 // Update clearPreview to use store
 export function clearPreview(canvas) {
-    if (!get(isPreviewActive)) return;
+	if (!get(isPreviewActive)) return;
 
-    // ... existing cleanup logic ...
+	// ... existing cleanup logic ...
 
-    originalStates.clear();
-    loopClones = [];
-    isPreviewActive.set(false);  // Use store.set()
-    canvas.requestRenderAll();
+	originalStates.clear();
+	loopClones = [];
+	isPreviewActive.set(false); // Use store.set()
+	canvas.requestRenderAll();
 }
 
 // Update the check function
 export function isPreviewModeActive() {
-    return get(isPreviewActive);
+	return get(isPreviewActive);
 }
 ```
 
@@ -156,19 +162,19 @@ export function isPreviewModeActive() {
 let previewOperationInProgress = false;
 
 export async function applyPreview(canvas, testValues) {
-    if (previewOperationInProgress) {
-        console.warn('Preview operation already in progress');
-        return { success: false, reason: 'operation_in_progress' };
-    }
+	if (previewOperationInProgress) {
+		console.warn('Preview operation already in progress');
+		return { success: false, reason: 'operation_in_progress' };
+	}
 
-    previewOperationInProgress = true;
-    try {
-        // ... existing logic ...
-        isPreviewActive.set(true);
-        return { success: true };
-    } finally {
-        previewOperationInProgress = false;
-    }
+	previewOperationInProgress = true;
+	try {
+		// ... existing logic ...
+		isPreviewActive.set(true);
+		return { success: true };
+	} finally {
+		previewOperationInProgress = false;
+	}
 }
 ```
 
@@ -178,16 +184,16 @@ export async function applyPreview(canvas, testValues) {
 
 ```javascript
 export async function applyPreview(canvas, testValues) {
-    // CRITICAL: Disable auto-render during batch operations
-    const originalRenderOnAddRemove = canvas.renderOnAddRemove;
-    canvas.renderOnAddRemove = false;
+	// CRITICAL: Disable auto-render during batch operations
+	const originalRenderOnAddRemove = canvas.renderOnAddRemove;
+	canvas.renderOnAddRemove = false;
 
-    try {
-        // ... all loop clone creation and visibility changes ...
-    } finally {
-        canvas.renderOnAddRemove = originalRenderOnAddRemove;
-        canvas.requestRenderAll();  // Single render at end
-    }
+	try {
+		// ... all loop clone creation and visibility changes ...
+	} finally {
+		canvas.renderOnAddRemove = originalRenderOnAddRemove;
+		canvas.requestRenderAll(); // Single render at end
+	}
 }
 ```
 
@@ -208,16 +214,16 @@ const variablesStore = writable({ map: new Map(), version: 0 });
 
 // For updates - O(1) reactivity trigger
 function updateVariable(name, variable) {
-    variablesStore.update(state => {
-        state.map.set(name, variable);  // Mutate in place
-        return { map: state.map, version: ++version };  // New version triggers reactivity
-    });
+	variablesStore.update((state) => {
+		state.map.set(name, variable); // Mutate in place
+		return { map: state.map, version: ++version }; // New version triggers reactivity
+	});
 }
 
 // Derived stores use version to know when to recompute
-export const variables = derived(variablesStore, $s => {
-    // $s.version change triggers this
-    return Array.from($s.map.values()).sort((a, b) => a.name.localeCompare(b.name));
+export const variables = derived(variablesStore, ($s) => {
+	// $s.version change triggers this
+	return Array.from($s.map.values()).sort((a, b) => a.name.localeCompare(b.name));
 });
 ```
 
@@ -227,20 +233,21 @@ If version counter is too complex, use copy-before-mutate:
 
 ```javascript
 // BEFORE (line 267-269) - Mutate THEN copy (wrong order)
-variablesMap.update(map => {
-    map.set(sanitizedName, variable);
-    return new Map(map);
+variablesMap.update((map) => {
+	map.set(sanitizedName, variable);
+	return new Map(map);
 });
 
 // AFTER - Copy THEN mutate (correct order)
-variablesMap.update(map => {
-    const newMap = new Map(map);
-    newMap.set(sanitizedName, variable);
-    return newMap;
+variablesMap.update((map) => {
+	const newMap = new Map(map);
+	newMap.set(sanitizedName, variable);
+	return newMap;
 });
 ```
 
 **Apply to ALL locations:**
+
 - `create()` function (line ~267)
 - `update()` function (line ~295)
 - `delete()` function (line ~320)
@@ -254,7 +261,7 @@ variablesMap.update(map => {
 import { SvelteMap } from 'svelte/reactivity';
 
 const variables = new SvelteMap();
-variables.set('foo', value);  // Automatically triggers reactivity
+variables.set('foo', value); // Automatically triggers reactivity
 ```
 
 Consider migrating to `SvelteMap` for cleaner reactivity (Svelte 5+ only).
@@ -264,6 +271,7 @@ Consider migrating to `SvelteMap` for cleaner reactivity (Svelte 5+ only).
 **File:** `src/lib/components/editor/VariablesPanel.svelte`
 
 Changes:
+
 1. Remove local `isPreviewActive` state (line 62)
 2. Import `isPreviewActive` store from engine
 3. Use `$isPreviewActive` in template and reactive statements
@@ -271,37 +279,37 @@ Changes:
 
 ```svelte
 <script>
-// BEFORE
-let isPreviewActive = false;  // LOCAL - causes dual source of truth
+	// BEFORE
+	let isPreviewActive = false; // LOCAL - causes dual source of truth
 
-// AFTER
-import { isPreviewActive } from '../../utils/canvas-preview-engine';
-// Remove local variable - use $isPreviewActive from store
+	// AFTER
+	import { isPreviewActive } from '../../utils/canvas-preview-engine';
+	// Remove local variable - use $isPreviewActive from store
 
-// Inline debounce (no separate utility file needed)
-let debounceTimer;
+	// Inline debounce (no separate utility file needed)
+	let debounceTimer;
 
-function updatePreviewDebounced() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(async () => {
-        if ($isPreviewActive && $editor) {
-            await applyPreview($editor, testValues);
-        }
-    }, 300);
-}
+	function updatePreviewDebounced() {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(async () => {
+			if ($isPreviewActive && $editor) {
+				await applyPreview($editor, testValues);
+			}
+		}, 300);
+	}
 
-// React to test value changes
-$: if ($isPreviewActive && testValues) {
-    updatePreviewDebounced();
-}
+	// React to test value changes
+	$: if ($isPreviewActive && testValues) {
+		updatePreviewDebounced();
+	}
 
-// Cleanup on destroy
-onDestroy(() => {
-    clearTimeout(debounceTimer);
-    if ($isPreviewActive && $editor) {
-        clearPreview($editor);
-    }
-});
+	// Cleanup on destroy
+	onDestroy(() => {
+		clearTimeout(debounceTimer);
+		if ($isPreviewActive && $editor) {
+			clearPreview($editor);
+		}
+	});
 </script>
 ```
 
@@ -314,32 +322,32 @@ let previewUpdateAbortController = null;
 let debounceTimer = null;
 
 function schedulePreviewUpdate() {
-    // Cancel pending timeout
-    if (debounceTimer) clearTimeout(debounceTimer);
+	// Cancel pending timeout
+	if (debounceTimer) clearTimeout(debounceTimer);
 
-    // Signal any in-flight operation to abort
-    if (previewUpdateAbortController) {
-        previewUpdateAbortController.abort();
-    }
+	// Signal any in-flight operation to abort
+	if (previewUpdateAbortController) {
+		previewUpdateAbortController.abort();
+	}
 
-    previewUpdateAbortController = new AbortController();
-    const signal = previewUpdateAbortController.signal;
+	previewUpdateAbortController = new AbortController();
+	const signal = previewUpdateAbortController.signal;
 
-    debounceTimer = setTimeout(async () => {
-        if (signal.aborted) return;
-        if (!$isPreviewActive || !$editor) return;
+	debounceTimer = setTimeout(async () => {
+		if (signal.aborted) return;
+		if (!$isPreviewActive || !$editor) return;
 
-        try {
-            await applyPreview($editor, testValues, signal);
-        } catch (e) {
-            if (e.name !== 'AbortError') throw e;
-        }
-    }, 300);
+		try {
+			await applyPreview($editor, testValues, signal);
+		} catch (e) {
+			if (e.name !== 'AbortError') throw e;
+		}
+	}, 300);
 }
 
 onDestroy(() => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    if (previewUpdateAbortController) previewUpdateAbortController.abort();
+	if (debounceTimer) clearTimeout(debounceTimer);
+	if (previewUpdateAbortController) previewUpdateAbortController.abort();
 });
 ```
 
@@ -354,23 +362,26 @@ onDestroy(() => {
 ```javascript
 // In Canvas.svelte page subscription
 pagesUnsubscribe = currentPageIndex.subscribe(async (newIndex) => {
-    if (fabricCanvas && previousPageIndex !== newIndex) {
-        // CRITICAL: Clear preview BEFORE serialization
-        // Preview clones have _isPreviewClone=true but it's not in serialization list
-        if (isPreviewModeActive()) {
-            clearPreview(fabricCanvas);
-        }
+	if (fabricCanvas && previousPageIndex !== newIndex) {
+		// CRITICAL: Clear preview BEFORE serialization
+		// Preview clones have _isPreviewClone=true but it's not in serialization list
+		if (isPreviewModeActive()) {
+			clearPreview(fabricCanvas);
+		}
 
-        // NOW safe to serialize
-        const currentData = fabricCanvas.toJSON([
-            'id', 'name', 'isVariable', 'variableBindings',
-            // ... other custom properties
-        ]);
-        pageActions.updateCurrentPageData(currentData, previousPageIndex);
+		// NOW safe to serialize
+		const currentData = fabricCanvas.toJSON([
+			'id',
+			'name',
+			'isVariable',
+			'variableBindings'
+			// ... other custom properties
+		]);
+		pageActions.updateCurrentPageData(currentData, previousPageIndex);
 
-        // Load new page
-        // ...
-    }
+		// Load new page
+		// ...
+	}
 });
 ```
 
@@ -382,25 +393,25 @@ pagesUnsubscribe = currentPageIndex.subscribe(async (newIndex) => {
 import { isPreviewModeActive, clearPreview } from '../../utils/canvas-preview-engine';
 
 function performUndo() {
-    // Clear preview FIRST - undo will load historical state
-    // that doesn't include current preview modifications
-    if (isPreviewModeActive()) {
-        clearPreview(fabricCanvas);
-    }
+	// Clear preview FIRST - undo will load historical state
+	// that doesn't include current preview modifications
+	if (isPreviewModeActive()) {
+		clearPreview(fabricCanvas);
+	}
 
-    isPerformingUndoRedo = true;
-    historyIndex--;
-    // ... existing undo logic
+	isPerformingUndoRedo = true;
+	historyIndex--;
+	// ... existing undo logic
 }
 
 function performRedo() {
-    if (isPreviewModeActive()) {
-        clearPreview(fabricCanvas);
-    }
+	if (isPreviewModeActive()) {
+		clearPreview(fabricCanvas);
+	}
 
-    isPerformingUndoRedo = true;
-    historyIndex++;
-    // ... existing redo logic
+	isPerformingUndoRedo = true;
+	historyIndex++;
+	// ... existing redo logic
 }
 ```
 
@@ -412,27 +423,27 @@ function performRedo() {
 
 ```javascript
 function rafDebounce(fn, delay) {
-    let timeoutId = null;
-    let rafId = null;
+	let timeoutId = null;
+	let rafId = null;
 
-    return function(...args) {
-        if (timeoutId) clearTimeout(timeoutId);
-        if (rafId) cancelAnimationFrame(rafId);
+	return function (...args) {
+		if (timeoutId) clearTimeout(timeoutId);
+		if (rafId) cancelAnimationFrame(rafId);
 
-        timeoutId = setTimeout(() => {
-            rafId = requestAnimationFrame(() => fn.apply(this, args));
-        }, delay);
-    };
+		timeoutId = setTimeout(() => {
+			rafId = requestAnimationFrame(() => fn.apply(this, args));
+		}, delay);
+	};
 }
 ```
 
 ### Research Insights: Debounce Timing Recommendations
 
-| Operation | Recommended | Current | Rationale |
-|-----------|-------------|---------|-----------|
-| Preview updates | 150ms | 300ms | Fast enough to feel responsive |
-| Canvas sync | 250ms | 200ms | Longer to avoid thrashing |
-| History save | 500ms | N/A | Infrequent, heavy operation |
+| Operation       | Recommended | Current | Rationale                      |
+| --------------- | ----------- | ------- | ------------------------------ |
+| Preview updates | 150ms       | 300ms   | Fast enough to feel responsive |
+| Canvas sync     | 250ms       | 200ms   | Longer to avoid thrashing      |
+| History save    | 500ms       | N/A     | Infrequent, heavy operation    |
 
 ### Research Insights: Canvas Event Batching
 
@@ -443,21 +454,21 @@ let pendingSyncCount = 0;
 let syncTimeout = null;
 
 function setupCanvasListeners() {
-    const handleChange = () => {
-        pendingSyncCount++;
+	const handleChange = () => {
+		pendingSyncCount++;
 
-        if (syncTimeout) clearTimeout(syncTimeout);
+		if (syncTimeout) clearTimeout(syncTimeout);
 
-        syncTimeout = setTimeout(() => {
-            console.log(`Syncing after ${pendingSyncCount} canvas events`);
-            pendingSyncCount = 0;
-            refreshTrigger++;
-        }, 200);
-    };
+		syncTimeout = setTimeout(() => {
+			console.log(`Syncing after ${pendingSyncCount} canvas events`);
+			pendingSyncCount = 0;
+			refreshTrigger++;
+		}, 200);
+	};
 
-    $editor.on('object:added', handleChange);
-    $editor.on('object:removed', handleChange);
-    $editor.on('object:modified', handleChange);
+	$editor.on('object:added', handleChange);
+	$editor.on('object:removed', handleChange);
+	$editor.on('object:modified', handleChange);
 }
 ```
 
@@ -490,32 +501,34 @@ function setupCanvasListeners() {
 
 ## Files to Modify (SIMPLIFIED)
 
-| File | Action | Description |
-|------|--------|-------------|
-| `src/lib/utils/canvas-preview-engine.js` | MODIFY | Convert `isPreviewActive` to writable store, add operation lock |
-| `src/store/variables.store.js` | MODIFY | Fix Map immutability (copy-before-mutate) |
-| `src/lib/components/editor/VariablesPanel.svelte` | MODIFY | Remove local `isPreviewActive`, use store, inline debounce |
-| `src/lib/components/editor/Canvas.svelte` | MODIFY | Clear preview before page switch and undo/redo |
+| File                                              | Action | Description                                                     |
+| ------------------------------------------------- | ------ | --------------------------------------------------------------- |
+| `src/lib/utils/canvas-preview-engine.js`          | MODIFY | Convert `isPreviewActive` to writable store, add operation lock |
+| `src/store/variables.store.js`                    | MODIFY | Fix Map immutability (copy-before-mutate)                       |
+| `src/lib/components/editor/VariablesPanel.svelte` | MODIFY | Remove local `isPreviewActive`, use store, inline debounce      |
+| `src/lib/components/editor/Canvas.svelte`         | MODIFY | Clear preview before page switch and undo/redo                  |
 
 **Files NOT needed (simplified from original plan):**
+
 - ~~`src/store/preview.store.js`~~ - Not needed, store lives in engine
 - ~~`src/lib/utils/debounce.js`~~ - Inline in component instead
 
 ## Risk Analysis & Mitigation (Enhanced)
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Breaking existing preview functionality | Medium | High | Thorough manual testing of all flows |
-| Performance regression from Map copies | Medium | Medium | Use version counter pattern or SvelteMap |
-| Race conditions - overlapping preview operations | High | High | Add `previewOperationInProgress` lock |
-| Race conditions - debounced updates during toggle | Medium | High | Use AbortController for cancelable operations |
-| Preview clones serialized on page switch | High | High | Clear preview BEFORE `toJSON()` in subscription |
-| Memory leaks from timeouts | Medium | Medium | Clear all timeouts in onDestroy |
-| Undo loads state without preview awareness | High | Medium | Clear preview before undo/redo |
+| Risk                                              | Likelihood | Impact | Mitigation                                      |
+| ------------------------------------------------- | ---------- | ------ | ----------------------------------------------- |
+| Breaking existing preview functionality           | Medium     | High   | Thorough manual testing of all flows            |
+| Performance regression from Map copies            | Medium     | Medium | Use version counter pattern or SvelteMap        |
+| Race conditions - overlapping preview operations  | High       | High   | Add `previewOperationInProgress` lock           |
+| Race conditions - debounced updates during toggle | Medium     | High   | Use AbortController for cancelable operations   |
+| Preview clones serialized on page switch          | High       | High   | Clear preview BEFORE `toJSON()` in subscription |
+| Memory leaks from timeouts                        | Medium     | Medium | Clear all timeouts in onDestroy                 |
+| Undo loads state without preview awareness        | High       | Medium | Clear preview before undo/redo                  |
 
 ### Research Insights: Testing Race Conditions
 
 **From julik-frontend-races-reviewer:** How to reproduce races:
+
 1. Double-click the preview button as fast as you can
 2. Type rapidly in test value input while preview is active
 3. Paste 10+ objects at once while preview is active
@@ -528,28 +541,33 @@ function setupCanvasListeners() {
 ### Manual Testing Checklist
 
 1. **Variable Creation Flow**
+
    - [ ] Create text element, mark as variable
    - [ ] Verify appears in VariablesPanel immediately
    - [ ] Enable preview, verify value applied
 
 2. **Test Value Update Flow**
+
    - [ ] Enable preview
    - [ ] Type in test value input
    - [ ] Verify canvas updates within 300ms
    - [ ] Rapid typing doesn't cause multiple renders
 
 3. **Preview Toggle Flow**
+
    - [ ] Enable preview - canvas shows test values
    - [ ] Disable preview - canvas restores originals
    - [ ] Re-enable preview - values applied correctly
 
 4. **Page Switch Flow**
+
    - [ ] Enable preview on page 1
    - [ ] Switch to page 2
    - [ ] Verify preview state cleared
    - [ ] Switch back to page 1, verify clean state
 
 5. **Undo/Redo Flow**
+
    - [ ] Enable preview
    - [ ] Make canvas change
    - [ ] Undo - verify preview cleared
@@ -563,16 +581,19 @@ function setupCanvasListeners() {
 ## References
 
 ### Internal References
+
 - `src/store/editor.store.js` - XState + Svelte store pattern (good example)
 - `src/store/binding.store.js` - Action object pattern reference
 - `plans/feat-frontend-template-modes-refactor.md` - Race condition handling patterns
 
 ### External References
+
 - [Svelte Stores Documentation](https://svelte.dev/docs/svelte/stores)
 - [Svelte #15152: $derived not updating with Map()](https://github.com/sveltejs/svelte/issues/15152)
 - [XState Svelte Integration](https://stately.ai/docs/xstate-svelte)
 
 ### Related Issues
+
 - `/todos/013-complete-p2-store-pattern-bypass.md` - Store pattern decisions
 - `/todos/002-complete-p1-race-condition-load-template.md` - Race condition patterns
 
@@ -581,36 +602,42 @@ function setupCanvasListeners() {
 ## Research Agent Outputs Summary
 
 ### Architecture Strategist
+
 - Keep `canvas-preview-engine.js` stateless where possible
 - Proposed pattern matches `variableActions`, `editorActions`, `copilotActions`
 - Recommended: Pass canvas as parameter, don't couple engine to store
 - Consider XState for preview only if race conditions prove difficult to manage
 
 ### Performance Oracle
+
 - Map immutability: O(n) per update could cause frame drops with 100+ variables
 - Recommend version counter pattern for O(1) reactivity triggers
 - Batch rendering: disable `renderOnAddRemove` during preview operations
 - Expected improvement: 80-90% fewer renders with batching
 
 ### Code Simplicity Reviewer
+
 - Plan was over-engineered: 250 lines -> 30 lines possible
 - Only `isPreviewActive` needs reactivity (not `originalStates`, `loopClones`)
 - No separate `preview.store.js` or `debounce.js` files needed
 - YAGNI violations identified in 5 derived stores and 8 action methods
 
 ### Frontend Races Reviewer (Julik)
+
 - 7 race conditions identified with specific code locations
 - Critical: Preview toggle race, debounced update overlap, page switch serialization
 - Mitigations: Operation lock, AbortController, cleanup ordering
 - Test strategies provided for reproducing each race
 
 ### TypeScript/JavaScript Reviewer (Kieran)
+
 - Recommended JSDoc types for all exports
 - Named function exports preferred over object pattern
 - Guard clauses for validation
 - Error boundaries with result objects
 
 ### Pattern Recognition Specialist
+
 - Proposed pattern consistent with `variableActions`, `editorActions`, `pageActions`
 - Anti-patterns in current code: module-level mutable state, hidden dependencies
 - Debounce utility is a good addition (first in codebase)

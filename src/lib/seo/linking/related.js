@@ -15,10 +15,10 @@ export function getRelatedPages(pageType, currentPage, allPages, maxResults = 5)
 	if (!allPages || allPages.length === 0) return [];
 
 	// Filter out the current page
-	const candidates = allPages.filter(p => getPageId(p) !== getPageId(currentPage));
+	const candidates = allPages.filter((p) => getPageId(p) !== getPageId(currentPage));
 
 	// Calculate relevance scores
-	const scored = candidates.map(page => ({
+	const scored = candidates.map((page) => ({
 		page,
 		score: calculateRelevanceScore(currentPage, page, pageType)
 	}));
@@ -27,7 +27,7 @@ export function getRelatedPages(pageType, currentPage, allPages, maxResults = 5)
 	return scored
 		.sort((a, b) => b.score - a.score)
 		.slice(0, maxResults)
-		.map(s => s.page);
+		.map((s) => s.page);
 }
 
 /**
@@ -86,7 +86,7 @@ export function calculateRelevanceScore(source, target, pageType = 'default') {
  */
 function getKeywords(page) {
 	const keywords = page.seoKeywords || page.keywords || [];
-	return keywords.map(k => k.toLowerCase().trim());
+	return keywords.map((k) => k.toLowerCase().trim());
 }
 
 /**
@@ -105,8 +105,8 @@ function getPageId(page) {
  * @returns {Array} Intersection of both arrays
  */
 function intersection(arr1, arr2) {
-	const set2 = new Set(arr2.map(item => String(item).toLowerCase()));
-	return arr1.filter(item => set2.has(String(item).toLowerCase()));
+	const set2 = new Set(arr2.map((item) => String(item).toLowerCase()));
+	return arr1.filter((item) => set2.has(String(item).toLowerCase()));
 }
 
 /**
@@ -118,8 +118,14 @@ function intersection(arr1, arr2) {
 function calculateTitleSimilarity(title1, title2) {
 	if (!title1 || !title2) return 0;
 
-	const words1 = title1.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-	const words2 = title2.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+	const words1 = title1
+		.toLowerCase()
+		.split(/\s+/)
+		.filter((w) => w.length > 2);
+	const words2 = title2
+		.toLowerCase()
+		.split(/\s+/)
+		.filter((w) => w.length > 2);
 
 	if (words1.length === 0 || words2.length === 0) return 0;
 

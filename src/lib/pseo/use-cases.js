@@ -1,5 +1,11 @@
 // Helper function to generate simple card template HTML
-function simpleCardTemplate({ title, subtitle, badge, accent = '#4ade80', background = '#FFFDF8' }) {
+function simpleCardTemplate({
+	title,
+	subtitle,
+	badge,
+	accent = '#4ade80',
+	background = '#FFFDF8'
+}) {
 	return `<html>
   <head>
     <style>
@@ -254,19 +260,41 @@ export const useCaseDetails = {
 			'Difficult to archive or reuse campaign visuals for retrospectives'
 		],
 		workflow: [
-			{ title: 'Prepare the HTML', detail: 'Grab the final HTML from your ESP (Mailchimp, Braze, HubSpot, etc.) and inline styles if needed.' },
-			{ title: 'Choose rendering size', detail: 'Use 1200×630 for portfolio decks or 1080×1920 for mobile-focused previews.' },
-			{ title: 'Generate & distribute', detail: 'Export PNG or JPG, drop it in Slack, Notion, or your approval workflow instantly.' }
+			{
+				title: 'Prepare the HTML',
+				detail:
+					'Grab the final HTML from your ESP (Mailchimp, Braze, HubSpot, etc.) and inline styles if needed.'
+			},
+			{
+				title: 'Choose rendering size',
+				detail: 'Use 1200×630 for portfolio decks or 1080×1920 for mobile-focused previews.'
+			},
+			{
+				title: 'Generate & distribute',
+				detail: 'Export PNG or JPG, drop it in Slack, Notion, or your approval workflow instantly.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I show both desktop and mobile previews?', a: 'Yes. Render once at 1200×630 for desktop, then switch to 1080×1920 for mobile. Each conversion produces a CDN-hosted image you can share immediately.' },
-			{ q: 'Will custom fonts and background images render?', a: 'As long as the HTML references publicly accessible assets, Pictify reproduces them. For best results, host fonts and images on a CDN.' },
-			{ q: 'Can I automate email previews with the API?', a: 'Absolutely. Use the Pictify API to generate email preview images programmatically whenever a campaign is ready for review. Integrate with your email platform webhooks for fully automated workflows.' },
-			{ q: 'What email service providers are supported?', a: 'Any ESP that exports HTML works — Mailchimp, Klaviyo, Braze, HubSpot, SendGrid, Campaign Monitor, and more. Simply export the email HTML and paste it into Pictify.' }
+			{
+				q: 'Can I show both desktop and mobile previews?',
+				a: 'Yes. Render once at 1200×630 for desktop, then switch to 1080×1920 for mobile. Each conversion produces a CDN-hosted image you can share immediately.'
+			},
+			{
+				q: 'Will custom fonts and background images render?',
+				a: 'As long as the HTML references publicly accessible assets, Pictify reproduces them. For best results, host fonts and images on a CDN.'
+			},
+			{
+				q: 'Can I automate email previews with the API?',
+				a: 'Absolutely. Use the Pictify API to generate email preview images programmatically whenever a campaign is ready for review. Integrate with your email platform webhooks for fully automated workflows.'
+			},
+			{
+				q: 'What email service providers are supported?',
+				a: 'Any ESP that exports HTML works — Mailchimp, Klaviyo, Braze, HubSpot, SendGrid, Campaign Monitor, and more. Simply export the email HTML and paste it into Pictify.'
+			}
 		],
 		related: ['table', 'markdown']
 	},
-	'table': {
+	table: {
 		label: 'HTML Table to Image',
 		description: 'Turn dashboards and reports into shareable images without screenshot tools.',
 		seoKeywords: [
@@ -372,19 +400,43 @@ export const useCaseDetails = {
 			'Sharing dashboards with external stakeholders without granting tool access'
 		],
 		workflow: [
-			{ title: 'Capture the HTML', detail: 'Use your data layer to output HTML tables with inline CSS for fonts, colors, and spacing.' },
-			{ title: 'Select high-resolution output', detail: 'For enterprise dashboards, 1920×1080 or 1600×900 provides a crisp slide-ready asset.' },
-			{ title: 'Generate and embed', detail: 'Drop the image in decks, Confluence, or Slack. CDN hosting gives you a shareable link as well.' }
+			{
+				title: 'Capture the HTML',
+				detail:
+					'Use your data layer to output HTML tables with inline CSS for fonts, colors, and spacing.'
+			},
+			{
+				title: 'Select high-resolution output',
+				detail:
+					'For enterprise dashboards, 1920×1080 or 1600×900 provides a crisp slide-ready asset.'
+			},
+			{
+				title: 'Generate and embed',
+				detail:
+					'Drop the image in decks, Confluence, or Slack. CDN hosting gives you a shareable link as well.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I render tables wider than 1920px?', a: 'Yes. Increase the custom canvas size before generating the image. Pictify supports up to 4000×4000 pixels.' },
-			{ q: 'Do sticky headers or alternating row colors work?', a: 'Any CSS that is supported by Chromium will display. Inline the relevant CSS to ensure consistent output.' },
-			{ q: 'Can I automate weekly dashboard images?', a: 'Absolutely. Use the Pictify API to render table snapshots on a schedule. Combine with your BI tool exports for fully automated reporting.' },
-			{ q: 'What about charts and graphs?', a: 'If your charts render as HTML/SVG, Pictify will capture them. For canvas-based charts, export as SVG first or use our chart element in the editor.' }
+			{
+				q: 'Can I render tables wider than 1920px?',
+				a: 'Yes. Increase the custom canvas size before generating the image. Pictify supports up to 4000×4000 pixels.'
+			},
+			{
+				q: 'Do sticky headers or alternating row colors work?',
+				a: 'Any CSS that is supported by Chromium will display. Inline the relevant CSS to ensure consistent output.'
+			},
+			{
+				q: 'Can I automate weekly dashboard images?',
+				a: 'Absolutely. Use the Pictify API to render table snapshots on a schedule. Combine with your BI tool exports for fully automated reporting.'
+			},
+			{
+				q: 'What about charts and graphs?',
+				a: 'If your charts render as HTML/SVG, Pictify will capture them. For canvas-based charts, export as SVG first or use our chart element in the editor.'
+			}
 		],
 		related: ['html-email', 'code']
 	},
-	'markdown': {
+	markdown: {
 		label: 'Markdown to Image',
 		description: 'Render Markdown content as polished images for social posts or documentation.',
 		seoKeywords: [
@@ -462,19 +514,36 @@ await createImage({
 			'Formatting inconsistencies when copying Markdown into slideware'
 		],
 		workflow: [
-			{ title: 'Convert Markdown to HTML', detail: 'Use your static site generator or a Markdown parser to create HTML with the desired theme.' },
-			{ title: 'Pick social-friendly dimensions', detail: 'Square (1080×1080) for Instagram, 1200×630 for LinkedIn/Twitter cards.' },
-			{ title: 'Customize and export', detail: 'Adjust background, fonts, and callouts before generating the final asset.' }
+			{
+				title: 'Convert Markdown to HTML',
+				detail:
+					'Use your static site generator or a Markdown parser to create HTML with the desired theme.'
+			},
+			{
+				title: 'Pick social-friendly dimensions',
+				detail: 'Square (1080×1080) for Instagram, 1200×630 for LinkedIn/Twitter cards.'
+			},
+			{
+				title: 'Customize and export',
+				detail: 'Adjust background, fonts, and callouts before generating the final asset.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I use dark mode themes?', a: 'Absolutely. Include the CSS for your preferred dark theme when generating the HTML, then convert it directly.' },
-			{ q: 'Does syntax highlighting survive?', a: 'Yes. Use a highlighting library (Prism, Highlight.js) to output styled HTML before conversion.' }
+			{
+				q: 'Can I use dark mode themes?',
+				a: 'Absolutely. Include the CSS for your preferred dark theme when generating the HTML, then convert it directly.'
+			},
+			{
+				q: 'Does syntax highlighting survive?',
+				a: 'Yes. Use a highlighting library (Prism, Highlight.js) to output styled HTML before conversion.'
+			}
 		],
 		related: ['code', 'html-email']
 	},
-	'certificate': {
+	certificate: {
 		label: 'Certificate from HTML',
-		description: 'Generate personalized certificates as downloadable images for events and courses.',
+		description:
+			'Generate personalized certificates as downloadable images for events and courses.',
 		seoKeywords: [
 			'certificate generator',
 			'create certificates online',
@@ -553,17 +622,33 @@ await createImage({
 			'Ensuring consistent branding across hundreds or thousands of certificates'
 		],
 		workflow: [
-			{ title: 'Build the template', detail: 'Design your certificate using HTML/CSS with placeholders for names and achievements.' },
-			{ title: 'Merge participant data', detail: 'Replace placeholders with dynamic data from your CRM or LMS before conversion.' },
-			{ title: 'Generate and distribute', detail: 'Export images and send them via email or allow download from your portal.' }
+			{
+				title: 'Build the template',
+				detail:
+					'Design your certificate using HTML/CSS with placeholders for names and achievements.'
+			},
+			{
+				title: 'Merge participant data',
+				detail: 'Replace placeholders with dynamic data from your CRM or LMS before conversion.'
+			},
+			{
+				title: 'Generate and distribute',
+				detail: 'Export images and send them via email or allow download from your portal.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I print the generated certificate?', a: 'Yes. Use 1920×1080 or larger to produce high-quality prints. You can also create a PDF if needed.' },
-			{ q: 'How do I handle signatures or seals?', a: 'Embed them as transparent PNGs in your HTML. They will render in the final image.' }
+			{
+				q: 'Can I print the generated certificate?',
+				a: 'Yes. Use 1920×1080 or larger to produce high-quality prints. You can also create a PDF if needed.'
+			},
+			{
+				q: 'How do I handle signatures or seals?',
+				a: 'Embed them as transparent PNGs in your HTML. They will render in the final image.'
+			}
 		],
 		related: ['html-email']
 	},
-	'code': {
+	code: {
 		label: 'Code to Image',
 		description: 'Share beautiful code snippets with syntax highlighting in seconds.',
 		seoKeywords: [
@@ -645,17 +730,33 @@ await createImage({
 			'Sharing sensitive paths or environment variables by accident'
 		],
 		workflow: [
-			{ title: 'Paste formatted HTML', detail: 'Use Prism/Highlight.js or MDX to output styled HTML for the snippet.' },
-			{ title: 'Pick theme & size', detail: 'Choose dark or light theme and select 1200×630 for OG cards or square for carousels.' },
-			{ title: 'Generate & publish', detail: 'Export and upload to your blog, docs, or social channels with consistent branding.' }
+			{
+				title: 'Paste formatted HTML',
+				detail: 'Use Prism/Highlight.js or MDX to output styled HTML for the snippet.'
+			},
+			{
+				title: 'Pick theme & size',
+				detail:
+					'Choose dark or light theme and select 1200×630 for OG cards or square for carousels.'
+			},
+			{
+				title: 'Generate & publish',
+				detail: 'Export and upload to your blog, docs, or social channels with consistent branding.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I include multiple files or tabs?', a: 'Yes. Structure your HTML with headers or tabs before converting, and Pictify will render them exactly.' },
-			{ q: 'Is there a character limit for code?', a: 'No strict limit, but ensure the canvas width/height is large enough for readability. You can always increase dimensions before generation.' }
+			{
+				q: 'Can I include multiple files or tabs?',
+				a: 'Yes. Structure your HTML with headers or tabs before converting, and Pictify will render them exactly.'
+			},
+			{
+				q: 'Is there a character limit for code?',
+				a: 'No strict limit, but ensure the canvas width/height is large enough for readability. You can always increase dimensions before generation.'
+			}
 		],
 		related: ['markdown', 'html-email']
 	},
-	'receipt': {
+	receipt: {
 		label: 'Receipt Generator',
 		description: 'Generate branded receipts as images for emails, downloads, and customer portals.',
 		seoKeywords: [
@@ -696,19 +797,38 @@ await createImage({
 			'Receipts are transactional media: one template, thousands of variable sets.',
 			'Render branded receipts from order data via API and reuse across email, portal, and support flows.'
 		],
-		painPoints: ['Manual screenshots or PDFs', 'Inconsistent formatting across devices', 'Hard to reissue at scale'],
+		painPoints: [
+			'Manual screenshots or PDFs',
+			'Inconsistent formatting across devices',
+			'Hard to reissue at scale'
+		],
 		workflow: [
-			{ title: 'Design once', detail: 'Create a receipt layout and bind variables like orderId, line items, and total.' },
-			{ title: 'Render per order', detail: 'Call the API with order variables to generate a receipt URL instantly.' },
-			{ title: 'Batch reissue', detail: 'Re-render receipts for many orders in one batch job when needed.' }
+			{
+				title: 'Design once',
+				detail: 'Create a receipt layout and bind variables like orderId, line items, and total.'
+			},
+			{
+				title: 'Render per order',
+				detail: 'Call the API with order variables to generate a receipt URL instantly.'
+			},
+			{
+				title: 'Batch reissue',
+				detail: 'Re-render receipts for many orders in one batch job when needed.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I include multiple line items?', a: 'Yes. Use multiple rows or build a repeatable block in the template workspace.' },
-			{ q: 'Can I embed the receipt in email?', a: 'Yes. Use the generated CDN URL in your transactional emails.' }
+			{
+				q: 'Can I include multiple line items?',
+				a: 'Yes. Use multiple rows or build a repeatable block in the template workspace.'
+			},
+			{
+				q: 'Can I embed the receipt in email?',
+				a: 'Yes. Use the generated CDN URL in your transactional emails.'
+			}
 		],
 		related: ['html-email', 'table']
 	},
-	'badge': {
+	badge: {
 		label: 'Badge Generator',
 		description: 'Generate achievement badges, labels, and milestones as shareable images.',
 		seoKeywords: [
@@ -749,13 +869,28 @@ await createImage({
 			'Badges are a lightweight, personalized growth loop artifact.',
 			'Generate badges for users, cohorts, and campaigns using one reusable template.'
 		],
-		painPoints: ['Manual badge design', 'Inconsistent sizes across channels', 'No scalable way to generate cohorts'],
-		workflow: [
-			{ title: 'Pick a badge layout', detail: 'Design a badge style once with your brand fonts and colors.' },
-			{ title: 'Bind variables', detail: 'Use variables for badgeName, userName, tier, and date.' },
-			{ title: 'Render at scale', detail: 'Batch render for cohorts and embed URLs across product surfaces.' }
+		painPoints: [
+			'Manual badge design',
+			'Inconsistent sizes across channels',
+			'No scalable way to generate cohorts'
 		],
-		faqs: [{ q: 'Do transparent backgrounds work?', a: 'Yes. Use PNG/WebP and keep the background transparent.' }],
+		workflow: [
+			{
+				title: 'Pick a badge layout',
+				detail: 'Design a badge style once with your brand fonts and colors.'
+			},
+			{ title: 'Bind variables', detail: 'Use variables for badgeName, userName, tier, and date.' },
+			{
+				title: 'Render at scale',
+				detail: 'Batch render for cohorts and embed URLs across product surfaces.'
+			}
+		],
+		faqs: [
+			{
+				q: 'Do transparent backgrounds work?',
+				a: 'Yes. Use PNG/WebP and keep the background transparent.'
+			}
+		],
 		related: ['certificate', 'quote-card']
 	},
 	'quote-card': {
@@ -774,13 +909,28 @@ await createImage({
 			'Quote cards are repeatable content with a consistent format.',
 			'Render quote variations from your CMS or spreadsheet via API and keep branding consistent.'
 		],
-		painPoints: ['Design bottlenecks for social posts', 'Manual resizing for each platform', 'Inconsistent typography'],
+		painPoints: [
+			'Design bottlenecks for social posts',
+			'Manual resizing for each platform',
+			'Inconsistent typography'
+		],
 		workflow: [
 			{ title: 'Create quote template', detail: 'Design quote + author + company layout once.' },
-			{ title: 'Render per quote', detail: 'Send quote variables and generate an image instantly.' },
-			{ title: 'Batch for campaigns', detail: 'Generate dozens of quote assets in a single batch job.' }
+			{
+				title: 'Render per quote',
+				detail: 'Send quote variables and generate an image instantly.'
+			},
+			{
+				title: 'Batch for campaigns',
+				detail: 'Generate dozens of quote assets in a single batch job.'
+			}
 		],
-		faqs: [{ q: 'What about long quotes?', a: 'Increase height or adjust font size/line height in the template.' }],
+		faqs: [
+			{
+				q: 'What about long quotes?',
+				a: 'Increase height or adjust font size/line height in the template.'
+			}
+		],
 		related: ['tweet-card', 'testimonial']
 	},
 	'tweet-card': {
@@ -801,11 +951,22 @@ await createImage({
 		],
 		painPoints: ['Manual screenshots', 'Inconsistent formatting', 'Slow content production'],
 		workflow: [
-			{ title: 'Design the template', detail: 'Create tweet layout once with variables for text, handle, and date.' },
-			{ title: 'Render for channels', detail: 'Generate platform-specific sizes (X, LinkedIn, IG).' },
+			{
+				title: 'Design the template',
+				detail: 'Create tweet layout once with variables for text, handle, and date.'
+			},
+			{
+				title: 'Render for channels',
+				detail: 'Generate platform-specific sizes (X, LinkedIn, IG).'
+			},
 			{ title: 'Batch schedule', detail: 'Batch render cards for a week of content.' }
 		],
-		faqs: [{ q: 'Can I include an avatar?', a: 'Yes. Add an image layer bound to an avatar URL variable.' }],
+		faqs: [
+			{
+				q: 'Can I include an avatar?',
+				a: 'Yes. Add an image layer bound to an avatar URL variable.'
+			}
+		],
 		related: ['quote-card', 'status-update']
 	},
 	'product-banner': {
@@ -826,11 +987,19 @@ await createImage({
 		],
 		painPoints: ['Design time per variant', 'Slow A/B iteration', 'Brand drift across teams'],
 		workflow: [
-			{ title: 'Design banner template', detail: 'Create a layout with variables for name, tagline, and price.' },
+			{
+				title: 'Design banner template',
+				detail: 'Create a layout with variables for name, tagline, and price.'
+			},
 			{ title: 'Render variants', detail: 'Generate variants for each segment or campaign.' },
 			{ title: 'Ship everywhere', detail: 'Use CDN URLs across ads, landing pages, and emails.' }
 		],
-		faqs: [{ q: 'Can I render multiple sizes per campaign?', a: 'Yes. Render the same template at different sizes for each platform.' }],
+		faqs: [
+			{
+				q: 'Can I render multiple sizes per campaign?',
+				a: 'Yes. Render the same template at different sizes for each platform.'
+			}
+		],
 		related: ['pricing-card', 'webinar-promo']
 	},
 	'pricing-card': {
@@ -849,13 +1018,25 @@ await createImage({
 			'Pricing assets must stay consistent across channels as plans evolve.',
 			'Render plan cards from structured data (plans/currencies) to keep everything in sync.'
 		],
-		painPoints: ['Outdated pricing screenshots', 'Manual work for multiple currencies', 'Inconsistent design across teams'],
+		painPoints: [
+			'Outdated pricing screenshots',
+			'Manual work for multiple currencies',
+			'Inconsistent design across teams'
+		],
 		workflow: [
-			{ title: 'Design once', detail: 'Create a plan card layout with variables for name/price/features.' },
+			{
+				title: 'Design once',
+				detail: 'Create a plan card layout with variables for name/price/features.'
+			},
 			{ title: 'Render per plan', detail: 'Generate cards for each tier and currency.' },
 			{ title: 'Batch updates', detail: 'Re-render when pricing or brand changes.' }
 		],
-		faqs: [{ q: 'Can I mark “Most popular”?', a: 'Yes. Use conditional logic in the template workspace.' }],
+		faqs: [
+			{
+				q: 'Can I mark “Most popular”?',
+				a: 'Yes. Use conditional logic in the template workspace.'
+			}
+		],
 		related: ['product-banner', 'report-cover']
 	},
 	'changelog-card': {
@@ -874,13 +1055,25 @@ await createImage({
 			'Changelog announcements are a repeatable workflow that benefits from automation.',
 			'Generate release cards from Git tags, CI pipelines, or docs in a consistent format.'
 		],
-		painPoints: ['Manual social assets per release', 'Slow announcements', 'Inconsistent formatting'],
+		painPoints: [
+			'Manual social assets per release',
+			'Slow announcements',
+			'Inconsistent formatting'
+		],
 		workflow: [
-			{ title: 'Create changelog template', detail: 'Design a layout for version, headline, and date.' },
+			{
+				title: 'Create changelog template',
+				detail: 'Design a layout for version, headline, and date.'
+			},
 			{ title: 'Render from CI', detail: 'Trigger generation automatically on release.' },
 			{ title: 'Distribute', detail: 'Use CDN URLs across social, docs, and email.' }
 		],
-		faqs: [{ q: 'Can I include multiple bullets?', a: 'Yes. Add a list section in the template and increase height.' }],
+		faqs: [
+			{
+				q: 'Can I include multiple bullets?',
+				a: 'Yes. Add a list section in the template and increase height.'
+			}
+		],
 		related: ['release-notes-card', 'status-update']
 	},
 	'release-notes-card': {
@@ -905,7 +1098,12 @@ await createImage({
 			{ title: 'Render from docs', detail: 'Generate from markdown or release metadata via API.' },
 			{ title: 'Publish', detail: 'Use the image URL across all channels.' }
 		],
-		faqs: [{ q: 'Can I include screenshots?', a: 'Yes. Add an image layer bound to a screenshot URL variable.' }],
+		faqs: [
+			{
+				q: 'Can I include screenshots?',
+				a: 'Yes. Add an image layer bound to a screenshot URL variable.'
+			}
+		],
 		related: ['changelog-card', 'markdown']
 	},
 	'api-response-card': {
@@ -931,7 +1129,12 @@ await createImage({
 			{ title: 'Bind fields', detail: 'Bind variables for the fields you want to showcase.' },
 			{ title: 'Generate on build', detail: 'Render cards during docs builds or CI runs.' }
 		],
-		faqs: [{ q: 'Can I render full JSON?', a: 'Yes, but increase canvas size or focus on key fields for readability.' }],
+		faqs: [
+			{
+				q: 'Can I render full JSON?',
+				a: 'Yes, but increase canvas size or focus on key fields for readability.'
+			}
+		],
 		related: ['json-to-image', 'code']
 	},
 	'json-to-image': {
@@ -956,9 +1159,15 @@ await createImage({
 		],
 		painPoints: ['Screenshots blur text', 'Payloads get stale', 'Hard to standardize formatting'],
 		workflow: [
-			{ title: 'Define the JSON shape', detail: 'Pick the fields you want to display and bind variables.' },
+			{
+				title: 'Define the JSON shape',
+				detail: 'Pick the fields you want to display and bind variables.'
+			},
 			{ title: 'Render on demand', detail: 'Generate images whenever payloads change.' },
-			{ title: 'Batch examples', detail: 'Render multiple example payloads for docs or onboarding.' }
+			{
+				title: 'Batch examples',
+				detail: 'Render multiple example payloads for docs or onboarding.'
+			}
 		],
 		faqs: [{ q: 'Can I highlight keys?', a: 'Yes. Use CSS in the template to style keys/values.' }],
 		related: ['api-response-card', 'code']
@@ -979,16 +1188,28 @@ await createImage({
 			'When something breaks, teams need fast and consistent communication.',
 			'Generate status cards from incident systems and distribute instantly across channels.'
 		],
-		painPoints: ['No time for design during incidents', 'Inconsistent messaging', 'Slow updates across channels'],
+		painPoints: [
+			'No time for design during incidents',
+			'Inconsistent messaging',
+			'Slow updates across channels'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create a layout for status, message, and timestamp.' },
-			{ title: 'Render from incident data', detail: 'Send incident fields to generate an image URL.' },
+			{
+				title: 'Render from incident data',
+				detail: 'Send incident fields to generate an image URL.'
+			},
 			{ title: 'Distribute', detail: 'Use the URL in social, email, and internal channels.' }
 		],
-		faqs: [{ q: 'Can I color-code status (green/yellow/red)?', a: 'Yes. Use conditional logic in the template workspace.' }],
+		faqs: [
+			{
+				q: 'Can I color-code status (green/yellow/red)?',
+				a: 'Yes. Use conditional logic in the template workspace.'
+			}
+		],
 		related: ['changelog-card', 'tweet-card']
 	},
-	'leaderboard': {
+	leaderboard: {
 		label: 'Leaderboard Card',
 		description: 'Generate leaderboard snapshots for communities, contests, and gamification.',
 		seoKeywords: [
@@ -1031,11 +1252,16 @@ await createImage({
 		],
 		painPoints: ['Manual exports', 'Inconsistent weekly formatting', 'Slow to publish updates'],
 		workflow: [
-			{ title: 'Design layout', detail: 'Create a leaderboard card with variables for names and scores.' },
+			{
+				title: 'Design layout',
+				detail: 'Create a leaderboard card with variables for names and scores.'
+			},
 			{ title: 'Render from data', detail: 'Send top results and generate an image URL.' },
 			{ title: 'Publish', detail: 'Post in Slack/Discord or embed in newsletters.' }
 		],
-		faqs: [{ q: 'Can I show more entries?', a: 'Yes. Increase height and add more rows/variables.' }],
+		faqs: [
+			{ q: 'Can I show more entries?', a: 'Yes. Increase height and add more rows/variables.' }
+		],
 		related: ['kpi-card', 'status-update']
 	},
 	'kpi-card': {
@@ -1056,14 +1282,19 @@ await createImage({
 		],
 		painPoints: ['Copy/paste from dashboards', 'Blurry screenshots', 'Formatting inconsistency'],
 		workflow: [
-			{ title: 'Create KPI template', detail: 'Design a card with variables for metric name/value/delta.' },
+			{
+				title: 'Create KPI template',
+				detail: 'Design a card with variables for metric name/value/delta.'
+			},
 			{ title: 'Render from analytics', detail: 'Call the API from your reporting job.' },
 			{ title: 'Distribute', detail: 'Embed URLs in Notion, decks, or newsletters.' }
 		],
-		faqs: [{ q: 'Can I render charts?', a: 'Yes. Render charts in HTML or add a chart image layer.' }],
+		faqs: [
+			{ q: 'Can I render charts?', a: 'Yes. Render charts in HTML or add a chart image layer.' }
+		],
 		related: ['table', 'leaderboard']
 	},
-	'testimonial': {
+	testimonial: {
 		label: 'Testimonial Card',
 		description: 'Turn customer reviews into shareable social proof images for marketing.',
 		seoKeywords: [
@@ -1106,11 +1337,19 @@ await createImage({
 		],
 		painPoints: ['Manual design work', 'Inconsistent styling', 'Slow iteration on landing pages'],
 		workflow: [
-			{ title: 'Design template', detail: 'Create a layout with testimonial + attribution variables.' },
+			{
+				title: 'Design template',
+				detail: 'Create a layout with testimonial + attribution variables.'
+			},
 			{ title: 'Render per entry', detail: 'Generate a card for each testimonial automatically.' },
 			{ title: 'Batch refresh', detail: 'Re-render when brand or typography changes.' }
 		],
-		faqs: [{ q: 'Can I add a customer logo?', a: 'Yes. Add an image layer bound to a logo URL variable.' }],
+		faqs: [
+			{
+				q: 'Can I add a customer logo?',
+				a: 'Yes. Add an image layer bound to a logo URL variable.'
+			}
+		],
 		related: ['quote-card', 'product-banner']
 	},
 	'webinar-promo': {
@@ -1129,13 +1368,19 @@ await createImage({
 			'Event marketing repeats the same pattern: title, date, speaker, CTA.',
 			'Render promo banners from your events database and ship assets on demand via API.'
 		],
-		painPoints: ['Design workload for every event', 'Inconsistent templates', 'Slow turnaround for campaigns'],
+		painPoints: [
+			'Design workload for every event',
+			'Inconsistent templates',
+			'Slow turnaround for campaigns'
+		],
 		workflow: [
 			{ title: 'Create promo template', detail: 'Design a layout for title/date/speaker/CTA.' },
 			{ title: 'Render per event', detail: 'Generate a banner for each webinar automatically.' },
 			{ title: 'Batch for series', detail: 'Render an entire series in one batch job.' }
 		],
-		faqs: [{ q: 'Can I add speaker photos?', a: 'Yes. Bind image URLs for headshots in the template.' }],
+		faqs: [
+			{ q: 'Can I add speaker photos?', a: 'Yes. Bind image URLs for headshots in the template.' }
+		],
 		related: ['event-ticket', 'product-banner']
 	},
 	'event-ticket': {
@@ -1156,7 +1401,10 @@ await createImage({
 		],
 		painPoints: ['Manual ticket creation', 'Hard to reissue', 'Inconsistent formatting'],
 		workflow: [
-			{ title: 'Design ticket template', detail: 'Create a layout with event and attendee variables.' },
+			{
+				title: 'Design ticket template',
+				detail: 'Create a layout with event and attendee variables.'
+			},
 			{ title: 'Render per attendee', detail: 'Generate a unique ticket for each registration.' },
 			{ title: 'Batch deliver', detail: 'Batch render and send through your email provider.' }
 		],
@@ -1179,13 +1427,25 @@ await createImage({
 			'Hiring content is repetitive and often needs variants per role and channel.',
 			'Render consistent job cards from your ATS data and publish automatically.'
 		],
-		painPoints: ['Manual design per role', 'Brand inconsistency', 'Slow updates when details change'],
+		painPoints: [
+			'Manual design per role',
+			'Brand inconsistency',
+			'Slow updates when details change'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create a job card layout once.' },
 			{ title: 'Render from ATS', detail: 'Use role/team/location variables to generate images.' },
-			{ title: 'Batch distribute', detail: 'Generate all openings weekly and share across channels.' }
+			{
+				title: 'Batch distribute',
+				detail: 'Generate all openings weekly and share across channels.'
+			}
 		],
-		faqs: [{ q: 'Can I include salary ranges?', a: 'Yes. Add variables like {{salaryMin}}–{{salaryMax}}.' }],
+		faqs: [
+			{
+				q: 'Can I include salary ranges?',
+				a: 'Yes. Add variables like {{salaryMin}}–{{salaryMax}}.'
+			}
+		],
 		related: ['tweet-card', 'product-banner']
 	},
 	'feature-flag-banner': {
@@ -1207,10 +1467,18 @@ await createImage({
 		painPoints: ['Outdated docs', 'Manual formatting', 'Confusing rollout comms'],
 		workflow: [
 			{ title: 'Create banner template', detail: 'Design a layout for flag name/status/rollout.' },
-			{ title: 'Render on changes', detail: 'Generate a new banner whenever status or rollout changes.' },
+			{
+				title: 'Render on changes',
+				detail: 'Generate a new banner whenever status or rollout changes.'
+			},
 			{ title: 'Publish', detail: 'Use image URLs across docs and internal channels.' }
 		],
-		faqs: [{ q: 'Can I show environments (prod/staging)?', a: 'Yes. Add variables and conditional blocks for each environment.' }],
+		faqs: [
+			{
+				q: 'Can I show environments (prod/staging)?',
+				a: 'Yes. Add variables and conditional blocks for each environment.'
+			}
+		],
 		related: ['release-notes-card', 'status-update']
 	},
 	'report-cover': {
@@ -1231,11 +1499,19 @@ await createImage({
 		],
 		painPoints: ['Manual cover updates', 'Inconsistent styling', 'Slow reporting cycles'],
 		workflow: [
-			{ title: 'Design cover template', detail: 'Create a cover layout with title and period variables.' },
+			{
+				title: 'Design cover template',
+				detail: 'Create a cover layout with title and period variables.'
+			},
 			{ title: 'Render from reporting job', detail: 'Generate covers when reports are produced.' },
 			{ title: 'Batch variants', detail: 'Render per team, region, or audience.' }
 		],
-		faqs: [{ q: 'Can I use this as a PDF cover?', a: 'Yes. Use the image as a first page cover or embed it in your PDF flow.' }],
+		faqs: [
+			{
+				q: 'Can I use this as a PDF cover?',
+				a: 'Yes. Use the image as a first page cover or embed it in your PDF flow.'
+			}
+		],
 		related: ['kpi-card', 'table']
 	},
 	'roadmap-card': {
@@ -1256,11 +1532,19 @@ await createImage({
 		],
 		painPoints: ['Manual slides every month', 'Outdated visuals', 'Slow stakeholder communication'],
 		workflow: [
-			{ title: 'Create roadmap template', detail: 'Design a card for quarter/theme and top items.' },
+			{
+				title: 'Create roadmap template',
+				detail: 'Design a card for quarter/theme and top items.'
+			},
 			{ title: 'Render from planning data', detail: 'Pull key items and render via API.' },
 			{ title: 'Distribute', detail: 'Use the image URL in docs, email, and exec updates.' }
 		],
-		faqs: [{ q: 'Can I include lanes (now/next/later)?', a: 'Yes. Create a 3-column layout and bind variables for each lane.' }],
+		faqs: [
+			{
+				q: 'Can I include lanes (now/next/later)?',
+				a: 'Yes. Create a 3-column layout and bind variables for each lane.'
+			}
+		],
 		related: ['status-update', 'kpi-card']
 	},
 	'youtube-thumbnail': {
@@ -1312,24 +1596,38 @@ await createImage({
 			'Generate and upload directly to YouTube'
 		],
 		overview: [
-			'YouTube thumbnails are your video\'s first impression. Great thumbnails combine bold text, expressive faces, and high contrast colors.',
+			"YouTube thumbnails are your video's first impression. Great thumbnails combine bold text, expressive faces, and high contrast colors.",
 			'Pictify lets you templatize winning thumbnail designs and generate variations programmatically for entire video libraries.'
 		],
-		painPoints: ['Inconsistent thumbnails hurt channel branding', 'Manual design for every video is time-consuming', 'Difficult to A/B test thumbnail styles'],
+		painPoints: [
+			'Inconsistent thumbnails hurt channel branding',
+			'Manual design for every video is time-consuming',
+			'Difficult to A/B test thumbnail styles'
+		],
 		workflow: [
-			{ title: 'Create template', detail: 'Design a thumbnail with text overlay and image placeholders.' },
+			{
+				title: 'Create template',
+				detail: 'Design a thumbnail with text overlay and image placeholders.'
+			},
 			{ title: 'Bind variables', detail: 'Connect title, category, and speaker image fields.' },
 			{ title: 'Generate at scale', detail: 'Render thumbnails for entire playlist via API.' }
 		],
 		faqs: [
-			{ q: 'What\'s the best YouTube thumbnail size?', a: '1280x720 pixels (16:9 aspect ratio) is the YouTube standard. We recommend this or 1920x1080 for higher resolution.' },
-			{ q: 'Can I add speaker photos?', a: 'Yes. Bind an image URL variable for dynamic speaker headshots in your template.' }
+			{
+				q: "What's the best YouTube thumbnail size?",
+				a: '1280x720 pixels (16:9 aspect ratio) is the YouTube standard. We recommend this or 1920x1080 for higher resolution.'
+			},
+			{
+				q: 'Can I add speaker photos?',
+				a: 'Yes. Bind an image URL variable for dynamic speaker headshots in your template.'
+			}
 		],
 		related: ['podcast-cover', 'blog-featured-image']
 	},
 	'linkedin-banner': {
 		label: 'LinkedIn Banner Generator',
-		description: 'Create professional LinkedIn banners and cover images for profiles and company pages.',
+		description:
+			'Create professional LinkedIn banners and cover images for profiles and company pages.',
 		seoKeywords: [
 			'linkedin banner generator',
 			'linkedin cover image maker',
@@ -1376,17 +1674,24 @@ await createImage({
 			'Generate and upload to LinkedIn'
 		],
 		overview: [
-			'LinkedIn banners are often overlooked, but they\'re visible on every profile visit.',
+			"LinkedIn banners are often overlooked, but they're visible on every profile visit.",
 			'Create templates for team-wide consistency or personal branding that updates dynamically.'
 		],
-		painPoints: ['Generic default banners hurt credibility', 'Design tools are overkill for simple banners', 'Keeping team banners consistent is manual'],
+		painPoints: [
+			'Generic default banners hurt credibility',
+			'Design tools are overkill for simple banners',
+			'Keeping team banners consistent is manual'
+		],
 		workflow: [
 			{ title: 'Choose template', detail: 'Select personal or company page dimensions.' },
 			{ title: 'Add branding', detail: 'Include logo, colors, and key messaging.' },
 			{ title: 'Generate variants', detail: 'Create banners for team or campaigns via API.' }
 		],
 		faqs: [
-			{ q: 'What size for LinkedIn personal profile?', a: '1584x396 pixels is the recommended size for personal profile banners.' },
+			{
+				q: 'What size for LinkedIn personal profile?',
+				a: '1584x396 pixels is the recommended size for personal profile banners.'
+			},
 			{ q: 'What about company pages?', a: 'Company page cover images should be 1128x191 pixels.' }
 		],
 		related: ['twitter-header', 'email-header']
@@ -1442,15 +1747,31 @@ await createImage({
 			'Podcast directories are visual-first. Great cover art increases discoverability and downloads.',
 			'Automate episode artwork generation so every release has polished, on-brand visuals.'
 		],
-		painPoints: ['Manual artwork for each episode is tedious', 'Inconsistent episode art hurts brand recognition', 'Meeting directory size requirements'],
+		painPoints: [
+			'Manual artwork for each episode is tedious',
+			'Inconsistent episode art hurts brand recognition',
+			'Meeting directory size requirements'
+		],
 		workflow: [
-			{ title: 'Design show template', detail: 'Create main artwork at 3000x3000 for directories.' },
-			{ title: 'Create episode variant', detail: 'Add variables for episode number, title, guest.' },
+			{
+				title: 'Design show template',
+				detail: 'Create main artwork at 3000x3000 for directories.'
+			},
+			{
+				title: 'Create episode variant',
+				detail: 'Add variables for episode number, title, guest.'
+			},
 			{ title: 'Automate via RSS', detail: 'Generate artwork when new episodes publish.' }
 		],
 		faqs: [
-			{ q: 'What size for Apple Podcasts?', a: '3000x3000 pixels is required for Apple Podcasts. Spotify accepts 1400x1400 minimum.' },
-			{ q: 'Can I add guest photos?', a: 'Yes. Bind a guest image URL variable to include headshots on episode artwork.' }
+			{
+				q: 'What size for Apple Podcasts?',
+				a: '3000x3000 pixels is required for Apple Podcasts. Spotify accepts 1400x1400 minimum.'
+			},
+			{
+				q: 'Can I add guest photos?',
+				a: 'Yes. Bind a guest image URL variable to include headshots on episode artwork.'
+			}
 		],
 		related: ['youtube-thumbnail', 'instagram-story']
 	},
@@ -1505,15 +1826,25 @@ await createImage({
 			'Twitter headers are prime real estate for promotions and branding.',
 			'Create templates that update easily for launches, events, or seasonal campaigns.'
 		],
-		painPoints: ['Headers often outdated or generic', 'Manual updates for each campaign', 'Keeping team headers consistent'],
+		painPoints: [
+			'Headers often outdated or generic',
+			'Manual updates for each campaign',
+			'Keeping team headers consistent'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create header with headline and visual elements.' },
 			{ title: 'Add campaign variables', detail: 'Bind launch name, date, or promotional text.' },
 			{ title: 'Generate and update', detail: 'Refresh headers automatically for campaigns.' }
 		],
 		faqs: [
-			{ q: 'What\'s the Twitter header size?', a: '1500x500 pixels is the recommended Twitter/X header size.' },
-			{ q: 'How do I avoid the profile photo overlap?', a: 'Keep important content away from the bottom-left corner where the profile photo appears on desktop.' }
+			{
+				q: "What's the Twitter header size?",
+				a: '1500x500 pixels is the recommended Twitter/X header size.'
+			},
+			{
+				q: 'How do I avoid the profile photo overlap?',
+				a: 'Keep important content away from the bottom-left corner where the profile photo appears on desktop.'
+			}
 		],
 		related: ['linkedin-banner', 'email-header']
 	},
@@ -1568,15 +1899,25 @@ await createImage({
 			'Stories are ephemeral but high-impact. Consistent, branded stories build recognition.',
 			'Create templates that your social team can generate quickly for any campaign or moment.'
 		],
-		painPoints: ['Stories need to be vertical (not square)', 'Manual design for each story is slow', 'Maintaining brand consistency across stories'],
+		painPoints: [
+			'Stories need to be vertical (not square)',
+			'Manual design for each story is slow',
+			'Maintaining brand consistency across stories'
+		],
 		workflow: [
 			{ title: 'Create template', detail: 'Design vertical 1080x1920 story layout.' },
 			{ title: 'Define variables', detail: 'Add headline, image, and date placeholders.' },
-			{ title: 'Batch generate', detail: 'Create week\'s worth of stories in one API call.' }
+			{ title: 'Batch generate', detail: "Create week's worth of stories in one API call." }
 		],
 		faqs: [
-			{ q: 'What\'s the Instagram Story size?', a: '1080x1920 pixels (9:16 aspect ratio) is the standard Instagram Story size.' },
-			{ q: 'Can I use this for Reels covers?', a: 'Yes. Reels cover images use the same 1080x1920 vertical format.' }
+			{
+				q: "What's the Instagram Story size?",
+				a: '1080x1920 pixels (9:16 aspect ratio) is the standard Instagram Story size.'
+			},
+			{
+				q: 'Can I use this for Reels covers?',
+				a: 'Yes. Reels cover images use the same 1080x1920 vertical format.'
+			}
 		],
 		related: ['podcast-cover', 'youtube-thumbnail']
 	},
@@ -1631,15 +1972,25 @@ await createImage({
 			'Email headers are seen by every subscriber. Consistent, on-brand headers build recognition.',
 			'Generate campaign-specific headers automatically to save design time.'
 		],
-		painPoints: ['Email-safe image constraints', 'Manual header design for each campaign', 'Inconsistent branding across sends'],
+		painPoints: [
+			'Email-safe image constraints',
+			'Manual header design for each campaign',
+			'Inconsistent branding across sends'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create header at 600px width for email clients.' },
 			{ title: 'Add variables', detail: 'Bind headline, date, and campaign name.' },
 			{ title: 'Generate per campaign', detail: 'Create new headers for each send automatically.' }
 		],
 		faqs: [
-			{ q: 'What width for email headers?', a: '600px is the safe width for most email clients. Use 2x (1200px) for retina displays.' },
-			{ q: 'Can I personalize headers?', a: 'Yes. Bind subscriber data like name or company for personalized headers.' }
+			{
+				q: 'What width for email headers?',
+				a: '600px is the safe width for most email clients. Use 2x (1200px) for retina displays.'
+			},
+			{
+				q: 'Can I personalize headers?',
+				a: 'Yes. Bind subscriber data like name or company for personalized headers.'
+			}
 		],
 		related: ['linkedin-banner', 'twitter-header']
 	},
@@ -1694,15 +2045,28 @@ await createImage({
 			'Featured images appear in social shares, RSS readers, and search results.',
 			'Automate generation so every post has a polished, on-brand image without manual work.'
 		],
-		painPoints: ['Manual image creation for every post', 'Inconsistent styling hurts brand', 'Time pressure on publish deadlines'],
+		painPoints: [
+			'Manual image creation for every post',
+			'Inconsistent styling hurts brand',
+			'Time pressure on publish deadlines'
+		],
 		workflow: [
-			{ title: 'Create template', detail: 'Design featured image with title and metadata variables.' },
+			{
+				title: 'Create template',
+				detail: 'Design featured image with title and metadata variables.'
+			},
 			{ title: 'Connect CMS', detail: 'Use webhooks to trigger generation on publish.' },
 			{ title: 'Auto-generate', detail: 'Images created and attached automatically.' }
 		],
 		faqs: [
-			{ q: 'What size for blog featured images?', a: '1200x630 (OG image standard) works for social sharing. 1200x675 is common for blog grids.' },
-			{ q: 'Can I include author photos?', a: 'Yes. Bind an author image URL for automatic headshot inclusion.' }
+			{
+				q: 'What size for blog featured images?',
+				a: '1200x630 (OG image standard) works for social sharing. 1200x675 is common for blog grids.'
+			},
+			{
+				q: 'Can I include author photos?',
+				a: 'Yes. Bind an author image URL for automatic headshot inclusion.'
+			}
 		],
 		related: ['og-image', 'youtube-thumbnail']
 	},
@@ -1757,15 +2121,25 @@ await createImage({
 			'Certificates motivate learners and provide shareable proof of achievement.',
 			'Automate certificate generation so every completion triggers instant delivery.'
 		],
-		painPoints: ['Manual certificate creation doesn\'t scale', 'Inconsistent certificate designs', 'Delayed delivery after completion'],
+		painPoints: [
+			"Manual certificate creation doesn't scale",
+			'Inconsistent certificate designs',
+			'Delayed delivery after completion'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create certificate with learner and course variables.' },
 			{ title: 'Connect LMS', detail: 'Trigger generation on course completion via webhook.' },
 			{ title: 'Auto-deliver', detail: 'Email certificate immediately upon completion.' }
 		],
 		faqs: [
-			{ q: 'Can I add signatures?', a: 'Yes. Include instructor signature images or bind signature URL variables.' },
-			{ q: 'What about unique certificate IDs?', a: 'Bind a unique ID variable for verification purposes.' }
+			{
+				q: 'Can I add signatures?',
+				a: 'Yes. Include instructor signature images or bind signature URL variables.'
+			},
+			{
+				q: 'What about unique certificate IDs?',
+				a: 'Bind a unique ID variable for verification purposes.'
+			}
 		],
 		related: ['certificate', 'event-ticket']
 	},
@@ -1820,7 +2194,11 @@ await createImage({
 			'Digital membership cards eliminate physical card costs and enable instant delivery.',
 			'Generate cards automatically when members join, upgrade, or renew.'
 		],
-		painPoints: ['Physical cards are expensive and slow', 'Manual card creation doesn\'t scale', 'Hard to update expiration dates'],
+		painPoints: [
+			'Physical cards are expensive and slow',
+			"Manual card creation doesn't scale",
+			'Hard to update expiration dates'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create card layout with member variables.' },
 			{ title: 'Add QR code', detail: 'Include verification QR with member ID.' },
@@ -1828,7 +2206,10 @@ await createImage({
 		],
 		faqs: [
 			{ q: 'Can I add member photos?', a: 'Yes. Bind a photo URL variable for member headshots.' },
-			{ q: 'What about tiered memberships?', a: 'Create template variants for each tier with different colors or badges.' }
+			{
+				q: 'What about tiered memberships?',
+				a: 'Create template variants for each tier with different colors or badges.'
+			}
 		],
 		related: ['event-ticket', 'course-certificate']
 	},
@@ -1862,7 +2243,7 @@ await createImage({
 		recommendedFormats: ['png', 'jpg'],
 		recommendedSizes: ['1080x1080', '1080x1350', '1200x630'],
 		templateHtml: simpleCardTemplate({
-			title: 'You\'re Invited!',
+			title: "You're Invited!",
 			subtitle: '{{eventName}} · {{date}} · {{venue}}',
 			badge: 'INVITATION',
 			accent: '#ec4899',
@@ -1883,15 +2264,25 @@ await createImage({
 			'Digital invitations are instant, personalized, and environmentally friendly.',
 			'Generate unique invitations for each guest or create shareable versions for social media.'
 		],
-		painPoints: ['Physical invitations are expensive', 'Manual personalization is tedious', 'Hard to update details after sending'],
+		painPoints: [
+			'Physical invitations are expensive',
+			'Manual personalization is tedious',
+			'Hard to update details after sending'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create invitation with event and guest variables.' },
 			{ title: 'Upload guest list', detail: 'Batch generate personalized invitations.' },
 			{ title: 'Deliver digitally', detail: 'Send via email, SMS, or messaging apps.' }
 		],
 		faqs: [
-			{ q: 'Can I add RSVP buttons?', a: 'Add QR codes or link text that guests can follow to RSVP.' },
-			{ q: 'What about plus-one invitations?', a: 'Include variables for guest count or additional names.' }
+			{
+				q: 'Can I add RSVP buttons?',
+				a: 'Add QR codes or link text that guests can follow to RSVP.'
+			},
+			{
+				q: 'What about plus-one invitations?',
+				a: 'Include variables for guest count or additional names.'
+			}
 		],
 		related: ['event-ticket', 'webinar-promo']
 	},
@@ -1945,15 +2336,25 @@ await createImage({
 			'Visual coupons are more shareable than text-only promo codes.',
 			'Generate campaign-specific coupon graphics with unique codes for tracking.'
 		],
-		painPoints: ['Plain text codes aren\'t engaging', 'Manual coupon design for each campaign', 'Tracking redemption by channel is hard'],
+		painPoints: [
+			"Plain text codes aren't engaging",
+			'Manual coupon design for each campaign',
+			'Tracking redemption by channel is hard'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create coupon with discount and code variables.' },
 			{ title: 'Generate variants', detail: 'Create channel-specific coupons with unique codes.' },
 			{ title: 'Track performance', detail: 'Monitor redemption by coupon code.' }
 		],
 		faqs: [
-			{ q: 'Can I create unique codes per image?', a: 'Yes. Bind a unique code variable for each generated coupon.' },
-			{ q: 'What about QR codes?', a: 'Add a QR code layer linking to the checkout with code applied.' }
+			{
+				q: 'Can I create unique codes per image?',
+				a: 'Yes. Bind a unique code variable for each generated coupon.'
+			},
+			{
+				q: 'What about QR codes?',
+				a: 'Add a QR code layer linking to the checkout with code applied.'
+			}
 		],
 		related: ['product-banner', 'testimonial']
 	},
@@ -2008,15 +2409,25 @@ await createImage({
 			'Portfolio cards create a professional, consistent presentation of your work.',
 			'Generate project cards automatically as you complete work.'
 		],
-		painPoints: ['Inconsistent portfolio presentation', 'Manual card creation for each project', 'Outdated portfolio images'],
+		painPoints: [
+			'Inconsistent portfolio presentation',
+			'Manual card creation for each project',
+			'Outdated portfolio images'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create project card with screenshot and details.' },
 			{ title: 'Generate per project', detail: 'Create cards for each portfolio piece.' },
 			{ title: 'Auto-update', detail: 'Refresh cards when project details change.' }
 		],
 		faqs: [
-			{ q: 'Can I include project screenshots?', a: 'Yes. Bind a screenshot URL variable for each project.' },
-			{ q: 'What about video projects?', a: 'Use a video thumbnail or frame capture as the project image.' }
+			{
+				q: 'Can I include project screenshots?',
+				a: 'Yes. Bind a screenshot URL variable for each project.'
+			},
+			{
+				q: 'What about video projects?',
+				a: 'Use a video thumbnail or frame capture as the project image.'
+			}
 		],
 		related: ['testimonial', 'blog-featured-image']
 	},
@@ -2071,15 +2482,25 @@ await createImage({
 			'Resume snapshots provide instant professional introductions.',
 			'Create shareable profile cards that summarize your key qualifications.'
 		],
-		painPoints: ['Full resumes are too detailed for quick shares', 'Manual image creation for profiles', 'Keeping profile images updated'],
+		painPoints: [
+			'Full resumes are too detailed for quick shares',
+			'Manual image creation for profiles',
+			'Keeping profile images updated'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create profile card with key professional details.' },
 			{ title: 'Add photo', detail: 'Include headshot variable for personalization.' },
 			{ title: 'Generate and share', detail: 'Update snapshot when profile changes.' }
 		],
 		faqs: [
-			{ q: 'Can I include a headshot?', a: 'Yes. Bind a photo URL variable for your profile image.' },
-			{ q: 'What about QR codes to full resume?', a: 'Add a QR code linking to your full resume or LinkedIn.' }
+			{
+				q: 'Can I include a headshot?',
+				a: 'Yes. Bind a photo URL variable for your profile image.'
+			},
+			{
+				q: 'What about QR codes to full resume?',
+				a: 'Add a QR code linking to your full resume or LinkedIn.'
+			}
 		],
 		related: ['linkedin-banner', 'portfolio-card']
 	},
@@ -2134,7 +2555,11 @@ await createImage({
 			'Menu graphics drive orders when they showcase dishes appetizingly.',
 			'Generate daily specials or seasonal menus automatically from your POS or menu system.'
 		],
-		painPoints: ['Manual specials graphics daily', 'Inconsistent menu presentation', 'Slow menu updates'],
+		painPoints: [
+			'Manual specials graphics daily',
+			'Inconsistent menu presentation',
+			'Slow menu updates'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create menu card with dish details.' },
 			{ title: 'Connect POS', detail: 'Pull specials from your menu system.' },
@@ -2197,14 +2622,21 @@ await createImage({
 			'Property flyers are essential marketing materials for every listing.',
 			'Automate flyer generation from your MLS or property management system.'
 		],
-		painPoints: ['Manual flyer creation per listing', 'Inconsistent agent branding', 'Slow time to market for new listings'],
+		painPoints: [
+			'Manual flyer creation per listing',
+			'Inconsistent agent branding',
+			'Slow time to market for new listings'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create flyer with property details and agent info.' },
 			{ title: 'Connect MLS', detail: 'Pull listings automatically via API.' },
 			{ title: 'Auto-generate', detail: 'Create flyers when new listings go live.' }
 		],
 		faqs: [
-			{ q: 'Can I include multiple photos?', a: 'Yes. Create a collage layout or multiple image variables.' },
+			{
+				q: 'Can I include multiple photos?',
+				a: 'Yes. Create a collage layout or multiple image variables.'
+			},
 			{ q: 'What about agent headshots?', a: 'Bind an agent photo URL for consistent branding.' }
 		],
 		related: ['product-banner', 'event-invitation']
@@ -2260,7 +2692,11 @@ await createImage({
 			'Score cards drive engagement during live events.',
 			'Generate real-time score graphics automatically from sports data feeds.'
 		],
-		painPoints: ['Manual score updates are slow', 'Inconsistent graphics hurt brand', 'Hard to keep up with live games'],
+		painPoints: [
+			'Manual score updates are slow',
+			'Inconsistent graphics hurt brand',
+			'Hard to keep up with live games'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create score card with team and game variables.' },
 			{ title: 'Connect data feed', detail: 'Pull live scores from sports API.' },
@@ -2323,14 +2759,21 @@ await createImage({
 			'Weather graphics are essential for media, events, and location-based content.',
 			'Generate weather widgets automatically from weather data APIs.'
 		],
-		painPoints: ['Manual weather graphic updates', 'Inconsistent forecast presentation', 'Time-consuming daily updates'],
+		painPoints: [
+			'Manual weather graphic updates',
+			'Inconsistent forecast presentation',
+			'Time-consuming daily updates'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create weather card with condition variables.' },
 			{ title: 'Connect weather API', detail: 'Pull forecast data automatically.' },
 			{ title: 'Schedule updates', detail: 'Generate new graphics daily or on schedule.' }
 		],
 		faqs: [
-			{ q: 'Can I include weather icons?', a: 'Yes. Use condition-based icon variables or include icon images.' },
+			{
+				q: 'Can I include weather icons?',
+				a: 'Yes. Use condition-based icon variables or include icon images.'
+			},
 			{ q: 'What about multi-day forecasts?', a: 'Create a template with multiple day sections.' }
 		],
 		related: ['status-update', 'kpi-card']
@@ -2386,19 +2829,29 @@ await createImage({
 			'Stock charts are essential for financial content and market communication.',
 			'Generate stock graphics automatically from market data feeds.'
 		],
-		painPoints: ['Manual chart screenshots are tedious', 'Inconsistent financial graphics', 'Hard to keep prices current'],
+		painPoints: [
+			'Manual chart screenshots are tedious',
+			'Inconsistent financial graphics',
+			'Hard to keep prices current'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create stock card with price and change variables.' },
 			{ title: 'Connect market data', detail: 'Pull live prices from financial API.' },
 			{ title: 'Auto-generate', detail: 'Create market updates on schedule or triggers.' }
 		],
 		faqs: [
-			{ q: 'Can I include sparkline charts?', a: 'Yes. Render mini chart images as variables or use SVG in the template.' },
-			{ q: 'What about cryptocurrency?', a: 'Same template works - just connect to crypto data APIs.' }
+			{
+				q: 'Can I include sparkline charts?',
+				a: 'Yes. Render mini chart images as variables or use SVG in the template.'
+			},
+			{
+				q: 'What about cryptocurrency?',
+				a: 'Same template works - just connect to crypto data APIs.'
+			}
 		],
 		related: ['kpi-card', 'table']
 	},
-	'infographic': {
+	infographic: {
 		label: 'Infographic Generator',
 		description: 'Create data-driven infographics and visual statistics.',
 		seoKeywords: [
@@ -2449,15 +2902,25 @@ await createImage({
 			'Infographics make data memorable and shareable.',
 			'Create data-driven infographics that update automatically from your data sources.'
 		],
-		painPoints: ['Manual infographic design is time-consuming', 'Hard to keep data current', 'Inconsistent visual style'],
+		painPoints: [
+			'Manual infographic design is time-consuming',
+			'Hard to keep data current',
+			'Inconsistent visual style'
+		],
 		workflow: [
 			{ title: 'Design template', detail: 'Create infographic layout with data variables.' },
 			{ title: 'Connect data', detail: 'Pull statistics from your data source.' },
 			{ title: 'Auto-generate', detail: 'Refresh infographics when data updates.' }
 		],
 		faqs: [
-			{ q: 'Can I include charts?', a: 'Yes. Render charts as SVG in the template or include chart images.' },
-			{ q: 'What about long infographics?', a: 'Use 1080x1920 or taller for vertical infographics.' }
+			{
+				q: 'Can I include charts?',
+				a: 'Yes. Render charts as SVG in the template or include chart images.'
+			},
+			{
+				q: 'What about long infographics?',
+				a: 'Use 1080x1920 or taller for vertical infographics.'
+			}
 		],
 		related: ['kpi-card', 'table']
 	},
@@ -2512,15 +2975,25 @@ await createImage({
 			'Memes are powerful engagement tools when done well.',
 			'Create branded meme templates that your social team can generate quickly.'
 		],
-		painPoints: ['Generic meme tools lack branding', 'Slow response to trending moments', 'Inconsistent meme quality'],
+		painPoints: [
+			'Generic meme tools lack branding',
+			'Slow response to trending moments',
+			'Inconsistent meme quality'
+		],
 		workflow: [
 			{ title: 'Create templates', detail: 'Design branded meme layouts with text variables.' },
 			{ title: 'Quick generation', detail: 'Generate memes in seconds with new text.' },
 			{ title: 'Stay on trend', detail: 'Respond to moments with on-brand humor.' }
 		],
 		faqs: [
-			{ q: 'Can I use popular meme formats?', a: 'Yes. Create templates based on popular meme layouts with your branding.' },
-			{ q: 'What about animated memes?', a: 'Use GIF format for simple animations or multiple frame generation.' }
+			{
+				q: 'Can I use popular meme formats?',
+				a: 'Yes. Create templates based on popular meme layouts with your branding.'
+			},
+			{
+				q: 'What about animated memes?',
+				a: 'Use GIF format for simple animations or multiple frame generation.'
+			}
 		],
 		related: ['quote-card', 'instagram-story']
 	}

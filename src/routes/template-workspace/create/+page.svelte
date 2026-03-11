@@ -4,10 +4,10 @@
 	import { pageActions } from '../../../store/pages.store';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	
+
 	let showSelector = true;
 	let selectedConfig = null;
-	
+
 	// Check if coming from a draft (tools workflow)
 	onMount(() => {
 		try {
@@ -32,16 +32,16 @@
 			console.log('No draft to load');
 		}
 	});
-	
+
 	function handleFormatSelect(event) {
 		selectedConfig = event.detail;
-		
+
 		const format = selectedConfig.outputFormat;
-		
+
 		if (format === 'pdf') {
 			// Save config to local storage or store if needed, but for now defaults are fine
-            // or pass as query params if complex config is needed.
-            // For now, straightforward redirect.
+			// or pass as query params if complex config is needed.
+			// For now, straightforward redirect.
 			goto('/template-workspace/pdf/create');
 		} else {
 			goto('/template-workspace/image/create');
@@ -53,7 +53,7 @@
 	{#if showSelector}
 		<TemplateTypeSelector on:select={handleFormatSelect} />
 	{/if}
-	
+
 	{#if !showSelector}
 		<CreateTemplate initialConfig={selectedConfig} />
 	{/if}

@@ -12,7 +12,7 @@ export async function GET() {
 	const urls = [];
 
 	// Template category pages
-	templateCategories.forEach(category => {
+	templateCategories.forEach((category) => {
 		urls.push(`  <url>
     <loc>${baseUrl}/templates/category/${category.id}</loc>
     <lastmod>${today}</lastmod>

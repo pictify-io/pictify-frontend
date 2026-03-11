@@ -41,19 +41,36 @@
 			href="/"
 			class="hidden lg:flex w-64 min-w-[16rem] min-h-[64px] sm:min-h-[80px] flex-shrink-0 items-center justify-center px-4 sm:px-6 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-[#ffc480] transition-all group relative overflow-hidden"
 		>
-
 			<div class="flex items-center gap-2 sm:gap-3">
 				<!-- Logo Icon (Abstract Shapes) -->
-				<div class="w-7 h-7 sm:w-8 sm:h-8 bg-gray-900 rounded-md flex items-center justify-center shadow-[2px_2px_0_0_#ffc480] sm:shadow-[3px_3px_0_0_#ffc480] group-hover:shadow-none group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-all border-2 border-transparent">
-					<svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" />
+				<div
+					class="w-7 h-7 sm:w-8 sm:h-8 bg-gray-900 rounded-md flex items-center justify-center shadow-[2px_2px_0_0_#ffc480] sm:shadow-[3px_3px_0_0_#ffc480] group-hover:shadow-none group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-all border-2 border-transparent"
+				>
+					<svg
+						class="w-4 h-4 sm:w-5 sm:h-5 text-white"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="3"
+							d="M13 10V3L4 14h7v7l9-11h-7z"
+						/>
 					</svg>
 				</div>
 
 				<!-- Text - Always show on larger screens, hide when collapsed on desktop -->
 				<div class="flex flex-col">
-					<span class="text-lg sm:text-xl font-black text-gray-900 tracking-tight leading-none group-hover:translate-x-1 transition-transform">PICTIFY</span>
-					<span class="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none group-hover:text-gray-900 transition-colors">Dashboard</span>
+					<span
+						class="text-lg sm:text-xl font-black text-gray-900 tracking-tight leading-none group-hover:translate-x-1 transition-transform"
+						>PICTIFY</span
+					>
+					<span
+						class="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none group-hover:text-gray-900 transition-colors"
+						>Dashboard</span
+					>
 				</div>
 			</div>
 		</a>
@@ -66,9 +83,10 @@
 
 	<!-- Right Side: System Status / Usage -->
 	<div class="flex items-stretch border-l-[3px] border-gray-900 flex-shrink-0">
-
 		<!-- Usage Widget Container -->
-		<div class="flex items-center px-3 sm:px-4 md:px-6 min-h-[64px] sm:min-h-[80px] hover:bg-gray-50 transition-colors relative group">
+		<div
+			class="flex items-center px-3 sm:px-4 md:px-6 min-h-[64px] sm:min-h-[80px] hover:bg-gray-50 transition-colors relative group"
+		>
 			<UsageWidget compact={true} />
 		</div>
 

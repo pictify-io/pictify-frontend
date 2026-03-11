@@ -124,7 +124,7 @@ export const createBindingAction = async (bindingData) => {
 			throw new Error('Failed to create binding');
 		}
 		// Add to list
-		bindings.update(b => [...b, response.binding]);
+		bindings.update((b) => [...b, response.binding]);
 		binding.set(response.binding);
 		return response.binding;
 	} catch (error) {
@@ -146,8 +146,8 @@ export const updateBindingAction = async (id, updates) => {
 			throw new Error('Failed to update binding');
 		}
 		// Update in list
-		bindings.update(b => {
-			const index = b.findIndex(item => item.uid === id);
+		bindings.update((b) => {
+			const index = b.findIndex((item) => item.uid === id);
 			if (index !== -1) {
 				b[index] = response.binding;
 			}
@@ -170,7 +170,7 @@ export const deleteBindingAction = async (id) => {
 	bindingLoading.set(true);
 	try {
 		await deleteBinding(id);
-		bindings.update(b => b.filter(item => item.uid !== id));
+		bindings.update((b) => b.filter((item) => item.uid !== id));
 		return true;
 	} catch (error) {
 		console.error('Error deleting binding:', error);
@@ -190,14 +190,14 @@ const createBindingStatusAction = (apiFunc, actionName) => async (id) => {
 	try {
 		const response = await apiFunc(id);
 		if (response?.binding) {
-			bindings.update(b => {
-				const index = b.findIndex(item => item.uid === id);
+			bindings.update((b) => {
+				const index = b.findIndex((item) => item.uid === id);
 				if (index !== -1) {
 					b[index] = response.binding;
 				}
 				return [...b];
 			});
-			binding.update(b => b.uid === id ? response.binding : b);
+			binding.update((b) => (b.uid === id ? response.binding : b));
 		}
 		return response?.binding;
 	} catch (error) {
@@ -305,7 +305,7 @@ export const createDataSourceAction = async (sourceData) => {
 		if (!response?.dataSource) {
 			throw new Error('Failed to create data source');
 		}
-		dataSources.update(ds => [...ds, response.dataSource]);
+		dataSources.update((ds) => [...ds, response.dataSource]);
 		dataSource.set(response.dataSource);
 		return response.dataSource;
 	} catch (error) {
@@ -326,8 +326,8 @@ export const updateDataSourceAction = async (id, updates) => {
 		if (!response?.dataSource) {
 			throw new Error('Failed to update data source');
 		}
-		dataSources.update(ds => {
-			const index = ds.findIndex(item => item.uid === id);
+		dataSources.update((ds) => {
+			const index = ds.findIndex((item) => item.uid === id);
 			if (index !== -1) {
 				ds[index] = response.dataSource;
 			}
@@ -350,7 +350,7 @@ export const deleteDataSourceAction = async (id) => {
 	dataSourceLoading.set(true);
 	try {
 		await deleteDataSource(id);
-		dataSources.update(ds => ds.filter(item => item.uid !== id));
+		dataSources.update((ds) => ds.filter((item) => item.uid !== id));
 		return true;
 	} catch (error) {
 		console.error('Error deleting data source:', error);

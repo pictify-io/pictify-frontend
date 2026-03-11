@@ -7,7 +7,7 @@
 		startExperimentAction,
 		updateExperimentAction,
 		checkSlugAction,
-		experimentLoading,
+		experimentLoading
 	} from '../../../../../store/experiments.store';
 	import { toast } from '../../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
@@ -26,7 +26,7 @@
 		{ id: 'basics', label: 'Basics' },
 		{ id: 'variants', label: 'Variants' },
 		{ id: 'schedule', label: 'Schedule' },
-		{ id: 'launch', label: 'Launch' },
+		{ id: 'launch', label: 'Launch' }
 	];
 	let currentStep = 'basics';
 
@@ -53,7 +53,7 @@
 				isDefault: true,
 				variables: {},
 				templateUid: '',
-				schedule: { startAt: null, endAt: null },
+				schedule: { startAt: null, endAt: null }
 			},
 			{
 				id: 'variant-b',
@@ -62,9 +62,9 @@
 				isDefault: false,
 				variables: {},
 				templateUid: '',
-				schedule: { startAt: null, endAt: null },
-			},
-		],
+				schedule: { startAt: null, endAt: null }
+			}
+		]
 	};
 
 	let slugStatus = '';
@@ -86,12 +86,15 @@
 
 	function humanizeVarName(rawKey) {
 		let name = rawKey;
-		name = name.replace(/^(RECT_OBJ_|TEXT_OBJ_|IMAGE_OBJ_|GROUP_OBJ_|CIRCLE_OBJ_|PATH_OBJ_|I-TEXT_)/i, '');
+		name = name.replace(
+			/^(RECT_OBJ_|TEXT_OBJ_|IMAGE_OBJ_|GROUP_OBJ_|CIRCLE_OBJ_|PATH_OBJ_|I-TEXT_)/i,
+			''
+		);
 		name = name.replace(/_[A-Z0-9]{6,}$/i, '');
 		name = name.replace(/\d{13,}/g, '');
 		name = name.replace(/_+/g, ' ').trim();
 		if (!name) return rawKey;
-		return name.replace(/\b\w/g, c => c.toUpperCase());
+		return name.replace(/\b\w/g, (c) => c.toUpperCase());
 	}
 
 	// ============== Definitions ==============
@@ -99,7 +102,7 @@
 	const outputFormats = [
 		{ value: 'png', label: 'PNG', desc: 'Lossless, best for text & graphics' },
 		{ value: 'jpeg', label: 'JPEG', desc: 'Smaller size, great for photos' },
-		{ value: 'webp', label: 'WebP', desc: 'Modern format, best compression' },
+		{ value: 'webp', label: 'WebP', desc: 'Modern format, best compression' }
 	];
 
 	// ============== Derived Values ==============
@@ -109,14 +112,16 @@
 	$: previewUrl = `pictify.io/s/${slugDisplay}.${form.outputConfig.format}`;
 
 	$: canGoStep2 = form.name.trim() !== '';
-	$: canGoStep3 = canGoStep2 && form.variants.every(v => v.templateUid !== '');
+	$: canGoStep3 = canGoStep2 && form.variants.every((v) => v.templateUid !== '');
 
 	$: effectiveCanSubmit =
 		form.name.trim() !== '' &&
 		form.slug.trim() !== '' &&
-		(isEditMode ? (slugStatus === 'available' || slugStatus === 'existing') : slugStatus === 'available') &&
+		(isEditMode
+			? slugStatus === 'available' || slugStatus === 'existing'
+			: slugStatus === 'available') &&
 		!isSubmitting &&
-		form.variants.every(v => v.templateUid !== '');
+		form.variants.every((v) => v.templateUid !== '');
 
 	let unsubscribeTemplates;
 
@@ -169,18 +174,22 @@
 				goalConfig: exp.goalConfig || { type: 'impressions_only', destinationUrl: '' },
 				expiresAt: exp.expiresAt || '',
 				fallbackImageUrl: exp.fallbackImageUrl || '',
-				variants: (exp.variants || []).map(v => ({
+				variants: (exp.variants || []).map((v) => ({
 					id: v.id,
 					name: v.name || '',
 					weight: v.weight || 0,
 					isDefault: v.isDefault || false,
 					variables: v.variables || {},
 					templateUid: v.templateUid || exp.templateUid || '',
-					schedule: v.schedule || { startAt: null, endAt: null, recurrence: { type: 'none', cronExpression: '', timezone: 'UTC' } },
-				})),
+					schedule: v.schedule || {
+						startAt: null,
+						endAt: null,
+						recurrence: { type: 'none', cronExpression: '', timezone: 'UTC' }
+					}
+				}))
 			};
 
-			variantVarEditors = form.variants.map(v => {
+			variantVarEditors = form.variants.map((v) => {
 				const vars = v.variables || {};
 				return Object.entries(vars).map(([key, value]) => ({ key, value: String(value) }));
 			});
@@ -224,7 +233,7 @@
 							name: vd.name,
 							type: vd.type || 'text',
 							defaultValue: vd.defaultValue ?? '',
-							description: vd.description || '',
+							description: vd.description || ''
 						});
 					}
 				} else if (tpl.variables && Array.isArray(tpl.variables) && tpl.variables.length > 0) {
@@ -243,7 +252,7 @@
 					templateDataCache[templateUid] = {
 						fabricJSData: tpl.fabricJSData,
 						width: tpl.width || tpl.fabricJSData?.width || 800,
-						height: tpl.height || tpl.fabricJSData?.height || 600,
+						height: tpl.height || tpl.fabricJSData?.height || 600
 					};
 				}
 			}
@@ -270,11 +279,15 @@
 
 	function populateVarEditorFromTemplate(variantIndex, templateVars) {
 		const existingEditor = variantVarEditors[variantIndex] || [];
-		const existingMap = new Map(existingEditor.map(r => [r.key, r.value]));
+		const existingMap = new Map(existingEditor.map((r) => [r.key, r.value]));
 
-		const newRows = templateVars.map(tv => ({
+		const newRows = templateVars.map((tv) => ({
 			key: tv.name,
-			value: existingMap.has(tv.name) ? existingMap.get(tv.name) : (tv.defaultValue != null ? String(tv.defaultValue) : ''),
+			value: existingMap.has(tv.name)
+				? existingMap.get(tv.name)
+				: tv.defaultValue != null
+				? String(tv.defaultValue)
+				: ''
 		}));
 		variantVarEditors[variantIndex] = newRows;
 		variantVarEditors = variantVarEditors;
@@ -346,8 +359,8 @@
 				isDefault: false,
 				variables: {},
 				templateUid: '',
-				schedule: { startAt: null, endAt: null },
-			},
+				schedule: { startAt: null, endAt: null }
+			}
 		];
 		nextVariantNum++;
 		variantVarEditors = [...variantVarEditors, []];
@@ -368,7 +381,7 @@
 		const remainder = 10000 - baseWeight * count;
 		form.variants = form.variants.map((v, i) => ({
 			...v,
-			weight: baseWeight + (i === 0 ? remainder : 0),
+			weight: baseWeight + (i === 0 ? remainder : 0)
 		}));
 	}
 
@@ -387,15 +400,15 @@
 				goalConfig: { ...form.goalConfig },
 				expiresAt: form.expiresAt || null,
 				fallbackImageUrl: form.fallbackImageUrl || null,
-				variants: form.variants.map(v => ({
+				variants: form.variants.map((v) => ({
 					id: v.id,
 					name: v.name.trim(),
 					weight: parseInt(v.weight) || 0,
 					isDefault: v.isDefault,
 					variables: v.variables || {},
 					templateUid: v.templateUid,
-					schedule: v.schedule || null,
-				})),
+					schedule: v.schedule || null
+				}))
 			};
 
 			if (isEditMode && editExperimentUid) {
@@ -441,7 +454,6 @@
 			isSubmitting = false;
 		}
 	}
-
 </script>
 
 <Toast />
@@ -449,9 +461,17 @@
 <div class="max-w-5xl mx-auto px-4 py-8">
 	<!-- Header -->
 	<div class="mb-8">
-		<a href="/dashboard/experiments" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors mb-4">
+		<a
+			href="/dashboard/experiments"
+			class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors mb-4"
+		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2.5"
+					d="M15 19l-7-7 7-7"
+				/>
 			</svg>
 			Back to Experiments
 		</a>
@@ -469,12 +489,16 @@
 	<!-- Step 1: Basics -->
 	{#if currentStep === 'basics'}
 		<div class="mt-8 space-y-6">
-			<div class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6 space-y-5">
+			<div
+				class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6 space-y-5"
+			>
 				<h3 class="text-sm font-black uppercase tracking-widest text-gray-900">Basic Setup</h3>
 
 				<!-- Name -->
 				<div>
-					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Experiment Name</label>
+					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+						>Experiment Name</label
+					>
 					<input
 						type="text"
 						value={form.name}
@@ -486,7 +510,9 @@
 
 				<!-- Slug -->
 				<div>
-					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">URL Slug</label>
+					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+						>URL Slug</label
+					>
 					<div class="flex items-center gap-3">
 						<input
 							type="text"
@@ -499,7 +525,14 @@
 							<span class="text-xs font-bold text-gray-400">Checking...</span>
 						{:else if slugStatus === 'available'}
 							<span class="text-xs font-bold text-green-600 flex items-center gap-1">
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="3"
+										d="M5 13l4 4L19 7"
+									/></svg
+								>
 								Available
 							</span>
 						{:else if slugStatus === 'taken'}
@@ -513,16 +546,18 @@
 
 				<!-- Output Format -->
 				<div>
-					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Output Format</label>
+					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+						>Output Format</label
+					>
 					<div class="flex gap-3">
 						{#each outputFormats as fmt}
 							<button
 								type="button"
-								on:click={() => form.outputConfig.format = fmt.value}
+								on:click={() => (form.outputConfig.format = fmt.value)}
 								class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 									{form.outputConfig.format === fmt.value
-										? 'border-[#ffc480] bg-[#ffc480]/10 shadow-[4px_4px_0_0_#ffc480]'
-										: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
+									? 'border-[#ffc480] bg-[#ffc480]/10 shadow-[4px_4px_0_0_#ffc480]'
+									: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
 							>
 								<span class="text-sm font-black">{fmt.label}</span>
 								<p class="text-[9px] font-bold text-gray-500 mt-0.5">{fmt.desc}</p>
@@ -537,7 +572,7 @@
 				<button
 					type="button"
 					disabled={!canGoStep2}
-					on:click={() => currentStep = 'variants'}
+					on:click={() => (currentStep = 'variants')}
 					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-[#ffc480] shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					Next: Variants
@@ -550,23 +585,40 @@
 	{#if currentStep === 'variants'}
 		<div class="mt-8 space-y-6">
 			{#each form.variants as variant, i}
-				<div class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] overflow-hidden">
+				<div
+					class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] overflow-hidden"
+				>
 					<!-- Variant header -->
-					<div class="flex items-center justify-between px-5 py-3 border-b-[3px] border-gray-200 bg-gray-50">
+					<div
+						class="flex items-center justify-between px-5 py-3 border-b-[3px] border-gray-200 bg-gray-50"
+					>
 						<div class="flex items-center gap-3">
 							<span class="text-sm font-black text-gray-900">{variant.name}</span>
 							{#if variant.isDefault}
-								<span class="text-[9px] font-black uppercase tracking-widest bg-gray-200 text-gray-500 px-2 py-0.5 rounded-md border border-gray-300">Default</span>
+								<span
+									class="text-[9px] font-black uppercase tracking-widest bg-gray-200 text-gray-500 px-2 py-0.5 rounded-md border border-gray-300"
+									>Default</span
+								>
 							{/if}
 						</div>
 						<div class="flex items-center gap-2">
 							<button
 								type="button"
-								on:click={() => expandedVariants[i] = !expandedVariants[i]}
+								on:click={() => (expandedVariants[i] = !expandedVariants[i])}
 								class="p-2 text-gray-400 hover:text-gray-900 transition-colors"
 							>
-								<svg class="w-4 h-4 transition-transform {expandedVariants[i] ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+								<svg
+									class="w-4 h-4 transition-transform {expandedVariants[i] ? 'rotate-180' : ''}"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2.5"
+										d="M19 9l-7 7-7-7"
+									/>
 								</svg>
 							</button>
 							{#if !variant.isDefault && form.variants.length > 2}
@@ -576,7 +628,12 @@
 									class="p-2 text-gray-300 hover:text-red-600 transition-colors"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2.5"
+											d="M6 18L18 6M6 6l12 12"
+										/>
 									</svg>
 								</button>
 							{/if}
@@ -587,7 +644,10 @@
 					<div class="p-5 space-y-4" class:hidden={!expandedVariants[i] && i > 0}>
 						<!-- Variant Name -->
 						<div>
-							<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Variant Name</label>
+							<label
+								class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+								>Variant Name</label
+							>
 							<input
 								type="text"
 								bind:value={variant.name}
@@ -597,7 +657,10 @@
 
 						<!-- Template Selection -->
 						<div>
-							<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Template</label>
+							<label
+								class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+								>Template</label
+							>
 							<TemplateSelector
 								bind:value={variant.templateUid}
 								on:change={() => handleVariantTemplateSelect(i)}
@@ -607,7 +670,10 @@
 						<!-- Variable Editor -->
 						{#if variant.templateUid && getTemplateVars(variant.templateUid).length > 0}
 							<div>
-								<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Variables</label>
+								<label
+									class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+									>Variables</label
+								>
 								<VariableEditor
 									bind:rows={variantVarEditors[i]}
 									templateVars={getTemplateVars(variant.templateUid)}
@@ -637,7 +703,12 @@
 				class="w-full px-4 py-3 border-[3px] border-dashed border-gray-300 rounded-xl text-sm font-black text-gray-400 hover:border-black hover:text-gray-900 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2.5"
+						d="M12 4v16m8-8H4"
+					/>
 				</svg>
 				Add Variant
 			</button>
@@ -646,7 +717,7 @@
 			<div class="flex justify-between">
 				<button
 					type="button"
-					on:click={() => currentStep = 'basics'}
+					on:click={() => (currentStep = 'basics')}
 					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px] transition-all"
 				>
 					Back
@@ -654,7 +725,7 @@
 				<button
 					type="button"
 					disabled={!canGoStep3}
-					on:click={() => currentStep = 'schedule'}
+					on:click={() => (currentStep = 'schedule')}
 					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-[#ffc480] shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					Next: Schedule
@@ -676,14 +747,14 @@
 			<div class="flex justify-between">
 				<button
 					type="button"
-					on:click={() => currentStep = 'variants'}
+					on:click={() => (currentStep = 'variants')}
 					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px] transition-all"
 				>
 					Back
 				</button>
 				<button
 					type="button"
-					on:click={() => currentStep = 'launch'}
+					on:click={() => (currentStep = 'launch')}
 					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-[#ffc480] shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all"
 				>
 					Next: Launch
@@ -696,30 +767,34 @@
 	{#if currentStep === 'launch'}
 		<div class="mt-8 space-y-6">
 			<!-- Goal Config -->
-			<div class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6 space-y-5">
+			<div
+				class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6 space-y-5"
+			>
 				<h3 class="text-sm font-black uppercase tracking-widest text-gray-900">Goal & Tracking</h3>
 
 				<div>
-					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Goal Type</label>
+					<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+						>Goal Type</label
+					>
 					<div class="flex gap-3">
 						<button
 							type="button"
-							on:click={() => form.goalConfig.type = 'impressions_only'}
+							on:click={() => (form.goalConfig.type = 'impressions_only')}
 							class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 								{form.goalConfig.type === 'impressions_only'
-									? 'border-[#ffc480] bg-[#ffc480]/10 shadow-[4px_4px_0_0_#ffc480]'
-									: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
+								? 'border-[#ffc480] bg-[#ffc480]/10 shadow-[4px_4px_0_0_#ffc480]'
+								: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
 						>
 							<span class="text-sm font-black">Views Only</span>
 							<p class="text-[9px] font-bold text-gray-500 mt-0.5">Track impressions</p>
 						</button>
 						<button
 							type="button"
-							on:click={() => form.goalConfig.type = 'click_through'}
+							on:click={() => (form.goalConfig.type = 'click_through')}
 							class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 								{form.goalConfig.type === 'click_through'
-									? 'border-[#ffc480] bg-[#ffc480]/10 shadow-[4px_4px_0_0_#ffc480]'
-									: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
+								? 'border-[#ffc480] bg-[#ffc480]/10 shadow-[4px_4px_0_0_#ffc480]'
+								: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
 						>
 							<span class="text-sm font-black">Click-through</span>
 							<p class="text-[9px] font-bold text-gray-500 mt-0.5">Track clicks + views</p>
@@ -729,7 +804,10 @@
 
 				{#if form.goalConfig.type === 'click_through'}
 					<div>
-						<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Destination URL</label>
+						<label
+							class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
+							>Destination URL</label
+						>
 						<input
 							type="url"
 							bind:value={form.goalConfig.destinationUrl}
@@ -757,11 +835,15 @@
 						<p class="text-[9px] font-black uppercase tracking-widest text-gray-500">Variants</p>
 					</div>
 					<div class="p-3 bg-gray-50 rounded-xl border-[2px] border-gray-200">
-						<p class="text-2xl font-black text-gray-900">{form.variants.filter(v => v.schedule?.startAt).length}</p>
+						<p class="text-2xl font-black text-gray-900">
+							{form.variants.filter((v) => v.schedule?.startAt).length}
+						</p>
 						<p class="text-[9px] font-black uppercase tracking-widest text-gray-500">Scheduled</p>
 					</div>
 					<div class="p-3 bg-gray-50 rounded-xl border-[2px] border-gray-200">
-						<p class="text-2xl font-black text-gray-900">{form.outputConfig.format.toUpperCase()}</p>
+						<p class="text-2xl font-black text-gray-900">
+							{form.outputConfig.format.toUpperCase()}
+						</p>
 						<p class="text-[9px] font-black uppercase tracking-widest text-gray-500">Format</p>
 					</div>
 					<div class="p-3 bg-gray-50 rounded-xl border-[2px] border-gray-200">
@@ -775,7 +857,7 @@
 			<div class="flex justify-between">
 				<button
 					type="button"
-					on:click={() => currentStep = 'schedule'}
+					on:click={() => (currentStep = 'schedule')}
 					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px] transition-all"
 				>
 					Back
@@ -797,8 +879,19 @@
 					>
 						{#if isSubmitting}
 							<svg class="w-4 h-4 animate-spin inline mr-2" fill="none" viewBox="0 0 24 24">
-								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								/>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+								/>
 							</svg>
 						{/if}
 						{isEditMode ? 'Update & Launch' : 'Create & Launch'}

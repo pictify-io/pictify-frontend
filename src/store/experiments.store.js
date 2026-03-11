@@ -29,7 +29,12 @@ export const createDefaultExperiment = () => ({
 	templateUid: null,
 	variants: [],
 	goalConfig: { type: 'impressions_only', destinationUrl: '' },
-	banditConfig: { enabled: false, algorithm: 'thompson_sampling', warmupImpressions: 50, recomputeIntervalMinutes: 15 },
+	banditConfig: {
+		enabled: false,
+		algorithm: 'thompson_sampling',
+		warmupImpressions: 50,
+		recomputeIntervalMinutes: 15
+	},
 	hypothesis: '',
 	minimumSampleSize: 1000,
 	confidenceThreshold: 0.95,
@@ -55,8 +60,14 @@ export const experimentAnalytics = writable(null);
 // Loading state (counter-based to handle concurrent operations)
 let _loadingCount = 0;
 export const experimentLoading = writable(false);
-const startLoading = () => { _loadingCount++; experimentLoading.set(true); };
-const stopLoading = () => { _loadingCount = Math.max(0, _loadingCount - 1); if (_loadingCount === 0) experimentLoading.set(false); };
+const startLoading = () => {
+	_loadingCount++;
+	experimentLoading.set(true);
+};
+const stopLoading = () => {
+	_loadingCount = Math.max(0, _loadingCount - 1);
+	if (_loadingCount === 0) experimentLoading.set(false);
+};
 
 // ============== Experiment Actions ==============
 
@@ -114,7 +125,7 @@ export const createExperimentAction = async (data) => {
 			throw new Error('Failed to create experiment');
 		}
 		// Add to list
-		experiments.update(e => [...e, response.experiment]);
+		experiments.update((e) => [...e, response.experiment]);
 		experiment.set(response.experiment);
 		return response.experiment;
 	} catch (error) {
@@ -136,8 +147,8 @@ export const updateExperimentAction = async (uid, updates) => {
 			throw new Error('Failed to update experiment');
 		}
 		// Update in list
-		experiments.update(e => {
-			const index = e.findIndex(item => item.uid === uid);
+		experiments.update((e) => {
+			const index = e.findIndex((item) => item.uid === uid);
 			if (index !== -1) {
 				e[index] = response.experiment;
 			}
@@ -160,7 +171,7 @@ export const deleteExperimentAction = async (uid) => {
 	startLoading();
 	try {
 		await deleteExperiment(uid);
-		experiments.update(e => e.filter(item => item.uid !== uid));
+		experiments.update((e) => e.filter((item) => item.uid !== uid));
 		return true;
 	} catch (error) {
 		console.error('Error deleting experiment:', error);
@@ -176,28 +187,30 @@ export const deleteExperimentAction = async (uid) => {
  * @param {string} actionName - Name for error logging
  * @returns {Function} Action function
  */
-const createExperimentStatusAction = (apiFunc, actionName) => async (uid, ...args) => {
-	startLoading();
-	try {
-		const response = await apiFunc(uid, ...args);
-		if (response?.experiment) {
-			experiments.update(e => {
-				const index = e.findIndex(item => item.uid === uid);
-				if (index !== -1) {
-					e[index] = response.experiment;
-				}
-				return [...e];
-			});
-			experiment.update(e => e.uid === uid ? response.experiment : e);
+const createExperimentStatusAction =
+	(apiFunc, actionName) =>
+	async (uid, ...args) => {
+		startLoading();
+		try {
+			const response = await apiFunc(uid, ...args);
+			if (response?.experiment) {
+				experiments.update((e) => {
+					const index = e.findIndex((item) => item.uid === uid);
+					if (index !== -1) {
+						e[index] = response.experiment;
+					}
+					return [...e];
+				});
+				experiment.update((e) => (e.uid === uid ? response.experiment : e));
+			}
+			return response?.experiment;
+		} catch (error) {
+			console.error(`Error ${actionName} experiment:`, error);
+			throw error;
+		} finally {
+			stopLoading();
 		}
-		return response?.experiment;
-	} catch (error) {
-		console.error(`Error ${actionName} experiment:`, error);
-		throw error;
-	} finally {
-		stopLoading();
-	}
-};
+	};
 
 /**
  * Start an experiment
@@ -212,7 +225,10 @@ export const pauseExperimentAction = createExperimentStatusAction(pauseExperimen
 /**
  * Complete an experiment with a winner variant
  */
-export const completeExperimentAction = createExperimentStatusAction(completeExperiment, 'completing');
+export const completeExperimentAction = createExperimentStatusAction(
+	completeExperiment,
+	'completing'
+);
 
 /**
  * Duplicate an experiment
@@ -225,7 +241,7 @@ export const duplicateExperimentAction = async (uid) => {
 			throw new Error('Failed to duplicate experiment');
 		}
 		// Add duplicated experiment to list
-		experiments.update(e => [...e, response.experiment]);
+		experiments.update((e) => [...e, response.experiment]);
 		return response.experiment;
 	} catch (error) {
 		console.error('Error duplicating experiment:', error);

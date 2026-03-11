@@ -55,7 +55,10 @@ export function getBreadcrumbItems(pageType, pageData = {}) {
 		toolDimension: [
 			home,
 			{ label: 'Tools', href: '/tools' },
-			{ label: `HTML to ${pageData.format || 'Image'}`, href: `/tools/html-to-${pageData.formatId || 'png'}` }
+			{
+				label: `HTML to ${pageData.format || 'Image'}`,
+				href: `/tools/html-to-${pageData.formatId || 'png'}`
+			}
 		],
 		useCase: [home, { label: 'Tools', href: '/tools' }],
 		ogPlatform: [
@@ -75,7 +78,9 @@ export function getBreadcrumbItems(pageType, pageData = {}) {
 		template: [
 			home,
 			{ label: 'Templates', href: '/templates' },
-			...(pageData.category ? [{ label: pageData.category.name, href: `/templates/category/${pageData.category.id}` }] : [])
+			...(pageData.category
+				? [{ label: pageData.category.name, href: `/templates/category/${pageData.category.id}` }]
+				: [])
 		],
 
 		// Persona

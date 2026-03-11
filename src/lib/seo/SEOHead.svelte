@@ -1,57 +1,57 @@
 <script>
-/**
- * SEOHead Component
- * Universal SEO component for consistent meta tags across all pages
- *
- * @prop {string} title - Page title
- * @prop {string} description - Meta description
- * @prop {string} canonical - Canonical URL
- * @prop {string[]} [keywords] - Keywords array
- * @prop {Object} [openGraph] - Open Graph data
- * @prop {Object} [twitter] - Twitter card data
- * @prop {Object} [schema] - JSON-LD structured data
- * @prop {string} [robots] - Robots meta directive
- * @prop {string} [ogImage] - OG image URL (shorthand)
- */
+	/**
+	 * SEOHead Component
+	 * Universal SEO component for consistent meta tags across all pages
+	 *
+	 * @prop {string} title - Page title
+	 * @prop {string} description - Meta description
+	 * @prop {string} canonical - Canonical URL
+	 * @prop {string[]} [keywords] - Keywords array
+	 * @prop {Object} [openGraph] - Open Graph data
+	 * @prop {Object} [twitter] - Twitter card data
+	 * @prop {Object} [schema] - JSON-LD structured data
+	 * @prop {string} [robots] - Robots meta directive
+	 * @prop {string} [ogImage] - OG image URL (shorthand)
+	 */
 
-export let title;
-export let description;
-export let canonical;
-export let keywords = [];
-export let openGraph = null;
-export let twitter = null;
-export let schema = null;
-export let robots = 'index, follow';
-export let ogImage = 'https://pictify.io/og-image-tools.jpg';
+	export let title;
+	export let description;
+	export let canonical;
+	export let keywords = [];
+	export let openGraph = null;
+	export let twitter = null;
+	export let schema = null;
+	export let robots = 'index, follow';
+	export let ogImage = 'https://pictify.io/og-image-tools.jpg';
 
-// Defaults for Open Graph
-$: og = {
-	title: title,
-	description: description,
-	url: canonical,
-	type: 'website',
-	image: ogImage,
-	siteName: 'Pictify',
-	...openGraph
-};
+	// Defaults for Open Graph
+	$: og = {
+		title: title,
+		description: description,
+		url: canonical,
+		type: 'website',
+		image: ogImage,
+		siteName: 'Pictify',
+		...openGraph
+	};
 
-// Defaults for Twitter Card
-$: tw = {
-	card: 'summary_large_image',
-	title: title,
-	description: description,
-	image: ogImage,
-	...twitter
-};
+	// Defaults for Twitter Card
+	$: tw = {
+		card: 'summary_large_image',
+		title: title,
+		description: description,
+		image: ogImage,
+		...twitter
+	};
 
-// Serialize schema for safe HTML embedding
-function serializeSchema(data) {
-	if (!data) return '';
-	return JSON.stringify(data, null, 0)
-		.replace(/</g, '\\u003c')
-		.replace(/>/g, '\\u003e')
-		.replace(/&/g, '\\u0026');
-}
+	// Serialize schema for safe HTML embedding
+	function serializeSchema(data) {
+		if (!data) return '';
+		return JSON.stringify(data, null, 0)
+			.replace(/</g, '\\u003c')
+			.replace(/>/g, '\\u003e')
+			.replace(/&/g, '\\u0026');
+	}
 </script>
 
 <svelte:head>

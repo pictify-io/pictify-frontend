@@ -23,7 +23,7 @@ export async function GET() {
 		{ path: '/tools/linkedin-banner-generator', priority: '0.8' }
 	];
 
-	mainTools.forEach(tool => {
+	mainTools.forEach((tool) => {
 		urls.push(`  <url>
     <loc>${baseUrl}${tool.path}</loc>
     <lastmod>${today}</lastmod>
@@ -33,7 +33,7 @@ export async function GET() {
 	});
 
 	// Use case pages
-	useCases.forEach(useCase => {
+	useCases.forEach((useCase) => {
 		urls.push(`  <url>
     <loc>${baseUrl}/tools/${useCase.id}</loc>
     <lastmod>${today}</lastmod>
@@ -43,7 +43,7 @@ export async function GET() {
 	});
 
 	// OG platform pages
-	ogPlatforms.forEach(platform => {
+	ogPlatforms.forEach((platform) => {
 		urls.push(`  <url>
     <loc>${baseUrl}/tools/og-image-generator/${platform.id}</loc>
     <lastmod>${today}</lastmod>

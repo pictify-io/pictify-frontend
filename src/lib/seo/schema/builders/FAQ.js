@@ -19,12 +19,12 @@ export function buildFAQSchema(faqs) {
 		return null;
 	}
 
-	const validFaqs = faqs.filter(faq => faq.q && faq.a);
+	const validFaqs = faqs.filter((faq) => faq.q && faq.a);
 	if (validFaqs.length === 0) return null;
 
 	return {
 		'@type': 'FAQPage',
-		mainEntity: validFaqs.map(faq => ({
+		mainEntity: validFaqs.map((faq) => ({
 			'@type': 'Question',
 			name: faq.q,
 			acceptedAnswer: {

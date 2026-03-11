@@ -12,7 +12,7 @@ export default {
 					bg: '#FFFDF8',
 					accent: '#ffc480',
 					danger: '#ff6b6b',
-					success: '#10b981',
+					success: '#10b981'
 				}
 			},
 			boxShadow: {
@@ -23,10 +23,10 @@ export default {
 				'brutal-2xl': '8px 8px 0 0 #1f2937',
 				'brutal-3xl': '12px 12px 0 0 #1f2937',
 				'brutal-accent-sm': '2px 2px 0 0 #ffc480',
-				'brutal-accent': '4px 4px 0 0 #ffc480',
+				'brutal-accent': '4px 4px 0 0 #ffc480'
 			},
 			borderWidth: {
-				'3': '3px',
+				3: '3px'
 			}
 		}
 	},

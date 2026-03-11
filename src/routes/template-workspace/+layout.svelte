@@ -19,10 +19,7 @@
 		}
 
 		// Initialize team state and PLG in parallel (needed for feature gating like AI Copilot)
-		await Promise.all([
-			initializeTeamState().catch(() => {}),
-			initPLG().catch(() => {}),
-		]);
+		await Promise.all([initializeTeamState().catch(() => {}), initPLG().catch(() => {})]);
 
 		// Complete the try_editor onboarding step
 		completeOnboardingStep('try_editor').catch(() => {
@@ -63,4 +60,3 @@
 		<slot />
 	</div>
 {/if}
-
