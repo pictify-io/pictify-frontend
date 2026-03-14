@@ -53,8 +53,7 @@
 		{
 			category: 'Output Formats',
 			features: [
-				{ label: 'PNG & JPG', feature: null, allPlans: true },
-				{ label: 'GIF Output', feature: FEATURES.GIF_OUTPUT, unit: '/mo' },
+				{ label: 'PNG, JPG & GIF', feature: null, allPlans: true },
 				{ label: 'PDF Export', feature: FEATURES.PDF_OUTPUT }
 			]
 		},
@@ -124,7 +123,7 @@
 		{
 			question: 'What features are included in the free plan?',
 			answer:
-				'The Free plan includes 50 renders/month, 5 GIF renders, 3 saved templates, PNG/JPG output, and full API access with no rate limits. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
+				'The Free plan includes 50 renders/month (PNG, JPG & GIF), 3 saved templates, and full API access with no rate limits. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
 			isOpened: false
 		},
 		{

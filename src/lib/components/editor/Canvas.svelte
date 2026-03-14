@@ -450,50 +450,24 @@
 			}
 		});
 
-		// Handle double click to ungroup and edit items
+		// Handle double click on groups — enter interactive editing mode
+		// instead of destructively ungrouping (which breaks layout on save)
 		fabricCanvas.on('mouse:dblclick', (e) => {
 			const target = e.target;
 			if (target && target.type === 'group') {
-				// Prevent ungrouping protected elements
+				// Prevent entering protected elements
 				if (target.isPatternFill || target.isQRCode || target.isChart || target.isTable) {
-					console.log('🔒 Protected group — double-click ungroup blocked');
+					console.log('🔒 Protected group — double-click edit blocked');
 					return;
 				}
-				// Manual ungroup implementation since toActiveSelection is missing
-				// 1. Get items and restore their canvas coordinates
-				const items = target._objects.concat(); // Copy array
 
-				// Restore objects to their original state (canvas coordinates)
-				if (typeof target._restoreObjectsState === 'function') {
-					target._restoreObjectsState();
-				} else {
-					// Fallback if _restoreObjectsState is missing (unlikely for Group)
-					// We would need manual matrix multiplication here
-					console.warn('_restoreObjectsState missing on group');
-				}
-
-				// 2. Remove group from canvas
-				fabricCanvas.remove(target);
-
-				// 3. Add items back to canvas
-				items.forEach((obj) => {
-					fabricCanvas.add(obj);
+				// Enable interactive mode on this group so sub-objects become selectable
+				target.set({
+					subTargetCheck: true,
+					interactive: true
 				});
-
-				// 4. Create active selection
-				const activeSelection = new ActiveSelection(items, {
-					canvas: fabricCanvas
-				});
-
-				fabricCanvas.setActiveObject(activeSelection);
 				fabricCanvas.requestRenderAll();
-
-				// Update selection in store
-				editorActions.selectComponent(activeSelection);
-
-				// Save state since structure changed
-				saveState();
-				console.log('🔓 Group ungrouped manually via double-click');
+				console.log('🔓 Group entered interactive mode via double-click');
 			}
 		});
 
@@ -601,7 +575,10 @@
 		'patternBoundsHeight',
 		'patternSpacingX',
 		'patternSpacingY',
-		'patternStagger'
+		'patternStagger',
+		'figmaImport',
+		'subTargetCheck',
+		'interactive'
 	];
 
 	function copySelection() {
@@ -836,7 +813,10 @@
 						'patternBoundsHeight',
 						'patternSpacingX',
 						'patternSpacingY',
-						'patternStagger'
+						'patternStagger',
+						'figmaImport',
+						'subTargetCheck',
+						'interactive'
 					]);
 					// Pass previousPageIndex to ensure we save to the page we are LEAVING
 					pageActions.updateCurrentPageData(currentData, previousPageIndex);

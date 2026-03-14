@@ -46,7 +46,7 @@
 		testMode: 'same_template', // 'same_template' | 'different_templates'
 		templateUid: '', // shared template (same_template mode)
 		outputConfig: { format: 'png', quality: 90 },
-		goalConfig: { type: 'impressions_only', destinationUrl: '' },
+		goalConfig: { type: 'impressions_only', destinationUrl: '', customEventName: '' },
 		autoOptimize: false, // Enable Thompson Sampling auto-optimization
 		variants: [
 			{
@@ -111,6 +111,8 @@
 	$: slugDisplay = form.slug || 'your-slug';
 	$: previewUrl = `pictify.io/s/${slugDisplay}.${form.outputConfig.format}`;
 	$: clickTrackUrl = `pictify.io/s/${slugDisplay}/click`;
+	$: resolveUrl = `pictify.io/s/${slugDisplay}/resolve`;
+	$: eventsUrl = `pictify.io/s/events`;
 	$: pixelUrl = `pictify.io/s/${slugDisplay}/pixel.gif`;
 
 	$: canGoStep2 = form.name.trim() !== '';
@@ -131,6 +133,7 @@
 		weightIsValid &&
 		!isSubmitting &&
 		(form.goalConfig.type !== 'click_through' || form.goalConfig.destinationUrl.trim() !== '') &&
+		(form.goalConfig.type !== 'custom_event' || /^[a-z][a-z0-9_]{0,49}$/.test(form.goalConfig.customEventName.trim())) &&
 		(form.testMode === 'same_template'
 			? form.templateUid !== ''
 			: form.variants.every((v) => v.templateUid !== ''));
@@ -143,6 +146,7 @@
 		weightIsValid &&
 		!isSubmitting &&
 		(form.goalConfig.type !== 'click_through' || form.goalConfig.destinationUrl.trim() !== '') &&
+		(form.goalConfig.type !== 'custom_event' || /^[a-z][a-z0-9_]{0,49}$/.test(form.goalConfig.customEventName.trim())) &&
 		(form.testMode === 'same_template'
 			? form.templateUid !== ''
 			: form.variants.every((v) => v.templateUid !== ''));
@@ -203,7 +207,7 @@
 				testMode,
 				templateUid: exp.templateUid || '',
 				outputConfig: exp.outputConfig || { format: 'png', quality: 90 },
-				goalConfig: exp.goalConfig || { type: 'impressions_only', destinationUrl: '' },
+				goalConfig: exp.goalConfig || { type: 'impressions_only', destinationUrl: '', customEventName: '' },
 				autoOptimize: exp.banditConfig?.enabled || false,
 				variants: (exp.variants || []).map((v, i) => ({
 					id: v.id,
@@ -1580,7 +1584,7 @@
 					<div class="p-6 space-y-6 bg-[#FFFDF8]">
 						<!-- Goal Type -->
 						<div
-							class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-[3px] border-gray-900 rounded-xl p-2 bg-gray-100 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-[3px] border-gray-900 rounded-xl p-2 bg-gray-100 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						>
 							<button
 								type="button"
@@ -1600,7 +1604,10 @@
 									</div>
 								{/if}
 								<div class="flex flex-col gap-3">
-									<div class="text-2xl">👁️</div>
+									<svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+									</svg>
 									<div>
 										<div class="text-xs font-black text-gray-900 uppercase tracking-wide">
 											Impressions Only
@@ -1634,7 +1641,9 @@
 									</div>
 								{/if}
 								<div class="flex flex-col gap-3">
-									<div class="text-2xl">🖱️</div>
+									<svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+									</svg>
 									<div>
 										<div class="text-xs font-black text-gray-900 uppercase tracking-wide">
 											Click-Through
@@ -1645,6 +1654,42 @@
 												: 'text-gray-400'}"
 										>
 											Track CTA clicks via a generated redirect link.
+										</div>
+									</div>
+								</div>
+							</button>
+
+							<button
+								type="button"
+								on:click={() => (form.goalConfig.type = 'custom_event')}
+								class="text-left p-4 border-[2px] rounded-lg transition-all relative
+									{form.goalConfig.type === 'custom_event'
+									? 'border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] z-10 scale-[1.02]'
+									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
+							>
+								{#if form.goalConfig.type === 'custom_event'}
+									<div class="absolute top-4 right-4 text-[#ffc480]">
+										<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+											><path
+												d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+											/></svg
+										>
+									</div>
+								{/if}
+								<div class="flex flex-col gap-3">
+									<svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+									</svg>
+									<div>
+										<div class="text-xs font-black text-gray-900 uppercase tracking-wide">
+											Custom Event
+										</div>
+										<div
+											class="text-sm font-bold mt-1 {form.goalConfig.type === 'custom_event'
+												? 'text-gray-600'
+												: 'text-gray-400'}"
+										>
+											Track a custom conversion event like signup or purchase.
 										</div>
 									</div>
 								</div>
@@ -1695,6 +1740,60 @@
 								>
 									Use the tracking link on your CTA button — it records the click and redirects
 									here.
+								</p>
+							</div>
+						{/if}
+
+						<!-- Custom Event Name -->
+						{#if form.goalConfig.type === 'custom_event'}
+							<div
+								class="bg-gray-50 border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+							>
+								<label
+									for="custom-event-name"
+									class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-3 flex items-center gap-2"
+								>
+									Event Name <span class="text-red-500">*</span>
+									<span
+										class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold shrink-0 cursor-help"
+										title="The event name your SDK or API will send (e.g. signup, purchase, add_to_cart)">?</span
+									>
+								</label>
+								<div class="relative">
+									<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+										<svg
+											class="w-5 h-5 text-gray-400"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2.5"
+												d="M13 10V3L4 14h7v7l9-11h-7z"
+											/>
+										</svg>
+									</div>
+									<input
+										id="custom-event-name"
+										type="text"
+										bind:value={form.goalConfig.customEventName}
+										placeholder="signup"
+										class="w-full pl-10 pr-4 py-3 border-[3px] rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400
+											{form.goalConfig.customEventName && !/^[a-z][a-z0-9_]{0,49}$/.test(form.goalConfig.customEventName) ? 'border-red-400' : 'border-gray-300'}"
+									/>
+								</div>
+								{#if form.goalConfig.customEventName && !/^[a-z][a-z0-9_]{0,49}$/.test(form.goalConfig.customEventName)}
+									<p class="mt-2 text-xs font-bold text-red-500">
+										Must start with a lowercase letter, only lowercase letters, numbers, and underscores.
+									</p>
+								{/if}
+								<p
+									class="mt-3 text-sm font-bold text-gray-500 bg-white px-4 py-3 rounded-lg border-[2px] border-gray-200"
+								>
+									Send this event via the <span class="font-mono text-gray-700">POST /s/events</span> API with
+									<span class="font-mono text-gray-700">{"{"}"event": "{form.goalConfig.customEventName || 'your_event'}"{"}"}</span>
 								</p>
 							</div>
 						{/if}
@@ -2049,11 +2148,11 @@
 										<span class="text-gray-500 font-bold shrink-0">TRACKING:</span>
 										<div class="text-right">
 											<span
-												class="font-black {form.goalConfig.type === 'click_through'
+												class="font-black {form.goalConfig.type !== 'impressions_only'
 													? 'bg-[#ffc480] px-1'
 													: ''} text-gray-900"
 											>
-												{form.goalConfig.type === 'click_through' ? 'CLICKS' : 'IMPRESSIONS'}
+												{form.goalConfig.type === 'click_through' ? 'CLICKS' : form.goalConfig.type === 'custom_event' ? 'CUSTOM EVENT' : 'IMPRESSIONS'}
 											</span>
 											{#if form.goalConfig.type === 'click_through' && form.goalConfig.destinationUrl}
 												<div
@@ -2061,6 +2160,13 @@
 													title={form.goalConfig.destinationUrl}
 												>
 													-> {form.goalConfig.destinationUrl}
+												</div>
+											{/if}
+											{#if form.goalConfig.type === 'custom_event' && form.goalConfig.customEventName}
+												<div
+													class="text-[10px] text-purple-600 font-mono mt-1"
+												>
+													event: {form.goalConfig.customEventName}
 												</div>
 											{/if}
 										</div>
@@ -2168,6 +2274,30 @@
 												Continue
 												<span class="text-blue-400">&lt;/a&gt;</span>
 											</div>
+										</div>
+									{:else if form.goalConfig.type === 'custom_event'}
+										<!-- Custom Event Snippet -->
+										<div class="space-y-2">
+											<div class="text-[10px] uppercase font-black tracking-widest text-[#f472b6]">
+												> Example Implementation
+											</div>
+											<pre
+												class="bg-black/50 p-4 rounded-lg border-[2px] border-gray-800 overflow-x-auto text-xs leading-relaxed text-gray-300 font-mono"><span class="text-gray-500">// 1. Show the A/B tested image</span>
+<span class="text-blue-400">&lt;img</span> <span class="text-green-400">src=</span><span class="text-amber-300">"{previewUrl}"</span> <span class="text-blue-400">/&gt;</span>
+
+<span class="text-gray-500">// 2. Get the assigned variant for this viewer</span>
+<span class="text-blue-300">const</span> res = <span class="text-blue-300">await</span> <span class="text-purple-400">fetch</span>(<span class="text-amber-300">"{resolveUrl}"</span>)
+<span class="text-blue-300">const</span> {'{'} variantId {'}'} = <span class="text-blue-300">await</span> res.<span class="text-purple-400">json</span>()
+
+<span class="text-gray-500">// 3. When user converts, fire the event</span>
+<span class="text-purple-400">fetch</span>(<span class="text-amber-300">"{eventsUrl}"</span>, {'{'}
+  <span class="text-green-400">method</span>: <span class="text-amber-300">"POST"</span>,
+  <span class="text-green-400">headers</span>: {'{'} <span class="text-amber-300">"Content-Type"</span>: <span class="text-amber-300">"application/json"</span> {'}'},
+  <span class="text-green-400">body</span>: <span class="text-purple-400">JSON.stringify</span>({'{'}{'\n'}    <span class="text-green-400">experiment</span>: <span class="text-amber-300">"{form.slug}"</span>,
+    <span class="text-green-400">event</span>: <span class="text-amber-300">"{form.goalConfig.customEventName || 'your_event'}"</span>,
+    variantId
+  {'}'})
+{'}'})</pre>
 										</div>
 									{:else}
 										<!-- HTML Snippet -->

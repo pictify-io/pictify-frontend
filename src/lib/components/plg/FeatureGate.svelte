@@ -18,7 +18,7 @@
 
 	/**
 	 * Feature name to gate - use FEATURES constants
-	 * Options: 'renders', 'gifOutput', 'pdfOutput', 'templatesSaved', 'batchRender',
+	 * Options: 'renders', 'pdfOutput', 'templatesSaved', 'batchRender',
 	 *          'aiBackgroundRemover', 'aiCopilot', 'webhooks', 'dynamicLinks', 'storageConnectors'
 	 */
 	export let feature;

@@ -224,6 +224,11 @@
 	$: isScheduled = exp?.type === 'scheduled';
 
 	$: isClickGoal = exp?.goalConfig?.type === 'click_through' || exp?.goalConfig?.type === 'ctr';
+	$: isCustomEventGoal = exp?.goalConfig?.type === 'custom_event';
+	$: customEventName = exp?.goalConfig?.customEventName || analytics?.summary?.customEventName || '';
+	$: totalCustomEvents = analytics?.summary?.customEvents || 0;
+	$: customEventRate =
+		totalImpressions > 0 ? ((totalCustomEvents / totalImpressions) * 100).toFixed(2) : '0.00';
 
 	// Smart link: separate fallback from rule variants, sorted by priority
 	$: smartLinkFallback = isSmartLink ? variants.find((v) => v.isDefault) : null;
@@ -708,7 +713,7 @@
 			</div>
 
 			<!-- ==================== STATS ROW ==================== -->
-			<div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+			<div class="grid grid-cols-2 {isCustomEventGoal ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-6">
 				<!-- Total Impressions -->
 				<div
 					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
@@ -828,6 +833,46 @@
 						</div>
 					</div>
 				</div>
+
+				<!-- Custom Events (only for custom_event goal) -->
+				{#if isCustomEventGoal}
+					<div
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
+					>
+						<div
+							class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#a855f7]/10 flex items-center justify-between pointer-events-none relative"
+						>
+							<div
+								class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMwMDAiLz48L3N2Zz4=')] mix-blend-overlay"
+							/>
+							<span
+								class="text-[10px] font-black text-gray-900 uppercase tracking-widest relative z-10"
+								>{customEventName || 'Custom'}</span
+							>
+							<svg
+								class="w-5 h-5 text-gray-900 relative z-10"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2.5"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
+								/>
+							</svg>
+						</div>
+						<div class="p-5 flex flex-col justify-center flex-1">
+							<div class="text-4xl font-black text-gray-900 tracking-tighter tabular-nums">
+								{totalCustomEvents.toLocaleString()}
+							</div>
+							<div class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mt-2">
+								{customEventRate}% of impressions
+							</div>
+						</div>
+					</div>
+				{/if}
 
 				<!-- Duration / Status -->
 				<div
@@ -981,7 +1026,7 @@
 									<div class="flex flex-col lg:flex-row">
 										<!-- Rule Conditions -->
 										<div
-											class="flex-1 p-5 space-y-4 {variant.preRenderedUrl
+											class="flex-1 p-5 space-y-4 {variant.preRenderedUrl || variant.templateThumbnail
 												? 'lg:border-r-[3px] lg:border-gray-900'
 												: ''}"
 										>
@@ -1073,16 +1118,19 @@
 										</div>
 
 										<!-- Image preview -->
-										{#if variant.preRenderedUrl}
+										{#if variant.preRenderedUrl || variant.templateThumbnail}
 											<div class="lg:w-48 p-4 flex items-center justify-center bg-gray-50">
 												<div
-													class="w-full h-32 lg:h-full bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+													class="w-full h-32 lg:h-full bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] relative"
 												>
 													<img
-														src={variant.preRenderedUrl}
+														src={variant.preRenderedUrl || variant.templateThumbnail}
 														alt="{variant.name || 'Variant'} preview"
 														class="w-full h-full object-contain p-2"
 													/>
+													{#if !variant.preRenderedUrl && variant.templateThumbnail}
+														<div class="absolute top-1 left-1 px-1.5 py-0.5 bg-gray-900/70 text-white text-[8px] font-black uppercase tracking-widest rounded">Template</div>
+													{/if}
 												</div>
 											</div>
 										{/if}
@@ -1130,15 +1178,18 @@
 									</div>
 								</div>
 								<div class="p-5 flex items-center gap-5">
-									{#if smartLinkFallback.preRenderedUrl}
+									{#if smartLinkFallback.preRenderedUrl || smartLinkFallback.templateThumbnail}
 										<div
-											class="w-40 h-28 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0"
+											class="w-40 h-28 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0 relative"
 										>
 											<img
-												src={smartLinkFallback.preRenderedUrl}
+												src={smartLinkFallback.preRenderedUrl || smartLinkFallback.templateThumbnail}
 												alt="Fallback preview"
 												class="w-full h-full object-contain p-2"
 											/>
+											{#if !smartLinkFallback.preRenderedUrl && smartLinkFallback.templateThumbnail}
+												<div class="absolute top-1 left-1 px-1.5 py-0.5 bg-gray-900/70 text-white text-[8px] font-black uppercase tracking-widest rounded">Template</div>
+											{/if}
 										</div>
 									{/if}
 									<div class="text-xs font-bold text-gray-500 leading-relaxed">
@@ -1326,15 +1377,18 @@
 
 									<!-- Preview + Stats -->
 									<div class="flex flex-col lg:flex-row gap-5">
-										{#if variant.preRenderedUrl}
+										{#if variant.preRenderedUrl || variant.templateThumbnail}
 											<div
-												class="w-full lg:w-48 h-32 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0"
+												class="w-full lg:w-48 h-32 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0 relative"
 											>
 												<img
-													src={variant.preRenderedUrl}
+													src={variant.preRenderedUrl || variant.templateThumbnail}
 													alt="{variant.name} preview"
 													class="w-full h-full object-contain p-2"
 												/>
+												{#if !variant.preRenderedUrl && variant.templateThumbnail}
+													<div class="absolute top-1 left-1 px-1.5 py-0.5 bg-gray-900/70 text-white text-[8px] font-black uppercase tracking-widest rounded">Template</div>
+												{/if}
 											</div>
 										{/if}
 										<div class="grid grid-cols-2 gap-4 flex-1">
@@ -1470,16 +1524,23 @@
 
 									<!-- Variant Body -->
 									<div class="p-6 space-y-5 bg-white">
-										<!-- Thumbnail Preview -->
-										{#if variant.preRenderedUrl}
+										<!-- Variant Preview -->
+										{#if variant.preRenderedUrl || variant.templateThumbnail}
 											<div
 												class="w-full h-40 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] relative group"
 											>
 												<img
-													src={variant.preRenderedUrl}
+													src={variant.preRenderedUrl || variant.templateThumbnail}
 													alt="{variant.name || 'Variant'} preview"
 													class="w-full h-full object-contain p-2"
 												/>
+												{#if !variant.preRenderedUrl && variant.templateThumbnail}
+													<div
+														class="absolute top-2 left-2 px-2 py-1 bg-gray-900/70 text-white text-[9px] font-black uppercase tracking-widest rounded"
+													>
+														Template
+													</div>
+												{/if}
 												<div
 													class="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
 												>
@@ -1652,6 +1713,55 @@
 								</button>
 							</div>
 						</div>
+
+						<!-- Custom Event Tracking Code -->
+						{#if isCustomEventGoal && exp.slug}
+							<div>
+								<label
+									class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2"
+								>
+									Custom Event Tracking Code
+								</label>
+								<div class="relative group">
+									<pre
+										class="px-5 py-4 bg-gray-900 text-gray-300 border-[3px] border-gray-900 rounded-xl font-mono text-xs overflow-x-auto shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.5)] leading-relaxed"><span class="text-gray-500">// 1. Show the A/B tested image</span>
+<span class="text-blue-400">&lt;img</span> <span class="text-green-400">src=</span><span class="text-amber-300">{`"https://${publicUrl}"`}</span> <span class="text-blue-400">/&gt;</span>
+
+<span class="text-gray-500">// 2. Get the assigned variant for this viewer</span>
+<span class="text-blue-300">const</span> res = <span class="text-blue-300">await</span> <span class="text-purple-400">fetch</span>(<span class="text-amber-300">"https://pictify.io/s/{exp.slug}/resolve"</span>)
+<span class="text-blue-300">const</span> {'{'} variantId {'}'} = <span class="text-blue-300">await</span> res.<span class="text-purple-400">json</span>()
+
+<span class="text-gray-500">// 3. When user converts, fire the event</span>
+<span class="text-purple-400">fetch</span>(<span class="text-amber-300">"https://pictify.io/s/events"</span>, {'{'}{'\n'}  <span class="text-green-400">method</span>: <span class="text-amber-300">"POST"</span>,{'\n'}  <span class="text-green-400">headers</span>: {'{'} <span class="text-amber-300">"Content-Type"</span>: <span class="text-amber-300">"application/json"</span> {'}'},
+  <span class="text-green-400">body</span>: <span class="text-purple-400">JSON.stringify</span>({'{'}{'\n'}    <span class="text-green-400">experiment</span>: <span class="text-amber-300">"{exp.slug}"</span>,{'\n'}    <span class="text-green-400">event</span>: <span class="text-amber-300">"{customEventName}"</span>,{'\n'}    variantId{'\n'}  {'}'})
+{'}'})</pre>
+									<button
+										on:click={() => copyToClipboard(
+`// 1. Show the A/B tested image
+// <img src="https://${publicUrl}" />
+
+// 2. Get the assigned variant for this viewer
+const res = await fetch("https://pictify.io/s/${exp.slug}/resolve")
+const { variantId } = await res.json()
+
+// 3. When user converts, fire the event
+fetch("https://pictify.io/s/events", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    experiment: "${exp.slug}",
+    event: "${customEventName}",
+    variantId
+  })
+})`, 'Tracking code copied!'
+										)}
+										class="absolute top-3 right-3 px-4 py-2 bg-[#a855f7] text-white font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
+									>
+										Copy Code
+									</button>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 			{/if}
@@ -1983,6 +2093,19 @@
 										>
 										<span class="text-xs font-mono font-bold text-gray-700 truncate block"
 											>{exp.goalConfig.destinationUrl}</span
+										>
+									</div>
+								{/if}
+								{#if exp.goalConfig?.customEventName}
+									<div
+										class="p-4 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+									>
+										<span
+											class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1"
+											>Event Name</span
+										>
+										<span class="text-xs font-mono font-bold text-purple-700 block"
+											>{exp.goalConfig.customEventName}</span
 										>
 									</div>
 								{/if}
@@ -2321,12 +2444,12 @@
 									</div>
 								</div>
 
-								{#if variant.preRenderedUrl}
+								{#if variant.preRenderedUrl || variant.templateThumbnail}
 									<div
 										class="w-16 h-16 bg-gray-100 border-[3px] border-gray-900 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] rounded-xl overflow-hidden shrink-0"
 									>
 										<img
-											src={variant.preRenderedUrl}
+											src={variant.preRenderedUrl || variant.templateThumbnail}
 											alt=""
 											class="w-full h-full object-contain p-1"
 										/>

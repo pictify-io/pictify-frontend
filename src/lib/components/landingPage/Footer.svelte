@@ -220,26 +220,6 @@
 			class="pt-8 border-t-[3px] border-gray-900 flex flex-col sm:flex-row items-center justify-between gap-6"
 		>
 			<div class="text-sm font-bold text-gray-500">© 2026 Pictify.io. All rights reserved.</div>
-
-			<!-- Peerlist Badge -->
-			<a
-				href="https://peerlist.io/suyashthakur/project/pictifyio"
-				target="_blank"
-				class="group relative inline-block"
-			>
-				<div
-					class="absolute inset-0 bg-[#ffc480] rounded-lg transform translate-x-1 translate-y-1 border-[2px] border-gray-900"
-				/>
-				<div
-					class="relative bg-white border-[2px] border-gray-900 rounded-lg px-4 py-2 flex items-center gap-2 group-hover:-translate-y-0.5 group-hover:-translate-x-0.5 transition-transform"
-				>
-					<span class="text-xl">🏆</span>
-					<div class="flex flex-col leading-none">
-						<span class="text-[10px] font-bold text-gray-400 uppercase">Featured on</span>
-						<span class="text-xs font-black text-gray-900">Peerlist</span>
-					</div>
-				</div>
-			</a>
 		</div>
 	</div>
 </footer>
