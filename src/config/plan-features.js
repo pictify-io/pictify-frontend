@@ -46,11 +46,11 @@ export const PLAN_PRICING = {
 export const OVERAGE_PRICING = {
 	[PLANS.STARTER]: { eligible: false, ratePerRenderCents: null },
 	free: { eligible: false, ratePerRenderCents: null }, // Alias
-	[PLANS.BASIC]: { eligible: true, ratePerRenderCents: 0.5 }, // $0.005/render
-	[PLANS.STANDARD]: { eligible: true, ratePerRenderCents: 0.5 }, // $0.005/render (Pro)
-	pro: { eligible: true, ratePerRenderCents: 0.5 }, // Alias for standard
-	[PLANS.PROFESSIONAL]: { eligible: true, ratePerRenderCents: 0.5 }, // $0.005/render
-	[PLANS.BUSINESS]: { eligible: true, ratePerRenderCents: 0.3 }, // $0.003/render
+	[PLANS.BASIC]: { eligible: true, ratePerRenderCents: 2 }, // $0.02/render
+	[PLANS.STANDARD]: { eligible: true, ratePerRenderCents: 1 }, // $0.01/render (Pro)
+	pro: { eligible: true, ratePerRenderCents: 1 }, // Alias for standard
+	[PLANS.PROFESSIONAL]: { eligible: true, ratePerRenderCents: 1 }, // $0.01/render
+	[PLANS.BUSINESS]: { eligible: true, ratePerRenderCents: 0.5 }, // $0.005/render
 	[PLANS.ENTERPRISE]: { eligible: true, ratePerRenderCents: null } // Custom
 };
 
@@ -91,7 +91,6 @@ export const FEATURES = {
 	RENDERS: 'renders',
 
 	// Output formats
-	GIF_OUTPUT: 'gifOutput',
 	PDF_OUTPUT: 'pdfOutput',
 
 	// Templates
@@ -145,7 +144,6 @@ export const PLAN_FEATURES = {
 		[FEATURES.RENDERS]: 50,
 
 		// Output formats
-		[FEATURES.GIF_OUTPUT]: 5, // Limited GIF renders per month
 		[FEATURES.PDF_OUTPUT]: false,
 
 		// Templates
@@ -189,7 +187,6 @@ export const PLAN_FEATURES = {
 		[FEATURES.RENDERS]: 1000,
 
 		// Output formats
-		[FEATURES.GIF_OUTPUT]: 25,
 		[FEATURES.PDF_OUTPUT]: true,
 
 		// Templates
@@ -233,7 +230,6 @@ export const PLAN_FEATURES = {
 		[FEATURES.RENDERS]: 10000,
 
 		// Output formats
-		[FEATURES.GIF_OUTPUT]: null, // Unlimited
 		[FEATURES.PDF_OUTPUT]: true,
 
 		// Templates
@@ -277,7 +273,6 @@ export const PLAN_FEATURES = {
 		[FEATURES.RENDERS]: 10000,
 
 		// Output formats
-		[FEATURES.GIF_OUTPUT]: null,
 		[FEATURES.PDF_OUTPUT]: true,
 
 		// Templates
@@ -321,7 +316,6 @@ export const PLAN_FEATURES = {
 		[FEATURES.RENDERS]: 40000,
 
 		// Output formats
-		[FEATURES.GIF_OUTPUT]: null,
 		[FEATURES.PDF_OUTPUT]: true,
 
 		// Templates
@@ -363,7 +357,6 @@ export const PLAN_FEATURES = {
 	[PLANS.ENTERPRISE]: {
 		// All unlimited/custom
 		[FEATURES.RENDERS]: null,
-		[FEATURES.GIF_OUTPUT]: null,
 		[FEATURES.PDF_OUTPUT]: true,
 		[FEATURES.TEMPLATES_SAVED]: null,
 		[FEATURES.BATCH_RENDER]: true,
@@ -395,12 +388,6 @@ export const FEATURE_METADATA = {
 		description: 'Monthly image render limit',
 		icon: 'image',
 		category: 'core'
-	},
-	[FEATURES.GIF_OUTPUT]: {
-		name: 'GIF Output',
-		description: 'Animated GIF renders',
-		icon: 'film',
-		category: 'output'
 	},
 	[FEATURES.PDF_OUTPUT]: {
 		name: 'PDF Output',
@@ -548,7 +535,6 @@ export const PLAN_ORDER = [
 // 3-tier system: Free (starter), Pro (standard), Business
 export const FEATURE_MIN_PLAN = {
 	[FEATURES.RENDERS]: PLANS.STARTER,
-	[FEATURES.GIF_OUTPUT]: PLANS.STARTER, // Limited on starter
 	[FEATURES.PDF_OUTPUT]: PLANS.STANDARD, // Pro tier
 	[FEATURES.TEMPLATES_SAVED]: PLANS.STARTER, // Limited on starter
 	[FEATURES.BATCH_RENDER]: PLANS.STANDARD, // Pro tier
@@ -571,11 +557,6 @@ export const FEATURE_MIN_PLAN = {
 
 // Upgrade messages for each feature (3-tier: Free, Pro, Business)
 export const FEATURE_UPGRADE_MESSAGES = {
-	[FEATURES.GIF_OUTPUT]: {
-		title: 'Unlock More GIF Renders',
-		message: "You've used all your GIF renders for this month.",
-		benefit: 'Create unlimited animated GIFs with Pro plan'
-	},
 	[FEATURES.PDF_OUTPUT]: {
 		title: 'PDF Export Available on Pro',
 		message: 'Export your designs as high-quality PDF documents.',

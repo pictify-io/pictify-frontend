@@ -479,6 +479,140 @@
 				/>
 			</div>
 		</div>
+
+		<!-- Figma Import Showcase -->
+		<div class="mt-24 max-w-5xl mx-auto group relative">
+			<!-- Decorative offset background -->
+			<div class="absolute inset-0 bg-[#a259ff] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
+			
+			<div class="relative bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300">
+				<!-- Mac Header -->
+				<div class="bg-[#facc15] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">
+					<div class="flex gap-2">
+						<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-black"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-white border-2 border-black"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-black"></div>
+					</div>
+					<div class="flex items-center gap-2 bg-white/40 px-3 py-1 rounded-md border-[2px] border-black">
+						<svg width="10" height="10" viewBox="0 0 38 57" fill="none"><path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="black"/><path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="black"/><path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="black"/><path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="black"/><path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="black"/></svg>
+						<span class="text-[10px] font-bold text-black uppercase tracking-widest">Figma Sync</span>
+					</div>
+				</div>
+
+				<div class="flex flex-col md:flex-row bg-[#FFFDF8]">
+					<!-- Left: Visual Flow -->
+					<div class="flex-1 p-8 md:p-14 flex items-center justify-center border-b-[3px] md:border-b-0 md:border-r-[3px] border-black relative overflow-hidden">
+						<!-- Grid Background -->
+						<div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 20px 20px;" />
+						
+						<div class="flex items-center gap-6 relative z-10">
+							<!-- Figma Frame -->
+							<div class="relative group/frame hover:-translate-y-2 hover:rotate-3 transition-transform duration-300">
+								<div class="w-28 h-36 md:w-40 md:h-48 bg-white rounded-xl border-[3px] border-black shadow-[6px_6px_0_0_#a259ff] overflow-hidden p-3 flex flex-col gap-2 relative z-10">
+									<!-- Figma mini layers mockup -->
+									<div class="w-full h-4 bg-[#a259ff] rounded-sm border-2 border-black"></div>
+									<div class="flex-1 bg-gray-100 rounded-sm border-2 border-black flex items-center justify-center relative overflow-hidden">
+										<!-- Graphic lines -->
+										<div class="absolute -right-4 -bottom-4 w-12 h-12 border-4 border-black rounded-full text-transparent"></div>
+										<svg class="w-10 h-10 md:w-12 md:h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+									</div>
+									<div class="flex gap-2">
+										<div class="flex-1 h-3 bg-[#4ade80] rounded-sm border-2 border-black"></div>
+										<div class="w-8 h-3 bg-[#ff6b6b] rounded-sm border-2 border-black"></div>
+									</div>
+								</div>
+								<!-- Figma logo badge -->
+								<div class="absolute -top-4 -left-4 w-10 h-10 bg-[#a259ff] rounded-lg border-[3px] border-black shadow-[4px_4px_0_0_black] flex items-center justify-center z-20 group-hover/frame:scale-110 transition-transform">
+									<svg width="16" height="16" viewBox="0 0 38 57" fill="none"><path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="white"/><path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="white"/><path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="white"/><path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="white"/><path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="white"/></svg>
+								</div>
+							</div>
+
+							<!-- Arrow -->
+							<div class="flex flex-col items-center gap-2 relative">
+								<div class="bg-black text-white px-3 py-1.5 rounded text-[11px] font-black uppercase tracking-widest border-[3px] border-black transform rotate-3 z-10 shadow-[4px_4px_0_0_#ffc480]">1-Click</div>
+							</div>
+
+							<!-- Pictify Template -->
+							<div class="relative group/template hover:-translate-y-2 hover:-rotate-3 transition-transform duration-300">
+								<div class="w-28 h-36 md:w-40 md:h-48 bg-white rounded-xl border-[3px] border-black shadow-[6px_6px_0_0_#4ade80] overflow-hidden p-3 flex flex-col gap-2 relative z-10">
+									<!-- Pictify mini template mockup -->
+									<div class="w-full h-4 bg-[#ffc480] rounded-sm border-2 border-black"></div>
+									<div class="flex-1 bg-gray-100 rounded-sm border-2 border-black relative overflow-hidden flex flex-col items-center justify-center">
+										<!-- Graphic lines -->
+										<div class="absolute -left-4 -top-4 w-12 h-12 border-4 border-black rounded-full text-transparent"></div>
+										<!-- Template variable indicators -->
+										<div class="px-2 py-1 bg-[#4ade80] border-[2px] border-black shadow-[2px_2px_0_0_black] rounded text-[9px] font-black text-black transform -rotate-2 relative z-10">{'{{name}}'}</div>
+									</div>
+									<div class="flex gap-2">
+										<div class="flex-1 h-3 bg-gray-300 rounded-sm border-2 border-black"></div>
+										<div class="w-8 h-3 bg-black rounded-sm border-2 border-black"></div>
+									</div>
+								</div>
+								<!-- Pictify logo badge -->
+								<div class="absolute -bottom-4 -right-4 w-10 h-10 bg-[#4ade80] rounded-lg border-[3px] border-black shadow-[4px_4px_0_0_black] flex items-center justify-center z-20 group-hover/template:scale-110 transition-transform">
+									<span class="text-lg font-black text-black">P</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right: Copy + CTA -->
+					<div class="flex-1 p-8 md:p-14 flex flex-col justify-center">
+						<div class="inline-block px-4 py-1.5 bg-[#a259ff] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform rotate-2 mb-6 self-start">
+							<span class="text-[11px] font-black text-white uppercase tracking-wider">Figma Plugin</span>
+						</div>
+
+						<h3 class="text-4xl md:text-5xl font-black text-black leading-[1.1] mb-6">
+							Design in Figma.<br />
+							<span class="relative inline-block mt-2">
+								Render in Code.
+								<svg
+									class="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-[#facc15] -z-10"
+									viewBox="0 0 100 10"
+									preserveAspectRatio="none"
+								>
+									<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
+								</svg>
+							</span>
+						</h3>
+
+						<p class="text-lg text-black/70 font-medium mb-8 max-w-lg leading-relaxed">
+							Select frames in Figma, send them to Pictify with one click. Layers become native image objects ready for our API.
+						</p>
+
+						<!-- Steps -->
+						<div class="space-y-4 mb-10">
+							<div class="flex items-center gap-4 group/step">
+								<div class="w-8 h-8 bg-[#a259ff] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+									<span class="text-sm font-black text-white">1</span>
+								</div>
+								<span class="text-base font-bold text-black">Install the plugin</span>
+							</div>
+							<div class="flex items-center gap-4 group/step">
+								<div class="w-8 h-8 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+									<span class="text-sm font-black text-black">2</span>
+								</div>
+								<span class="text-base font-bold text-black">Select frames</span>
+							</div>
+							<div class="flex items-center gap-4 group/step">
+								<div class="w-8 h-8 bg-[#4ade80] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+									<span class="text-sm font-black text-black">3</span>
+								</div>
+								<span class="text-base font-bold text-black">Send to Pictify</span>
+							</div>
+						</div>
+
+						<a
+							href="/signup"
+							class="inline-flex items-center gap-3 px-8 py-4 bg-black text-white text-base font-black uppercase tracking-wider rounded-xl border-[3px] border-black shadow-[6px_6px_0_0_#a259ff] hover:shadow-[2px_2px_0_0_#a259ff] hover:translate-x-1 hover:translate-y-1 transition-all self-start"
+						>
+							Get Started
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
 

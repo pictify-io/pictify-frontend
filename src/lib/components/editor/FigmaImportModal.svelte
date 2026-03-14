@@ -7,6 +7,38 @@
 
 	const dispatch = createEventDispatcher();
 
+	/**
+	 * Recursively flatten nested groups so only leaf objects remain.
+	 * The top-level group is created separately — this processes its children.
+	 */
+	function flattenNestedGroups(objects) {
+		const flat = [];
+		for (const obj of objects) {
+			if (obj.type === 'group' && obj._objects) {
+				// Bake the group's transform into each child
+				const groupLeft = obj.left || 0;
+				const groupTop = obj.top || 0;
+				const groupScaleX = obj.scaleX || 1;
+				const groupScaleY = obj.scaleY || 1;
+				const groupAngle = obj.angle || 0;
+				const groupOpacity = obj.opacity ?? 1;
+
+				// Ungroup: get the children with their absolute positions
+				const children = obj.removeAll();
+				for (const child of children) {
+					child.set({ opacity: (child.opacity ?? 1) * groupOpacity });
+					flat.push(child);
+				}
+				// Recurse in case children are also groups
+				const deeper = flattenNestedGroups(flat.splice(flat.length - children.length, children.length));
+				flat.push(...deeper);
+			} else {
+				flat.push(obj);
+			}
+		}
+		return flat;
+	}
+
 	let pendingImports = [];
 	let loading = true;
 	let importing = false;
@@ -99,9 +131,15 @@
 			importProgress = 'Adding to canvas...';
 			if (window.__historyBatchStart) window.__historyBatchStart();
 
-			const importGroup = new Group(objects, {
+			// Flatten nested groups so all elements are directly accessible
+			const flatObjects = flattenNestedGroups(objects);
+			console.log(`[FigmaImport] Flattened ${objects.length} objects → ${flatObjects.length} leaf objects`);
+
+			const importGroup = new Group(flatObjects, {
 				figmaImport: true,
-				name: data.metadata?.frameName || 'Figma Import'
+				name: data.metadata?.frameName || 'Figma Import',
+				subTargetCheck: true,
+				interactive: true
 			});
 
 			const canvas = $editor;

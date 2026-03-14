@@ -81,7 +81,6 @@
 		renders: getFeatureLimit(plan, FEATURES.RENDERS),
 		aiCopilot: getFeatureLimit(plan, FEATURES.AI_COPILOT),
 		templates: getFeatureLimit(plan, FEATURES.TEMPLATES_SAVED),
-		gifOutput: getFeatureLimit(plan, FEATURES.GIF_OUTPUT),
 		batchRender: getFeatureLimit(plan, FEATURES.BATCH_RENDER),
 		aiBackgroundRemover: getFeatureLimit(plan, FEATURES.AI_BACKGROUND_REMOVER)
 	};
@@ -91,7 +90,6 @@
 				renders: getFeatureLimit(nextPlan, FEATURES.RENDERS),
 				aiCopilot: getFeatureLimit(nextPlan, FEATURES.AI_COPILOT),
 				templates: getFeatureLimit(nextPlan, FEATURES.TEMPLATES_SAVED),
-				gifOutput: getFeatureLimit(nextPlan, FEATURES.GIF_OUTPUT),
 				batchRender: getFeatureLimit(nextPlan, FEATURES.BATCH_RENDER),
 				aiBackgroundRemover: getFeatureLimit(nextPlan, FEATURES.AI_BACKGROUND_REMOVER)
 		  }
@@ -115,7 +113,6 @@
 	const featureDisplay = [
 		{ key: 'renders', label: 'Renders', unit: '/mo' },
 		{ key: 'templates', label: 'Templates', unit: '' },
-		{ key: 'gifOutput', label: 'GIF Renders', unit: '/mo' },
 		{ key: 'aiCopilot', label: 'AI Copilot', unit: '/mo' },
 		{ key: 'aiBackgroundRemover', label: 'AI Background Remover', unit: '/mo' },
 		{ key: 'batchRender', label: 'Batch Render', unit: '' }

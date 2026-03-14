@@ -14,6 +14,7 @@
 	import LayersPanel from './LayersPanel.svelte';
 	import VariablesPanel from './VariablesPanel.svelte';
 	import AlignmentGuides from './AlignmentGuides.svelte';
+	import FigmaImportModal from './FigmaImportModal.svelte';
 	import {
 		selectedComponent,
 		canvasZoom,
@@ -30,6 +31,9 @@
 
 	// Keyboard shortcuts modal
 	let showShortcutsModal = false;
+
+	// Figma import modal
+	let showFigmaModal = false;
 
 	const isMac = typeof navigator !== 'undefined' && navigator.platform.includes('Mac');
 	const modKey = isMac ? 'Cmd' : 'Ctrl';
@@ -129,7 +133,7 @@
 	<!-- Main Content Area -->
 	<div class="flex flex-1 w-full overflow-hidden relative min-h-0">
 		<!-- Left Sidebar -->
-		<LeftSidebar />
+		<LeftSidebar on:openFigma={() => (showFigmaModal = true)} />
 
 		<!-- Asset Panel -->
 		<div
@@ -308,6 +312,14 @@
 				</div>
 			</div>
 		</div>
+	{/if}
+
+	<!-- Figma Import Modal -->
+	{#if showFigmaModal}
+		<FigmaImportModal
+			on:close={() => (showFigmaModal = false)}
+			on:imported={() => (showFigmaModal = false)}
+		/>
 	{/if}
 </div>
 

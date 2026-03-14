@@ -48,6 +48,29 @@
 	let figmaImportHandled = false;
 	let hasLoadedTemplate = false; // Track if we've already loaded the template
 
+	/**
+	 * Recursively flatten nested groups so only leaf objects remain.
+	 * The top-level group is created separately — this processes its children.
+	 */
+	function flattenNestedGroups(objects) {
+		const flat = [];
+		for (const obj of objects) {
+			if (obj.type === 'group' && obj._objects) {
+				const groupOpacity = obj.opacity ?? 1;
+				const children = obj.removeAll();
+				for (const child of children) {
+					child.set({ opacity: (child.opacity ?? 1) * groupOpacity });
+					flat.push(child);
+				}
+				const deeper = flattenNestedGroups(flat.splice(flat.length - children.length, children.length));
+				flat.push(...deeper);
+			} else {
+				flat.push(obj);
+			}
+		}
+		return flat;
+	}
+
 	let unsubscribe = () => {};
 	let templateUnsubscribe = () => {};
 	let pagesUnsubscribe = () => {};
@@ -113,9 +136,15 @@
 
 			if (window.__historyBatchStart) window.__historyBatchStart();
 
-			const importGroup = new Group(objects, {
+			// Flatten nested groups so all elements are directly accessible
+			const flatObjects = flattenNestedGroups(objects);
+			console.log(`[FigmaAutoImport] Flattened ${objects.length} objects → ${flatObjects.length} leaf objects`);
+
+			const importGroup = new Group(flatObjects, {
 				figmaImport: true,
-				name: data.metadata?.frameName || 'Figma Import'
+				name: data.metadata?.frameName || 'Figma Import',
+				subTargetCheck: true,
+				interactive: true
 			});
 
 			const maxWidth = canvas.width * 0.9;

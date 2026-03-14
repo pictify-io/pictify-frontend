@@ -127,6 +127,10 @@
 				height: 100%;
 				object-fit: contain;
 			}
+			.frame-preview .placeholder-icon {
+				color: #ccc;
+				font-size: 24px;
+			}
 			.frame-info {
 				padding: 8px;
 			}
@@ -408,9 +412,12 @@
 			// State
 			let apiToken = null;
 			let userName = '';
-			let frames = [];
+			let frames = []; // Full frames with export data (from 'selection' message)
+			let previewFrames = []; // Lightweight frame info (from 'selection-preview' message)
 			let selectedFrameIds = new Set();
 			let lastEditorUrl = '';
+			let isAuthenticated = false;
+			let objectUrls = []; // Track blob URLs for cleanup
 			// Change to 'https://api.pictify.io' for production
 			const API_BASE = 'http://localhost:3000';
 
@@ -429,14 +436,29 @@
 						}
 						break;
 
+					case 'selection-preview':
+						// Lightweight preview — show frame cards immediately (without thumbnails)
+						previewFrames = msg.frames || [];
+						frames = []; // Clear full data until 'selection' arrives
+						if (isAuthenticated) {
+							renderPreviewFrames();
+						}
+						break;
+
 					case 'selection':
+						// Full data with PNGs — update cards with thumbnails
 						frames = msg.frames || [];
-						renderFrames();
+						if (isAuthenticated) {
+							renderFrames();
+						}
 						break;
 
 					case 'no-selection':
 						frames = [];
-						renderFrames();
+						previewFrames = [];
+						if (isAuthenticated) {
+							renderFrames();
+						}
 						break;
 				}
 			};
@@ -448,6 +470,7 @@
 				document.getElementById('loading').classList.add('hidden');
 				document.getElementById('auth-screen').classList.toggle('hidden', name !== 'auth');
 				document.getElementById('main-screen').classList.toggle('hidden', name !== 'main');
+				isAuthenticated = name === 'main';
 			}
 
 			// Auth
@@ -461,6 +484,15 @@
 					userName = data.name || data.email;
 					document.getElementById('user-name').textContent = userName;
 					showScreen('main');
+
+					// Render whatever frame data we already have
+					if (frames.length > 0) {
+						renderFrames();
+					} else if (previewFrames.length > 0) {
+						renderPreviewFrames();
+					} else {
+						renderFrames(); // Shows empty state
+					}
 				} catch {
 					apiToken = null;
 					parent.postMessage({ pluginMessage: { type: 'clear-token' } }, '*');
@@ -491,6 +523,16 @@
 
 					document.getElementById('user-name').textContent = userName;
 					showScreen('main');
+
+					// Render whatever frame data we already have
+					if (frames.length > 0) {
+						renderFrames();
+					} else if (previewFrames.length > 0) {
+						renderPreviewFrames();
+					} else {
+						// Trigger a fresh selection read now that we're authenticated
+						parent.postMessage({ pluginMessage: { type: 'refresh-selection' } }, '*');
+					}
 				} catch {
 					showError('auth-error', 'Invalid API token. Check your token and try again.');
 				} finally {
@@ -501,17 +543,26 @@
 
 			function disconnect() {
 				apiToken = null;
+				isAuthenticated = false;
 				parent.postMessage({ pluginMessage: { type: 'clear-token' } }, '*');
 				showScreen('auth');
 			}
 
-			// Frame rendering
-			function renderFrames() {
+			// Revoke all existing object URLs to prevent memory leaks
+			function revokeObjectUrls() {
+				for (const url of objectUrls) {
+					URL.revokeObjectURL(url);
+				}
+				objectUrls = [];
+			}
+
+			// Render lightweight preview frames (no thumbnails yet)
+			function renderPreviewFrames() {
 				const grid = document.getElementById('frame-grid');
 				const empty = document.getElementById('empty-selection');
 				const sendSection = document.getElementById('send-section');
 
-				if (frames.length === 0) {
+				if (previewFrames.length === 0) {
 					grid.innerHTML = '';
 					empty.classList.remove('hidden');
 					sendSection.classList.add('hidden');
@@ -519,12 +570,52 @@
 				}
 
 				empty.classList.add('hidden');
+				revokeObjectUrls();
+				selectedFrameIds = new Set(previewFrames.map((f) => f.id));
+
+				grid.innerHTML = previewFrames
+					.map((f) => {
+						return `
+      <div class="frame-card selected" data-id="${f.id}" onclick="toggleFrame('${f.id}')">
+        <div class="frame-preview"><span class="placeholder-icon"><div class="spinner"></div></span></div>
+        <div class="frame-info">
+          <div class="frame-name">${escapeHtml(f.name)}</div>
+          <div class="frame-dims">${f.width} x ${f.height}</div>
+        </div>
+      </div>
+    `;
+					})
+					.join('');
+
+				// Show send button but disable until full export data arrives
+				sendSection.classList.remove('hidden');
+				document.getElementById('send-btn').disabled = true;
+			}
+
+			// Frame rendering (full data with thumbnails)
+			function renderFrames() {
+				const grid = document.getElementById('frame-grid');
+				const empty = document.getElementById('empty-selection');
+				const sendSection = document.getElementById('send-section');
+				const sendBtn = document.getElementById('send-btn');
+
+				if (frames.length === 0 && previewFrames.length === 0) {
+					revokeObjectUrls();
+					grid.innerHTML = '';
+					empty.classList.remove('hidden');
+					sendSection.classList.add('hidden');
+					return;
+				}
+
+				empty.classList.add('hidden');
+				revokeObjectUrls();
 				selectedFrameIds = new Set(frames.map((f) => f.id));
 
 				grid.innerHTML = frames
 					.map((f) => {
 						const pngBlob = new Blob([new Uint8Array(f.pngData)], { type: 'image/png' });
 						const url = URL.createObjectURL(pngBlob);
+						objectUrls.push(url);
 						return `
       <div class="frame-card selected" data-id="${f.id}" onclick="toggleFrame('${f.id}')">
         <div class="frame-preview"><img src="${url}" /></div>
@@ -538,6 +629,7 @@
 					.join('');
 
 				sendSection.classList.remove('hidden');
+				sendBtn.disabled = selectedFrameIds.size === 0;
 			}
 
 			function toggleFrame(id) {
@@ -550,8 +642,10 @@
 				document.querySelectorAll('.frame-card').forEach((card) => {
 					card.classList.toggle('selected', selectedFrameIds.has(card.dataset.id));
 				});
-				// Update send button
-				document.getElementById('send-btn').disabled = selectedFrameIds.size === 0;
+				// Update send button — also require that full frame data is loaded
+				const hasFullData = frames.length > 0;
+				document.getElementById('send-btn').disabled =
+					selectedFrameIds.size === 0 || !hasFullData;
 			}
 
 			// Send to Pictify
@@ -641,6 +735,8 @@
 			function resetToMain() {
 				document.getElementById('success-state').classList.add('hidden');
 				document.getElementById('selection-area').classList.remove('hidden');
+				// Re-enable send button
+				document.getElementById('send-btn').disabled = false;
 				parent.postMessage({ pluginMessage: { type: 'refresh-selection' } }, '*');
 			}
 

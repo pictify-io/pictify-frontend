@@ -54,11 +54,11 @@
 
 	// Status badge config
 	const statusConfig = {
-		draft: { bg: 'bg-gray-100 text-gray-700 border-gray-900', dot: 'bg-gray-400' },
-		running: { bg: 'bg-[#4ade80]/20 text-gray-900 border-gray-900', dot: 'bg-[#4ade80]' },
-		paused: { bg: 'bg-[#ffc480]/20 text-gray-900 border-gray-900', dot: 'bg-[#ffc480]' },
-		completed: { bg: 'bg-[#60a5fa]/20 text-gray-900 border-gray-900', dot: 'bg-[#60a5fa]' },
-		archived: { bg: 'bg-gray-100 text-gray-500 border-gray-900', dot: 'bg-gray-400' }
+		draft: { bg: 'bg-white text-gray-900 border-gray-900', dot: 'bg-gray-400' },
+		running: { bg: 'bg-[#4ade80] text-gray-900 border-gray-900', dot: 'bg-white' },
+		paused: { bg: 'bg-[#ffc480] text-gray-900 border-gray-900', dot: 'bg-white' },
+		completed: { bg: 'bg-[#60a5fa] text-gray-900 border-gray-900', dot: 'bg-white' },
+		archived: { bg: 'bg-gray-200 text-gray-500 border-gray-900', dot: 'bg-gray-400' }
 	};
 
 	// Type filter options
@@ -474,260 +474,146 @@
 					</div>
 				{:else if !isLoading}
 					<!-- Experiments Grid -->
-					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8">
 						{#each filteredExperiments as exp (exp.uid)}
 							<div
-								class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 flex flex-col"
+								class="group bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
+								on:click={() => handleView(exp.uid)}
+								on:keydown={(e) => e.key === 'Enter' && handleView(exp.uid)}
+								role="button"
+								tabindex="0"
 							>
-								<!-- Visual Header Banner -->
-								<div
-									class="relative h-24 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-b-[3px] border-gray-900 flex items-center justify-between px-6 overflow-hidden"
-								>
-									<!-- Abstract Decorative Elements -->
-									<div
-										class="absolute -right-4 -top-4 w-24 h-24 bg-[#ffc480]/20 rounded-full blur-xl"
-									/>
-									<div
-										class="absolute -left-4 -bottom-4 w-24 h-24 bg-[#4ade80]/20 rounded-full blur-xl"
-									/>
+								<!-- Background Pattern -->
+								<div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
 
-									<h3
-										class="text-2xl font-black text-gray-900 truncate relative z-10 max-w-[70%]"
-										title={exp.name}
-									>
-										{exp.name}
-									</h3>
-
-									<div class="flex flex-col gap-2 relative z-10 items-end shrink-0">
-										<!-- Type Badge -->
-										<span
-											class="inline-flex items-center px-2 py-0.5 rounded shadow-[2px_2px_0_0_rgba(0,0,0,0.1)] text-[9px] font-black uppercase tracking-widest border-[2px] {typeColors[
-												exp.type
-											] || 'bg-gray-100 text-gray-700 border-gray-900'}"
-										>
-											{typeLabels[exp.type] || exp.type}
-										</span>
-										{#if exp.banditConfig?.enabled}
-											<span
-												class="inline-flex items-center gap-1 px-2 py-0.5 rounded shadow-[2px_2px_0_0_rgba(0,0,0,0.1)] text-[9px] font-black uppercase tracking-widest border-[2px] bg-[#a855f7]/20 text-[#7c3aed] border-[#a855f7]"
-											>
-												<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2.5"
-														d="M13 10V3L4 14h7v7l9-11h-7z"
-													/></svg
-												>
-												Auto-Optimize
-											</span>
-										{/if}
-										<!-- Status Badge -->
-										<span
-											class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded shadow-[2px_2px_0_0_rgba(0,0,0,0.1)] text-[9px] font-black uppercase tracking-widest border-[2px] {statusConfig[
-												exp.status
-											]?.bg || 'bg-gray-100 text-gray-700 border-gray-900'}"
-										>
-											<span
-												class="w-1.5 h-1.5 rounded-full {statusConfig[exp.status]?.dot ||
-													'bg-gray-400'} {exp.status === 'running' ? 'animate-pulse' : ''}"
-											/>
-											{exp.status}
-										</span>
-									</div>
-								</div>
-
-								<!-- Card Body (Stats & Details) -->
-								<div class="p-6 flex-grow flex flex-col justify-center bg-white space-y-4">
-									<!-- Info Grid -->
-									<div class="grid grid-cols-2 gap-4">
-										<!-- Variants -->
-										<div class="bg-gray-50 border-[2px] border-gray-900 rounded-lg p-3">
-											<div class="flex items-center gap-2 mb-1">
-												<svg
-													class="w-4 h-4 text-gray-900"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2.5"
-														d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-													/></svg
-												>
-												<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest"
-													>Variants</span
-												>
-											</div>
-											<div class="text-lg font-black text-gray-900 tabular-nums">
-												{exp.variants?.length || 0}
-											</div>
-										</div>
-
-										<!-- Impressions (if running, else created date) -->
-										<div class="bg-gray-50 border-[2px] border-gray-900 rounded-lg p-3">
-											{#if exp.status === 'running' && exp.totalImpressions != null}
-												<div class="flex items-center gap-2 mb-1">
-													<svg
-														class="w-4 h-4 text-green-500"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2.5"
-															d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-														/><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2.5"
-															d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-														/></svg
-													>
-													<span
-														class="text-[10px] font-black text-gray-500 uppercase tracking-widest"
-														>Impressions</span
-													>
-												</div>
-												<div class="text-lg font-black text-green-600 tabular-nums">
-													{exp.totalImpressions.toLocaleString()}
-												</div>
+								<!-- Card Content Container -->
+								<div class="relative z-10 flex flex-col h-full">
+									<!-- Top Section: Image & Badges -->
+									<div class="relative p-4 sm:p-5 border-b-[3px] border-gray-900 bg-white">
+										<!-- Image Container (Neo brutalist container) -->
+										<div class="aspect-[16/9] w-full bg-[#f8fafc] border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] relative">
+											{#if exp.template?.thumbnail || exp.variants?.[0]?.templateThumbnail || exp.variants?.[0]?.preRenderedUrl}
+												<img
+													src={exp.template?.thumbnail || exp.variants?.[0]?.templateThumbnail || exp.variants?.[0]?.preRenderedUrl}
+													alt="{exp.name} preview"
+													class="w-full h-full object-cover"
+												/>
 											{:else}
-												<div class="flex items-center gap-2 mb-1">
-													<svg
-														class="w-4 h-4 text-gray-900"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2.5"
-															d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-														/></svg
-													>
-													<span
-														class="text-[10px] font-black text-gray-500 uppercase tracking-widest"
-														>Created</span
-													>
-												</div>
-												<div class="text-lg font-black text-gray-900 tabular-nums truncate">
-													{formatRelativeDate(exp.createdAt)}
+												<div class="w-full h-full flex flex-col items-center justify-center bg-gray-50/80">
+													<div class="w-12 h-12 bg-white rounded-lg border-[2px] border-gray-200 flex items-center justify-center mb-2 shadow-sm rotate-[-5deg]">
+														<svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+													</div>
+													<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">No Preview</span>
 												</div>
 											{/if}
 										</div>
-									</div>
 
-									<!-- Template Reference -->
-									{#if exp.templateUid}
-										<div
-											class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg border-[2px] border-gray-200"
-										>
-											<svg
-												class="w-4 h-4 text-gray-500 shrink-0"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-												/></svg
+										<!-- Floating Badges Top Left -->
+										<div class="absolute top-6 left-6 flex flex-col items-start gap-2">
+											<span
+												class="inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-[3px_3px_0_0_#1f2937] {typeColors[exp.type] || 'bg-white text-gray-900 border-gray-900'}"
 											>
-											<span class="text-xs font-bold text-gray-600 truncate">
-												Based on <span class="font-black text-gray-900"
-													>{exp.templateName || exp.templateUid}</span
-												>
+												{typeLabels[exp.type] || exp.type}
 											</span>
 										</div>
-									{/if}
-								</div>
 
-								<!-- Action Control Panel Footer -->
-								<div
-									class="p-4 border-t-[3px] border-gray-900 bg-[#FFFDF8] flex items-center gap-3"
-								>
-									<!-- View Button (Primary Action) -->
-									<button
-										on:click={() => handleView(exp.uid)}
-										class="flex-1 px-4 py-2.5 bg-gray-900 text-white text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.5)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2"
-									>
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-											/><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-											/></svg
-										>
-										View Setup
-									</button>
-
-									<!-- Start / Pause Button -->
-									{#if exp.status === 'draft' || exp.status === 'paused'}
-										<button
-											on:click={() => handleStart(exp.uid)}
-											class="w-11 h-11 bg-[#4ade80] text-gray-900 rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0"
-											title="Start Experiment"
-										>
-											<svg
-												class="w-5 h-5 ml-1"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2.5"
-													d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-												/><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2.5"
-													d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-												/></svg
+										<!-- Floating Status Top Right -->
+										<div class="absolute top-6 right-6">
+											<span
+												class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-[3px_3px_0_0_#000] {statusConfig[exp.status]?.bg || 'bg-white text-gray-900 border-gray-900'}"
 											>
-										</button>
-									{:else if exp.status === 'running'}
-										<button
-											on:click={() => handlePause(exp.uid)}
-											class="w-11 h-11 bg-[#ffc480] text-gray-900 rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0"
-											title="Pause Experiment"
-										>
-											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2.5"
-													d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
-												/></svg
-											>
-										</button>
-									{/if}
+												<span
+													class="w-2 h-2 rounded-full border-[1.5px] border-white {statusConfig[exp.status]?.dot || 'bg-gray-400'} {exp.status === 'running' ? 'animate-pulse' : ''}"
+												/>
+												{exp.status}
+											</span>
+										</div>
+									</div>
 
-									<!-- Delete Button -->
-									<button
-										on:click={() => confirmDelete(exp)}
-										class="w-11 h-11 bg-white text-[#ff6b6b] rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#ff6b6b] hover:border-[#ff6b6b] hover:bg-[#ff6b6b]/10 hover:-translate-y-[1px] transition-all flex items-center justify-center shrink-0"
-										title="Delete Experiment"
-									>
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-											/></svg
-										>
-									</button>
+									<!-- Bottom Section: Details & Actions -->
+									<div class="p-4 sm:p-5 flex-grow flex flex-col bg-[#FFFDF8] relative">
+										
+										<!-- Quick actions on the right (delete) positioned absolutely for clean layout -->
+										<div class="absolute top-4 right-4 sm:top-5 sm:right-5 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+											<button
+												on:click|stopPropagation={() => confirmDelete(exp)}
+												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-[#ff6b6b] hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
+												title="Delete"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+											</button>
+										</div>
+
+										<!-- Name & Title -->
+										<div class="mb-4 pr-10">
+											<h3
+												class="text-xl sm:text-2xl font-black text-gray-900 leading-tight mb-3 line-clamp-2 decoration-[3px] decoration-[#ffc480]/50 group-hover:underline underline-offset-[6px]"
+												title={exp.name}
+											>
+												{exp.name}
+											</h3>
+											
+											<div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+												<span class="flex items-center gap-1.5 px-2 py-1 bg-white border-[2px] border-gray-200 rounded-md">
+													<svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+													{exp.variants?.length || 0} Variant{(exp.variants?.length || 0) !== 1 ? 's' : ''}
+												</span>
+												
+												{#if exp.banditConfig?.enabled}
+													<span class="flex items-center gap-1.5 px-2 py-1 bg-purple-50 border-[2px] border-purple-200 rounded-md text-purple-600 shadow-[1px_1px_0_0_#d8b4fe]">
+														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+														Auto-Optimize
+													</span>
+												{/if}
+
+												{#if exp.status === 'running'}
+													<span class="flex items-center gap-1.5 text-green-700 bg-green-50 border-[2px] border-green-200 px-2 py-1 rounded-md shadow-[1px_1px_0_0_#bbf7d0]">
+														<span class="relative flex h-2 w-2">
+															<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+															<span class="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
+														</span>
+														{(exp.variants || []).reduce((s, v) => s + (v.impressions || 0), 0).toLocaleString()} Views
+													</span>
+												{:else}
+													<span class="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border-[2px] border-gray-200 rounded-md">
+														<svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+														{formatRelativeDate(exp.createdAt)}
+													</span>
+												{/if}
+											</div>
+										</div>
+
+										<div class="flex-grow"></div>
+
+										<!-- Actions Bar -->
+										<div class="mt-4 pt-4 border-t-[3px] border-gray-900 border-dashed flex items-center justify-between gap-3">
+											<button
+												on:click|stopPropagation={() => handleView(exp.uid)}
+												class="flex-1 bg-white text-gray-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 hover:bg-gray-900 hover:text-white group/btn"
+											>
+												<span>Open Editor</span>
+												<svg class="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+											</button>
+
+											{#if exp.status === 'draft' || exp.status === 'paused'}
+												<button
+													on:click|stopPropagation={() => handleStart(exp.uid)}
+													class="w-12 h-12 bg-[#4ade80] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													title="Start"
+												>
+													<svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+												</button>
+											{:else if exp.status === 'running'}
+												<button
+													on:click|stopPropagation={() => handlePause(exp.uid)}
+													class="w-12 h-12 bg-[#ffc480] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													title="Pause"
+												>
+													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+												</button>
+											{/if}
+										</div>
+									</div>
 								</div>
 							</div>
 						{/each}
