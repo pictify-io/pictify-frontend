@@ -25,6 +25,7 @@
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// Optional platform prop to specialize content (e.g., 'wordpress')
 	export let platform = null;
@@ -1227,31 +1228,27 @@
 
 					<!-- Generated Image Result -->
 					{#if imageUrl}
-						<div class="border-t-[3px] border-black bg-[#4ade80] p-6 md:p-8">
-							<div
-								class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"
-							>
-								<div class="flex items-center gap-3">
-									<svg
-										class="w-6 h-6 text-black"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M5 13l4 4L19 7"
-										/></svg
-									>
-									<span class="font-black text-black uppercase tracking-wide"
-										>Image Generated Successfully!</span
-									>
+						<div class="border-t-[3px] border-black">
+							<!-- Image preview -->
+							<div class="p-4 md:p-6 bg-white">
+								<div class="border-[3px] border-black bg-white p-2">
+									<img src={imageUrl} alt="Generated OG" class="w-full" />
 								</div>
-								<div class="flex gap-3">
+							</div>
+							<!-- Action bar -->
+							<div
+								class="bg-[#4ade80] border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+							>
+								<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg
+									>
+									Image generated
+								</span>
+								<div class="flex items-center gap-2">
 									<button
 										on:click={() => copyToClipboard(imageUrl)}
-										class="px-4 py-2 bg-black text-white font-bold uppercase text-sm border-[2px] border-black hover:bg-white hover:text-black transition-colors"
+										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white font-bold uppercase text-xs border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Copy URL
 									</button>
@@ -1259,78 +1256,79 @@
 										href={imageUrl}
 										download="og-image.png"
 										target="_blank"
-										class="px-4 py-2 bg-white text-black font-bold uppercase text-sm border-[2px] border-black hover:bg-black hover:text-white transition-colors"
+										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Download
 									</a>
 								</div>
 							</div>
-							<div class="border-[3px] border-black bg-white p-2">
-								<img src={imageUrl} alt="Generated OG" class="w-full" />
-							</div>
-
-							<NextSteps
-								heading="Next steps"
-								description="Copy the API request, save this as a reusable template background, and batch render variants."
-								curlSnippet={nextStepsCurlSnippet}
-								templateDraft={nextStepsTemplateDraft}
-								generatedUrl={imageUrl}
-								toolName="OG Image Generator"
-							/>
 						</div>
 					{/if}
 
-					<!-- Generate Button -->
-					<div
-						class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-[#FFFDF8] to-[#fff5e6]"
-					>
-						<button
-							on:click={generateImage}
-							disabled={isImageGenerating}
-							class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-[#ff6b6b] border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+					<!-- Generate Button (hidden once image is generated) -->
+					{#if !imageUrl}
+						<div
+							class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-[#FFFDF8] to-[#fff5e6]"
 						>
-							<div class="flex items-center justify-center gap-3 md:gap-4">
-								{#if isImageGenerating}
-									<svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
-										><circle
-											class="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
+							<button
+								on:click={generateImage}
+								disabled={isImageGenerating}
+								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-[#ff6b6b] border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+							>
+								<div class="flex items-center justify-center gap-3 md:gap-4">
+									{#if isImageGenerating}
+										<svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+											><circle
+												class="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												stroke-width="4"
+											/><path
+												class="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+											/></svg
+										>
+										<span class="font-black text-lg md:text-2xl text-white uppercase tracking-tight"
+											>Generating...</span
+										>
+									{:else}
+										<span
+											class="font-black text-lg md:text-2xl text-white uppercase tracking-tight group-hover:scale-105 transition-transform"
+											>Generate Image</span
+										>
+										<svg
+											class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1 transition-transform"
+											fill="none"
 											stroke="currentColor"
-											stroke-width="4"
-										/><path
-											class="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										/></svg
-									>
-									<span class="font-black text-lg md:text-2xl text-white uppercase tracking-tight"
-										>Generating...</span
-									>
-								{:else}
-									<span
-										class="font-black text-lg md:text-2xl text-white uppercase tracking-tight group-hover:scale-105 transition-transform"
-										>Generate Image</span
-									>
-									<svg
-										class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1 transition-transform"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M13 7l5 5m0 0l-5 5m5-5H6"
-										/></svg
-									>
-								{/if}
-							</div>
-						</button>
-					</div>
+											viewBox="0 0 24 24"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="3"
+												d="M13 7l5 5m0 0l-5 5m5-5H6"
+											/></svg
+										>
+									{/if}
+								</div>
+							</button>
+						</div>
+					{/if}
 				</div>
 			</div>
+
+			{#if imageUrl}
+				<NextSteps
+					heading="Next steps"
+					description="Copy the API request, save this as a reusable template background, and batch render variants."
+					curlSnippet={nextStepsCurlSnippet}
+					templateDraft={nextStepsTemplateDraft}
+					generatedUrl={imageUrl}
+					toolName="OG Image Generator"
+				/>
+			{/if}
 		{/if}
 
 		<!-- Templates Grid -->
@@ -1552,6 +1550,7 @@
 			</div>
 		</div>
 	</main>
+	<RelatedTools tools={['youtube-thumbnail', 'linkedin-banner', 'twitter-header', 'responsive-image-generator']} />
 	<Footer />
 	<Toast />
 

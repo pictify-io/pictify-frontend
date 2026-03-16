@@ -14,6 +14,7 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { page } from '$app/stores';
 	import { analytics } from '$lib/analytics.js';
+	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -238,7 +239,6 @@
 		const iframe = invoiceTemplateWrapper.querySelector('iframe');
 
 		const document = iframe.contentWindow.document;
-		console.log(document);
 		const companyName = document.querySelector('#company-name');
 		const companyAddress = document.querySelector('#company-address');
 		const clientName = document.querySelector('#client-name');
@@ -686,37 +686,39 @@
 							<span class="font-black uppercase tracking-wider text-sm text-black"
 								>✓ Invoice Generated</span
 							>
-							<button
-								on:click={() => copyToClipboard(imageUrl)}
-								class="px-3 py-1 bg-black text-white border-[2px] border-black font-bold text-xs uppercase shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								Copy URL
-							</button>
+							<div class="flex items-center gap-2">
+								<button
+									on:click={() => copyToClipboard(imageUrl)}
+									class="px-3 py-1 bg-black text-white border-[2px] border-black font-bold text-xs uppercase shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								>
+									Copy URL
+								</button>
+								<a
+									href={imageUrl}
+									target="_blank"
+									class="px-3 py-1 bg-white text-black border-[2px] border-black font-bold text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								>
+									Open in Tab
+								</a>
+							</div>
 						</div>
-						<div class="p-4 flex flex-col gap-4">
-							<a
-								href={imageUrl}
-								target="_blank"
-								class="px-6 py-3 bg-white border-[3px] border-black font-bold uppercase tracking-wide hover:bg-[#ffc480] transition-colors shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] text-center text-sm"
-							>
-								Open in New Tab
-							</a>
+						<div class="p-4">
 							<img
 								src={imageUrl}
 								alt="Invoice"
 								class="w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000]"
 							/>
-
-							<NextSteps
-								heading="Next steps"
-								description="Copy the API request, save this invoice as a template background, and batch render variants."
-								curlSnippet={nextStepsCurlSnippet}
-								templateDraft={nextStepsTemplateDraft}
-								generatedUrl={imageUrl}
-								toolName="Invoice Generator"
-							/>
 						</div>
 					</div>
+
+					<NextSteps
+						heading="Next steps"
+						description="Copy the API request, save this invoice as a template background, and batch render variants."
+						curlSnippet={nextStepsCurlSnippet}
+						templateDraft={nextStepsTemplateDraft}
+						generatedUrl={imageUrl}
+						toolName="Invoice Generator"
+					/>
 				{/if}
 			</div>
 		</div>
@@ -969,6 +971,8 @@
 			</div>
 		</div>
 	</main>
+
+	<RelatedTools tools={['receipt', 'certificate', 'membership-card', 'event-ticket']} />
 
 	<Toast />
 	<Footer />

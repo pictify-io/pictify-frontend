@@ -5,6 +5,8 @@
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
+	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
+	import TemplateGallery from '$lib/components/tools/TemplateGallery.svelte';
 	import { page } from '$app/stores';
 	import {
 		useCases,
@@ -44,6 +46,7 @@
 	let isGenerating = false;
 	let generatedImageUrl = '';
 	let generationError = '';
+	let miniEditorRef;
 
 	function openInCanvasEditor() {
 		if (!validCase) return;
@@ -64,7 +67,7 @@
 			const DRAFT_KEY = 'pictify_template_draft_v1';
 			localStorage.setItem(DRAFT_KEY, JSON.stringify(template));
 		} catch (e) {
-			console.warn('Could not save draft to localStorage:', e);
+			/* ignored */
 		}
 
 		if ($user?.email) {
@@ -78,7 +81,9 @@
 	// Quick generate from template
 	// Uses public endpoint (no auth required, rate limited)
 	async function handleQuickGenerate() {
-		if (!template?.fabricJSData) {
+		// Use edited data from MiniEditor if available, otherwise fallback to template
+		const editedData = miniEditorRef?.getEditedFabricData?.() || template?.fabricJSData;
+		if (!editedData) {
 			toast.set({ message: 'No template data available', type: 'error', duration: 2000 });
 			return;
 		}
@@ -93,7 +98,7 @@
 			// Use public canvas endpoint (no auth required, rate limited)
 			// Request watermark for non-logged-in users
 			const response = await backend.post('/image/public/canvas', {
-				fabricJSData: template.fabricJSData,
+				fabricJSData: editedData,
 				width: templateWidth,
 				height: templateHeight,
 				fileExtension: 'png',
@@ -107,7 +112,6 @@
 				throw new Error('No image URL in response');
 			}
 		} catch (e) {
-			console.error('Generation failed:', e);
 			// Handle rate limit error
 			if (e.message?.includes('rate') || e.status === 429) {
 				generationError = 'Too many requests. Please wait a moment and try again.';
@@ -120,67 +124,10 @@
 		}
 	}
 
-	// Template preview generation
-	let previewCanvasEl;
-	let fabricCanvas;
-	let previewLoading = true;
-
+	// Template data (MiniEditor handles its own FabricJS loading)
 	$: template = validCase ? getTemplateForUseCase(useCaseId, config?.label || useCaseId) : null;
 	$: templateWidth = template?.width || 1200;
 	$: templateHeight = template?.height || 630;
-
-	onMount(async () => {
-		if (template?.fabricJSData) {
-			await loadFabricAndRenderPreview();
-		}
-	});
-
-	async function loadFabricAndRenderPreview() {
-		previewLoading = true;
-		try {
-			// Dynamically load FabricJS
-			if (!window.fabric) {
-				await new Promise((resolve, reject) => {
-					const script = document.createElement('script');
-					script.src = 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js';
-					script.onload = resolve;
-					script.onerror = reject;
-					document.head.appendChild(script);
-				});
-			}
-
-			// Wait for the canvas element to be available
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			if (previewCanvasEl && window.fabric) {
-				// Calculate scale to fit container (max width ~600px for nice display)
-				const maxWidth = 600;
-				const scale = Math.min(1, maxWidth / templateWidth);
-				const displayWidth = templateWidth * scale;
-				const displayHeight = templateHeight * scale;
-
-				// Set canvas size
-				previewCanvasEl.width = displayWidth;
-				previewCanvasEl.height = displayHeight;
-
-				// Create FabricJS canvas
-				fabricCanvas = new window.fabric.StaticCanvas(previewCanvasEl);
-				fabricCanvas.setWidth(displayWidth);
-				fabricCanvas.setHeight(displayHeight);
-
-				// Load the JSON data
-				fabricCanvas.loadFromJSON(template.fabricJSData, () => {
-					// Scale all objects to fit
-					fabricCanvas.setZoom(scale);
-					fabricCanvas.renderAll();
-					previewLoading = false;
-				});
-			}
-		} catch (err) {
-			console.error('Failed to load FabricJS preview:', err);
-			previewLoading = false;
-		}
-	}
 
 	// Escape HTML for code display
 	function escapeHtml(source) {
@@ -387,49 +334,57 @@
 						<div
 							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
 						>
-							<span class="px-2 py-0.5 bg-gray-200 rounded text-gray-700">Canva Mode</span>
+							<span class="px-2 py-0.5 bg-[#4ade80]/20 border border-[#4ade80] rounded text-gray-700">Interactive Editor</span>
 							{templateWidth} x {templateHeight}px
 						</div>
 					</div>
 
-					<!-- Main Preview Canvas Area -->
+					<!-- Interactive Mini-Editor Preview -->
 					<div
 						class="p-8 bg-gray-100 flex flex-col items-center justify-center relative min-h-[400px]"
 					>
-						<!-- Checkerboard -->
 						<div
 							class="absolute inset-0 opacity-10"
 							style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
 						/>
 
-						<div class="relative z-10 flex flex-col items-center gap-8 w-full">
-							<!-- FabricJS Canvas Preview -->
-							<div
-								class="relative rounded-xl border-[2px] border-gray-200 shadow-xl overflow-hidden bg-white hover:scale-[1.01] transition-transform duration-300"
-							>
-								{#if template?.fabricJSData}
-									{#if previewLoading}
-										<div class="absolute inset-0 flex items-center justify-center bg-white z-20">
-											<div
-												class="w-8 h-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin"
-											/>
-										</div>
-									{/if}
-									<canvas bind:this={previewCanvasEl} />
-								{:else}
-									<div class="w-[600px] h-[315px] flex items-center justify-center bg-gray-50">
-										<p class="font-bold text-gray-400">Preview not available</p>
-									</div>
-								{/if}
-							</div>
+						<div class="relative z-10 flex flex-col items-center gap-8 w-full max-w-[640px] mx-auto">
+							<!-- MiniEditor (interactive canvas — replaces StaticCanvas) -->
+							{#if template?.fabricJSData}
+								<MiniEditor
+									bind:this={miniEditorRef}
+									fabricJSData={template.fabricJSData}
+									width={templateWidth}
+									height={templateHeight}
+								/>
+							{:else}
+								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]">
+									<p class="font-bold text-gray-400">Preview not available</p>
+								</div>
+							{/if}
 
 							<!-- Action Bar -->
 							<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
 								<button
 									type="button"
+									on:click={openInCanvasEditor}
+									class="flex-1 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
+								>
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+										/></svg
+									>
+									Open Editor — Free
+								</button>
+								<button
+									type="button"
 									on:click={handleQuickGenerate}
 									disabled={isGenerating}
-									class="flex-1 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+									class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
 								>
 									{#if isGenerating}
 										<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"
@@ -456,23 +411,8 @@
 												d="M13 10V3L4 14h7v7l9-11h-7z"
 											/></svg
 										>
-										Run Test
+										Quick Preview
 									{/if}
-								</button>
-								<button
-									type="button"
-									on:click={openInCanvasEditor}
-									class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-										/></svg
-									>
-									Edit Design
 								</button>
 							</div>
 						</div>

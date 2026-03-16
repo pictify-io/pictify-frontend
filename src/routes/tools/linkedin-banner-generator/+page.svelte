@@ -21,6 +21,7 @@
 		LINKEDIN_BANNER_HEIGHT,
 		SAFE_ZONE
 	} from '$lib/pseo/linkedin-banner.js';
+	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// Social proof counter
 	let totalBannersCreated = 23847;
@@ -1144,6 +1145,8 @@
 		docsLabel={apiCtaDetails.docsLabel}
 		secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
 	/>
+
+	<RelatedTools tools={['twitter-header', 'youtube-thumbnail', 'responsive-image-generator']} />
 
 	<Footer />
 </section>

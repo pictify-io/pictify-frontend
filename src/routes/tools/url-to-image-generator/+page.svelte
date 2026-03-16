@@ -13,6 +13,7 @@
 	import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
 	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/analytics.js';
+	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// Track tool opened on mount
 	onMount(() => {
@@ -121,13 +122,11 @@
 				'message',
 				(event) => {
 					if (event.data.type === 'elementHover') {
-						console.log('elementHover', event.data.selector);
 						// Update UI to show hovered selector (optional)
 					} else if (event.data.type === 'elementSelected') {
 						selector = event.data.selector;
 						toast.set({ message: 'Selector updated', type: 'success', duration: 1500 });
 					} else if (event.data.type === 'iframeReady') {
-						console.log('iframeReady');
 						// The iframe is ready, send the selection script
 						sendSelectionScript();
 					}
@@ -138,12 +137,9 @@
 			const injectedScript = `
     <script>
       window.addEventListener('message', (event) => {
-        console.log('message', event.data);
         if (event.data.type === 'checkReady') {
-        console.log('checkReady');
           window.parent.postMessage({ type: 'iframeReady' }, '*');
         } else if (event.data.type === 'injectScript') {
-          console.log('injectScript');
           const script = document.createElement('script');
           script.textContent = event.data.script;
           document.body.appendChild(script);
@@ -173,7 +169,6 @@
 	}
 
 	function sendSelectionScript() {
-		console.log('sendSelectionScript');
 		const script = `
       let highlightElementPictify = null;
 
@@ -588,42 +583,24 @@
 
 		{#if imageUrl}
 			<div class="mt-16 w-full max-w-5xl mx-auto px-2 md:px-0 z-20">
-				<!-- Success Window -->
-				<div class="border-[4px] border-black bg-[#4ade80] shadow-[12px_12px_0_0_#000]">
-					<!-- Header -->
-					<div class="bg-black text-white px-4 py-2 flex justify-between items-center">
-						<div class="font-mono font-bold uppercase tracking-widest">STATUS: 200 OK</div>
-						<!-- Decorative Close Button -->
-						<div
-							class="w-6 h-6 bg-white flex items-center justify-center border-2 border-transparent hover:border-black cursor-pointer"
-						>
-							<span class="text-black font-black leading-none pb-0.5">×</span>
-						</div>
+				<div class="border-[4px] border-black bg-white shadow-[8px_8px_0_0_#000]">
+					<!-- Success Header -->
+					<div
+						class="bg-[#4ade80] border-b-[3px] border-black px-4 py-3 flex justify-between items-center"
+					>
+						<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg
+							>
+							Screenshot captured
+						</span>
+						<div class="font-mono text-xs font-bold bg-black text-[#4ade80] px-2 py-1">200 OK</div>
 					</div>
-					<!-- Content -->
-					<div class="p-6 md:p-8 bg-white border-t-[3px] border-black">
-						<h3 class="text-4xl font-black uppercase mb-6 text-center tracking-tighter">
-							Capture Complete!
-						</h3>
 
-						<!-- URL & Copy -->
-						<div class="flex flex-col md:flex-row gap-4 mb-8">
-							<div
-								class="flex-grow bg-gray-100 border-[3px] border-black p-3 font-mono text-xs md:text-sm break-all flex items-center"
-							>
-								{imageUrl}
-							</div>
-							<button
-								on:click={() => copyToClipboard(imageUrl)}
-								class="bg-black text-white px-6 py-3 font-bold uppercase border-[3px] border-black hover:bg-white hover:text-black transition-colors flex-shrink-0"
-							>
-								Copy URL
-							</button>
-						</div>
-
-						<!-- Preview -->
+					<!-- Preview -->
+					<div class="p-4 md:p-6">
 						<div
-							class="border-[3px] border-black bg-[#f3f4f6] p-4 shadow-[8px_8px_0_0_#ccc] mb-8 relative"
+							class="border-[3px] border-black bg-[#f3f4f6] p-4 relative"
 						>
 							<div class="absolute top-2 left-2 w-2 h-2 bg-black rounded-full" />
 							<div class="absolute top-2 right-2 w-2 h-2 bg-black rounded-full" />
@@ -637,34 +614,51 @@
 								/>
 							</a>
 						</div>
+					</div>
 
-						<!-- Actions -->
-						<div class="flex flex-col md:flex-row gap-4 justify-center">
+					<!-- Action bar -->
+					<div
+						class="border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+					>
+						<!-- URL + Copy -->
+						<div class="flex-1 min-w-0 flex items-center gap-0 border-[2px] border-black">
+							<div
+								class="flex-1 min-w-0 bg-gray-50 px-3 py-2 font-mono text-xs overflow-x-auto whitespace-nowrap select-all"
+							>
+								{imageUrl}
+							</div>
+							<button
+								on:click={() => copyToClipboard(imageUrl)}
+								class="bg-black text-white hover:bg-gray-800 font-bold uppercase px-4 py-2 transition-colors flex items-center gap-1.5 flex-shrink-0 text-xs"
+							>
+								Copy
+							</button>
+						</div>
+						<!-- Action buttons -->
+						<div class="flex items-center gap-2">
 							<a
 								href={imageUrl}
 								download="screenshot.jpg"
-								class="px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center"
+								class="flex items-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
-								Download Image
-							</a>
-							<a
-								href="/signup?redirect=/dashboard/api-token"
-								class="px-8 py-4 bg-white text-black border-[3px] border-black font-black uppercase tracking-wider shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all text-center"
-							>
-								Get free API key
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg
+								>
+								Download
 							</a>
 						</div>
-
-						<NextSteps
-							heading="Next steps"
-							description="Copy the API request, turn this capture into a reusable template, and batch render variants."
-							curlSnippet={nextStepsCurlSnippet}
-							templateDraft={nextStepsTemplateDraft}
-							generatedUrl={imageUrl}
-							toolName="URL to Image"
-						/>
 					</div>
 				</div>
+
+				<!-- Next steps — below result card -->
+				<NextSteps
+					heading="Next steps"
+					description="Copy the API request, turn this capture into a reusable template, and batch render variants."
+					curlSnippet={nextStepsCurlSnippet}
+					templateDraft={nextStepsTemplateDraft}
+					generatedUrl={imageUrl}
+					toolName="URL to Image"
+				/>
 			</div>
 		{/if}
 
@@ -924,6 +918,8 @@
 				</button>
 			</div>
 		</div>
+
+		<RelatedTools tools={['html-email', 'blog-featured-image', 'product-banner']} />
 
 		<Toast />
 		<Footer />
