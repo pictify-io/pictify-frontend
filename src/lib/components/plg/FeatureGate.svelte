@@ -146,9 +146,7 @@
 			if (result.limitExceeded) {
 				showLimitBanner = true;
 			}
-		} catch (error) {
-			console.error('Failed to check feature:', error);
-		} finally {
+		} catch (error) { /* ignored */ } finally {
 			checking = false;
 		}
 	}

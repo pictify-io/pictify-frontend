@@ -74,7 +74,6 @@
 			assets = response.assets || [];
 			counts = response.counts || {};
 		} catch (error) {
-			console.error('Error loading brand assets:', error);
 			toast.set({ message: 'Failed to load brand assets', type: 'error', duration: 2000 });
 		} finally {
 			loading = false;
@@ -113,7 +112,6 @@
 
 			toast.set({ message: `${asset.name} added to canvas`, type: 'success', duration: 2000 });
 		} catch (error) {
-			console.error('Error adding image to canvas:', error);
 			toast.set({ message: 'Failed to add image', type: 'error', duration: 2000 });
 		}
 	}
@@ -169,9 +167,7 @@
 		await loadBrandFonts();
 		try {
 			await document.fonts.load(`12px "${fontFamily}"`);
-		} catch (e) {
-			console.warn(`Font load warning for ${fontFamily}:`, e);
-		}
+		} catch (e) { /* ignored */ }
 
 		activeObject.set('fontFamily', fontFamily);
 		activeObject.initDimensions();

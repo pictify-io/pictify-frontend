@@ -76,7 +76,6 @@
 			preview = { url: dataUrl, loading: false, error: null };
 			staticCanvas.dispose();
 		} catch (err) {
-			console.error('Preview render failed:', err);
 			preview = { url: null, loading: false, error: err?.message || 'Preview render failed' };
 		}
 	}

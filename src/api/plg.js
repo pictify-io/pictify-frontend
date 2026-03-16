@@ -12,7 +12,6 @@ export const incrementFeatureUsage = async (feature, amount = 1) => {
 		const response = await backend.post(`/api/plg/feature-usage/${feature}`, { amount });
 		return response;
 	} catch (error) {
-		console.error('Failed to increment feature usage:', error);
 		return { success: false };
 	}
 };
@@ -25,7 +24,6 @@ export const checkFeatureLimit = async (feature, amount = 1) => {
 		const response = await backend.get(`/api/plg/feature-check/${feature}?amount=${amount}`);
 		return response;
 	} catch (error) {
-		console.error('Failed to check feature limit:', error);
 		// Fail open - allow the feature if API fails
 		return { allowed: true, remaining: -1 };
 	}
@@ -39,7 +37,6 @@ export const recordMilestone = async (milestoneId) => {
 		const response = await backend.post(`/api/plg/milestone/${milestoneId}`);
 		return response;
 	} catch (error) {
-		console.error('Failed to record milestone:', error);
 		return { success: false };
 	}
 };
@@ -52,7 +49,6 @@ export const recordUpgradePrompt = async (action, promptType, context = {}) => {
 		const response = await backend.post('/api/plg/upgrade-prompt', { action, promptType, context });
 		return response;
 	} catch (error) {
-		console.error('Failed to record upgrade prompt:', error);
 		return { success: false };
 	}
 };
@@ -65,7 +61,6 @@ export const getDiscountCode = async (percentage) => {
 		const response = await backend.get(`/api/plg/discount-code/${percentage}`);
 		return response;
 	} catch (error) {
-		console.error('Failed to get discount code:', error);
 		return { code: null, valid: false };
 	}
 };

@@ -55,7 +55,7 @@
 
 		try {
 			sessionStorage.setItem(EXIT_POPUP_SHOWN_KEY, 'true');
-		} catch (e) {}
+		} catch (e) { /* ignored */ }
 	}
 
 	function closePopup() {
@@ -131,7 +131,7 @@
 				hasShownPopup = true;
 				return;
 			}
-		} catch (e) {}
+		} catch (e) { /* ignored */ }
 
 		// Desktop: mouse leave detection
 		document.addEventListener('mouseleave', handleMouseLeave);

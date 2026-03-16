@@ -92,7 +92,6 @@
 			// Reset form
 			resetForm();
 		} catch (error) {
-			console.error('Error creating QR code:', error);
 			alert('Failed to create QR code. Please try again.');
 		}
 	}

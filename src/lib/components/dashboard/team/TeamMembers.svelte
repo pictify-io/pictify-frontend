@@ -43,7 +43,7 @@
 	});
 
 	async function handleInvite() {
-		if (!inviteEmail.trim() || !inviteEmail.includes('@')) {
+		if (!inviteEmail.trim() || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())) {
 			error = 'Please enter a valid email address';
 			return;
 		}

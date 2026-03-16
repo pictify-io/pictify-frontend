@@ -176,7 +176,6 @@ export const refreshOnboarding = async () => {
 
 		return status;
 	} catch (error) {
-		console.error('Failed to refresh onboarding:', error);
 		return null;
 	}
 };

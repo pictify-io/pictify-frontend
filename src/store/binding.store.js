@@ -84,7 +84,6 @@ export const getBindingsAction = async (params = {}) => {
 		bindings.set(response.bindings);
 		return response.bindings;
 	} catch (error) {
-		console.error('Error fetching bindings:', error);
 		bindings.set([]);
 		return [];
 	} finally {
@@ -106,7 +105,6 @@ export const getBindingAction = async (id) => {
 		binding.set(response.binding);
 		return response.binding;
 	} catch (error) {
-		console.error('Error fetching binding:', error);
 		return null;
 	} finally {
 		bindingLoading.set(false);
@@ -128,7 +126,6 @@ export const createBindingAction = async (bindingData) => {
 		binding.set(response.binding);
 		return response.binding;
 	} catch (error) {
-		console.error('Error creating binding:', error);
 		throw error;
 	} finally {
 		bindingLoading.set(false);
@@ -156,7 +153,6 @@ export const updateBindingAction = async (id, updates) => {
 		binding.set(response.binding);
 		return response.binding;
 	} catch (error) {
-		console.error('Error updating binding:', error);
 		throw error;
 	} finally {
 		bindingLoading.set(false);
@@ -173,7 +169,6 @@ export const deleteBindingAction = async (id) => {
 		bindings.update((b) => b.filter((item) => item.uid !== id));
 		return true;
 	} catch (error) {
-		console.error('Error deleting binding:', error);
 		throw error;
 	} finally {
 		bindingLoading.set(false);
@@ -201,7 +196,6 @@ const createBindingStatusAction = (apiFunc, actionName) => async (id) => {
 		}
 		return response?.binding;
 	} catch (error) {
-		console.error(`Error ${actionName} binding:`, error);
 		throw error;
 	}
 };
@@ -224,7 +218,6 @@ export const refreshBindingAction = async (id) => {
 		const response = await refreshBinding(id);
 		return response;
 	} catch (error) {
-		console.error('Error refreshing binding:', error);
 		throw error;
 	}
 };
@@ -237,7 +230,6 @@ export const getBindingStatsAction = async (id) => {
 		const response = await getBindingStats(id);
 		return response;
 	} catch (error) {
-		console.error('Error fetching binding stats:', error);
 		return null;
 	}
 };
@@ -258,7 +250,6 @@ export const getDataSourcesAction = async () => {
 		dataSources.set(response.dataSources);
 		return response.dataSources;
 	} catch (error) {
-		console.error('Error fetching data sources:', error);
 		dataSources.set([]);
 		return [];
 	} finally {
@@ -288,7 +279,6 @@ export const getDataSourceAction = async (id) => {
 		dataSource.set(response.dataSource);
 		return response.dataSource;
 	} catch (error) {
-		console.error('Error fetching data source:', error);
 		return null;
 	} finally {
 		dataSourceLoading.set(false);
@@ -309,7 +299,6 @@ export const createDataSourceAction = async (sourceData) => {
 		dataSource.set(response.dataSource);
 		return response.dataSource;
 	} catch (error) {
-		console.error('Error creating data source:', error);
 		throw error;
 	} finally {
 		dataSourceLoading.set(false);
@@ -336,7 +325,6 @@ export const updateDataSourceAction = async (id, updates) => {
 		dataSource.set(response.dataSource);
 		return response.dataSource;
 	} catch (error) {
-		console.error('Error updating data source:', error);
 		throw error;
 	} finally {
 		dataSourceLoading.set(false);
@@ -353,7 +341,6 @@ export const deleteDataSourceAction = async (id) => {
 		dataSources.update((ds) => ds.filter((item) => item.uid !== id));
 		return true;
 	} catch (error) {
-		console.error('Error deleting data source:', error);
 		throw error;
 	} finally {
 		dataSourceLoading.set(false);
@@ -368,7 +355,6 @@ export const testDataSourceAction = async (sourceData) => {
 		const response = await testDataSource(sourceData);
 		return response;
 	} catch (error) {
-		console.error('Error testing data source:', error);
 		throw error;
 	}
 };

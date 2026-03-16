@@ -23,7 +23,6 @@ export async function getAllFonts() {
 
 		return await response.json();
 	} catch (error) {
-		console.error('Error fetching fonts:', error);
 		// Return fallback fonts
 		return {
 			fonts: getFallbackFonts(),
@@ -48,7 +47,6 @@ export async function getPopularFonts() {
 
 		return await response.json();
 	} catch (error) {
-		console.error('Error fetching popular fonts:', error);
 		return { fonts: getFallbackFonts().filter((f) => f.popular) };
 	}
 }
@@ -68,7 +66,6 @@ export async function getFontsByCategory(category) {
 
 		return await response.json();
 	} catch (error) {
-		console.error('Error fetching fonts by category:', error);
 		return { category, fonts: [] };
 	}
 }
@@ -91,7 +88,6 @@ export async function searchFonts(query, extended = false) {
 
 		return await response.json();
 	} catch (error) {
-		console.error('Error searching fonts:', error);
 		return { fonts: [], source: 'local' };
 	}
 }
@@ -117,7 +113,6 @@ export async function addGoogleFont(family, url = null) {
 
 		return await response.json();
 	} catch (error) {
-		console.error('Error adding font:', error);
 		throw error;
 	}
 }
@@ -137,7 +132,6 @@ export async function getSystemFontAlternatives() {
 
 		return await response.json();
 	} catch (error) {
-		console.error('Error fetching system font alternatives:', error);
 		return { alternatives: {} };
 	}
 }

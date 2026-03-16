@@ -8,7 +8,6 @@ export async function getCdnDashboard() {
 	try {
 		return await backend.get('/api/cdn/dashboard');
 	} catch (error) {
-		console.error('Failed to get CDN dashboard:', error);
 		return {
 			totalHits: 0,
 			totalBytes: 0,
@@ -34,7 +33,6 @@ export async function getCdnAnalytics({ range = '30d', sort = 'hits', page = 1, 
 		const params = new URLSearchParams({ range, sort, page, limit });
 		return await backend.get(`/api/cdn/analytics?${params}`);
 	} catch (error) {
-		console.error('Failed to get CDN analytics:', error);
 		return {
 			summary: {
 				totalHits: 0,

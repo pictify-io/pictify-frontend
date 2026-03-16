@@ -16,20 +16,19 @@
 			if (raw) {
 				const draft = JSON.parse(raw);
 				// If draft exists, skip selector and go directly to editor
-				if (draft && draft.fabricJSData) {
-					showSelector = false;
-					selectedConfig = {
-						outputFormat: draft.outputFormat || 'image',
-						pdfPreset: draft.pdfPreset || 'A4',
-						width: draft.width || 1080,
-						height: draft.height || 1080
-					};
-					pageActions.setOutputFormat(selectedConfig.outputFormat);
-					pageActions.setPdfPreset(selectedConfig.pdfPreset);
+				if (draft && (draft.fabricJSData || draft.backgroundImageUrl)) {
+					// Tools workflow drafts use backgroundImageUrl — always image type
+					const format = draft.outputFormat || 'image';
+					if (format === 'pdf') {
+						goto('/template-workspace/pdf/create');
+					} else {
+						goto('/template-workspace/image/create');
+					}
+					return;
 				}
 			}
 		} catch (e) {
-			console.log('No draft to load');
+			/* ignored */
 		}
 	});
 

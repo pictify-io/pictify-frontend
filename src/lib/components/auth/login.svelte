@@ -95,16 +95,16 @@
 		}, 1000);
 	}
 
-	function handleForgotPassword() {
+	async function handleForgotPassword() {
 		if (!email) {
 			errorMessage = 'Please enter your email';
 			return;
 		}
 		try {
-			forgotPassword(email);
+			await forgotPassword(email);
 			errorMessage = `Password reset link sent to ${email}`;
 		} catch (e) {
-			errorMessage = e.message;
+			errorMessage = e.message || 'Failed to send reset link';
 		}
 	}
 </script>

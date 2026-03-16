@@ -34,7 +34,6 @@
 		isUserLoggedIn = !!userData.email;
 		isEmailVerified = userData.isEmailVerified;
 		userEmail = userData.email || '';
-		console.log('userData', userData);
 		if (userData && Array.isArray(userData.apiTokens) && userData.apiTokens.length > 0) {
 			apiKey = userData.apiTokens[0].token || '';
 		}
@@ -250,7 +249,6 @@
 			);
 			isLoading = false;
 		} catch (error) {
-			console.error('Error loading templates:', error);
 			toast.set({ message: 'Failed to load templates', type: 'error', duration: 1500 });
 			defaultTemplatesList = [];
 			isLoading = false;
@@ -263,7 +261,6 @@
 		isLoadingSaved = true;
 		try {
 			const response = await getTemplatesForTypeAction('og-image');
-			console.log('Loaded saved templates:', response);
 
 			// Get templates from store as fallback
 			const storeTemplates = get(templatesStore) || [];
@@ -286,9 +283,7 @@
 				templateOptions = [];
 			}
 
-			console.log('Final saved templates:', savedTemplates);
 		} catch (error) {
-			console.error('Error loading saved templates:', error);
 			toast.set({ message: 'Failed to load saved templates', type: 'error', duration: 1500 });
 			savedTemplates = [];
 			templateOptions = [];
@@ -320,7 +315,6 @@
 				activeTab = 'saved';
 			}
 		} catch (error) {
-			console.error('Error saving template:', error);
 			toast.set({ message: 'Failed to save template', type: 'error', duration: 1500 });
 		}
 	};
@@ -345,7 +339,6 @@
 				await loadSavedTemplates();
 			}
 		} catch (error) {
-			console.error('Error updating template:', error);
 			toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
 		}
 	};
@@ -401,7 +394,6 @@
 				await loadSavedTemplates();
 			}
 		} catch (error) {
-			console.error('Error deleting template:', error);
 			toast.set({ message: 'Failed to delete template', type: 'error', duration: 1500 });
 		}
 	};
@@ -451,7 +443,6 @@
 				showSignupPrompt = true;
 			}
 		} catch (error) {
-			console.error('Error generating image:', error);
 			testResponse = {
 				status: error.status || 500,
 				error: error.message || 'Failed to generate image'
@@ -485,7 +476,6 @@
 			};
 			isApiOperational = true;
 		} catch (error) {
-			console.error('Error fetching templates:', error);
 			testResponse = {
 				status: error.status || 500,
 				error: error.message || 'Failed to fetch templates'
@@ -528,7 +518,6 @@
 				}
 			}
 		} catch (error) {
-			console.error('Error loading API tokens:', error);
 			toast.set({ message: 'Failed to load API tokens', type: 'error', duration: 1500 });
 		}
 	};

@@ -74,10 +74,8 @@ export async function loadBrandFonts() {
 		loadedFontFamilies = families;
 		fontsLoaded = true;
 
-		console.log('Brand fonts loaded:', families);
 		return families;
 	} catch (error) {
-		console.error('Error loading brand fonts:', error);
 		fontsLoaded = true;
 		return [];
 	}

@@ -346,7 +346,7 @@ export const PLAN_FEATURES = {
 
 		// Enterprise
 		[FEATURES.BRAND_ASSETS]: true,
-		[FEATURES.SSO_SAML]: true,
+		[FEATURES.SSO_SAML]: false, // SSO not yet implemented — enable when ready
 		[FEATURES.AUDIT_LOGS]: true,
 		[FEATURES.WHITE_LABEL]: true,
 

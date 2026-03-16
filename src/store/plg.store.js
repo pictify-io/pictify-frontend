@@ -239,7 +239,6 @@ const _doInitPLG = async () => {
 		const planDetails = await getPlanDetails();
 
 		if (!planDetails) {
-			console.warn('Failed to get plan details');
 			plgLoading.set(false);
 			return null;
 		}
@@ -329,7 +328,6 @@ const _doInitPLG = async () => {
 
 		return status;
 	} catch (error) {
-		console.error('Failed to init PLG:', error);
 	} finally {
 		plgLoading.set(false);
 	}
@@ -411,7 +409,7 @@ export const refreshUsageWidget = async () => {
 
 		return widget;
 	} catch (error) {
-		console.error('Failed to refresh usage widget:', error);
+		/* ignored */
 	}
 };
 
@@ -458,7 +456,6 @@ export const trackFeatureUsage = async (feature, amount = 1) => {
 
 		return result;
 	} catch (error) {
-		console.error('Failed to track feature usage:', error);
 		throw error;
 	}
 };
@@ -478,7 +475,6 @@ export const canUseFeature = async (feature, amount = 1) => {
 
 		return result;
 	} catch (error) {
-		console.error('Failed to check feature limit:', error);
 		return { allowed: true }; // Fail open
 	}
 };
@@ -623,7 +619,7 @@ export const dismissMilestone = async () => {
 			const milestoneId = milestone.id || `${milestone.feature || 'renders'}-${milestone.count}`;
 			await recordMilestone(milestoneId);
 		} catch (error) {
-			console.error('Failed to record milestone:', error);
+			/* ignored */
 		}
 	}
 	activeMilestone.set(null);
@@ -969,7 +965,7 @@ export const initNudgeState = () => {
 			proactiveModalShownThisCycle
 		});
 	} catch (e) {
-		console.warn('Failed to init nudge state:', e);
+		/* ignored */
 	}
 };
 
@@ -1006,7 +1002,7 @@ export const dismissUsageBanner = () => {
 	try {
 		localStorage.setItem(BANNER_DISMISS_KEY, now.toString());
 	} catch (e) {
-		console.warn('Failed to save banner dismiss:', e);
+		/* ignored */
 	}
 };
 
@@ -1041,7 +1037,7 @@ export const markProactiveModalShown = () => {
 			JSON.stringify({ shownAt: new Date().toISOString() })
 		);
 	} catch (e) {
-		console.warn('Failed to save proactive modal state:', e);
+		/* ignored */
 	}
 };
 
@@ -1071,7 +1067,6 @@ export const initOverageState = async () => {
 
 		return preferences;
 	} catch (error) {
-		console.error('Failed to init overage state:', error);
 		return null;
 	}
 };
@@ -1101,7 +1096,6 @@ export const updateOveragePreferences = async ({ allowOverages, spendingCapCents
 
 		return result;
 	} catch (error) {
-		console.error('Failed to update overage preferences:', error);
 		throw error;
 	}
 };
@@ -1125,7 +1119,6 @@ export const refreshOverageSummary = async () => {
 
 		return summary;
 	} catch (error) {
-		console.error('Failed to refresh overage summary:', error);
 		return null;
 	}
 };

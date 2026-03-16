@@ -233,7 +233,6 @@ export const switchTeamAction = async (teamId) => {
 
 		// Refresh onboarding state for the new team
 		initOnboarding().catch((err) => {
-			console.error('Failed to refresh onboarding after team switch:', err);
 		});
 
 		return response;
@@ -367,7 +366,6 @@ export const fetchTeamInvitations = async (teamId) => {
 
 	try {
 		const response = await getInvitationsAPI(targetTeamId);
-		console.log('[Team Store] Fetched invitations:', response);
 		teamStore.update((state) => ({
 			...state,
 			invitations: response.invitations || [],
@@ -375,7 +373,6 @@ export const fetchTeamInvitations = async (teamId) => {
 		}));
 		return response.invitations;
 	} catch (error) {
-		console.error('[Team Store] Error fetching invitations:', error);
 		setError(error);
 		setLoading('invitations', false);
 		throw error;

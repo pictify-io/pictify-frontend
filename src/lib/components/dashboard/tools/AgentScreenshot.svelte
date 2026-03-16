@@ -54,23 +54,19 @@
 
 		// Ensure we have an API token
 		if (!currentApiToken) {
-			console.log('No API token, fetching...');
 			try {
 				await getAPITokenAction();
 			} catch (error) {
-				console.error('Failed to get API token:', error);
 				toast.set({ message: 'Failed to get API token', type: 'error', duration: 1500 });
 				return;
 			}
 		}
 
 		if (!currentApiToken) {
-			console.error('No API token available after fetch attempt');
 			toast.set({ message: 'No API token available', type: 'error', duration: 1500 });
 			return;
 		}
 
-		console.log('Using API token:', currentApiToken.token ? 'Token present' : 'Token missing');
 
 		isGenerating = true;
 		streamingLogs = [];
@@ -92,7 +88,6 @@
 
 			toast.set({ message: 'Screenshot generated successfully!', type: 'success', duration: 1500 });
 		} catch (error) {
-			console.error('Error generating screenshot:', error);
 			toast.set({ message: 'Failed to generate screenshot', type: 'error', duration: 1500 });
 			streamingLogs = [
 				...streamingLogs,
@@ -170,9 +165,7 @@
 		if (isUserLoggedIn) {
 			try {
 				await getAPITokenAction();
-			} catch (error) {
-				console.error('Error loading API token:', error);
-			}
+			} catch (error) { /* ignored */ }
 		}
 	});
 </script>

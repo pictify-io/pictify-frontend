@@ -296,7 +296,6 @@
 
 		// Ignore clicks on elements that were removed from DOM (e.g. due to re-render)
 		if (!e.target.isConnected) {
-			console.log('[ColorPicker] Ignoring click on detached element');
 			return;
 		}
 
@@ -304,7 +303,6 @@
 		const isInsideModal = e.target.closest('.color-picker-modal');
 
 		if (!isInsideButton && !isInsideModal) {
-			console.log('[ColorPicker] Click outside detected, closing');
 			showColorPicker = false;
 		}
 	}
@@ -332,7 +330,6 @@
 			}
 		} catch (err) {
 			// User cancelled the eyedropper
-			console.log('Eyedropper cancelled');
 		}
 	}
 
@@ -360,9 +357,7 @@
 			setTimeout(() => {
 				copiedColor = null;
 			}, 1500);
-		} catch (err) {
-			console.error('Failed to copy color:', err);
-		}
+		} catch (err) { /* ignored */ }
 	}
 
 	onMount(() => {
@@ -399,7 +394,6 @@
 			type="button"
 			class="flex items-center gap-2 px-2 py-1 rounded-lg border-[2px] border-gray-300 hover:border-gray-400 transition-all bg-white"
 			on:click={(e) => {
-				console.log('[ColorPicker] Button clicked!');
 				e.stopPropagation();
 				toggleColorPicker();
 			}}

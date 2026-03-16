@@ -78,7 +78,6 @@ export const historyActions = {
 	 * @param {string} source - Source of the operation ('user' | 'copilot' | 'system')
 	 */
 	startBatch: (description = 'Batch operation', source = 'user') => {
-		console.log('🔄 History batch started:', description, 'source:', source);
 		batchState.set({
 			isActive: true,
 			description,
@@ -91,7 +90,6 @@ export const historyActions = {
 	 */
 	endBatch: () => {
 		const batch = get(batchState);
-		console.log('🔄 History batch ended:', batch.description);
 		batchState.set({
 			isActive: false,
 			description: null,
@@ -108,9 +106,7 @@ export const historyActions = {
 	setStreaming: (streaming) => {
 		isStreaming.set(streaming);
 		if (streaming) {
-			console.log('⏳ Streaming started - undo/redo disabled');
 		} else {
-			console.log('✅ Streaming ended - undo/redo enabled');
 		}
 	},
 
@@ -120,7 +116,6 @@ export const historyActions = {
 	 */
 	requestUndo: () => {
 		if (get(isStreaming)) {
-			console.log('⚠️ Cannot undo while streaming is active');
 			return false;
 		}
 		triggerUndo.update((n) => n + 1);
@@ -133,7 +128,6 @@ export const historyActions = {
 	 */
 	requestRedo: () => {
 		if (get(isStreaming)) {
-			console.log('⚠️ Cannot redo while streaming is active');
 			return false;
 		}
 		triggerRedo.update((n) => n + 1);

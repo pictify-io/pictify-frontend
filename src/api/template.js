@@ -116,12 +116,18 @@ const renderTemplate = async (uid, variables = {}, options = {}) => {
 			body.height = options.height;
 		}
 
+		// Add layout variant key (single or multiple)
+		if (options.layouts && options.layouts.length > 0) {
+			body.layouts = options.layouts;
+		} else if (options.layout) {
+			body.layout = options.layout;
+		}
+
 		const response = await backend.post(`/templates/${uid}/render`, body, {
 			headers
 		});
 		return response;
 	} catch (error) {
-		console.error('Error rendering template:', error);
 		throw error;
 	}
 };
@@ -156,7 +162,6 @@ const renderTemplateMultiSize = async (uid, variables = {}, sizes = [], options 
 		);
 		return response;
 	} catch (error) {
-		console.error('Error multi-size rendering template:', error);
 		throw error;
 	}
 };
@@ -171,7 +176,6 @@ const getTemplateVariables = async (uid) => {
 		const response = await backend.get(`/templates/${uid}/variables`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching template variables:', error);
 		return null;
 	}
 };
@@ -191,7 +195,8 @@ const batchRenderTemplate = async (uid, variableSets, options = {}) => {
 				variableSets,
 				format: options.format || 'png',
 				quality: options.quality || 0.9,
-				concurrency: options.concurrency || 5
+				concurrency: options.concurrency || 5,
+				...(options.layouts ? { layouts: options.layouts } : options.layout ? { layout: options.layout } : {})
 			},
 			{
 				headers: options.headers || {}
@@ -199,7 +204,6 @@ const batchRenderTemplate = async (uid, variableSets, options = {}) => {
 		);
 		return response;
 	} catch (error) {
-		console.error('Error batch rendering template:', error);
 		throw error;
 	}
 };
@@ -224,7 +228,6 @@ const cancelBatchJob = async (batchId) => {
 		const response = await backend.post(`/templates/batch/${batchId}/cancel`, {});
 		return response;
 	} catch (error) {
-		console.error('Error cancelling batch job:', error);
 		return null;
 	}
 };
@@ -248,7 +251,8 @@ const batchRenderFromCsv = async (uid, csvUrl, mappings, options = {}) => {
 				mappings,
 				format: options.format || 'png',
 				quality: options.quality || 0.9,
-				concurrency: options.concurrency || 5
+				concurrency: options.concurrency || 5,
+				...(options.layouts ? { layouts: options.layouts } : options.layout ? { layout: options.layout } : {})
 			},
 			{
 				headers: options.headers || {}
@@ -256,7 +260,6 @@ const batchRenderFromCsv = async (uid, csvUrl, mappings, options = {}) => {
 		);
 		return response;
 	} catch (error) {
-		console.error('Error batch rendering from CSV:', error);
 		throw error;
 	}
 };
@@ -273,7 +276,6 @@ const uploadCsvForBatch = async (file) => {
 		const response = await backend.postFormData('/templates/upload-csv', formData);
 		return response;
 	} catch (error) {
-		console.error('Error uploading CSV:', error);
 		throw error;
 	}
 };
@@ -288,7 +290,6 @@ const regenerateThumbnail = async (uid) => {
 		const response = await backend.post(`/templates/${uid}/regenerate-thumbnail`, {});
 		return response;
 	} catch (error) {
-		console.error('Error regenerating thumbnail:', error);
 		return null;
 	}
 };
@@ -302,7 +303,6 @@ const regenerateAllThumbnails = async () => {
 		const response = await backend.post('/templates/regenerate-thumbnails', {});
 		return response;
 	} catch (error) {
-		console.error('Error regenerating all thumbnails:', error);
 		return null;
 	}
 };
@@ -313,7 +313,6 @@ const validateExpression = async (expression) => {
 		const response = await backend.post('/templates/expression/validate', { expression });
 		return response;
 	} catch (error) {
-		console.error('Error validating expression:', error);
 		return null;
 	}
 };
@@ -323,7 +322,6 @@ const testExpression = async (expression, variables = {}) => {
 		const response = await backend.post('/templates/expression/test', { expression, variables });
 		return response;
 	} catch (error) {
-		console.error('Error testing expression:', error);
 		return null;
 	}
 };
@@ -333,7 +331,6 @@ const interpolateText = async (text, variables = {}) => {
 		const response = await backend.post('/templates/expression/interpolate', { text, variables });
 		return response;
 	} catch (error) {
-		console.error('Error interpolating text:', error);
 		return null;
 	}
 };
@@ -343,7 +340,6 @@ const getExpressionFunctions = async () => {
 		const response = await backend.get('/templates/expression/functions');
 		return response;
 	} catch (error) {
-		console.error('Error fetching expression functions:', error);
 		return null;
 	}
 };
@@ -363,7 +359,6 @@ const getPublicTemplates = async (params = {}) => {
 		const response = await backend.get(`/public/templates?${queryParams}`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching public templates:', error);
 		return null;
 	}
 };
@@ -373,7 +368,6 @@ const getPublicTemplate = async (uid) => {
 		const response = await backend.get(`/public/templates/${uid}`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching public template:', error);
 		return null;
 	}
 };
@@ -383,7 +377,6 @@ const forkTemplate = async (uid) => {
 		const response = await backend.post(`/public/templates/${uid}/fork`, {});
 		return response;
 	} catch (error) {
-		console.error('Error forking template:', error);
 		return null;
 	}
 };
@@ -404,7 +397,6 @@ const renderPdf = async (templateUid, variables = {}, options = {}) => {
 		);
 		return response;
 	} catch (error) {
-		console.error('Error rendering PDF:', error);
 		throw error;
 	}
 };
@@ -424,7 +416,6 @@ const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) 
 		);
 		return response;
 	} catch (error) {
-		console.error('Error rendering multi-page PDF:', error);
 		throw error;
 	}
 };

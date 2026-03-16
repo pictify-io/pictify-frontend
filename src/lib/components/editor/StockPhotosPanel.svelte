@@ -77,7 +77,6 @@
 			}));
 			featuredPhotos = photos;
 		} catch (err) {
-			console.error('Error loading featured photos:', err);
 			// Use demo photos as fallback
 			photos = getDemoPhotos();
 			featuredPhotos = photos;
@@ -137,7 +136,6 @@
 			hasMore = data.results.length === UNSPLASH_CONFIG.DEFAULT_PER_PAGE;
 			page = pageNum;
 		} catch (err) {
-			console.error('Error searching photos:', err);
 			error = 'Unable to search photos. Please try again.';
 			// Show demo photos on error
 			if (pageNum === 1) {
@@ -205,7 +203,6 @@
 			// This is REQUIRED by Unsplash when user adds photo to canvas
 			triggerDownload(photo);
 		} catch (err) {
-			console.error('Error adding photo to canvas:', err);
 			error = 'Failed to add photo. Please try again.';
 		} finally {
 			loading = false;
@@ -219,7 +216,6 @@
 			try {
 				await fetch(`${photo.downloadLocation}?client_id=${UNSPLASH_CONFIG.ACCESS_KEY}`);
 			} catch (err) {
-				console.error('Error tracking download:', err);
 				// Silent fail - don't block user experience
 			}
 		}

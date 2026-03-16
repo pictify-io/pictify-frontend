@@ -123,7 +123,6 @@
 				imageUrlInput = ''; // Reset input
 			})
 			.catch((error) => {
-				console.error('Error loading image from URL:', error);
 				alert('Failed to load image from URL. Please check the URL and try again.');
 			});
 	}

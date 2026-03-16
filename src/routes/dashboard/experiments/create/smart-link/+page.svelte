@@ -12,6 +12,7 @@
 	} from '../../../../../store/experiments.store';
 	import { toast } from '../../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
+	import { analytics } from '$lib/analytics.js';
 	import { getTemplatesAction, templates } from '../../../../../store/template.store';
 	import { getTemplateById } from '../../../../../api/template';
 	import { getContextVariables } from '../../../../../api/experiments';
@@ -317,7 +318,6 @@
 				}
 			}
 		} catch (err) {
-			console.error('Failed to load experiment for editing:', err);
 			toast.set({ message: 'Failed to load experiment', type: 'error' });
 		}
 	}
@@ -363,7 +363,7 @@
 				}
 			}
 		} catch (err) {
-			console.error('Failed to fetch template variables:', err);
+			/* ignored */
 		}
 	}
 
@@ -591,7 +591,6 @@
 			variantPreviews[variantIndex] = { url: dataUrl, loading: false, error: null };
 			staticCanvas.dispose();
 		} catch (err) {
-			console.error('Preview render failed:', err);
 			variantPreviews[variantIndex] = {
 				url: null,
 				loading: false,
@@ -685,9 +684,12 @@
 			} else {
 				const created = await createExperimentAction(payload);
 				if (created?.uid) {
+					analytics.trackExperimentCreated({ type: 'smart_link', variant_count: payload.variants?.length || 2 });
+					analytics.trackExperimentWizardCompleted({ type: 'smart_link' });
 					if (startAfterCreate) {
 						try {
 							await startExperimentAction(created.uid);
+							analytics.trackExperimentStarted({ type: 'smart_link', uid: created.uid });
 							toast.set({ message: 'Smart link created and launched!', type: 'success' });
 						} catch {
 							toast.set({ message: 'Smart link created but failed to launch.', type: 'warning' });

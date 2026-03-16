@@ -8,6 +8,7 @@
 	import { page } from '$app/stores';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 	import TeamSwitcher from './TeamSwitcher.svelte';
+	import { analytics } from '$lib/analytics.js';
 	import { initializeTeamState, currentTeam, isTeamOwner } from '../../../store/team.store';
 
 	$: isPaidPlan = $user?.currentPlan !== 'starter' && $user?.currentPlan !== 'free';
@@ -22,15 +23,17 @@
 	onMount(async () => {
 		try {
 			await initializeTeamState();
-		} catch (error) {
-			console.error('Failed to initialize team state:', error);
-		}
+		} catch (error) { /* ignored */ }
 	});
 
 	async function gotoPaymentPortal() {
-		const paymentPortal = await getPaymentPortal();
-		if (!paymentPortal.portalLink) return;
-		window.open(paymentPortal.portalLink, '_blank');
+		try {
+			const paymentPortal = await getPaymentPortal();
+			if (!paymentPortal?.portalLink) return;
+			window.open(paymentPortal.portalLink, '_blank');
+		} catch (error) {
+			/* ignored */
+		}
 	}
 
 	function logout() {
@@ -142,6 +145,7 @@
 			<a
 				href="/dashboard/experiments"
 				aria-current={isActive(currentPath, '/dashboard/experiments') ? 'page' : undefined}
+				on:click={() => analytics.trackExperimentFeatureDiscovered({ source: 'nav' })}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/experiments')
 					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'

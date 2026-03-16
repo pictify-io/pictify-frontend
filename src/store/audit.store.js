@@ -193,7 +193,6 @@ export async function exportLogs(options = {}) {
 		const result = await exportAuditLogs(params);
 		return result;
 	} catch (error) {
-		console.error('Failed to export audit logs:', error);
 		throw error;
 	}
 }
@@ -206,7 +205,6 @@ export async function fetchLogsForResource(resourceId, options = {}) {
 		const result = await fetchResourceLogs(resourceId, options);
 		return result;
 	} catch (error) {
-		console.error('Failed to fetch resource logs:', error);
 		throw error;
 	}
 }

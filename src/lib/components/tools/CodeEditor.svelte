@@ -122,7 +122,6 @@ body {
 	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
-		console.log(fileExtension);
 		updateIframe();
 	});
 
@@ -183,9 +182,7 @@ body {
 			img = image;
 			dispatch('imageGenerated', { image });
 			isImageLoading = false;
-		} catch (e) {
-			console.error(e);
-		}
+		} catch (e) { /* ignored */ }
 	}
 
 	async function createGif() {
@@ -207,9 +204,7 @@ body {
 			});
 			img = gif;
 			isImageLoading = false;
-		} catch (e) {
-			console.error(e);
-		}
+		} catch (e) { /* ignored */ }
 	}
 
 	function copyToClipboard(text) {

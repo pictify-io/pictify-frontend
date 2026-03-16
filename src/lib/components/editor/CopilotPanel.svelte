@@ -26,6 +26,7 @@
 	let chatContainer;
 	let textareaElement;
 	let activeStream = null;
+	let usePerformanceInsights = true;
 
 	// Race condition guards
 	let destroyed = false;
@@ -102,7 +103,6 @@
 		}
 		streamingTimeoutId = setTimeout(() => {
 			if (isLoading) {
-				console.warn('[Copilot] Streaming timeout reached (60s), force-resetting state');
 				cleanupStream();
 				if (!destroyed) {
 					streamError = 'Generation timed out. Please try again.';
@@ -128,25 +128,14 @@
 		if (destroyed) return;
 
 		if (!$editor || !canvasJson) {
-			console.warn('[Copilot] Cannot apply canvas state:', {
-				hasEditor: !!$editor,
-				hasState: !!canvasJson
-			});
 			return;
 		}
 
 		// Validate canvas state has objects
 		if (!canvasJson.objects || !Array.isArray(canvasJson.objects)) {
-			console.error('[Copilot] Invalid canvas state - missing objects array:', canvasJson);
 			return;
 		}
 
-		console.log('[Copilot] Applying canvas state:', {
-			objectCount: canvasJson.objects.length,
-			background: canvasJson.background,
-			width: canvasJson.width,
-			height: canvasJson.height
-		});
 
 		// Use unified history store for batching copilot updates
 		historyActions.startBatch('Copilot canvas update', 'copilot');
@@ -168,24 +157,9 @@
 					}
 
 					// Log canvas and first few objects for debugging
-					console.log('[Copilot] Canvas dimensions after load:', {
-						width: $editor.width,
-						height: $editor.height,
-						zoom: $editor.getZoom()
-					});
 
 					const objects = $editor.getObjects();
 					if (objects.length > 0) {
-						console.log('[Copilot] First object:', {
-							type: objects[0].type,
-							left: objects[0].left,
-							top: objects[0].top,
-							width: objects[0].width,
-							height: objects[0].height,
-							fill: objects[0].fill,
-							opacity: objects[0].opacity,
-							visible: objects[0].visible
-						});
 					}
 
 					// Explicitly render all objects
@@ -206,7 +180,6 @@
 						}
 						$editor.renderAll();
 						$editor.requestRenderAll();
-						console.log('[Copilot] Canvas rendered with', $editor.getObjects().length, 'objects');
 						resolve();
 					}, 100);
 				});
@@ -226,8 +199,6 @@
 		// Guard: check if destroyed before processing
 		if (destroyed) return;
 
-		console.log('[Copilot Swarm] Received step payload:', payload);
-		console.log('[Copilot Swarm] Canvas state present?', !!payload.canvasState);
 
 		const { step, canvasState } = payload;
 
@@ -263,10 +234,8 @@
 
 		// Apply canvas state if provided (real-time preview)
 		if (canvasState) {
-			console.log('[Copilot Swarm] Applying canvas state from step event');
 			await applyCanvasState(canvasState);
 		} else {
-			console.log('[Copilot Swarm] No canvas state in step payload');
 		}
 
 		if (!destroyed) {
@@ -293,19 +262,11 @@
 		// Guard: check if destroyed before processing
 		if (destroyed) return;
 
-		console.log('[Copilot Swarm] Generation complete:', payload);
-		console.log('[Copilot Swarm] Complete payload keys:', Object.keys(payload));
-		console.log('[Copilot Swarm] Canvas state present?', !!payload.canvasState);
 
 		// Extract canvas state from swarm response
 		if (payload.success && payload.canvasState) {
-			console.log('[Copilot Swarm] Applying final canvas state from complete event');
 			await applyCanvasState(payload.canvasState);
 		} else {
-			console.warn('[Copilot Swarm] No canvas state in complete payload or generation failed', {
-				success: payload.success,
-				hasCanvasState: !!payload.canvasState
-			});
 		}
 
 		// Guard: check again after async operations
@@ -374,7 +335,6 @@
 
 		// Guard: prevent multiple concurrent generations
 		if (isLoading) {
-			console.warn('[Copilot] Generation already in progress, ignoring request');
 			return;
 		}
 
@@ -462,15 +422,8 @@
 						fonts: brandData.assets.filter((a) => a.type === 'font'),
 						logos: brandData.assets.filter((a) => a.type === 'logo')
 					};
-					console.log('[Copilot] Brand assets loaded:', {
-						colors: brandAssets.colors.length,
-						fonts: brandAssets.fonts.length,
-						logos: brandAssets.logos.length
-					});
 				}
-			} catch (e) {
-				console.warn('[Copilot] Could not load brand assets:', e);
-			}
+			} catch (e) { /* ignored */ }
 
 			activeStream = await streamSimpleGenerate({
 				prompt: textToUse,
@@ -478,6 +431,7 @@
 				brandAssets,
 				width: $editor.width,
 				height: $editor.height,
+				includePerformanceData: usePerformanceInsights,
 				onStep: (payload) => handleStepPayload(payload),
 				onComplete: async (payload) => {
 					await handleCompletePayload(payload);
@@ -496,7 +450,6 @@
 				onError: (err) => handleStreamFailure(err)
 			});
 		} catch (err) {
-			console.error(err);
 			error = 'Something went wrong. Please try again.';
 			copilotActions.setError(error);
 			isLoading = false;
@@ -977,11 +930,19 @@
 				</div>
 			{/if}
 			<div class="mt-1.5 flex justify-between items-center px-0.5">
-				<span class="text-[9px] text-gray-400 flex items-center gap-1">
-					<kbd class="text-[8px] font-mono bg-gray-100 px-1 rounded border border-gray-200"
-						>Enter</kbd
-					> to send
-				</span>
+				<label class="flex items-center gap-1.5 cursor-pointer group" title="Use A/B test performance data to improve suggestions">
+					<input
+						type="checkbox"
+						bind:checked={usePerformanceInsights}
+						class="w-3 h-3 rounded border-gray-300 text-[#ffc480] focus:ring-[#ffc480] cursor-pointer"
+					/>
+					<span class="text-[9px] text-gray-400 group-hover:text-gray-600 transition-colors flex items-center gap-1">
+						{#if usePerformanceInsights}
+							<span class="inline-block w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
+						{/if}
+						Performance insights
+					</span>
+				</label>
 				<button
 					class="text-[9px] text-gray-400 hover:text-gray-600 transition-colors"
 					on:click={handleSaveTemplate}

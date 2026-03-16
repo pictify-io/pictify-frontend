@@ -45,7 +45,6 @@
 				limit: 20
 			});
 		} catch (err) {
-			console.error('Failed to load analytics:', err);
 		} finally {
 			isLoading = false;
 		}

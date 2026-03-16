@@ -58,6 +58,29 @@
 	let errors = [];
 	let batchError = null; // Error message to display prominently
 
+	// Layout selection — multi-select
+	let selectedBulkLayouts = new Set(['default']);
+	$: bulkTemplateLayouts = template?.layouts ? Object.entries(template.layouts) : [];
+	$: allBulkLayoutKeys = ['default', ...bulkTemplateLayouts.map(([key]) => key)];
+	$: allBulkSelected = allBulkLayoutKeys.length > 0 && allBulkLayoutKeys.every(k => selectedBulkLayouts.has(k));
+
+	function toggleBulkLayout(key) {
+		if (selectedBulkLayouts.has(key)) {
+			selectedBulkLayouts.delete(key);
+		} else {
+			selectedBulkLayouts.add(key);
+		}
+		selectedBulkLayouts = new Set(selectedBulkLayouts);
+	}
+
+	function toggleAllBulkLayouts() {
+		if (allBulkSelected) {
+			selectedBulkLayouts = new Set(['default']);
+		} else {
+			selectedBulkLayouts = new Set(allBulkLayoutKeys);
+		}
+	}
+
 	// API Key state
 	let apiTokens = [];
 	let selectedApiKey = '';
@@ -77,31 +100,20 @@
 	$: uid = $page.params.uid;
 
 	// Debug: log step changes
-	$: console.log(
-		'[Step Change] step is now:',
-		step,
-		'isLoading:',
-		isLoading,
-		'template:',
-		template?.name || 'null'
-	);
 
 	// Track previous UID to prevent unnecessary resets
 	let previousUid = null;
 
 	// Re-load when UID changes (only if actually different)
 	$: if (uid && uid !== previousUid) {
-		console.log('[UID Change] uid changed from', previousUid, 'to', uid, 'current step:', step);
 		previousUid = uid;
 		// Only reset and reload if not in the middle of a batch operation
 		if (step === 'upload' || step === 'map') {
-			console.log('[UID Change] Calling reset() and loadTemplate() because step is:', step);
 			template = null;
 			variables = [];
 			reset();
 			loadTemplate();
 		} else {
-			console.log('[UID Change] NOT calling reset/loadTemplate because step is:', step);
 		}
 		analytics.trackDashboardPage({ page_name: 'template_bulk_render', template_id: uid });
 	}
@@ -145,7 +157,6 @@
 			}
 		} catch (error) {
 			if (thisVersion === loadVersion) {
-				console.error('Error loading template:', error);
 				toast.set({ message: 'Failed to load template', type: 'error', duration: 3000 });
 			}
 		} finally {
@@ -236,16 +247,13 @@
 	let isBatchSubmitting = false;
 
 	async function startBatch() {
-		console.log('[startBatch] Called, isBatchSubmitting:', isBatchSubmitting);
 
 		// Double-click guard
 		if (isBatchSubmitting) {
-			console.log('[startBatch] Already submitting, returning early');
 			return;
 		}
 
 		if (!canStartBatch) {
-			console.log('[startBatch] Cannot start batch - canStartBatch is false');
 			if (!selectedApiKey) {
 				toast.set({ message: 'Please select an API key', type: 'error', duration: 3000 });
 			} else if (unmappedRequired.length > 0) {
@@ -259,23 +267,18 @@
 		}
 
 		if (!csvFile) {
-			console.log('[startBatch] No CSV file');
 			toast.set({ message: 'Please upload a CSV file', type: 'error', duration: 3000 });
 			return;
 		}
 
-		console.log('[startBatch] Starting batch process');
 		isBatchSubmitting = true;
 		batchError = null; // Clear any previous error
 		progress = { completed: 0, failed: 0, total: csvRows.length, status: 'uploading' };
 		step = 'progress';
-		console.log('[startBatch] Step set to:', step);
 
 		try {
 			// Step 1: Upload CSV to get URL
-			console.log('[startBatch] Uploading CSV...');
 			const uploadResult = await uploadCsvForBatch(csvFile);
-			console.log('[startBatch] Upload result:', uploadResult);
 			const csvUrl = uploadResult.url;
 
 			if (!csvUrl) {
@@ -283,11 +286,9 @@
 			}
 
 			progress.status = 'submitting';
-			console.log('[startBatch] CSV uploaded, submitting batch...');
 
 			// Step 2: Send mappings directly as { templateVar: csvColumn }
 			// This format allows multiple template variables to map to the same CSV column
-			console.log('[startBatch] Mappings:', mappings);
 
 			// Step 3: Call batch render with CSV URL and mappings
 			// Note: template.outputFormat is 'image' or 'pdf', not the actual render format
@@ -295,16 +296,15 @@
 				format: 'png',
 				quality: 0.9,
 				concurrency: 5,
+				...(selectedBulkLayouts.size > 1 ? { layouts: [...selectedBulkLayouts] } : selectedBulkLayouts.size === 1 && !selectedBulkLayouts.has('default') ? { layout: [...selectedBulkLayouts][0] } : {}),
 				headers: {
 					Authorization: `Bearer ${selectedApiKey}`
 				}
 			});
-			console.log('[startBatch] Batch render response:', response);
 
 			batchId = response.batchId;
 			progress.total = response.totalItems;
 			progress.status = 'processing';
-			console.log('[startBatch] Batch created, batchId:', batchId, 'totalItems:', progress.total);
 
 			// Track batch submission
 			analytics.track('bulk_render_started', {
@@ -313,11 +313,8 @@
 			});
 
 			// Start polling with cancellation support
-			console.log('[startBatch] Starting polling for batchId:', response.batchId);
 			startPolling(response.batchId);
-			console.log('[startBatch] Batch started successfully, step:', step, 'batchId:', batchId);
 		} catch (error) {
-			console.error('[startBatch] Error:', error);
 			isBatchSubmitting = false;
 			progress.status = 'failed';
 			step = 'map'; // Go back to mapping step so user can try again
@@ -329,7 +326,6 @@
 
 	// === POLLING (with race guards + exponential backoff) ===
 	async function startPolling(id) {
-		console.log('[Polling] Starting polling for batch:', id, 'pollVersion:', pollVersion + 1);
 		const thisVersion = ++pollVersion;
 		pollAbortController = new AbortController();
 
@@ -338,34 +334,15 @@
 		let consecutiveErrors = 0;
 		const maxConsecutiveErrors = 10;
 
-		console.log('[Polling] Entering polling loop, thisVersion:', thisVersion);
 
 		while (!pollAbortController.signal.aborted) {
-			console.log(
-				'[Polling] Loop iteration - aborted:',
-				pollAbortController.signal.aborted,
-				'destroyed:',
-				destroyed,
-				'thisVersion:',
-				thisVersion,
-				'pollVersion:',
-				pollVersion
-			);
 
 			if (destroyed || thisVersion !== pollVersion) {
-				console.log(
-					'[Polling] Stopped - destroyed:',
-					destroyed,
-					'version mismatch:',
-					thisVersion !== pollVersion
-				);
 				return;
 			}
 
 			try {
-				console.log('[Polling] Fetching batch results for:', id, 'at', new Date().toISOString());
 				const result = await getBatchJobResults(id);
-				console.log('[Polling] Result:', result);
 
 				if (destroyed || thisVersion !== pollVersion) return;
 
@@ -378,10 +355,8 @@
 						total: result.totalItems || progress.total,
 						status: result.status
 					};
-					console.log('[Polling] Updated progress:', progress);
 
 					if (['completed', 'partial', 'failed', 'cancelled'].includes(result.status)) {
-						console.log('[Polling] Batch finished with status:', result.status);
 						results = result.results || [];
 						errors = result.errors || [];
 						step = 'results';
@@ -399,12 +374,8 @@
 				} else {
 					// Result is null - might be an auth error or batch not found
 					consecutiveErrors++;
-					console.warn(
-						`[Polling] Returned null for batch ${id}, error count: ${consecutiveErrors}`
-					);
 
 					if (consecutiveErrors >= maxConsecutiveErrors) {
-						console.error(`[Polling] Too many consecutive errors for batch ${id}, stopping`);
 						toast.set({
 							message: 'Lost connection to batch job. Please refresh the page.',
 							type: 'error',
@@ -418,7 +389,6 @@
 			} catch (error) {
 				if (thisVersion !== pollVersion) return;
 				consecutiveErrors++;
-				console.error(`[Polling] Error for batch ${id}:`, error);
 
 				// Check for specific error messages that should stop polling immediately
 				const errorMessage = error?.message || 'Unknown error';
@@ -479,9 +449,23 @@
 	let isDownloading = false;
 	let downloadProgress = 0;
 
+	// Flatten all layout renders from 2D results into a flat list for download
+	$: allRenderImages = results
+		.filter((r) => r.success && r.results?.length > 0)
+		.flatMap((item, itemIdx) =>
+			item.results.map((lr) => ({
+				url: lr.url,
+				layout: lr.layout,
+				name: lr.name,
+				itemIndex: item.index ?? itemIdx,
+				format: lr.format || 'png',
+			}))
+		);
+
+	$: totalRenderedImages = allRenderImages.length;
+
 	async function downloadAsZip() {
-		const successResults = results.filter((r) => r.success);
-		if (successResults.length === 0) {
+		if (allRenderImages.length === 0) {
 			toast.set({ message: 'No successful renders to download', type: 'error', duration: 3000 });
 			return;
 		}
@@ -490,23 +474,26 @@
 		downloadProgress = 0;
 
 		const zip = new JSZip();
-		const CHUNK_SIZE = 5; // Fetch 5 at a time
+		const CHUNK_SIZE = 5;
+		const hasMultipleLayouts = new Set(allRenderImages.map((r) => r.layout)).size > 1;
 
 		try {
-			for (let i = 0; i < successResults.length; i += CHUNK_SIZE) {
-				const chunk = successResults.slice(i, i + CHUNK_SIZE);
+			for (let i = 0; i < allRenderImages.length; i += CHUNK_SIZE) {
+				const chunk = allRenderImages.slice(i, i + CHUNK_SIZE);
 
 				await Promise.all(
-					chunk.map(async (result, idx) => {
-						const response = await fetch(result.url);
+					chunk.map(async (img) => {
+						const response = await fetch(img.url);
 						const blob = await response.blob();
-						const ext = 'png';
-						const filename = `render-${String(i + idx + 1).padStart(4, '0')}.${ext}`;
+						const ext = img.format || 'png';
+						const filename = hasMultipleLayouts
+							? `${img.layout}/render-${String(img.itemIndex + 1).padStart(4, '0')}.${ext}`
+							: `render-${String(img.itemIndex + 1).padStart(4, '0')}.${ext}`;
 						zip.file(filename, blob);
 					})
 				);
 
-				downloadProgress = Math.round(((i + chunk.length) / successResults.length) * 100);
+				downloadProgress = Math.round(((i + chunk.length) / allRenderImages.length) * 100);
 			}
 
 			const blob = await zip.generateAsync({
@@ -515,7 +502,6 @@
 				compressionOptions: { level: 6 }
 			});
 
-			// Trigger download
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
@@ -526,15 +512,14 @@
 			URL.revokeObjectURL(url);
 
 			toast.set({
-				message: `Downloaded ${successResults.length} images`,
+				message: `Downloaded ${allRenderImages.length} images`,
 				type: 'success',
 				duration: 3000
 			});
 
-			// Track download
 			analytics.trackDownload({
 				content_type: 'bulk_render_zip',
-				item_count: successResults.length,
+				item_count: allRenderImages.length,
 				template_id: uid
 			});
 		} catch (error) {
@@ -588,11 +573,12 @@
 		batchError = null;
 	}
 
-	function downloadSingle(url, index) {
+	function downloadSingle(url, index, layout = '') {
 		const a = document.createElement('a');
 		a.href = url;
 		const ext = 'png';
-		a.download = `render-${String(index + 1).padStart(4, '0')}.${ext}`;
+		const suffix = layout ? `-${layout}` : '';
+		a.download = `render-${String(index + 1).padStart(4, '0')}${suffix}.${ext}`;
 		a.target = '_blank';
 		document.body.appendChild(a);
 		a.click();
@@ -1196,6 +1182,70 @@
 								</div>
 							</div>
 
+							<!-- Layout Selector (multi-select) -->
+							{#if bulkTemplateLayouts.length > 0}
+								<div class="px-6 py-4 border-t-[2px] border-gray-200">
+									<div class="flex items-center justify-between mb-2">
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+											>Layouts to Render</label
+										>
+										<button
+											class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider transition-colors"
+											on:click={toggleAllBulkLayouts}
+										>
+											{allBulkSelected ? 'Deselect All' : 'Select All'}
+										</button>
+									</div>
+									<p class="text-[10px] text-gray-500 mb-2">{selectedBulkLayouts.size} of {allBulkLayoutKeys.length} selected. Each row renders once per selected layout.</p>
+									<div class="grid grid-cols-2 gap-2">
+										<button
+											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedBulkLayouts.has('default')
+												? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												: 'bg-white border-gray-200 hover:border-gray-900'}"
+											on:click={() => toggleBulkLayout('default')}
+										>
+											<div class="flex items-center gap-2">
+												<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+													{selectedBulkLayouts.has('default') ? 'bg-gray-900 border-gray-900' : ''}">
+													{#if selectedBulkLayouts.has('default')}
+														<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+															<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+														</svg>
+													{/if}
+												</div>
+												<div>
+													<span class="block text-xs font-black text-gray-900 leading-tight">Default</span>
+													<span class="block text-[10px] font-bold text-gray-500 font-mono">{template.width}x{template.height}</span>
+												</div>
+											</div>
+										</button>
+										{#each bulkTemplateLayouts as [key, layout]}
+											<button
+												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedBulkLayouts.has(key)
+													? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													: 'bg-white border-gray-200 hover:border-gray-900'}"
+												on:click={() => toggleBulkLayout(key)}
+											>
+												<div class="flex items-center gap-2">
+													<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+														{selectedBulkLayouts.has(key) ? 'bg-gray-900 border-gray-900' : ''}">
+														{#if selectedBulkLayouts.has(key)}
+															<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+																<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+															</svg>
+														{/if}
+													</div>
+													<div>
+														<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name || key}</span>
+														<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+													</div>
+												</div>
+											</button>
+										{/each}
+									</div>
+								</div>
+							{/if}
+
 							<div
 								class="bg-gray-50 border-t-[3px] border-gray-900 px-6 py-4 flex justify-end gap-3"
 							>
@@ -1421,7 +1471,7 @@
 								<h2 class="text-2xl font-black text-gray-900 tracking-tighter">Batch Complete!</h2>
 								<div class="flex gap-4 text-sm font-bold text-gray-600">
 									<span class="text-green-600"
-										>{results.filter((r) => r.success).length} successful</span
+										>{results.filter((r) => r.success).length} rows, {totalRenderedImages} images</span
 									>
 									{#if errors.length > 0}
 										<span class="text-red-600">{errors.length} failed</span>
@@ -1440,7 +1490,7 @@
 							<button
 								class="px-8 py-3 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 font-black rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
 								on:click={downloadAsZip}
-								disabled={isDownloading || results.filter((r) => r.success).length === 0}
+								disabled={isDownloading || totalRenderedImages === 0}
 							>
 								{#if isDownloading}
 									<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -1492,77 +1542,116 @@
 						</div>
 					{/if}
 
-					<!-- Grid of Results -->
+					<!-- Grid of Results (2D: per item -> per layout) -->
 					{#if results.filter((r) => r.success).length > 0}
+						{@const successItems = results.filter((r) => r.success && r.results?.length > 0).slice(0, 50)}
+						{@const hasMultipleLayouts = successItems.some((r) => r.results.length > 1)}
 						<div>
 							<h3
 								class="font-black text-gray-900 uppercase tracking-widest text-sm mb-4 flex items-center justify-between"
 							>
-								<span>Generated Images</span>
-								<span class="text-gray-400 text-xs">Only showing first 50</span>
+								<span>Generated Images ({totalRenderedImages})</span>
+								<span class="text-gray-400 text-xs">Showing first 50 rows</span>
 							</h3>
 
-							<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-								{#each results.filter((r) => r.success).slice(0, 50) as result, i}
-									<div
-										class="group relative aspect-square bg-gray-100 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[4px_4px_0_0_#ccc] hover:shadow-[6px_6px_0_0_#999] transition-all hover:-translate-y-1"
-									>
-										<img
-											src={result.url}
-											alt="Result {i}"
-											class="w-full h-full object-cover"
-											loading="lazy"
-										/>
-
-										<div
-											class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
-										>
-											<button
-												class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-lg"
-												title="Download"
-												on:click={() => downloadSingle(result.url, i)}
-											>
-												<svg
-													class="w-5 h-5 text-gray-900"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-													/></svg
-												>
-											</button>
-											<button
-												class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-lg"
-												title="Open New Tab"
-												on:click={() => window.open(result.url, '_blank')}
-											>
-												<svg
-													class="w-5 h-5 text-gray-900"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-													/></svg
-												>
-											</button>
+							{#if hasMultipleLayouts}
+								<!-- Multi-layout: show each row as a card with layout variants inside -->
+								<div class="space-y-4">
+									{#each successItems as item, i}
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#ccc]">
+											<div class="px-4 py-2 bg-gray-50 border-b-[2px] border-gray-200 flex items-center justify-between">
+												<span class="text-xs font-black text-gray-900 uppercase">Row #{(item.index ?? i) + 1}</span>
+												<span class="text-[10px] text-gray-400">{item.results.length} layout{item.results.length > 1 ? 's' : ''}</span>
+											</div>
+											<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3">
+												{#each item.results as lr}
+													<div class="group relative bg-gray-100 rounded-lg border-2 border-gray-200 overflow-hidden">
+														<img
+															src={lr.url}
+															alt="Row {(item.index ?? i) + 1} - {lr.name}"
+															class="w-full aspect-video object-contain bg-white"
+															loading="lazy"
+														/>
+														<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+															<button
+																class="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 shadow-lg"
+																title="Download"
+																on:click={() => downloadSingle(lr.url, item.index ?? i, lr.layout)}
+															>
+																<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+																</svg>
+															</button>
+															<button
+																class="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 shadow-lg"
+																title="Open"
+																on:click={() => window.open(lr.url, '_blank')}
+															>
+																<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+																</svg>
+															</button>
+														</div>
+														<div class="px-2 py-1 bg-gray-50 border-t border-gray-200 text-center">
+															<span class="text-[10px] font-bold text-gray-600">{lr.name}</span>
+															<span class="text-[9px] text-gray-400 ml-1">{lr.width}x{lr.height}</span>
+														</div>
+													</div>
+												{/each}
+											</div>
+											{#if item.errors?.length > 0}
+												<div class="px-3 pb-2">
+													{#each item.errors as err}
+														<p class="text-[10px] text-red-500 font-bold">{err.layout}: {err.error}</p>
+													{/each}
+												</div>
+											{/if}
 										</div>
-
+									{/each}
+								</div>
+							{:else}
+								<!-- Single layout: flat grid (original look) -->
+								<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+									{#each successItems as item, i}
+										{@const lr = item.results[0]}
 										<div
-											class="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-[10px] font-bold rounded backdrop-blur-sm"
+											class="group relative aspect-square bg-gray-100 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[4px_4px_0_0_#ccc] hover:shadow-[6px_6px_0_0_#999] transition-all hover:-translate-y-1"
 										>
-											#{i + 1}
+											<img
+												src={lr.url}
+												alt="Result {i}"
+												class="w-full h-full object-cover"
+												loading="lazy"
+											/>
+											<div
+												class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
+											>
+												<button
+													class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-lg"
+													title="Download"
+													on:click={() => downloadSingle(lr.url, item.index ?? i)}
+												>
+													<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+													</svg>
+												</button>
+												<button
+													class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-lg"
+													title="Open New Tab"
+													on:click={() => window.open(lr.url, '_blank')}
+												>
+													<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+													</svg>
+												</button>
+											</div>
+											<div class="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-[10px] font-bold rounded backdrop-blur-sm">
+												#{(item.index ?? i) + 1}
+											</div>
 										</div>
-									</div>
-								{/each}
-							</div>
+									{/each}
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</div>

@@ -12,6 +12,7 @@
 	import { toast } from '../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { user } from '../../../../store/user.store';
+	import { analytics } from '$lib/analytics.js';
 	import {
 		getTemplatesAction,
 		getTemplateAction,
@@ -252,7 +253,6 @@
 				}
 			}
 		} catch (err) {
-			console.error('Failed to load experiment for editing:', err);
 			toast.set({ message: 'Failed to load experiment', type: 'error' });
 		}
 	}
@@ -306,7 +306,7 @@
 				}
 			}
 		} catch (err) {
-			console.error('Failed to fetch template variables:', err);
+			/* ignored */
 		}
 	}
 
@@ -596,7 +596,6 @@
 			// Cleanup
 			staticCanvas.dispose();
 		} catch (err) {
-			console.error('Preview render failed:', err);
 			variantPreviews[variantIndex] = {
 				url: null,
 				loading: false,
@@ -719,9 +718,12 @@
 				// Create new experiment
 				const created = await createExperimentAction(payload);
 				if (created?.uid) {
+					analytics.trackExperimentCreated({ type: 'ab_test', variant_count: payload.variants?.length || 2 });
+					analytics.trackExperimentWizardCompleted({ type: 'ab_test' });
 					if (startAfterCreate) {
 						try {
 							await startExperimentAction(created.uid);
+							analytics.trackExperimentStarted({ type: 'ab_test', uid: created.uid });
 							toast.set({ message: 'Experiment created and started!', type: 'success' });
 						} catch {
 							toast.set({ message: 'Experiment created but failed to start.', type: 'warning' });

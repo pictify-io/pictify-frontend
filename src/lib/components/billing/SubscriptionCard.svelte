@@ -90,7 +90,6 @@
 				window.open(customerPortalUrl, '_blank');
 			}
 		} catch (error) {
-			console.error('Failed to get portal URL:', error);
 			// Fallback to cached URL on error
 			if (customerPortalUrl) {
 				window.open(customerPortalUrl, '_blank');
@@ -115,7 +114,6 @@
 				window.open(url, '_blank');
 			}
 		} catch (error) {
-			console.error('Failed to get portal URL:', error);
 			// Fallback to cached URLs
 			const url = subscription?.updatePaymentMethodUrl || customerPortalUrl;
 			if (url) {

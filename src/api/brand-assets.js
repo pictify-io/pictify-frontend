@@ -25,7 +25,6 @@ export async function getBrandAssets({ type, tag, limit = 50, offset = 0 } = {})
 		const response = await backend.get(`/brand-assets?${params.toString()}`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching brand assets:', error);
 		return {
 			assets: [],
 			pagination: { total: 0, limit, offset, hasMore: false },
@@ -44,7 +43,6 @@ export async function getBrandAsset(uid) {
 		const response = await backend.get(`/brand-assets/${uid}`);
 		return response.asset;
 	} catch (error) {
-		console.error('Error fetching brand asset:', error);
 		throw error;
 	}
 }
@@ -75,7 +73,6 @@ export async function uploadBrandAsset(
 		const response = await backend.postFormData('/brand-assets/upload', formData);
 		return response;
 	} catch (error) {
-		console.error('Error uploading brand asset:', error);
 		throw error;
 	}
 }
@@ -100,7 +97,6 @@ export async function addBrandColor({ name, value, category, description, isPrim
 		});
 		return response;
 	} catch (error) {
-		console.error('Error adding brand color:', error);
 		throw error;
 	}
 }
@@ -115,7 +111,6 @@ export async function updateBrandAsset(uid, updates) {
 		const response = await backend.put(`/brand-assets/${uid}`, updates);
 		return response;
 	} catch (error) {
-		console.error('Error updating brand asset:', error);
 		throw error;
 	}
 }
@@ -129,7 +124,6 @@ export async function deleteBrandAsset(uid) {
 		const response = await backend.delete(`/brand-assets/${uid}`);
 		return response;
 	} catch (error) {
-		console.error('Error deleting brand asset:', error);
 		throw error;
 	}
 }
@@ -143,7 +137,6 @@ export async function deleteBrandAssets(uids) {
 		const response = await backend.post('/brand-assets/bulk-delete', { uids });
 		return response;
 	} catch (error) {
-		console.error('Error deleting brand assets:', error);
 		throw error;
 	}
 }
@@ -159,7 +152,6 @@ export async function getBrandFontsCSS() {
 		});
 		return response;
 	} catch (error) {
-		console.error('Error fetching brand fonts CSS:', error);
 		return '';
 	}
 }

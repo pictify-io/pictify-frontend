@@ -121,6 +121,64 @@
 	let refreshTimeout = null;
 
 	export let guestMode = false;
+	export let currentLayoutKey = null;
+
+	// Multi-layout render
+	let multiLayoutResults = null; // { results: [], errors: [] }
+	$: hasLayouts = Object.keys($template?.layouts || {}).length > 0;
+
+	// Per-layout image retry/polling (same pattern as single-image)
+	let layoutImgState = {}; // { [layoutKey]: { src, loaded, retryCount, timer } }
+
+	function initLayoutImgState(results) {
+		// Clear old timers
+		Object.values(layoutImgState).forEach(s => clearTimeout(s.timer));
+		const state = {};
+		for (const r of results) {
+			state[r.layout] = { src: r.url, loaded: false, retryCount: 0, timer: null };
+		}
+		layoutImgState = state;
+	}
+
+	function handleLayoutImgLoad(layoutKey) {
+		if (layoutImgState[layoutKey]) {
+			layoutImgState[layoutKey].loaded = true;
+			layoutImgState[layoutKey].retryCount = 0;
+			layoutImgState = { ...layoutImgState };
+		}
+	}
+
+	function handleLayoutImgError(layoutKey, originalUrl) {
+		const s = layoutImgState[layoutKey];
+		if (s && s.retryCount < IMG_MAX_RETRIES) {
+			s.retryCount++;
+			s.timer = setTimeout(() => {
+				const sep = originalUrl.includes('?') ? '&' : '?';
+				s.src = `${originalUrl}${sep}_r=${s.retryCount}`;
+				layoutImgState = { ...layoutImgState };
+			}, IMG_RETRY_DELAY);
+		}
+	}
+	let selectedRenderLayouts = new Set(['default']);
+	$: allRenderLayoutKeys = ['default', ...Object.keys($template?.layouts || {})];
+	$: allRenderSelected = allRenderLayoutKeys.length > 0 && allRenderLayoutKeys.every(k => selectedRenderLayouts.has(k));
+
+	function toggleRenderLayout(key) {
+		if (selectedRenderLayouts.has(key)) {
+			selectedRenderLayouts.delete(key);
+		} else {
+			selectedRenderLayouts.add(key);
+		}
+		selectedRenderLayouts = new Set(selectedRenderLayouts);
+	}
+
+	function toggleAllRenderLayouts() {
+		if (allRenderSelected) {
+			selectedRenderLayouts = new Set(['default']);
+		} else {
+			selectedRenderLayouts = new Set(allRenderLayoutKeys);
+		}
+	}
 
 	// Store event handler reference for cleanup
 	let triggerGenerateHandler = null;
@@ -681,29 +739,53 @@
 		renderError = null;
 		renderedImageUrl = null;
 		renderedPdfUrl = null;
+		multiLayoutResults = null;
 		const startTime = Date.now();
 
 		try {
 			const isPdf = $outputFormat === 'pdf';
-			const result = await renderTemplate($template.uid, testValues, {
+			const renderOptions = {
 				format: isPdf ? 'pdf' : 'png',
 				quality: 0.9,
 				headers: selectedToken ? { Authorization: `Bearer ${selectedToken}` } : {}
-			});
+			};
+
+			// Multi-layout render
+			if (hasLayouts && selectedRenderLayouts.size > 1) {
+				renderOptions.layouts = [...selectedRenderLayouts];
+			} else if (hasLayouts && selectedRenderLayouts.size === 1 && !selectedRenderLayouts.has('default')) {
+				renderOptions.layout = [...selectedRenderLayouts][0];
+			} else if (currentLayoutKey) {
+				renderOptions.layout = currentLayoutKey;
+			}
+
+			const result = await renderTemplate($template.uid, testValues, renderOptions);
 
 			lastRenderTime = Date.now() - startTime;
 
-			if (isPdf) {
-				renderedPdfUrl = result.url;
+			// Response is always { results: [...] } array format
+			const results = result.results || [];
+			if (results.length === 0) {
+				renderError = 'No render results returned';
+			} else if (isPdf) {
+				renderedPdfUrl = results[0].url;
 				toast.set({
 					message: `PDF rendered in ${lastRenderTime}ms!`,
 					type: 'success',
 					duration: 2000
 				});
-			} else {
-				renderedImageUrl = result.url;
+			} else if (results.length === 1) {
+				renderedImageUrl = results[0].url;
 				toast.set({
 					message: `Image rendered in ${lastRenderTime}ms!`,
+					type: 'success',
+					duration: 2000
+				});
+			} else {
+				multiLayoutResults = result;
+				initLayoutImgState(results);
+				toast.set({
+					message: `${result.totalRendered} layout${result.totalRendered > 1 ? 's' : ''} rendered in ${lastRenderTime}ms!`,
 					type: 'success',
 					duration: 2000
 				});
@@ -720,10 +802,22 @@
 		}
 	}
 
+	function generateRequestBody() {
+		const body = { variables: testValues };
+		if (hasLayouts && selectedRenderLayouts.size > 1) {
+			body.layouts = [...selectedRenderLayouts];
+		} else if (hasLayouts && selectedRenderLayouts.size === 1 && !selectedRenderLayouts.has('default')) {
+			body.layout = [...selectedRenderLayouts][0];
+		} else if (currentLayoutKey) {
+			body.layout = currentLayoutKey;
+		}
+		return body;
+	}
+
 	function generateCurlCommand() {
 		if (!$template?.uid) return '';
 
-		const varsJson = JSON.stringify({ variables: testValues }, null, 2);
+		const varsJson = JSON.stringify(generateRequestBody(), null, 2);
 		return `curl -X POST \\
   '${window.location.origin}/api/templates/${$template.uid}/render' \\
   -H 'Authorization: Bearer ${selectedToken || 'YOUR_API_TOKEN'}' \\
@@ -1032,7 +1126,7 @@
 				};
 				localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 			}
-		} catch (e) {}
+		} catch (e) { /* ignored */ }
 
 		// Show auth modal instead of redirecting
 		showAuthModal = true;
@@ -2013,6 +2107,46 @@
 					</div>
 				{/if}
 
+				<!-- Layout Selector for Render -->
+				{#if hasLayouts && !guestMode}
+					<div class="space-y-1.5">
+						<div class="flex items-center justify-between">
+							<span class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Layouts to Render</span>
+							<button
+								class="text-[9px] font-bold text-gray-400 hover:text-gray-900 uppercase tracking-wider transition-colors"
+								on:click={toggleAllRenderLayouts}
+							>
+								{allRenderSelected ? 'Deselect All' : 'Select All'}
+							</button>
+						</div>
+						<div class="flex flex-wrap gap-1.5">
+							<!-- Default -->
+							<button
+								class="px-2 py-1 text-[10px] font-bold border-2 rounded transition-all
+									{selectedRenderLayouts.has('default')
+									? 'border-gray-900 bg-[#ffc480]/20 shadow-[1px_1px_0_0_#1f2937]'
+									: 'border-gray-200 text-gray-400 hover:border-gray-400'}"
+								on:click={() => toggleRenderLayout('default')}
+							>
+								Default {$template.width}x{$template.height}
+							</button>
+							<!-- Other layouts -->
+							{#each Object.entries($template.layouts || {}) as [key, layout]}
+								<button
+									class="px-2 py-1 text-[10px] font-bold border-2 rounded transition-all
+										{selectedRenderLayouts.has(key)
+										? 'border-gray-900 bg-[#ffc480]/20 shadow-[1px_1px_0_0_#1f2937]'
+										: 'border-gray-200 text-gray-400 hover:border-gray-400'}"
+									on:click={() => toggleRenderLayout(key)}
+								>
+									{layout.name || key} {layout.width}x{layout.height}
+								</button>
+							{/each}
+						</div>
+						<p class="text-[9px] text-gray-400">{selectedRenderLayouts.size} of {allRenderLayoutKeys.length} selected</p>
+					</div>
+				{/if}
+
 				<!-- Render Button -->
 				<button
 					class="w-full py-2.5 px-3 {guestMode && !$user?.email
@@ -2143,6 +2277,76 @@
 					</div>
 				{/if}
 
+				<!-- Multi-Layout Results -->
+				{#if multiLayoutResults?.results}
+					<div class="space-y-3">
+						<div class="flex items-center justify-between">
+							<span class="text-xs font-black text-gray-900 uppercase tracking-wide">
+								{multiLayoutResults.totalRendered} Layout{multiLayoutResults.totalRendered > 1 ? 's' : ''}
+							</span>
+							{#if lastRenderTime}
+								<span class="text-[10px] font-bold text-green-600 uppercase">
+									<i class="fa fa-clock mr-1" />{lastRenderTime}ms
+								</span>
+							{/if}
+						</div>
+
+						{#each multiLayoutResults.results as layoutResult}
+							{@const imgState = layoutImgState[layoutResult.layout] || { src: layoutResult.url, loaded: false }}
+							<div class="border-[2px] border-gray-200 rounded-lg overflow-hidden">
+								<div class="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-b border-gray-200">
+									<span class="text-[10px] font-black text-gray-900 uppercase">{layoutResult.name}</span>
+									<span class="text-[10px] text-gray-400 font-mono">{layoutResult.width}x{layoutResult.height}</span>
+								</div>
+								<div class="p-2 bg-[#e5e5e5] flex items-center justify-center" style="min-height: 60px;">
+									{#if !imgState.loaded}
+										<div class="flex items-center gap-2 py-4">
+											<div class="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+											<span class="text-[10px] font-bold text-gray-500 uppercase">Loading...</span>
+										</div>
+									{/if}
+									<img
+										src={imgState.src}
+										alt="{layoutResult.name} render"
+										class="w-full rounded border border-gray-300 bg-white"
+										class:hidden={!imgState.loaded}
+										on:load={() => handleLayoutImgLoad(layoutResult.layout)}
+										on:error={() => handleLayoutImgError(layoutResult.layout, layoutResult.url)}
+									/>
+								</div>
+								{#if imgState.loaded}
+									<div class="flex items-center gap-1 px-2 py-1.5 bg-gray-50 border-t border-gray-200">
+										<button
+											class="flex-1 text-[9px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider py-1"
+											on:click={() => {
+												navigator.clipboard.writeText(layoutResult.url);
+												toast.set({ message: 'URL copied!', type: 'success', duration: 1500 });
+											}}
+										>
+											<i class="fa fa-copy mr-1" />Copy URL
+										</button>
+										<a
+											href={layoutResult.url}
+											download="{$template.uid}-{layoutResult.layout}.png"
+											class="flex-1 text-center text-[9px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider py-1"
+										>
+											<i class="fa fa-download mr-1" />Download
+										</a>
+									</div>
+								{/if}
+							</div>
+						{/each}
+
+						{#if multiLayoutResults.errors?.length > 0}
+							<div class="p-2 bg-red-50 border-[2px] border-red-200 rounded-lg">
+								{#each multiLayoutResults.errors as err}
+									<p class="text-[10px] text-red-600 font-bold">{err.layout}: {err.error}</p>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/if}
+
 				{#if renderedPdfUrl}
 					<div class="space-y-3">
 						<div class="flex items-center justify-between">
@@ -2263,7 +2467,7 @@
 									Request Body:
 								</p>
 								<pre class="text-[10px] text-gray-800 font-mono overflow-x-auto font-medium"><code
-										>{JSON.stringify({ variables: testValues }, null, 2)}</code
+										>{JSON.stringify(generateRequestBody(), null, 2)}</code
 									></pre>
 							</div>
 						</div>

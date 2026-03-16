@@ -14,10 +14,10 @@
 	import { toast } from '../../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
 	import RenderForm from '$lib/components/render/RenderForm.svelte';
-	import RenderPreview from '$lib/components/render/RenderPreview.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import { analytics } from '$lib/analytics.js';
 	import ModeTabs from '$lib/components/dashboard/ModeTabs.svelte';
+	import CopyAsCode from '$lib/components/render/CopyAsCode.svelte';
 
 	let template = null;
 	let variables = [];
@@ -29,23 +29,65 @@
 
 	// Output options
 	let selectedFormat = 'png';
-	let sizeMode = 'original'; // 'original' | 'preset' | 'custom'
-	let customWidth = '';
-	let customHeight = '';
-	let selectedPreset = '';
 
-	const PLATFORM_PRESETS = [
-		{ id: 'instagram-post', width: 1080, height: 1080, label: 'Instagram Post' },
-		{ id: 'instagram-story', width: 1080, height: 1920, label: 'Instagram Story' },
-		{ id: 'facebook-post', width: 1200, height: 630, label: 'Facebook Post' },
-		{ id: 'linkedin-post', width: 1200, height: 627, label: 'LinkedIn Post' },
-		{ id: 'twitter-post', width: 1024, height: 512, label: 'Twitter/X Post' },
-		{ id: 'youtube-thumbnail', width: 1280, height: 720, label: 'YouTube Thumbnail' },
-		{ id: 'og-image', width: 1200, height: 630, label: 'OG Image' },
-		{ id: 'pinterest-pin', width: 1000, height: 1500, label: 'Pinterest Pin' }
-	];
+	// Image polling/retry state for rendered results
+	const IMG_MAX_RETRIES = 10;
+	const IMG_RETRY_DELAY = 1500;
+	let renderImgState = {}; // { [layout]: { src, loaded, retryCount, timer } }
 
-	$: activePreset = PLATFORM_PRESETS.find((p) => p.id === selectedPreset);
+	function initRenderImgState(results) {
+		Object.values(renderImgState).forEach(s => clearTimeout(s.timer));
+		const state = {};
+		for (const r of results) {
+			state[r.layout] = { src: r.url, loaded: false, retryCount: 0, timer: null };
+		}
+		renderImgState = state;
+	}
+
+	function handleRenderImgLoad(layout) {
+		if (renderImgState[layout]) {
+			renderImgState[layout].loaded = true;
+			renderImgState[layout].retryCount = 0;
+			renderImgState = { ...renderImgState };
+		}
+	}
+
+	function handleRenderImgError(layout, originalUrl) {
+		const s = renderImgState[layout];
+		if (s && s.retryCount < IMG_MAX_RETRIES) {
+			s.retryCount++;
+			s.timer = setTimeout(() => {
+				const sep = originalUrl.includes('?') ? '&' : '?';
+				s.src = `${originalUrl}${sep}_r=${s.retryCount}`;
+				renderImgState = { ...renderImgState };
+			}, IMG_RETRY_DELAY);
+		}
+	}
+
+	// Layout selection — multi-select (includes 'default' as a selectable key)
+	let selectedLayouts = new Set(['default']); // default is pre-selected
+	$: templateLayouts = template?.layouts ? Object.entries(template.layouts) : [];
+	$: allLayoutKeys = ['default', ...templateLayouts.map(([key]) => key)];
+	$: allSelected = allLayoutKeys.length > 0 && allLayoutKeys.every(k => selectedLayouts.has(k));
+
+	function toggleLayout(key) {
+		if (selectedLayouts.has(key)) {
+			selectedLayouts.delete(key);
+		} else {
+			selectedLayouts.add(key);
+		}
+		selectedLayouts = new Set(selectedLayouts);
+	}
+
+	function toggleAllLayouts() {
+		if (allSelected) {
+			// Deselect all — keep only default
+			selectedLayouts = new Set(['default']);
+		} else {
+			// Select all
+			selectedLayouts = new Set(allLayoutKeys);
+		}
+	}
 
 	// API Key state
 	let apiTokens = [];
@@ -72,10 +114,7 @@
 		renderResult = null;
 		renderError = null;
 		selectedFormat = 'png';
-		sizeMode = 'original';
-		customWidth = '';
-		customHeight = '';
-		selectedPreset = '';
+		selectedLayouts = new Set(['default']);
 		// Load fresh data
 		loadTemplate();
 		// Track page view
@@ -120,7 +159,6 @@
 			// Check if this load is still current
 			if (thisLoadVersion !== currentLoadVersion) return;
 
-			console.error('Error loading template:', error);
 			toast.set({ message: 'Failed to load template', type: 'error', duration: 3000 });
 		} finally {
 			if (thisLoadVersion === currentLoadVersion) {
@@ -152,13 +190,12 @@
 				apiKey: selectedApiKey
 			};
 
-			// Add dimension overrides based on size mode
-			if (sizeMode === 'preset' && activePreset) {
-				renderOptions.width = activePreset.width;
-				renderOptions.height = activePreset.height;
-			} else if (sizeMode === 'custom' && customWidth && customHeight) {
-				renderOptions.width = parseInt(customWidth, 10);
-				renderOptions.height = parseInt(customHeight, 10);
+			// Add layouts if multiple selected (multi-layout render)
+			if (templateLayouts.length > 0 && selectedLayouts.size > 1) {
+				renderOptions.layouts = [...selectedLayouts];
+			} else if (templateLayouts.length > 0 && selectedLayouts.size === 1 && !selectedLayouts.has('default')) {
+				// Single non-default layout selected
+				renderOptions.layout = [...selectedLayouts][0];
 			}
 
 			const result = await renderTemplate(uid, variableValues, renderOptions);
@@ -167,6 +204,7 @@
 			if (thisRenderVersion !== currentRenderVersion) return;
 
 			renderResult = result;
+			if (result?.results) initRenderImgState(result.results);
 
 			// Track successful template render
 			analytics.trackTemplateRendered({
@@ -177,7 +215,6 @@
 			// Check if this render is still current
 			if (thisRenderVersion !== currentRenderVersion) return;
 
-			console.error('Render error:', error);
 			renderError = error.message || 'Failed to render template';
 			toast.set({ message: renderError, type: 'error', duration: 3000 });
 
@@ -223,11 +260,12 @@
 	};
 
 	const handleDownload = () => {
-		if (!renderResult?.url) return;
+		const firstResult = renderResult?.results?.[0];
+		if (!firstResult?.url) return;
 
 		const link = document.createElement('a');
-		link.href = renderResult.url;
-		link.download = `${template?.name || 'render'}.${renderResult.format || 'png'}`;
+		link.href = firstResult.url;
+		link.download = `${template?.name || 'render'}.${firstResult.format || 'png'}`;
 		link.target = '_blank';
 		document.body.appendChild(link);
 		link.click();
@@ -236,7 +274,7 @@
 		// Track download
 		analytics.trackDownload({
 			content_type: 'rendered_image',
-			format: renderResult.format || 'png',
+			format: firstResult.format || 'png',
 			template_id: uid
 		});
 	};
@@ -244,20 +282,21 @@
 	let isCopyingUrl = false;
 	let cachedShareUrl = null;
 	// Reset cached share URL when render result changes
-	$: if (renderResult?.url) cachedShareUrl = null;
+	$: if (renderResult?.results?.[0]?.url) cachedShareUrl = null;
 
 	const copyUrl = async () => {
-		if (!renderResult?.url) return;
+		const firstResult = renderResult?.results?.[0];
+		if (!firstResult?.url) return;
 		isCopyingUrl = true;
 		try {
 			// Create share result if not cached
 			if (!cachedShareUrl) {
 				const response = await createShareResult({
-					assetUrl: renderResult.url,
-					contentType: renderResult.format === 'gif' ? 'gif' : 'image',
-					width: renderResult.width,
-					height: renderResult.height,
-					format: renderResult.format || 'png',
+					assetUrl: firstResult.url,
+					contentType: firstResult.format === 'gif' ? 'gif' : 'image',
+					width: firstResult.width,
+					height: firstResult.height,
+					format: firstResult.format || 'png',
 					source: 'template',
 					templateUid: uid,
 					title: template?.name || ''
@@ -266,7 +305,7 @@
 					cachedShareUrl = `${window.location.origin}${response.shareUrl}`;
 				}
 			}
-			const urlToCopy = cachedShareUrl || renderResult.url;
+			const urlToCopy = cachedShareUrl || firstResult.url;
 			await navigator.clipboard.writeText(urlToCopy);
 			toast.set({ message: 'Share link copied to clipboard', type: 'success', duration: 2000 });
 
@@ -291,13 +330,6 @@
 			format,
 			quality: 0.9
 		};
-		if (sizeMode === 'preset' && activePreset) {
-			body.width = activePreset.width;
-			body.height = activePreset.height;
-		} else if (sizeMode === 'custom' && customWidth && customHeight) {
-			body.width = parseInt(customWidth, 10);
-			body.height = parseInt(customHeight, 10);
-		}
 
 		// Build URL-param render URL
 		const queryParts = Object.entries(variableValues)
@@ -449,98 +481,79 @@ console.log(result.url); // CDN URL of rendered image
 								</div>
 							</div>
 
-							<!-- Size mode -->
-							<div class="space-y-2">
-								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
-									>Size</label
-								>
-								<div class="flex gap-2">
-									<button
-										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode ===
-										'original'
-											? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
-											: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-										on:click={() => {
-											sizeMode = 'original';
-											selectedPreset = '';
-										}}
-									>
-										Original
-									</button>
-									<button
-										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode ===
-										'preset'
-											? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
-											: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-										on:click={() => {
-											sizeMode = 'preset';
-										}}
-									>
-										Preset
-									</button>
-									<button
-										class="flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[3px] transition-all {sizeMode ===
-										'custom'
-											? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#9ca3af]'
-											: 'bg-white text-gray-600 border-gray-300 hover:border-gray-900'}"
-										on:click={() => {
-											sizeMode = 'custom';
-											selectedPreset = '';
-										}}
-									>
-										Custom
-									</button>
-								</div>
-							</div>
-
-							<!-- Preset grid -->
-							{#if sizeMode === 'preset'}
-								<div class="grid grid-cols-2 gap-2">
-									{#each PLATFORM_PRESETS as preset}
-										<button
-											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedPreset ===
-											preset.id
-												? 'bg-[#4ecdc4]/10 border-[#4ecdc4] shadow-[2px_2px_0_0_#0d9488]'
-												: 'bg-white border-gray-200 hover:border-gray-900'}"
-											on:click={() => (selectedPreset = preset.id)}
+							<!-- Layout selector (only show when template has layouts) -->
+							{#if templateLayouts.length > 0}
+								<div class="space-y-2">
+									<div class="flex items-center justify-between">
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+											>Layouts to Render</label
 										>
-											<span class="block text-xs font-black text-gray-900 leading-tight"
-												>{preset.label}</span
-											>
-											<span class="block text-[10px] font-bold text-gray-500 font-mono"
-												>{preset.width}x{preset.height}</span
-											>
+										<button
+											class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider transition-colors"
+											on:click={toggleAllLayouts}
+										>
+											{allSelected ? 'Deselect All' : 'Select All'}
 										</button>
-									{/each}
+									</div>
+									<p class="text-[10px] text-gray-500">{selectedLayouts.size} of {allLayoutKeys.length} selected</p>
+									<div class="grid grid-cols-2 gap-2">
+										<!-- Default layout -->
+										<button
+											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has('default')
+												? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												: 'bg-white border-gray-200 hover:border-gray-900'}"
+											on:click={() => toggleLayout('default')}
+										>
+											<div class="flex items-center gap-2">
+												<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+													{selectedLayouts.has('default') ? 'bg-gray-900 border-gray-900' : ''}">
+													{#if selectedLayouts.has('default')}
+														<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+															<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+														</svg>
+													{/if}
+												</div>
+												<div>
+													<span class="block text-xs font-black text-gray-900 leading-tight">Default</span>
+													<span class="block text-[10px] font-bold text-gray-500 font-mono"
+														>{template.width}x{template.height}</span
+													>
+												</div>
+											</div>
+										</button>
+										<!-- Other layouts -->
+										{#each templateLayouts as [key, layout]}
+											<button
+												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has(key)
+													? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													: 'bg-white border-gray-200 hover:border-gray-900'}"
+												on:click={() => toggleLayout(key)}
+											>
+												<div class="flex items-center gap-2">
+													<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+														{selectedLayouts.has(key) ? 'bg-gray-900 border-gray-900' : ''}">
+														{#if selectedLayouts.has(key)}
+															<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+																<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+															</svg>
+														{/if}
+													</div>
+													<div>
+														<span class="block text-xs font-black text-gray-900 leading-tight"
+															>{layout.name || key}</span
+														>
+														<span class="block text-[10px] font-bold text-gray-500 font-mono"
+															>{layout.width}x{layout.height}</span
+														>
+													</div>
+												</div>
+											</button>
+										{/each}
+									</div>
 								</div>
 							{/if}
 
-							<!-- Custom dimensions -->
-							{#if sizeMode === 'custom'}
-								<div class="flex gap-3 items-center">
-									<input
-										type="number"
-										bind:value={customWidth}
-										placeholder="Width"
-										min="10"
-										max="4096"
-										class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#a78bfa] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
-									/>
-									<span class="text-gray-400 font-black text-lg">x</span>
-									<input
-										type="number"
-										bind:value={customHeight}
-										placeholder="Height"
-										min="10"
-										max="4096"
-										class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#a78bfa] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
-									/>
-								</div>
-								<p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">
-									Min 10px, Max 4096px
-								</p>
-							{/if}
-						</div>
+							</div>
 					</div>
 
 					<!-- API Key Selection -->
@@ -744,15 +757,107 @@ console.log(result.url); // CDN URL of rendered image
 						</div>
 
 						<div class="p-6">
-							<RenderPreview
-								{renderResult}
-								{renderError}
-								{isRendering}
-								{isCopyingUrl}
-								templateThumbnail={template?.thumbnail}
-								on:download={handleDownload}
-								on:copyUrl={copyUrl}
-							/>
+							<!-- Loading state -->
+							{#if isRendering}
+								<div class="flex items-center justify-center py-12">
+									<div class="flex items-center gap-3">
+										<div class="w-5 h-5 border-[3px] border-gray-400 border-t-transparent rounded-full animate-spin" />
+										<span class="text-sm font-bold text-gray-500 uppercase tracking-wide">Rendering...</span>
+									</div>
+								</div>
+							{:else if renderError}
+								<div class="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+									<p class="text-sm font-bold text-red-700">{renderError}</p>
+								</div>
+							{:else if renderResult?.results}
+								<div class="space-y-4">
+									{#each renderResult.results as layoutResult}
+									{@const imgState = renderImgState[layoutResult.layout] || { src: layoutResult.url, loaded: false }}
+										<div class="border-2 border-gray-200 rounded-lg overflow-hidden">
+											<div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b-2 border-gray-200">
+												<div>
+													<span class="text-xs font-black text-gray-900">{layoutResult.name}</span>
+													<span class="text-[10px] text-gray-500 ml-2 font-mono">{layoutResult.width}x{layoutResult.height}</span>
+												</div>
+												{#if imgState.loaded}
+													<div class="flex items-center gap-2">
+														<button
+															class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
+															on:click={() => {
+																navigator.clipboard.writeText(layoutResult.url);
+																toast.set({ message: 'URL copied!', type: 'success', duration: 1500 });
+															}}
+														>
+															Copy URL
+														</button>
+														<a
+															href={layoutResult.url}
+															download="{uid}-{layoutResult.layout}.{layoutResult.format || 'png'}"
+															class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
+														>
+															Download
+														</a>
+													</div>
+												{/if}
+											</div>
+											<div class="p-3 bg-[#e5e5e5] flex items-center justify-center" style="min-height: 120px;">
+												{#if !imgState.loaded}
+													<div class="flex items-center gap-2 py-6">
+														<div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+														<span class="text-xs font-bold text-gray-500 uppercase">Loading image...</span>
+													</div>
+												{/if}
+												<img
+													src={imgState.src}
+													alt="{layoutResult.name} render"
+													class="max-w-full max-h-[300px] object-contain border border-gray-300 bg-white"
+													class:hidden={!imgState.loaded}
+													on:load={() => handleRenderImgLoad(layoutResult.layout)}
+													on:error={() => handleRenderImgError(layoutResult.layout, layoutResult.url)}
+												/>
+											</div>
+										</div>
+									{/each}
+
+									{#if renderResult.errors?.length > 0}
+										<div class="p-3 bg-red-50 border-2 border-red-200 rounded-lg">
+											<p class="text-xs font-bold text-red-700">
+												{renderResult.totalErrors} layout{renderResult.totalErrors > 1 ? 's' : ''} failed to render:
+											</p>
+											{#each renderResult.errors as err}
+												<p class="text-xs text-red-600 mt-1">{err.layout}: {err.error}</p>
+											{/each}
+										</div>
+									{/if}
+
+									<!-- Copy as Code for the first result -->
+									{#if renderResult.results.length > 0}
+										<div class="flex justify-end">
+											<CopyAsCode
+												imageUrl={renderResult.results[0].url}
+												templateUid={uid}
+												variables={variableValues}
+												format={selectedFormat}
+												apiKey={selectedApiKey}
+											/>
+										</div>
+									{/if}
+								</div>
+							{:else}
+								<!-- Empty state: no render yet -->
+								<div class="flex flex-col items-center justify-center py-12 text-center">
+									{#if template?.thumbnail}
+										<img
+											src={template.thumbnail}
+											alt="Template preview"
+											class="max-w-full max-h-[200px] object-contain border-2 border-gray-200 rounded-lg mb-4 opacity-60"
+										/>
+									{/if}
+									<p class="text-sm font-bold text-gray-400 uppercase tracking-wide">
+										Fill in variables and click Render
+									</p>
+								</div>
+							{/if}
 						</div>
 					</div>
 				</div>

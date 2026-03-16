@@ -169,9 +169,7 @@
 				currentPage = page;
 				hasMore = res.pagination?.hasNext ?? false;
 			}
-		} catch (err) {
-			console.error('TemplateSelector: fetch failed', err);
-		} finally {
+		} catch (err) { /* ignored */ } finally {
 			loading = false;
 			loadingMore = false;
 		}

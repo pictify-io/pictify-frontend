@@ -47,7 +47,6 @@
 			}
 		} catch (err) {
 			error = 'Failed to load team data';
-			console.error(err);
 		} finally {
 			loading = false;
 		}
@@ -88,7 +87,7 @@
 	}
 
 	async function handleInvite() {
-		if (!inviteEmail.trim() || !inviteEmail.includes('@')) {
+		if (!inviteEmail.trim() || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())) {
 			inviteError = 'Please enter a valid email address';
 			return;
 		}

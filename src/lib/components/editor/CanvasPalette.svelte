@@ -24,9 +24,7 @@
 			setTimeout(() => {
 				copiedColor = null;
 			}, 1500);
-		} catch (err) {
-			console.error('Failed to copy color:', err);
-		}
+		} catch (err) { /* ignored */ }
 	}
 </script>
 

@@ -150,7 +150,6 @@ export const keywordTemplates = {
 export function generateTitle(pageType, data = {}) {
 	const template = titleTemplates[pageType];
 	if (!template) {
-		console.warn(`No title template found for page type: ${pageType}`);
 		return data.title || SITE_NAME;
 	}
 	return interpolate(template, { ...data, year: data.year || new Date().getFullYear() });
@@ -165,7 +164,6 @@ export function generateTitle(pageType, data = {}) {
 export function generateDescription(pageType, data = {}) {
 	const template = descriptionTemplates[pageType];
 	if (!template) {
-		console.warn(`No description template found for page type: ${pageType}`);
 		return data.description || '';
 	}
 	const description = interpolate(template, data);

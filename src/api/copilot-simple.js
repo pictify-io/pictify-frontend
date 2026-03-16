@@ -41,7 +41,6 @@ export const generateSimple = async (
 		});
 		return response;
 	} catch (error) {
-		console.error('Error in generateSimple:', error);
 		throw error;
 	}
 };
@@ -65,6 +64,7 @@ export const streamSimpleGenerate = async ({
 	brandAssets = null,
 	width = 1080,
 	height = 1080,
+	includePerformanceData = false,
 	onStep,
 	onComplete,
 	onError
@@ -85,7 +85,8 @@ export const streamSimpleGenerate = async ({
 				canvasState,
 				brandAssets,
 				width,
-				height
+				height,
+				includePerformanceData
 			}),
 			signal: controller.signal
 		});
@@ -129,7 +130,7 @@ export const streamSimpleGenerate = async ({
 								onError?.(new Error(parsed.message || 'Unknown error'));
 							}
 						} catch (error) {
-							console.warn('Failed to parse SSE payload', error);
+							/* ignored */
 						}
 					}
 				}
@@ -152,7 +153,6 @@ export const streamSimpleGenerate = async ({
 				if (controller.signal.aborted) {
 					return;
 				}
-				console.error('Copilot stream error:', error);
 				onError?.(error);
 			}
 		})();
@@ -162,7 +162,6 @@ export const streamSimpleGenerate = async ({
 		};
 	} catch (error) {
 		controller.abort();
-		console.error('Error starting copilot stream:', error);
 		onError?.(error);
 		throw error;
 	}
@@ -265,7 +264,6 @@ export const streamCopilotGenerate = async ({
 						// Validate tool input
 						const validation = validateToolInput(parsed.name, parsed.input || {});
 						if (!validation.valid) {
-							console.warn(`Invalid tool input for ${parsed.name}:`, validation.errors);
 						}
 						// Check if confirmation needed
 						const needsConfirm = requiresConfirmation(parsed.name);
@@ -337,7 +335,7 @@ export const streamCopilotGenerate = async ({
 							const parsed = JSON.parse(dataPayload);
 							processSSEEvent(eventName, parsed);
 						} catch (error) {
-							console.warn('Failed to parse SSE payload:', error, dataPayload);
+							/* ignored */
 						}
 					}
 				}
@@ -366,7 +364,6 @@ export const streamCopilotGenerate = async ({
 					console.debug('Stream aborted gracefully');
 					return;
 				}
-				console.error('Copilot stream error:', error);
 				onError?.(error);
 			} finally {
 				// Ensure reader is released
@@ -388,7 +385,6 @@ export const streamCopilotGenerate = async ({
 	} catch (error) {
 		isAborted = true;
 		controller.abort();
-		console.error('Error starting copilot stream:', error);
 		onError?.(error);
 		throw error;
 	}
@@ -416,7 +412,6 @@ export const sendToolResult = async (threadId, toolCallId, result) => {
 		});
 		return response;
 	} catch (error) {
-		console.error('Error sending tool result:', error);
 		throw error;
 	}
 };
@@ -436,9 +431,28 @@ export const continueWithToolResults = async (threadId, toolResults) => {
 		});
 		return response;
 	} catch (error) {
-		console.error('Error continuing with tool results:', error);
 		throw error;
 	}
+};
+
+// =============================================================================
+// Resize API
+// =============================================================================
+
+/**
+ * Resize a template's canvas to a target size using AI (server-side)
+ * @param {string} templateUid - Template UID to resize
+ * @param {number} targetWidth - Target width in pixels
+ * @param {number} targetHeight - Target height in pixels
+ * @returns {Promise<{success: boolean, canvasState: object, width: number, height: number}>}
+ */
+export const resizeTemplate = async (templateUid, targetWidth, targetHeight) => {
+	const response = await backend.post(`${BASE_PATH}/resize`, {
+		templateUid,
+		targetWidth,
+		targetHeight
+	});
+	return response;
 };
 
 // =============================================================================

@@ -39,14 +39,12 @@ import {
 const DEBUG = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
 const _logs = [];
 function log(...args) {
-	if (DEBUG) console.log('[FigmaConverter]', ...args);
 	_logs.push({
 		ts: Date.now(),
 		args: args.map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
 	});
 }
 function warn(...args) {
-	console.warn('[FigmaConverter]', ...args);
 	_logs.push({
 		ts: Date.now(),
 		level: 'warn',
@@ -54,7 +52,6 @@ function warn(...args) {
 	});
 }
 function logError(...args) {
-	console.error('[FigmaConverter]', ...args);
 	_logs.push({
 		ts: Date.now(),
 		level: 'error',

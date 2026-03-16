@@ -94,14 +94,12 @@ export const editorActions = {
 		// FabricJS uses 'ActiveSelection' (PascalCase) for multi-selections
 		const selectionType = activeSelection?.type?.toLowerCase();
 		if (!activeSelection || selectionType !== 'activeselection') {
-			console.warn('No multiple objects selected to group. Type:', activeSelection?.type);
 			return null;
 		}
 
 		// Get all objects in the selection (copy the array)
 		const objects = activeSelection.getObjects().concat();
 		if (objects.length < 2) {
-			console.warn('Need at least 2 objects to group');
 			return null;
 		}
 
@@ -129,7 +127,6 @@ export const editorActions = {
 		// Update selection in store
 		editorActor.send({ type: 'SELECT_COMPONENT', component: group });
 
-		console.log('✅ Group created at', group.left, group.top);
 		return group;
 	},
 
@@ -145,13 +142,11 @@ export const editorActions = {
 		// FabricJS uses 'Group' (PascalCase) for groups
 		const objectType = group?.type?.toLowerCase();
 		if (!group || objectType !== 'group') {
-			console.warn('Selected object is not a group. Type:', group?.type);
 			return false;
 		}
 
 		// Check if this is a protected element (QR code, chart, or table)
 		if (group.isQRCode || group.isChart || group.isTable || group.isPatternFill) {
-			console.warn('Cannot ungroup protected elements (QR codes, charts, tables, pattern fills)');
 			return false;
 		}
 
@@ -182,7 +177,6 @@ export const editorActions = {
 		}
 
 		canvas.requestRenderAll();
-		console.log('✅ Group ungrouped, objects:', objects.length);
 
 		return true;
 	}

@@ -39,7 +39,6 @@
 			pagination = response.pagination || pagination;
 			filters = response.filters || filters;
 		} catch (e) {
-			console.error('Failed to load templates:', e);
 			error = e.message || 'Failed to load templates';
 			templates = [];
 		} finally {

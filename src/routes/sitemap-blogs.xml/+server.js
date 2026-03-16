@@ -27,7 +27,7 @@ export async function GET() {
   </url>`
 		);
 	} catch (error) {
-		console.error('Error fetching blog links for sitemap:', error);
+		/* ignored */
 	}
 
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>

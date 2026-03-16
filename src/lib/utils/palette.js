@@ -263,10 +263,6 @@ export function findDominantColor(colors) {
 	// Sort by score (highest first)
 	colorData.sort((a, b) => b.score - a.score);
 
-	console.log(
-		'Color scores:',
-		colorData.map((c) => ({ hex: c.hex, score: c.score.toFixed(3), s: c.hsl.s, l: c.hsl.l }))
-	);
 
 	return colorData[0].hex;
 }

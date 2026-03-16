@@ -19,21 +19,13 @@ const getApiToken = async () => {
 };
 
 const createApiToken = async () => {
-	try {
-		const response = await backend.post('/api/users/api-tokens');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/api/users/api-tokens');
+	return response;
 };
 
 const deleteApiToken = async (apiTokenId) => {
-	try {
-		const response = await backend.delete(`/api/users/api-tokens/${apiTokenId}`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.delete(`/api/users/api-tokens/${apiTokenId}`);
+	return response;
 };
 
 const getPlanDetails = async () => {
@@ -46,35 +38,23 @@ const getPlanDetails = async () => {
 };
 
 const resetPassword = async ({ password, token }) => {
-	try {
-		const response = await backend.post('/auth/reset-password', {
-			password,
-			token
-		});
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/auth/reset-password', {
+		password,
+		token
+	});
+	return response;
 };
 
 const forgotPassword = async (email) => {
-	try {
-		const response = await backend.post('/auth/forgot-password', {
-			email
-		});
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/auth/forgot-password', {
+		email
+	});
+	return response;
 };
 
 const getPaymentPortal = async () => {
-	try {
-		const response = await backend.get('/lemon-squeezy/customer-portal');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get('/lemon-squeezy/customer-portal');
+	return response;
 };
 
 export {
