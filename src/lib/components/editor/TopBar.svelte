@@ -16,6 +16,7 @@
 	export let isSaving = false;
 	export let guestMode = false;
 	export let backHref = '/dashboard/template';
+	export let showResizeModal = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -35,7 +36,6 @@
 	];
 
 	function save() {
-		console.log('TopBar: Save clicked');
 		dispatch('save');
 	}
 
@@ -96,7 +96,6 @@
 	let wasSaving = false;
 	$: {
 		if (wasSaving && !isSaving) {
-			console.log('TopBar: Save completed, marking as clean');
 			triggerMarkSaved.update((n) => n + 1);
 		}
 		wasSaving = isSaving;
@@ -190,34 +189,46 @@
 
 		<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full" />
 
-		<div class="relative">
-			<button
-				class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
-				{guestMode
-					? 'bg-[#ff6b6b] text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
-					: $isDirty
-					? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
-					: 'bg-gray-100 text-gray-400 cursor-default'}"
-				on:click={save}
-				disabled={guestMode ? isSaving : isSaving || !$isDirty}
-			>
-				{#if isSaving}
-					<i class="fa fa-spinner fa-spin" />
-					<span class="hidden sm:inline">Saving...</span>
-				{:else if guestMode}
-					<i class="fa fa-lock" />
-					<span class="hidden sm:inline">Save (free account)</span>
-					<span class="sm:hidden">Save</span>
-				{:else if $isDirty}
-					<i class="fa fa-save" />
-					<span class="hidden sm:inline">Save</span>
-					<span class="sm:hidden">Save</span>
-				{:else}
-					<i class="fa fa-check" />
-					<span class="hidden sm:inline">Saved</span>
-					<span class="sm:hidden">Saved</span>
-				{/if}
-			</button>
-		</div>
+		<!-- Resize Button -->
+		<button
+			class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border-[3px] border-gray-900 bg-white text-gray-900
+				shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+			on:click={() => dispatch('resize')}
+			title="Resize for different platforms"
+		>
+			<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+			</svg>
+			<span class="hidden sm:inline">Resize</span>
+		</button>
+
+		<!-- Save Button -->
+		<button
+			class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
+			{guestMode
+				? 'bg-[#ff6b6b] text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
+				: $isDirty
+				? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
+				: 'bg-gray-100 text-gray-400 cursor-default'}"
+			on:click={save}
+			disabled={guestMode ? isSaving : isSaving || !$isDirty}
+		>
+			{#if isSaving}
+				<i class="fa fa-spinner fa-spin" />
+				<span class="hidden sm:inline">Saving...</span>
+			{:else if guestMode}
+				<i class="fa fa-lock" />
+				<span class="hidden sm:inline">Save (free account)</span>
+				<span class="sm:hidden">Save</span>
+			{:else if $isDirty}
+				<i class="fa fa-save" />
+				<span class="hidden sm:inline">Save</span>
+				<span class="sm:hidden">Save</span>
+			{:else}
+				<i class="fa fa-check" />
+				<span class="hidden sm:inline">Saved</span>
+				<span class="sm:hidden">Saved</span>
+			{/if}
+		</button>
 	</div>
 </div>

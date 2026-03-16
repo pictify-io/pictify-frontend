@@ -5,7 +5,6 @@ const getImages = async ({ limit = 12, offset = 0 } = {}) => {
 		const response = await backend.get(`/image?limit=${limit}&offset=${offset}`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching images:', error);
 		return { images: [], pagination: { total: 0, limit, offset, hasMore: false } };
 	}
 };
@@ -15,7 +14,6 @@ const getGifs = async ({ limit = 12, offset = 0 } = {}) => {
 		const response = await backend.get(`/gif?limit=${limit}&offset=${offset}`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching gifs:', error);
 		return { gifs: [], pagination: { total: 0, limit, offset, hasMore: false } };
 	}
 };
@@ -25,7 +23,6 @@ const getPdfs = async ({ limit = 12, offset = 0 } = {}) => {
 		const response = await backend.get(`/pdf?limit=${limit}&offset=${offset}`);
 		return response;
 	} catch (error) {
-		console.error('Error fetching pdfs:', error);
 		return { pdfs: [], pagination: { total: 0, limit, offset, hasMore: false } };
 	}
 };

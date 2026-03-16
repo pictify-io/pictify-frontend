@@ -163,11 +163,6 @@ export async function handleFetch({ event, request, fetch }) {
  */
 export function handleError({ error, event }) {
 	// Log error for monitoring
-	console.error('Server error:', {
-		message: error.message,
-		pathname: event.url.pathname,
-		timestamp: new Date().toISOString()
-	});
 
 	// Return generic error to client
 	return {

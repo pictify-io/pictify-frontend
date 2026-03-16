@@ -17,8 +17,10 @@
 	import { toast } from '../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import AnalyticsBreakdowns from '$lib/components/experiments/AnalyticsBreakdowns.svelte';
 	import { formatRelativeDate, copyToClipboard } from '$lib/utils/format.js';
 	import { COUNTRIES } from '$lib/utils/countries.js';
+	import { analytics as analyticsTracker } from '$lib/analytics.js';
 
 	// ============== Smart Link Rule Summary Helpers ==============
 
@@ -387,8 +389,10 @@
 		try {
 			await getExperimentAction(uid);
 			await getExperimentAnalyticsAction(uid);
+			if (exp?.type) {
+				analyticsTracker.trackExperimentViewed({ type: exp.type, uid });
+			}
 		} catch (err) {
-			console.error('Failed to load experiment:', err);
 		} finally {
 			isLoading = false;
 		}
@@ -1941,6 +1945,18 @@ fetch("https://pictify.io/s/events", {
 										</div>
 									{/each}
 								</div>
+							</div>
+						{/if}
+
+						<!-- Channel / Device / Geo Breakdowns -->
+						{#if analytics}
+							<div class="pt-6 border-t-[3px] border-gray-200 border-dashed">
+								<AnalyticsBreakdowns
+									channelBreakdown={analytics.channelBreakdown || []}
+									deviceBreakdown={analytics.deviceBreakdown || []}
+									geoBreakdown={analytics.geoBreakdown || []}
+									referrerBreakdown={analytics.referrerBreakdown || []}
+								/>
 							</div>
 						{/if}
 

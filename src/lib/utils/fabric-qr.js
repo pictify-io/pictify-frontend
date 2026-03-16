@@ -81,7 +81,6 @@ async function generateQRMatrix(data, errorCorrectionLevel = 'M') {
 			size: qrData.modules.size
 		};
 	} catch (error) {
-		console.error('Error generating QR code:', error);
 		// Fallback to a simple pattern for error cases
 		const size = 25;
 		const modules = new Uint8Array(size * size);

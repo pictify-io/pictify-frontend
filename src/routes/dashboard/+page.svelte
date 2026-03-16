@@ -256,7 +256,6 @@
 				getDismissedNudges()
 			);
 		} catch (error) {
-			console.error('Failed to load dashboard data:', error);
 		} finally {
 			isLoading = false;
 		}

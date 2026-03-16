@@ -38,7 +38,7 @@
 		}
 		// Fetch teams on mount if not already loaded
 		if ($teams.length === 0) {
-			fetchTeams().catch(console.error);
+			fetchTeams().catch(() => { /* ignored */ });
 		}
 	});
 

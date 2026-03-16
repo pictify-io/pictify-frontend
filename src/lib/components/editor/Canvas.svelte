@@ -24,6 +24,7 @@
 	import { loadBrandFonts } from '../../utils/brand-fonts-loader';
 	import { isPreviewModeActive, clearPreview } from '../../utils/canvas-preview-engine';
 	import { showToast } from '../../../store/toast.store';
+	import { template } from '../../../store/template.store';
 
 	const dispatch = createEventDispatcher();
 
@@ -54,6 +55,11 @@
 	// Per-page history preservation
 	let pageHistoryMap = {};
 
+	// Per-layout history preservation and switching
+	let layoutHistoryMap = {};
+	let currentLayoutKey = null;
+	let isLayoutSwitching = false;
+
 	// Auto-save timer
 	let autoSaveTimer = null;
 	const AUTO_SAVE_DELAY = 30000; // 30 seconds
@@ -71,12 +77,9 @@
 			isPerformingUndoRedo ||
 			isLoadingCanvas ||
 			isBatchingActive ||
-			isPageSwitching
+			isPageSwitching ||
+			isLayoutSwitching
 		) {
-			if (isPerformingUndoRedo) console.log('🚫 saveState blocked: performing undo/redo');
-			if (isLoadingCanvas) console.log('🚫 saveState blocked: loading canvas');
-			if (isBatchingActive) console.log('🚫 saveState blocked: batching operations');
-			if (isPageSwitching) console.log('🚫 saveState blocked: page switching');
 			return;
 		}
 
@@ -96,14 +99,6 @@
 			historyIndex++;
 		}
 
-		console.log(
-			'📝 State saved. Index:',
-			historyIndex,
-			'SavedIndex:',
-			savedHistoryIndex,
-			'Stack length:',
-			historyStack.length
-		);
 
 		// Update can undo/redo flags
 		updateHistoryFlags();
@@ -127,7 +122,6 @@
 		}
 		autoSaveTimer = setTimeout(() => {
 			if ($isDirty) {
-				console.log('⏰ Auto-save triggered');
 				dispatch('autosave');
 			}
 		}, AUTO_SAVE_DELAY);
@@ -142,15 +136,7 @@
 	}
 
 	function performUndo() {
-		console.log(
-			'⏪ Undo called. Current index:',
-			historyIndex,
-			'Stack length:',
-			historyStack.length
-		);
-		if (!fabricCanvas || historyIndex <= 0 || isPerformingUndoRedo) {
-			if (isPerformingUndoRedo) console.log('❌ Cannot undo - operation already in progress');
-			else console.log('❌ Cannot undo - at beginning of history');
+		if (!fabricCanvas || historyIndex <= 0 || isPerformingUndoRedo || isLayoutSwitching) {
 			return;
 		}
 
@@ -161,14 +147,12 @@
 
 		isPerformingUndoRedo = true;
 		historyIndex--;
-		console.log('⏪ Undoing to index:', historyIndex);
 
 		const state = historyStack[historyIndex];
 		fabricCanvas.loadFromJSON(state, () => {
 			fabricCanvas.renderAll();
 			editorActions.clearSelection();
 			updateHistoryFlags();
-			console.log('✅ Undo complete. New index:', historyIndex);
 
 			// Delay resetting the flag to ensure all Fabric.js events have been processed
 			// Fabric fires object:added/removed events AFTER this callback completes
@@ -176,21 +160,12 @@
 				isPerformingUndoRedo = false;
 				fabricCanvas.requestRenderAll(); // Force visual update
 				updateEmptyState();
-				console.log('🔓 Undo flag reset');
 			}, 50);
 		});
 	}
 
 	function performRedo() {
-		console.log(
-			'⏩ Redo called. Current index:',
-			historyIndex,
-			'Stack length:',
-			historyStack.length
-		);
-		if (!fabricCanvas || historyIndex >= historyStack.length - 1 || isPerformingUndoRedo) {
-			if (isPerformingUndoRedo) console.log('❌ Cannot redo - operation already in progress');
-			else console.log('❌ Cannot redo - at end of history');
+		if (!fabricCanvas || historyIndex >= historyStack.length - 1 || isPerformingUndoRedo || isLayoutSwitching) {
 			return;
 		}
 
@@ -201,21 +176,18 @@
 
 		isPerformingUndoRedo = true;
 		historyIndex++;
-		console.log('⏩ Redoing to index:', historyIndex);
 
 		const state = historyStack[historyIndex];
 		fabricCanvas.loadFromJSON(state, () => {
 			fabricCanvas.renderAll();
 			editorActions.clearSelection();
 			updateHistoryFlags();
-			console.log('✅ Redo complete. New index:', historyIndex);
 
 			// Delay resetting the flag to ensure all Fabric.js events have been processed
 			setTimeout(() => {
 				isPerformingUndoRedo = false;
 				fabricCanvas.requestRenderAll(); // Force visual update
 				updateEmptyState();
-				console.log('🔓 Redo flag reset');
 			}, 50);
 		});
 	}
@@ -254,13 +226,8 @@
 	async function initCanvas() {
 		// Load brand fonts before initializing canvas
 		try {
-			const brandFonts = await loadBrandFonts();
-			if (brandFonts.length > 0) {
-				console.log('🎨 Loaded brand fonts:', brandFonts);
-			}
-		} catch (error) {
-			console.warn('Failed to load brand fonts:', error);
-		}
+			await loadBrandFonts();
+		} catch { /* ignored */ }
 
 		// Get dimensions based on output format
 		let width = 1080;
@@ -285,7 +252,6 @@
 			const dims = pdfDimensions[preset] || pdfDimensions['A4'];
 			width = dims.width;
 			height = dims.height;
-			console.log(`📄 PDF Canvas initialized with ${preset}: ${width}x${height}`);
 		}
 
 		const canvasElement = document.createElement('canvas');
@@ -341,7 +307,6 @@
 		fabricCanvas.on('mouse:down', () => {
 			// Safety: If user interacts, we are definitely done loading
 			if (isLoadingCanvas) {
-				console.warn('⚠️ User interaction detected while isLoadingCanvas=true. Forcing false.');
 				isLoadingCanvas = false;
 			}
 
@@ -352,7 +317,6 @@
 
 		// Save when path is completely drawn
 		fabricCanvas.on('path:created', () => {
-			console.log('✏️ Path drawing complete');
 			isDrawing = false;
 			saveState();
 		});
@@ -372,15 +336,12 @@
 
 		// object:modified fires ONCE when transformation completes (not during drag/resize)
 		fabricCanvas.on('object:modified', async (e) => {
-			console.log('🔧 Object modified:', e.target?.type);
 
 			// Don't save during undo/redo operations
 			if (isPerformingUndoRedo) {
-				console.log('🚫 object:modified ignored during undo/redo');
 				return;
 			}
 			if (isLoadingCanvas) {
-				console.log('🚫 object:modified ignored during loading');
 				return;
 			}
 
@@ -433,7 +394,6 @@
 			if (e.target?.selectable === false && e.target?.evented === false) return;
 
 			if (!isDrawing && !isPerformingUndoRedo && !isLoadingCanvas) {
-				console.log('➕ Object added:', e.target?.type);
 				saveState();
 			}
 		});
@@ -445,7 +405,6 @@
 			if (e.target?.selectable === false && e.target?.evented === false) return;
 
 			if (!isDrawing && !isPerformingUndoRedo && !isLoadingCanvas) {
-				console.log('➖ Object removed:', e.target?.type);
 				saveState();
 			}
 		});
@@ -457,7 +416,6 @@
 			if (target && target.type === 'group') {
 				// Prevent entering protected elements
 				if (target.isPatternFill || target.isQRCode || target.isChart || target.isTable) {
-					console.log('🔒 Protected group — double-click edit blocked');
 					return;
 				}
 
@@ -467,34 +425,19 @@
 					interactive: true
 				});
 				fabricCanvas.requestRenderAll();
-				console.log('🔓 Group entered interactive mode via double-click');
 			}
 		});
 
 		// Subscribe to undo/redo triggers - track previous value to avoid firing on initial subscription
 		unsubscribeUndo = triggerUndo.subscribe((value) => {
-			console.log(
-				'🔔 triggerUndo subscription fired. Value:',
-				value,
-				'Previous:',
-				previousUndoValue
-			);
 			if (previousUndoValue !== undefined && value !== previousUndoValue) {
-				console.log('▶️ Triggering undo...');
 				performUndo();
 			}
 			previousUndoValue = value;
 		});
 
 		unsubscribeRedo = triggerRedo.subscribe((value) => {
-			console.log(
-				'🔔 triggerRedo subscription fired. Value:',
-				value,
-				'Previous:',
-				previousRedoValue
-			);
 			if (previousRedoValue !== undefined && value !== previousRedoValue) {
-				console.log('▶️ Triggering redo...');
 				performRedo();
 			}
 			previousRedoValue = value;
@@ -502,7 +445,6 @@
 
 		unsubscribeMarkSaved = triggerMarkSaved.subscribe((value) => {
 			if (previousMarkSavedValue !== undefined && value !== previousMarkSavedValue) {
-				console.log('💾 Marking current state as saved. Index:', historyIndex);
 				savedHistoryIndex = historyIndex;
 				updateHistoryFlags();
 			}
@@ -519,7 +461,6 @@
 			savedHistoryIndex = historyIndex;
 			updateHistoryFlags();
 			updateEmptyState();
-			console.log('🎨 Canvas initialization complete, history tracking started');
 		}, 500); // Increased delay to ensure canvas is fully set up
 
 		// Initial scale update
@@ -759,7 +700,6 @@
 			// Subscribe to page changes for multi-page PDF
 			pagesUnsubscribe = currentPageIndex.subscribe((newIndex) => {
 				if (fabricCanvas && previousPageIndex !== newIndex) {
-					console.log(`📄 Switching from page ${previousPageIndex + 1} to page ${newIndex + 1}`);
 
 					// CRITICAL: Clear preview BEFORE serialization to avoid saving preview clones
 					// Preview clones have _isPreviewClone=true but that's not in the serialization list
@@ -840,7 +780,6 @@
 										isLoadingCanvas = false;
 										isPageSwitching = false;
 										updateEmptyState();
-										console.log('✅ Page loaded via Promise');
 
 										// Force another render after a short delay
 										setTimeout(() => {
@@ -848,7 +787,6 @@
 										}, 50);
 									})
 									.catch((err) => {
-										console.error('Error loading page:', err);
 										showToast('Failed to load page — staying on current page', 'error');
 										isLoadingCanvas = false;
 										isPageSwitching = false;
@@ -862,10 +800,8 @@
 								isLoadingCanvas = false;
 								isPageSwitching = false;
 								updateEmptyState();
-								console.log('✅ Page loaded (sync)');
 							}
 						} catch (err) {
-							console.error('Error loading page:', err);
 							showToast('Failed to load page — staying on current page', 'error');
 							isLoadingCanvas = false;
 							isPageSwitching = false;
@@ -881,7 +817,6 @@
 						restorePageHistory(newIndex);
 						isPageSwitching = false;
 						updateEmptyState();
-						console.log('📄 Blank page created');
 					}
 
 					previousPageIndex = newIndex;
@@ -913,6 +848,89 @@
 	// Clean up history when a page is deleted
 	export function clearPageHistory(pageIndex) {
 		delete pageHistoryMap[pageIndex];
+	}
+
+	/**
+	 * Handle layout switch — Canvas owns the FULL sequence (H1):
+	 * serialize current → save history → restore history → loadFromJSON → base state
+	 */
+	export async function handleLayoutSwitch(event) {
+		const { fromLayoutKey, toLayoutKey, targetData } = event.detail || event;
+		if (!fabricCanvas || isLayoutSwitching) return;
+
+		isLayoutSwitching = true;
+		isLoadingCanvas = true;
+
+		// Clear auto-save timer to prevent stale serialization (H3)
+		if (autoSaveTimer) {
+			clearTimeout(autoSaveTimer);
+			autoSaveTimer = null;
+		}
+
+		// 1. Serialize current canvas and save to template store (H5)
+		const currentState = fabricCanvas.toJSON(CUSTOM_PROPS);
+		if (fromLayoutKey === null) {
+			template.update((t) => ({ ...t, fabricJSData: currentState }));
+		} else {
+			template.update((t) => ({
+				...t,
+				layouts: {
+					...(t.layouts || {}),
+					[fromLayoutKey]: { ...(t.layouts || {})[fromLayoutKey], fabricJSData: currentState }
+				}
+			}));
+		}
+
+		// 2. Save current layout's undo history
+		const fromKey = currentLayoutKey || '__default__';
+		layoutHistoryMap[fromKey] = {
+			historyStack: [...historyStack],
+			historyIndex,
+			savedHistoryIndex
+		};
+
+		// 3. Restore target layout's undo history
+		const toKey = toLayoutKey || '__default__';
+		const saved = layoutHistoryMap[toKey];
+		if (saved) {
+			historyStack = saved.historyStack;
+			historyIndex = saved.historyIndex;
+			savedHistoryIndex = saved.savedHistoryIndex;
+		} else {
+			historyStack = [];
+			historyIndex = -1;
+			savedHistoryIndex = -1;
+		}
+
+		currentLayoutKey = toLayoutKey;
+
+		// 4. Load target canvas (Promise-based — C1)
+		try {
+			fabricCanvas.setWidth(targetData.width);
+			fabricCanvas.setHeight(targetData.height);
+
+			const prevRenderOnAdd = fabricCanvas.renderOnAddRemove;
+			fabricCanvas.renderOnAddRemove = false;
+			await fabricCanvas.loadFromJSON(targetData.fabricJSData);
+			fabricCanvas.renderOnAddRemove = prevRenderOnAdd;
+			fabricCanvas.renderAll();
+
+			// Push initial base state for new layouts (W6)
+			if (!saved) {
+				historyStack = [fabricCanvas.toJSON(CUSTOM_PROPS)];
+				historyIndex = 0;
+				savedHistoryIndex = 0;
+			}
+
+			editorActions.clearSelection();
+			updateScale();
+		} catch (err) {
+			showToast('Failed to load layout', 'error');
+		} finally {
+			isLoadingCanvas = false;
+			isLayoutSwitching = false;
+			updateHistoryFlags();
+		}
 	}
 
 	// Reactive statement to update scale if editor dimensions change programmatically

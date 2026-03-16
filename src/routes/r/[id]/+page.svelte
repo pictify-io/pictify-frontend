@@ -130,7 +130,6 @@
 			result = response.result;
 			template = response.template;
 		} catch (e) {
-			console.error('Failed to load result:', e);
 			error = e.message || 'Result not found';
 		} finally {
 			loading = false;
@@ -214,7 +213,6 @@
 				}, 500);
 			}
 		} catch (e) {
-			console.error('Failed to fork template:', e);
 			toast.set({
 				message: e.message || 'Failed to remix template',
 				type: 'error',
@@ -239,18 +237,8 @@
 		if (!result?.uid) return;
 		analyticsLoading = true;
 		try {
-			console.log(
-				'[Analytics] Fetching for result:',
-				result.uid,
-				'createdBy:',
-				result.createdBy,
-				'user:',
-				$user?.email
-			);
 			analytics = await backend.get(`/public/results/${result.uid}/analytics`);
-			console.log('[Analytics] Success:', analytics);
 		} catch (e) {
-			console.log('[Analytics] Error:', e.status, e.message);
 		} finally {
 			analyticsLoading = false;
 		}

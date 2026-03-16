@@ -27,7 +27,7 @@ const signup = async ({ email, password }) => {
 		return response.data;
 	} catch (error) {
 		if (error.status === 409) throw new Error('Email already exists');
-		else if (error.response.status === 401) throw new Error(error.response.data.message);
+		else if (error.status === 401) throw new Error(error.message || 'Invalid credentials');
 		else throw new Error('Error signing up');
 	}
 };

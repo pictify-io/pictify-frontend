@@ -215,9 +215,7 @@
 
 				// Update codeHTML with the current state of the preview
 				codeHTML = previewDoc.documentElement.outerHTML;
-			} catch (error) {
-				console.error('Error updating preview:', error);
-			}
+			} catch (error) { /* ignored */ }
 		}
 	};
 
@@ -388,9 +386,7 @@
 				selectedFont = template.settings.font || selectedFont;
 				logoWidth = template.settings.logoWidth || logoWidth;
 			}
-		} catch (error) {
-			console.error('Error updating HTML:', error);
-		}
+		} catch (error) { /* ignored */ }
 	}
 
 	function saveTemplate() {
@@ -440,7 +436,6 @@
 				toast.set({ message: 'Image generated successfully!', type: 'success', duration: 1500 });
 			})
 			.catch((error) => {
-				console.error('Error generating image:', error);
 				toast.set({ message: 'Failed to generate image', type: 'error', duration: 1500 });
 			})
 			.finally(() => {

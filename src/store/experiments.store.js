@@ -85,7 +85,6 @@ export const getExperimentsAction = async (params = {}) => {
 		experiments.set(response.experiments);
 		return response.experiments;
 	} catch (error) {
-		console.error('Error fetching experiments:', error);
 		experiments.set([]);
 		return [];
 	} finally {
@@ -107,7 +106,6 @@ export const getExperimentAction = async (uid) => {
 		experiment.set(response.experiment);
 		return response.experiment;
 	} catch (error) {
-		console.error('Error fetching experiment:', error);
 		return null;
 	} finally {
 		stopLoading();
@@ -129,7 +127,6 @@ export const createExperimentAction = async (data) => {
 		experiment.set(response.experiment);
 		return response.experiment;
 	} catch (error) {
-		console.error('Error creating experiment:', error);
 		throw error;
 	} finally {
 		stopLoading();
@@ -157,7 +154,6 @@ export const updateExperimentAction = async (uid, updates) => {
 		experiment.set(response.experiment);
 		return response.experiment;
 	} catch (error) {
-		console.error('Error updating experiment:', error);
 		throw error;
 	} finally {
 		stopLoading();
@@ -174,7 +170,6 @@ export const deleteExperimentAction = async (uid) => {
 		experiments.update((e) => e.filter((item) => item.uid !== uid));
 		return true;
 	} catch (error) {
-		console.error('Error deleting experiment:', error);
 		throw error;
 	} finally {
 		stopLoading();
@@ -205,7 +200,6 @@ const createExperimentStatusAction =
 			}
 			return response?.experiment;
 		} catch (error) {
-			console.error(`Error ${actionName} experiment:`, error);
 			throw error;
 		} finally {
 			stopLoading();
@@ -244,7 +238,6 @@ export const duplicateExperimentAction = async (uid) => {
 		experiments.update((e) => [...e, response.experiment]);
 		return response.experiment;
 	} catch (error) {
-		console.error('Error duplicating experiment:', error);
 		throw error;
 	} finally {
 		stopLoading();
@@ -261,7 +254,6 @@ export const getExperimentAnalyticsAction = async (uid) => {
 		experimentAnalytics.set(response);
 		return response;
 	} catch (error) {
-		console.error('Error fetching experiment analytics:', error);
 		experimentAnalytics.set(null);
 		return null;
 	} finally {
@@ -279,7 +271,6 @@ export const getExperimentQuotaAction = async () => {
 		experimentQuota.set(response);
 		return response;
 	} catch (error) {
-		console.error('Error fetching experiment quota:', error);
 		experimentQuota.set({ limits: {}, counts: {} });
 		return null;
 	} finally {
@@ -295,7 +286,6 @@ export const checkSlugAction = async (slug) => {
 		const response = await checkSlugAvailability(slug);
 		return response;
 	} catch (error) {
-		console.error('Error checking slug availability:', error);
 		throw error;
 	}
 };

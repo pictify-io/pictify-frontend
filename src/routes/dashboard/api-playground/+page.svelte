@@ -82,7 +82,6 @@
 				userTemplates = result.templates;
 			}
 		} catch (error) {
-			console.error('Error fetching templates:', error);
 		} finally {
 			loadingTemplates = false;
 		}
@@ -105,7 +104,7 @@
 				try {
 					await getAPITokenAction();
 				} catch (error) {
-					console.error('Error loading API tokens:', error);
+					/* ignored */
 				}
 			}
 
@@ -230,8 +229,35 @@
 		templateUid: '',
 		variables: '{}',
 		format: 'png',
-		quality: 0.9
+		quality: 0.9,
+		layout: '',
+		layouts: []
 	};
+
+	// Layout multi-select for API playground
+	let playgroundSelectedLayouts = new Set();
+	let playgroundAvailableLayouts = []; // populated when template is selected
+
+	function togglePlaygroundLayout(key) {
+		if (playgroundSelectedLayouts.has(key)) {
+			playgroundSelectedLayouts.delete(key);
+		} else {
+			playgroundSelectedLayouts.add(key);
+		}
+		playgroundSelectedLayouts = new Set(playgroundSelectedLayouts);
+		renderTemplateParams.layouts = [...playgroundSelectedLayouts];
+		renderTemplateParams.layout = ''; // clear single layout when using multi
+	}
+
+	function toggleAllPlaygroundLayouts() {
+		if (playgroundSelectedLayouts.size === playgroundAvailableLayouts.length) {
+			playgroundSelectedLayouts = new Set();
+		} else {
+			playgroundSelectedLayouts = new Set(playgroundAvailableLayouts.map(l => l.key));
+		}
+		renderTemplateParams.layouts = [...playgroundSelectedLayouts];
+		renderTemplateParams.layout = '';
+	}
 
 	// Batch render parameters
 	let batchRenderParams = {
@@ -246,7 +272,8 @@
 		),
 		format: 'png',
 		quality: 0.9,
-		concurrency: 5
+		concurrency: 5,
+		layout: ''
 	};
 
 	// Batch render from CSV parameters
@@ -264,8 +291,27 @@
 		),
 		format: 'png',
 		quality: 0.9,
-		concurrency: 5
+		concurrency: 5,
+		layout: ''
 	};
+
+	// Available layouts for batch render (populated on template select)
+	let batchAvailableLayouts = [];
+	let batchCsvAvailableLayouts = [];
+	let batchSelectedLayouts = new Set(['default']);
+	let batchCsvSelectedLayouts = new Set(['default']);
+
+	function toggleBatchLayout(key) {
+		if (batchSelectedLayouts.has(key)) batchSelectedLayouts.delete(key);
+		else batchSelectedLayouts.add(key);
+		batchSelectedLayouts = new Set(batchSelectedLayouts);
+	}
+
+	function toggleBatchCsvLayout(key) {
+		if (batchCsvSelectedLayouts.has(key)) batchCsvSelectedLayouts.delete(key);
+		else batchCsvSelectedLayouts.add(key);
+		batchCsvSelectedLayouts = new Set(batchCsvSelectedLayouts);
+	}
 
 	let batchStatusParams = {
 		batchId: ''
@@ -293,16 +339,48 @@
 				renderTemplateParams.templateUid = templateUid;
 				// Auto-fetch variables when template is selected
 				fetchTemplateVariables(templateUid);
+				// Fetch template to get available layouts
+				getTemplateById(templateUid).then(res => {
+					const layouts = res?.template?.layouts || {};
+					const entries = Object.entries(layouts);
+					playgroundAvailableLayouts = [
+						{ key: 'default', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
+						...entries.map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
+					];
+					playgroundSelectedLayouts = new Set(['default']);
+					renderTemplateParams.layouts = [];
+					renderTemplateParams.layout = '';
+				}).catch(() => {
+					playgroundAvailableLayouts = [];
+				});
 				break;
 			case 'batch-render':
 				batchRenderParams.templateUid = templateUid;
 				// Auto-fetch variables for batch render
 				fetchTemplateVariables(templateUid, true);
+				// Fetch layouts
+				getTemplateById(templateUid).then(res => {
+					const layouts = res?.template?.layouts || {};
+					batchAvailableLayouts = [
+						{ key: '', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
+						...Object.entries(layouts).map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
+					];
+					batchRenderParams.layout = '';
+				}).catch(() => { batchAvailableLayouts = []; });
 				break;
 			case 'batch-render-csv':
 				batchRenderCsvParams.templateUid = templateUid;
 				// Auto-fetch variables for CSV batch render mappings
 				fetchTemplateVariablesForCsv(templateUid);
+				// Fetch layouts
+				getTemplateById(templateUid).then(res => {
+					const layouts = res?.template?.layouts || {};
+					batchCsvAvailableLayouts = [
+						{ key: '', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
+						...Object.entries(layouts).map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
+					];
+					batchRenderCsvParams.layout = '';
+				}).catch(() => { batchCsvAvailableLayouts = []; });
 				break;
 			case 'get-variables':
 				getVariablesParams.uid = templateUid;
@@ -341,7 +419,7 @@
 				}
 			}
 		} catch (error) {
-			console.error('Error fetching template variables:', error);
+			/* ignored */
 		}
 	}
 
@@ -361,7 +439,7 @@
 				batchRenderCsvParams.mappings = JSON.stringify(exampleMappings, null, 2);
 			}
 		} catch (error) {
-			console.error('Error fetching template variables for CSV:', error);
+			/* ignored */
 		}
 	}
 
@@ -424,15 +502,25 @@
 					if (!renderTemplateParams.templateUid) {
 						throw new Error('Template UID is required');
 					}
-					data = await renderTemplateApi(
-						renderTemplateParams.templateUid,
-						JSON.parse(renderTemplateParams.variables),
-						{
+					{
+						const opts = {
 							format: renderTemplateParams.format,
 							quality: renderTemplateParams.quality,
 							headers: { Authorization: `Bearer ${apiToken}` }
+						};
+						if (playgroundSelectedLayouts.size > 1) {
+							opts.layouts = [...playgroundSelectedLayouts];
+						} else if (playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default')) {
+							opts.layout = [...playgroundSelectedLayouts][0];
+						} else if (renderTemplateParams.layout) {
+							opts.layout = renderTemplateParams.layout;
 						}
-					);
+						data = await renderTemplateApi(
+							renderTemplateParams.templateUid,
+							JSON.parse(renderTemplateParams.variables),
+							opts
+						);
+					}
 					break;
 
 				case 'batch-render':
@@ -446,6 +534,7 @@
 							format: batchRenderParams.format,
 							quality: batchRenderParams.quality,
 							concurrency: batchRenderParams.concurrency,
+							...(batchSelectedLayouts.size > 1 ? { layouts: [...batchSelectedLayouts] } : batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default') ? { layout: [...batchSelectedLayouts][0] } : {}),
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -466,6 +555,7 @@
 							format: batchRenderCsvParams.format,
 							quality: batchRenderCsvParams.quality,
 							concurrency: batchRenderCsvParams.concurrency,
+							...(batchCsvSelectedLayouts.size > 1 ? { layouts: [...batchCsvSelectedLayouts] } : batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default') ? { layout: [...batchCsvSelectedLayouts][0] } : {}),
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -499,7 +589,6 @@
 			responseJson = JSON.stringify(data, null, 2);
 			toast.set({ message: 'Request successful!', type: 'success', duration: 1500 });
 		} catch (error) {
-			console.error('Error:', error);
 			response = error.response?.data || { error: error.message };
 			responseJson = JSON.stringify(response, null, 2);
 			toast.set({
@@ -677,7 +766,9 @@
 			payload: {
 				variables: JSON.parse(renderTemplateParams.variables || '{}'),
 				format: renderTemplateParams.format,
-				quality: renderTemplateParams.quality
+				quality: renderTemplateParams.quality,
+				...(playgroundSelectedLayouts.size > 1 ? { layouts: [...playgroundSelectedLayouts] } : {}),
+				...(playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default') ? { layout: [...playgroundSelectedLayouts][0] } : {}),
 			},
 			requiresAuth: true
 		},
@@ -689,7 +780,8 @@
 				variableSets: JSON.parse(batchRenderParams.variableSets || '[]'),
 				format: batchRenderParams.format,
 				quality: batchRenderParams.quality,
-				concurrency: batchRenderParams.concurrency
+				concurrency: batchRenderParams.concurrency,
+				...(batchSelectedLayouts.size > 1 ? { layouts: [...batchSelectedLayouts] } : batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default') ? { layout: [...batchSelectedLayouts][0] } : {})
 			},
 			requiresAuth: true
 		},
@@ -702,7 +794,8 @@
 				mappings: JSON.parse(batchRenderCsvParams.mappings || '{}'),
 				format: batchRenderCsvParams.format,
 				quality: batchRenderCsvParams.quality,
-				concurrency: batchRenderCsvParams.concurrency
+				concurrency: batchRenderCsvParams.concurrency,
+				...(batchCsvSelectedLayouts.size > 1 ? { layouts: [...batchCsvSelectedLayouts] } : batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default') ? { layout: [...batchCsvSelectedLayouts][0] } : {})
 			},
 			requiresAuth: true
 		},
@@ -1447,6 +1540,62 @@
 										/>
 									</div>
 								</div>
+								<!-- Layout selector -->
+								{#if playgroundAvailableLayouts.length > 1}
+									<div>
+										<div class="flex items-center justify-between mb-2">
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+												>Layouts to Render</label
+											>
+											<button
+												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider transition-colors"
+												on:click={toggleAllPlaygroundLayouts}
+											>
+												{playgroundSelectedLayouts.size === playgroundAvailableLayouts.length ? 'Deselect All' : 'Select All'}
+											</button>
+										</div>
+										<div class="grid grid-cols-2 gap-2">
+											{#each playgroundAvailableLayouts as layout}
+												<button
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(layout.key)
+														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														: 'bg-white border-gray-200 hover:border-gray-900'}"
+													on:click={() => togglePlaygroundLayout(layout.key)}
+												>
+													<div class="flex items-center gap-2">
+														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{playgroundSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+															{#if playgroundSelectedLayouts.has(layout.key)}
+																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																</svg>
+															{/if}
+														</div>
+														<div>
+															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+														</div>
+													</div>
+												</button>
+											{/each}
+										</div>
+										<p class="text-[10px] text-gray-500 mt-1">{playgroundSelectedLayouts.size} of {playgroundAvailableLayouts.length} selected</p>
+									</div>
+								{:else}
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Layout <span class="text-gray-400 normal-case">(optional)</span></label
+										>
+										<input
+											type="text"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											bind:value={renderTemplateParams.layout}
+											placeholder="e.g. twitter-post, facebook-post"
+										/>
+										<p class="text-[10px] text-gray-500 mt-1">Leave empty for default layout.</p>
+									</div>
+								{/if}
 							</div>
 						{:else if selectedEndpoint === 'batch-render'}
 							<div class="space-y-4">
@@ -1609,6 +1758,46 @@
 										/>
 									</div>
 								</div>
+								{#if batchAvailableLayouts.length > 1}
+									<div>
+										<div class="flex items-center justify-between mb-2">
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Layouts</label>
+											<button
+												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
+												on:click={() => {
+													if (batchSelectedLayouts.size === batchAvailableLayouts.length) batchSelectedLayouts = new Set(['default']);
+													else batchSelectedLayouts = new Set(batchAvailableLayouts.map(l => l.key));
+												}}
+											>{batchSelectedLayouts.size === batchAvailableLayouts.length ? 'Deselect All' : 'Select All'}</button>
+										</div>
+										<div class="grid grid-cols-2 gap-2">
+											{#each batchAvailableLayouts as layout}
+												<button
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(layout.key)
+														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														: 'bg-white border-gray-200 hover:border-gray-900'}"
+													on:click={() => toggleBatchLayout(layout.key)}
+												>
+													<div class="flex items-center gap-2">
+														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{batchSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+															{#if batchSelectedLayouts.has(layout.key)}
+																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																</svg>
+															{/if}
+														</div>
+														<div>
+															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+														</div>
+													</div>
+												</button>
+											{/each}
+										</div>
+										<p class="text-[10px] text-gray-500 mt-1">{batchSelectedLayouts.size} selected</p>
+									</div>
+								{/if}
 							</div>
 						{:else if selectedEndpoint === 'batch-render-csv'}
 							<div class="space-y-4">
@@ -1784,6 +1973,46 @@
 										/>
 									</div>
 								</div>
+								{#if batchCsvAvailableLayouts.length > 1}
+									<div>
+										<div class="flex items-center justify-between mb-2">
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Layouts</label>
+											<button
+												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
+												on:click={() => {
+													if (batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length) batchCsvSelectedLayouts = new Set(['default']);
+													else batchCsvSelectedLayouts = new Set(batchCsvAvailableLayouts.map(l => l.key));
+												}}
+											>{batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length ? 'Deselect All' : 'Select All'}</button>
+										</div>
+										<div class="grid grid-cols-2 gap-2">
+											{#each batchCsvAvailableLayouts as layout}
+												<button
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(layout.key)
+														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														: 'bg-white border-gray-200 hover:border-gray-900'}"
+													on:click={() => toggleBatchCsvLayout(layout.key)}
+												>
+													<div class="flex items-center gap-2">
+														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{batchCsvSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+															{#if batchCsvSelectedLayouts.has(layout.key)}
+																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																</svg>
+															{/if}
+														</div>
+														<div>
+															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+														</div>
+													</div>
+												</button>
+											{/each}
+										</div>
+										<p class="text-[10px] text-gray-500 mt-1">{batchCsvSelectedLayouts.size} selected</p>
+									</div>
+								{/if}
 							</div>
 						{:else if selectedEndpoint === 'batch-status'}
 							<div>

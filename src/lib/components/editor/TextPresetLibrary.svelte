@@ -476,9 +476,7 @@
 				await document.fonts.load(
 					`${element.fontWeight} ${element.fontSize}px "${element.fontFamily}"`
 				);
-			} catch (e) {
-				console.error(`Failed to load font ${element.fontFamily}`, e);
-			}
+			} catch (e) { /* ignored */ }
 		}
 
 		// Create text objects

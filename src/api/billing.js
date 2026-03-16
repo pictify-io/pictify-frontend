@@ -21,7 +21,6 @@ export async function getBillingDashboard({ refresh = false } = {}) {
 		const response = await backend.get(url);
 		return response;
 	} catch (error) {
-		console.error('Failed to get billing dashboard:', error);
 		return {
 			subscription: null,
 			invoices: [],
@@ -45,7 +44,6 @@ export async function getSubscription() {
 		const response = await backend.get('/api/billing/subscription');
 		return response;
 	} catch (error) {
-		console.error('Failed to get subscription:', error);
 		return null;
 	}
 }
@@ -114,7 +112,6 @@ export async function getInvoices({ limit = 10 } = {}) {
 		const response = await backend.get('/api/billing/invoices', { params: { limit } });
 		return response.invoices || [];
 	} catch (error) {
-		console.error('Failed to get invoices:', error);
 		return [];
 	}
 }
@@ -130,7 +127,6 @@ export async function getTimeline({ limit = 20 } = {}) {
 		const response = await backend.get('/api/billing/timeline', { params: { limit } });
 		return response.timeline || [];
 	} catch (error) {
-		console.error('Failed to get timeline:', error);
 		return [];
 	}
 }
@@ -148,7 +144,6 @@ export async function getBillingPreferences() {
 		const response = await backend.get('/api/billing-preferences');
 		return response;
 	} catch (error) {
-		console.error('Failed to get billing preferences:', error);
 		return {
 			allowOverages: false,
 			spendingCapCents: null,
@@ -174,7 +169,6 @@ export async function updateBillingPreferences({ allowOverages, spendingCapCents
 		});
 		return response;
 	} catch (error) {
-		console.error('Failed to update billing preferences:', error);
 		throw error;
 	}
 }
@@ -188,7 +182,6 @@ export async function getOverageInvoices() {
 		const response = await backend.get('/api/billing-preferences/overage-invoices');
 		return response;
 	} catch (error) {
-		console.error('Failed to get overage invoices:', error);
 		return { invoices: [], entityType: 'user' };
 	}
 }
@@ -202,7 +195,6 @@ export async function getOverageSummary() {
 		const response = await backend.get('/api/billing-preferences/overage-summary');
 		return response;
 	} catch (error) {
-		console.error('Failed to get overage summary:', error);
 		return {
 			allowOverages: false,
 			currentCycleOverages: 0,

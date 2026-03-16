@@ -301,7 +301,40 @@
 				</div>
 			{/if}
 
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+			<!-- Save as template — full-width horizontal card -->
+			<div class="border-[3px] border-black bg-[#FFFDF8] shadow-[4px_4px_0_0_#000] p-5">
+				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+					<div class="flex-1">
+						<h4 class="text-sm font-black uppercase tracking-widest">Save as template</h4>
+						<p class="text-xs font-bold text-gray-600 mt-2">
+							Open the template workspace and start from this design. Then bind variables and batch
+							render variants.
+						</p>
+					</div>
+					<div class="flex flex-col sm:flex-row gap-2 sm:flex-shrink-0">
+						<button
+							class="py-3 px-6 bg-[#ff6b6b] text-white border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap"
+							type="button"
+							on:click={saveDraftAndOpenWorkspace}
+							disabled={!templateDraft}
+						>
+							{isLoggedIn ? 'Open template workspace' : 'Create free account + save'}
+						</button>
+						{#if templateDraft?.backgroundImageUrl}
+							<button
+								class="py-2 px-4 bg-white text-black border-[2px] border-black font-black uppercase tracking-wide shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs whitespace-nowrap"
+								type="button"
+								on:click={() => copy(templateDraft.backgroundImageUrl, 'Background URL copied')}
+							>
+								Copy background URL
+							</button>
+						{/if}
+					</div>
+				</div>
+			</div>
+
+			<!-- API request + Batch example — two-column on wider screens -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
 				<!-- Copy API request -->
 				<div class="border-[3px] border-black bg-[#FFFDF8] shadow-[4px_4px_0_0_#000] p-5">
 					<div class="flex items-center justify-between gap-3">
@@ -322,37 +355,6 @@
 						class="mt-4 text-xs font-mono bg-white border-[2px] border-black p-3 overflow-auto max-h-48">{truncate(
 							curlSnippet || 'Add a curlSnippet to enable copying.'
 						)}</pre>
-				</div>
-
-				<!-- Save as template -->
-				<div class="border-[3px] border-black bg-[#FFFDF8] shadow-[4px_4px_0_0_#000] p-5">
-					<div class="flex items-center justify-between gap-3">
-						<h4 class="text-sm font-black uppercase tracking-widest">Save as template</h4>
-					</div>
-					<p class="text-xs font-bold text-gray-600 mt-2">
-						Open the template workspace and start from this design. Then bind variables and batch
-						render variants.
-					</p>
-
-					<div class="mt-4 space-y-2">
-						<button
-							class="w-full py-3 bg-[#ff6b6b] text-white border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							type="button"
-							on:click={saveDraftAndOpenWorkspace}
-							disabled={!templateDraft}
-						>
-							{isLoggedIn ? 'Open template workspace' : 'Create free account + save'}
-						</button>
-						{#if templateDraft?.backgroundImageUrl}
-							<button
-								class="w-full py-2 bg-white text-black border-[2px] border-black font-black uppercase tracking-wide shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs"
-								type="button"
-								on:click={() => copy(templateDraft.backgroundImageUrl, 'Background URL copied')}
-							>
-								Copy background URL
-							</button>
-						{/if}
-					</div>
 				</div>
 
 				<!-- Batch example -->

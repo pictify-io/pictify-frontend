@@ -22,7 +22,9 @@ export const template = writable({
 	// PDF support
 	outputFormat: 'image',
 	pdfPreset: 'A4',
-	pages: []
+	pages: [],
+	// Layout variants (multi-size resize)
+	layouts: {}
 });
 
 export const templates = writable([]);
@@ -70,7 +72,6 @@ export const getTemplatesAction = async ({
 		}
 		return response;
 	} catch (error) {
-		console.error('Error fetching templates:', error);
 		templates.set([]);
 		return { templates: [], pagination: null };
 	}
@@ -93,6 +94,7 @@ export const getTemplateAction = async (uid) => {
 			outputFormat: 'image',
 			pdfPreset: 'A4',
 			pages: [],
+			layouts: {},
 			_loading: true // Optional flag to indicate loading state
 		});
 
@@ -111,7 +113,8 @@ export const getTemplateAction = async (uid) => {
 				type: null,
 				outputFormat: 'image',
 				pdfPreset: 'A4',
-				pages: []
+				pages: [],
+				layouts: {}
 			});
 			return null;
 		}
@@ -119,7 +122,6 @@ export const getTemplateAction = async (uid) => {
 		template.set(response.template);
 		return response.template;
 	} catch (error) {
-		console.error('Error fetching template:', error);
 		return null;
 	}
 };
@@ -134,7 +136,6 @@ export const createTemplateAction = async (templateData) => {
 		templates.update((t) => [...t, response.template]);
 		return response.template;
 	} catch (error) {
-		console.error('Error creating template:', error);
 		return null;
 	}
 };
@@ -155,7 +156,6 @@ export const updateTemplateAction = async (templateData) => {
 		});
 		return response.template;
 	} catch (error) {
-		console.error('Error updating template:', error);
 		return null;
 	}
 };
@@ -169,7 +169,6 @@ export const deleteTemplateAction = async (uid) => {
 		}
 		return false;
 	} catch (error) {
-		console.error('Error deleting template:', error);
 		return false;
 	}
 };
@@ -199,7 +198,6 @@ export const searchTemplatesAction = async (query, { page = 1, limit = 12 } = {}
 		}
 		return response;
 	} catch (error) {
-		console.error('Error searching templates:', error);
 		templates.set([]);
 		return { templates: [], pagination: null };
 	}
@@ -214,7 +212,6 @@ export const getTemplatesForTypeAction = async (type) => {
 		}
 		templates.set(response.templates);
 	} catch (error) {
-		console.error('Error fetching templates by type:', error);
 		templates.set([]);
 	}
 };

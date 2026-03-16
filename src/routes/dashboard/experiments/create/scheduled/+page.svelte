@@ -11,6 +11,7 @@
 	} from '../../../../../store/experiments.store';
 	import { toast } from '../../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
+	import { analytics } from '$lib/analytics.js';
 	import { getTemplatesAction, templates } from '../../../../../store/template.store';
 	import { getTemplateById } from '../../../../../api/template';
 	import WizardStepper from '$lib/components/dashboard/WizardStepper.svelte';
@@ -211,7 +212,6 @@
 				}
 			}
 		} catch (err) {
-			console.error('Failed to load experiment for editing:', err);
 			toast.set({ message: 'Failed to load experiment', type: 'error' });
 		}
 	}
@@ -257,7 +257,7 @@
 				}
 			}
 		} catch (err) {
-			console.error('Failed to fetch template variables:', err);
+			/* ignored */
 		}
 	}
 
@@ -433,9 +433,12 @@
 			} else {
 				const created = await createExperimentAction(payload);
 				if (created?.uid) {
+					analytics.trackExperimentCreated({ type: 'scheduled', variant_count: payload.variants?.length || 2 });
+					analytics.trackExperimentWizardCompleted({ type: 'scheduled' });
 					if (startAfterCreate) {
 						try {
 							await startExperimentAction(created.uid);
+							analytics.trackExperimentStarted({ type: 'scheduled', uid: created.uid });
 							toast.set({ message: 'Scheduled experiment created and launched!', type: 'success' });
 						} catch {
 							toast.set({ message: 'Created but failed to launch.', type: 'warning' });

@@ -27,7 +27,6 @@ export const generateSwarm = async (prompt, canvasState, options = {}) => {
 		});
 		return response;
 	} catch (error) {
-		console.error('Error in generateSwarm:', error);
 		throw error;
 	}
 };
@@ -119,7 +118,7 @@ export const streamSwarmGenerate = async ({
 								onError?.(new Error(parsed.message || 'Unknown error'));
 							}
 						} catch (error) {
-							console.warn('Failed to parse SSE payload', error);
+							/* ignored */
 						}
 					}
 				}
@@ -142,7 +141,6 @@ export const streamSwarmGenerate = async ({
 				if (controller.signal.aborted) {
 					return;
 				}
-				console.error('Copilot stream error:', error);
 				onError?.(error);
 			}
 		})();
@@ -152,7 +150,6 @@ export const streamSwarmGenerate = async ({
 		};
 	} catch (error) {
 		controller.abort();
-		console.error('Error starting copilot stream:', error);
 		onError?.(error);
 		throw error;
 	}

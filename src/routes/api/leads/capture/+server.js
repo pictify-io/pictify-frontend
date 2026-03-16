@@ -19,15 +19,6 @@ export async function POST({ request }) {
 		}
 
 		// Log the lead capture (in production, this would go to a database or CRM)
-		console.log('[Lead Capture]', {
-			email,
-			source: source || 'unknown',
-			toolName: toolName || null,
-			generatedUrl: generatedUrl || null,
-			timestamp: new Date().toISOString(),
-			userAgent: request.headers.get('user-agent'),
-			referer: request.headers.get('referer')
-		});
 
 		// TODO: In production, implement one of these:
 		// 1. Save to database
@@ -51,7 +42,6 @@ export async function POST({ request }) {
 			message: 'Lead captured successfully'
 		});
 	} catch (error) {
-		console.error('[Lead Capture Error]', error);
 		return json({ error: 'Failed to capture lead' }, { status: 500 });
 	}
 }

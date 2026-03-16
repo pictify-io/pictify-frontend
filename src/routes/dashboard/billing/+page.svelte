@@ -86,7 +86,6 @@
 				.filter((plan) => plan && typeof plan.request_per_month === 'number')
 				.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
 		} catch (err) {
-			console.error('Failed to load plans:', err);
 			error = 'Failed to load pricing plans. Please try again.';
 		} finally {
 			isLoading = false;

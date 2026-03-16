@@ -99,7 +99,6 @@
 				// Keep open for iteration, but maybe show success state?
 			}
 		} catch (err) {
-			console.error(err);
 			error = 'Failed to update. Try a different prompt.';
 		} finally {
 			isLoading = false;

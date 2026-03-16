@@ -162,7 +162,6 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 			apiUrl.searchParams.append('token', apiKey);
 		}
 
-		console.log('Making request to:', apiUrl.toString());
 
 		const response = await fetch(apiUrl, {
 			method: 'POST',
@@ -172,8 +171,6 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 			body: JSON.stringify({ prompt })
 		});
 
-		console.log('Response status:', response.status);
-		console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
 		if (!response.ok) {
 			let errorMessage = `HTTP error! status: ${response.status}`;
@@ -181,7 +178,6 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 			// Try to get error details from response
 			try {
 				const errorText = await response.text();
-				console.error('Error response body:', errorText);
 
 				// Try to parse as JSON
 				try {
@@ -191,7 +187,7 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 					errorMessage += ` - ${errorText}`;
 				}
 			} catch (e) {
-				console.error('Could not read error response:', e);
+				/* ignored */
 			}
 
 			throw new Error(errorMessage);
@@ -212,7 +208,6 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 				const { done, value } = await reader.read();
 
 				if (done) {
-					console.log('Stream ended');
 					break;
 				}
 
@@ -235,7 +230,7 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 							const parsed = JSON.parse(data);
 							onMessage(parsed);
 						} catch (e) {
-							console.error('Error parsing SSE data:', e, 'Raw data:', data);
+							/* ignored */
 						}
 					}
 				}
@@ -244,7 +239,6 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 			reader.releaseLock();
 		}
 	} catch (error) {
-		console.error('createAgentScreenshotStream error:', error);
 		throw error;
 	}
 };

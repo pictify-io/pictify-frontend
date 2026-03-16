@@ -162,7 +162,7 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, PDF, or video.
+						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, or PDF.
 						{#if activeStep === 2 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"

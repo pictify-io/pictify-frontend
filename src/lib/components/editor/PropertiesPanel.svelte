@@ -427,9 +427,7 @@
 					try {
 						const response = await searchFonts(query, true);
 						extendedSearchResults = (response.fonts || []).filter((f) => f.source === 'google');
-					} catch (error) {
-						console.error('Extended search failed:', error);
-					} finally {
+					} catch (error) { /* ignored */ } finally {
 						isSearchingGoogle = false;
 					}
 				}
@@ -540,15 +538,12 @@
 					// Prepend brand fonts to show them first
 					allFonts = [...brandFontObjects, ...allFonts];
 				}
-			} catch (error) {
-				console.warn('Failed to load brand fonts:', error);
-			}
+			} catch (error) { /* ignored */ }
 
 			// Preload popular fonts for preview
 			const popularFonts = allFonts.filter((f) => f.popular).slice(0, 20);
 			preloadFonts(popularFonts);
 		} catch (error) {
-			console.error('Failed to fetch fonts:', error);
 			// Use fallback fonts
 			allFonts = [
 				{ family: 'Roboto', category: 'sans-serif', weights: [400, 700], popular: true },
@@ -579,9 +574,7 @@
 
 		try {
 			await document.fonts.load(`12px "${font}"`);
-		} catch (e) {
-			console.warn(`Font load warning for ${font}:`, e.message);
-		}
+		} catch (e) { /* ignored */ }
 	}
 
 	// Debounce timer for property changes to prevent saving intermediate states
@@ -698,7 +691,6 @@
 				extendedSearchResults = [];
 			}
 		} catch (e) {
-			console.error('Error adding custom font:', e);
 			addFontError = e.message || 'Failed to add font. Please check the font name or URL.';
 		} finally {
 			addingFont = false;
@@ -1638,7 +1630,6 @@
 			if (!newData) {
 				newData = JSON.parse(chartDataInput);
 				if (!Array.isArray(newData)) {
-					console.error('Chart data must be an array');
 					return;
 				}
 			}
@@ -1666,7 +1657,6 @@
 			$editor.setActiveObject(newChart);
 			$editor.renderAll();
 		} catch (error) {
-			console.error('Failed to update chart data:', error);
 			showToast('Failed to update chart data: ' + (error.message || 'Unknown error'), 'error');
 		}
 	}
@@ -1688,7 +1678,6 @@
 			$editor.setActiveObject(newTable);
 			$editor.renderAll();
 		} catch (error) {
-			console.error('Failed to update table data:', error);
 			showToast('Failed to update table data: ' + (error.message || 'Unknown error'), 'error');
 		}
 	}
@@ -2125,7 +2114,6 @@
 				tableCustomColors = null;
 			}
 		} catch (error) {
-			console.error('Failed to change table style:', error);
 			showToast('Failed to change table style', 'error');
 		}
 	}
@@ -2199,7 +2187,6 @@
 				$editor.renderAll();
 			}
 		} catch (error) {
-			console.error('Failed to update chart appearance:', error);
 			showToast('Failed to update chart appearance', 'error');
 		}
 	}
@@ -2267,7 +2254,6 @@
 				$editor.renderAll();
 			}
 		} catch (error) {
-			console.error('Failed to update table appearance:', error);
 			showToast('Failed to update table appearance', 'error');
 		}
 	}
@@ -2316,7 +2302,6 @@
 			qrData = formattedData;
 			debouncedPropertyChange(newQR);
 		} catch (error) {
-			console.error('Failed to update QR code:', error);
 			showToast('Failed to update QR code', 'error');
 		}
 	}
@@ -2342,7 +2327,6 @@
 			qrConfig = newConfig;
 			debouncedPropertyChange(newQR);
 		} catch (error) {
-			console.error('Failed to update QR code config:', error);
 			showToast('Failed to update QR code config', 'error');
 		}
 	}
@@ -2708,12 +2692,6 @@
 
 			isRemovingBackground = false;
 		} catch (error) {
-			console.error('[Background Removal] Error:', error);
-			console.error('[Background Removal] Error details:', {
-				status: error.status,
-				message: error.message,
-				stack: error.stack
-			});
 
 			// Remove loading overlay on error
 			if (loadingOverlay) {

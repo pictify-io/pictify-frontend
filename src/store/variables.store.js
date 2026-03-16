@@ -618,7 +618,7 @@ export const variableActions = {
 				}
 			});
 		} catch (error) {
-			console.error('Failed to import variables:', error);
+			/* ignored */
 		}
 	},
 

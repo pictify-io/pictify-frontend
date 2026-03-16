@@ -236,7 +236,7 @@
 					>
 					<span>50 free credits/mo</span>
 					<span class="w-1.5 h-1.5 rounded-full bg-gray-300 mx-1" />
-					<span>Plans from $39</span>
+					<span>Plans from $15</span>
 				</div>
 			</div>
 		</div>

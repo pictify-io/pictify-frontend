@@ -143,13 +143,10 @@
 
 			// Log warnings for partial failures
 			if (variablesRes.status === 'rejected') {
-				console.warn('Failed to load variables:', variablesRes.reason);
 			}
 			if (bindingsRes.status === 'rejected') {
-				console.warn('Failed to load bindings:', bindingsRes.reason);
 			}
 			if (dataSourcesRes.status === 'rejected') {
-				console.warn('Failed to load data sources:', dataSourcesRes.reason);
 			}
 
 			// If there's an existing binding, load it
@@ -191,7 +188,6 @@
 		} catch (error) {
 			// Check if component is still mounted before setting error state
 			if (!mounted || thisLoad !== loadVersion) return;
-			console.error('Error loading data:', error);
 			toast.set({ message: 'Failed to load data', type: 'error', duration: 3000 });
 		} finally {
 			if (mounted && thisLoad === loadVersion) {

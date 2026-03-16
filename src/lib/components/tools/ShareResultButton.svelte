@@ -76,7 +76,6 @@
 				}
 			}
 		} catch (e) {
-			console.error('Failed to create share:', e);
 			toast.set({
 				message: e.message || 'Failed to create share link',
 				type: 'error',

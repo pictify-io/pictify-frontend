@@ -120,7 +120,6 @@ export const initBilling = async ({ refresh = false } = {}) => {
 
 		return dashboard;
 	} catch (error) {
-		console.error('Failed to init billing:', error);
 		billingState.update((s) => ({
 			...s,
 			loading: false,
@@ -139,7 +138,6 @@ export const refreshSubscription = async () => {
 		billingState.update((s) => ({ ...s, subscription }));
 		return subscription;
 	} catch (error) {
-		console.error('Failed to refresh subscription:', error);
 		return null;
 	}
 };
@@ -153,7 +151,6 @@ export const refreshInvoices = async (limit = 10) => {
 		billingState.update((s) => ({ ...s, invoices }));
 		return invoices;
 	} catch (error) {
-		console.error('Failed to refresh invoices:', error);
 		return [];
 	}
 };
@@ -167,7 +164,6 @@ export const refreshTimeline = async (limit = 20) => {
 		billingState.update((s) => ({ ...s, timeline }));
 		return timeline;
 	} catch (error) {
-		console.error('Failed to refresh timeline:', error);
 		return [];
 	}
 };
@@ -185,7 +181,6 @@ export const doPauseSubscription = async ({ resumesAt } = {}) => {
 		await initBilling({ refresh: true });
 		return { success: true };
 	} catch (error) {
-		console.error('Failed to pause subscription:', error);
 		return { success: false, error: error.message || 'Failed to pause subscription' };
 	} finally {
 		billingActions.update((a) => ({ ...a, pausing: false }));
@@ -203,7 +198,6 @@ export const doResumeSubscription = async () => {
 		await initBilling({ refresh: true });
 		return { success: true };
 	} catch (error) {
-		console.error('Failed to resume subscription:', error);
 		return { success: false, error: error.message || 'Failed to resume subscription' };
 	} finally {
 		billingActions.update((a) => ({ ...a, resuming: false }));
@@ -221,7 +215,6 @@ export const doCancelSubscription = async () => {
 		await initBilling({ refresh: true });
 		return { success: true };
 	} catch (error) {
-		console.error('Failed to cancel subscription:', error);
 		return { success: false, error: error.message || 'Failed to cancel subscription' };
 	} finally {
 		billingActions.update((a) => ({ ...a, cancelling: false }));
@@ -239,7 +232,6 @@ export const doReactivateSubscription = async () => {
 		await initBilling({ refresh: true });
 		return { success: true };
 	} catch (error) {
-		console.error('Failed to reactivate subscription:', error);
 		return { success: false, error: error.message || 'Failed to reactivate subscription' };
 	} finally {
 		billingActions.update((a) => ({ ...a, reactivating: false }));

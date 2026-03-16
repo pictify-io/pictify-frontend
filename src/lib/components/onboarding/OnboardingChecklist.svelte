@@ -43,9 +43,7 @@
 	async function handleDismiss() {
 		try {
 			await dismissOnboardingAction();
-		} catch (error) {
-			console.error('Failed to dismiss onboarding:', error);
-		}
+		} catch (error) { /* ignored */ }
 	}
 
 	function handleToggleCollapse() {

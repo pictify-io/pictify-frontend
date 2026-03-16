@@ -47,6 +47,7 @@
 	let editorTemplate = null;
 	let figmaImportHandled = false;
 	let hasLoadedTemplate = false; // Track if we've already loaded the template
+	let currentLayoutKey = null; // Active layout key, bound from EditorLayout
 
 	/**
 	 * Recursively flatten nested groups so only leaf objects remain.
@@ -97,15 +98,6 @@
 			const data = await backend.get(`/figma/plugin/import/${figmaImportId}`);
 			if (!data.nodeTree) return;
 
-			console.log(
-				'[FigmaAutoImport] Input nodeTree:',
-				data.nodeTree?.type,
-				data.nodeTree?.name,
-				'children:',
-				data.nodeTree?.children?.length
-			);
-			console.log('[FigmaAutoImport] Fallback images:', Object.keys(data.fallbackImages || {}));
-			console.log('[FigmaAutoImport] Metadata:', data.metadata);
 
 			const result = await convertFigmaToFabric(data.nodeTree, {
 				fallbackImages: data.fallbackImages || {},
@@ -113,17 +105,8 @@
 			});
 			const { objects, fonts, _debug } = result;
 
-			console.log('[FigmaAutoImport] Conversion result:', {
-				objectCount: objects.length,
-				fonts: [...fonts],
-				errors: _debug?.errors || [],
-				errorCount: _debug?.errorCount || 0,
-				elapsed: _debug?.elapsed
-			});
 
 			if (_debug?.errorCount > 0) {
-				console.warn(`[FigmaAutoImport] ${_debug.errorCount} conversion errors — check debug logs`);
-				console.log('[FigmaAutoImport] Debug dump:', JSON.stringify(_debug, null, 2));
 			}
 
 			if (objects.length === 0) return;
@@ -138,7 +121,6 @@
 
 			// Flatten nested groups so all elements are directly accessible
 			const flatObjects = flattenNestedGroups(objects);
-			console.log(`[FigmaAutoImport] Flattened ${objects.length} objects → ${flatObjects.length} leaf objects`);
 
 			const importGroup = new Group(flatObjects, {
 				figmaImport: true,
@@ -175,8 +157,6 @@
 				duration: 3000
 			});
 		} catch (err) {
-			console.error('[FigmaAutoImport] Failed:', err);
-			console.error('[FigmaAutoImport] Stack:', err?.stack);
 			toast.set({
 				message: 'Failed to load Figma import: ' + (err.message || 'Unknown error'),
 				type: 'error',
@@ -317,7 +297,6 @@
 
 		const variables = Array.from(variableMap.values());
 
-		console.log('Extracted variables:', variables);
 
 		return variables;
 	}
@@ -388,7 +367,6 @@
 			if (!obj.id) {
 				const uniqueId = `obj_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`;
 				obj.id = uniqueId; // Direct property assignment
-				console.log('Assigned ID to object:', obj.type, uniqueId);
 			}
 		});
 	}
@@ -530,11 +508,6 @@
 			const fabricJSData = serializeCanvasWithCustomProps();
 
 			// Debug: Log what we're saving
-			console.log('Saving fabricJSData:', fabricJSData);
-			console.log(
-				'Objects with IDs:',
-				fabricJSData?.objects?.map((o) => ({ type: o.type, id: o.id, isVariable: o.isVariable }))
-			);
 
 			const width = fabricCanvas.width;
 			const height = fabricCanvas.height;
@@ -547,17 +520,33 @@
 				i === currentIndex ? { ...p, fabricJSData } : p
 			);
 
+			// Handle layout-aware save (H5): active canvas goes to correct slot
+			const storeData = get(template);
+			let layoutsForSave = { ...(storeData.layouts || {}) };
+			let defaultFabricData = fabricJSData;
+
+			if (currentLayoutKey && layoutsForSave[currentLayoutKey]) {
+				// Viewing a non-default layout — live canvas belongs to that layout
+				layoutsForSave[currentLayoutKey] = {
+					...layoutsForSave[currentLayoutKey],
+					fabricJSData
+				};
+				// Default stays from store (was saved on last layout switch)
+				defaultFabricData = storeData.fabricJSData;
+			}
+
 			const templateData = {
 				...editorTemplate,
 				name: templateName,
-				fabricJSData,
-				width,
-				height,
+				fabricJSData: defaultFabricData,
+				width: currentLayoutKey === null ? width : (storeData.width || width),
+				height: currentLayoutKey === null ? height : (storeData.height || height),
 				type: templateType,
 				variableDefinitions,
 				outputFormat: get(outputFormat),
 				pdfPreset: get(pdfPreset),
-				pages: updatedPages
+				pages: updatedPages,
+				layouts: layoutsForSave
 			};
 
 			const result = await updateTemplateAction(templateData);
@@ -565,7 +554,7 @@
 				// Draft is now saved; clear it.
 				try {
 					localStorage.removeItem(DRAFT_KEY);
-				} catch (e) {}
+				} catch (e) { /* ignored */ }
 
 				// Update the template store with the updated template
 				template.set(result);
@@ -581,7 +570,6 @@
 				toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
 			}
 		} catch (error) {
-			console.error('Error updating template:', error);
 			toast.set({ message: 'Failed to update template', type: 'error', duration: 1500 });
 		} finally {
 			isSaving = false;
@@ -629,7 +617,7 @@
 				// Draft is now saved; clear it.
 				try {
 					localStorage.removeItem(DRAFT_KEY);
-				} catch (e) {}
+				} catch (e) { /* ignored */ }
 
 				// Update the template store with the created template (includes UID)
 				// This allows the Variables panel to immediately test the API
@@ -654,7 +642,6 @@
 				toast.set({ message: 'Failed to create template', type: 'error', duration: 1500 });
 			}
 		} catch (error) {
-			console.error('Error creating template:', error);
 			toast.set({ message: 'Failed to create template', type: 'error', duration: 1500 });
 		} finally {
 			isSaving = false;
@@ -662,7 +649,6 @@
 	};
 
 	const saveTemplate = async () => {
-		console.log('CreateTemplate: saveTemplate called', { isEdit, templateName });
 		if (guestMode) {
 			// Persist the current canvas as a draft, then prompt signup.
 			try {
@@ -678,7 +664,7 @@
 					};
 					localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 				}
-			} catch (e) {}
+			} catch (e) { /* ignored */ }
 
 			toast.set({
 				message: 'Create a free account to save templates and use the API.',
@@ -699,36 +685,16 @@
 	 * Load template data into the canvas with proper handling for custom properties
 	 */
 	function loadTemplateIntoCanvas() {
-		console.log('loadTemplateIntoCanvas called:', {
-			hasFabricCanvas: !!fabricCanvas,
-			hasEditorTemplate: !!editorTemplate,
-			hasFabricJSData: !!editorTemplate?.fabricJSData,
-			hasLoadedTemplate,
-			templateUid: editorTemplate?.uid
-		});
 
 		if (!fabricCanvas || !editorTemplate?.fabricJSData || hasLoadedTemplate) {
-			console.log('loadTemplateIntoCanvas returning early - condition not met');
 			return;
 		}
 
-		console.log(
-			'Loading template into canvas:',
-			editorTemplate.uid,
-			'with',
-			editorTemplate.fabricJSData?.objects?.length,
-			'objects'
-		);
 		hasLoadedTemplate = true;
 
 		// Load saved variable definitions BEFORE canvas sync
 		// This ensures user-specified types are preserved when syncFromCanvas runs
 		if (editorTemplate.variableDefinitions && editorTemplate.variableDefinitions.length > 0) {
-			console.log(
-				'Loading variable definitions from template:',
-				editorTemplate.variableDefinitions.length,
-				'variables'
-			);
 			variableActions.loadFromDefinitions(editorTemplate.variableDefinitions);
 		}
 
@@ -749,14 +715,6 @@
 			});
 		}
 
-		console.log(
-			'Loading template with variableBindings:',
-			fabricData.objects?.map((o) => ({
-				id: o.id,
-				isVariable: o.isVariable,
-				bindings: o.variableBindings
-			}))
-		);
 
 		// Fabric.js v6 loadFromJSON returns a Promise
 		const loadPromise = fabricCanvas.loadFromJSON(fabricData);
@@ -764,7 +722,6 @@
 		if (loadPromise && typeof loadPromise.then === 'function') {
 			loadPromise
 				.then(() => {
-					console.log('loadFromJSON promise resolved');
 
 					// Get all canvas objects
 					const objects = fabricCanvas.getObjects();
@@ -784,22 +741,14 @@
 									isVariable: true,
 									variableBindings: objData.variableBindings
 								});
-								console.log(
-									'Restored variable bindings to object:',
-									obj.id,
-									obj.type,
-									objData.variableBindings
-								);
 							}
 
 							// Conditional logic properties
 							if (objData.showWhen !== undefined && objData.showWhen !== null) {
 								obj.set('showWhen', objData.showWhen);
-								console.log('Restored showWhen to object:', obj.id, objData.showWhen);
 							}
 							if (objData.hideWhen !== undefined && objData.hideWhen !== null) {
 								obj.set('hideWhen', objData.hideWhen);
-								console.log('Restored hideWhen to object:', obj.id, objData.hideWhen);
 							}
 
 							// Loop/repeat properties
@@ -812,7 +761,6 @@
 									loopSpacing: objData.loopSpacing || 50,
 									loopColumns: objData.loopColumns || 3
 								});
-								console.log('Restored loop properties to object:', obj.id, objData.loopVariable);
 							}
 
 							// Chart properties
@@ -823,7 +771,6 @@
 									chartData: objData.chartData || [],
 									chartConfig: objData.chartConfig || {}
 								});
-								console.log('Restored chart properties to object:', obj.id, objData.chartType);
 							}
 
 							// Table properties
@@ -837,7 +784,6 @@
 									tableConfig: objData.tableConfig || {},
 									tableStyle: objData.tableStyle || 'modern'
 								});
-								console.log('Restored table properties to object:', obj.id, objData.tableType);
 							}
 
 							// QR Code properties
@@ -847,7 +793,6 @@
 									qrData: objData.qrData || '',
 									qrConfig: objData.qrConfig || {}
 								});
-								console.log('Restored QR code properties to object:', obj.id, objData.qrData);
 							}
 						}
 					});
@@ -858,13 +803,6 @@
 
 					// Log variable count for debugging
 					const variableCount = objects.filter((o) => o.isVariable).length;
-					console.log(
-						'Template loaded successfully with',
-						objects.length,
-						'objects,',
-						variableCount,
-						'variables'
-					);
 
 					// Ensure all fonts used by text objects are fully loaded, then re-render
 					// This fixes brand fonts (and slow Google Fonts) showing as fallback on refresh
@@ -896,7 +834,6 @@
 											obj.dirty = true;
 										});
 										fabricCanvas.requestRenderAll();
-										console.log('Fonts re-rendered after load:', uniqueFonts);
 									});
 							});
 						}
@@ -916,7 +853,6 @@
 					}, 100);
 				})
 				.catch((err) => {
-					console.error('Error loading template:', err);
 					hasLoadedTemplate = false; // Allow retry on error
 					// End history batch on error too
 					if (typeof window !== 'undefined' && window.__historyBatchEnd) {
@@ -926,7 +862,6 @@
 		} else {
 			// Fallback for older Fabric.js versions
 			fabricCanvas.renderAll();
-			console.log('Template loaded (sync)');
 			if (typeof window !== 'undefined' && window.__historyBatchEnd) {
 				window.__historyBatchEnd();
 			}
@@ -937,20 +872,10 @@
 	 * Attempt to load template - called when either canvas or template becomes available
 	 */
 	function attemptTemplateLoad() {
-		console.log('attemptTemplateLoad called:', {
-			isEdit,
-			hasFabricCanvas: !!fabricCanvas,
-			hasEditorTemplate: !!editorTemplate,
-			hasFabricJSData: !!editorTemplate?.fabricJSData,
-			hasLoadedTemplate,
-			templateUid: editorTemplate?.uid
-		});
 
 		if (isEdit && fabricCanvas && editorTemplate?.fabricJSData && !hasLoadedTemplate) {
-			console.log('Scheduling template load in 600ms...');
 			// Wait for canvas to be fully initialized (Canvas.svelte has a 500ms init delay)
 			setTimeout(() => {
-				console.log('Timeout fired, calling loadTemplateIntoCanvas');
 				loadTemplateIntoCanvas();
 			}, 600);
 		}
@@ -973,11 +898,10 @@
 		// Remove any default objects
 		try {
 			fabricCanvas.getObjects().forEach((obj) => fabricCanvas.remove(obj));
-		} catch (e) {}
+		} catch (e) { /* ignored */ }
 
 		// Check if we have full FabricJS data (pre-built template from use case)
 		if (pendingDraft.fabricJSData && pendingDraft.fabricJSData.objects) {
-			console.log('Loading FabricJS template from draft:', pendingDraft.name);
 
 			// Start history batch to prevent saving during load
 			if (typeof window !== 'undefined' && window.__historyBatchStart) {
@@ -1009,12 +933,6 @@
 										isVariable: true,
 										variableBindings: objData.variableBindings
 									});
-									console.log(
-										'Restored variable bindings to draft object:',
-										obj.id,
-										obj.type,
-										objData.variableBindings
-									);
 								}
 
 								// Restore ID if present
@@ -1042,13 +960,6 @@
 						fabricCanvas.renderAll();
 
 						const variableCount = objects.filter((o) => o.isVariable).length;
-						console.log(
-							'Draft template loaded with',
-							objects.length,
-							'objects,',
-							variableCount,
-							'variables'
-						);
 
 						// End history batch after load completes
 						setTimeout(() => {
@@ -1069,7 +980,6 @@
 						});
 					})
 					.catch((err) => {
-						console.error('Error loading draft template:', err);
 						if (typeof window !== 'undefined' && window.__historyBatchEnd) {
 							window.__historyBatchEnd();
 						}
@@ -1173,7 +1083,6 @@
 	}
 
 	onMount(() => {
-		console.log('CreateTemplate onMount, isEdit:', isEdit);
 
 		// Listen for save-and-generate events
 		window.addEventListener('save-template-and-generate', handleSaveAndGenerate);
@@ -1189,7 +1098,6 @@
 		}
 
 		unsubscribe = editor.subscribe((e) => {
-			console.log('Editor subscribe fired, canvas:', !!e);
 			fabricCanvas = e;
 			applyDraftToCanvas();
 			// Try to load template when canvas becomes available
@@ -1199,18 +1107,10 @@
 		});
 
 		templateUnsubscribe = template.subscribe((t) => {
-			console.log('Template subscribe fired:', {
-				uid: t?.uid,
-				name: t?.name,
-				hasFabricJSData: !!t?.fabricJSData,
-				objectCount: t?.fabricJSData?.objects?.length,
-				outputFormat: t?.outputFormat
-			});
 
 			// Debug: Check if objects have isVariable property
 			if (t?.fabricJSData?.objects) {
 				const varsInData = t.fabricJSData.objects.filter((o) => o.isVariable);
-				console.log('Variables in loaded fabricJSData:', varsInData.length, varsInData);
 			}
 
 			editorTemplate = t;
@@ -1225,11 +1125,9 @@
 				// This ensures PDF templates open in PDF mode when refreshed
 				if (editorTemplate.outputFormat) {
 					pageActions.setOutputFormat(editorTemplate.outputFormat);
-					console.log('Restored outputFormat:', editorTemplate.outputFormat);
 				}
 				if (editorTemplate.pdfPreset) {
 					pageActions.setPdfPreset(editorTemplate.pdfPreset);
-					console.log('Restored pdfPreset:', editorTemplate.pdfPreset);
 				}
 
 				// Try to load template when template data becomes available
@@ -1250,7 +1148,7 @@
 	});
 </script>
 
-<EditorLayout bind:templateName {isSaving} {guestMode} on:save={saveTemplate} />
+<EditorLayout bind:templateName bind:currentLayoutKey {isSaving} {guestMode} on:save={saveTemplate} />
 
 <Toast />
 

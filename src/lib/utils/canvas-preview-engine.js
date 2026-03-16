@@ -212,7 +212,6 @@ function evaluateExpression(expression, context) {
 		const value = resolveValue(expr, context);
 		return Boolean(value);
 	} catch (error) {
-		console.warn('Expression evaluation error:', error.message, 'Expression:', expression);
 		return true; // Default to showing on error
 	}
 }
@@ -381,7 +380,6 @@ export async function applyPreview(canvas, testValues) {
 
 	// Prevent overlapping preview operations (race condition mitigation)
 	if (previewOperationInProgress) {
-		console.warn('Preview operation already in progress');
 		return { hiddenCount: 0, loopClonesCount: 0, success: false, reason: 'operation_in_progress' };
 	}
 
@@ -536,9 +534,6 @@ function applyVariableValueByProperty(obj, property, value) {
 			// Mark the object so users know dynamic data is not fully previewed
 			if (obj.isChart) {
 				obj.set('chartData', value);
-				console.log(
-					`[Preview] Chart data bound to variable, full preview not supported — data stored for render`
-				);
 			}
 			break;
 		case 'tableData':
@@ -546,9 +541,6 @@ function applyVariableValueByProperty(obj, property, value) {
 			if (obj.isTable) {
 				if (value && value.headers) obj.set('tableHeaders', value.headers);
 				if (value && value.rows) obj.set('tableRows', value.rows);
-				console.log(
-					`[Preview] Table data bound to variable, full preview not supported — data stored for render`
-				);
 			}
 			break;
 		default:
@@ -556,7 +548,7 @@ function applyVariableValueByProperty(obj, property, value) {
 			try {
 				obj.set(property, value);
 			} catch (e) {
-				console.warn(`Could not apply value to property "${property}":`, e.message);
+				/* ignored */
 			}
 	}
 }
@@ -579,7 +571,6 @@ async function processLoop(canvas, obj, items, baseContext) {
 	// Limit loop items to prevent performance issues
 	const limitedItems = items.slice(0, MAX_LOOP_ITEMS);
 	if (items.length > MAX_LOOP_ITEMS) {
-		console.warn(`Loop preview limited to ${MAX_LOOP_ITEMS} items (${items.length} total)`);
 	}
 
 	for (let index = 0; index < limitedItems.length; index++) {
@@ -668,7 +659,7 @@ async function processLoop(canvas, obj, items, baseContext) {
 			canvas.add(clone);
 			loopClones.push(clone);
 		} catch (err) {
-			console.warn('Failed to clone loop item:', err);
+			/* ignored */
 		}
 	}
 }

@@ -42,7 +42,7 @@
 			color: 'bg-purple-400',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
-			items: ['AI Copilot', 'Background Removal'],
+			items: ['AI Copilot', 'Smart Resize'],
 			cols: 'xl:col-span-4'
 		},
 		{

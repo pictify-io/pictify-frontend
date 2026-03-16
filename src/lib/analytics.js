@@ -121,7 +121,7 @@ export const analytics = {
 			try {
 				sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(utm));
 			} catch (e) {
-				console.warn('Failed to store UTM params:', e);
+				/* ignored */
 			}
 		}
 
@@ -594,6 +594,102 @@ export const analytics = {
 			format: params.format,
 			template_id: params.template_id,
 			tool_name: params.tool_name
+		});
+	},
+
+	// ============================================
+	// Experiment Tracking
+	// ============================================
+
+	trackExperimentCreated: (params = {}) => {
+		analytics.track('experiment_created', {
+			type: params.type,
+			variant_count: params.variant_count
+		});
+	},
+
+	trackExperimentStarted: (params = {}) => {
+		analytics.track('experiment_started', {
+			type: params.type,
+			uid: params.uid
+		});
+	},
+
+	trackExperimentPaused: (params = {}) => {
+		analytics.track('experiment_paused', {
+			type: params.type,
+			uid: params.uid
+		});
+	},
+
+	trackExperimentCompleted: (params = {}) => {
+		analytics.track('experiment_completed', {
+			type: params.type,
+			uid: params.uid,
+			winner_declared: params.winner_declared
+		});
+	},
+
+	trackExperimentViewed: (params = {}) => {
+		analytics.track('experiment_viewed', {
+			type: params.type,
+			uid: params.uid
+		});
+	},
+
+	trackExperimentAnalyticsViewed: (params = {}) => {
+		analytics.track('experiment_analytics_viewed', {
+			uid: params.uid
+		});
+	},
+
+	trackExperimentVariantAdded: (params = {}) => {
+		analytics.track('experiment_variant_added', {
+			type: params.type
+		});
+	},
+
+	trackExperimentRuleAdded: (params = {}) => {
+		analytics.track('experiment_rule_added', {
+			rule_type: params.rule_type
+		});
+	},
+
+	trackExperimentFeatureDiscovered: (params = {}) => {
+		analytics.track('experiment_feature_discovered', {
+			source: params.source
+		});
+	},
+
+	trackAutoOptimizeEnabled: (params = {}) => {
+		analytics.track('auto_optimize_enabled', {
+			uid: params.uid
+		});
+	},
+
+	trackSmartLinkRuleConfigured: (params = {}) => {
+		analytics.track('smart_link_rule_configured', {
+			rule_type: params.rule_type
+		});
+	},
+
+	trackExperimentWizardStep: (params = {}) => {
+		analytics.track('experiment_wizard_step', {
+			step: params.step,
+			type: params.type
+		});
+	},
+
+	trackExperimentWizardAbandoned: (params = {}) => {
+		analytics.track('experiment_wizard_abandoned', {
+			step: params.step,
+			type: params.type
+		});
+	},
+
+	trackExperimentWizardCompleted: (params = {}) => {
+		analytics.track('experiment_wizard_completed', {
+			type: params.type
 		});
 	}
 };

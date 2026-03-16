@@ -89,9 +89,6 @@
 				throw new Error('Import data is empty or expired');
 			}
 
-			console.log('[FigmaImport] Input nodeTree:', nodeTree);
-			console.log('[FigmaImport] Fallback images:', Object.keys(data.fallbackImages || {}));
-			console.log('[FigmaImport] Metadata:', data.metadata);
 
 			importProgress = 'Converting design...';
 			const result = await convertFigmaToFabric(nodeTree, {
@@ -101,16 +98,9 @@
 
 			const { objects, fonts, _debug } = result;
 
-			console.log('[FigmaImport] Conversion result:', {
-				objectCount: objects.length,
-				fonts: [...fonts],
-				errors: _debug?.errors || [],
-				elapsed: _debug?.elapsed
-			});
 
 			// Store debug info for download if there were errors
 			if (_debug?.errorCount > 0) {
-				console.warn(`[FigmaImport] ${_debug.errorCount} conversion errors occurred`);
 				lastDebugDump = buildDebugDump(importId, data, _debug, null);
 			}
 
@@ -133,7 +123,6 @@
 
 			// Flatten nested groups so all elements are directly accessible
 			const flatObjects = flattenNestedGroups(objects);
-			console.log(`[FigmaImport] Flattened ${objects.length} objects → ${flatObjects.length} leaf objects`);
 
 			const importGroup = new Group(flatObjects, {
 				figmaImport: true,
@@ -166,15 +155,11 @@
 
 			// Log partial errors even on success
 			if (_debug?.errorCount > 0) {
-				console.warn(
-					`[FigmaImport] Import succeeded with ${_debug.errorCount} partial errors — some nodes may be missing or incorrect`
-				);
 			}
 
 			dispatch('imported', { objectCount: objects.length, frameName: data.metadata?.frameName });
 			close();
 		} catch (err) {
-			console.error('[FigmaImport] Import failed:', err);
 			if (!lastDebugDump) {
 				lastDebugDump = buildDebugDump(importId, data, null, err.message || 'Unknown error');
 			}
