@@ -11,7 +11,8 @@
 
 	$: isLoggedIn = !!$user?.email;
 	$: remaining = GUEST_DAILY_LIMIT - ($generationLimits?.count || 0);
-	$: showBanner = !isLoggedIn;
+	$: hasGenerated = ($generationLimits?.count || 0) > 0;
+	$: showBanner = !isLoggedIn && hasGenerated; // Show after first generation, not before
 	$: isLow = remaining <= 2;
 	$: isExhausted = remaining <= 0;
 

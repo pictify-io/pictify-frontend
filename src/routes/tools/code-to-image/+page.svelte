@@ -13,6 +13,7 @@
 	import { page } from '$app/stores';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// Syntax highlighting via refractor (Prism under the hood)
 	import { refractor } from 'refractor';
@@ -1453,87 +1454,78 @@
 								{/key}
 							</div>
 						{:else if generatedImage}
-							<div class="flex flex-col items-center justify-center w-full h-full p-4 sm:p-8">
+							<div class="flex items-center justify-center w-full h-full p-4 sm:p-8">
 								<img
 									src={generatedImage.url}
 									alt="Generated output"
 									class="max-w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000]"
 								/>
-
-								<!-- Success Badge -->
-								<div
-									class="mt-4 sm:mt-6 px-3 sm:px-4 py-2 bg-[#4ade80] border-[3px] border-black text-black font-bold text-xs sm:text-sm text-center"
-								>
-									✓ IMAGE GENERATED
-								</div>
-
-								<div
-									class="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto"
-								>
-									<a
-										href={generatedImage.url}
-										target="_blank"
-										class="px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-[3px] border-black font-bold uppercase tracking-wide hover:bg-[#ffc480] transition-colors shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] text-center text-sm"
-										>Open in Tab</a
-									>
-									<button
-										on:click={() => copyToClipboard(generatedImage.url)}
-										class="px-4 sm:px-6 py-2.5 sm:py-3 bg-black text-white border-[3px] border-black font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors shadow-[3px_3px_0_0_#666] sm:shadow-[4px_4px_0_0_#666] hover:shadow-[2px_2px_0_0_#666] hover:translate-x-[1px] hover:translate-y-[1px] text-sm"
-										>Copy URL</button
-									>
-								</div>
-
-								<!-- Share Buttons -->
-								<div class="grid grid-cols-2 gap-2 sm:gap-4 mt-4 sm:mt-6 w-full max-w-md">
-									<button
-										class="py-2 sm:py-3 px-3 sm:px-6 w-full border-[3px] border-black font-bold bg-black tracking-wide text-xs sm:text-sm text-white shadow-[3px_3px_0_0_#444] sm:shadow-[4px_4px_0_0_#444] hover:shadow-[2px_2px_0_0_#444] hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase"
-										on:click={() => handleSocialShare('twitter')}
-									>
-										<span class="inline-flex items-center gap-1.5 sm:gap-2 justify-center">
-											<svg
-												class="w-3.5 h-3.5 sm:w-4 sm:h-4"
-												fill="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<path
-													d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-												/>
-											</svg>
-											<span class="hidden xs:inline">Share on</span> X
-										</span>
-									</button>
-
-									<button
-										class="py-2 sm:py-3 px-3 sm:px-6 w-full border-[3px] border-black font-bold bg-[#0A66C2] tracking-wide text-xs sm:text-sm text-white shadow-[3px_3px_0_0_#084c94] sm:shadow-[4px_4px_0_0_#084c94] hover:shadow-[2px_2px_0_0_#084c94] hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase"
-										on:click={() => handleSocialShare('linkedin')}
-									>
-										<span class="inline-flex items-center gap-1.5 sm:gap-2 justify-center">
-											<svg
-												class="w-3.5 h-3.5 sm:w-4 sm:h-4"
-												fill="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<path
-													d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-												/>
-											</svg>
-											<span class="hidden xs:inline">Share on</span> LinkedIn
-										</span>
-									</button>
-								</div>
-
-								<NextSteps
-									heading="Next steps"
-									description="Copy the API request, save this output as a template background, and batch render variants."
-									curlSnippet={nextStepsCurlSnippet}
-									templateDraft={nextStepsTemplateDraft}
-									generatedUrl={generatedImage?.url || ''}
-									toolName="Code to Image"
-								/>
 							</div>
 						{/if}
 					</div>
+
+					<!-- Action bar below preview (only when image is generated) -->
+					{#if generatedImage}
+						<div
+							class="bg-[#4ade80] border-t-[3px] border-black px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
+						>
+							<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black"
+								>✓ Image generated</span
+							>
+							<div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+								<a
+									href={generatedImage.url}
+									target="_blank"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									>Open in Tab</a
+								>
+								<button
+									on:click={() => copyToClipboard(generatedImage.url)}
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-[2px_2px_0_0_#666] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									>Copy URL</button
+								>
+								<button
+									class="px-3 sm:px-4 py-1.5 sm:py-2 border-[2px] border-black font-bold bg-black text-white text-xs shadow-[2px_2px_0_0_#444] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase"
+									on:click={() => handleSocialShare('twitter')}
+								>
+									<span class="inline-flex items-center gap-1.5 justify-center">
+										<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+											<path
+												d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+											/>
+										</svg>
+										X
+									</span>
+								</button>
+								<button
+									class="px-3 sm:px-4 py-1.5 sm:py-2 border-[2px] border-black font-bold bg-[#0A66C2] text-white text-xs shadow-[2px_2px_0_0_#084c94] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase"
+									on:click={() => handleSocialShare('linkedin')}
+								>
+									<span class="inline-flex items-center gap-1.5 justify-center">
+										<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+											<path
+												d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+											/>
+										</svg>
+										LinkedIn
+									</span>
+								</button>
+							</div>
+						</div>
+					{/if}
 				</div>
+
+				<!-- Next steps — outside preview panel -->
+				{#if generatedImage}
+					<NextSteps
+						heading="Next steps"
+						description="Copy the API request, save this output as a template background, and batch render variants."
+						curlSnippet={nextStepsCurlSnippet}
+						templateDraft={nextStepsTemplateDraft}
+						generatedUrl={generatedImage?.url || ''}
+						toolName="Code to Image"
+					/>
+				{/if}
 			</div>
 		</div>
 
@@ -2734,6 +2726,8 @@
 				</div>
 			</div>
 		{/if}
+
+		<RelatedTools tools={['json-to-image', 'markdown', 'api-response-card', 'changelog-card']} />
 
 		<Footer />
 	</main>

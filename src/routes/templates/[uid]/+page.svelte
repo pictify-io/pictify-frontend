@@ -26,7 +26,6 @@
 			const response = await getPublicTemplate(uid);
 			template = response.template;
 		} catch (e) {
-			console.error('Failed to load template:', e);
 			error = e.message || 'Template not found';
 		} finally {
 			loading = false;
@@ -59,7 +58,6 @@
 				}, 500);
 			}
 		} catch (e) {
-			console.error('Failed to fork template:', e);
 			toast.set({
 				message: e.message || 'Failed to remix template',
 				type: 'error',
@@ -338,7 +336,12 @@
 									Remixing...
 								</span>
 							{:else}
-								🔄 Remix this template
+								<span class="flex items-center justify-center gap-2">
+									<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+									</svg>
+									Remix this template
+								</span>
 							{/if}
 						</button>
 						<p class="text-sm font-bold text-gray-500 mt-2">
@@ -409,7 +412,12 @@
 					href="/template-workspace/create"
 					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
 				>
-					<h3 class="font-black text-lg mb-2">✨ Create from scratch</h3>
+					<h3 class="font-black text-lg mb-2 flex items-center gap-2">
+						<svg class="w-5 h-5 text-[#ffc480]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+						</svg>
+						Create from scratch
+					</h3>
 					<p class="text-sm text-gray-600">Build your own template in the editor</p>
 				</a>
 
@@ -417,7 +425,12 @@
 					href="/pricing"
 					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
 				>
-					<h3 class="font-black text-lg mb-2">🚀 Get API access</h3>
+					<h3 class="font-black text-lg mb-2 flex items-center gap-2">
+						<svg class="w-5 h-5 text-[#ff6b6b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+						</svg>
+						Get API access
+					</h3>
 					<p class="text-sm text-gray-600">Automate renders at scale</p>
 				</a>
 			</section>

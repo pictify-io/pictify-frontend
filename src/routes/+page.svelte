@@ -11,6 +11,7 @@
 	import MidSectionCta from '$lib/components/landingPage/MidSectionCta.svelte';
 	import ExperimentsShowcase from '$lib/components/landingPage/ExperimentsShowcase.svelte';
 	import IntegrationsEcosystem from '$lib/components/landingPage/IntegrationsEcosystem.svelte';
+	import ResponsiveShowcase from '$lib/components/landingPage/ResponsiveShowcase.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { analytics } from '$lib/analytics.js';
@@ -105,7 +106,7 @@
 					'REST API with <200ms latency',
 					'Webhooks and storage connectors',
 					'AI copilot for template generation',
-					'Background removal',
+					'AI-powered smart resize',
 					'Batch image generation'
 				],
 				offers: {
@@ -146,6 +147,10 @@
 	<!-- 6. Template Builder: Visual Editor -->
 	<CanvasShowcase />
 	<SectionSeparator icon="star" />
+
+	<!-- 6.5. Responsive Image API -->
+	<ResponsiveShowcase />
+	<SectionSeparator icon="bolt" />
 
 	<!-- 7. Infrastructure & Integrations -->
 	<IntegrationsEcosystem />

@@ -3,10 +3,73 @@
 	import { onMount, tick } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import TopBar from './TopBar.svelte';
+	import ResizeModal from './ResizeModal.svelte';
 	import AnimatedBackground from './AnimatedBackground.svelte';
 	import PageNavigator from './PageNavigator.svelte';
 
+	let showResizeModal = false;
+
 	const dispatch = createEventDispatcher();
+
+	// Layout variant state (local, no separate store needed)
+	export let currentLayoutKey = null;
+	export let isLayoutSwitching = false;
+
+	function handleSaveLayout(event) {
+		const { key, canvasState, width, height, name } = event.detail;
+		if (!canvasState) {
+			toast.set({ message: 'Failed to save layout', type: 'error' });
+			return;
+		}
+
+		template.update((t) => ({
+			...t,
+			layouts: {
+				...(t.layouts || {}),
+				[key]: { fabricJSData: canvasState, width, height, name, createdAt: new Date().toISOString() }
+			}
+		}));
+		toast.set({ message: `Saved ${name} layout`, type: 'success' });
+
+		// Auto-save to persist layouts to backend
+		dispatch('save');
+	}
+
+	async function handleLayoutSwitch(key) {
+		if (isLayoutSwitching) return;
+
+		const target =
+			key === null
+				? {
+						fabricJSData: $template.fabricJSData,
+						width: $template.width,
+						height: $template.height
+					}
+				: ($template.layouts || {})[key];
+
+		if (!target?.fabricJSData) {
+			toast.set({ message: 'Layout data not found', type: 'error' });
+			return;
+		}
+
+		// Canvas owns the full switch sequence (H1)
+		const prevKey = currentLayoutKey;
+		currentLayoutKey = key;
+		isLayoutSwitching = true;
+		if (canvasComponent?.handleLayoutSwitch) {
+			try {
+				await canvasComponent.handleLayoutSwitch({
+					fromLayoutKey: prevKey,
+					toLayoutKey: key,
+					targetData: target
+				});
+			} finally {
+				isLayoutSwitching = false;
+			}
+		} else {
+			isLayoutSwitching = false;
+		}
+	}
 	import LeftSidebar from './LeftSidebar.svelte';
 	import AssetPanel from './AssetPanel.svelte';
 	import Canvas from './Canvas.svelte';
@@ -17,17 +80,91 @@
 	import FigmaImportModal from './FigmaImportModal.svelte';
 	import {
 		selectedComponent,
+		editor,
 		canvasZoom,
 		activeSidebarTab,
 		activeRightSidebarTab,
 		editorActions
 	} from '../../../store/editor.store';
+	import { toast } from '../../../store/toast.store';
+	import { template } from '../../../store/template.store';
 	import FloatingCopilot from './FloatingCopilot.svelte';
 	import { outputFormat } from '../../../store/pages.store';
 
 	export let templateName = '';
 	export let isSaving = false;
 	export let guestMode = false;
+
+	// Layout thumbnail generation
+	let layoutThumbnails = {};
+	let thumbnailVersions = {};
+	let pendingThumbnails = new Set();
+
+	async function generateThumbnail(fabricJSData, width, height) {
+		if (typeof window === 'undefined' || !fabricJSData) return null;
+		try {
+			const { StaticCanvas } = await import('fabric');
+			const scale = 48 / Math.max(width, height);
+			const canvas = new StaticCanvas(null, {
+				width: Math.round(width * scale),
+				height: Math.round(height * scale),
+				renderOnAddRemove: false,
+				enableRetinaScaling: false
+			});
+			canvas.setZoom(scale);
+			await canvas.loadFromJSON(fabricJSData);
+			canvas.renderAll();
+			const dataUrl = canvas.toDataURL({ format: 'png', quality: 0.5 });
+			canvas.setWidth(0);
+			canvas.setHeight(0);
+			canvas.dispose();
+			return dataUrl;
+		} catch {
+			return null;
+		}
+	}
+
+	function quickHash(obj) {
+		const str = JSON.stringify(obj).slice(0, 200);
+		let hash = 0;
+		for (let i = 0; i < str.length; i++) {
+			hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+		}
+		return hash;
+	}
+
+	$: if ($template.layouts || $template.fabricJSData) {
+		regenerateThumbnails();
+	}
+
+	async function regenerateThumbnails() {
+		const entries = Object.entries($template.layouts || {});
+		const allLayouts = [
+			['__default__', { fabricJSData: $template.fabricJSData, width: $template.width, height: $template.height }],
+			...entries
+		];
+
+		for (const [key, layout] of allLayouts) {
+			if (!layout?.fabricJSData || pendingThumbnails.has(key)) continue;
+			const version = quickHash(layout.fabricJSData);
+			if (thumbnailVersions[key] === version) continue;
+
+			pendingThumbnails.add(key);
+			try {
+				const dataUrl = await generateThumbnail(layout.fabricJSData, layout.width, layout.height);
+				if (dataUrl) {
+					layoutThumbnails[key] = dataUrl;
+					thumbnailVersions[key] = version;
+					layoutThumbnails = layoutThumbnails;
+				}
+			} finally {
+				pendingThumbnails.delete(key);
+			}
+		}
+	}
+
+	// Canvas component reference for layout switching
+	let canvasComponent;
 
 	// Keyboard shortcuts modal
 	let showShortcutsModal = false;
@@ -122,13 +259,58 @@
 		{isSaving}
 		{guestMode}
 		on:save={() => {
-			console.log('EditorLayout: save event received');
 			dispatch('save');
 		}}
+		on:resize={() => (showResizeModal = true)}
 	/>
+
+	<ResizeModal bind:show={showResizeModal} on:saveLayout={handleSaveLayout} />
 
 	<!-- Page Navigator (for PDF templates) -->
 	<PageNavigator on:beforeSwitch={handlePageSwitch} on:afterSwitch on:pageAdded on:pageDeleted />
+
+	<!-- Layout Tabs (only show when layouts exist and not PDF) -->
+	{#if Object.keys($template.layouts || {}).length > 0 && $outputFormat !== 'pdf'}
+		<div class="flex items-center gap-1 px-4 py-2 border-b-[3px] border-gray-900 bg-gray-50 overflow-x-auto relative z-10">
+			<button
+				on:click={() => handleLayoutSwitch(null)}
+				disabled={isLayoutSwitching}
+				class="px-2 py-1.5 text-xs font-bold border-2 whitespace-nowrap transition-all flex items-center gap-2
+					{currentLayoutKey === null
+					? 'border-gray-900 bg-[#ffc480]/20 shadow-[2px_2px_0_0_#1f2937]'
+					: 'border-gray-200 hover:border-gray-400'}
+					disabled:opacity-50 disabled:cursor-not-allowed"
+			>
+				{#if layoutThumbnails['__default__']}
+					<img src={layoutThumbnails['__default__']} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
+				{/if}
+				<div class="text-left">
+					<div class="text-xs font-bold">Default</div>
+					<div class="text-[10px] text-gray-400">{$template.width}x{$template.height}</div>
+				</div>
+			</button>
+
+			{#each Object.entries($template.layouts || {}) as [key, layout]}
+				<button
+					on:click={() => handleLayoutSwitch(key)}
+					disabled={isLayoutSwitching}
+					class="px-2 py-1.5 text-xs font-bold border-2 whitespace-nowrap transition-all flex items-center gap-2
+						{currentLayoutKey === key
+						? 'border-gray-900 bg-[#ffc480]/20 shadow-[2px_2px_0_0_#1f2937]'
+						: 'border-gray-200 hover:border-gray-400'}
+						disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					{#if layoutThumbnails[key]}
+						<img src={layoutThumbnails[key]} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
+					{/if}
+					<div class="text-left">
+						<div class="text-xs font-bold">{layout.name || key}</div>
+						<div class="text-[10px] text-gray-400">{layout.width}x{layout.height}</div>
+					</div>
+				</button>
+			{/each}
+		</div>
+	{/if}
 
 	<!-- Main Content Area -->
 	<div class="flex flex-1 w-full overflow-hidden relative min-h-0">
@@ -151,8 +333,8 @@
 		<div class="relative flex-1 overflow-hidden bg-transparent">
 			<AlignmentGuides />
 			<Canvas
+				bind:this={canvasComponent}
 				on:autosave={() => {
-					console.log('EditorLayout: autosave event received');
 					dispatch('save');
 				}}
 			/>
@@ -248,7 +430,7 @@
 					</div>
 				{:else if $activeRightSidebarTab === 'variables'}
 					<div class="absolute inset-0 overflow-hidden">
-						<VariablesPanel {guestMode} />
+						<VariablesPanel {guestMode} {currentLayoutKey} />
 					</div>
 				{/if}
 			</div>

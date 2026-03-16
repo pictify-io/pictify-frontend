@@ -22,6 +22,7 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	$: format = $page.params.format;
 
 	// Support optional size parameter from nested route: /tools/html-to-[format]/[dimensions]
@@ -990,49 +991,10 @@
 						<div class="font-mono text-xs font-bold bg-black text-[#4ade80] px-2 py-1">200 OK</div>
 					</div>
 
-					<!-- Main Content -->
-					<div class="p-4 md:p-8">
-						<div class="text-center mb-8">
-							<h2 class="text-2xl md:text-4xl font-black mb-2 uppercase tracking-tight">
-								Ready to Ship! 🚀
-							</h2>
-							<p class="font-bold text-gray-500 text-sm md:text-base">
-								Join {totalImagesGenerated.toLocaleString()} creators making the web look better.
-							</p>
-						</div>
-
-						<!-- URL Input Group -->
+					<!-- Image Preview -->
+					<div class="p-4 md:p-6">
 						<div
-							class="flex flex-col md:flex-row gap-0 mb-8 border-[3px] border-black shadow-[4px_4px_0_0_#ccc]"
-						>
-							<div
-								class="flex-1 bg-gray-50 p-4 font-mono text-xs md:text-sm overflow-x-auto whitespace-nowrap border-b-[3px] md:border-b-0 md:border-r-[3px] border-black flex items-center select-all"
-							>
-								{imageUrl}
-							</div>
-							<button
-								on:click={() => copyToClipboard(imageUrl)}
-								class="bg-black text-white hover:bg-gray-800 font-bold uppercase px-6 py-4 transition-colors flex items-center justify-center gap-2 flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-									/></svg
-								>
-								Copy URL
-							</button>
-						</div>
-
-						<!-- Image Preview -->
-						<div
-							class="bg-[url('/transparent-bg.png')] border-[3px] border-black mb-8 relative group overflow-hidden bg-contain"
+							class="bg-[url('/transparent-bg.png')] border-[3px] border-black relative group overflow-hidden bg-contain"
 						>
 							<div
 								class="relative w-full"
@@ -1060,18 +1022,51 @@
 								class="absolute bottom-0 right-0 w-4 h-4 border-r-[2px] border-b-[2px] border-black"
 							/>
 						</div>
+					</div>
 
-						<!-- Actions -->
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<!-- Download Button -->
+					<!-- Action bar -->
+					<div
+						class="border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+					>
+						<!-- URL + Copy -->
+						<div
+							class="flex-1 min-w-0 flex items-center gap-0 border-[2px] border-black"
+						>
+							<div
+								class="flex-1 min-w-0 bg-gray-50 px-3 py-2 font-mono text-xs overflow-x-auto whitespace-nowrap select-all"
+							>
+								{imageUrl}
+							</div>
+							<button
+								on:click={() => copyToClipboard(imageUrl)}
+								class="bg-black text-white hover:bg-gray-800 font-bold uppercase px-4 py-2 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0 text-xs"
+							>
+								<svg
+									class="w-3.5 h-3.5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+									/></svg
+								>
+								Copy
+							</button>
+						</div>
+
+						<!-- Action buttons -->
+						<div class="flex items-center gap-2">
 							<a
 								href={imageUrl}
 								download
 								target="_blank"
-								class="flex items-center justify-center gap-2 w-full py-4 text-center bg-white border-[3px] border-black font-black uppercase shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
+								class="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 group-hover:animate-bounce"
+									class="w-4 h-4"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -1082,28 +1077,27 @@
 										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
 									/></svg
 								>
-								Download Image
+								Download
 							</a>
-							<!-- Signup Button if guest -->
 							{#if !isUserLoggedIn}
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
-									class="flex items-center justify-center gap-2 w-full py-4 text-center bg-[#ffc480] border-[3px] border-black font-black uppercase shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#ffc480] border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
-									Create Free Account
+									Sign up free
 								</a>
 							{/if}
 						</div>
-
-						<!-- Next steps (PLG) -->
-						<NextSteps
-							heading="Next steps"
-							description="Copy the exact API request, save this as a reusable template, and batch render variants."
-							curlSnippet={nextStepsCurlSnippet}
-							templateDraft={nextStepsTemplateDraft}
-						/>
 					</div>
 				</div>
+
+				<!-- Next steps — below result card -->
+				<NextSteps
+					heading="Next steps"
+					description="Copy the exact API request, save this as a reusable template, and batch render variants."
+					curlSnippet={nextStepsCurlSnippet}
+					templateDraft={nextStepsTemplateDraft}
+				/>
 			</div>
 		{/if}
 
@@ -2011,6 +2005,7 @@
 			</section>
 		</div>
 	</main>
+	<RelatedTools tools={['html-email', 'table', 'certificate', 'quote-card']} />
 	<Footer />
 
 	<!-- Exit Intent Popup for lead capture -->
