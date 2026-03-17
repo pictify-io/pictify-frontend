@@ -1,10 +1,11 @@
 {
 	"name": "Send to Pictify",
-	"id": "pictify-send-to-pictify",
+	"id": "1615607722660906937",
 	"api": "1.0.0",
 	"main": "code.js",
 	"ui": "ui.html",
 	"editorType": ["figma"],
+	"documentAccess": "dynamic-page",
 	"networkAccess": {
 		"allowedDomains": ["https://pictify.io", "https://api.pictify.io"],
 		"devAllowedDomains": ["http://localhost:3000"],
