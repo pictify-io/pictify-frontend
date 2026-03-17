@@ -21,7 +21,6 @@
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
@@ -1554,8 +1553,6 @@
 	<Footer />
 	<Toast />
 
-	<!-- Exit Intent Popup for lead capture -->
-	<ExitIntentPopup toolName="OG Image Generator" generatedImageUrl={imageUrl} />
 </section>
 
 <style>

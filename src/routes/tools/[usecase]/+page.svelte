@@ -3,7 +3,6 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
 	import TemplateGallery from '$lib/components/tools/TemplateGallery.svelte';
@@ -865,8 +864,6 @@
 
 	<Footer />
 
-	<!-- Exit Intent Popup for lead capture -->
-	<ExitIntentPopup toolName={config?.label || useCaseId} {generatedImageUrl} />
 </section>
 
 <style>

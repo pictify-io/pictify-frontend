@@ -3,7 +3,6 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import InvoiceTemplate from '$lib/components/tools/InvoiceTemplate.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { getTemplates, getTemplate } from '../../../api/tools/invoice.js';
@@ -977,8 +976,6 @@
 	<Toast />
 	<Footer />
 
-	<!-- Exit Intent Popup for lead capture -->
-	<ExitIntentPopup toolName="Invoice Generator" generatedImageUrl={imageUrl} />
 </section>
 
 <style>

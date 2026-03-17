@@ -4,7 +4,6 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { onMount } from 'svelte';
 	import { toast } from '../../../store/toast.store';
@@ -925,8 +924,6 @@
 		<Footer />
 	</main>
 
-	<!-- Exit Intent Popup for lead capture -->
-	<ExitIntentPopup toolName="URL to Image" generatedImageUrl={imageUrl} />
 </div>
 
 <style>

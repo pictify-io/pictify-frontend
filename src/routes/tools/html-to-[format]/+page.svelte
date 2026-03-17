@@ -11,7 +11,6 @@
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -2008,11 +2007,6 @@
 	<RelatedTools tools={['html-email', 'table', 'certificate', 'quote-card']} />
 	<Footer />
 
-	<!-- Exit Intent Popup for lead capture -->
-	<ExitIntentPopup
-		toolName={`HTML to ${format?.toUpperCase() || 'Image'}`}
-		generatedImageUrl={imageUrl}
-	/>
 </section>
 
 <!-- Add IDs for schema steps -->

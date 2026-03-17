@@ -5,7 +5,6 @@
 	import { user } from '../../../store/user.store';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import ExitIntentPopup from '$lib/components/tools/ExitIntentPopup.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -1324,20 +1323,9 @@
 					class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#e5e7eb] border-[3px] border-black p-3 sm:p-4"
 				>
 					<div class="flex items-center gap-2 sm:gap-3">
-						<button
-							on:click={() => {
-								currentTab = 'preview';
-							}}
-							class="px-3 sm:px-5 py-2 font-bold text-xs sm:text-sm border-[3px] border-black transition-all {currentTab ===
-							'preview'
-								? 'bg-black text-white'
-								: 'bg-white text-black hover:bg-[#ffc480]'}"
-						>
-							PREVIEW
-						</button>
 						{#if previewFrame}
 							<div
-								class="hidden md:flex items-center gap-2 ml-2 px-3 py-1.5 bg-white border-[3px] border-black"
+								class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border-[3px] border-black"
 							>
 								<span class="text-[10px] font-bold text-black uppercase tracking-wider">SIZE:</span>
 								<input
@@ -1410,7 +1398,7 @@
 									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
 								/></svg
 							>
-							<span class="hidden sm:inline">DOWNLOAD IMAGE</span>
+							<span class="hidden sm:inline">GENERATE IMAGE</span>
 							<span class="sm:hidden">GENERATE</span>
 						{/if}
 					</button>
@@ -2733,8 +2721,6 @@
 	</main>
 	<Toast />
 
-	<!-- Exit Intent Popup for lead capture -->
-	<ExitIntentPopup toolName="Code to Image" generatedImageUrl={generatedImage?.url || ''} />
 </section>
 
 <style>
