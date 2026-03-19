@@ -520,11 +520,11 @@ export const FEATURE_CATEGORIES = {
 };
 
 // Plan order for comparison (lowest to highest)
-// Includes legacy plans (Basic, Professional) for grandfathered users
-// New users only see: Free (starter), Pro (standard), Business
+// Active plans: Free (starter), Basic, Pro (standard), Business
+// Legacy: Professional (grandfathered users only)
 export const PLAN_ORDER = [
 	PLANS.STARTER,
-	PLANS.BASIC, // Legacy - grandfathered users only
+	PLANS.BASIC,
 	PLANS.STANDARD, // Pro tier
 	PLANS.PROFESSIONAL, // Legacy - grandfathered users only
 	PLANS.BUSINESS,
@@ -532,19 +532,19 @@ export const PLAN_ORDER = [
 ];
 
 // Minimum plan required for each feature (used for upgrade prompts)
-// 3-tier system: Free (starter), Pro (standard), Business
+// 4-tier system: Free (starter), Basic, Pro (standard), Business
 export const FEATURE_MIN_PLAN = {
 	[FEATURES.RENDERS]: PLANS.STARTER,
-	[FEATURES.PDF_OUTPUT]: PLANS.STANDARD, // Pro tier
+	[FEATURES.PDF_OUTPUT]: PLANS.BASIC,
 	[FEATURES.TEMPLATES_SAVED]: PLANS.STARTER, // Limited on starter
-	[FEATURES.BATCH_RENDER]: PLANS.STANDARD, // Pro tier
-	[FEATURES.AI_BACKGROUND_REMOVER]: PLANS.STANDARD, // Pro tier
-	[FEATURES.AI_COPILOT]: PLANS.STANDARD, // Pro tier (was Professional, now included in Pro)
+	[FEATURES.BATCH_RENDER]: PLANS.BASIC,
+	[FEATURES.AI_BACKGROUND_REMOVER]: PLANS.BASIC,
+	[FEATURES.AI_COPILOT]: PLANS.BASIC,
 	[FEATURES.TEAM_SEATS]: PLANS.STARTER, // 1 seat on starter
-	[FEATURES.WEBHOOKS]: PLANS.STANDARD, // Pro tier
-	[FEATURES.DYNAMIC_LINKS]: PLANS.STANDARD, // Pro tier
-	[FEATURES.STORAGE_CONNECTORS]: PLANS.STANDARD, // Pro tier (was Professional)
-	[FEATURES.BRAND_ASSETS]: PLANS.STANDARD, // Pro tier (was Basic)
+	[FEATURES.WEBHOOKS]: PLANS.BASIC,
+	[FEATURES.DYNAMIC_LINKS]: PLANS.BASIC,
+	[FEATURES.STORAGE_CONNECTORS]: PLANS.BASIC,
+	[FEATURES.BRAND_ASSETS]: PLANS.BASIC,
 	[FEATURES.AB_TESTING]: PLANS.STARTER,
 	[FEATURES.SMART_LINKS]: PLANS.BASIC,
 	[FEATURES.SCHEDULED_IMAGES]: PLANS.BASIC,
@@ -555,45 +555,45 @@ export const FEATURE_MIN_PLAN = {
 	[FEATURES.API_ACCESS]: PLANS.STARTER
 };
 
-// Upgrade messages for each feature (3-tier: Free, Pro, Business)
+// Upgrade messages for each feature (4-tier: Free, Basic, Pro, Business)
 export const FEATURE_UPGRADE_MESSAGES = {
 	[FEATURES.PDF_OUTPUT]: {
-		title: 'PDF Export Available on Pro',
+		title: 'PDF Export Available on All Paid Plans',
 		message: 'Export your designs as high-quality PDF documents.',
 		benefit: 'Perfect for print materials and professional documents'
 	},
 	[FEATURES.TEMPLATES_SAVED]: {
 		title: 'Save More Templates',
 		message: "You've reached your template limit.",
-		benefit: 'Get unlimited templates on Pro plan'
+		benefit: 'Get 25 templates on Basic, unlimited on Pro'
 	},
 	[FEATURES.BATCH_RENDER]: {
 		title: 'Unlock Batch Rendering',
 		message: 'Process multiple images at once with batch rendering.',
-		benefit: 'Available on Pro plan - save hours with automated processing'
+		benefit: 'Save hours with automated processing'
 	},
 	[FEATURES.AI_BACKGROUND_REMOVER]: {
 		title: 'AI Background Remover',
 		message: 'Remove backgrounds instantly with AI.',
-		benefit: 'Available on Pro plan with 100 uses/month'
+		benefit: 'Available on Basic (25/mo), Pro (100/mo), Business (500/mo)'
 	},
 	[FEATURES.AI_COPILOT]: {
 		title: 'Unlock AI Copilot',
 		message: 'Get AI-powered design assistance.',
-		benefit: 'Available on Pro plan with 50 generations/month'
+		benefit: 'Available on Basic (15/mo), Pro (50/mo), Business (500/mo)'
 	},
 	[FEATURES.WEBHOOKS]: {
-		title: 'Webhooks Available on Pro',
+		title: 'Webhooks Available on All Paid Plans',
 		message: 'Automate your workflow with custom webhooks.',
 		benefit: 'Integrate with your existing tools and systems'
 	},
 	[FEATURES.DYNAMIC_LINKS]: {
-		title: 'Live Links Available on Pro',
+		title: 'Live Links Available on All Paid Plans',
 		message: 'Create images with real-time data bindings.',
 		benefit: 'Perfect for personalized content at scale'
 	},
 	[FEATURES.STORAGE_CONNECTORS]: {
-		title: 'Storage Connectors on Pro',
+		title: 'Storage Connectors on All Paid Plans',
 		message: 'Connect to S3, GCS, or Cloudinary.',
 		benefit: 'Store renders directly in your cloud storage'
 	},
@@ -603,12 +603,12 @@ export const FEATURE_UPGRADE_MESSAGES = {
 		benefit: 'Test more variants and find what performs best'
 	},
 	[FEATURES.SMART_LINKS]: {
-		title: 'Smart Links Available on Basic+',
+		title: 'Smart Links Available on All Paid Plans',
 		message: 'Show different images based on device, location, or time.',
 		benefit: 'Personalize images for every viewer automatically'
 	},
 	[FEATURES.SCHEDULED_IMAGES]: {
-		title: 'Scheduled Images on Basic+',
+		title: 'Scheduled Images on All Paid Plans',
 		message: 'Schedule image changes for campaigns and promotions.',
 		benefit: 'Set it and forget it - images change on your schedule'
 	},

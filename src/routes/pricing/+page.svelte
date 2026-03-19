@@ -108,7 +108,9 @@
 	const FAQs = [
 		{
 			question: 'What happens if I exceed the monthly limit?',
-			answer: `Pro and Business users can enable <strong>overage billing</strong> to keep rendering beyond their limit. Pro: ${formatOverageRate(
+			answer: `All paid plans can enable <strong>overage billing</strong> to keep rendering beyond their limit. Basic: ${formatOverageRate(
+				PLANS.BASIC
+			)}/render, Pro: ${formatOverageRate(
 				PLANS.STANDARD
 			)}/render, Business: ${formatOverageRate(
 				PLANS.BUSINESS
@@ -141,7 +143,7 @@
 		{
 			question: 'What AI features are available?',
 			answer:
-				'Both AI Background Remover and AI Copilot are included in the Pro plan. Business plan includes unlimited AI Copilot usage.',
+				'AI Background Remover and AI Copilot are included on all paid plans. Basic gets 25 and 15 uses/mo respectively, Pro gets 100 and 50, Business gets 500 each.',
 			isOpened: false
 		}
 	];

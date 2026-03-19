@@ -30,8 +30,8 @@
 
 	// 3-tier system matching pricing page: Free (Starter), Pro (Standard), Business
 	// Legacy plans (Basic, Professional) are excluded — only for grandfathered users
-	const legacyPlanNames = ['Basic', 'Professional'];
-	const featuredPlanNames = ['Standard', 'Business'];
+	const legacyPlanNames = ['Professional'];
+	const featuredPlanNames = ['Basic', 'Standard', 'Business'];
 
 	$: featuredPlans = allPlans
 		.filter((p) => !legacyPlanNames.includes(p.name))
@@ -270,8 +270,8 @@
 				<p class="text-gray-600 font-medium text-sm">{error}</p>
 			</div>
 		{:else}
-			<!-- Featured Plans (2-tier: Pro and Business) -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+			<!-- Featured Plans (3-tier: Basic, Pro, Business) -->
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
 				{#each featuredPlans as plan (plan.name + '-' + showAnnual)}
 					{@const isCurrent = isPlanCurrent(plan)}
 					{@const isPopular = plan.name === 'Standard'}
