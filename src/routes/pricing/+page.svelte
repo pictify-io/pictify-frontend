@@ -220,7 +220,13 @@
 	};
 
 	const selectPlanHandler = (planName) => {
-		const planIndex = plans.findIndex((p) => p.name?.toLowerCase() === planName?.toLowerCase());
+		// Map internal plan IDs to API product names (API returns "Pro", config uses "standard")
+		const nameAliases = { standard: 'pro', pro: 'standard' };
+		const searchName = planName?.toLowerCase();
+		const altName = nameAliases[searchName];
+		const planIndex = plans.findIndex(
+			(p) => p.name?.toLowerCase() === searchName || p.name?.toLowerCase() === altName
+		);
 		const plan = planIndex >= 0 ? plans[planIndex] : null;
 
 		// Use annual URL if available and annual billing is selected
