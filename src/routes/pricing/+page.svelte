@@ -719,7 +719,7 @@
 									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'}"
 								on:click={() => selectPlanHandler(planId)}
 							>
-								{planId === PLANS.BUSINESS ? 'Talk to Sales' : 'Get Started'}
+								Get Started
 							</button>
 						</div>
 					{/each}
