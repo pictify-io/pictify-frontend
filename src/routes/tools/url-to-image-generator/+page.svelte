@@ -319,11 +319,7 @@
 		content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/r49i0-1725792197198.png" />
-	<script type="application/ld+json">
-		{
-			JSON.stringify(structuredData);
-		}
-	</script>
+	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 
 <div

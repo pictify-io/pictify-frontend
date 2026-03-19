@@ -236,11 +236,7 @@
 	<meta name="twitter:image" content="https://pictify.io/og-image-tools.jpg" />
 
 	{#if structuredData}
-		<script type="application/ld+json">
-			{
-				JSON.stringify(structuredData);
-			}
-		</script>
+		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 	{/if}
 </svelte:head>
 

@@ -3,34 +3,30 @@
 	import { analytics } from '$lib/analytics.js';
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] border-t-[3px] border-gray-900">
+<section class="w-full py-24 md:py-32 bg-[#FFFDF8] border-t-[3px] border-gray-900 overflow-hidden">
 	<div class="max-w-6xl mx-auto px-4">
 		<!-- The Monolith CTA Card -->
 		<div class="relative group">
-			<!-- Decorative Under-layers for depth -->
+			<!-- Decorative Under-layers for depth (hidden on mobile to prevent overflow) -->
 			<div
-				class="absolute top-4 left-4 w-full h-full bg-gray-900 rounded-3xl border-[3px] border-gray-900 opacity-20"
+				class="absolute top-4 left-4 w-full h-full bg-gray-900 rounded-3xl border-[3px] border-gray-900 opacity-20 hidden sm:block"
 			/>
 			<div
-				class="absolute top-2 left-2 w-full h-full bg-[#ffc480] rounded-3xl border-[3px] border-gray-900"
+				class="absolute top-2 left-2 w-full h-full bg-[#ffc480] rounded-3xl border-[3px] border-gray-900 hidden sm:block"
 			/>
 
 			<!-- Main Container -->
 			<div
-				class="relative bg-white rounded-[2.5rem] border-[3px] border-gray-900 overflow-hidden shadow-2xl"
+				class="relative bg-white rounded-[2.5rem] border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#ffc480] sm:shadow-2xl"
 			>
 				<!-- Terminal Header / Window Controls -->
 				<div
-					class="h-12 bg-gray-50 border-b-[3px] border-gray-900 flex items-center justify-between px-6"
+					class="h-12 bg-gray-50 border-b-[3px] border-gray-900 flex items-center px-6"
 				>
 					<div class="flex gap-2">
 						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
-					</div>
-					<div class="font-mono text-xs text-gray-500 font-bold flex items-center gap-2">
-						<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-gray-900" />
-						SYSTEM_READY
 					</div>
 				</div>
 
@@ -47,8 +43,9 @@
 						<div
 							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-[2px_2px_0_0_#000] mb-8 transform -rotate-2"
 						>
-							<span class="text-gray-900 text-sm font-bold uppercase tracking-wider"
-								>🚀 Free Tier Available</span
+							<span class="text-gray-900 text-sm font-bold uppercase tracking-wider flex items-center gap-2"
+								><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+								Free Tier Available</span
 							>
 						</div>
 

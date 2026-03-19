@@ -205,7 +205,7 @@
 				</div>
 
 				<!-- Canvas Interface Mockup -->
-				<div class="flex h-[500px] md:h-[600px] bg-gray-50 overflow-hidden relative">
+				<div class="flex h-[350px] sm:h-[450px] md:h-[600px] bg-gray-50 overflow-hidden relative">
 					<!-- Try Canvas Editor CTA Overlay -->
 					{#if isHovering}
 						<div
@@ -469,10 +469,10 @@
 
 			<!-- Decorative Elements -->
 			<div
-				class="absolute -top-10 -right-10 w-32 h-32 bg-[#ffc480] border-[3px] border-gray-900 -z-10 rotate-12 animate-[float_6s_ease-in-out_infinite]"
+				class="hidden md:block absolute -top-10 -right-10 w-32 h-32 bg-[#ffc480] border-[3px] border-gray-900 -z-10 rotate-12 animate-[float_6s_ease-in-out_infinite]"
 			/>
 			<div
-				class="absolute -bottom-10 -left-10 w-40 h-40 bg-[#ff6b6b] border-[3px] border-gray-900 -z-10 rotate-[-12deg] animate-[float_7s_ease-in-out_infinite_reverse]"
+				class="hidden md:block absolute -bottom-10 -left-10 w-40 h-40 bg-[#ff6b6b] border-[3px] border-gray-900 -z-10 rotate-[-12deg] animate-[float_7s_ease-in-out_infinite_reverse]"
 			>
 				<div
 					class="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,#000_45%,#000_55%,transparent_55%)] [background-size:10px_10px] opacity-10"
@@ -483,7 +483,7 @@
 		<!-- Figma Import Showcase -->
 		<div class="mt-24 max-w-5xl mx-auto group relative">
 			<!-- Decorative offset background -->
-			<div class="absolute inset-0 bg-[#a259ff] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
+			<div class="hidden sm:block absolute inset-0 bg-[#a259ff] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 			
 			<div class="relative bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300">
 				<!-- Mac Header -->

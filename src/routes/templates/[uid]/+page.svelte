@@ -139,20 +139,18 @@
 		{/if}
 
 		<!-- Structured data -->
-		{@html `<script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "CreativeWork",
-        "name": "${template.name}",
-        "description": "${template.publicDescription || ''}",
-        "url": "https://pictify.io/templates/${template.uid}",
-        ${template.thumbnail ? `"image": "${template.thumbnail}",` : ''}
-        "creator": {
-          "@type": "Organization",
-          "name": "Pictify"
-        }
-      }
-    </script>`}
+		{@html `<script type="application/ld+json">${JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'CreativeWork',
+			name: template.name,
+			description: template.publicDescription || '',
+			url: `https://pictify.io/templates/${template.uid}`,
+			...(template.thumbnail ? { image: template.thumbnail } : {}),
+			creator: {
+				'@type': 'Organization',
+				name: 'Pictify'
+			}
+		})}</script>`}
 	{:else}
 		<title>Template | Pictify</title>
 	{/if}

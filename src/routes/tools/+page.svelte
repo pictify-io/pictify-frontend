@@ -131,11 +131,7 @@
 	<meta property="og:image" content="https://pictify.io/og-image-tools.jpg" />
 	<meta property="og:url" content="https://pictify.io/tools" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<script type="application/ld+json">
-		{
-			JSON.stringify(itemListStructuredData);
-		}
-	</script>
+	{@html `<script type="application/ld+json">${JSON.stringify(itemListStructuredData)}</script>`}
 </svelte:head>
 
 <div

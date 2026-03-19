@@ -128,10 +128,10 @@
 		</div>
 
 		<!-- Bento Grid -->
-		<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-8">
 			<!-- Block 1: Social Automation (Spans 7 cols) -->
 			<div
-				class="xl:col-span-7 bg-[#7dd3fc] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col h-[500px]"
+				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<!-- Subtle texture -->
 				<div
@@ -318,7 +318,7 @@
 
 			<!-- Block 2: Dynamic Retail (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-white rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col h-[500px]"
+				class="xl:col-span-5 bg-white rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<div
 					class="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.15] pointer-events-none"

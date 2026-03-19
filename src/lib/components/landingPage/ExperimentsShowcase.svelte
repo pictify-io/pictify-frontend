@@ -462,7 +462,7 @@
 
 			<!-- Block 3: Live URL / Data Binding (Spans 12 cols) -->
 			<div
-				class="xl:col-span-12 bg-[#bfdbfe] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group"
+				class="xl:col-span-12 bg-[#bfdbfe] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Text Content (Left, 5 columns) -->
@@ -513,7 +513,7 @@
 
 					<!-- Visual (Right, 7 columns) -->
 					<div
-						class="lg:col-span-7 p-6 md:p-10 pt-12 md:pt-16 lg:pt-16 flex flex-col justify-center relative bg-[#e0e7ff]/30"
+						class="lg:col-span-7 p-6 md:p-10 pt-14 md:pt-16 lg:pt-16 flex flex-col justify-center relative bg-[#e0e7ff]/30 overflow-hidden"
 					>
 						<div
 							class="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none"
@@ -522,7 +522,7 @@
 						<div class="relative z-10 w-full max-w-2xl mx-auto mt-4 md:mt-0">
 							<!-- Floating Pipeline Widget -->
 							<div
-								class="absolute -top-6 md:-top-8 left-4 md:-left-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-2 flex items-center gap-2 z-20 transform -rotate-2 group-hover:rotate-0 transition-transform"
+								class="hidden sm:flex absolute -top-6 md:-top-8 left-4 md:-left-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-2 items-center gap-2 z-20 transform -rotate-2 group-hover:rotate-0 transition-transform"
 							>
 								<span
 									class="px-2 py-1 bg-black text-white text-[10px] font-black rounded uppercase border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
@@ -564,7 +564,7 @@
 
 							<!-- Browser Frame -->
 							<div
-								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-[8px_8px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-6 md:mt-4"
+								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-[8px_8px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-0 sm:mt-6 md:mt-4"
 							>
 								<div
 									class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
@@ -633,12 +633,12 @@
 
 			<!-- Block 4: Target Context (Spans 12 cols, Flipped Layout) -->
 			<div
-				class="xl:col-span-12 bg-[#fce7f3] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group"
+				class="xl:col-span-12 bg-[#fce7f3] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Visual (Left, 7 columns) -->
 					<div
-						class="lg:col-span-7 p-6 md:p-10 flex flex-col justify-center relative bg-[#fdf2f8]/50 order-2 lg:order-1 pt-16 md:pt-20 lg:pt-20"
+						class="lg:col-span-7 p-6 md:p-10 flex flex-col justify-center relative bg-[#fdf2f8]/50 order-2 lg:order-1 pt-8 md:pt-20 lg:pt-20 overflow-hidden"
 					>
 						<div
 							class="absolute inset-0 bg-[radial-gradient(#ec4899_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none"
@@ -647,7 +647,7 @@
 						<div class="relative z-10 w-full max-w-2xl mx-auto mt-4 md:mt-0">
 							<!-- Floating Detection Widget -->
 							<div
-								class="absolute -top-10 md:-top-12 right-4 md:-right-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-3 flex flex-col gap-2 z-20 transform rotate-2 group-hover:rotate-0 transition-transform"
+								class="hidden sm:flex absolute -top-10 md:-top-12 right-4 md:-right-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-3 flex-col gap-2 z-20 transform rotate-2 group-hover:rotate-0 transition-transform"
 							>
 								<div class="flex items-center gap-2">
 									<div
@@ -685,7 +685,7 @@
 
 							<!-- Browser Frame -->
 							<div
-								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-[8px_8px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-10 md:mt-8"
+								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-[8px_8px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-0 sm:mt-10 md:mt-8"
 							>
 								<div
 									class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"

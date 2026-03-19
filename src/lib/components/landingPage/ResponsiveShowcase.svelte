@@ -76,7 +76,7 @@
 
 				<div class="flex flex-col lg:flex-row lg:items-stretch bg-[#FFFDF8]">
 					<!-- Left: Visual Illustration -->
-					<div class="w-full lg:w-[55%] min-h-[400px] flex items-center justify-center border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-gray-900 relative overflow-hidden">
+					<div class="w-full lg:w-[55%] min-h-[350px] lg:min-h-[400px] flex items-center justify-center border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-gray-900 relative overflow-hidden">
 						
 						<div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 20px 20px;" />
 

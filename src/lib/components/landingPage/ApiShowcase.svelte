@@ -213,8 +213,8 @@ const image = await pictify.render({
 				<!-- Decorative yellow offset shadow box -->
 				<div class="absolute inset-0 bg-[#ffc480] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 
-				<div class="relative bg-[#1e1e1e] rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[500px]">
-					
+				<div class="relative bg-[#1e1e1e] rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
+
 					<!-- Mac Header -->
 					<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">
 						<div class="flex gap-2">
@@ -232,7 +232,7 @@ const image = await pictify.render({
 					<div class="flex flex-wrap border-b-[3px] border-black bg-[#252526]">
 						{#each Object.entries(codeExamples) as [key, tab]}
 							<button 
-								class="flex-1 min-w-[120px] px-3 md:px-4 py-3 text-xs md:text-sm font-mono font-bold border-r-[3px] border-black last:border-r-0 transition-all flex items-center justify-center gap-2
+								class="flex-1 min-w-[80px] sm:min-w-[120px] px-3 md:px-4 py-3 text-xs md:text-sm font-mono font-bold border-r-[3px] border-black last:border-r-0 transition-all flex items-center justify-center gap-2
 								{activeTab === key ? 'bg-[#1e1e1e] text-white' : 'bg-[#2d2d2d] text-gray-500 hover:bg-[#3d3d3d] hover:text-gray-300'}"
 								on:click={() => handleTabChange(key)}
 							>

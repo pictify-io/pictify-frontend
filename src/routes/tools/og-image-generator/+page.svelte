@@ -752,11 +752,7 @@
 			: 'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'}
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/z8xnl-1723429909736.png" />
-	<script type="application/ld+json">
-		{
-			JSON.stringify(structuredData);
-		}
-	</script>
+	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">

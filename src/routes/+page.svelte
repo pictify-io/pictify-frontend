@@ -85,39 +85,34 @@
 	/>
 	<meta name="twitter:site" content="@pictify_io" />
 	<link rel="canonical" href="https://pictify.io/" />
-	<script type="application/ld+json">
-		{
-			JSON.stringify({
-				'@context': 'https://schema.org',
-				'@type': 'SoftwareApplication',
-				name: 'Pictify.io',
-				url: 'https://pictify.io',
-				image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
-				description:
-					'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
-				applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
-				operatingSystem: 'Web',
-				featureList: [
-					'Expression engine with 50+ functions',
-					'Visual template editor with drag-and-drop',
-					'A/B testing with Thompson Sampling',
-					'Smart links with geo/device targeting',
-					'Scheduled image variants',
-					'REST API with <200ms latency',
-					'Webhooks and storage connectors',
-					'AI copilot for template generation',
-					'AI-powered smart resize',
-					'Batch image generation'
-				],
-				offers: {
-					'@type': 'Offer',
-					price: '0',
-					priceCurrency: 'USD',
-					availability: 'https://schema.org/InStock'
-				}
-			});
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'SoftwareApplication',
+		name: 'Pictify.io',
+		url: 'https://pictify.io',
+		image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
+		description: 'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
+		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
+		operatingSystem: 'Web',
+		featureList: [
+			'Expression engine with 50+ functions',
+			'Visual template editor with drag-and-drop',
+			'A/B testing with Thompson Sampling',
+			'Smart links with geo/device targeting',
+			'Scheduled image variants',
+			'REST API with <200ms latency',
+			'Webhooks and storage connectors',
+			'AI copilot for template generation',
+			'AI-powered smart resize',
+			'Batch image generation'
+		],
+		offers: {
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'USD',
+			availability: 'https://schema.org/InStock'
 		}
-	</script>
+	})}</script>`}
 </svelte:head>
 
 <section

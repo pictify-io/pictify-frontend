@@ -52,29 +52,27 @@
 	<meta Property="og:type" content="website" />
 	<meta Property="og:site_name" content="Pictify.io" />
 	<meta Property="og:locale" content="en_US" />
-	<script type="application/ld+json">
-    {
-      "@context": "https://schema.org/",
-      "@type": "BlogPosting",
-      "headline": "{blog.title}",
-      "image": "{blog.image}",
-      "author": {
-        "@type": "Person",
-        "name": "{blog.author}"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Pictify.io",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
-        }
-      },
-      "datePublished": "{blog.date}",
-      "dateModified": "{blog.date}",
-      "description": "{blog.description}"
-    }
-	</script>
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org/',
+		'@type': 'BlogPosting',
+		headline: blog.title,
+		image: blog.image,
+		author: {
+			'@type': 'Person',
+			name: blog.author
+		},
+		publisher: {
+			'@type': 'Organization',
+			name: 'Pictify.io',
+			logo: {
+				'@type': 'ImageObject',
+				url: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png'
+			}
+		},
+		datePublished: blog.date,
+		dateModified: blog.date,
+		description: blog.description
+	})}</script>`}
 </svelte:head>
 
 <div

@@ -372,7 +372,7 @@
 
 						<!-- Light Canvas Area -->
 						<div
-							class="relative flex-1 flex items-center justify-center p-6 sm:p-12 min-h-[350px] lg:min-h-0 bg-[#bfdbfe] overflow-hidden"
+							class="relative flex-1 flex items-center justify-center p-6 sm:p-12 min-h-[280px] sm:min-h-[350px] lg:min-h-0 bg-[#bfdbfe] overflow-hidden"
 						>
 							<!-- Blue Dot Grid -->
 							<div

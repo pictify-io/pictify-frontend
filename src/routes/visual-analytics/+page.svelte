@@ -148,9 +148,6 @@
 
 	<!-- Hero Section -->
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
-		<div class="absolute top-10 right-10 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-3xl -z-10 pointer-events-none" />
-		<div class="absolute bottom-0 left-10 w-40 h-40 bg-[#ffc480]/20 rounded-full blur-3xl -z-10 pointer-events-none" />
-
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
 				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform rotate-1 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
@@ -158,10 +155,10 @@
 				<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
 				</svg>
-				<span class="text-xs font-black text-gray-900 uppercase tracking-widest">Conversions · Channels · Devices · Geography</span>
+				<span class="text-sm font-black text-gray-900 uppercase tracking-widest">Conversions · Channels · Devices · Geography</span>
 			</div>
 
-			<h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-[0.95] mb-8">
+			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Know Which Images<br />
 				<span class="relative inline-block text-[#4ade80] mt-2">
 					Convert

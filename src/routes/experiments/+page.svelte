@@ -183,14 +183,6 @@
 		class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
 		in:fly={{ y: 30, duration: 600 }}
 	>
-		<!-- Background Elements -->
-		<div
-			class="absolute top-20 right-0 w-64 h-64 bg-[#ffc480]/20 rounded-full blur-3xl -z-10 pointer-events-none"
-		/>
-		<div
-			class="absolute bottom-0 left-0 w-72 h-72 bg-green-100/40 rounded-full blur-3xl -z-10 pointer-events-none"
-		/>
-
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Badge -->
 			<div
@@ -209,12 +201,12 @@
 						d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
 					/>
 				</svg>
-				<span class="text-xs font-black text-gray-900 uppercase tracking-widest"
+				<span class="text-sm font-black text-gray-900 uppercase tracking-widest"
 					>A/B TEST · SMART LINKS · SCHEDULED · AUTO-OPTIMIZE</span
 				>
 			</div>
 
-			<h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-[0.95] mb-8">
+			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Test Your Images<br />
 				<span class="relative inline-block text-[#ff6b6b] mt-2">
 					Like You Test Your Copy
