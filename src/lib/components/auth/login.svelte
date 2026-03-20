@@ -19,17 +19,19 @@
 
 	/**
 	 * Validate redirect URL to prevent open redirect attacks.
-	 * Only allows relative paths or same-origin URLs.
+	 * Only allows relative paths, same-origin URLs, or trusted Pictify domains.
 	 */
 	function validateRedirectUrl(url) {
 		if (!url || url === 'null') return null;
 		// Allow relative paths
 		if (url.startsWith('/')) return url;
-		// Reject absolute URLs to external domains
+		// Allow absolute URLs to trusted domains
 		try {
-			const parsed = new URL(url, window.location.origin);
+			const parsed = new URL(url);
 			if (parsed.origin === window.location.origin)
 				return parsed.pathname + parsed.search + parsed.hash;
+			// Allow OAuth redirects back to the Pictify API
+			if (parsed.hostname === 'api.pictify.io') return url;
 		} catch (e) {
 			// Invalid URL
 		}
@@ -39,7 +41,12 @@
 	function safeRedirect() {
 		const safeUrl = validateRedirectUrl(redirectUrl);
 		if (safeUrl) {
-			goto(safeUrl);
+			// External trusted redirect (e.g. OAuth flow back to API)
+			if (safeUrl.startsWith('http')) {
+				window.location.href = safeUrl;
+			} else {
+				goto(safeUrl);
+			}
 		} else {
 			goto('/dashboard');
 		}
