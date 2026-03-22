@@ -2581,7 +2581,7 @@
 					codeLanguage="bash"
 					docsUrl="https://docs.pictify.io/"
 					docsLabel="Explore HTML to Image API"
-					secondaryCtaUrl="https://docs.pictify.io/examples"
+					secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
 					secondaryCtaLabel="See examples"
 					note="Need custom fonts or private templates? Talk to us for enterprise access."
 				/>

@@ -45,7 +45,7 @@ export const integrations = [
 			'Create certificates on course completion',
 			'Generate social cards from CRM data'
 		],
-		docsUrl: 'https://docs.pictify.io/integrations/zapier',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'zapier',
 		tutorial: {
 			title: 'How to Connect Pictify with Zapier',
@@ -155,7 +155,7 @@ Body (JSON):
 			'Multi-variant A/B test images',
 			'Complex conditional image generation'
 		],
-		docsUrl: 'https://docs.pictify.io/integrations/make',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'make',
 		tutorial: {
 			title: 'How to Generate Images with Make (Integromat)',
@@ -276,7 +276,7 @@ Request content:
 			'Custom workflow logic',
 			'Privacy-sensitive applications'
 		],
-		docsUrl: 'https://docs.pictify.io/integrations/n8n',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'n8n',
 		tutorial: {
 			title: 'How to Use Pictify with n8n',
@@ -1194,7 +1194,7 @@ end`,
 			'Product page social cards',
 			'User-generated content previews'
 		],
-		docsUrl: 'https://docs.pictify.io/frameworks/nextjs',
+		docsUrl: 'https://docs.pictify.io/sdks/nodejs',
 		icon: 'nextjs',
 		tutorial: {
 			title: 'Dynamic OG Images with Next.js',
@@ -1408,7 +1408,7 @@ export async function GET(request: NextRequest) {
 			'SSR compatible'
 		],
 		useCases: ['Vue-based applications', 'SSR image generation', 'Jamstack sites'],
-		docsUrl: 'https://docs.pictify.io/frameworks/nuxt',
+		docsUrl: 'https://docs.pictify.io/sdks/nodejs',
 		icon: 'nuxt',
 		tutorial: {
 			title: 'Dynamic OG Images with Nuxt',
@@ -1613,7 +1613,7 @@ export default defineNitroPlugin(async () => {
 			'TypeScript support'
 		],
 		useCases: ['Svelte applications', 'Static site generation', 'Dynamic server routes'],
-		docsUrl: 'https://docs.pictify.io/frameworks/sveltekit',
+		docsUrl: 'https://docs.pictify.io/sdks/nodejs',
 		icon: 'svelte',
 		tutorial: {
 			title: 'Dynamic OG Images with SvelteKit',
@@ -1841,7 +1841,7 @@ return {
 			'Featured image generation',
 			'WooCommerce product images'
 		],
-		docsUrl: 'https://docs.pictify.io/cms/wordpress',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'wordpress',
 		tutorial: {
 			title: 'Auto-Generate OG Images in WordPress',
@@ -1998,7 +1998,7 @@ Products → Use template: "product-card"`,
 			'Member data support'
 		],
 		useCases: ['Publication social cards', 'Newsletter images', 'Member certificates'],
-		docsUrl: 'https://docs.pictify.io/cms/ghost',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'ghost',
 		tutorial: {
 			title: 'Auto-Generate OG Images in Ghost',
@@ -2181,7 +2181,7 @@ image       → post.current.feature_image`,
 			'Zapier connection'
 		],
 		useCases: ['Collection item images', 'Dynamic directories', 'Portfolio showcases'],
-		docsUrl: 'https://docs.pictify.io/cms/webflow',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'webflow',
 		tutorial: {
 			title: 'Auto-Generate OG Images for Webflow CMS',
@@ -2389,7 +2389,7 @@ export default async function handler(req, res) {
 			'App embed blocks'
 		],
 		useCases: ['Product social cards', 'Sale promo graphics', 'Dynamic product badges'],
-		docsUrl: 'https://docs.pictify.io/ecommerce/shopify',
+		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'shopify',
 		tutorial: {
 			title: 'Auto-Generate Product Images for Shopify',

@@ -13,7 +13,7 @@
 	// Keep public pages frictionless: route gated actions via signup.
 	export let ctaUrl = '/signup?redirect=/dashboard/api-token';
 	export let ctaLabel = 'Get free API key';
-	export let secondaryCtaUrl = 'https://docs.pictify.io/examples';
+	export let secondaryCtaUrl = 'https://docs.pictify.io/api-reference/overview';
 	export let secondaryCtaLabel = 'See examples';
 	export let showSecondaryCta = true;
 	export let note = '';

@@ -667,7 +667,7 @@
 					codeLanguage="bash"
 					docsUrl="https://docs.pictify.io/"
 					docsLabel="Read URL to Image docs"
-					secondaryCtaUrl="https://docs.pictify.io/examples"
+					secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
 					secondaryCtaLabel="See examples"
 					note="Need JS execution, authentication, or regional rendering? Contact us for advanced plans."
 				/>

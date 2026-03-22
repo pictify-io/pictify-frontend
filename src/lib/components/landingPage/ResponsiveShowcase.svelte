@@ -176,7 +176,7 @@
 
 						<div class="mt-8 flex justify-start">
 							<a
-								href="/docs"
+								href="https://docs.pictify.io"
 								class="inline-flex items-center gap-2 px-6 py-3.5 bg-black text-white font-black text-sm uppercase tracking-widest rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_#a259ff] group-hover/rightpane:shadow-[2px_2px_0_0_#a259ff] group-hover/rightpane:translate-x-1 group-hover/rightpane:translate-y-1 transition-all"
 							>
 								Read API Docs

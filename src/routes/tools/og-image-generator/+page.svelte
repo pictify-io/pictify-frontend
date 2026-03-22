@@ -688,7 +688,7 @@
 		softwareHelp: {
 			'@type': 'CreativeWork',
 			name: 'OG Image Generator Documentation',
-			url: 'https://pictify.io/docs/og-image-generator'
+			url: 'https://docs.pictify.io/api-reference/generation/images'
 		},
 		keywords: [
 			'OG image generator',
@@ -1391,7 +1391,7 @@
 				docsUrl={apiCtaDetails.docsUrl}
 				docsLabel={apiCtaDetails.docsLabel}
 				secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
-				secondaryCtaUrl="https://docs.pictify.io/examples"
+				secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
 				note="Contact us for volume pricing or dedicated rendering regions."
 			/>
 		</section>

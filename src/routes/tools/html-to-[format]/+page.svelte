@@ -1360,7 +1360,7 @@
 					.replace('FORMAT_PLACEHOLDER', format)}
 				docsUrl="https://docs.pictify.io"
 				docsLabel="View HTML → Image API docs"
-				secondaryCtaUrl="https://docs.pictify.io/examples"
+				secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
 				secondaryCtaLabel="See examples"
 				note="Talk to sales for dedicated regions, SLAs, or volume pricing."
 			/>
