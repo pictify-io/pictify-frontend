@@ -8,6 +8,7 @@
 	import {
 		onboardingStore,
 		showOnboarding,
+		showWelcomeWizard,
 		initOnboarding,
 		completeStepAction,
 		dismissOnboardingAction,
@@ -16,6 +17,7 @@
 	} from '../../store/onboarding.store';
 	import { fetchAuditLogs } from '../../api/audit';
 	import { getTemplates } from '../../api/template';
+	import { getApiToken } from '../../api/user';
 	import { analytics } from '$lib/analytics.js';
 	import {
 		getQuickActions,
@@ -26,14 +28,19 @@
 	} from '../../config/personalization.js';
 	import { evaluateNudges, getDismissedNudges, dismissNudge } from '$lib/utils/nudge-engine.js';
 	import NudgeBanner from '$lib/components/dashboard/NudgeBanner.svelte';
+	import GettingStartedGuide from '$lib/components/onboarding/GettingStartedGuide.svelte';
+	import WelcomeWizard from '$lib/components/onboarding/WelcomeWizard.svelte';
+	import { browser } from '$app/environment';
 
 	let isLoading = true;
+	let guideDismissed = false;
 	let recentLogs = [];
 	let recentTemplates = [];
 	let totalTemplates = 0;
 	let cdnTimeRange = '30d';
 	let nudges = [];
 	let starterPreviews = {}; // templateId → { name, svgHtml }
+	let userApiKey = '';
 
 	// Filtered daily stats based on time range
 	$: filteredDailyStats = getFilteredStats($cdnStore.dailyStats, cdnTimeRange);
@@ -53,6 +60,24 @@
 	$: primaryCTA = getPrimaryCTA(useCase, integrationMode);
 	$: isNewUser = isPersonalized && totalTemplates < 2;
 	$: starterTemplateIds = useCase ? STARTER_TEMPLATES[useCase] || [] : [];
+
+	// Getting Started Guide
+	$: guideHasApiKey = ($onboardingStore.steps || []).some(
+		(s) => s.id === 'get_api_key' && s.completed
+	);
+	$: guideHasTemplates = totalTemplates > 0;
+	$: guideHasImages = ($onboardingStore.steps || []).some(
+		(s) => s.id === 'first_image' && s.completed
+	);
+	$: guideIntent = $personalization?.useCase || null;
+	$: showGuide = !guideDismissed && totalTemplates < 3;
+
+	function handleDismissGuide() {
+		guideDismissed = true;
+		if (browser) {
+			localStorage.setItem('pictify_guide_dismissed', 'true');
+		}
+	}
 
 	function getFilteredStats(dailyStats, range) {
 		if (!dailyStats || !dailyStats.length) return [];
@@ -229,13 +254,24 @@
 	onMount(async () => {
 		analytics.page('Dashboard Home');
 
+		// Check if Getting Started Guide was previously dismissed
+		if (browser) {
+			guideDismissed = localStorage.getItem('pictify_guide_dismissed') === 'true';
+		}
+
 		try {
 			// Fetch data in parallel
-			const [cdnData, logsData, templatesData] = await Promise.all([
+			const [cdnData, logsData, templatesData, apiTokenData] = await Promise.all([
 				initCdnAnalytics(),
 				fetchAuditLogs({ limit: 8 }).catch(() => ({ logs: [] })),
-				getTemplates({ page: 1, limit: 6, sort: 'newest' }).catch(() => null)
+				getTemplates({ page: 1, limit: 6, sort: 'newest' }).catch(() => null),
+				getApiToken().catch(() => null)
 			]);
+
+			// Extract API key for getting started guide
+			if (apiTokenData?.apiTokens?.length) {
+				userApiKey = apiTokenData.apiTokens[0].token || '';
+			}
 
 			recentLogs = logsData?.logs || [];
 			recentTemplates = templatesData?.templates || [];
@@ -337,6 +373,20 @@
 			</a>
 		</div>
 	</div>
+
+	<!-- Getting Started Guide (new users only) -->
+	{#if showGuide && !isLoading}
+		<div class="mb-10">
+			<GettingStartedGuide
+				hasApiKey={guideHasApiKey}
+				hasTemplates={guideHasTemplates}
+				hasImages={guideHasImages}
+				intent={guideIntent}
+				apiKey={userApiKey}
+				on:dismiss={handleDismissGuide}
+			/>
+		</div>
+	{/if}
 
 	{#if isLoading}
 		<div class="flex flex-col items-center justify-center py-20">
@@ -1109,3 +1159,8 @@
 		</div>
 	{/if}
 </section>
+
+<!-- Intent Wizard (full-screen overlay for new users) -->
+{#if $showWelcomeWizard}
+	<WelcomeWizard />
+{/if}

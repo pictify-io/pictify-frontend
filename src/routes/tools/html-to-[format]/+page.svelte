@@ -10,7 +10,6 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -219,44 +218,6 @@
     "height": HEIGHT_PLACEHOLDER,
     "fileExtension": "FORMAT_PLACEHOLDER"
   }'`;
-
-	function buildCurlSnippetFromHtml(html, width, height, ext) {
-		const safeHtml = String(html || '');
-		const payload = {
-			html: safeHtml,
-			width: Number(width) || 1200,
-			height: Number(height) || 630,
-			fileExtension: String(ext || 'png')
-		};
-		// Keep display readable; clipboard copy uses the full snippet string.
-		return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(
-			payload,
-			null,
-			2
-		)}'`;
-	}
-
-	$: nextStepsCurlSnippet = buildCurlSnippetFromHtml(
-		previewHtml,
-		hasSize ? dimWidth : previewWidth,
-		hasSize ? dimHeight : previewHeight,
-		fileExtension
-	);
-	$: nextStepsTemplateType =
-		Number(previewWidth) === 1200 && [628, 630, 675].includes(Number(previewHeight))
-			? 'og-image'
-			: 'social-media';
-	$: nextStepsTemplateDraft = imageUrl
-		? {
-				version: 1,
-				name: `${String(currentFormat?.fullName || format || 'Image')} from HTML`,
-				type: nextStepsTemplateType,
-				width: hasSize ? dimWidth : previewWidth,
-				height: hasSize ? dimHeight : previewHeight,
-				backgroundImageUrl: imageUrl,
-				source: `html-to-${format}`
-		  }
-		: null;
 
 	let imageUrl = '';
 	let isImageGenerating = false;
@@ -871,7 +832,7 @@
 		{/if}
 
 		<!-- Code Editor Workstation -->
-		<div class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0">
+		<div class="w-full max-w-6xl mx-auto mb-20 relative px-2 md:px-0">
 			<div
 				class="border-[3px] md:border-[4px] border-black bg-white relative z-10 shadow-[8px_8px_0_0_#000] overflow-hidden"
 			>
@@ -879,8 +840,6 @@
 				<CodeEditor
 					isPreviewEnabled={true}
 					{fileExtension}
-					targetWidth={hasSize ? dimWidth : undefined}
-					targetHeight={hasSize ? dimHeight : undefined}
 					on:previewUpdated={handlePreviewUpdate}
 				/>
 
@@ -1090,13 +1049,106 @@
 					</div>
 				</div>
 
-				<!-- Next steps — below result card -->
-				<NextSteps
-					heading="Next steps"
-					description="Copy the exact API request, save this as a reusable template, and batch render variants."
-					curlSnippet={nextStepsCurlSnippet}
-					templateDraft={nextStepsTemplateDraft}
-				/>
+				<!-- Next steps — stacked vertically -->
+				<div class="w-full mt-8 space-y-5">
+					<!-- Automate via API -->
+					<div class="border-[3px] border-black bg-white shadow-[6px_6px_0_0_#000]">
+						<div class="bg-[#4ade80] px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
+							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">01</span>
+							<h4 class="font-black uppercase tracking-widest text-sm">Automate via API</h4>
+						</div>
+						<div class="p-5 md:p-6 flex flex-col md:flex-row gap-5">
+							<div class="flex-1">
+								<p class="text-sm font-bold text-gray-700 mb-3">
+									Generate {currentFormat.fullName} images programmatically. Send HTML, get back a hosted image URL — one API call.
+								</p>
+								<a
+									href="https://docs.pictify.io/api-reference/overview"
+									target="_blank"
+									class="inline-block py-2.5 px-5 bg-[#4ade80] text-black border-[2px] border-black font-black uppercase text-xs shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								>
+									View API docs
+								</a>
+							</div>
+							<div class="flex-1">
+								<pre class="text-[12px] font-mono bg-[#282c34] text-[#abb2bf] border-[2px] border-black p-4 overflow-auto rounded-sm">{@html `<span style="color:#e06c75">curl</span> -X POST <span style="color:#98c379">https://api.pictify.io/image</span> <span style="color:#5c6370">\\</span>
+  -H <span style="color:#98c379">"Content-Type: application/json"</span> <span style="color:#5c6370">\\</span>
+  -H <span style="color:#98c379">"Authorization: Bearer YOUR_API_KEY"</span> <span style="color:#5c6370">\\</span>
+  -d <span style="color:#98c379">'{</span>
+    <span style="color:#e06c75">"html"</span>: <span style="color:#98c379">"&lt;h1&gt;Hello World&lt;/h1&gt;"</span>,
+    <span style="color:#e06c75">"width"</span>: <span style="color:#d19a66">${hasSize ? dimWidth : previewWidth}</span>,
+    <span style="color:#e06c75">"height"</span>: <span style="color:#d19a66">${hasSize ? dimHeight : previewHeight}</span>,
+    <span style="color:#e06c75">"fileExtension"</span>: <span style="color:#98c379">"${fileExtension}"</span>
+  <span style="color:#98c379">}'</span>`}</pre>
+							</div>
+						</div>
+					</div>
+
+					<!-- Use with AI via MCP -->
+					<div class="border-[3px] border-black bg-white shadow-[6px_6px_0_0_#000]">
+						<div class="bg-[#ffc480] px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
+							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">02</span>
+							<h4 class="font-black uppercase tracking-widest text-sm">Use with AI agents</h4>
+						</div>
+						<div class="p-5 md:p-6 flex flex-col md:flex-row gap-5">
+							<div class="flex-1">
+								<p class="text-sm font-bold text-gray-700 mb-3">
+									Connect Pictify as an MCP server to Claude, Cursor, or any AI coding agent. Generate and iterate on images using natural language.
+								</p>
+								<div class="flex flex-wrap gap-3">
+									<a
+										href="https://www.npmjs.com/package/@pictify/mcp-server"
+										target="_blank"
+										class="inline-flex items-center gap-2 py-2.5 px-5 bg-[#ffc480] text-black border-[2px] border-black font-black uppercase text-xs shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									>
+										<svg class="w-4 h-4" viewBox="0 0 256 256" fill="currentColor"><path d="M0 256V0h256v256z" fill="#C12127"/><path d="M48 48h160v160H176V80H128v128H48z" fill="#fff"/></svg>
+										npm install
+									</a>
+									<a
+										href="https://docs.pictify.io"
+										target="_blank"
+										class="inline-block py-2.5 px-5 bg-white text-black border-[2px] border-black font-black uppercase text-xs shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									>
+										Read docs
+									</a>
+								</div>
+							</div>
+							<div class="flex-1">
+								<pre class="text-[12px] font-mono bg-[#282c34] text-[#abb2bf] border-[2px] border-black p-4 overflow-auto rounded-sm">{@html `<span style="color:#5c6370">// Add to your MCP config</span>
+<span style="color:#e06c75">"pictify"</span>: {
+  <span style="color:#e06c75">"command"</span>: <span style="color:#98c379">"npx"</span>,
+  <span style="color:#e06c75">"args"</span>: [<span style="color:#98c379">"-y"</span>, <span style="color:#98c379">"@pictify/mcp-server"</span>],
+  <span style="color:#e06c75">"env"</span>: {
+    <span style="color:#e06c75">"PICTIFY_API_KEY"</span>: <span style="color:#98c379">"your_key"</span>
+  }
+}`}</pre>
+							</div>
+						</div>
+					</div>
+
+					<!-- Sign up CTA -->
+					{#if !isUserLoggedIn}
+						<div class="border-[3px] border-black bg-[#ff6b6b] shadow-[6px_6px_0_0_#000]">
+							<div class="p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+								<div class="flex items-center gap-4">
+									<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs flex-shrink-0">03</span>
+									<div>
+										<h4 class="font-black uppercase tracking-widest text-sm text-white">Go unlimited</h4>
+										<p class="text-xs font-bold text-white/80 mt-1">
+											No watermarks, unlimited generations, and your own API key — all free.
+										</p>
+									</div>
+								</div>
+								<a
+									href={`/signup?redirect=/tools/html-to-${format}`}
+									class="py-3 px-6 bg-white text-black border-[2px] border-black font-black uppercase text-sm shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap flex-shrink-0"
+								>
+									Sign up free
+								</a>
+							</div>
+						</div>
+					{/if}
+				</div>
 			</div>
 		{/if}
 

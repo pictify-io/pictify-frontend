@@ -13,14 +13,22 @@ export default defineConfig({
 		}
 	},
 	optimizeDeps: {
-		exclude: [
+		include: [
 			'codemirror',
 			'@codemirror/lang-html',
+			'@codemirror/lang-css',
+			'@codemirror/lang-javascript',
 			'@codemirror/state',
 			'@codemirror/view',
-			'@codemirror/basic-setup',
 			'@codemirror/commands',
-			'@codemirror/language'
+			'@codemirror/language',
+			'@codemirror/theme-one-dark',
+			'@lezer/common',
+			'@lezer/highlight',
+			'@lezer/html',
+			'@lezer/css',
+			'@lezer/javascript',
+			'@lezer/lr'
 		]
 	}
 });

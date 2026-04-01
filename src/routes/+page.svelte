@@ -49,10 +49,10 @@
 </script>
 
 <svelte:head>
-	<title>Pictify.io | Dynamic Image Generation API — No Puppeteer, No Infra</title>
+	<title>Pictify — Image Generation API for Developers | No Puppeteer, No Infra</title>
 	<meta
 		name="description"
-		content="Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available."
+		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available."
 	/>
 	<meta
 		name="keywords"
@@ -60,10 +60,10 @@
 	/>
 	<meta name="author" content="Pictify.io" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta property="og:title" content="Pictify.io | Dynamic Image Generation API" />
+	<meta property="og:title" content="Pictify — Image Generation API for Developers" />
 	<meta
 		property="og:description"
-		content="Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
+		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
 	/>
 	<meta
 		property="og:image"
@@ -74,10 +74,10 @@
 	<meta property="og:site_name" content="Pictify.io" />
 	<meta property="og:locale" content="en_US" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Pictify.io | Dynamic Image Generation API" />
+	<meta name="twitter:title" content="Pictify — Image Generation API for Developers" />
 	<meta
 		name="twitter:description"
-		content="Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
+		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
 	/>
 	<meta
 		name="twitter:image"

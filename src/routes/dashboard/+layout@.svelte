@@ -7,11 +7,8 @@
 	import PLGProvider from '$lib/components/plg/PLGProvider.svelte';
 	import UsageBanner from '$lib/components/plg/UsageBanner.svelte';
 	import ProactiveUpgradeModal from '$lib/components/plg/ProactiveUpgradeModal.svelte';
-	import OnboardingChecklist from '$lib/components/onboarding/OnboardingChecklist.svelte';
-	import WelcomeWizard from '$lib/components/onboarding/WelcomeWizard.svelte';
-
 	import { getUser } from '../../store/user.store';
-	import { initOnboarding, showWelcomeWizard } from '../../store/onboarding.store';
+	import { initOnboarding } from '../../store/onboarding.store';
 
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -139,15 +136,7 @@
 			</div>
 		</div>
 
-		<!-- Onboarding Checklist -->
-		{#if isUserLoaded}
-			<OnboardingChecklist />
-		{/if}
-
-		<!-- Welcome Wizard (first-time personalization) -->
-		{#if isUserLoaded && $showWelcomeWizard}
-			<WelcomeWizard />
-		{/if}
+		<!-- Getting Started Guide is now rendered inline on the dashboard page -->
 	</div>
 
 	<!-- Proactive Upgrade Modal (shows once at 75%) -->

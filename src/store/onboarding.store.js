@@ -95,11 +95,10 @@ export const initOnboarding = async () => {
 		const status = await getStatusAPI();
 
 		const p = status.personalization || null;
-		const hasPersonalization = p?.completedAt || p?.skippedAt;
 		const completedCount = status.completedCount || 0;
-		// Show wizard whenever personalization hasn't been completed or skipped.
-		// Skip for users who dismissed the onboarding checklist (existing users).
-		const shouldShowWizard = !hasPersonalization && !status.isDismissed;
+		// Show wizard when user hasn't picked an intent yet
+		const hasChosenIntent = !!p?.useCase;
+		const shouldShowWizard = !hasChosenIntent && !status.isDismissed;
 
 		onboardingStore.update((state) => ({
 			...state,
