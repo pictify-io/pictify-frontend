@@ -55,6 +55,18 @@
 			icon: 'fa-solid fa-code'
 		},
 		{
+			name: 'Markdown to Image',
+			description: 'Convert markdown to beautiful, shareable images with themes and fonts.',
+			url: '/tools/markdown',
+			icon: 'fa-brands fa-markdown'
+		},
+		{
+			name: 'Table to Image',
+			description: 'Turn CSV data or HTML tables into polished, shareable table images.',
+			url: '/tools/table',
+			icon: 'fa-solid fa-table'
+		},
+		{
 			name: 'OG Image Generator',
 			description: 'Create custom Open Graph images for improved social media engagement and SEO.',
 			url: '/tools/og-image-generator',
