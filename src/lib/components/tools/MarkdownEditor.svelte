@@ -15,6 +15,7 @@
 	import rust from 'refractor/lang/rust.js';
 	import yaml from 'refractor/lang/yaml.js';
 	import sql from 'refractor/lang/sql.js';
+	import Toast from '$lib/components/Toast.svelte';
 	import { createImagePublic } from '../../../api/image.js';
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
@@ -35,21 +36,20 @@
 	refractor.register(yaml);
 	refractor.register(sql);
 
-	// Configure marked with syntax highlighting
-	marked.setOptions({
-		gfm: true,
-		breaks: true,
-		highlight: (code, lang) => {
-			if (!lang) return code;
-			try {
-				const prismLang = lang === 'html' ? 'markup' : lang;
-				const hast = refractor.highlight(code, prismLang);
-				return toHtml(hast);
-			} catch {
-				return code;
-			}
+	// Configure marked with syntax highlighting via custom renderer (v5 API)
+	const renderer = new marked.Renderer();
+	renderer.code = (code, lang) => {
+		if (!lang) return `<pre><code>${code}</code></pre>`;
+		try {
+			const prismLang = lang === 'html' ? 'markup' : lang;
+			const hast = refractor.highlight(code, prismLang);
+			return `<pre><code class="language-${lang}">${toHtml(hast)}</code></pre>`;
+		} catch {
+			return `<pre><code>${code}</code></pre>`;
 		}
-	});
+	};
+	marked.setOptions({ gfm: true, breaks: true });
+	marked.use({ renderer });
 
 	// ── Theme definitions ──
 	const themes = [
@@ -360,8 +360,10 @@ function generateImage(markdown) {
 
 	// Listen for height measurements from iframe
 	function handleMessage(e) {
+		// Sandboxed iframes post with a null origin; reject anything else
+		if (e.origin !== 'null' && e.origin !== null) return;
 		if (e.data?.type === 'measured-height' && e.data.height > 0) {
-			measuredHeight = e.data.height;
+			measuredHeight = Math.min(e.data.height, 5000);
 		}
 	}
 
@@ -458,7 +460,18 @@ function generateImage(markdown) {
 	function copyToClipboard(text, label) {
 		if (!browser) return;
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: `${label} copied!`, type: 'success', duration: 1500 });
+			toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
+		}).catch(() => {
+			// Fallback for insecure contexts
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			textarea.style.position = 'fixed';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textarea);
+			toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
 		});
 	}
 
@@ -1101,4 +1114,5 @@ function generateImage(markdown) {
 			</div>
 		</div>
 	{/if}
+	<Toast />
 </div>
