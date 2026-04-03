@@ -5,6 +5,8 @@
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
+	import MarkdownEditor from '$lib/components/tools/MarkdownEditor.svelte';
+	import TableEditor from '$lib/components/tools/TableEditor.svelte';
 	import TemplateGallery from '$lib/components/tools/TemplateGallery.svelte';
 	import { page } from '$app/stores';
 	import {
@@ -312,6 +314,13 @@
 			<!-- Generation Limit Banner -->
 			<GenerationLimitBanner />
 
+			{#if useCaseId === 'markdown'}
+				<!-- Markdown Editor (self-contained: editor, preview, generate, result) -->
+				<MarkdownEditor {isUserLoggedIn} />
+			{:else if useCaseId === 'table'}
+				<!-- Table Editor (self-contained: CSV/HTML input, preview, generate, result) -->
+				<TableEditor {isUserLoggedIn} />
+			{:else}
 			<!-- Template Preview Section (Window Style) -->
 			<div class="max-w-5xl mx-auto px-4 mb-20">
 				<div
@@ -489,6 +498,7 @@
 						>
 					</div>
 				</div>
+			{/if}
 			{/if}
 
 			<!-- Why Teams Choose This Section (Three Pillars Style) -->
