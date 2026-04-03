@@ -8,6 +8,7 @@
 	import { html as htmlLang } from '@codemirror/lang-html';
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import { indentWithTab } from '@codemirror/commands';
+	import Toast from '$lib/components/Toast.svelte';
 	import { createImagePublic } from '../../../api/image.js';
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
@@ -323,8 +324,10 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 
 	// Listen for height measurements
 	function handleMessage(e) {
+		// Sandboxed iframes post with a null origin; reject anything else
+		if (e.origin !== 'null' && e.origin !== null) return;
 		if (e.data?.type === 'measured-height' && e.data.height > 0) {
-			measuredHeight = e.data.height;
+			measuredHeight = Math.min(e.data.height, 5000);
 		}
 	}
 
@@ -489,7 +492,18 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	function copyToClipboard(text, label) {
 		if (!browser) return;
 		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: `${label} copied!`, type: 'success', duration: 1500 });
+			toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
+		}).catch(() => {
+			// Fallback for insecure contexts
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			textarea.style.position = 'fixed';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textarea);
+			toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
 		});
 	}
 
@@ -1022,4 +1036,5 @@ Bob,Designer,Active"""</span>
 			</div>
 		</div>
 	{/if}
+	<Toast />
 </div>
