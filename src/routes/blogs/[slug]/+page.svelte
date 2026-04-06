@@ -45,13 +45,12 @@
 	<title>{blog.title}</title>
 	<meta name="keywords" content={blog.tags.join(', ')} />
 	<meta name="author" content={blog.author} />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta Property="og:title" content={blog.title} />
-	<meta Property="og:image" content={blog.heroImage} />
-	<meta Property="og:url" content={`https://pictify.io/blogs/${$page.params.slug}`} />
-	<meta Property="og:type" content="website" />
-	<meta Property="og:site_name" content="Pictify.io" />
-	<meta Property="og:locale" content="en_US" />
+	<meta property="og:title" content={blog.title} />
+	<meta property="og:image" content={blog.heroImage} />
+	<meta property="og:url" content={`https://pictify.io/blogs/${$page.params.slug}`} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify.io" />
+	<meta property="og:locale" content="en_US" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org/',
 		'@type': 'BlogPosting',

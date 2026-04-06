@@ -130,67 +130,67 @@ export async function GET() {
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
        <url>
           <loc>https://pictify.io/</loc>
-          <lastmod>2024-03-11</lastmod>
+          <lastmod>${today}</lastmod>
           <changefreq>daily</changefreq>
           <priority>0.9</priority>
        </url>
         <url>
             <loc>https://pictify.io/pricing</loc>
-            <lastmod>2024-08-02</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/blogs</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/og-image-generator</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/html-to-jpg</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/online-invoice-generator</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/url-to-image-generator</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/html-to-png</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/html-to-webp</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>
          <url>
             <loc>https://pictify.io/tools/code-to-image</loc>
-            <lastmod>2024-04-19</lastmod>
+            <lastmod>${today}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
          </url>

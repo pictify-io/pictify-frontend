@@ -9,7 +9,7 @@
 	} from '$lib/pseo/config.js';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
-	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -43,25 +43,15 @@
 
 	// SEO head computed values (dimension-aware)
 	$: headTitle = hasSize
-		? `HTML to ${
-				(currentFormat && currentFormat.fullName) || 'Image'
-		  } ${sizeString} Converter | Pictify.io`
-		: `Convert Image from HTML | HTML to ${
-				format || 'Image'
-		  } | Free Online HTML Image Generator | Pictify.io`;
+		? `HTML to ${(currentFormat && currentFormat.fullName) || 'Image'} ${sizeString} | Pictify`
+		: `HTML to ${(format && format.toUpperCase()) || 'Image'} Converter — Free Online | Pictify`;
 	$: headDescription = hasSize
 		? `Convert HTML to ${
 				(currentFormat && currentFormat.fullName) || 'image'
 		  } at ${sizeString} instantly. Perfect for ${
 				(currentFormat && currentFormat.bestFor) || 'web use'
 		  }.`
-		: `Convert HTML to ${format || 'image'} easily with Pictify.io. Transform HTML to ${
-				(format && format.toUpperCase && format.toUpperCase()) || 'IMAGE'
-		  } images instantly. Perfect for ${
-				(currentFormat && currentFormat.bestFor) || 'web use'
-		  }. Try our HTML to ${
-				(format && format.toUpperCase && format.toUpperCase()) || 'IMAGE'
-		  } image converter now!`;
+		: `Convert HTML to ${(format && format.toUpperCase()) || 'IMAGE'} images online for free. Create images from HTML code instantly — perfect for social cards, email headers, and automated workflows. API access included.`;
 	$: canonicalUrl = hasSize
 		? `https://pictify.io/tools/html-to-${format}/${sizeString}`
 		: `https://pictify.io/tools/html-to-${format}`;
@@ -76,6 +66,65 @@
 		  } images for free with Pictify.io's online HTML to ${
 				(format && format.toUpperCase && format.toUpperCase()) || ''
 		  } converter. Perfect for creating social media content, email marketing visuals, and website mockups.`;
+
+	const htmlToImageExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'render.js',
+			code: `<span class="text-[#6a9955]">// Convert HTML to image with Pictify API</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">'&lt;html&gt;&lt;body style="padding:48px"&gt;&lt;h1&gt;Hello World&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;'</span>;
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span>, <span class="text-[#9cdcfe]">fileExtension</span>: <span class="text-[#ce9178]">'png'</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// CDN-hosted image URL</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'render.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+    <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+    <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#ce9178]">"&lt;h1&gt;Hello&lt;/h1&gt;"</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>})
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'go',
+			label: 'Go',
+			fileName: 'main.go',
+			code: `<span class="text-[#c586c0]">package</span> <span class="text-[#9cdcfe]">main</span>
+
+<span class="text-[#c586c0]">import</span> (<span class="text-[#ce9178]">"bytes"</span>; <span class="text-[#ce9178]">"encoding/json"</span>; <span class="text-[#ce9178]">"net/http"</span>)
+
+<span class="text-[#c586c0]">func</span> <span class="text-[#dcdcaa]">main</span>() {
+    <span class="text-[#9cdcfe]">body</span>, _ := <span class="text-[#9cdcfe]">json</span>.<span class="text-[#dcdcaa]">Marshal</span>(<span class="text-[#c586c0]">map</span>[<span class="text-[#c586c0]">string</span>]<span class="text-[#c586c0]">any</span>{
+        <span class="text-[#ce9178]">"html"</span>: <span class="text-[#ce9178]">"&lt;h1&gt;Hello&lt;/h1&gt;"</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>,
+    })
+    <span class="text-[#9cdcfe]">req</span>, _ := <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">NewRequest</span>(<span class="text-[#ce9178]">"POST"</span>, <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>, <span class="text-[#9cdcfe]">bytes</span>.<span class="text-[#dcdcaa]">NewBuffer</span>(<span class="text-[#9cdcfe]">body</span>))
+    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span class="text-[#dcdcaa]">Set</span>(<span class="text-[#ce9178]">"Authorization"</span>, <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>)
+    <span class="text-[#9cdcfe]">http</span>.<span class="text-[#9cdcfe]">DefaultClient</span>.<span class="text-[#dcdcaa]">Do</span>(<span class="text-[#9cdcfe]">req</span>)
+}`
+		},
+		{
+			id: 'ruby',
+			label: 'Ruby',
+			fileName: 'render.rb',
+			code: `<span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"net/http"</span>; <span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"json"</span>
+<span class="text-[#9cdcfe]">uri</span> = <span class="text-[#9cdcfe]">URI</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>)
+<span class="text-[#9cdcfe]">req</span> = <span class="text-[#9cdcfe]">Net</span>::<span class="text-[#9cdcfe]">HTTP</span>::<span class="text-[#9cdcfe]">Post</span>.<span class="text-[#dcdcaa]">new</span>(<span class="text-[#9cdcfe]">uri</span>)
+<span class="text-[#9cdcfe]">req</span>[<span class="text-[#ce9178]">"Authorization"</span>] = <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>
+<span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">body</span> = { <span class="text-[#9cdcfe]">html</span>: <span class="text-[#ce9178]">"&lt;h1&gt;Hello&lt;/h1&gt;"</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span> }.<span class="text-[#dcdcaa]">to_json</span>
+<span class="text-[#9cdcfe]">res</span> = <span class="text-[#9cdcfe]">Net</span>::<span class="text-[#9cdcfe]">HTTP</span>.<span class="text-[#dcdcaa]">start</span>(<span class="text-[#9cdcfe]">uri</span>.<span class="text-[#9cdcfe]">hostname</span>, <span class="text-[#9cdcfe]">uri</span>.<span class="text-[#9cdcfe]">port</span>, <span class="text-[#9cdcfe]">use_ssl</span>: <span class="text-[#569cd6]">true</span>) { |<span class="text-[#9cdcfe]">http</span>| <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">request</span>(<span class="text-[#9cdcfe]">req</span>) }
+<span class="text-[#dcdcaa]">puts</span> <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">parse</span>(<span class="text-[#9cdcfe]">res</span>.<span class="text-[#9cdcfe]">body</span>)[<span class="text-[#ce9178]">"url"</span>]`
+		}
+	];
 
 	// Add copyToClipboard function
 	function copyToClipboard(text) {
@@ -519,6 +568,7 @@
 				]
 		  }
 		: null;
+
 </script>
 
 <svelte:head>
@@ -535,24 +585,37 @@
 			  } image creator, Pictify.io`}
 	/>
 	<meta name="author" content="Pictify.io" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta Property="og:title" content="Pictify.io" />
-	<meta Property="og:description" content={ogDescription} />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:description" content={ogDescription} />
 	<meta
-		Property="og:image"
-		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
+		property="og:image"
+		content="https://media.pictify.io/gre6p-1775406841745.png"
 	/>
-	<meta Property="og:url" content={canonicalUrl} />
-	<meta Property="og:type" content="website" />
-	<meta Property="og:site_name" content="Pictify.io" />
-	<meta Property="og:locale" content="en_US" />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify.io" />
+	<meta property="og:locale" content="en_US" />
 	<link rel="canonical" href={canonicalUrl} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:site" content="@pictify_io" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content="https://media.pictify.io/gre6p-1775406841745.png" />
 
 	{#if schemaMarkup}
 		{@html `<script type="application/ld+json">
 	${JSON.stringify(schemaMarkup)}
 </script>`}
 	{/if}
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'HTML to ' + (format ? format.toUpperCase() : 'Image') }
+		]
+	})}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
@@ -1399,23 +1462,50 @@
 			</div>
 		</div>
 
-		<!-- Popular Use Cases & API -->
 		<section class="mb-16 max-w-5xl mx-auto">
-			<ApiPromptSection
-				title={`Ship HTML → ${currentFormat.fullName} via API`}
-				description="Render marketing visuals, invoices, or personalized content at scale without managing browsers or queues."
-				featurePoints={apiFeatureBullets}
-				codeLanguage="bash"
-				codeSnippet={apiSnippetTemplate
-					.replace('WIDTH_PLACEHOLDER', (hasSize ? dimWidth : previewWidth) || 1200)
-					.replace('HEIGHT_PLACEHOLDER', (hasSize ? dimHeight : previewHeight) || 630)
-					.replace('FORMAT_PLACEHOLDER', format)}
-				docsUrl="https://docs.pictify.io"
-				docsLabel="View HTML → Image API docs"
-				secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
-				secondaryCtaLabel="See examples"
-				note="Talk to sales for dedicated regions, SLAs, or volume pricing."
+			<ApiCodeSection
+				title="Automate with the"
+				titleHighlight="API"
+				description="Convert HTML to {(format && format.toUpperCase()) || 'image'} programmatically. Render social cards, email headers, and marketing visuals in your CI/CD pipeline."
+				codeExamples={htmlToImageExamples}
 			/>
+		</section>
+
+		<!-- HTML to Image — When to Use Each Format -->
+		<section class="mb-16 border-[3px] border-black p-6 md:p-8 bg-[#fffdf8] shadow-[8px_8px_0_0_#9ca3af]">
+			<h2 class="text-3xl font-black mb-6 text-black uppercase">HTML to Image — Choosing the Right Format</h2>
+			<div class="overflow-x-auto">
+				<table class="w-full text-left border-collapse">
+					<thead>
+						<tr class="border-b-[3px] border-black">
+							<th class="p-3 font-black uppercase text-sm">Format</th>
+							<th class="p-3 font-black uppercase text-sm">Best For</th>
+							<th class="p-3 font-black uppercase text-sm">Transparency</th>
+							<th class="p-3 font-black uppercase text-sm">File Size</th>
+						</tr>
+					</thead>
+					<tbody class="text-sm font-medium text-gray-700">
+						<tr class="border-b border-gray-200 {format === 'png' ? 'bg-[#ffc480]/10' : ''}">
+							<td class="p-3 font-black">PNG</td>
+							<td class="p-3">Screenshots, UI elements, text-heavy images</td>
+							<td class="p-3">Yes</td>
+							<td class="p-3">Large</td>
+						</tr>
+						<tr class="border-b border-gray-200 {format === 'jpg' ? 'bg-[#ffc480]/10' : ''}">
+							<td class="p-3 font-black">JPG</td>
+							<td class="p-3">Photos, OG images, social cards, email headers</td>
+							<td class="p-3">No</td>
+							<td class="p-3">Small</td>
+						</tr>
+						<tr class="{format === 'webp' ? 'bg-[#ffc480]/10' : ''}">
+							<td class="p-3 font-black">WebP</td>
+							<td class="p-3">Web graphics, combining quality of PNG with size of JPG</td>
+							<td class="p-3">Yes</td>
+							<td class="p-3">Smallest</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</section>
 
 		<!-- Other Formats Section -->
@@ -2057,6 +2147,19 @@
 		</div>
 	</main>
 	<RelatedTools tools={['html-email', 'table', 'certificate', 'quote-card']} />
+
+		<!-- Internal Links -->
+		<section class="mb-16 w-full max-w-5xl mx-auto px-4">
+			<h2 class="text-2xl font-black mb-6 text-black uppercase text-center">Related Tools</h2>
+			<div class="flex flex-wrap gap-3 justify-center">
+				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">URL to Image</a>
+				<a href="/tools/code-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">Code to Image</a>
+				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">OG Image Generator</a>
+				<a href="/glossary/html-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">What is HTML to Image?</a>
+				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">Compare Alternatives</a>
+			</div>
+		</section>
+
 	<Footer />
 
 </section>

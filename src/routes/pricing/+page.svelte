@@ -386,6 +386,11 @@
 	}
 </script>
 
+<svelte:head>
+	<meta property="og:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
+	<meta name="twitter:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
+</svelte:head>
+
 <section class="bg-[#FFFDF8] min-h-screen overflow-x-hidden">
 	<Nav />
 	<main class="relative z-10">

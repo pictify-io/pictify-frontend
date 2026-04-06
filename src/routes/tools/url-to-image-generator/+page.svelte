@@ -2,10 +2,10 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
+	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
 	import { user } from '../../../store/user.store';
 	import { generationLimits } from '../../../store/generationLimits.store';
@@ -19,20 +19,189 @@
 		analytics.trackToolOpened({ tool_name: 'url_to_image_generator' });
 	});
 
+	// Clean up message listener on destroy (fixes memory leak)
+	let messageHandler = null;
+	onDestroy(() => {
+		if (browser && messageHandler) {
+			window.removeEventListener('message', messageHandler);
+		}
+	});
+
 	// User login state
 	let isUserLoggedIn = false;
 	user.subscribe((userData) => {
 		isUserLoggedIn = !!userData?.email;
 	});
 
+	// ── Core state ─────────────────────────────────────────
 	let url = '';
 	let selector = '';
-	let overlayElement;
 	let imageUrl = '';
 	let isImageGenerating = false;
 	let isPreviewLoaded = false;
 	let iframeWrapper;
 	let isLoading = false;
+
+	// ── Capture settings ───────────────────────────────────
+	let captureWidth = 1200;
+	let captureHeight = 630;
+	let fileFormat = 'png';
+	let activePreset = '';
+
+	const devicePresets = [
+		{ id: 'desktop', label: 'Desktop', width: 1440, height: 900 },
+		{ id: 'tablet', label: 'Tablet', width: 768, height: 1024 },
+		{ id: 'mobile', label: 'Mobile', width: 375, height: 812 }
+	];
+
+	function selectPreset(preset) {
+		captureWidth = preset.width;
+		captureHeight = preset.height;
+		activePreset = preset.id;
+		// Resize iframe to match device width
+		if (iframeWrapper) {
+			iframeWrapper.style.maxWidth = preset.width + 'px';
+		}
+	}
+
+	function handleDimensionInput() {
+		activePreset = '';
+		// Clamp values
+		if (captureWidth < 1) captureWidth = 1;
+		if (captureWidth > 4000) captureWidth = 4000;
+		if (captureHeight < 1) captureHeight = 1;
+		if (captureHeight > 4000) captureHeight = 4000;
+		// Reset iframe max-width on custom input
+		if (iframeWrapper) {
+			iframeWrapper.style.maxWidth = '';
+		}
+	}
+
+	// ── Live API curl (reactive) ───────────────────────────
+	function buildLiveCurl(urlVal, sel, w, h, fmt) {
+		const payload = { url: urlVal || 'https://example.com', width: w, height: h, fileExtension: fmt };
+		if (sel) payload.selector = sel;
+		return `curl -X POST https://api.pictify.io/image \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d '${JSON.stringify(payload, null, 2)}'`;
+	}
+	$: liveCurlSnippet = buildLiveCurl(url, selector, captureWidth, captureHeight, fileFormat);
+
+	function escapeHtml(source) {
+		return source
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+	}
+
+	function highlightCurl(source) {
+		const escaped = escapeHtml(source);
+		return escaped
+			.replace(/^curl/m, '<span class="text-[#ff79c6]">curl</span>')
+			.replace(/ (-H|-d|-X)/g, (m) => ` <span class="text-[#8be9fd]">${m.trim()}</span>`)
+			.replace(/https:\/\/[^\s\\]+/g, (m) => `<span class="text-[#f1fa8c]">${m}</span>`)
+			.replace(/'([^']*)'/g, (m) => `<span class="text-[#50fa7b]">${m}</span>`)
+			.replace(/POST/g, '<span class="text-[#ff79c6]">POST</span>');
+	}
+
+	$: highlightedCurl = highlightCurl(liveCurlSnippet);
+
+	const urlToImageExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'screenshot.js',
+			code: `<span class="text-[#6a9955]">// Capture any URL as an image</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: {
+    <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>,
+    <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span>
+  },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({
+    <span class="text-[#9cdcfe]">url</span>: <span class="text-[#ce9178]">'https://example.com'</span>,
+    <span class="text-[#9cdcfe]">selector</span>: <span class="text-[#ce9178]">'#main-content'</span>,  <span class="text-[#6a9955]">// optional: capture specific element</span>
+    <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>,
+    <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span>
+  })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// https://cdn.pictify.io/img/abc123.png</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'screenshot.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#6a9955]"># Capture any URL as an image</span>
+<span class="text-[#9cdcfe]">response</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(
+    <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+    <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+    <span class="text-[#9cdcfe]">json</span>={
+        <span class="text-[#ce9178]">"url"</span>: <span class="text-[#ce9178]">"https://example.com"</span>,
+        <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1200</span>,
+        <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>
+    }
+)
+
+<span class="text-[#9cdcfe]">image_url</span> = <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>]
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">image_url</span>)`
+		},
+		{
+			id: 'go',
+			label: 'Go',
+			fileName: 'main.go',
+			code: `<span class="text-[#c586c0]">package</span> <span class="text-[#9cdcfe]">main</span>
+
+<span class="text-[#c586c0]">import</span> (<span class="text-[#ce9178]">"bytes"</span>; <span class="text-[#ce9178]">"encoding/json"</span>; <span class="text-[#ce9178]">"net/http"</span>)
+
+<span class="text-[#c586c0]">func</span> <span class="text-[#dcdcaa]">main</span>() {
+    <span class="text-[#9cdcfe]">body</span>, _ := <span class="text-[#9cdcfe]">json</span>.<span class="text-[#dcdcaa]">Marshal</span>(<span class="text-[#c586c0]">map</span>[<span class="text-[#c586c0]">string</span>]<span class="text-[#c586c0]">any</span>{
+        <span class="text-[#ce9178]">"url"</span>:    <span class="text-[#ce9178]">"https://example.com"</span>,
+        <span class="text-[#ce9178]">"width"</span>:  <span class="text-[#b5cea8]">1200</span>,
+        <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>,
+    })
+    <span class="text-[#9cdcfe]">req</span>, _ := <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">NewRequest</span>(<span class="text-[#ce9178]">"POST"</span>, <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>, <span class="text-[#9cdcfe]">bytes</span>.<span class="text-[#dcdcaa]">NewBuffer</span>(<span class="text-[#9cdcfe]">body</span>))
+    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span class="text-[#dcdcaa]">Set</span>(<span class="text-[#ce9178]">"Authorization"</span>, <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>)
+    <span class="text-[#9cdcfe]">http</span>.<span class="text-[#9cdcfe]">DefaultClient</span>.<span class="text-[#dcdcaa]">Do</span>(<span class="text-[#9cdcfe]">req</span>)
+}`
+		},
+		{
+			id: 'ruby',
+			label: 'Ruby',
+			fileName: 'screenshot.rb',
+			code: `<span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"net/http"</span>
+<span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"json"</span>
+
+<span class="text-[#9cdcfe]">uri</span> = <span class="text-[#9cdcfe]">URI</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>)
+<span class="text-[#9cdcfe]">req</span> = <span class="text-[#9cdcfe]">Net</span>::<span class="text-[#9cdcfe]">HTTP</span>::<span class="text-[#9cdcfe]">Post</span>.<span class="text-[#dcdcaa]">new</span>(<span class="text-[#9cdcfe]">uri</span>)
+<span class="text-[#9cdcfe]">req</span>[<span class="text-[#ce9178]">"Authorization"</span>] = <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>
+<span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">body</span> = { <span class="text-[#9cdcfe]">url</span>: <span class="text-[#ce9178]">"https://example.com"</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span> }.<span class="text-[#dcdcaa]">to_json</span>
+
+<span class="text-[#9cdcfe]">res</span> = <span class="text-[#9cdcfe]">Net</span>::<span class="text-[#9cdcfe]">HTTP</span>.<span class="text-[#dcdcaa]">start</span>(<span class="text-[#9cdcfe]">uri</span>.<span class="text-[#9cdcfe]">hostname</span>, <span class="text-[#9cdcfe]">uri</span>.<span class="text-[#9cdcfe]">port</span>, <span class="text-[#9cdcfe]">use_ssl</span>: <span class="text-[#569cd6]">true</span>) { |<span class="text-[#9cdcfe]">http</span>| <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">request</span>(<span class="text-[#9cdcfe]">req</span>) }
+<span class="text-[#dcdcaa]">puts</span> <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">parse</span>(<span class="text-[#9cdcfe]">res</span>.<span class="text-[#9cdcfe]">body</span>)[<span class="text-[#ce9178]">"url"</span>]`
+		},
+		{
+			id: 'php',
+			label: 'PHP',
+			fileName: 'screenshot.php',
+			code: `<span class="text-[#569cd6]">&lt;?php</span>
+<span class="text-[#9cdcfe]">$ch</span> = <span class="text-[#dcdcaa]">curl_init</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>);
+<span class="text-[#dcdcaa]">curl_setopt_array</span>(<span class="text-[#9cdcfe]">$ch</span>, [
+    <span class="text-[#9cdcfe]">CURLOPT_POST</span> =&gt; <span class="text-[#569cd6]">true</span>,
+    <span class="text-[#9cdcfe]">CURLOPT_RETURNTRANSFER</span> =&gt; <span class="text-[#569cd6]">true</span>,
+    <span class="text-[#9cdcfe]">CURLOPT_HTTPHEADER</span> =&gt; [<span class="text-[#ce9178]">"Content-Type: application/json"</span>, <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span>],
+    <span class="text-[#9cdcfe]">CURLOPT_POSTFIELDS</span> =&gt; <span class="text-[#dcdcaa]">json_encode</span>([<span class="text-[#ce9178]">"url"</span> =&gt; <span class="text-[#ce9178]">"https://example.com"</span>, <span class="text-[#ce9178]">"width"</span> =&gt; <span class="text-[#b5cea8]">1200</span>, <span class="text-[#ce9178]">"height"</span> =&gt; <span class="text-[#b5cea8]">630</span>])
+]);
+<span class="text-[#dcdcaa]">echo</span> <span class="text-[#dcdcaa]">json_decode</span>(<span class="text-[#dcdcaa]">curl_exec</span>(<span class="text-[#9cdcfe]">$ch</span>), <span class="text-[#569cd6]">true</span>)[<span class="text-[#ce9178]">"url"</span>];`
+		}
+	];
+
 	const structuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
@@ -49,50 +218,46 @@
 			availability: 'https://schema.org/InStock'
 		}
 	};
-	const apiFeatureBullets = [
-		'Capture full-page or element-level screenshots across thousands of URLs',
-		'Schedule batch crawls and deliver CDN-hosted images instantly',
-		'Manage API usage, tokens, and webhooks directly from the dashboard'
-	];
-	const apiSnippet = `curl -X POST https://api.pictify.io/image \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '{
-    "url": "https://example.com",
-    "selector": "#main-content",
-    "width": 1600,
-    "height": 900
-  }'`;
-
+	const faqSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: [
+			{
+				'@type': 'Question',
+				name: 'What is URL to Image?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for archives, thumbnails, and proofs.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'How does URL to Image work?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'We spawn a headless browser in the cloud, navigate to your URL, wait for assets to load, and take a high-fidelity screenshot.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'Can I customize the screenshot?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'Yes! You can select specific elements, set custom viewport sizes, and handle cookie banners via our API.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'Is my data private?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'We do not store your URLs or generated images. All processing is done on-the-fly and images are cached temporarily on our CDN for performance.'
+				}
+			}
+		]
+	};
 	let iframeElement;
 	let isIframeReady = false;
-
-	function buildCurlSnippetFromUrl(urlValue, selectorValue) {
-		const payload = {
-			url: String(urlValue || 'https://example.com'),
-			selector: String(selectorValue || ''),
-			width: 1200,
-			height: 630
-		};
-		return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(
-			payload,
-			null,
-			2
-		)}'`;
-	}
-
-	$: nextStepsCurlSnippet = buildCurlSnippetFromUrl(url, selector);
-	$: nextStepsTemplateDraft = imageUrl
-		? {
-				version: 1,
-				name: 'Screenshot template',
-				type: 'og-image',
-				width: 1200,
-				height: 630,
-				backgroundImageUrl: imageUrl,
-				source: 'url-to-image'
-		  }
-		: null;
 
 	const isValidUrl = (url) => {
 		try {
@@ -113,25 +278,25 @@
 		try {
 			const { content: html } = await getWebsiteHTML(url);
 			if (!html) {
-				toast.set({ message: 'Error fetching website content', type: 'error', duration: 3000 });
+				toast.set({ message: 'No content returned. Check the URL and try again.', type: 'error', duration: 3000 });
 				return;
 			}
 
-			window.addEventListener(
-				'message',
-				(event) => {
-					if (event.data.type === 'elementHover') {
-						// Update UI to show hovered selector (optional)
-					} else if (event.data.type === 'elementSelected') {
-						selector = event.data.selector;
-						toast.set({ message: 'Selector updated', type: 'success', duration: 1500 });
-					} else if (event.data.type === 'iframeReady') {
-						// The iframe is ready, send the selection script
-						sendSelectionScript();
-					}
-				},
-				false
-			);
+			// Remove previous message listener to prevent leak
+			if (messageHandler) {
+				window.removeEventListener('message', messageHandler);
+			}
+			messageHandler = (event) => {
+				if (event.data.type === 'elementHover') {
+					// Visual feedback handled in iframe
+				} else if (event.data.type === 'elementSelected') {
+					selector = event.data.selector;
+					toast.set({ message: 'Element selected', type: 'success', duration: 1500 });
+				} else if (event.data.type === 'iframeReady') {
+					sendSelectionScript();
+				}
+			};
+			window.addEventListener('message', messageHandler, false);
 
 			const injectedScript = `
     <script>
@@ -147,16 +312,26 @@
     <\/script>
   `;
 
-			// Inject the script into the HTML
 			const modifiedHTML = html.replace('</body>', `${injectedScript}</body>`);
-			const iframeElement = iframeWrapper.querySelector('iframe');
-			if (iframeElement) {
-				iframeElement.srcdoc = modifiedHTML;
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-				iframeElement.contentWindow.postMessage({ type: 'checkReady' }, '*');
+			const iframe = iframeWrapper.querySelector('iframe');
+			if (iframe) {
+				// Wait for iframe load instead of hardcoded 1s delay
+				const loadPromise = new Promise((resolve) => {
+					const onLoad = () => { iframe.removeEventListener('load', onLoad); resolve(); };
+					iframe.addEventListener('load', onLoad);
+				});
+				const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 10000));
+				iframe.srcdoc = modifiedHTML;
+				await Promise.race([loadPromise, timeoutPromise]);
+				iframe.contentWindow.postMessage({ type: 'checkReady' }, '*');
 			}
 		} catch (error) {
-			toast.set({ message: 'Error fetching website content', type: 'error', duration: 3000 });
+			const msg = error?.message || '';
+			if (msg.includes('timeout') || msg.includes('TIMEOUT')) {
+				toast.set({ message: 'Page took too long to load. Try a simpler URL.', type: 'error', duration: 5000 });
+			} else {
+				toast.set({ message: 'Could not fetch this page. Check the URL and try again.', type: 'error', duration: 4000 });
+			}
 		} finally {
 			isLoading = false;
 		}
@@ -231,30 +406,39 @@
 			return;
 		}
 
-		// Track generation in global limits store
+		if (!isUserLoggedIn && !generationLimits.isWithinLimit()) {
+			toast.set({ message: 'Daily limit reached. Sign up for unlimited access.', type: 'warning', duration: 5000 });
+			return;
+		}
+
 		generationLimits.increment();
 		isImageGenerating = true;
 
 		try {
-			// Note: URL screenshots capture external pages, so watermark is added server-side
-			// for non-authenticated requests via the public API
 			const { image } = await createImagePublic({
-				url: url,
-				selector: selector,
-				width: 1200,
-				height: 630,
-				watermark: !isUserLoggedIn // Request watermark for guests
+				url,
+				selector,
+				width: captureWidth,
+				height: captureHeight,
+				fileExtension: fileFormat,
+				watermark: !isUserLoggedIn
 			});
 			imageUrl = image.url;
 
-			// Track successful image generation
 			analytics.trackImageGenerated({
 				tool_name: 'url_to_image_generator',
-				format: 'jpg',
+				format: fileFormat,
 				with_watermark: !isUserLoggedIn
 			});
 		} catch (error) {
-			toast.set({ message: 'Error generating image', type: 'error', duration: 3000 });
+			const status = error?.status || error?.response?.status;
+			if (status === 429) {
+				toast.set({ message: 'Rate limit reached. Wait a moment and try again.', type: 'warning', duration: 5000 });
+			} else if (status === 408 || error?.message?.includes('timeout')) {
+				toast.set({ message: 'Screenshot timed out. Try smaller dimensions or a simpler page.', type: 'error', duration: 5000 });
+			} else {
+				toast.set({ message: 'Screenshot failed. Please try again.', type: 'error', duration: 4000 });
+			}
 		}
 		isImageGenerating = false;
 	}
@@ -297,11 +481,11 @@
 	<title>URL to Image Generator | Pictify.io</title>
 	<meta
 		name="description"
-		content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more."
+		content="Free URL to image generator — convert any webpage to a picture. Generate image URLs, create link previews, and capture screenshots via API. No signup required."
 	/>
 	<meta
 		name="keywords"
-		content="URL to Image Generator, image generator, URL to image, web to image, screenshot, social media image, thumbnail, web preview"
+		content="url to image, image url generator, url to picture converter, photo url generator, picture url maker, link to picture, image link generator, screenshot api, webpage to image"
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/url-to-image-generator" />
 	<meta property="og:title" content="URL to Image Generator | Pictify.io" />
@@ -309,7 +493,7 @@
 		property="og:description"
 		content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more."
 	/>
-	<meta property="og:image" content="https://media.pictify.io/r49i0-1725792197198.png" />
+	<meta property="og:image" content="https://media.pictify.io/vombm-1775406853373.png" />
 	<meta property="og:url" content="https://pictify.io/tools/url-to-image-generator" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
@@ -318,8 +502,18 @@
 		name="twitter:description"
 		content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more."
 	/>
-	<meta name="twitter:image" content="https://media.pictify.io/r49i0-1725792197198.png" />
+	<meta name="twitter:image" content="https://media.pictify.io/vombm-1775406853373.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
+	{@html `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`}
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'URL to Image' }
+		]
+	})}</script>`}
 </svelte:head>
 
 <div
@@ -334,7 +528,7 @@
 	<Nav />
 
 	<main
-		class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative cursor-crosshair"
+		class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative"
 	>
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
@@ -443,22 +637,98 @@
 						<div class="md:w-auto w-full">
 							<button
 								on:click={loadPreview}
-								class="w-full h-full px-8 py-4 bg-[#ffc480] text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+								disabled={isLoading || !url}
+								class="w-full h-full px-8 py-4 bg-[#ffc480] text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
 							>
-								Initialize
+								{#if isLoading}Loading...{:else}Load Preview{/if}
 							</button>
 						</div>
 					</div>
 
-					<!-- Add this disclaimer after the input and button -->
+					<!-- Capture Settings -->
+					<div class="mt-6 border-t-[3px] border-black pt-6">
+						<div class="flex items-center gap-2 mb-4">
+							<div class="bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider">Capture Settings</div>
+						</div>
+
+						<div class="flex flex-col md:flex-row gap-6">
+							<!-- Device Presets -->
+							<div>
+								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500">Device</span>
+								<div class="flex gap-2">
+									{#each devicePresets as preset}
+										<button
+											on:click={() => selectPreset(preset)}
+											class="px-3 py-2 border-[3px] border-black font-bold text-sm transition-all flex items-center gap-1.5
+												{activePreset === preset.id
+													? 'bg-black text-white shadow-none'
+													: 'bg-white text-black shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+										>
+											{#if preset.id === 'desktop'}
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+											{:else if preset.id === 'tablet'}
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+											{:else}
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+											{/if}
+											{preset.label}
+										</button>
+									{/each}
+								</div>
+							</div>
+
+							<!-- Custom Size -->
+							<div>
+								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500">Size (px)</span>
+								<div class="flex items-center gap-1">
+									<input
+										type="number"
+										bind:value={captureWidth}
+										on:input={handleDimensionInput}
+										min="1"
+										max="4000"
+										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-[#ff6b6b]"
+									/>
+									<span class="font-black text-gray-400">×</span>
+									<input
+										type="number"
+										bind:value={captureHeight}
+										on:input={handleDimensionInput}
+										min="1"
+										max="4000"
+										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-[#ff6b6b]"
+									/>
+								</div>
+							</div>
+
+							<!-- Format -->
+							<div>
+								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500">Format</span>
+								<div class="flex gap-0">
+									{#each ['png', 'jpg', 'webp'] as fmt}
+										<button
+											on:click={() => (fileFormat = fmt)}
+											class="px-4 py-2 border-[3px] border-black font-black text-sm uppercase transition-all -ml-[3px] first:ml-0
+												{fileFormat === fmt
+													? 'bg-black text-white z-10'
+													: 'bg-white text-black hover:bg-gray-50'}"
+										>
+											{fmt}
+										</button>
+									{/each}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- CORS Disclaimer -->
 					<div
 						class="mt-6 text-xs md:text-sm font-bold text-black bg-[#fff] border-[2px] border-black p-4 shadow-[4px_4px_0_0_#ccc] flex items-start gap-3"
 					>
 						<span class="text-xl">⚠️</span>
 						<p>
-							DISCLAIMER: Due to CORS and security policies, live previews may be restricted for
-							some domains. The capture engine operates server-side and will bypass these
-							limitations.
+							Due to CORS policies, live previews may be restricted for some domains.
+							The capture engine operates server-side and will bypass these limitations.
 						</p>
 					</div>
 				</div>
@@ -472,8 +742,8 @@
 			</h3>
 			<div
 				bind:this={iframeWrapper}
-				class="border-[4px] border-black bg-white p-2 shadow-[12px_12px_0_0_#000] relative"
-				style="height: 600px;"
+				class="border-[4px] border-black bg-white p-2 shadow-[12px_12px_0_0_#000] relative cursor-crosshair mx-auto"
+				style="height: 600px; transition: max-width 0.3s ease;"
 			>
 				{#if isLoading}
 					<div class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
@@ -556,7 +826,7 @@
 							</svg>
 							Rendering...
 						{:else}
-							<span>Generate Image</span>
+							<span>Capture {fileFormat.toUpperCase()}</span>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								class="h-5 w-5"
@@ -577,115 +847,120 @@
 		</div>
 
 		{#if imageUrl}
-			<div class="mt-16 w-full max-w-5xl mx-auto px-2 md:px-0 z-20">
-				<div class="border-[4px] border-black bg-white shadow-[8px_8px_0_0_#000]">
-					<!-- Success Header -->
+			<div class="max-w-4xl mx-auto px-4 mb-20 mt-16">
+				<div
+					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
+				>
+					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+
+					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
+						Screenshot Captured!
+					</h3>
+
 					<div
-						class="bg-[#4ade80] border-b-[3px] border-black px-4 py-3 flex justify-between items-center"
+						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
 					>
-						<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg
-							>
-							Screenshot captured
-						</span>
-						<div class="font-mono text-xs font-bold bg-black text-[#4ade80] px-2 py-1">200 OK</div>
+						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
+							<img
+								src={imageUrl}
+								alt="Generated screenshot"
+								class="max-w-full h-auto max-h-[400px]"
+							/>
+						</a>
 					</div>
 
-					<!-- Preview -->
-					<div class="p-4 md:p-6">
-						<div
-							class="border-[3px] border-black bg-[#f3f4f6] p-4 relative"
+					<div class="flex flex-wrap justify-center gap-4">
+						<a
+							href={imageUrl}
+							download="pictify-screenshot.{fileFormat}"
+							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
-							<div class="absolute top-2 left-2 w-2 h-2 bg-black rounded-full" />
-							<div class="absolute top-2 right-2 w-2 h-2 bg-black rounded-full" />
-							<div class="absolute bottom-2 left-2 w-2 h-2 bg-black rounded-full" />
-							<div class="absolute bottom-2 right-2 w-2 h-2 bg-black rounded-full" />
-							<a href={imageUrl} target="_blank" rel="noopener noreferrer">
-								<img
-									src={imageUrl}
-									alt="Generated Screenshot"
-									class="w-full h-auto border-[2px] border-black hover:opacity-95 transition-opacity"
-								/>
-							</a>
-						</div>
-					</div>
-
-					<!-- Action bar -->
-					<div
-						class="border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
-					>
-						<!-- URL + Copy -->
-						<div class="flex-1 min-w-0 flex items-center gap-0 border-[2px] border-black">
-							<div
-								class="flex-1 min-w-0 bg-gray-50 px-3 py-2 font-mono text-xs overflow-x-auto whitespace-nowrap select-all"
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg
 							>
-								{imageUrl}
-							</div>
-							<button
-								on:click={() => copyToClipboard(imageUrl)}
-								class="bg-black text-white hover:bg-gray-800 font-bold uppercase px-4 py-2 transition-colors flex items-center gap-1.5 flex-shrink-0 text-xs"
+							Download {fileFormat.toUpperCase()}
+						</a>
+						<button
+							on:click={() => copyToClipboard(imageUrl)}
+							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						>
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg
 							>
-								Copy
-							</button>
-						</div>
-						<!-- Action buttons -->
-						<div class="flex items-center gap-2">
-							<a
-								href={imageUrl}
-								download="screenshot.jpg"
-								class="flex items-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg
-								>
-								Download
-							</a>
-						</div>
+							Copy URL
+						</button>
 					</div>
 				</div>
 
-				<!-- Next steps — below result card -->
-				<NextSteps
-					heading="Next steps"
-					description="Copy the API request, turn this capture into a reusable template, and batch render variants."
-					curlSnippet={nextStepsCurlSnippet}
-					templateDraft={nextStepsTemplateDraft}
-					generatedUrl={imageUrl}
-					toolName="URL to Image"
-				/>
 			</div>
 		{/if}
 
-		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-20 mb-20">
-			<section>
-				<ApiPromptSection
-					title="Automate URL screenshots with our API"
-					description="Trigger screenshot captures from scripts, CRON jobs, or workflows and receive CDN-hosted images in seconds."
-					featurePoints={apiFeatureBullets}
-					codeSnippet={apiSnippet}
-					codeLanguage="bash"
-					docsUrl="https://docs.pictify.io/"
-					docsLabel="Read URL to Image docs"
-					secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
-					secondaryCtaLabel="See examples"
-					note="Need JS execution, authentication, or regional rendering? Contact us for advanced plans."
-				/>
-			</section>
-		</div>
-
-		<!-- Separator -->
-		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 my-20">
-			<div class="border-t-[4px] border-black relative">
-				<div class="absolute left-1/2 -top-5 -translate-x-1/2 bg-[#FFFDF8] px-4">
-					<div
-						class="w-10 h-10 bg-black text-white flex items-center justify-center border-[3px] border-black rotate-45 transform hover:rotate-90 transition-transform duration-500"
+		<!-- Live API Request Builder -->
+		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-16 mb-8">
+			<div class="border-[3px] border-black shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+				<div class="bg-black px-4 py-3 flex items-center justify-between">
+					<div class="flex items-center gap-3">
+						<span class="text-xs font-black uppercase tracking-widest text-[#ffc480]">Your API Request</span>
+						<span class="text-xs text-gray-500 font-mono">— updates as you change settings</span>
+					</div>
+					<button
+						on:click={() => copyToClipboard(liveCurlSnippet)}
+						class="px-3 py-1 bg-[#ffc480] text-black border-[2px] border-[#ffc480] font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
 					>
-						<div class="-rotate-45">✦</div>
+						Copy
+					</button>
+				</div>
+				<div class="bg-[#1e1e1e]">
+					<div class="bg-[#2d2d2d] px-4 py-2 border-b border-gray-800 flex items-center gap-2">
+						<div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+						<div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+						<div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+						<span class="ml-auto text-xs text-gray-500 font-mono font-bold uppercase tracking-wider">BASH</span>
+					</div>
+					<div class="p-6 overflow-x-auto">
+						<pre class="font-mono text-sm leading-relaxed text-gray-300">{@html highlightedCurl}</pre>
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
+
+		<ApiCodeSection
+			title="Automate with the"
+			titleHighlight="API"
+			description="Convert any URL to an image programmatically. Generate screenshots, link previews, and image URLs in your CI/CD pipeline."
+			codeExamples={urlToImageExamples}
+		/>
+
+		<!-- URL to Image Use Cases -->
+		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
+			<h2 class="text-3xl font-black mb-8 text-black uppercase text-center">What You Can Build</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
+					<h3 class="font-black text-lg mb-2">Link Preview Images</h3>
+					<p class="text-gray-600 font-medium text-sm">Auto-generate thumbnail images from any URL for link previews, bookmarks, and content cards.</p>
+				</div>
+				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
+					<h3 class="font-black text-lg mb-2">Visual QA Monitoring</h3>
+					<p class="text-gray-600 font-medium text-sm">Schedule periodic screenshots of your pages to catch visual regressions before users do.</p>
+				</div>
+				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ff6b6b]">
+					<h3 class="font-black text-lg mb-2">Photo URL Generator</h3>
+					<p class="text-gray-600 font-medium text-sm">Turn any webpage into a hosted image URL. Share as a picture link on social media or embed in emails.</p>
+				</div>
+				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#1f2937]">
+					<h3 class="font-black text-lg mb-2">OG Image Fallbacks</h3>
+					<p class="text-gray-600 font-medium text-sm">Generate Open Graph images on-the-fly for pages that don't have custom social previews.</p>
+				</div>
+				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
+					<h3 class="font-black text-lg mb-2">Web Archiving</h3>
+					<p class="text-gray-600 font-medium text-sm">Capture and store visual snapshots of competitor pages, legal evidence, or content for compliance.</p>
+				</div>
+				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
+					<h3 class="font-black text-lg mb-2">Image Link Converter</h3>
+					<p class="text-gray-600 font-medium text-sm">Convert any URL to a picture URL that can be embedded anywhere — Notion, Confluence, Slack, or email.</p>
+				</div>
+			</div>
+		</section>
 
 		<!-- FAQ Section -->
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
@@ -914,7 +1189,7 @@
 			</div>
 		</div>
 
-		<RelatedTools tools={['html-email', 'blog-featured-image', 'product-banner']} />
+		<RelatedTools tools={['html-email', 'blog-featured-image', 'og-image-generator', 'code-to-image', 'html-to-png']} />
 
 		<Toast />
 		<Footer />

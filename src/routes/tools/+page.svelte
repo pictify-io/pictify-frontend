@@ -140,9 +140,10 @@
 		property="og:description"
 		content="Free tools powered by Pictify — design templates and render images at scale via API."
 	/>
-	<meta property="og:image" content="https://pictify.io/og-image-tools.jpg" />
+	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	<meta property="og:url" content="https://pictify.io/tools" />
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify(itemListStructuredData)}</script>`}
 </svelte:head>
 

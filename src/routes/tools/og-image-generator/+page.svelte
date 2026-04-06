@@ -669,7 +669,7 @@
 		],
 		screenshot: {
 			'@type': 'ImageObject',
-			url: 'https://media.pictify.io/z8xnl-1723429909736.png',
+			url: 'https://media.pictify.io/31hxg-1775406864453.png',
 			width: '1200',
 			height: '630'
 		},
@@ -717,7 +717,7 @@
 			property="og:description"
 			content={`Design ${platformLabel} OG images in seconds with Pictify.io.`}
 		/>
-		<meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png" />
+		<meta property="og:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
 		<meta
 			property="og:url"
 			content={`https://pictify.io/tools/og-image-generator/${platformObj.id}`}
@@ -734,7 +734,7 @@
 			property="og:description"
 			content="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds."
 		/>
-		<meta property="og:image" content="https://media.pictify.io/z8xnl-1723429909736.png" />
+		<meta property="og:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
 		<meta property="og:url" content="https://pictify.io/tools/og-image-generator" />
 	{/if}
 	<meta name="twitter:card" content="summary_large_image" />
@@ -751,7 +751,7 @@
 			? `Design ${platformLabel} OG images in seconds with Pictify.io.`
 			: 'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'}
 	/>
-	<meta name="twitter:image" content="https://media.pictify.io/z8xnl-1723429909736.png" />
+	<meta name="twitter:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 

@@ -3,7 +3,7 @@
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { user } from '../../../store/user.store';
-	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
@@ -62,6 +62,57 @@
 	refractor.register(jsx);
 	refractor.register(tsx);
 	refractor.register(scss);
+
+	const codeToImageExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'code-screenshot.js',
+			code: `<span class="text-[#6a9955]">// Generate a syntax-highlighted code screenshot</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">'&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css"&gt;&lt;pre class="language-js" style="padding:32px"&gt;&lt;code&gt;const x = 42;&lt;/code&gt;&lt;/pre&gt;'</span>;
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">800</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">400</span>, <span class="text-[#9cdcfe]">fileExtension</span>: <span class="text-[#ce9178]">'png'</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// CDN-hosted code image</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'code_screenshot.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">'&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dracula.min.css"&gt;&lt;pre class="language-python" style="padding:32px"&gt;&lt;code&gt;def fib(n): return n if n &lt; 2 else fib(n-1) + fib(n-2)&lt;/code&gt;&lt;/pre&gt;'</span>
+
+<span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+    <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+    <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">800</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">400</span>})
+
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'go',
+			label: 'Go',
+			fileName: 'main.go',
+			code: `<span class="text-[#c586c0]">package</span> <span class="text-[#9cdcfe]">main</span>
+
+<span class="text-[#c586c0]">import</span> (<span class="text-[#ce9178]">"bytes"</span>; <span class="text-[#ce9178]">"encoding/json"</span>; <span class="text-[#ce9178]">"net/http"</span>)
+
+<span class="text-[#c586c0]">func</span> <span class="text-[#dcdcaa]">main</span>() {
+    <span class="text-[#9cdcfe]">body</span>, _ := <span class="text-[#9cdcfe]">json</span>.<span class="text-[#dcdcaa]">Marshal</span>(<span class="text-[#c586c0]">map</span>[<span class="text-[#c586c0]">string</span>]<span class="text-[#c586c0]">any</span>{
+        <span class="text-[#ce9178]">"html"</span>: <span class="text-[#ce9178]">"&lt;pre class='language-go'&gt;&lt;code&gt;fmt.Println()&lt;/code&gt;&lt;/pre&gt;"</span>,
+        <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">800</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">400</span>,
+    })
+    <span class="text-[#9cdcfe]">req</span>, _ := <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">NewRequest</span>(<span class="text-[#ce9178]">"POST"</span>, <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>, <span class="text-[#9cdcfe]">bytes</span>.<span class="text-[#dcdcaa]">NewBuffer</span>(<span class="text-[#9cdcfe]">body</span>))
+    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span class="text-[#dcdcaa]">Set</span>(<span class="text-[#ce9178]">"Authorization"</span>, <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>)
+    <span class="text-[#9cdcfe]">http</span>.<span class="text-[#9cdcfe]">DefaultClient</span>.<span class="text-[#dcdcaa]">Do</span>(<span class="text-[#9cdcfe]">req</span>)
+}`
+		}
+	];
 
 	const themeOptions = [
 		// Dark themes
@@ -771,21 +822,85 @@
 		}
 		return css.replace('[styleOpen]', openTag).replace('[styleClose]', closeTag);
 	}
+
+	const faqSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: [
+			{
+				'@type': 'Question',
+				name: 'What programming languages are supported?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'Can I customize the appearance?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'What image formats are supported?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'Is there a limit on code length?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'Can I use images commercially?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks.'
+				}
+			}
+		]
+	};
+
 </script>
 
 <svelte:head>
-	<title>Code Snippet to Image (Syntax Highlighter) | Pictify.io</title>
+	<title>Code to Image — Syntax Highlighted Screenshots | Pictify</title>
 	<meta
 		name="description"
-		content="Convert code snippets to beautiful images with syntax highlighting. Free online tool powered by Pictify HTML to Image API."
+		content="Free code to image generator with syntax highlighting. Convert code snippets to beautiful screenshot images in 25+ languages, 18+ themes. API available for automation."
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/code-to-image" />
-	<meta property="og:title" content="Code to Image - Syntax Highlighted Code Screenshots" />
+	<meta property="og:title" content="Code to Image — Syntax Highlighted Screenshots | Pictify" />
 	<meta
 		property="og:description"
 		content="Create shareable code images with themes, fonts, and window frames. Free and fast."
 	/>
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:site" content="@pictify_io" />
+	<meta name="twitter:title" content="Code to Image — Syntax Highlighted Screenshots | Pictify" />
+	<meta name="twitter:description" content="Free code to image generator with syntax highlighting. Convert code snippets to beautiful screenshot images in 25+ languages, 18+ themes. API available for automation." />
+	<meta property="og:url" content="https://pictify.io/tools/code-to-image" />
+	<meta property="og:image" content="https://media.pictify.io/by55n-1775406886142.png" />
+	<meta name="twitter:image" content="https://media.pictify.io/by55n-1775406886142.png" />
+	{@html `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`}
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'Code to Image' }
+		]
+	})}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
@@ -1541,6 +1656,68 @@
 					/>
 				</span>
 			</h2>
+
+			<ApiCodeSection
+				title="Automate with the"
+				titleHighlight="API"
+				description="Generate syntax-highlighted code screenshots programmatically. Render code snippets as images in your docs pipeline, blog CMS, or CI/CD workflows."
+				codeExamples={codeToImageExamples}
+			/>
+
+			<!-- Code to Image — Comparison -->
+			<section class="mb-8 sm:mb-12 bg-[#fffdf8] border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 transition-all duration-300">
+				<h3 class="text-xl sm:text-2xl font-black mb-6 text-black tracking-tight">Code Screenshot Tools Compared</h3>
+				<div class="overflow-x-auto">
+					<table class="w-full text-left border-collapse text-sm">
+						<thead>
+							<tr class="border-b-[3px] border-black">
+								<th class="p-3 font-black uppercase text-xs">Feature</th>
+								<th class="p-3 font-black uppercase text-xs">Pictify</th>
+								<th class="p-3 font-black uppercase text-xs">Carbon.sh</th>
+								<th class="p-3 font-black uppercase text-xs">Ray.so</th>
+							</tr>
+						</thead>
+						<tbody class="font-medium text-gray-700">
+							<tr class="border-b border-gray-200">
+								<td class="p-3 font-bold">API Access</td>
+								<td class="p-3 text-green-600 font-bold">Yes</td>
+								<td class="p-3 text-red-500">No</td>
+								<td class="p-3 text-red-500">No</td>
+							</tr>
+							<tr class="border-b border-gray-200">
+								<td class="p-3 font-bold">Batch Generation</td>
+								<td class="p-3 text-green-600 font-bold">Yes</td>
+								<td class="p-3 text-red-500">No</td>
+								<td class="p-3 text-red-500">No</td>
+							</tr>
+							<tr class="border-b border-gray-200">
+								<td class="p-3 font-bold">Custom Themes</td>
+								<td class="p-3">18+</td>
+								<td class="p-3">15+</td>
+								<td class="p-3">8</td>
+							</tr>
+							<tr class="border-b border-gray-200">
+								<td class="p-3 font-bold">Languages</td>
+								<td class="p-3">25+</td>
+								<td class="p-3">150+</td>
+								<td class="p-3">20+</td>
+							</tr>
+							<tr class="border-b border-gray-200">
+								<td class="p-3 font-bold">CI/CD Integration</td>
+								<td class="p-3 text-green-600 font-bold">Yes</td>
+								<td class="p-3 text-red-500">No</td>
+								<td class="p-3 text-red-500">No</td>
+							</tr>
+							<tr>
+								<td class="p-3 font-bold">Free Tier</td>
+								<td class="p-3 text-green-600 font-bold">Yes</td>
+								<td class="p-3 text-green-600">Yes</td>
+								<td class="p-3 text-green-600">Yes</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
 
 			<!-- What is a Code to Image Generator Section -->
 			<section
@@ -2571,21 +2748,6 @@
 				</div>
 			</section>
 
-			<!-- Social Sharing Section -->
-			<section class="mb-16">
-				<ApiPromptSection
-					title="Automate code cards with our API"
-					description="Push release notes, blog updates, and onboarding experiences live with consistent, on-brand code visuals rendered via API."
-					featurePoints={apiFeatureBullets}
-					codeSnippet={apiCodeSample}
-					codeLanguage="bash"
-					docsUrl="https://docs.pictify.io/"
-					docsLabel="Explore HTML to Image API"
-					secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
-					secondaryCtaLabel="See examples"
-					note="Need custom fonts or private templates? Talk to us for enterprise access."
-				/>
-			</section>
 		</div>
 
 		<!-- First Generation Prompt -->
@@ -2716,6 +2878,18 @@
 		{/if}
 
 		<RelatedTools tools={['json-to-image', 'markdown', 'api-response-card', 'changelog-card']} />
+
+		<!-- Related Tools -->
+		<section class="mb-12 max-w-5xl mx-auto px-4">
+			<h3 class="text-xl font-black mb-4 text-black uppercase text-center">Related Tools</h3>
+			<div class="flex flex-wrap gap-3 justify-center">
+				<a href="/tools/html-to-png" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">HTML to PNG</a>
+				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">URL to Image</a>
+				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">OG Image Generator</a>
+				<a href="/tools/markdown" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">Markdown to Image</a>
+				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">Compare Tools</a>
+			</div>
+		</section>
 
 		<Footer />
 	</main>

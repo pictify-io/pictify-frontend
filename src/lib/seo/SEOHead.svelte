@@ -22,7 +22,7 @@
 	export let twitter = null;
 	export let schema = null;
 	export let robots = 'index, follow';
-	export let ogImage = 'https://pictify.io/og-image-tools.jpg';
+	export let ogImage = 'https://media.pictify.io/v3g37-1775406808141.png';
 
 	// Defaults for Open Graph
 	$: og = {

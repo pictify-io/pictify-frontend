@@ -303,7 +303,7 @@
 		property="og:description"
 		content="Create custom invoices to streamline your billing process and maintain a professional image."
 	/>
-	<meta property="og:image" content="https://media.pictify.io/zuhz9-1725661278941.png" />
+	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	<meta property="og:url" content="https://pictify.io/tools/online-invoice-generator" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
@@ -312,7 +312,7 @@
 		name="twitter:description"
 		content="Create custom invoices to streamline your billing process and maintain a professional image."
 	/>
-	<meta name="twitter:image" content="https://media.pictify.io/zuhz9-1725661278941.png" />
+	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
 </svelte:head>
 

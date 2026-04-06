@@ -49,7 +49,7 @@
 </script>
 
 <svelte:head>
-	<title>Pictify — Image Generation API for Developers | No Puppeteer, No Infra</title>
+	<title>Pictify — Image Generation API for Developers</title>
 	<meta
 		name="description"
 		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available."
@@ -59,7 +59,6 @@
 		content="image generation API, dynamic image API, template image rendering, OG image generator, social card API, replace puppeteer, image automation API, programmatic image generation, Pictify.io"
 	/>
 	<meta name="author" content="Pictify.io" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta property="og:title" content="Pictify — Image Generation API for Developers" />
 	<meta
 		property="og:description"
@@ -67,7 +66,7 @@
 	/>
 	<meta
 		property="og:image"
-		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
+		content="https://media.pictify.io/v3g37-1775406808141.png"
 	/>
 	<meta property="og:url" content="https://pictify.io" />
 	<meta property="og:type" content="website" />
@@ -81,7 +80,7 @@
 	/>
 	<meta
 		name="twitter:image"
-		content="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
+		content="https://media.pictify.io/v3g37-1775406808141.png"
 	/>
 	<meta name="twitter:site" content="@pictify_io" />
 	<link rel="canonical" href="https://pictify.io/" />
@@ -90,7 +89,7 @@
 		'@type': 'SoftwareApplication',
 		name: 'Pictify.io',
 		url: 'https://pictify.io',
-		image: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png',
+		image: 'https://media.pictify.io/v3g37-1775406808141.png',
 		description: 'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
 		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
 		operatingSystem: 'Web',

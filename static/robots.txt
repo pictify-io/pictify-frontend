@@ -1,6 +1,13 @@
 User-agent: *
 Allow: /
 
+# Private/authenticated routes
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /template-workspace
+Disallow: /canvas/
+Disallow: /invite/
+Disallow: /api/
+
 Sitemap: https://pictify.io/sitemap.xml
-
-

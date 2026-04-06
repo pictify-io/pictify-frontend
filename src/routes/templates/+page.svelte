@@ -93,6 +93,25 @@
 	/>
 	<link rel="canonical" href="https://pictify.io/templates" />
 
+	<!-- Open Graph -->
+	<meta property="og:title" content="Template Gallery | Pictify" />
+	<meta
+		property="og:description"
+		content="Browse and remix professionally designed templates. Create OG images, social media graphics, certificates, and more — then automate with the Pictify API."
+	/>
+	<meta property="og:url" content="https://pictify.io/templates" />
+	<meta property="og:type" content="website" />
+	<meta property="og:image" content="https://media.pictify.io/x9rnt-1775406954406.png" />
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Template Gallery | Pictify" />
+	<meta
+		name="twitter:description"
+		content="Browse and remix professionally designed templates. Create OG images, social media graphics, certificates, and more — then automate with the Pictify API."
+	/>
+	<meta name="twitter:image" content="https://media.pictify.io/x9rnt-1775406954406.png" />
+
 	<!-- Structured data for gallery -->
 	{@html `<script type="application/ld+json">
     {

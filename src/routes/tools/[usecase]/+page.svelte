@@ -188,6 +188,22 @@
 		  }
 		: null;
 
+	// FAQ structured data for SEO
+	$: faqSchema = validCase && config.faqs && config.faqs.length > 0
+		? {
+				'@context': 'https://schema.org',
+				'@type': 'FAQPage',
+				mainEntity: config.faqs.map((faq) => ({
+					'@type': 'Question',
+					name: faq.q,
+					acceptedAnswer: {
+						'@type': 'Answer',
+						text: faq.a
+					}
+				}))
+		  }
+		: null;
+
 	// API example snippet
 	$: apiSnippet = `curl -X POST https://api.pictify.io/image \\
   -H "Content-Type: application/json" \\
@@ -229,17 +245,29 @@
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://pictify.io/og-image-tools.jpg" />
+	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://pictify.io/og-image-tools.jpg" />
+	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 
 	{#if structuredData}
 		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 	{/if}
+	{#if faqSchema}
+		{@html `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`}
+	{/if}
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: config?.label || 'Tool' }
+		]
+	})}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
