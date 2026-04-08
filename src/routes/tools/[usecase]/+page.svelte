@@ -7,6 +7,7 @@
 	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
 	import MarkdownEditor from '$lib/components/tools/MarkdownEditor.svelte';
 	import TableEditor from '$lib/components/tools/TableEditor.svelte';
+	import BarcodeEditor from '$lib/components/tools/BarcodeEditor.svelte';
 	import TemplateGallery from '$lib/components/tools/TemplateGallery.svelte';
 	import { page } from '$app/stores';
 	import {
@@ -37,7 +38,7 @@
 	$: config = useCaseDetails[useCaseId];
 	$: useCase = config ? useCases.find((u) => u.id === useCaseId) : null;
 	$: validCase = !!useCase;
-	$: title = validCase ? `${config.label} | Pictify.io` : 'Use Case | Pictify.io';
+	$: title = validCase ? (config.seoTitle || `${config.label} | Pictify.io`) : 'Use Case | Pictify.io';
 	$: description = validCase
 		? config.description
 		: 'Convert HTML to images instantly with Pictify.io.';
@@ -245,13 +246,13 @@
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
+	<meta property="og:image" content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'} />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
+	<meta name="twitter:image" content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'} />
 
 	{#if structuredData}
 		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
@@ -348,6 +349,9 @@
 			{:else if useCaseId === 'table'}
 				<!-- Table Editor (self-contained: CSV/HTML input, preview, generate, result) -->
 				<TableEditor {isUserLoggedIn} />
+			{:else if useCaseId === 'barcode-generator'}
+				<!-- Barcode Editor (self-contained: input, preview, generate, result, API examples) -->
+				<BarcodeEditor />
 			{:else}
 			<!-- Template Preview Section (Window Style) -->
 			<div class="max-w-5xl mx-auto px-4 mb-20">

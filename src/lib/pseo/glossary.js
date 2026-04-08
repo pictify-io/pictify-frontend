@@ -214,5 +214,95 @@ export const glossary = [
 			"Aspect ratio is the proportional relationship between an image's width and height, expressed as two numbers separated by a colon (like 16:9 or 1:1). Different platforms prefer different aspect ratios—Instagram feed posts work best at 1:1 (square), Stories at 9:16 (vertical), and OG images at 1.91:1 (landscape). Understanding aspect ratios ensures your images display correctly across platforms.",
 		relatedTerms: ['image-dimensions', 'social-media-sizes', 'responsive-images'],
 		seoKeywords: ['aspect ratio', 'image aspect ratio', 'social media aspect ratio', '16:9 vs 1:1']
+	},
+	{
+		term: 'dynamic-image-generation',
+		title: 'Dynamic Image Generation',
+		shortDefinition:
+			'The process of creating images programmatically at runtime using templates, data, and APIs.',
+		longDefinition:
+			'Dynamic image generation refers to creating images on-the-fly by combining templates with variable data — such as user names, product prices, or analytics metrics. Unlike static image creation in design tools, dynamic generation happens programmatically via API calls, enabling personalization at scale. Common use cases include social media cards with dynamic titles, e-commerce product images with live pricing, personalized email headers, and automated marketing visuals. Tools like Pictify provide HTML-to-image APIs that render any HTML/CSS template as a pixel-perfect image, making dynamic generation accessible to developers without graphics programming expertise.',
+		relatedTerms: [
+			'api-image-generation',
+			'template-variables',
+			'programmatic-image-generation',
+			'headless-rendering'
+		],
+		seoKeywords: [
+			'dynamic image generation',
+			'generate images dynamically',
+			'dynamic image api',
+			'runtime image creation',
+			'programmatic image generation'
+		]
+	},
+	{
+		term: 'image-rendering-api',
+		title: 'Image Rendering API',
+		shortDefinition:
+			'An API service that converts HTML, templates, or URLs into rendered image files.',
+		longDefinition:
+			'An image rendering API accepts input — typically HTML/CSS, a template with variables, or a URL — and returns a rendered image file (PNG, JPG, WebP). These APIs abstract away the complexity of running headless browsers, managing rendering infrastructure, and handling edge cases like font loading, JavaScript execution, and viewport sizing. Developers use image rendering APIs to generate OG images, social media cards, certificates, invoices, screenshots, and any other visual content that needs to be created programmatically. Key evaluation criteria include rendering fidelity, latency, supported output formats, and API ergonomics.',
+		relatedTerms: ['api-image-generation', 'headless-rendering', 'screenshot-api', 'html-to-image'],
+		seoKeywords: [
+			'image rendering api',
+			'image generation api',
+			'html to image api',
+			'render image from html',
+			'image api service'
+		]
+	},
+	{
+		term: 'serverless-image-generation',
+		title: 'Serverless Image Generation',
+		shortDefinition:
+			'Generating images using serverless functions or managed APIs without maintaining rendering infrastructure.',
+		longDefinition:
+			'Serverless image generation eliminates the need to run and maintain headless browsers, Puppeteer instances, or rendering servers. Instead of managing Chrome processes, memory limits, and concurrency on your own infrastructure, you call a managed API that handles rendering at scale. This approach reduces operational complexity, eliminates cold-start delays associated with spinning up browsers, and provides predictable per-image pricing. Pictify is an example of a serverless image generation platform — you send HTML or template data via API and receive a CDN-hosted image URL in under 200ms, with no infrastructure to manage.',
+		relatedTerms: [
+			'api-image-generation',
+			'headless-rendering',
+			'puppeteer-alternative',
+			'dynamic-images'
+		],
+		seoKeywords: [
+			'serverless image generation',
+			'image generation without server',
+			'managed image rendering',
+			'no infrastructure image api',
+			'serverless screenshot'
+		]
+	},
+	{
+		term: 'html-canvas-rendering',
+		title: 'HTML Canvas Rendering',
+		shortDefinition:
+			'Converting HTML and CSS content into rasterized image output using browser rendering engines.',
+		longDefinition:
+			'HTML canvas rendering is the process of taking HTML/CSS content and converting it into a rasterized image — similar to taking a screenshot of a webpage. This can be done client-side using libraries like html2canvas (which re-implements CSS rendering on a Canvas element) or server-side using headless browsers like Puppeteer or Playwright that render HTML through a full browser engine. Server-side rendering via headless browsers produces higher fidelity output since it uses the actual Chromium rendering engine, supporting all CSS features, web fonts, and JavaScript execution. APIs like Pictify abstract this process, providing a simple endpoint that accepts HTML and returns a rendered image.',
+		relatedTerms: ['html-to-image', 'headless-rendering', 'headless-browser', 'chromium'],
+		seoKeywords: [
+			'html canvas rendering',
+			'html to canvas',
+			'render html as image',
+			'html2canvas alternative',
+			'browser rendering to image'
+		]
+	},
+	{
+		term: 'image-cdn',
+		title: 'Image CDN (Content Delivery Network)',
+		shortDefinition:
+			'A distributed network that hosts, optimizes, and delivers images with low latency worldwide.',
+		longDefinition:
+			'An image CDN is a content delivery network specialized for image hosting and delivery. It stores images across globally distributed edge servers, serving them from the location closest to the end user for minimal latency. Advanced image CDNs also provide on-the-fly transformations — resizing, format conversion (WebP, AVIF), quality adjustment, and cropping — via URL parameters. When generating images programmatically (e.g., OG images, social cards, certificates), having CDN-hosted output means the generated images are immediately available at a permanent URL with global edge caching. Pictify hosts all generated images on its CDN, providing instant availability and fast load times without additional infrastructure.',
+		relatedTerms: ['cdn', 'image-optimization', 'web-performance', 'core-web-vitals'],
+		seoKeywords: [
+			'image cdn',
+			'image delivery network',
+			'cdn for images',
+			'image hosting cdn',
+			'global image delivery'
+		]
 	}
 ];

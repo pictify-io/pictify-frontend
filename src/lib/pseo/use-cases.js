@@ -174,7 +174,13 @@ export const useCases = [
 	{ id: 'stock-chart', label: 'Stock Chart Image' },
 	{ id: 'infographic', label: 'Infographic Generator' },
 	{ id: 'meme-generator', label: 'Meme Generator' },
-	{ id: 'responsive-image-generator', label: 'Responsive Image Generator' }
+	{ id: 'responsive-image-generator', label: 'Responsive Image Generator' },
+	{ id: 'barcode-generator', label: 'Barcodes' },
+	{ id: 'qr-code-generator', label: 'QR Code Generator' },
+	{ id: 'signature-generator', label: 'Email Signature' },
+	{ id: 'name-badge', label: 'Name Badge' },
+	{ id: 'social-proof-card', label: 'Social Proof Card' },
+	{ id: 'changelog-image', label: 'Changelog Image' }
 ];
 
 export const useCaseDetails = {
@@ -3159,5 +3165,299 @@ export const useCaseDetails = {
 			badge: 'CANVAS EDITOR',
 			accent: '#ffc480'
 		})
+	},
+	'barcode-generator': {
+		label: 'Barcodes',
+		seoTitle: 'Free Barcode Generator Online — Create & Download | Pictify',
+		ogImage: 'https://media.pictify.io/que8z-1775618085943.png',
+		description: 'Free online barcode generator — create Code 128, EAN-13, UPC-A, and ITF-14 barcodes instantly. Download as PNG or JPG. API available for bulk generation.',
+		seoKeywords: [
+			'barcode generator', 'barcode maker', 'barcode image', 'generate barcode online',
+			'barcode creator', 'barcode label generator', 'barcode png', 'product barcode generator',
+			'inventory barcode', 'shipping label barcode'
+		],
+		longDescription: `Modern inventory and logistics systems require barcodes on demand — for product labels, shipping packages, warehouse bins, and event tickets. Manually creating barcodes in design tools is slow and error-prone. With Pictify, you render barcode HTML (using libraries like JsBarcode or bwip-js) as pixel-perfect images via API. Generate thousands of unique barcode labels in seconds, each with custom text, sizes, and formats.
+
+Automate barcode generation in your warehouse management system, e-commerce platform, or ticketing pipeline. Every barcode is rendered server-side, delivered as a CDN-hosted image, and ready to print or embed.`,
+		useCaseScenarios: [
+			'E-commerce platforms generating product barcode labels',
+			'Warehouse teams printing bin location barcodes',
+			'Shipping departments creating package labels at scale',
+			'Event organizers generating scannable ticket barcodes',
+			'Retailers printing shelf price tags with barcodes'
+		],
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['600x200', '800x400'],
+		templateHtml: simpleCardTemplate({
+			title: '{{product}}',
+			subtitle: '{{sku}} · {{barcode}}',
+			badge: 'BARCODE',
+			accent: '#1f2937',
+			background: '#ffffff'
+		}),
+		overview: [
+			'Inventory, logistics, and retail teams need barcodes generated on demand — not hand-crafted in Illustrator. By rendering barcode HTML as images via API, you integrate barcode generation directly into your existing workflows.',
+			'E-commerce, warehouse, and shipping systems use this to produce scannable barcode labels programmatically, eliminating manual steps and reducing labeling errors.'
+		],
+		painPoints: [
+			'Manual barcode creation in design tools is slow and error-prone',
+			'Most barcode generators lack API access for automation',
+			'Inconsistent label formatting across departments'
+		],
+		workflow: [
+			{ title: 'Generate barcode HTML', detail: 'Use JsBarcode or bwip-js to render a barcode as an HTML element with your data encoded.' },
+			{ title: 'Style the label', detail: 'Add product name, SKU, price, or any metadata around the barcode using CSS.' },
+			{ title: 'Render via API', detail: 'Send the HTML to Pictify to get a print-ready PNG or JPG image delivered via CDN.' }
+		],
+		faqs: [
+			{ q: 'What barcode formats are supported?', a: 'Any format your HTML barcode library supports — Code 128, EAN-13, UPC-A, QR codes, Data Matrix, and more. Pictify renders whatever HTML you send.' },
+			{ q: 'Can I batch generate barcodes?', a: 'Yes. Use the batch render API to generate thousands of unique barcode images in a single request.' },
+			{ q: 'Are the images print-ready?', a: 'Yes. Use 300 DPI-equivalent dimensions (e.g., 600×200 at 2x) for crisp print output.' }
+		],
+		related: ['receipt', 'product-banner', 'badge']
+	},
+	'qr-code-generator': {
+		label: 'QR Code Generator',
+		description: 'Create branded QR codes with logos and custom styling as downloadable images.',
+		seoKeywords: [
+			'qr code generator', 'custom qr code', 'qr code with logo', 'branded qr code',
+			'qr code maker', 'qr code image', 'qr code creator', 'qr code api',
+			'generate qr code online', 'qr code png'
+		],
+		longDescription: `Plain QR codes work, but branded QR codes convert better. With Pictify, you render styled QR code HTML — with your logo, brand colors, rounded corners, and custom frames — as high-quality images. Use libraries like qrcode.js or QRCode.react to generate the QR code, style it with CSS, and convert to a shareable image via API.
+
+Perfect for marketing materials, product packaging, restaurant menus, event tickets, and business cards. Automate QR code generation in your CMS or marketing platform — every new page or product gets a branded QR code automatically.`,
+		useCaseScenarios: [
+			'Marketing teams creating branded QR codes for print campaigns',
+			'Restaurants generating menu QR codes with branding',
+			'Event organizers adding QR codes to tickets and badges',
+			'E-commerce brands embedding QR codes on packaging',
+			'Real estate agents adding property listing QR codes to flyers'
+		],
+		recommendedFormats: ['png'],
+		recommendedSizes: ['1080x1080', '600x600'],
+		templateHtml: simpleCardTemplate({
+			title: '{{label}}',
+			subtitle: 'Scan to visit · {{url}}',
+			badge: 'QR CODE',
+			accent: '#4ade80',
+			background: '#ffffff'
+		}),
+		overview: [
+			'QR codes bridge physical and digital — but generic black-and-white squares look unprofessional. By rendering styled QR code HTML as images, you create on-brand codes that match your visual identity.',
+			'Marketing, packaging, and event teams use this workflow to auto-generate branded QR codes for every campaign, product, or venue without touching a design tool.'
+		],
+		painPoints: [
+			'Generic QR code generators produce bland, unbranded output',
+			'Manual QR code creation does not scale for product catalogs',
+			'No API access for automated QR code generation in most tools'
+		],
+		workflow: [
+			{ title: 'Generate QR code HTML', detail: 'Use qrcode.js or a similar library to render a QR code as an SVG or Canvas element in HTML.' },
+			{ title: 'Brand it', detail: 'Add your logo overlay, brand colors, rounded modules, and a call-to-action frame using CSS.' },
+			{ title: 'Render via API', detail: 'Send the styled HTML to Pictify to get a high-resolution PNG ready for print or digital use.' }
+		],
+		faqs: [
+			{ q: 'Can I add a logo to the QR code?', a: 'Yes. Overlay your logo in the center of the QR code using HTML/CSS positioning. The QR spec has error correction that allows up to 30% of the code to be obscured.' },
+			{ q: 'Will the QR code still scan?', a: 'Yes, as long as you use medium or high error correction and keep the logo under 25-30% of the QR area.' },
+			{ q: 'What sizes work best?', a: '1080×1080 for social media, 600×600 for print materials. Higher resolution ensures reliable scanning.' }
+		],
+		related: ['barcode-generator', 'event-ticket', 'product-banner']
+	},
+	'signature-generator': {
+		label: 'Email Signature Generator',
+		description: 'Create professional email signatures as images for consistent branding across your team.',
+		seoKeywords: [
+			'signature generator', 'email signature maker', 'email signature image',
+			'professional email signature', 'html email signature', 'signature creator',
+			'email signature template', 'team email signature', 'branded email signature',
+			'signature block generator'
+		],
+		longDescription: `Email signatures are one of the most viewed pieces of marketing collateral — every employee sends dozens of emails daily. Yet most teams have inconsistent, poorly formatted signatures. With Pictify, you design a signature template once and render personalized variants for every team member via API.
+
+Feed employee data (name, title, phone, photo URL) into your template and generate pixel-perfect signature images that look identical across Gmail, Outlook, Apple Mail, and every other client. No more broken HTML signatures or missing images.`,
+		useCaseScenarios: [
+			'HR teams rolling out branded signatures company-wide',
+			'Marketing departments ensuring consistent signature branding',
+			'Sales teams adding promotional banners to signatures',
+			'Agencies managing signatures across multiple client brands',
+			'Startups creating professional signatures from day one'
+		],
+		recommendedFormats: ['png'],
+		recommendedSizes: ['600x200', '700x250'],
+		templateHtml: simpleCardTemplate({
+			title: '{{name}}',
+			subtitle: '{{title}} · {{company}}',
+			badge: 'SIGNATURE',
+			accent: '#ff6b6b',
+			background: '#ffffff'
+		}),
+		overview: [
+			'Email signatures are seen more than your website — yet most are inconsistent, broken across clients, or missing entirely. Image-based signatures solve this by rendering identically everywhere.',
+			'HR, marketing, and IT teams use this to generate and distribute branded signatures across the organization, ensuring every email reinforces the brand.'
+		],
+		painPoints: [
+			'HTML email signatures break across different email clients',
+			'Manually updating signatures for every employee is tedious',
+			'Inconsistent formatting undermines brand credibility'
+		],
+		workflow: [
+			{ title: 'Design the template', detail: 'Create an HTML/CSS signature layout with placeholders for name, title, phone, photo, and social links.' },
+			{ title: 'Feed employee data', detail: 'Pass each employee\'s details as template variables to generate personalized signature images.' },
+			{ title: 'Distribute', detail: 'Download or API-deliver the signature images. Employees paste them into their email client settings.' }
+		],
+		faqs: [
+			{ q: 'Why use an image signature instead of HTML?', a: 'Image signatures render identically across all email clients — no broken layouts, missing fonts, or inconsistent spacing.' },
+			{ q: 'Can I update all signatures at once?', a: 'Yes. Update the template and batch-render new images for the entire team via API.' },
+			{ q: 'What size should email signatures be?', a: '600×200 pixels is the sweet spot — wide enough for full details, compact enough not to dominate the email.' }
+		],
+		related: ['html-email', 'email-header', 'membership-card']
+	},
+	'name-badge': {
+		label: 'Name Badge Generator',
+		description: 'Generate personalized name badges and name tags as printable images for events and conferences.',
+		seoKeywords: [
+			'name badge generator', 'name tag maker', 'conference badge generator',
+			'event name badge', 'printable name badge', 'name badge template',
+			'badge maker online', 'name tag creator', 'event badge generator',
+			'conference name tag'
+		],
+		longDescription: `Conference and event organizers need hundreds or thousands of unique name badges — each with a different name, title, company, and sometimes a QR code or photo. Designing each one manually is impossible at scale. With Pictify, you create one badge template and generate every variant programmatically.
+
+Upload your attendee CSV, map columns to template variables, and batch-render all badges in minutes. Print-ready PNG or PDF output ensures crisp text at any size. Perfect for conferences, corporate events, workshops, and trade shows.`,
+		useCaseScenarios: [
+			'Conference organizers printing badges for 500+ attendees',
+			'Corporate events creating VIP and general admission badges',
+			'Workshop facilitators generating name tags with session info',
+			'Trade show booths printing visitor badges on demand',
+			'School events creating student and parent name tags'
+		],
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['1200x800', '900x600'],
+		templateHtml: simpleCardTemplate({
+			title: '{{name}}',
+			subtitle: '{{title}} · {{company}}',
+			badge: 'NAME BADGE',
+			accent: '#ffc480',
+			background: '#FFFDF8'
+		}),
+		overview: [
+			'Events require unique badges per attendee, but design tools do not scale. Programmatic badge generation from attendee data eliminates the bottleneck.',
+			'Event ops teams, conference organizers, and corporate admins use this to batch-generate print-ready badges from registration data — no design skills required.'
+		],
+		painPoints: [
+			'Manually creating individual badges for large events is impractical',
+			'Generic badge tools lack customization and API access',
+			'Last-minute attendee changes require rapid re-generation'
+		],
+		workflow: [
+			{ title: 'Design your badge template', detail: 'Create an HTML/CSS badge layout with placeholders for name, title, company, and optional QR code or photo.' },
+			{ title: 'Import attendee data', detail: 'Upload a CSV or connect your registration system to provide attendee details as template variables.' },
+			{ title: 'Batch render', detail: 'Generate all badges in one API call. Download as individual PNGs or a combined PDF for printing.' }
+		],
+		faqs: [
+			{ q: 'Can I add QR codes to badges?', a: 'Yes. Include a QR code library in your HTML template and encode each attendee\'s unique ID or vCard data.' },
+			{ q: 'What print size works best?', a: '4×3 inches (1200×900 pixels at 300 DPI) is standard for conference badges. Adjust based on your badge holder size.' },
+			{ q: 'Can I handle last-minute changes?', a: 'Yes. Re-render individual badges instantly via API when attendee details change.' }
+		],
+		related: ['badge', 'event-ticket', 'certificate']
+	},
+	'social-proof-card': {
+		label: 'Social Proof Card',
+		description: 'Generate testimonial and review cards as shareable images for social media and marketing.',
+		seoKeywords: [
+			'social proof card', 'testimonial card generator', 'review card maker',
+			'testimonial image', 'customer review card', 'social proof widget',
+			'testimonial graphic', 'review screenshot', 'customer feedback image',
+			'social proof image generator'
+		],
+		longDescription: `Customer testimonials are your most powerful marketing asset — but they are buried in review platforms and support tickets. With Pictify, you turn raw testimonial text into beautifully designed, shareable image cards that work on Twitter, LinkedIn, Instagram, and your website.
+
+Design a testimonial card template once — with customer photo, name, company, star rating, and quote — then generate variants for every review via API. Perfect for social media managers, growth teams, and marketing automation pipelines.`,
+		useCaseScenarios: [
+			'Marketing teams sharing customer testimonials on social media',
+			'Growth teams creating review cards for ad campaigns',
+			'SaaS companies featuring user quotes on landing pages',
+			'E-commerce brands showcasing product reviews as images',
+			'Sales teams adding proof points to pitch decks'
+		],
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['1080x1080', '1200x630'],
+		templateHtml: simpleCardTemplate({
+			title: '{{quote}}',
+			subtitle: '{{name}} · {{company}}',
+			badge: 'TESTIMONIAL',
+			accent: '#ffc480',
+			background: '#FFFDF8'
+		}),
+		overview: [
+			'Testimonials convert — but plain text quotes get ignored on visual platforms. Turning reviews into designed image cards dramatically increases engagement and shareability.',
+			'Marketing, growth, and social media teams use this to systematically convert customer feedback into on-brand visual content for every channel.'
+		],
+		painPoints: [
+			'Testimonials buried in text get low engagement on social platforms',
+			'Designing individual testimonial graphics is time-consuming',
+			'Inconsistent formatting across different team members'
+		],
+		workflow: [
+			{ title: 'Design the card template', detail: 'Create an HTML/CSS testimonial card with placeholders for quote, customer name, photo, company, and star rating.' },
+			{ title: 'Pull review data', detail: 'Connect to your review platform, CRM, or spreadsheet to extract testimonial data.' },
+			{ title: 'Generate and share', detail: 'Render cards via API and post directly to social media or embed on your website.' }
+		],
+		faqs: [
+			{ q: 'Can I include star ratings?', a: 'Yes. Use HTML/CSS star components or Unicode stars in your template. Style them however you like.' },
+			{ q: 'What size works for social media?', a: '1080×1080 for Instagram and Facebook feed posts, 1200×630 for Twitter and LinkedIn cards.' },
+			{ q: 'Can I automate this from a review platform?', a: 'Yes. Use the API with Zapier, Make, or a custom integration to auto-generate cards when new reviews come in.' }
+		],
+		related: ['testimonial', 'quote-card', 'kpi-card']
+	},
+	'changelog-image': {
+		label: 'Changelog Image Generator',
+		description: 'Generate visual changelog and release notes as shareable images for social media and documentation.',
+		seoKeywords: [
+			'changelog image', 'release notes image', 'changelog generator',
+			'release notes graphic', 'product update image', 'changelog card',
+			'release announcement image', 'what is new image', 'product changelog',
+			'version release image'
+		],
+		longDescription: `Shipping features without telling anyone is wasted effort. With Pictify, you turn your changelog or release notes into polished visual cards that get attention on Twitter, LinkedIn, and your product blog. Each release gets a branded image automatically.
+
+Integrate with your CI/CD pipeline to generate a changelog image on every deploy. Pull the release title, version number, feature list, and date from your release process and render a social-ready graphic in seconds. No designer needed.`,
+		useCaseScenarios: [
+			'DevRel teams announcing new features on social media',
+			'Product teams sharing weekly release notes internally',
+			'Open source maintainers generating release announcement graphics',
+			'Marketing teams creating product update posts',
+			'Engineering teams documenting releases visually'
+		],
+		recommendedFormats: ['png', 'jpg'],
+		recommendedSizes: ['1200x630', '1080x1080'],
+		templateHtml: simpleCardTemplate({
+			title: '{{title}}',
+			subtitle: 'v{{version}} · {{date}}',
+			badge: 'CHANGELOG',
+			accent: '#4ade80',
+			background: '#0b0b1f'
+		}),
+		overview: [
+			'Release notes as plain text get ignored. Visual changelog cards grab attention on social platforms and internal channels, driving feature adoption and engagement.',
+			'Product, engineering, and DevRel teams use this to automate release communication — every deploy generates a branded announcement graphic from the changelog data.'
+		],
+		painPoints: [
+			'Release notes as text posts get low engagement',
+			'Manually creating announcement graphics delays shipping',
+			'Inconsistent release communication across channels'
+		],
+		workflow: [
+			{ title: 'Extract release data', detail: 'Pull the release title, version, date, and feature list from your CI/CD pipeline or changelog file.' },
+			{ title: 'Apply the template', detail: 'Map release data to your branded changelog card template with version badge, feature bullets, and release date.' },
+			{ title: 'Post and share', detail: 'Render the image via API and auto-post to Twitter, LinkedIn, Slack, or your blog.' }
+		],
+		faqs: [
+			{ q: 'Can I trigger this from CI/CD?', a: 'Yes. Call the Pictify API in your deploy script — pass release metadata as template variables and get a social-ready image back.' },
+			{ q: 'Can I include a feature list?', a: 'Yes. Render bullet points, icons, or even code diffs in your HTML template. Pictify renders any valid HTML.' },
+			{ q: 'What about dark mode?', a: 'Use a dark background in your template. Many changelog cards look great with dark themes — they stand out in social feeds.' }
+		],
+		related: ['release-notes-card', 'feature-flag-banner', 'status-update']
 	}
 };
