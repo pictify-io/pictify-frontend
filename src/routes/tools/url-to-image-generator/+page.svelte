@@ -4,6 +4,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
+	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
@@ -13,11 +14,34 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/analytics.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import posthog from 'posthog-js';
+
+	// Experiment: post-generation signup CTA variant
+	let stickyBar;
+
+	function getCtaVariant() {
+		if (!browser) return 'control';
+		const flag = posthog.getFeatureFlag?.('tool-signup-cta-experiment');
+		// In dev (PostHog not loaded), test with value-prop variant
+		if (flag === undefined && !posthog.__loaded) return 'value-prop';
+		return flag || 'control';
+	}
+	// Resolve lazily — by the time imageUrl is set, flags are loaded
+	$: ctaVariant = imageUrl ? getCtaVariant() : 'control';
 
 	// Track tool opened on mount
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'url_to_image_generator' });
 	});
+
+	function trackSignupClick(ctaLocation) {
+		analytics.track('tool_signup_click', {
+			tool_name: 'url_to_image_generator',
+			cta_location: ctaLocation,
+			experiment: 'tool-signup-cta-experiment',
+			variant: ctaVariant
+		});
+	}
 
 	// Clean up message listener on destroy (fixes memory leak)
 	let messageHandler = null;
@@ -430,6 +454,11 @@
 				format: fileFormat,
 				with_watermark: !isUserLoggedIn
 			});
+
+			// Trigger sticky bar experiment after generation
+			if (!isUserLoggedIn && stickyBar) {
+				stickyBar.triggerAfterGeneration();
+			}
 		} catch (error) {
 			const status = error?.status || error?.response?.status;
 			if (status === 429) {
@@ -590,7 +619,7 @@
 		</div>
 
 		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner />
+		<GenerationLimitBanner toolName="url_to_image_generator" />
 
 		<div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
 			<!-- Control Board -->
@@ -890,6 +919,38 @@
 							Copy URL
 						</button>
 					</div>
+
+					<!-- Experiment: Post-generation signup CTA -->
+					{#if !isUserLoggedIn && ctaVariant === 'value-prop'}
+						<div class="mt-8 border-[3px] border-black bg-[#ffc480]/20 p-6 flex flex-col items-center text-center gap-3">
+							<p class="font-black text-gray-900 text-base uppercase tracking-wide">Like it? Automate it.</p>
+							<p class="text-sm font-bold text-gray-600 max-w-md">Sign up to get your API key and capture unlimited screenshots programmatically — same quality, zero daily limits.</p>
+							<a
+								href="/signup?redirect=/tools/url-to-image-generator"
+								on:click={() => trackSignupClick('post_generation_value_prop')}
+								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							>
+								Get Your API Key — Free
+							</a>
+						</div>
+					{:else if !isUserLoggedIn && ctaVariant === 'social-proof'}
+						<div class="mt-8 border-[3px] border-black bg-[#4ade80]/10 p-6 flex flex-col items-center text-center gap-3">
+							<div class="flex -space-x-2">
+								{#each ['#ff6b6b', '#ffc480', '#4ade80', '#60a5fa'] as color}
+									<div class="w-8 h-8 rounded-full border-[2px] border-white" style="background: {color};"></div>
+								{/each}
+							</div>
+							<p class="font-black text-gray-900 text-base">10,000+ developers capture screenshots via API</p>
+							<p class="text-sm font-bold text-gray-500 max-w-md">Sign up free to get unlimited captures, your own API key, and higher resolution output.</p>
+							<a
+								href="/signup?redirect=/tools/url-to-image-generator"
+								on:click={() => trackSignupClick('post_generation_social_proof')}
+								class="mt-1 px-6 py-3 bg-[#ff6b6b] text-white border-[3px] border-black font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							>
+								Sign Up Free
+							</a>
+						</div>
+					{/if}
 				</div>
 
 			</div>
@@ -927,6 +988,7 @@
 		<ApiCodeSection
 			title="Automate with the"
 			titleHighlight="API"
+			toolName="url_to_image_generator"
 			description="Convert any URL to an image programmatically. Generate screenshots, link previews, and image URLs in your CI/CD pipeline."
 			codeExamples={urlToImageExamples}
 		/>
@@ -1195,6 +1257,7 @@
 		<Footer />
 	</main>
 
+	<StickySignupBar bind:this={stickyBar} toolName="url_to_image_generator" />
 </div>
 
 <style>

@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Loader from '$lib/components/Loader.svelte';
 	import { verifyEmail } from '../../api/auth';
+	import { analytics } from '$lib/analytics.js';
 
 	let status = 'idle';
 	let message = 'Hang tight while we check your verification link.';
@@ -28,6 +29,7 @@
 			await verifyEmail({ token });
 			status = 'success';
 			message = 'Your email is verified. You can now log in to Pictify.';
+			analytics.trackEmailVerification({ success: true, method: 'link' });
 		} catch (error) {
 			status = 'error';
 			message =

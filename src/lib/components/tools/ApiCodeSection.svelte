@@ -20,15 +20,15 @@
 	 * `code` should be pre-formatted HTML with <span> syntax highlighting.
 	 */
 	export let codeExamples = [];
+	export let toolName = '';
+
+	import { analytics } from '$lib/analytics.js';
 
 	let selectedLang = codeExamples.length ? codeExamples[0].id : 'javascript';
 	$: activeLang = codeExamples.find((e) => e.id === selectedLang) || codeExamples[0];
 
 	function handleSignupClick() {
-		// Track if analytics is available
-		if (typeof window !== 'undefined' && window.gtag) {
-			window.gtag('event', 'cta_click', { event_category: 'api_code_section', event_label: 'get_api_key' });
-		}
+		analytics.track('tool_signup_click', { tool_name: toolName, cta_location: 'api_code_section' });
 	}
 </script>
 

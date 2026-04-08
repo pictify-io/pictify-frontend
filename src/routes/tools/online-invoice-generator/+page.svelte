@@ -395,7 +395,7 @@
 		</div>
 
 		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner />
+		<GenerationLimitBanner toolName="online_invoice_generator" />
 
 		<!-- Main Editor Grid -->
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">

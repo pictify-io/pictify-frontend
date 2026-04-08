@@ -1003,7 +1003,7 @@
 		</div>
 
 		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner />
+		<GenerationLimitBanner toolName="og_image_generator" />
 
 		<!-- Editor Section -->
 		{#if websiteInfo && selectedTemplate}
@@ -1335,6 +1335,7 @@
 				{#if !isUserLoggedIn}
 					<a
 						href="/signup"
+						on:click={() => analytics.track('tool_signup_click', { tool_name: 'og_image_generator', cta_location: 'view_all_templates' })}
 						class="font-bold text-black hover:text-[#ff6b6b] transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
 					>
 						View All Templates →

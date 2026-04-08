@@ -10,6 +10,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { user } from '../../../store/user.store';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
+	import { analytics } from '$lib/analytics.js';
 	import {
 		allTemplates,
 		getTemplatesByCategory,
@@ -964,6 +965,7 @@
 									</p>
 									<a
 										href="/signup"
+										on:click={() => analytics.track('tool_signup_click', { tool_name: 'linkedin_banner_generator', cta_location: 'remove_watermark' })}
 										class="inline-block mt-3 px-6 py-3 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:shadow-[2px_2px_0_0_#ff6b6b] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Remove Watermark Free

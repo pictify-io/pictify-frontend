@@ -2,12 +2,14 @@
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
+	import { analytics } from '$lib/analytics.js';
 
 	/**
 	 * Generation Limit Banner
 	 * Shows remaining free generations for guest users
 	 * Encourages signup when limit is low
 	 */
+	export let toolName = '';
 
 	$: isLoggedIn = !!$user?.email;
 	$: remaining = GUEST_DAILY_LIMIT - ($generationLimits?.count || 0);
@@ -61,6 +63,7 @@
 
 			<a
 				href="/signup"
+				on:click={() => analytics.track('tool_signup_click', { tool_name: toolName, cta_location: 'generation_limit_banner' })}
 				class={`
           px-4 py-2 border-[2px] border-black font-black text-xs uppercase tracking-wide transition-all
           ${

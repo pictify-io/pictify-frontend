@@ -21,6 +21,9 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
+	import posthog from 'posthog-js';
+	let stickyBar;
 	$: format = $page.params.format;
 
 	// Support optional size parameter from nested route: /tools/html-to-[format]/[dimensions]
@@ -162,6 +165,10 @@
 		if (browser) {
 			goto(`/tools/html-to-${newFormat}`);
 		}
+	}
+
+	function trackSignupClick(ctaLocation) {
+		analytics.track('tool_signup_click', { tool_name: `html_to_${format}`, cta_location: ctaLocation });
 	}
 
 	// Add local storage management
@@ -335,6 +342,11 @@
 				format: fileExtension || format,
 				with_watermark: !isUserLoggedIn
 			});
+
+			// Trigger sticky bar experiment after generation
+			if (!isUserLoggedIn && stickyBar) {
+				stickyBar.triggerAfterGeneration();
+			}
 
 			// Update usage tracking for non-logged in users
 			if (!isUserLoggedIn) {
@@ -883,6 +895,7 @@
 							<div class="flex-shrink-0">
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
+									on:click={() => trackSignupClick('generation_limit_banner')}
 									class="inline-block py-2 px-4 rounded-lg border-[3px] border-gray-900 font-bold bg-[#ff6b6b] text-white shadow-[4px_4px_0_0_#1f2937] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#1f2937] transition-all text-sm"
 								>
 									Sign Up Free
@@ -1103,6 +1116,7 @@
 							{#if !isUserLoggedIn}
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
+									on:click={() => trackSignupClick('result_actions')}
 									class="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#ffc480] border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									Sign up free
@@ -1204,6 +1218,7 @@
 								</div>
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
+									on:click={() => trackSignupClick('go_unlimited_banner')}
 									class="py-3 px-6 bg-white text-black border-[2px] border-black font-black uppercase text-sm shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap flex-shrink-0"
 								>
 									Sign up free
@@ -1305,6 +1320,7 @@
 					<div class="space-y-4">
 						<a
 							href={`/signup?redirect=/tools/html-to-${format}`}
+							on:click={() => trackSignupClick('free_tier_card')}
 							class="block w-full py-4 px-6 border-[3px] border-black font-black bg-black text-center text-white shadow-[4px_4px_0_0_#ff6b6b] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#ff6b6b] transition-all uppercase tracking-wider"
 						>
 							Create Free Account
@@ -1415,6 +1431,7 @@
 						<div class="relative group w-full">
 							<a
 								href={`/signup?redirect=/tools/html-to-${format}`}
+								on:click={() => trackSignupClick('pro_tier_card')}
 								class="block w-full py-4 px-6 border-[3px] border-black font-black bg-[#ff6b6b] text-center text-white shadow-[4px_4px_0_0_#000] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wider relative z-10"
 							>
 								Sign Up Free
@@ -1466,6 +1483,7 @@
 			<ApiCodeSection
 				title="Automate with the"
 				titleHighlight="API"
+				toolName={`html_to_${format}`}
 				description="Convert HTML to {(format && format.toUpperCase()) || 'image'} programmatically. Render social cards, email headers, and marketing visuals in your CI/CD pipeline."
 				codeExamples={htmlToImageExamples}
 			/>
@@ -2162,6 +2180,7 @@
 
 	<Footer />
 
+	<StickySignupBar bind:this={stickyBar} toolName={`html_to_${format}`} />
 </section>
 
 <!-- Add IDs for schema steps -->

@@ -4,6 +4,7 @@
 	import { user } from '../../../store/user.store';
 	import ShareResultButton from './ShareResultButton.svelte';
 	import { onMount } from 'svelte';
+	import { analytics } from '$lib/analytics.js';
 
 	/**
 	 * Next steps module for PLG:
@@ -389,6 +390,7 @@
 					</p>
 					<a
 						href="/signup"
+						on:click={() => analytics.track('tool_signup_click', { tool_name: toolName, cta_location: 'next_steps' })}
 						class="text-sm font-black uppercase tracking-wide text-[#ff6b6b] hover:underline underline-offset-4 flex items-center gap-1"
 					>
 						Join them free

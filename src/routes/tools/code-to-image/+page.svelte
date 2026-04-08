@@ -13,6 +13,8 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
+	let stickyBar;
 
 	// Syntax highlighting via refractor (Prism under the hood)
 	import { refractor } from 'refractor';
@@ -752,6 +754,11 @@
 				with_watermark: !isUserLoggedIn
 			});
 
+			// Trigger sticky bar experiment
+			if (!isUserLoggedIn && stickyBar) {
+				stickyBar.triggerAfterGeneration();
+			}
+
 			// Update usage tracking for non-logged in users
 			if (!isUserLoggedIn) {
 				updateUsage();
@@ -981,7 +988,7 @@
 		</div>
 
 		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner />
+		<GenerationLimitBanner toolName="code_to_image" />
 
 		<div class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 lg:gap-8 items-start">
 			<!-- Left Column: Controls -->
@@ -1660,6 +1667,7 @@
 			<ApiCodeSection
 				title="Automate with the"
 				titleHighlight="API"
+				toolName="code_to_image"
 				description="Generate syntax-highlighted code screenshots programmatically. Render code snippets as images in your docs pipeline, blog CMS, or CI/CD workflows."
 				codeExamples={codeToImageExamples}
 			/>
@@ -2792,6 +2800,7 @@
 						<div class="space-y-3">
 							<a
 								href="/signup?redirect=/tools/code-to-image"
+								on:click={() => analytics.track('tool_signup_click', { tool_name: 'code_to_image', cta_location: 'free_tier_card' })}
 								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Create Free Account
@@ -2860,6 +2869,7 @@
 						<div class="space-y-3">
 							<a
 								href="/signup?redirect=/tools/code-to-image"
+								on:click={() => analytics.track('tool_signup_click', { tool_name: 'code_to_image', cta_location: 'limit_reached_modal' })}
 								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Sign Up Free
@@ -2894,6 +2904,7 @@
 		<Footer />
 	</main>
 	<Toast />
+	<StickySignupBar bind:this={stickyBar} toolName="code_to_image" />
 
 </section>
 

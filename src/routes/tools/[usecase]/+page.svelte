@@ -341,7 +341,7 @@
 			</div>
 
 			<!-- Generation Limit Banner -->
-			<GenerationLimitBanner />
+			<GenerationLimitBanner toolName="usecase_tool" />
 
 			{#if useCaseId === 'markdown'}
 				<!-- Markdown Editor (self-contained: editor, preview, generate, result) -->
