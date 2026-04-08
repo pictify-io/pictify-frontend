@@ -157,7 +157,7 @@ export const signupAction = async (email, password) => {
 		if (userData) {
 			setUser(userData);
 
-			// Track signup and identify user
+			// Track signup, identify user, and track as login
 			analytics.identify(userData.email, {
 				email: userData.email,
 				plan: 'starter',
@@ -165,6 +165,7 @@ export const signupAction = async (email, password) => {
 				is_email_verified: false
 			});
 			analytics.trackSignupCompleted({ method: 'email', plan: 'starter' });
+			analytics.trackLoginCompleted({ method: 'email', is_new_signup: true });
 		}
 		return response;
 	} catch (error) {

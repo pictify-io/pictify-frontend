@@ -78,6 +78,10 @@
 				await loginAction(email, password);
 			} else {
 				await signupAction(email, password);
+				// Flag for post-signup welcome on tool pages
+				if (typeof sessionStorage !== 'undefined') {
+					sessionStorage.setItem('pictify_just_signed_up', '1');
+				}
 			}
 			if (isLoggedIn()) {
 				safeRedirect();
@@ -94,8 +98,13 @@
 			if (newWindow.closed) {
 				clearInterval(interval);
 				newWindow = { closed: true };
+				const wasLoggedIn = isLoggedIn();
 				await getUser();
 				if (isLoggedIn()) {
+					// If user wasn't logged in before, this is a new signup via Google
+					if (!wasLoggedIn && !isLogin && typeof sessionStorage !== 'undefined') {
+						sessionStorage.setItem('pictify_just_signed_up', '1');
+					}
 					safeRedirect();
 				}
 			}

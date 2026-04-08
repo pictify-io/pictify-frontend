@@ -17,7 +17,7 @@
 	} from '../../store/onboarding.store';
 	import { fetchAuditLogs } from '../../api/audit';
 	import { getTemplates } from '../../api/template';
-	import { getApiToken } from '../../api/user';
+	import { getApiToken, createApiToken } from '../../api/user';
 	import { analytics } from '$lib/analytics.js';
 	import {
 		getQuickActions,
@@ -268,9 +268,16 @@
 				getApiToken().catch(() => null)
 			]);
 
-			// Extract API key for getting started guide
+			// Extract API key for getting started guide, auto-create if none exists
 			if (apiTokenData?.apiTokens?.length) {
 				userApiKey = apiTokenData.apiTokens[0].token || '';
+			} else {
+				try {
+					const created = await createApiToken();
+					userApiKey = created?.token || '';
+				} catch {
+					// Non-critical — user can create later
+				}
 			}
 
 			recentLogs = logsData?.logs || [];

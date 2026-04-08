@@ -1,10 +1,11 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import {
 		GETTING_STARTED_STEPS,
 		DEFAULT_GETTING_STARTED_STEPS,
 		getCurlExample
 	} from '../../../config/personalization.js';
+	import { analytics } from '$lib/analytics.js';
 
 	export let hasApiKey = false;
 	export let hasTemplates = false;
@@ -13,6 +14,25 @@
 	export let apiKey = '';
 
 	const dispatch = createEventDispatcher();
+
+	// Track which onboarding steps are viewed when the guide renders
+	let trackedStepViews = new Set();
+	onMount(() => {
+		if (steps?.length) {
+			steps.forEach((step) => {
+				if (!trackedStepViews.has(step.id || step.number)) {
+					trackedStepViews.add(step.id || step.number);
+					analytics.track('onboarding_step_viewed', {
+						step_id: step.id || step.number,
+						step_title: step.title,
+						step_number: step.number,
+						completed: isCompleted(step),
+						intent,
+					});
+				}
+			});
+		}
+	});
 
 	$: steps = (intent && GETTING_STARTED_STEPS[intent]) || DEFAULT_GETTING_STARTED_STEPS;
 

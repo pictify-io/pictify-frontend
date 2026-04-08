@@ -14,6 +14,7 @@
 	import { analytics } from '$lib/analytics.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
+	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
 	let stickyBar;
 
 	// Syntax highlighting via refractor (Prism under the hood)
@@ -986,6 +987,9 @@
 				</p>
 			</div>
 		</div>
+
+		<!-- Post-signup welcome with API key -->
+		<PostSignupWelcome toolName="code_to_image" />
 
 		<!-- Generation Limit Banner -->
 		<GenerationLimitBanner toolName="code_to_image" />

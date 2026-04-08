@@ -22,6 +22,7 @@
 	import { analytics } from '$lib/analytics.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
+	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
 	import posthog from 'posthog-js';
 	let stickyBar;
 	$: format = $page.params.format;
@@ -659,6 +660,9 @@
 				<li class="text-gray-900">HTML to {currentFormat.fullName}</li>
 			</ol>
 		</nav>
+
+		<!-- Post-signup welcome with API key -->
+		<PostSignupWelcome toolName={`html_to_${format}`} />
 
 		<!-- Hero Section -->
 		<div

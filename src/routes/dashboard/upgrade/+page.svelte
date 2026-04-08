@@ -62,6 +62,11 @@
 	onMount(async () => {
 		// Track pricing page view from dashboard
 		analytics.trackPricingViewed({ source: 'dashboard_upgrade' });
+		analytics.track('checkout_page_loaded', {
+			source: source || 'dashboard_upgrade',
+			current_plan: currentPlan,
+			discount_code: discountCode || null,
+		});
 
 		try {
 			const response = await getProducts();

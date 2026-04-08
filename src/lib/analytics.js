@@ -193,7 +193,8 @@ export const analytics = {
 	 */
 	trackLoginCompleted: (params = {}) => {
 		analytics.track('login_completed', {
-			method: params.method || 'email'
+			method: params.method || 'email',
+			...(params.is_new_signup !== undefined && { is_new_signup: params.is_new_signup })
 		});
 	},
 

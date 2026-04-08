@@ -5,6 +5,7 @@
 	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
+	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
@@ -617,6 +618,9 @@
 				</p>
 			</div>
 		</div>
+
+		<!-- Post-signup welcome with API key -->
+		<PostSignupWelcome toolName="url_to_image_generator" />
 
 		<!-- Generation Limit Banner -->
 		<GenerationLimitBanner toolName="url_to_image_generator" />
