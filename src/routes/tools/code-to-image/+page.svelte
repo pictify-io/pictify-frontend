@@ -881,21 +881,21 @@
 </script>
 
 <svelte:head>
-	<title>Code to Image — Syntax Highlighted Screenshots | Pictify</title>
+	<title>Code to Image — Beautiful Code Screenshots Free | Pictify</title>
 	<meta
 		name="description"
-		content="Free code to image generator with syntax highlighting. Convert code snippets to beautiful screenshot images in 25+ languages, 18+ themes. API available for automation."
+		content="Turn code snippets into shareable images with syntax highlighting. 25+ languages, 18+ themes, custom fonts and window frames. Paste code, pick a theme, export PNG. Free, no signup."
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/code-to-image" />
-	<meta property="og:title" content="Code to Image — Syntax Highlighted Screenshots | Pictify" />
+	<meta property="og:title" content="Code to Image — Beautiful Code Screenshots Free | Pictify" />
 	<meta
 		property="og:description"
 		content="Create shareable code images with themes, fonts, and window frames. Free and fast."
 	/>
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:title" content="Code to Image — Syntax Highlighted Screenshots | Pictify" />
-	<meta name="twitter:description" content="Free code to image generator with syntax highlighting. Convert code snippets to beautiful screenshot images in 25+ languages, 18+ themes. API available for automation." />
+	<meta name="twitter:title" content="Code to Image — Beautiful Code Screenshots Free | Pictify" />
+	<meta name="twitter:description" content="Turn code into shareable images. 25+ languages, 18+ themes, custom fonts. Paste code, pick a theme, export PNG. Free, no signup." />
 	<meta property="og:url" content="https://pictify.io/tools/code-to-image" />
 	<meta property="og:image" content="https://media.pictify.io/by55n-1775406886142.png" />
 	<meta name="twitter:image" content="https://media.pictify.io/by55n-1775406886142.png" />

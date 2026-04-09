@@ -508,29 +508,29 @@
 </script>
 
 <svelte:head>
-	<title>URL to Image Generator | Pictify.io</title>
+	<title>URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify</title>
 	<meta
 		name="description"
-		content="Free URL to image generator — convert any webpage to a picture. Generate image URLs, create link previews, and capture screenshots via API. No signup required."
+		content="Enter any URL and get a high-quality screenshot as PNG, JPG, or WebP. Choose device size, crop specific elements, and download instantly. Free with API access — no signup needed."
 	/>
 	<meta
 		name="keywords"
 		content="url to image, image url generator, url to picture converter, photo url generator, picture url maker, link to picture, image link generator, screenshot api, webpage to image"
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/url-to-image-generator" />
-	<meta property="og:title" content="URL to Image Generator | Pictify.io" />
+	<meta property="og:title" content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify" />
 	<meta
 		property="og:description"
-		content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more."
+		content="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/vombm-1775406853373.png" />
 	<meta property="og:url" content="https://pictify.io/tools/url-to-image-generator" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:title" content="URL to Image Generator | Pictify.io" />
+	<meta name="twitter:title" content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify" />
 	<meta
 		name="twitter:description"
-		content="Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more."
+		content="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/vombm-1775406853373.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}

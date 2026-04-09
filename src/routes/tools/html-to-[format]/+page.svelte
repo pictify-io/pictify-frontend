@@ -47,29 +47,31 @@
 
 	// SEO head computed values (dimension-aware)
 	$: headTitle = hasSize
-		? `HTML to ${(currentFormat && currentFormat.fullName) || 'Image'} ${sizeString} | Pictify`
-		: `HTML to ${(format && format.toUpperCase()) || 'Image'} Converter — Free Online | Pictify`;
+		? `HTML to ${(currentFormat && currentFormat.fullName) || 'Image'} ${sizeString} — Free Converter | Pictify`
+		: format === 'png'
+			? `HTML to PNG — Free Online Converter & API | Pictify`
+			: format === 'jpg'
+				? `HTML to JPG — Convert Code to Image Online Free | Pictify`
+				: `HTML to ${(format && format.toUpperCase()) || 'Image'} — Free Online Converter & API | Pictify`;
 	$: headDescription = hasSize
 		? `Convert HTML to ${
 				(currentFormat && currentFormat.fullName) || 'image'
-		  } at ${sizeString} instantly. Perfect for ${
-				(currentFormat && currentFormat.bestFor) || 'web use'
-		  }.`
-		: `Convert HTML to ${(format && format.toUpperCase()) || 'IMAGE'} images online for free. Create images from HTML code instantly — perfect for social cards, email headers, and automated workflows. API access included.`;
+		  } at ${sizeString} instantly. Paste your code, preview live, and export. No file upload needed.`
+		: format === 'png'
+			? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor — no signup, no file upload. API available for automation.`
+			: format === 'jpg'
+				? `Convert HTML and CSS to a JPG image instantly. Paste your code, see a live preview, and download. Free online tool with API access for developers. No signup required.`
+				: `Convert HTML to ${(format && format.toUpperCase()) || 'IMAGE'} images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
 	$: canonicalUrl = hasSize
 		? `https://pictify.io/tools/html-to-${format}/${sizeString}`
 		: `https://pictify.io/tools/html-to-${format}`;
 	$: ogDescription = hasSize
 		? `Convert HTML to high-quality ${
 				(currentFormat && currentFormat.fullName) || 'Image'
-		  } ${sizeString} images for free with Pictify.io's online HTML to ${
-				(format && format.toUpperCase && format.toUpperCase()) || ''
-		  } converter.`
-		: `Convert HTML to high-quality ${
-				(currentFormat && currentFormat.fullName) || 'Image'
-		  } images for free with Pictify.io's online HTML to ${
-				(format && format.toUpperCase && format.toUpperCase()) || ''
-		  } converter. Perfect for creating social media content, email marketing visuals, and website mockups.`;
+		  } at ${sizeString}. Paste code, preview live, export instantly. No file upload needed.`
+		: `Paste HTML + CSS and get a high-quality ${
+				(format && format.toUpperCase()) || 'image'
+		  } in one click. Free online converter with a live code editor and API access for developers.`;
 
 	const htmlToImageExamples = [
 		{
@@ -560,20 +562,36 @@
 						mainEntity: [
 							{
 								'@type': 'Question',
-								name: `How does HTML to ${currentFormat?.fullName || 'Image'} conversion work?`,
+								name: `How do I convert HTML to ${currentFormat?.fullName || 'image'}?`,
 								acceptedAnswer: {
 									'@type': 'Answer',
-									text: 'Our converter renders your HTML code in a virtual browser environment and captures the output as a high-quality image.'
+									text: `Paste your HTML and CSS code into Pictify's free online editor, see a live preview, then click "Capture" to download a high-quality ${currentFormat?.fullName || 'image'} file. No file upload or signup needed. You can also use the Pictify API to convert HTML to ${currentFormat?.fullName || 'image'} programmatically.`
 								}
 							},
 							{
 								'@type': 'Question',
-								name: `What's the best use case for ${currentFormat?.fullName || 'Image'}?`,
+								name: `Can I convert HTML to ${currentFormat?.fullName || 'image'} with an API?`,
+								acceptedAnswer: {
+									'@type': 'Answer',
+									text: `Yes. Send a POST request to the Pictify API with your HTML code, width, and height. The API returns a CDN-hosted ${currentFormat?.fullName || 'image'} URL. Supports custom CSS, Google Fonts, and dynamic variables. Free tier includes 100 renders per month.`
+								}
+							},
+							{
+								'@type': 'Question',
+								name: `Is this HTML to ${currentFormat?.fullName || 'image'} converter free?`,
+								acceptedAnswer: {
+									'@type': 'Answer',
+									text: `Yes, the online converter is completely free with no signup required. You get ${format === 'png' ? '5' : '5'} free generations per day as a guest, and unlimited generations when you create a free account.`
+								}
+							},
+							{
+								'@type': 'Question',
+								name: `What is ${currentFormat?.fullName || 'this format'} best for?`,
 								acceptedAnswer: {
 									'@type': 'Answer',
 									text: `${currentFormat?.fullName || 'Image'} is best for ${
 										currentFormat?.bestFor || 'web use'
-									}.`
+									}. Common use cases include social media cards, Open Graph images, email headers, certificates, and automated report generation.`
 								}
 							}
 						]

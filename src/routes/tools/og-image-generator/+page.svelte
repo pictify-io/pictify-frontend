@@ -723,16 +723,16 @@
 			content={`https://pictify.io/tools/og-image-generator/${platformObj.id}`}
 		/>
 	{:else}
-		<title>Free OG Image Generator: Create Custom Open Graph Images | Pictify.io</title>
+		<title>Free OG Image Generator — Create Open Graph Images in Seconds | Pictify</title>
 		<meta
 			name="description"
-			content="Create stunning Open Graph images for free with Pictify.io's OG Image Generator. Boost social media engagement and SEO with custom OG images for your content."
+			content="Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free with no signup — API available for automation."
 		/>
 		<link rel="canonical" href="https://pictify.io/tools/og-image-generator" />
-		<meta property="og:title" content="Best OG Image Generator | Create Open Graph Images Free" />
+		<meta property="og:title" content="Free OG Image Generator — Create Open Graph Images in Seconds | Pictify" />
 		<meta
 			property="og:description"
-			content="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds."
+			content="Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup."
 		/>
 		<meta property="og:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
 		<meta property="og:url" content="https://pictify.io/tools/og-image-generator" />
