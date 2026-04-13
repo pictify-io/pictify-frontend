@@ -5,7 +5,7 @@
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits } from '../../../store/generationLimits.store';
@@ -15,11 +15,8 @@
 	import { analytics } from '$lib/analytics.js';
 	import { certificateTemplates } from '$lib/components/tools/CertificateTemplates.js';
 
-	// User login state
-	let isUserLoggedIn = false;
-	user.subscribe((userData) => {
-		isUserLoggedIn = !!userData?.email;
-	});
+	// User login state (reactive — no manual subscribe needed)
+	$: isUserLoggedIn = !!$user?.email;
 
 	let selectedTemplate = certificateTemplates[0];
 	let formValues = {
@@ -33,18 +30,25 @@
 	let generatedImageUrl = '';
 	let generationError = '';
 	let miniEditorRef;
+	let lastEditedData = null;
 
-	// Debounced form-to-canvas sync
+	// Debounced form-to-canvas sync (single renderAll via setVariableValues)
 	let debounceTimer;
 	$: if (miniEditorRef && formValues) {
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
-			miniEditorRef.setVariableValue?.('recipientName', formValues.recipientName);
-			miniEditorRef.setVariableValue?.('organizationName', formValues.organizationName);
-			miniEditorRef.setVariableValue?.('date', formValues.date);
-			miniEditorRef.setVariableValue?.('achievementText', formValues.achievementText);
+			miniEditorRef.setVariableValues?.({
+				recipientName: formValues.recipientName,
+				organizationName: formValues.organizationName,
+				date: formValues.date,
+				achievementText: formValues.achievementText
+			});
 		}, 150);
 	}
+
+	onDestroy(() => {
+		clearTimeout(debounceTimer);
+	});
 
 	function selectTemplate(template) {
 		selectedTemplate = template;
@@ -56,6 +60,7 @@
 		};
 		generatedImageUrl = '';
 		generationError = '';
+		lastEditedData = null;
 	}
 
 	// Generation flow (matches [usecase] page pattern)
@@ -82,6 +87,7 @@
 
 			if (response?.url) {
 				generatedImageUrl = response.url;
+				lastEditedData = editedData;
 				toast.set({ message: 'Certificate generated successfully!', type: 'success', duration: 2000 });
 				analytics.trackImageGenerated({
 					tool_name: 'certificate_generator',
@@ -127,22 +133,23 @@
 		}
 	}
 
-	// NextSteps template draft
+	// NextSteps template draft — uses the edited canvas state captured on generation
+	$: currentFabricData = lastEditedData || selectedTemplate.fabricJSData;
 	$: templateDraft = {
 		version: 1,
 		name: 'Certificate template',
 		type: 'certificate',
 		width: selectedTemplate.width,
 		height: selectedTemplate.height,
-		fabricJSData: miniEditorRef?.getEditedFabricData?.() || selectedTemplate.fabricJSData,
+		fabricJSData: currentFabricData,
 		source: 'certificate-generator'
 	};
 
-	// API snippet for NextSteps
+	// API snippet for NextSteps — reflects the actual data that was rendered
 	$: apiSnippet = `curl -X POST https://api.pictify.io/image/canvas \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '${JSON.stringify({ fabricJSData: selectedTemplate.fabricJSData, width: selectedTemplate.width, height: selectedTemplate.height }, null, 2)}'`;
+  -d '${JSON.stringify({ fabricJSData: currentFabricData, width: selectedTemplate.width, height: selectedTemplate.height }, null, 2)}'`;
 
 	// FAQ data
 	const faqs = [

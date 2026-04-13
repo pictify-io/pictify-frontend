@@ -132,6 +132,20 @@
 		fabricCanvas.renderAll();
 	}
 
+	export function setVariableValues(map) {
+		if (!fabricCanvas || !map) return;
+		fabricCanvas.getObjects().forEach((obj) => {
+			const bindings = obj.variableBindings;
+			if (!bindings || !Array.isArray(bindings)) return;
+			for (const binding of bindings) {
+				if (binding.variableName in map) {
+					obj.set('text', map[binding.variableName]);
+				}
+			}
+		});
+		fabricCanvas.renderAll();
+	}
+
 	export function getVariables() {
 		if (!fabricCanvas) return [];
 		const variables = [];
