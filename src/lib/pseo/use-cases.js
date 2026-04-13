@@ -533,6 +533,7 @@ export const useCaseDetails = {
 	},
 	certificate: {
 		label: 'Certificate Generator',
+		toolUrl: '/tools/certificate-generator',
 		description: 'Generate personalized certificates and diplomas as downloadable images for events, courses, and recognition programs.',
 		seoKeywords: [
 			'certificate generator',
