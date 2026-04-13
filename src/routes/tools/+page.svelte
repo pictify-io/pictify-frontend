@@ -91,6 +91,12 @@
 			icon: 'fa-solid fa-file-invoice-dollar'
 		},
 		{
+			name: 'Certificate Generator',
+			description: 'Create professional certificates with 5 beautiful templates. Customize and download for free.',
+			url: '/tools/certificate-generator',
+			icon: 'fa-solid fa-certificate'
+		},
+		{
 			name: 'URL to Image',
 			description: 'Generate images from any URL with our free online tool.',
 			url: '/tools/url-to-image-generator',

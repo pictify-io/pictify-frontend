@@ -11,6 +11,7 @@
 	let selectedText = null;
 	let canvasReady = false;
 	let loading = false;
+	let loadError = false;
 	let loadGeneration = 0;
 	let lastLoadedData = null; // Track what we've already loaded to prevent re-render loop
 
@@ -33,6 +34,7 @@
 		const thisGeneration = ++loadGeneration;
 		loading = true;
 		canvasReady = false;
+		loadError = false;
 
 		// Dispose previous canvas if exists
 		if (fabricCanvas) {
@@ -99,7 +101,7 @@
 				selectedText = null;
 			});
 		} catch (err) {
-			// Silent fail — canvas preview is non-critical
+			loadError = true;
 		} finally {
 			loading = false;
 		}
@@ -114,10 +116,51 @@
 		if (!fabricCanvas) return null;
 		return fabricCanvas.toJSON();
 	}
+
+	export function setVariableValue(variableName, value) {
+		if (!fabricCanvas) return;
+		fabricCanvas.getObjects().forEach((obj) => {
+			const bindings = obj.variableBindings;
+			if (!bindings || !Array.isArray(bindings)) return;
+			for (const binding of bindings) {
+				if (binding.variableName === variableName) {
+					obj.set('text', value);
+					break;
+				}
+			}
+		});
+		fabricCanvas.renderAll();
+	}
+
+	export function getVariables() {
+		if (!fabricCanvas) return [];
+		const variables = [];
+		fabricCanvas.getObjects().forEach((obj) => {
+			const bindings = obj.variableBindings;
+			if (!bindings || !Array.isArray(bindings) || bindings.length === 0) return;
+			for (const binding of bindings) {
+				variables.push({
+					name: binding.variableName,
+					value: obj.text,
+					description: binding.description
+				});
+			}
+		});
+		return variables;
+	}
 </script>
 
 <div class="relative">
-	{#if loading}
+	{#if loadError}
+		<div
+			class="absolute inset-0 z-20 flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]"
+		>
+			<div class="flex flex-col items-center gap-2 text-center px-4">
+				<span class="text-lg font-bold text-gray-900">Failed to load editor</span>
+				<span class="text-sm text-gray-500">The template could not be rendered. Please try selecting another template.</span>
+			</div>
+		</div>
+	{:else if loading}
 		<div
 			class="absolute inset-0 z-20 flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]"
 		>
