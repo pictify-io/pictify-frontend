@@ -97,6 +97,12 @@
 			icon: 'fa-solid fa-certificate'
 		},
 		{
+			name: 'Tweet Screenshot Generator',
+			description: 'Paste any tweet URL, customize every field, download a clean PNG — no Twitter API key required.',
+			url: '/tools/tweet-screenshot',
+			icon: 'fa-brands fa-x-twitter'
+		},
+		{
 			name: 'URL to Image',
 			description: 'Generate images from any URL with our free online tool.',
 			url: '/tools/url-to-image-generator',

@@ -20,7 +20,9 @@ export async function GET() {
 		{ path: '/tools/code-to-image', priority: '0.8' },
 		{ path: '/tools/online-invoice-generator', priority: '0.8' },
 		{ path: '/tools/url-to-image-generator', priority: '0.8' },
-		{ path: '/tools/linkedin-banner-generator', priority: '0.8' }
+		{ path: '/tools/linkedin-banner-generator', priority: '0.8' },
+		{ path: '/tools/certificate-generator', priority: '0.8' },
+		{ path: '/tools/tweet-screenshot', priority: '0.8' }
 	];
 
 	mainTools.forEach((tool) => {
