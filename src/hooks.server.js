@@ -52,10 +52,31 @@ const NO_CACHE_PATTERNS = [
 ];
 
 /**
+ * Permanent redirects for legacy / renamed URLs.
+ * Map of exact pathname -> destination.
+ */
+const PERMANENT_REDIRECTS = {
+	'/tools/code': '/tools/code-to-image'
+};
+
+/**
  * Handle function - runs for every request
  */
 export async function handle({ event, resolve }) {
 	const pathname = event.url.pathname;
+
+	// 301 redirects for legacy paths (trailing slash tolerant)
+	const normalized = pathname.replace(/\/+$/, '') || '/';
+	const redirectTo = PERMANENT_REDIRECTS[normalized];
+	if (redirectTo) {
+		return new Response(null, {
+			status: 301,
+			headers: {
+				Location: redirectTo + event.url.search,
+				'Cache-Control': 'public, max-age=86400'
+			}
+		});
+	}
 
 	// Proxy /s/ experiment render routes to the backend API
 	if (pathname.startsWith('/s/')) {
