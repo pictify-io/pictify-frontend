@@ -407,22 +407,24 @@ export const comparisons = [
 	},
 	{
 		slug: 'pictify-vs-bannerbear',
-		title: 'Pictify vs Bannerbear',
+		title: 'Bannerbear Alternative — Pictify vs Bannerbear Compared',
 		competitor: 'Bannerbear',
 		competitorDescription: 'Automated image and video generation API',
 		metaDescription:
-			'Compare Pictify and Bannerbear for automated image generation. Both offer visual editors with different approaches.',
-		tldr: 'Bannerbear offers layer-based editing with video support. Pictify offers a visual canvas editor, AI template generation, Dynamic Links for real-time data, and full HTML/CSS control at lower pricing.',
+			'Looking for a Bannerbear alternative? Pictify ships a real expression engine, live data bindings, and native A/B experiments — features Bannerbear templates don\'t support. Full comparison with pricing, features, and migration guide.',
+		tldr: 'Bannerbear templates do string replacement — no conditionals, no expressions, no live data. Pictify templates carry a real expression engine ({{ price | currency }}), bind to live data sources, and run native A/B experiments. For logic-heavy or data-driven images, Pictify is the Bannerbear alternative that keeps the logic in the template instead of your backend.',
 		advantages: [
+			'Real expression engine in templates ({{ price * 0.9 | currency }}, conditionals, filters)',
+			'Live data bindings — templates fetch from HTTP endpoints or webhooks at render time',
+			'Native A/B experiments on rendered images',
 			'Visual canvas editor (Canva-like drag-and-drop)',
-			'AI Copilot generates templates from prompts',
-			'Full HTML/CSS support for unlimited designs',
+			'Agentic AI copilot generates templates from prompts',
+			'HTML/CSS escape hatch for designs the editor can\'t express',
 			'Dynamic Links with auto-refresh from data sources',
-			'Multi-page PDF generation',
+			'Multi-page PDF generation (native text, not stitched images)',
 			'Background removal built-in',
-			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'More affordable pricing',
-			'Built-in A/B testing, smart links, and scheduled experiments'
+			'Cloud storage integration (S3, GCS, Cloudinary, ImageKit)',
+			'More affordable pricing at every tier'
 		],
 		competitorAdvantages: [
 			'Video generation support',

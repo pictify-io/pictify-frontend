@@ -7,10 +7,14 @@
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import { indentWithTab } from '@codemirror/commands';
 	import { createGifPublic } from '../../../api/image.js';
+	import { analytics } from '$lib/analytics.js';
 
 	export let isGifEnabled = false;
 	export let isPreviewEnabled = true;
 	export let fileExtension = 'png';
+	export let toolName = '';
+
+	let hasTrackedFirstInput = false;
 
 	const defaultHTML = `<html>
   <head>
@@ -141,6 +145,10 @@
 						keymap.of([indentWithTab]),
 						EditorView.updateListener.of((update) => {
 							if (update.docChanged) {
+								if (!hasTrackedFirstInput && toolName) {
+									hasTrackedFirstInput = true;
+									analytics.trackToolFirstInput({ tool_name: toolName });
+								}
 								codeHTML = update.state.doc.toString();
 								updateIframe();
 							}

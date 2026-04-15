@@ -1,6 +1,9 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import ToolPageShell from '$lib/components/tools/scaffold/ToolPageShell.svelte';
+	import ToolBreadcrumb from '$lib/components/tools/scaffold/ToolBreadcrumb.svelte';
+	import ToolSeoHead from '$lib/components/tools/scaffold/ToolSeoHead.svelte';
+	import ToolSuccessBanner from '$lib/components/tools/scaffold/ToolSuccessBanner.svelte';
+	import ToolFaq from '$lib/components/tools/scaffold/ToolFaq.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import { onMount } from 'svelte';
@@ -369,7 +372,10 @@ print(res.json()['image']['url'])`;
 		}
 	];
 
-	const structuredDataJson = JSON.stringify({
+	// SEO schema data — consumed by <ToolSeoHead>. Keeping the shape identical to
+	// what the page emitted inline before the scaffold refactor so JSON-LD output
+	// stays byte-identical (apart from optional whitespace).
+	const webApplicationSchema = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Pictify.io Tweet Screenshot Generator',
@@ -388,130 +394,65 @@ print(res.json()['image']['url'])`;
 			'No Twitter API key required'
 		],
 		creator: { '@type': 'Organization', name: 'Pictify.io', url: 'https://pictify.io' }
-	});
-	const faqSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'FAQPage',
-		mainEntity: faqs.map((f) => ({
-			'@type': 'Question',
-			name: f.q,
-			acceptedAnswer: { '@type': 'Answer', text: f.a }
-		}))
-	});
-	const breadcrumbSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'Tweet Screenshot Generator' }
-		]
-	});
-	// HowTo schema — eligible for rich results on "how to screenshot a tweet" queries.
-	const howToSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'HowTo',
+	};
+	const howToMeta = {
 		name: 'How to screenshot a tweet',
 		description:
 			'Generate a clean PNG screenshot of any public tweet in three steps — no screen capture, no Twitter API key.',
 		totalTime: 'PT30S',
 		supply: [{ '@type': 'HowToSupply', name: 'A public tweet URL from twitter.com or x.com' }],
-		tool: [{ '@type': 'HowToTool', name: 'Pictify Tweet Screenshot Generator' }],
-		step: [
-			{
-				'@type': 'HowToStep',
-				position: 1,
-				name: 'Paste the tweet URL',
-				text: 'Copy a tweet link from twitter.com or x.com and paste it into the input field.',
-				url: 'https://pictify.io/tools/tweet-screenshot#paste-url'
-			},
-			{
-				'@type': 'HowToStep',
-				position: 2,
-				name: 'Customize the fields',
-				text: 'Edit any field — display name, handle, verified badge, body text, media, or engagement metrics. The live preview updates instantly.',
-				url: 'https://pictify.io/tools/tweet-screenshot#customize'
-			},
-			{
-				'@type': 'HowToStep',
-				position: 3,
-				name: 'Download the PNG',
-				text: 'Click Download to get a high-resolution PNG, or copy the API call to automate it from your backend.',
-				url: 'https://pictify.io/tools/tweet-screenshot#download'
-			}
-		]
-	});
+		tool: [{ '@type': 'HowToTool', name: 'Pictify Tweet Screenshot Generator' }]
+	};
+	const howToSteps = [
+		{
+			name: 'Paste the tweet URL',
+			text: 'Copy a tweet link from twitter.com or x.com and paste it into the input field.',
+			url: 'https://pictify.io/tools/tweet-screenshot#paste-url'
+		},
+		{
+			name: 'Customize the fields',
+			text: 'Edit any field — display name, handle, verified badge, body text, media, or engagement metrics. The live preview updates instantly.',
+			url: 'https://pictify.io/tools/tweet-screenshot#customize'
+		},
+		{
+			name: 'Download the PNG',
+			text: 'Click Download to get a high-resolution PNG, or copy the API call to automate it from your backend.',
+			url: 'https://pictify.io/tools/tweet-screenshot#download'
+		}
+	];
 
 	onMount(() => {
 		analytics.trackToolOpened?.({ tool_name: 'tweet_screenshot' });
 	});
 </script>
 
-<svelte:head>
-	<title>Tweet Screenshot Generator — Free Twitter Screenshot Maker | Pictify</title>
-	<meta
-		name="description"
-		content="Free tweet screenshot generator. Paste any Twitter or X URL, customize the tweet, download a PNG — or automate it with one API call. No Twitter API key needed."
-	/>
-	<link rel="canonical" href="https://pictify.io/tools/tweet-screenshot" />
+<ToolSeoHead
+	title="Tweet Screenshot Generator — Free Twitter Screenshot Maker | Pictify"
+	description="Free tweet screenshot generator. Paste any Twitter or X URL, customize the tweet, download a PNG — or automate it with one API call. No Twitter API key needed."
+	canonical="https://pictify.io/tools/tweet-screenshot"
+	robots="index,follow,max-image-preview:large,max-snippet:-1"
+	ogSiteName="Pictify"
+	ogTitle="Tweet Screenshot Generator — Free Twitter Screenshot Maker"
+	ogDescription="Paste a tweet URL, customize every field, download a PNG. Automate the whole thing with one API call — no Twitter API key required."
+	ogImage="https://media.pictify.io/k2oq1-1776144080510.png"
+	ogImageWidth={1200}
+	ogImageHeight={630}
+	ogImageAlt="Pictify tweet screenshot generator — paste a URL, download a PNG"
+	twitterSite="@pictify_io"
+	twitterCreator="@pictify_io"
+	twitterTitle="Tweet Screenshot Generator — Free Twitter Screenshot Maker"
+	twitterDescription="Paste a tweet URL, customize every field, download a PNG. Automate with one API call."
+	twitterImage="https://media.pictify.io/k2oq1-1776144080510.png"
+	twitterImageAlt="Pictify tweet screenshot generator"
+	{webApplicationSchema}
+	{faqs}
+	breadcrumbLabel="Tweet Screenshot Generator"
+	{howToSteps}
+	{howToMeta}
+/>
 
-	<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
-
-	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:title" content="Tweet Screenshot Generator — Free Twitter Screenshot Maker" />
-	<meta
-		property="og:description"
-		content="Paste a tweet URL, customize every field, download a PNG. Automate the whole thing with one API call — no Twitter API key required."
-	/>
-	<meta property="og:url" content="https://pictify.io/tools/tweet-screenshot" />
-	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://media.pictify.io/k2oq1-1776144080510.png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify tweet screenshot generator — paste a URL, download a PNG" />
-
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:creator" content="@pictify_io" />
-	<meta name="twitter:title" content="Tweet Screenshot Generator — Free Twitter Screenshot Maker" />
-	<meta
-		name="twitter:description"
-		content="Paste a tweet URL, customize every field, download a PNG. Automate with one API call."
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/k2oq1-1776144080510.png" />
-	<meta name="twitter:image:alt" content="Pictify tweet screenshot generator" />
-
-	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
-	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${howToSchemaJson}</script>`}
-</svelte:head>
-
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
-	<Nav />
-
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-
-	<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-24 md:pb-32 relative z-10">
-		<!-- Breadcrumb -->
-		<nav class="mb-8 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">Tweet Screenshot</li>
-			</ol>
-		</nav>
+<ToolPageShell>
+		<ToolBreadcrumb label="Tweet Screenshot" marginClass="mb-8" />
 
 		<!-- Hero -->
 		<header class="text-center mb-10">
@@ -707,48 +648,14 @@ print(res.json()['image']['url'])`;
 			</div>
 		</div>
 
-		<!-- Success banner + NextSteps (mirrors /tools/[usecase] post-generation flow) -->
+		<!-- Success banner — shown only after a successful generation. -->
 		{#if generatedImageUrl}
-			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
-				<div
-					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
-				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
-
-					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
-						Success! Here is your tweet screenshot
-					</h3>
-
-					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
-					>
-						<img
-							src={generatedImageUrl}
-							alt="Generated tweet screenshot"
-							class="max-w-full h-auto max-h-[400px]"
-						/>
-					</div>
-
-					<div class="flex flex-wrap justify-center gap-4">
-						<a
-							href={generatedImageUrl}
-							download="tweet-screenshot.png"
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-								/></svg
-							>
-							Download PNG
-						</a>
-					</div>
-				</div>
-
-			</div>
+			<ToolSuccessBanner
+				imageUrl={generatedImageUrl}
+				imageAlt="Generated tweet screenshot"
+				heading="Success! Here is your tweet screenshot"
+				downloadFileName="tweet-screenshot.png"
+			/>
 		{/if}
 
 		<!-- Automate with the API — always visible so devs see the programmatic path even without generating first -->
@@ -957,29 +864,12 @@ print(res.json()['image']['url'])`;
 			</div>
 		</section>
 
-		<!-- FAQ -->
-		<section class="mt-16">
-			<h2 class="text-3xl md:text-4xl font-black text-gray-900 text-center mb-8">Frequently asked questions</h2>
-			<div class="max-w-3xl mx-auto space-y-4">
-				{#each faqs as faq}
-					<details class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 group">
-						<summary class="font-black text-lg cursor-pointer flex justify-between items-center">
-							<span>{faq.q}</span>
-							<span class="text-2xl group-open:rotate-45 transition-transform">+</span>
-						</summary>
-						<p class="mt-3 text-gray-700 leading-relaxed">{faq.a}</p>
-					</details>
-				{/each}
-			</div>
-		</section>
+		<ToolFaq {faqs} />
 
 		<div class="mt-20">
 			<RelatedTools tools={['certificate', 'markdown', 'code']} />
 		</div>
-	</main>
-
-	<Footer />
-</section>
+</ToolPageShell>
 
 <style>
 	/* Syntax tokens for the Automate-with-the-API snippet block.

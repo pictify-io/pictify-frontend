@@ -401,6 +401,16 @@ export const analytics = {
 	},
 
 	/**
+	 * Track first meaningful input on a tool (activation signal)
+	 * @param {Object} params - { tool_name }
+	 */
+	trackToolFirstInput: (params = {}) => {
+		analytics.track('tool_first_input', {
+			tool_name: params.tool_name
+		});
+	},
+
+	/**
 	 * Track social share
 	 * @param {Object} params - { platform, content_type, tool_name }
 	 */

@@ -97,7 +97,7 @@
 
 				{#if showSolutionsDropdown}
 					<div
-						class="absolute top-full left-0 mt-0 w-72 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] z-50"
+						class="absolute top-full left-0 mt-0 w-80 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] z-50"
 						transition:fly={{ y: -8, duration: 150 }}
 					>
 						<a
@@ -147,7 +147,7 @@
 						</a>
 						<a
 							href="/visual-analytics"
-							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors"
+							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
 							on:click={() => { showSolutionsDropdown = false; trackNav('Visual Analytics', '/visual-analytics', 'header'); }}
 						>
 							<div class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -159,6 +159,13 @@
 								<span class="block text-sm font-black text-gray-900">Visual Analytics</span>
 								<span class="block text-xs text-gray-500 mt-0.5">Track, measure & optimize performance</span>
 							</div>
+						</a>
+						<a
+							href="/solutions"
+							class="block px-5 py-3 bg-gray-50 text-center text-xs font-black uppercase tracking-widest text-gray-700 hover:text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
+							on:click={() => { showSolutionsDropdown = false; trackNav('View all solutions', '/solutions', 'header'); }}
+						>
+							View all solutions →
 						</a>
 					</div>
 				{/if}

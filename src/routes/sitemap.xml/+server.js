@@ -10,6 +10,7 @@ import {
 	integrations,
 	personas
 } from '$lib/pseo/config.js';
+import { publishedSolutions } from '$lib/solutions/related.js';
 
 export async function GET() {
 	const response = await getBlogLinks();
@@ -111,6 +112,28 @@ export async function GET() {
 		</url>
 	`
 	);
+
+	// Solutions pages (image-automation cluster) + the /solutions index
+	const solutionUrls = [
+		`
+		<url>
+			<loc>https://pictify.io/solutions</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>0.8</priority>
+		</url>
+	`,
+		...publishedSolutions().map(
+			(s) => `
+		<url>
+			<loc>https://pictify.io/solutions/${s.slug}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>${s.isPillar ? '0.9' : '0.8'}</priority>
+		</url>
+	`
+		)
+	];
 
 	// Persona pages
 	const personaUrls = personas.map(
@@ -231,6 +254,7 @@ export async function GET() {
 	   		${comparisonUrls.join('')}
 	   		${glossaryUrls.join('')}
 	   		${integrationUrls.join('')}
+	   		${solutionUrls.join('')}
 	   		${personaUrls.join('')}
 	   		${urls.join('')}
     </urlset>

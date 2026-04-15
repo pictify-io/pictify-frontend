@@ -30,6 +30,15 @@
 	// Resolve lazily — by the time imageUrl is set, flags are loaded
 	$: ctaVariant = imageUrl ? getCtaVariant() : 'control';
 
+	let hasTrackedFirstInput = false;
+
+	function handleFirstInput() {
+		if (!hasTrackedFirstInput) {
+			hasTrackedFirstInput = true;
+			analytics.trackToolFirstInput({ tool_name: 'url_to_image_generator' });
+		}
+	}
+
 	// Track tool opened on mount
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'url_to_image_generator' });
@@ -662,6 +671,7 @@
 							</div>
 							<input
 								bind:value={url}
+								on:input={handleFirstInput}
 								type="text"
 								class="w-full h-full border-[3px] border-black bg-white placeholder-gray-400 text-lg font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#ff6b6b] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all px-6 py-4"
 								placeholder="https://example.com"

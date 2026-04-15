@@ -321,6 +321,15 @@
 		}, 100);
 	};
 
+	let hasTrackedFirstInput = false;
+
+	function handleFirstInput() {
+		if (!hasTrackedFirstInput) {
+			hasTrackedFirstInput = true;
+			analytics.trackToolFirstInput({ tool_name: 'og_image_generator' });
+		}
+	}
+
 	// Initialize editor with default template
 	onMount(async () => {
 		// Track tool opened
@@ -934,6 +943,7 @@
 							<div class="flex flex-col md:flex-row gap-4">
 								<input
 									bind:value={url}
+									on:input={handleFirstInput}
 									type="text"
 									class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] py-4 px-5 transition-all bg-white"
 									placeholder="https://yourwebsite.com"

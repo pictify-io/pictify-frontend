@@ -233,52 +233,93 @@
 		]
 	});
 
+	const howToSchemaJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'HowTo',
+		name: 'How to Make a Certificate Online',
+		description:
+			'Make a custom certificate online for free in six steps using Pictify\'s certificate generator.',
+		totalTime: 'PT2M',
+		supply: [{ '@type': 'HowToSupply', name: 'Recipient name, organization, date, achievement text' }],
+		tool: [{ '@type': 'HowToTool', name: 'Pictify Certificate Generator' }],
+		step: [
+			{ '@type': 'HowToStep', position: 1, name: 'Choose a template', text: 'Choose a certificate template from the gallery above.' },
+			{ '@type': 'HowToStep', position: 2, name: 'Enter details', text: 'Enter the recipient name, organization, date, and achievement.' },
+			{ '@type': 'HowToStep', position: 3, name: 'Preview the certificate', text: 'Preview your certificate in the interactive canvas editor.' },
+			{ '@type': 'HowToStep', position: 4, name: 'Edit on canvas', text: 'Click any text on the canvas to make direct edits.' },
+			{ '@type': 'HowToStep', position: 5, name: 'Generate the certificate', text: 'Click Generate Certificate to create a high-resolution PNG.' },
+			{ '@type': 'HowToStep', position: 6, name: 'Download', text: 'Download your certificate or open it in the full editor for further customization.' }
+		]
+	});
+
+	const templateListSchemaJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'ItemList',
+		name: 'Free Certificate Templates',
+		itemListOrder: 'https://schema.org/ItemListUnordered',
+		numberOfItems: 5,
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, item: { '@type': 'CreativeWork', name: 'Certificate of Achievement Template', description: 'Classic formal certificate of achievement with gold borders and elegant serif typography.' } },
+			{ '@type': 'ListItem', position: 2, item: { '@type': 'CreativeWork', name: 'Certificate of Completion Template', description: 'Sleek dark theme certificate of completion with purple accents and clean sans-serif typography.' } },
+			{ '@type': 'ListItem', position: 3, item: { '@type': 'CreativeWork', name: 'Corporate Certificate Template', description: 'Professional corporate certificate design with navy header and formal layout.' } },
+			{ '@type': 'ListItem', position: 4, item: { '@type': 'CreativeWork', name: 'Minimalist Certificate Template', description: 'Clean minimalist certificate design with generous whitespace and refined typography.' } },
+			{ '@type': 'ListItem', position: 5, item: { '@type': 'CreativeWork', name: 'Creative Award Certificate Template', description: 'Bold, colorful award certificate with coral accents and playful geometric elements.' } }
+		]
+	});
+
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'certificate_generator' });
 	});
 </script>
 
 <svelte:head>
-	<title>Free Certificate Generator Online | Create Custom Certificates | Pictify.io</title>
+	<title>Free Certificate Generator & Maker — Make Custom Certificates Online | Pictify</title>
 	<meta
 		name="description"
-		content="Create professional certificates for free with Pictify's interactive certificate generator. Choose from 5 beautiful templates, customize recipient names, dates, and achievements, and download as PNG."
+		content="Free online certificate generator and maker. Choose from 5 professional templates (Achievement, Completion, Participation, Award, Appreciation), customize names, dates, and achievements, and download a high-resolution PNG. Free API for bulk certificate generation."
 	/>
 	<meta
 		name="keywords"
-		content="certificate generator, free certificate maker, online certificate creator, custom certificates, certificate template, printable certificates, Pictify"
+		content="certificate generator, certificate maker, certificate template, make a certificate, create a certificate, online certificate maker, certificate of achievement template, certificate builder, free certificate maker, bulk certificate generator, certificate generator API, Pictify"
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/certificate-generator" />
 
 	<!-- Open Graph -->
 	<meta
 		property="og:title"
-		content="Free Certificate Generator Online | Create Custom Certificates | Pictify.io"
+		content="Free Certificate Generator & Maker — Make Custom Certificates Online | Pictify"
 	/>
 	<meta
 		property="og:description"
-		content="Create professional certificates for free. Choose from 5 beautiful templates, customize text, and download as high-resolution PNG."
+		content="Free online certificate generator and maker. 5 templates, customize names and dates, download high-resolution PNG. Free API for bulk certificate generation."
 	/>
 	<meta property="og:url" content="https://pictify.io/tools/certificate-generator" />
 	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
 	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Certificate Generator — 5 free templates with API for bulk generation" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
 	<meta
 		name="twitter:title"
-		content="Free Certificate Generator Online | Pictify.io"
+		content="Free Certificate Generator & Maker — Make Custom Certificates | Pictify"
 	/>
 	<meta
 		name="twitter:description"
-		content="Create professional certificates for free. Choose from 5 beautiful templates, customize text, and download as high-resolution PNG."
+		content="Free online certificate generator and maker. 5 templates, free API for bulk certificate generation."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
+	<meta name="twitter:image:alt" content="Pictify Certificate Generator — 5 free templates with API for bulk generation" />
 
 	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
 	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
 	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
+	{@html `<script type="application/ld+json">${howToSchemaJson}</script>`}
+	{@html `<script type="application/ld+json">${templateListSchemaJson}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
@@ -385,6 +426,8 @@
 							? 'border-[#ff6b6b] shadow-[6px_6px_0_0_#ff6b6b]'
 							: 'border-black shadow-[4px_4px_0_0_#000]'} p-3 overflow-hidden hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
 						on:click={() => selectTemplate(template)}
+						aria-label="{template.name} certificate template — {template.description}"
+						title="{template.name} certificate template"
 					>
 						{#if selectedTemplate.id === template.id}
 							<div
@@ -395,6 +438,8 @@
 						{/if}
 						<div
 							class="w-full h-20 rounded-lg mb-2 border-[2px] border-gray-200"
+							role="img"
+							aria-label="{template.name} certificate template preview"
 							style="background-color: {template.thumbnailColor};"
 						/>
 						<span class="text-xs font-black text-gray-900 uppercase tracking-wide block text-center"
@@ -632,7 +677,7 @@
 					>
 						<img
 							src={generatedImageUrl}
-							alt="Generated certificate"
+							alt="Generated {selectedTemplate.name} certificate for {formValues.recipientName}"
 							class="max-w-full h-auto max-h-[400px]"
 						/>
 					</div>
@@ -819,7 +864,7 @@
 				<h3
 					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
 				>
-					How to Create a Certificate
+					How to Make a Certificate Online in 6 Steps
 				</h3>
 				<div class="space-y-4">
 					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive canvas editor' }, { num: '4', text: 'Click any text on the canvas to make direct edits' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate or open it in the full editor for further customization' }] as step}
@@ -884,6 +929,95 @@
 						</details>
 					{/each}
 				</div>
+			</section>
+
+			<!-- Certificate Templates Section -->
+			<section
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+			>
+				<div
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#a78bfa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+				>
+					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+						/></svg
+					>
+					Templates
+				</div>
+				<h3
+					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+				>
+					Certificate Templates: Choose from 5 Free Designs
+				</h3>
+				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-6">
+					Every certificate template works for any certificate type — award, achievement, completion, participation, or appreciation. Pick a design that matches your brand and customize the title, recipient name, date, and achievement text. All templates are free and come with commercial-use rights.
+				</p>
+				<div class="space-y-5">
+					<div class="border-l-[4px] border-[#ffc480] pl-4 sm:pl-5">
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Achievement Template</h4>
+						<p class="text-sm text-gray-700 font-medium">
+							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong>Elegant</strong> template, with gold borders and serif typography, is our most popular certificate of achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
+						</p>
+					</div>
+					<div class="border-l-[4px] border-[#60a5fa] pl-4 sm:pl-5">
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Completion Template</h4>
+						<p class="text-sm text-gray-700 font-medium">
+							Issue a certificate of completion for courses, training programs, workshops, and onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek, contemporary feel that reads well on-screen and in print.
+						</p>
+					</div>
+					<div class="border-l-[4px] border-[#4ade80] pl-4 sm:pl-5">
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Participation Template</h4>
+						<p class="text-sm text-gray-700 font-medium">
+							Acknowledge attendance and engagement with a certificate of participation. The <strong>Corporate</strong> template's navy header and formal layout make it the right certificate of participation template for conferences, webinars, and corporate events.
+						</p>
+					</div>
+					<div class="border-l-[4px] border-[#ff6b6b] pl-4 sm:pl-5">
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">Award Certificate Template</h4>
+						<p class="text-sm text-gray-700 font-medium">
+							Celebrate winners and honorees with a bold award certificate. The <strong>Creative</strong> template — coral accents and playful geometry — works well for employee-of-the-month awards, tournament winners, and community recognition.
+						</p>
+					</div>
+					<div class="border-l-[4px] border-[#1f2937] pl-4 sm:pl-5">
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Appreciation Template</h4>
+						<p class="text-sm text-gray-700 font-medium">
+							Thank volunteers, partners, and team members with a certificate of appreciation. The <strong>Minimalist</strong> template's generous whitespace and refined typography puts the focus on the recipient — a perfect certificate of appreciation template for donor recognition and retirement gifts.
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Online Certificate Maker Section -->
+			<section
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+			>
+				<div
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+				>
+					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+						/></svg
+					>
+					Free Online
+				</div>
+				<h3
+					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+				>
+					Use Our Online Certificate Maker for Free
+				</h3>
+				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
+					Pictify's online certificate maker runs entirely in your browser — no downloads, no installs, no signup. The certificate maker supports real-time preview, direct-on-canvas editing, and high-resolution PNG export at 1920×1080. Generate one certificate in under a minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds at once from a spreadsheet or database.
+				</p>
+				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+					Because the certificate maker is part of the full Pictify editor, anything you create here can be reopened, edited, or connected to a webhook, Zapier, or Make.com flow. That's the difference between a one-off certificate generator and a programmable certificate builder: you get the fast free tool today and the API for when you're ready to scale.
+				</p>
 			</section>
 
 			<!-- Open in Editor CTA -->

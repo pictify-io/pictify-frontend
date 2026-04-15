@@ -372,6 +372,7 @@
 	};
 
 	let code = sampleCode.javascript;
+	let hasTrackedFirstInput = false;
 	let language = 'javascript';
 	let themeId = themeOptions[0].id;
 	let fontId = fontOptions[0].id;
@@ -1438,6 +1439,10 @@
 						bind:value={code}
 						on:input={() => {
 							isUsingSample = false;
+							if (!hasTrackedFirstInput) {
+								hasTrackedFirstInput = true;
+								analytics.trackToolFirstInput({ tool_name: 'code_to_image' });
+							}
 						}}
 						placeholder="Paste your code here..."
 						spellcheck="false"

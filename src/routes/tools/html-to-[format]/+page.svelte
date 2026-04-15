@@ -938,6 +938,7 @@
 				<CodeEditor
 					isPreviewEnabled={true}
 					{fileExtension}
+					toolName={`html_to_${format}`}
 					on:previewUpdated={handlePreviewUpdate}
 				/>
 
