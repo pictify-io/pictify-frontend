@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Neobrutalist focus ring — replaces Tailwind's default outline/ring for
+ * interactive elements in the HTML editor. Single 3px accent-colored
+ * outer shadow keyed to `focus-visible` so mouse users don't see the ring
+ * on click while keyboard users still get the affordance. */
+@layer utilities {
+	.focus-brutal:focus-visible {
+		outline: none;
+		box-shadow: 0 0 0 3px #ffc480;
+	}
+	/* Combine with existing brutal shadow tokens without double-halo */
+	.focus-brutal.shadow-brutal-sm:focus-visible {
+		box-shadow: 2px 2px 0 0 #1f2937, 0 0 0 3px #ffc480;
+	}
+	.focus-brutal.shadow-brutal-md:focus-visible {
+		box-shadow: 3px 3px 0 0 #1f2937, 0 0 0 3px #ffc480;
+	}
+	.focus-brutal.shadow-brutal-lg:focus-visible {
+		box-shadow: 4px 4px 0 0 #1f2937, 0 0 0 3px #ffc480;
+	}
+}
+
 /* Global Scrollbar Styling */
 ::-webkit-scrollbar {
 	width: 6px;
