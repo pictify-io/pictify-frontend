@@ -12,6 +12,7 @@
 	import TemplateList from '$lib/components/dashboard/template/TemplateList.svelte';
 	import EmptyTemplate from '$lib/components/dashboard/template/EmptyTemplate.svelte';
 	import TemplateTypeSelector from '$lib/components/editor/TemplateTypeSelector.svelte';
+	import EnginePicker from '$lib/components/editor/html/EnginePicker.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { FeatureUpgradePrompt } from '$lib/components/plg';
 	import {
@@ -35,6 +36,7 @@
 	let formatFilter = 'all'; // Backend-driven filter: 'all', 'image', 'pdf'
 	let dynamicFilter = false; // Filter for templates with dynamic links
 	let showTemplateTypeSelector = false;
+	let showEnginePicker = false;
 	let showTemplateLimitPrompt = false;
 
 	// Template limit checking
@@ -109,7 +111,25 @@
 			showTemplateLimitPrompt = true;
 			return;
 		}
-		showTemplateTypeSelector = true;
+		// Two-stage create flow:
+		//   (1) pick engine — Canvas (fabric) or HTML
+		//   (2) if Canvas, pick image/pdf format (existing flow)
+		// HTML path jumps straight into the HTML editor.
+		showEnginePicker = true;
+	};
+
+	const handleEngineSelect = (event) => {
+		showEnginePicker = false;
+		if (event.detail.engine === 'html') {
+			goto('/template-workspace/html/create?engine=html');
+		} else {
+			// Canvas → existing format selector
+			showTemplateTypeSelector = true;
+		}
+	};
+
+	const handleCloseEnginePicker = () => {
+		showEnginePicker = false;
 	};
 
 	const handleFormatSelect = (event) => {
@@ -422,6 +442,14 @@
 			{/if}
 		</div>
 	</div>
+
+	{#if showEnginePicker}
+		<EnginePicker
+			mode="modal"
+			on:select={handleEngineSelect}
+			on:close={handleCloseEnginePicker}
+		/>
+	{/if}
 
 	{#if showTemplateTypeSelector}
 		<TemplateTypeSelector on:select={handleFormatSelect} on:close={handleCloseSelector} />
