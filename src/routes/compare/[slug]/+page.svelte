@@ -23,11 +23,14 @@
 
 	// SEO
 	$: title = validComparison
-		? `${comparison.title} (2025) | Honest Comparison`
+		? `${comparison.title} (2026) | Honest Comparison`
 		: 'Comparison | Pictify';
 	$: description = validComparison
 		? comparison.metaDescription
 		: 'Compare image generation services.';
+	$: ogImage = validComparison
+		? `https://pictify.io/og/compare/${slug}.png`
+		: 'https://pictify.io/og-default.png';
 	$: canonical = validComparison
 		? `https://pictify.io/compare/${slug}`
 		: 'https://pictify.io/compare';
@@ -231,13 +234,18 @@
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="article" />
-	<meta property="og:image" content="https://media.pictify.io/qyw0z-1775406908773.png" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content={ogImage} />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify vs {comparison?.competitor} — honest comparison" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://media.pictify.io/qyw0z-1775406908773.png" />
+	<meta name="twitter:image" content={ogImage} />
+	<meta name="twitter:image:alt" content="Pictify vs {comparison?.competitor} — honest comparison" />
 
 	{#if structuredData}
 		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
@@ -706,6 +714,36 @@
 						class="px-8 py-4 bg-transparent text-white border-[3px] border-white font-black uppercase tracking-wide hover:bg-white hover:text-gray-900 transition-all rounded-xl"
 					>
 						View Pricing
+					</a>
+				</div>
+			</section>
+
+			<!-- Related reading -->
+			<section class="mb-16">
+				<h2 class="text-xl font-black uppercase tracking-wide text-gray-400 mb-6 text-center">
+					Related Reading
+				</h2>
+				<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+					<a
+						href="/solutions/automated-image-generation"
+						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					>
+						<h3 class="font-black text-gray-900 mb-1 text-sm">Automated Image Generation</h3>
+						<p class="text-xs text-gray-500">The complete guide — templates, APIs, expressions, and live data bindings.</p>
+					</a>
+					<a
+						href="/solutions/image-generation-api"
+						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#4ade80] hover:shadow-[2px_2px_0_0_#4ade80] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					>
+						<h3 class="font-black text-gray-900 mb-1 text-sm">Image Generation API</h3>
+						<p class="text-xs text-gray-500">POST template + variables, get image URL. Three-line integration guide.</p>
+					</a>
+					<a
+						href="/blogs/bannerbear-alternatives-for-developers"
+						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#ff6b6b] hover:shadow-[2px_2px_0_0_#ff6b6b] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					>
+						<h3 class="font-black text-gray-900 mb-1 text-sm">Bannerbear Alternatives</h3>
+						<p class="text-xs text-gray-500">12 tools compared honestly, with code examples where the differences matter.</p>
 					</a>
 				</div>
 			</section>

@@ -7,7 +7,7 @@
 	const description =
 		'Images that render based on request context — user, product, time, or data state. Live-bound templates so what you render is always current.';
 	const canonical = 'https://pictify.io/solutions/dynamic-image-generation';
-	const ogImage = 'https://media.pictify.io/z37dh-1776200239048.png';
+	const ogImage = 'https://pictify.io/og/solutions/dynamic-image-generation.png';
 	const related = getRelatedSolutions('dynamic-image-generation', 6);
 
 	const faqs = [

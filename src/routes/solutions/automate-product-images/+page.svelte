@@ -7,7 +7,7 @@
 	const description =
 		'Render catalog-scale product cards, seasonal variants, and stock-aware banners from one template — bound to your inventory data. One API, any scale.';
 	const canonical = 'https://pictify.io/solutions/automate-product-images';
-	const ogImage = 'https://media.pictify.io/ub2kk-1776199735728.png';
+	const ogImage = 'https://pictify.io/og/solutions/automate-product-images.png';
 	const related = getRelatedSolutions('automate-product-images', 6);
 
 	const faqs = [

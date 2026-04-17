@@ -131,11 +131,20 @@
 <svelte:head>
 	<title>Email Image Personalization — Dynamic Images for Email Marketing | Pictify</title>
 	<meta name="description" content="Personalize email images at open time. Show each recipient their name, city, countdown timer, or live pricing — no ESP plugins needed." />
+	<link rel="canonical" href="https://pictify.io/email-personalization" />
 	<meta property="og:title" content="Email Image Personalization | Pictify" />
 	<meta property="og:description" content="Each recipient sees a different image — personalized at open time." />
+	<meta property="og:url" content="https://pictify.io/email-personalization" />
 	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/pages/email-personalization.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Email Personalization — dynamic email hero images" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Email Image Personalization | Pictify" />
+	<meta name="twitter:description" content="Each recipient sees a different image — personalized at open time." />
+	<meta name="twitter:image" content="https://pictify.io/og/pages/email-personalization.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org',
 		'@type': 'SoftwareApplication',

@@ -17,6 +17,20 @@
 		name="description"
 		content="Guides and articles on programmatic media: templates, HTML-to-image, OG generation, and rendering workflows with Pictify."
 	/>
+	<link rel="canonical" href="https://pictify.io/blogs" />
+	<meta property="og:title" content="Pictify Blog — Programmatic Media Automation" />
+	<meta property="og:description" content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows for developers." />
+	<meta property="og:url" content="https://pictify.io/blogs" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/blogs/index.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Blog — deep technical image dev content" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Pictify Blog — Programmatic Media Automation" />
+	<meta name="twitter:description" content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows." />
+	<meta name="twitter:image" content="https://pictify.io/og/blogs/index.png" />
 </svelte:head>
 
 <div

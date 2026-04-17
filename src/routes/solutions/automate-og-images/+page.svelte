@@ -7,7 +7,7 @@
 	const description =
 		'Dynamic Open Graph images for every blog post, product, or page. Render on-demand from your data via the Pictify API — no pre-rendering pipeline, no design bottleneck.';
 	const canonical = 'https://pictify.io/solutions/automate-og-images';
-	const ogImage = 'https://media.pictify.io/mskf0-1776199916311.png';
+	const ogImage = 'https://pictify.io/og/solutions/automate-og-images.png';
 	const related = getRelatedSolutions('automate-og-images', 6);
 
 	const faqs = [

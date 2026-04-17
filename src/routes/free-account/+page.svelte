@@ -78,6 +78,16 @@
 		content="Create a free Pictify account to unlock watermark-free images, API access, and unlimited template storage."
 	/>
 	<meta property="og:url" content="https://pictify.io/free-account" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/pages/free-account.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify — 50 free renders per month, no credit card" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Free Account Benefits | Pictify" />
+	<meta name="twitter:description" content="50 free renders/month. No credit card. No watermark. Full API access." />
+	<meta name="twitter:image" content="https://pictify.io/og/pages/free-account.png" />
 </svelte:head>
 
 <div class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900">

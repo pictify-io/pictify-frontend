@@ -7,7 +7,7 @@
 	const description =
 		'The image generation API for developers. POST a template + variables, get a CDN-cached PNG/JPEG/WebP/PDF/GIF. Expression engine, live bindings, and batch rendering built in.';
 	const canonical = 'https://pictify.io/solutions/image-generation-api';
-	const ogImage = 'https://media.pictify.io/1gxyd-1776199216529.png';
+	const ogImage = 'https://pictify.io/og/solutions/image-generation-api.png';
 
 	const related = getRelatedSolutions('image-generation-api', 6);
 

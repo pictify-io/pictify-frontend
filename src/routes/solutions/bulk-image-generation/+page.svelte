@@ -7,7 +7,7 @@
 	const description =
 		'Generate thousands of images from a spreadsheet, CSV, or JSON batch. Async jobs, webhooks on completion, parallelized renders — all from one template.';
 	const canonical = 'https://pictify.io/solutions/bulk-image-generation';
-	const ogImage = 'https://media.pictify.io/b4o9c-1776200153158.png';
+	const ogImage = 'https://pictify.io/og/solutions/bulk-image-generation.png';
 	const related = getRelatedSolutions('bulk-image-generation', 6);
 
 	const faqs = [

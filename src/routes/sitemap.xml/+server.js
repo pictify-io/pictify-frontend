@@ -10,6 +10,7 @@ import {
 	integrations,
 	personas
 } from '$lib/pseo/config.js';
+import { alternatives } from '$lib/pseo/comparisons.js';
 import { publishedSolutions } from '$lib/solutions/related.js';
 
 export async function GET() {
@@ -88,6 +89,28 @@ export async function GET() {
 		</url>
 	`
 	);
+
+	// Alternatives pages (/alternatives/[slug] brand-hijack pages) + the /alternatives index
+	const alternativeUrls = [
+		`
+		<url>
+			<loc>https://pictify.io/alternatives</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>weekly</changefreq>
+			<priority>0.8</priority>
+		</url>
+	`,
+		...alternatives.map(
+			(alt) => `
+		<url>
+			<loc>https://pictify.io/alternatives/${alt.slug}</loc>
+			<lastmod>${today}</lastmod>
+			<changefreq>monthly</changefreq>
+			<priority>0.7</priority>
+		</url>
+	`
+		)
+	];
 
 	// Glossary term pages
 	const glossaryUrls = glossary.map(
@@ -252,6 +275,7 @@ export async function GET() {
 	   		${useCaseUrls.join('')}
 	   		${templateCategoryUrls.join('')}
 	   		${comparisonUrls.join('')}
+	   		${alternativeUrls.join('')}
 	   		${glossaryUrls.join('')}
 	   		${integrationUrls.join('')}
 	   		${solutionUrls.join('')}

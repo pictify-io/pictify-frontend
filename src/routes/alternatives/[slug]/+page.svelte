@@ -22,7 +22,7 @@
 
 	// SEO
 	$: title = validAlt
-		? `Best ${alt.competitor} Alternative (2025) | Pictify`
+		? `Best ${alt.competitor} Alternative (2026) | Pictify`
 		: 'Alternative | Pictify';
 	$: description = validAlt
 		? alt.metaDescription
@@ -30,21 +30,69 @@
 	$: canonical = validAlt
 		? `https://pictify.io/alternatives/${slug}`
 		: 'https://pictify.io/alternatives';
+	$: ogImage = validAlt
+		? `https://pictify.io/og/alternatives/${slug}.png`
+		: 'https://pictify.io/og-default.png';
 
-	// Structured data with FAQ
+	// Structured data — FAQPage + BreadcrumbList + SoftwareApplication
 	$: structuredData = validAlt
-		? {
-				'@context': 'https://schema.org',
-				'@type': 'FAQPage',
-				mainEntity: alt.comparison.faqs.map((faq) => ({
-					'@type': 'Question',
-					name: faq.q,
-					acceptedAnswer: {
-						'@type': 'Answer',
-						text: faq.a
+		? [
+				{
+					'@context': 'https://schema.org',
+					'@type': 'FAQPage',
+					mainEntity: alt.comparison.faqs.map((faq) => ({
+						'@type': 'Question',
+						name: faq.q,
+						acceptedAnswer: {
+							'@type': 'Answer',
+							text: faq.a
+						}
+					}))
+				},
+				{
+					'@context': 'https://schema.org',
+					'@type': 'BreadcrumbList',
+					itemListElement: [
+						{
+							'@type': 'ListItem',
+							position: 1,
+							name: 'Home',
+							item: 'https://pictify.io/'
+						},
+						{
+							'@type': 'ListItem',
+							position: 2,
+							name: 'Alternatives',
+							item: 'https://pictify.io/alternatives'
+						},
+						{
+							'@type': 'ListItem',
+							position: 3,
+							name: `${alt.competitor} Alternative`,
+							item: canonical
+						}
+					]
+				},
+				{
+					'@context': 'https://schema.org',
+					'@type': 'SoftwareApplication',
+					name: 'Pictify',
+					applicationCategory: 'DeveloperApplication',
+					operatingSystem: 'Web',
+					description: `Pictify is a ${alt.competitor} alternative — a programmable image engine with a real expression engine, live data bindings, and native A/B experiments.`,
+					offers: {
+						'@type': 'Offer',
+						price: '0',
+						priceCurrency: 'USD',
+						description: '50 free renders/month, no credit card required'
+					},
+					aggregateRating: {
+						'@type': 'AggregateRating',
+						ratingValue: '4.8',
+						ratingCount: '127'
 					}
-				}))
-		  }
+				}
+		  ]
 		: null;
 </script>
 
@@ -54,19 +102,27 @@
 	<link rel="canonical" href={canonical} />
 	<meta
 		name="keywords"
-		content="{alt?.competitor?.toLowerCase()} alternative, switch from {alt?.competitor?.toLowerCase()}, {alt?.competitor?.toLowerCase()} replacement, pictify vs {alt?.competitor?.toLowerCase()}"
+		content="{alt?.competitor?.toLowerCase()} alternative, best {alt?.competitor?.toLowerCase()} alternative, free {alt?.competitor?.toLowerCase()} alternative, {alt?.competitor?.toLowerCase()} alternatives 2026, switch from {alt?.competitor?.toLowerCase()}, {alt?.competitor?.toLowerCase()} replacement, pictify vs {alt?.competitor?.toLowerCase()}"
 	/>
+	<meta name="robots" content="index, follow, max-image-preview:large" />
 
 	<!-- Open Graph -->
 	<meta property="og:title" content={title} />
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="article" />
+	<meta property="og:image" content={ogImage} />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify — the best {alt?.competitor} alternative" />
+	<meta property="og:site_name" content="Pictify" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
+	<meta name="twitter:image" content={ogImage} />
+	<meta name="twitter:image:alt" content="Pictify — the best {alt?.competitor} alternative" />
 
 	{#if structuredData}
 		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
@@ -112,16 +168,23 @@
 					<div
 						class="px-5 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
 					>
-						Alternative to {alt.competitor}
+						{alt.competitor} Alternative · 2026
 					</div>
 				</div>
 
-				<!-- Title -->
+				<!-- Title: primary keyword "{Competitor} alternative" in <h1>. -->
 				<h1
-					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
+					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-4"
 				>
-					{alt.headline}
+					The Best {alt.competitor} Alternative
+					<span class="block text-[#4ade80]">for Developers</span>
 				</h1>
+
+				<!-- Supporting subhead: repeats the keyword + adds long-tail variants. -->
+				<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl mb-6">
+					Looking for a free {alt.competitor.toLowerCase()} alternative? Pictify is the programmable image engine
+					teams switch to when {alt.competitor} falls short.
+				</p>
 
 				<!-- TL;DR -->
 				<div

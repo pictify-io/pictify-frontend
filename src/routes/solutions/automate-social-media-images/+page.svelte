@@ -7,7 +7,7 @@
 	const description =
 		'Personalized social cards at scale — one template, thousands of variants, zero manual design work. Generate LinkedIn, X, Instagram, and Facebook images via API.';
 	const canonical = 'https://pictify.io/solutions/automate-social-media-images';
-	const ogImage = 'https://media.pictify.io/6ese3-1776199824315.png';
+	const ogImage = 'https://pictify.io/og/solutions/automate-social-media-images.png';
 	const related = getRelatedSolutions('automate-social-media-images', 6);
 
 	const faqs = [

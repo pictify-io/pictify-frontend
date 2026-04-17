@@ -106,12 +106,20 @@
 <svelte:head>
 	<title>Dynamic Image Links — Auto-Updating Images from Live Data | Pictify</title>
 	<meta name="description" content="Create images that update automatically from APIs, databases, and webhooks. Perfect for e-commerce, dashboards, and personalized email." />
+	<link rel="canonical" href="https://pictify.io/dynamic-images" />
 	<meta property="og:title" content="Dynamic Image Links — Auto-Updating Images from Live Data | Pictify" />
 	<meta property="og:description" content="Create images that update automatically from APIs, databases, and webhooks." />
+	<meta property="og:url" content="https://pictify.io/dynamic-images" />
 	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/pages/dynamic-images.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Dynamic Images — auto-updating from live data" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Dynamic Image Links | Pictify" />
 	<meta name="twitter:description" content="Images that update themselves from live data sources." />
+	<meta name="twitter:image" content="https://pictify.io/og/pages/dynamic-images.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org',
 		'@type': 'SoftwareApplication',

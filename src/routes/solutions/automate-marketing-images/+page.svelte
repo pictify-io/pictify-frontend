@@ -7,7 +7,7 @@
 	const description =
 		'Automate marketing image generation across landing pages, ads, email, social, and lifecycle campaigns. One template stack, every channel, powered by your data.';
 	const canonical = 'https://pictify.io/solutions/automate-marketing-images';
-	const ogImage = 'https://media.pictify.io/8yji7-1776200628243.png';
+	const ogImage = 'https://pictify.io/og/solutions/automate-marketing-images.png';
 	const related = getRelatedSolutions('automate-marketing-images', 6);
 
 	const faqs = [

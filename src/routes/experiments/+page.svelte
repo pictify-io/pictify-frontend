@@ -144,12 +144,20 @@
 <svelte:head>
 	<title>Image Experiments — A/B Test, Smart Links & Auto-Optimize | Pictify</title>
 	<meta name="description" content="A/B test your images, target by device and location with Smart Links, schedule variant swaps, and let AI auto-optimize. One URL, data-driven visuals." />
+	<link rel="canonical" href="https://pictify.io/experiments" />
 	<meta property="og:title" content="Image Experiments — A/B Test, Smart Links & Auto-Optimize | Pictify" />
 	<meta property="og:description" content="Test image variants, target by context, and auto-optimize with Thompson Sampling." />
+	<meta property="og:url" content="https://pictify.io/experiments" />
 	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/pages/experiments.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Experiments — A/B test images with one URL" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Image Experiments | Pictify" />
 	<meta name="twitter:description" content="A/B test images, target by device/location, auto-optimize with AI." />
+	<meta name="twitter:image" content="https://pictify.io/og/pages/experiments.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org',
 		'@type': 'SoftwareApplication',

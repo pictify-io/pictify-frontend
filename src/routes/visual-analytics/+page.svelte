@@ -113,11 +113,20 @@
 <svelte:head>
 	<title>Visual Analytics — Track, Measure & Optimize Image Performance | Pictify</title>
 	<meta name="description" content="Know which images convert. Track impressions, clicks, and conversions across channels. Compare performance by device and geography. Data-driven visual optimization." />
+	<link rel="canonical" href="https://pictify.io/visual-analytics" />
 	<meta property="og:title" content="Visual Analytics — Image Performance Tracking | Pictify" />
 	<meta property="og:description" content="Track, measure, and optimize every image. Know which visuals drive conversions." />
+	<meta property="og:url" content="https://pictify.io/visual-analytics" />
 	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/pages/visual-analytics.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Visual Analytics — track every image variant" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Visual Analytics | Pictify" />
+	<meta name="twitter:description" content="Track, measure, and optimize every image. Know which visuals drive conversions." />
+	<meta name="twitter:image" content="https://pictify.io/og/pages/visual-analytics.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org',
 		'@type': 'SoftwareApplication',

@@ -510,7 +510,17 @@
 		property="og:description"
 		content="Create professional LinkedIn banners in seconds. 20+ templates for developers, designers, marketers, and more."
 	/>
+	<meta property="og:url" content="https://pictify.io/tools/linkedin-banner-generator" />
 	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/tools/linkedin-banner-generator.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify LinkedIn banner generator — free, 1584×396" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Free LinkedIn Banner Generator | Pictify" />
+	<meta name="twitter:description" content="Create professional LinkedIn banners in seconds. 20+ templates. Free, no watermark." />
+	<meta name="twitter:image" content="https://pictify.io/og/tools/linkedin-banner-generator.png" />
 
 	<link rel="canonical" href="https://pictify.io/tools/linkedin-banner-generator" />
 </svelte:head>

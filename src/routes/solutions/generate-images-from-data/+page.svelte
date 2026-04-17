@@ -7,7 +7,7 @@
 	const description =
 		'Bind image templates to Google Sheets, HTTP endpoints, or webhooks. When data changes, images reflect it — no manual re-render, no backend glue code.';
 	const canonical = 'https://pictify.io/solutions/generate-images-from-data';
-	const ogImage = 'https://media.pictify.io/sywyu-1776200332591.png';
+	const ogImage = 'https://pictify.io/og/solutions/generate-images-from-data.png';
 	const related = getRelatedSolutions('generate-images-from-data', 6);
 
 	const faqs = [

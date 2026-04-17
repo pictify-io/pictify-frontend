@@ -7,7 +7,7 @@
 	const description =
 		'Generate per-user personalized images at scale — for lifecycle emails, in-app onboarding, ads, and Year-in-Review graphics. One template, N users, N images.';
 	const canonical = 'https://pictify.io/solutions/personalized-images-at-scale';
-	const ogImage = 'https://media.pictify.io/4xor0-1776200540417.png';
+	const ogImage = 'https://pictify.io/og/solutions/personalized-images-at-scale.png';
 	const related = getRelatedSolutions('personalized-images-at-scale', 6);
 
 	const faqs = [

@@ -9,7 +9,7 @@
 	const description =
 		'Automated image generation API for developers. Templates with expressions, live data bindings, and A/B experiments — one API, any scale.';
 	const canonical = 'https://pictify.io/solutions/automated-image-generation';
-	const ogImage = 'https://media.pictify.io/bm2ot-1776199021097.png';
+	const ogImage = 'https://pictify.io/og/solutions/automated-image-generation.png';
 
 	const related = solutions.filter((s) => !s.isPillar);
 
@@ -159,7 +159,7 @@
 		},
 		{
 			q: "What's the cheapest way to generate images programmatically?",
-			a: 'Pictify has a free tier for up to a few hundred renders per month, which is enough to validate an integration. Beyond that, our per-render pricing is cheaper than running your own Puppeteer fleet (~$0.001/render vs ~$0.01 all-in when you account for compute, cold-starts, and ops) and competitive with Bannerbear/Placid/RenderForm.'
+			a: 'Pictify has a free tier with 50 renders per month (no watermark, no credit card), which is enough to validate an integration. Beyond that, our per-render pricing is cheaper than running your own Puppeteer fleet (~$0.001/render vs ~$0.01 all-in when you account for compute, cold-starts, and ops) and competitive with Bannerbear/Placid/RenderForm.'
 		},
 		{
 			q: 'Can I use automated image generation for server-side OG images?',

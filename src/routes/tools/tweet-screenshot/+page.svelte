@@ -434,7 +434,7 @@ print(res.json()['image']['url'])`;
 	ogSiteName="Pictify"
 	ogTitle="Tweet Screenshot Generator — Free Twitter Screenshot Maker"
 	ogDescription="Paste a tweet URL, customize every field, download a PNG. Automate the whole thing with one API call — no Twitter API key required."
-	ogImage="https://media.pictify.io/k2oq1-1776144080510.png"
+	ogImage="https://pictify.io/og/tools/tweet-screenshot.png"
 	ogImageWidth={1200}
 	ogImageHeight={630}
 	ogImageAlt="Pictify tweet screenshot generator — paste a URL, download a PNG"
@@ -442,7 +442,7 @@ print(res.json()['image']['url'])`;
 	twitterCreator="@pictify_io"
 	twitterTitle="Tweet Screenshot Generator — Free Twitter Screenshot Maker"
 	twitterDescription="Paste a tweet URL, customize every field, download a PNG. Automate with one API call."
-	twitterImage="https://media.pictify.io/k2oq1-1776144080510.png"
+	twitterImage="https://pictify.io/og/tools/tweet-screenshot.png"
 	twitterImageAlt="Pictify tweet screenshot generator"
 	{webApplicationSchema}
 	{faqs}

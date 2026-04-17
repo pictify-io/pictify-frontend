@@ -472,20 +472,32 @@ export const comparisons = [
 		},
 		faqs: [
 			{
+				q: 'Is Pictify a good Bannerbear alternative?',
+				a: 'Yes. Pictify is the most common Bannerbear alternative for teams whose templates need logic beyond string replacement. The API shape is similar (POST template ID + variables, receive image URL), so migration is straightforward. The delta is what lives inside the template — Pictify supports expressions, conditionals, and live data bindings that Bannerbear templates cannot do.'
+			},
+			{
 				q: 'Does Pictify have a visual editor like Bannerbear?',
-				a: 'Yes! Pictify has a Canva-like drag-and-drop editor plus AI template generation from prompts.'
+				a: 'Yes. Pictify has a Canva-like drag-and-drop canvas editor plus an agentic AI copilot that generates templates from prompts. You can also use raw HTML/CSS as a layer type for designs the editor cannot express.'
 			},
 			{
 				q: 'Does Pictify support video generation?',
-				a: 'Pictify focuses on images, GIFs, and PDFs. For video, Bannerbear has an advantage.'
+				a: 'Pictify focuses on images, GIFs, and PDFs. For video, Bannerbear has an advantage. If you need both images and video from the same product, Bannerbear or Placid are better fits.'
 			},
 			{
 				q: 'Can Pictify connect to live data?',
-				a: 'Yes—Dynamic Links auto-refresh images from any API, webhook, or data source.'
+				a: 'Yes. Dynamic Links auto-refresh images from any API, webhook, or data source. Templates can also bind to HTTP endpoints and fetch variables at render time — a feature unique to Pictify in the Bannerbear alternative space.'
 			},
 			{
-				q: 'Which has better pricing?',
-				a: 'Pictify offers a generous free tier and pro plans starting at $39/mo (billed annually).'
+				q: 'Which is cheaper — Pictify or Bannerbear?',
+				a: 'Pictify is cheaper at every tier. Pictify offers 50 free renders per month (no watermark, no credit card). Bannerbear offers a one-time 30-credit trial with no recurring free tier. Paid plans: Pictify starts at $15/mo vs Bannerbear at $49/mo.'
+			},
+			{
+				q: 'What is the best free Bannerbear alternative?',
+				a: 'Pictify offers the most capable free tier among Bannerbear alternatives — 50 renders/month with no watermark and no credit card required. Other free options include HTML/CSS to Image (50/month, raw HTML only) and APITemplate.io (50/month, 3 templates). Bannerbear itself has no recurring free tier.'
+			},
+			{
+				q: 'How hard is it to migrate from Bannerbear to Pictify?',
+				a: 'Easy — typically 2-3 hours. The API pattern is the same (POST template + variables → image URL). Recreate your templates in Pictify\'s visual editor or AI copilot, swap the endpoint and template IDs in your backend, and existing integrations work. Any backend formatting logic (currency, conditionals) can move into the Pictify template itself, simplifying your code.'
 			}
 		]
 	},
@@ -2499,8 +2511,13 @@ export const alternatives = comparisons.map((comp) => ({
 		.replace(/^-|-$/g, ''),
 	competitor: comp.competitor,
 	title: `${comp.competitor} Alternative`,
-	headline: `Looking for a ${comp.competitor} alternative?`,
-	metaDescription: `Pictify is the best ${comp.competitor} alternative for HTML to image generation. Compare features, pricing, and see why teams switch.`,
+	headline: `The Best ${comp.competitor} Alternative for Developers`,
+	// Prefer the hand-crafted metaDescription from the comparisons entry when
+	// present — it's tuned for the primary keyword. Fall back to a generic
+	// template only when the comparison entry hasn't supplied one.
+	metaDescription:
+		comp.metaDescription ||
+		`Pictify is the best ${comp.competitor} alternative for HTML to image generation. Compare features, pricing, and see why teams switch.`,
 	whySwitch: comp.advantages.slice(0, 4),
 	comparison: comp,
 	cta: 'Try Pictify Free'

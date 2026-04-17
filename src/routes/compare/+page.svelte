@@ -24,13 +24,13 @@
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://media.pictify.io/qyw0z-1775406908773.png" />
+	<meta property="og:image" content="https://pictify.io/og/compare/index.png" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://media.pictify.io/qyw0z-1775406908773.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/compare/index.png" />
 </svelte:head>
 
 <section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">

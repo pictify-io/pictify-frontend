@@ -7,7 +7,7 @@
 	const description =
 		'Automate personalized email header images per recipient. Open rates rise when the image says the reader\'s name. One template, every send.';
 	const canonical = 'https://pictify.io/solutions/automate-email-headers';
-	const ogImage = 'https://media.pictify.io/9xm2k-1776200714552.png';
+	const ogImage = 'https://pictify.io/og/solutions/automate-email-headers.png';
 	const related = getRelatedSolutions('automate-email-headers', 6);
 
 	const faqs = [
