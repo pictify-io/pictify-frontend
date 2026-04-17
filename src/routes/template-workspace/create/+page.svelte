@@ -1,12 +1,15 @@
 <script>
 	import CreateTemplate from '$lib/components/dashboard/template/CreateTemplate.svelte';
 	import TemplateTypeSelector from '$lib/components/editor/TemplateTypeSelector.svelte';
+	import EnginePicker from '$lib/components/editor/html/EnginePicker.svelte';
 	import { pageActions } from '../../../store/pages.store';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
 	let showSelector = true;
 	let selectedConfig = null;
+	// Stage 1: engine picker. Stage 2: fabric format selector (only for canvas).
+	let stage = 'engine';
 
 	// Check if coming from a draft (tools workflow)
 	onMount(() => {
@@ -32,6 +35,15 @@
 		}
 	});
 
+	function handleEngineSelect(event) {
+		if (event.detail.engine === 'html') {
+			goto('/template-workspace/html/create?engine=html');
+		} else {
+			// Fabric — fall through to the legacy format selector.
+			stage = 'format';
+		}
+	}
+
 	function handleFormatSelect(event) {
 		selectedConfig = event.detail;
 
@@ -49,7 +61,9 @@
 </script>
 
 <div class="h-full w-full">
-	{#if showSelector}
+	{#if stage === 'engine'}
+		<EnginePicker on:select={handleEngineSelect} />
+	{:else if showSelector && stage === 'format'}
 		<TemplateTypeSelector on:select={handleFormatSelect} />
 	{/if}
 
