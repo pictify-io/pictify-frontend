@@ -248,10 +248,18 @@
 	}
 </script>
 
-<div
-	bind:this={container}
-	class="cm-html-editor h-full w-full border-3 border-gray-800 bg-brand-bg"
-></div>
+<!--
+	The CodeMirror host is wrapped in a padded page so the frame lines up
+	with the tab bar above it and the panel cards in sibling tabs. The
+	inner rounded-xl card carries the code face; the buffer keeps its
+	JetBrains Mono + brand Handlebars token styling (the signature detail).
+-->
+<div class="flex h-full w-full flex-col bg-[#FFFDF8] p-6">
+	<div
+		bind:this={container}
+		class="cm-html-editor h-full w-full overflow-hidden rounded-xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[4px_4px_0_0_#1f2937]"
+	></div>
+</div>
 
 <style>
 	.cm-html-editor :global(.cm-editor) {

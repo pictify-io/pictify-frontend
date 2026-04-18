@@ -99,20 +99,33 @@
 <Toast />
 
 {#if loadError}
-	<div class="flex h-screen items-center justify-center bg-brand-bg p-6">
-		<div class="max-w-md border-3 border-gray-800 bg-white p-6 shadow-brutal-md">
-			<h2 class="font-heading text-2xl">Couldn't load this template</h2>
-			<p class="mt-2 font-mono text-sm text-brand-danger">{loadError}</p>
+	<div class="flex h-screen items-center justify-center bg-[#FFFDF8] p-6">
+		<div class="max-w-md rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-[8px_8px_0_0_#1f2937]">
+			<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ff6b6b] shadow-[3px_3px_0_0_#1f2937]">
+				<i class="fa fa-triangle-exclamation text-white"></i>
+			</div>
+			<h2 class="text-xl font-black uppercase tracking-widest text-gray-900">
+				Couldn't load template
+			</h2>
+			<p class="mt-2 font-mono text-xs text-gray-600">{loadError}</p>
 			<a
 				href="/dashboard/template"
-				class="mt-4 inline-block border-2 border-gray-800 bg-brand-accent px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider shadow-brutal-sm"
-			>← Back to templates</a>
+				class="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-[#ffc480] px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+			>
+				<i class="fa fa-arrow-left text-[10px]"></i>
+				Back to templates
+			</a>
 		</div>
 	</div>
 {:else if template}
 	<HtmlEditorLayout {template} {isSaving} on:save={handleSave} />
 {:else}
-	<div class="flex h-screen items-center justify-center bg-brand-bg">
-		<p class="font-mono text-sm text-gray-500">· Loading template…</p>
+	<div class="flex h-screen items-center justify-center bg-[#FFFDF8]">
+		<div class="flex flex-col items-center gap-3 text-gray-700">
+			<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937]">
+				<i class="fa fa-hourglass-half"></i>
+			</div>
+			<p class="text-[11px] font-black uppercase tracking-widest">Loading template…</p>
+		</div>
 	</div>
 {/if}

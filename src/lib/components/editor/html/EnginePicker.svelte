@@ -207,41 +207,58 @@
 	</div>
 {:else}
 	<!--
-		Page mode. Quiet editor dialect — sharp corners, DynaPuff, brand
-		accent. Matches the editor experience users are about to enter.
+		Page mode. Same dashboard dialect as the modal — the only differences
+		are scale (larger cards) and that we're not inside an overlay.
+		Keeping both modes visually aligned means there's no "mode switch"
+		surprise if a user arrives here via a shared link vs the modal path.
 	-->
 	<div
-		class="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center bg-brand-bg p-6"
+		class="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center bg-[#FFFDF8] p-6"
 	>
 		<div class="flex w-full max-w-5xl flex-col gap-10">
 			<header class="text-center">
-				<h1 class="font-heading text-4xl text-gray-900 md:text-5xl">
-					Start a new template
+				<div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[4px_4px_0_0_#1f2937]">
+					<i class="fa fa-plus text-xl text-gray-900"></i>
+				</div>
+				<h1 class="text-3xl font-black uppercase tracking-widest text-gray-900 md:text-4xl">
+					Create New Template
 				</h1>
-				<p class="mt-3 text-base text-gray-700">
+				<p class="mx-auto mt-3 max-w-xl text-sm font-bold text-gray-600">
 					Two ways to design, one render engine. Pick what fits your workflow.
 				</p>
 			</header>
 
 			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+				<!-- Canvas card -->
 				<button
 					type="button"
-					class="group relative flex flex-col items-start gap-4 border-3 border-gray-800 bg-brand-bg p-8 text-left shadow-brutal-lg transition-transform duration-150 hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-xl focus-brutal"
-					class:bg-brand-accent={selected === 'fabric'}
+					class="relative flex flex-col gap-4 rounded-xl border-[3px] p-6 text-left transition-all
+						{selected === 'fabric'
+							? 'border-gray-900 bg-[#ffc480]/20 shadow-[6px_6px_0_0_#1f2937] -translate-x-[2px] -translate-y-[2px]'
+							: 'border-gray-900 bg-white hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
 					on:click={() => choose('fabric')}
 				>
+					{#if selected === 'fabric'}
+						<div
+							class="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-[2px] border-gray-900 bg-[#ffc480] shadow-[2px_2px_0_0_#1f2937]"
+						>
+							<i class="fa fa-check text-[11px] font-bold text-gray-900"></i>
+						</div>
+					{/if}
 					<div class="flex items-center gap-3">
-						<span
-							class="flex h-10 w-10 items-center justify-center border-2 border-gray-800 bg-white font-mono text-sm font-bold"
-						>◧</span>
-						<h2 class="font-heading text-2xl text-gray-900">Canvas</h2>
+						<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937]">
+							<i class="fa fa-object-group text-xl text-gray-900"></i>
+						</div>
+						<h2 class="text-xl font-black uppercase tracking-tight text-gray-900">
+							Canvas
+						</h2>
 					</div>
-					<p class="text-sm text-gray-800">
-						Visual drag-and-drop editor. Best for marketing assets, social
-						posts, and anyone who doesn't want to write code.
+					<p class="text-sm font-bold leading-relaxed text-gray-600">
+						Visual drag-and-drop editor. Marketing assets, social posts, anything
+						you'd want to design visually.
 					</p>
 					<pre
-						class="mt-2 w-full overflow-hidden border-2 border-gray-800 bg-white p-3 font-mono text-[11px] leading-relaxed text-gray-700"
+						class="mt-1 w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"
 					><code>{`{
   "fabricJSData": {
     "version": "5.0",
@@ -252,31 +269,40 @@
   }
 }`}</code></pre>
 					<span
-						class="mt-auto inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-900"
-					>Drag · Align · Snap</span>
+						class="mt-auto text-[10px] font-black uppercase tracking-widest text-gray-500"
+					>
+						Drag · Align · Snap
+					</span>
 				</button>
 
+				<!-- HTML card -->
 				<button
 					type="button"
-					class="group relative flex flex-col items-start gap-4 border-3 border-gray-800 bg-brand-bg p-8 text-left shadow-brutal-lg transition-transform duration-150 hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-xl focus-brutal"
-					class:bg-brand-accent={selected === 'html'}
+					class="relative flex flex-col gap-4 rounded-xl border-[3px] p-6 text-left transition-all
+						{selected === 'html'
+							? 'border-gray-900 bg-[#ff6b6b]/10 shadow-[6px_6px_0_0_#1f2937] -translate-x-[2px] -translate-y-[2px]'
+							: 'border-gray-900 bg-white hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
 					on:click={() => choose('html')}
 				>
-					<div class="flex items-center gap-3">
-						<span
-							class="flex h-10 w-10 items-center justify-center border-2 border-gray-800 bg-white font-mono text-sm font-bold"
-						>{'</>'}</span>
-						<h2 class="font-heading text-2xl text-gray-900">HTML</h2>
-						<span
-							class="ml-1 inline-flex items-center border-2 border-gray-800 bg-brand-accent px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-gray-900"
-						>New</span>
+					<!-- NEW badge -->
+					<div
+						class="absolute right-3 top-3 rounded-lg border-[2px] border-gray-900 bg-[#ff6b6b] px-2 py-0.5 shadow-[2px_2px_0_0_#1f2937]"
+					>
+						<span class="text-[10px] font-black uppercase tracking-widest text-white">New</span>
 					</div>
-					<p class="text-sm text-gray-800">
-						Write markup with Handlebars variables. Full CSS, custom fonts,
-						SVG, and Tailwind support. Render via Puppeteer.
+
+					<div class="flex items-center gap-3">
+						<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ff6b6b] shadow-[3px_3px_0_0_#1f2937]">
+							<i class="fa fa-code text-xl text-white"></i>
+						</div>
+						<h2 class="text-xl font-black uppercase tracking-tight text-gray-900">HTML</h2>
+					</div>
+					<p class="text-sm font-bold leading-relaxed text-gray-600">
+						Write markup with Handlebars variables. Full CSS, custom fonts, SVG, and
+						Tailwind. Rendered via Puppeteer.
 					</p>
 					<pre
-						class="mt-2 w-full overflow-hidden border-2 border-gray-800 bg-white p-3 font-mono text-[11px] leading-relaxed text-gray-700"
+						class="mt-1 w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"
 					><code>{`<div class="invoice">
   <h1>{{title}}</h1>
   <p>{{amount | currency}}</p>
@@ -285,14 +311,21 @@
   {{/each}}
 </div>`}</code></pre>
 					<span
-						class="mt-auto inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-900"
-					>Code · CSS · SVG · Puppeteer</span>
+						class="mt-auto text-[10px] font-black uppercase tracking-widest text-gray-500"
+					>
+						Code · CSS · SVG · Puppeteer
+					</span>
 				</button>
 			</div>
 
-			<p class="text-center text-[13px] italic text-gray-500">
-				Engine can't be changed later — fork the template to switch.
-			</p>
+			<div
+				class="mx-auto flex max-w-md items-center gap-3 rounded-lg border-[2px] border-dashed border-gray-300 bg-white px-4 py-3"
+			>
+				<i class="fa fa-info-circle text-sm text-gray-500"></i>
+				<p class="text-[11px] font-bold leading-relaxed text-gray-600">
+					Engine can't be changed later — <span class="text-gray-900">fork the template to switch</span>.
+				</p>
+			</div>
 		</div>
 	</div>
 {/if}
