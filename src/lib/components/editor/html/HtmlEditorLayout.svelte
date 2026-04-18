@@ -144,17 +144,9 @@
 	function removeFromTokenInspector() {
 		if (editingIndex < 0) return;
 		const target = template.variableDefinitions[editingIndex];
-		template = {
-			...template,
-			variableDefinitions: template.variableDefinitions.filter((_, i) => i !== editingIndex)
-		};
-		if (target?.name && testValues[target.name] !== undefined) {
-			const nv = { ...testValues };
-			delete nv[target.name];
-			testValues = nv;
-		}
-		markDirty();
 		closeTokenInspector();
+		if (!target?.name) return;
+		requestVariableRemoval({ detail: { names: [target.name] } });
 	}
 
 	function doUndo() {
@@ -241,6 +233,87 @@
 		};
 		testValues = e.detail.testValues || testValues;
 		markDirty();
+	}
+
+	// ---- Variable removal with editor sync ----------------------------
+	// Variables can be deleted from two surfaces (Variables panel, token
+	// inspector). Both now funnel through `requestRemove` which prompts
+	// the user when tokens still exist in the HTML — if they confirm we
+	// strip {{var}}/{{{var}}} occurrences before removing the declaration.
+
+	let pendingRemoval = null; // { names: string[], occurrences: number }
+
+	function countTokenOccurrences(src, name) {
+		if (!src || !name) return 0;
+		const safe = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		// Matches {{name}}, {{{name}}}, {{name|helper}}, {{#if name}}, etc.
+		const re = new RegExp(
+			`\\{\\{\\{?\\s*(?:[#\\/]?\\w+\\s+)?${safe}(?:[.\\[\\]\\w]*)\\s*(?:\\|[^}]*)?\\}?\\}\\}`,
+			'g'
+		);
+		const matches = src.match(re);
+		return matches ? matches.length : 0;
+	}
+
+	function stripTokens(src, name) {
+		if (!src || !name) return src;
+		const safe = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		// Conservative strip: drop simple `{{name}}` and `{{{name}}}` tokens
+		// and path accessors like `{{name.foo}}`. We deliberately leave
+		// `{{#each name}}...{{/each}}` blocks alone — removing just the
+		// `name` would orphan the block body and almost certainly break
+		// the template silently. The confirm dialog warns about block uses.
+		const simple = new RegExp(
+			`\\{\\{\\{?\\s*${safe}(?:\\.[\\w.]+)?\\s*(?:\\|[^}]*)?\\}?\\}\\}`,
+			'g'
+		);
+		return src.replace(simple, '');
+	}
+
+	function requestVariableRemoval(e) {
+		const names = (e.detail && e.detail.names) || [];
+		if (names.length === 0) return;
+		const occurrences = names.reduce(
+			(sum, n) => sum + countTokenOccurrences(template.html, n),
+			0
+		);
+		if (occurrences === 0) {
+			applyVariableRemoval(names, { strip: false });
+			return;
+		}
+		// Tokens still referenced — ask before destroying markup.
+		pendingRemoval = { names, occurrences };
+	}
+
+	function applyVariableRemoval(names, { strip }) {
+		const removeSet = new Set(names);
+		let nextHtml = template.html;
+		if (strip) {
+			for (const name of names) {
+				nextHtml = stripTokens(nextHtml, name);
+			}
+		}
+		const nextDefs = (template.variableDefinitions || []).filter(
+			(v) => v && !removeSet.has(v.name)
+		);
+		const nextTest = { ...testValues };
+		for (const name of names) delete nextTest[name];
+		template = { ...template, html: nextHtml, variableDefinitions: nextDefs };
+		testValues = nextTest;
+		// Prune the auto-added badges for removed names so they don't flash
+		// back as "auto-added" if the user re-types the token later.
+		autoAdded = autoAdded.filter((n) => !removeSet.has(n));
+		markDirty();
+	}
+
+	function confirmRemoval(strip) {
+		if (!pendingRemoval) return;
+		applyVariableRemoval(pendingRemoval.names, { strip });
+		pendingRemoval = null;
+	}
+
+	function cancelRemoval() {
+		pendingRemoval = null;
 	}
 
 	function handleSettingsChange(e) {
@@ -484,6 +557,7 @@
 							{testValues}
 							{autoAdded}
 							on:change={handleVariablesChange}
+							on:requestRemove={requestVariableRemoval}
 							on:ackAutoAdded={() => (autoAdded = [])}
 						/>
 					{:else if activeTab === 'settings'}
@@ -546,6 +620,85 @@
 	on:apply={applyResize}
 	on:close={() => (showResizeModal = false)}
 />
+
+<!-- Variable removal confirm — shown only when tokens exist in the HTML
+     that would be orphaned by the delete. Cancel restores the declaration
+     (we never mutated it upstream). -->
+{#if pendingRemoval}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-[150] flex items-center justify-center bg-gray-900/55 p-6"
+		on:click|self={cancelRemoval}
+	>
+		<div
+			class="w-full max-w-md overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937]"
+			role="alertdialog"
+			aria-modal="true"
+			aria-labelledby="remove-var-title"
+		>
+			<!-- Header strip — red accent because this is a destructive action. -->
+			<div class="flex items-center gap-3 border-b-[3px] border-gray-900 bg-[#ff6b6b] px-5 py-3">
+				<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+					<i class="fa fa-triangle-exclamation text-[12px] text-gray-900"></i>
+				</div>
+				<h2 id="remove-var-title" class="text-[12px] font-black uppercase tracking-widest text-white">
+					{pendingRemoval.names.length === 1
+						? `Delete "${pendingRemoval.names[0]}"?`
+						: `Delete ${pendingRemoval.names.length} variables?`}
+				</h2>
+			</div>
+
+			<div class="px-5 py-5">
+				<p class="text-[13px] font-semibold leading-relaxed text-gray-800">
+					{#if pendingRemoval.names.length === 1}
+						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[11px] text-[#ffc480]">{'{{' + pendingRemoval.names[0] + '}}'}</code>
+						is still referenced
+						<strong class="font-black text-gray-900">{pendingRemoval.occurrences}
+							{pendingRemoval.occurrences === 1 ? 'time' : 'times'}</strong>
+						in your template.
+					{:else}
+						These variables are still referenced
+						<strong class="font-black text-gray-900">{pendingRemoval.occurrences}
+							{pendingRemoval.occurrences === 1 ? 'time' : 'times'}</strong>
+						across your template.
+					{/if}
+				</p>
+				<p class="mt-3 text-[12px] font-semibold leading-relaxed text-gray-600">
+					Deleting the declaration will <strong>also remove the <code class="font-mono text-gray-900">{'{{…}}'}</code> tokens from your HTML</strong>. This can't be undone through the editor toolbar — use <span class="font-mono">⌘Z</span> in the editor to recover.
+				</p>
+
+				<!-- Block-statement heads-up — each/if/with wrappers are NOT stripped. -->
+				<div class="mt-4 rounded-lg border-[2px] border-gray-900 bg-[#ffe066] px-3 py-2">
+					<p class="text-[11px] font-bold leading-relaxed text-gray-900">
+						<i class="fa fa-circle-info mr-1 text-[10px]"></i>
+						<span class="font-black uppercase tracking-widest">Block uses kept.</span>
+						Occurrences inside <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{#each}}'}</code> /
+						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{#if}}'}</code> stay — remove those by hand if needed.
+					</p>
+				</div>
+			</div>
+
+			<div class="flex items-center justify-end gap-2 border-t-[3px] border-gray-900 bg-gray-50 px-5 py-3">
+				<button
+					type="button"
+					on:click={cancelRemoval}
+					class="rounded-md border-[2px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+				>Cancel</button>
+				<button
+					type="button"
+					on:click={() => confirmRemoval(false)}
+					class="rounded-md border-[2px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+				>Keep tokens</button>
+				<button
+					type="button"
+					on:click={() => confirmRemoval(true)}
+					class="rounded-md border-[2px] border-gray-900 bg-[#ff6b6b] px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+				>Delete + strip tokens</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <!-- Command palette overlay -->
 {#if showCommandPalette}

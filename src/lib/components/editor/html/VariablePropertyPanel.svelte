@@ -29,12 +29,48 @@
 	const dispatch = createEventDispatcher();
 
 	const TYPES = [
-		{ value: 'text', label: 'Text' },
-		{ value: 'image', label: 'Image URL' },
-		{ value: 'color', label: 'Color' },
-		{ value: 'chart', label: 'Chart' },
-		{ value: 'table', label: 'Table' }
+		{ value: 'text', label: 'Text', short: 'Text' },
+		{ value: 'image', label: 'Image URL', short: 'Img' },
+		{ value: 'color', label: 'Color', short: 'Color' },
+		{ value: 'array', label: 'Array — use with {{#each}}', short: 'Array' },
+		{ value: 'object', label: 'Object — nested path access', short: 'Obj' },
+		{ value: 'chart', label: 'Chart', short: 'Chart' },
+		{ value: 'table', label: 'Table', short: 'Table' }
 	];
+
+	// JSON-typed variables need a parseable textarea. We keep the draft's
+	// canonical value as a parsed object/array but edit via raw text so the
+	// user sees the exact JSON they typed — including trailing commas that
+	// parse but don't round-trip through JSON.stringify.
+	let jsonDraftText = '';
+	let jsonError = null;
+
+	$: isJsonType = draft && (draft.type === 'array' || draft.type === 'object');
+
+	function onJsonInput(e) {
+		const next = e.target.value;
+		jsonDraftText = next;
+		if (!next.trim()) {
+			jsonError = null;
+			draft = { ...draft, defaultValue: draft.type === 'array' ? [] : {} };
+			return;
+		}
+		try {
+			const parsed = JSON.parse(next);
+			if (draft.type === 'array' && !Array.isArray(parsed)) {
+				jsonError = 'Expected a JSON array — wrap values in [ … ]';
+				return;
+			}
+			if (draft.type === 'object' && (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed))) {
+				jsonError = 'Expected a JSON object — wrap in { … }';
+				return;
+			}
+			jsonError = null;
+			draft = { ...draft, defaultValue: parsed };
+		} catch (err) {
+			jsonError = (err && err.message) || 'Invalid JSON';
+		}
+	}
 
 	// Local draft — apply on blur or explicit save to avoid flooding the
 	// parent (and the backend preview) with keystroke-level updates.
@@ -51,6 +87,49 @@
 	$: if (variable && variable !== lastSeededVariable) {
 		draft = { ...variable };
 		lastSeededVariable = variable;
+		// Reseed the JSON textarea when we're editing a new variable of a
+		// JSON-backed type. Stringify what we have so the user sees their
+		// canonical default in readable form.
+		if (draft.type === 'array' || draft.type === 'object') {
+			try {
+				jsonDraftText =
+					draft.defaultValue !== undefined && draft.defaultValue !== ''
+						? JSON.stringify(draft.defaultValue, null, 2)
+						: '';
+			} catch {
+				jsonDraftText = '';
+			}
+		} else {
+			jsonDraftText = '';
+		}
+		jsonError = null;
+	}
+
+	// When the user toggles type INTO array/object, pre-fill with a sane
+	// skeleton so they see a valid starting point instead of a blank box.
+	function onTypeChange(nextType) {
+		let nextDefault = draft.defaultValue;
+		if (nextType === 'array') {
+			nextDefault = Array.isArray(draft.defaultValue) ? draft.defaultValue : [];
+			jsonDraftText = jsonDraftText && jsonDraftText.trim()
+				? jsonDraftText
+				: '[\n  { "name": "First item" },\n  { "name": "Second item" }\n]';
+		} else if (nextType === 'object') {
+			nextDefault =
+				draft.defaultValue && typeof draft.defaultValue === 'object' && !Array.isArray(draft.defaultValue)
+					? draft.defaultValue
+					: {};
+			jsonDraftText = jsonDraftText && jsonDraftText.trim()
+				? jsonDraftText
+				: '{\n  "title": "Hello",\n  "subtitle": "World"\n}';
+		} else if (draft.type === 'array' || draft.type === 'object') {
+			// Leaving a JSON-backed type — reset default to empty string
+			// so the text input doesn't render "[object Object]".
+			nextDefault = '';
+			jsonDraftText = '';
+			jsonError = null;
+		}
+		draft = { ...draft, type: nextType, defaultValue: nextDefault };
 	}
 
 	// Name validation runs on every draft change; independent from the
@@ -125,6 +204,7 @@
 
 	function apply() {
 		if (nameError) return;
+		if (isJsonType && jsonError) return;
 		dispatch('apply', { patch: draft });
 	}
 
@@ -210,35 +290,62 @@
 			<div class="space-y-1">
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-900"
 					>Type</label>
-				<div class="grid grid-cols-5 gap-1.5">
+				<div class="grid grid-cols-7 gap-1">
 					{#each TYPES as t}
 						<button
 							type="button"
-							on:click={() => (draft = { ...draft, type: t.value })}
-							class="rounded-md border-[2px] border-gray-900 px-2 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all
+							on:click={() => onTypeChange(t.value)}
+							class="rounded-md border-[2px] border-gray-900 px-1.5 py-1.5 text-[9px] font-black uppercase tracking-widest transition-all
 								{draft.type === t.value
 									? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#1f2937]'
 									: 'bg-white text-gray-700 hover:shadow-[1px_1px_0_0_#1f2937]'}"
 							title={t.label}
 						>
-							{t.label.slice(0, 4)}
+							{t.short}
 						</button>
 					{/each}
 				</div>
+				{#if isJsonType}
+					<p class="pt-1 font-mono text-[10px] text-gray-500">
+						{#if draft.type === 'array'}
+							Use with <code class="text-[#c88a3b]">{'{{#each ' + draft.name + '}}…{{/each}}'}</code>
+						{:else}
+							Access fields via <code class="text-[#c88a3b]">{'{{' + draft.name + '.field}}'}</code>
+						{/if}
+					</p>
+				{/if}
 			</div>
 
-			<!-- Default value -->
+			<!-- Default value — JSON textarea for array/object, single-line input otherwise -->
 			<div class="space-y-1">
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-900"
-					>Default</label>
-				<input
-					type="text"
-					value={draft.defaultValue ?? ''}
-					on:input={(e) => (draft = { ...draft, defaultValue: e.target.value })}
-					placeholder="—"
-					autocomplete="off"
-					class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-xs text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
-				/>
+					>Default {#if isJsonType}<span class="text-gray-400">(JSON)</span>{/if}</label>
+				{#if isJsonType}
+					<textarea
+						value={jsonDraftText}
+						on:input={onJsonInput}
+						rows="6"
+						spellcheck="false"
+						placeholder={draft.type === 'array' ? '[\n  { "name": "…" }\n]' : '{\n  "field": "…"\n}'}
+						class="w-full resize-y rounded-lg border-[2px] {jsonError ? 'border-[#ff6b6b]' : 'border-gray-900'} bg-white px-3 py-2 font-mono text-[11px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+					></textarea>
+					{#if jsonError}
+						<p class="pt-0.5 text-[10px] font-bold text-[#c62828]">{jsonError}</p>
+					{:else}
+						<p class="pt-0.5 font-mono text-[10px] text-gray-500">
+							Parsed as live JSON — preview + API both consume this default.
+						</p>
+					{/if}
+				{:else}
+					<input
+						type="text"
+						value={draft.defaultValue ?? ''}
+						on:input={(e) => (draft = { ...draft, defaultValue: e.target.value })}
+						placeholder="—"
+						autocomplete="off"
+						class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-xs text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+					/>
+				{/if}
 			</div>
 
 			<!-- Description -->
@@ -341,7 +448,7 @@
 				<button
 					type="button"
 					on:click={apply}
-					disabled={!!nameError}
+					disabled={!!nameError || (isJsonType && !!jsonError)}
 					class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[2px_2px_0_0_#1f2937]"
 				>
 					<i class="fa fa-check mr-1 text-[10px]"></i>
