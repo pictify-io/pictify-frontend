@@ -29,6 +29,7 @@
 		highlightActiveLine,
 		tooltips
 	} from '@codemirror/view';
+	import { startCompletion } from '@codemirror/autocomplete';
 	import {
 		defaultKeymap,
 		indentWithTab,
@@ -175,6 +176,31 @@
 			}
 		};
 
+		// Explicit completion trigger — binds ⌃Space (Ctrl+Space) AND the
+		// `{` key so the popup opens both manually and the moment the user
+		// starts a handlebars token. CM6's built-in activateOnTyping only
+		// fires for word characters; `{` isn't one, so without this the
+		// menu waits until the user types the first letter INSIDE the
+		// braces — which feels like the autocomplete is broken.
+		const triggerCompletionKey = {
+			key: '{',
+			run: (view) => {
+				// Let the `{` land first, then ask the popup to open. If
+				// the caret is now after `{{` the source returns options;
+				// if it's after a single `{` the source returns null and
+				// CM6 keeps the popup closed — safe either way.
+				setTimeout(() => startCompletion(view), 0);
+				return false; // false = don't stop propagation; the char still lands
+			}
+		};
+		const manualCompletionKey = {
+			key: 'Ctrl-Space',
+			run: (view) => {
+				startCompletion(view);
+				return true;
+			}
+		};
+
 		recomputeCompileErrors(value);
 		emitVariableReferences(value);
 
@@ -226,9 +252,17 @@
 				// handlebarsAutocomplete installs completionKeymap internally
 				// (defaultKeymap: true, CM6's default) so Tab/Enter/Escape
 				// already hit the completion handler first when the popup
-				// is open. Host-level keymap just covers Save + indent +
-				// the defaults.
-				keymap.of([saveKey, indentWithTab, ...defaultKeymap, ...historyKeymap]),
+				// is open. Host-level keymap just covers Save, the `{`
+				// trigger for opening the popup, explicit Ctrl+Space, and
+				// the CM6 defaults.
+				keymap.of([
+					saveKey,
+					triggerCompletionKey,
+					manualCompletionKey,
+					indentWithTab,
+					...defaultKeymap,
+					...historyKeymap
+				]),
 				htmlLang(),
 				syntaxHighlighting(paperHighlight),
 				handlebarsHighlight(),
