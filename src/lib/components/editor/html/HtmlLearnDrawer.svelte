@@ -155,6 +155,12 @@
 							<p class="mt-2 text-[11px] font-bold text-gray-600">
 								Undeclared names auto-add as text variables when you save.
 							</p>
+							<div class="mt-3 rounded-lg border-[2px] border-gray-900 bg-[#ffe066] px-3 py-2">
+								<p class="text-[11px] font-bold leading-snug text-gray-900">
+									<i class="fa fa-hand-pointer mr-1 text-[10px]"></i>
+									<strong class="font-black">⌘-click</strong> a <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{token}}'}</code> to open the variable inspector. A plain click just places the caret for normal editing.
+								</p>
+							</div>
 						</section>
 
 						<section>

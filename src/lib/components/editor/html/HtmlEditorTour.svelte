@@ -44,7 +44,7 @@
 			targetId: 'tab-variables',
 			placement: 'bottom',
 			title: 'Variables auto-declare',
-			body: 'Type {{customerName}} in the editor and we add it here automatically. Click any token to edit its properties — type, default, required, raw HTML.',
+			body: 'Type {{customerName}} in the editor and we add it here automatically. ⌘-click any token to edit its properties — type, default, required, raw HTML. A plain click just places the caret.',
 			icon: 'fa-cube'
 		},
 		{
