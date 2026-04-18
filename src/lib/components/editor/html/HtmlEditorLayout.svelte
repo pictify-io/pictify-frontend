@@ -83,29 +83,49 @@
 			// immediately so the inspector has something to edit. Mirrors
 			// the server-side auto-add performed at save time. Clicking a
 			// token is an explicit "I want this" — lift any tombstone.
-			const next = {
+			//
+			// Infer the likely type from the surrounding context: a click
+			// inside `{{#each items}}` strongly implies `items` is an
+			// array, so pre-seed the type so the JSON default editor and
+			// shape-validator are correctly set on first open.
+			const inferredType = token.block === 'open' ? inferTypeForBlock(token) : 'text';
+			const seed = {
 				name: token.name,
-				type: 'text',
-				defaultValue: '',
+				type: inferredType,
+				defaultValue: inferredType === 'array' ? [] : inferredType === 'object' ? {} : '',
 				description: '',
 				validation: { required: false }
 			};
 			template = {
 				...template,
-				variableDefinitions: [...defs, next]
+				variableDefinitions: [...defs, seed]
 			};
 			idx = template.variableDefinitions.length - 1;
 			autoAdded = [...autoAdded, token.name];
 			if (explicitlyDeleted.has(token.name)) {
-				const next = new Set(explicitlyDeleted);
-				next.delete(token.name);
-				explicitlyDeleted = next;
+				const nextSet = new Set(explicitlyDeleted);
+				nextSet.delete(token.name);
+				explicitlyDeleted = nextSet;
 			}
 			markDirty();
 		}
 		editingIndex = idx;
 		editingVariable = template.variableDefinitions[idx];
 		editingAnchor = token.rect;
+	}
+
+	// Map a block-opener token (`{{#each items}}`, `{{#if user}}`,
+	// `{{#with obj}}`) to the sensible initial variable type. We don't
+	// try to be clever — this is a pure heuristic that users can
+	// override in the inspector.
+	function inferTypeForBlock(token) {
+		// The token resolver only exposes `block: 'open' | 'close' | null`,
+		// not the helper head, so we peek at the source text around the
+		// token's position. Template.html is the truth here.
+		const raw = (template.html || '').slice(token.from, token.to);
+		if (/\{\{#\s*each\b/.test(raw)) return 'array';
+		if (/\{\{#\s*with\b/.test(raw)) return 'object';
+		return 'text';
 	}
 
 	function closeTokenInspector() {
@@ -224,20 +244,64 @@
 		// add any undeclared ones locally so autocomplete stays useful while
 		// typing; the backend re-computes on save and returns the canonical
 		// list in `addedVariables`.
-		const current = new Set(
+		//
+		// We ALSO prune auto-added entries whose tokens no longer appear —
+		// otherwise typing `{{foo}}` and then renaming it to `{{foobar}}`
+		// would leave `foo` stranded in the panel forever. Pruning is
+		// scoped to the `autoAdded` set so user-created declarations and
+		// user-edited variables are never silently removed.
+		const referenced = new Set(e.detail.identifiers || []);
+		const currentNames = new Set(
 			(template.variableDefinitions || []).map((v) => v && v.name).filter(Boolean)
 		);
 		const additions = [];
-		for (const id of e.detail.identifiers || []) {
-			if (current.has(id)) continue;
+		for (const id of referenced) {
+			if (currentNames.has(id)) continue;
 			if (explicitlyDeleted.has(id)) continue; // tombstoned — respect the user's delete
 			additions.push({ name: id, type: 'text', defaultValue: '' });
 		}
+
+		// Compute prunable names: auto-added AND not referenced AND the
+		// user hasn't touched their row (no description, no custom type,
+		// no explicit defaultValue, no validation tweaks — we treat any
+		// customization as evidence the user adopted the entry).
+		const referencedOrKept = new Set([...referenced, ...additions.map((a) => a.name)]);
+		const kept = [];
+		const prunedNames = [];
+		for (const def of template.variableDefinitions || []) {
+			if (!def || !def.name) continue;
+			const isAutoAdded = autoAdded.includes(def.name);
+			const isOrphan = !referencedOrKept.has(def.name);
+			const isPristine =
+				(!def.type || def.type === 'text') &&
+				(def.defaultValue === undefined || def.defaultValue === '') &&
+				(!def.description || def.description === '') &&
+				!def.allowRawHtml &&
+				!(def.validation && def.validation.required);
+			if (isAutoAdded && isOrphan && isPristine) {
+				prunedNames.push(def.name);
+				continue;
+			}
+			kept.push(def);
+		}
+
+		const changed = additions.length > 0 || prunedNames.length > 0;
+		if (!changed) return;
+
+		template = {
+			...template,
+			variableDefinitions: [...kept, ...additions]
+		};
+		if (prunedNames.length > 0) {
+			const prunedSet = new Set(prunedNames);
+			autoAdded = autoAdded.filter((n) => !prunedSet.has(n));
+			// Drop any stale test values for pruned names so the preview
+			// payload doesn't carry keys the backend will reject.
+			const nextTest = { ...testValues };
+			for (const n of prunedNames) delete nextTest[n];
+			testValues = nextTest;
+		}
 		if (additions.length > 0) {
-			template = {
-				...template,
-				variableDefinitions: [...(template.variableDefinitions || []), ...additions]
-			};
 			autoAdded = [...autoAdded, ...additions.map((a) => a.name)];
 		}
 	}

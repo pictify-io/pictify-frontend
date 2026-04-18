@@ -79,26 +79,36 @@ export function resolveHandlebarsTokenAt(state, pos) {
 		const start = m.index
 		const end = start + m[0].length
 		if (col >= start && col <= end) {
-			// Trim whitespace + leading `#`/`/` block-helper markers so the
-			// extracted name is the variable identifier only, not the
-			// surrounding decorative syntax.
 			const rawInner = m[1].trim()
-			// First whitespace-delimited word, stripping `#if x`, `/each`,
-			// `titleCase name` etc. down to the first identifier.
-			const firstToken = rawInner.replace(/^[#/]/, '').split(/\s+/)[0]
+			const isOpener = rawInner.startsWith('#')
+			const isCloser = rawInner.startsWith('/')
+			// Split once the leading # / / marker is gone. The interesting
+			// NAME depends on the shape:
+			//   {{foo}}            → name = foo
+			//   {{titleCase foo}}  → name = titleCase (helper) + inline arg foo ignored
+			//   {{#each items}}    → name = items (the subject, not the helper)
+			//   {{#if user}}       → name = user
+			//   {{#with obj}}      → name = obj
+			//   {{/each}}          → name = each (closer — skip elsewhere)
+			const words = rawInner.replace(/^[#/]/, '').trim().split(/\s+/)
+			const helperHead = words[0] || ''
+			const BLOCK_HELPERS = ['each', 'if', 'unless', 'with']
+			let name
+			if (isOpener && BLOCK_HELPERS.includes(helperHead) && words[1]) {
+				// `{{#each items}}` → the variable the user reasons about IS
+				// the subject of the block, so surface that instead of the
+				// builtin helper name. Strip nested path accessors so
+				// `{{#each user.items}}` resolves to `user`.
+				name = words[1].split('.')[0]
+			} else {
+				name = helperHead
+			}
 			return {
-				name: firstToken,
+				name,
 				from: line.from + start,
 				to: line.from + end,
 				isRaw: m[0].startsWith('{{{'),
-				// The surrounding block helper (if the token starts with # or /),
-				// so callers can skip opening the inspector for `{{#if}}` forms.
-				block:
-					m[1].trimStart().startsWith('#')
-						? 'open'
-						: m[1].trimStart().startsWith('/')
-							? 'close'
-							: null
+				block: isOpener ? 'open' : isCloser ? 'close' : null
 			}
 		}
 	}
@@ -127,10 +137,12 @@ export const handlebarsTokenClick = ({ onTokenClick }) =>
 
 			const token = resolveHandlebarsTokenAt(view.state, pos)
 			if (!token || !token.name) return false
-			// Block helpers (`{{#if x}}`, `{{/each}}`) aren't variables per
-			// se — skip opening the inspector for those so users can still
-			// position their caret inside block syntax for normal editing.
-			if (token.block) return false
+			// Block closers (`{{/each}}`, `{{/if}}`) carry the name for AST
+			// balance but aren't useful inspector targets — skip them.
+			// Openers like `{{#each items}}` DO reference a real variable
+			// (often an array/object) so we let them through; the host can
+			// decide how to render the inspector for that shape.
+			if (token.block === 'close') return false
 
 			const coords = view.coordsAtPos(token.from)
 			if (!coords) return false
