@@ -106,31 +106,79 @@
 			const ids = new Set();
 			const BUILTINS = new Set(['if', 'unless', 'each', 'with', 'lookup', 'log', 'this', 'else']);
 
+			// Add a path-expression head to the identifier set, honouring
+			// the current block scope + builtin list.
+			const tryAddPath = (pathNode, scope) => {
+				if (!pathNode || pathNode.type !== 'PathExpression') return;
+				if (pathNode.data) return; // @root / @index / @first — not user vars
+				// `{{this.field}}` and `{{../x}}` reference the block's
+				// own scope — Handlebars strips `this` from `parts` but
+				// preserves it in `original`. We must detect these and
+				// skip registering the next part (`field`) as a root
+				// variable.
+				const original = pathNode.original || '';
+				if (original.startsWith('this.') || original === 'this') return;
+				if (original.startsWith('../') || pathNode.depth > 0) return;
+				const head = pathNode.parts && pathNode.parts[0];
+				if (!head) return;
+				if (head === 'this') return;
+				if (BUILTINS.has(head)) return;
+				if (scope.has(head)) return;
+				ids.add(head);
+			};
+
+			// When a node has params or hash pairs, its `path` is a HELPER
+			// call (`{{titleCase x}}`), not a variable. We must NOT add the
+			// helper name to the identifier set. We do, however, walk into
+			// params + hash values so nested variables are captured.
+			const walkInvocation = (node, scope) => {
+				const helperName = node.path && node.path.parts && node.path.parts[0];
+				// Unknown helper names passed a param list are almost always
+				// still helper-call intent (the user typo'd a helper name);
+				// builtins + safelisted helpers are always helpers. We treat
+				// any path with params/hash as a helper callsite and skip
+				// registering the head as a variable.
+				const isHelperCall =
+					(node.params && node.params.length > 0) ||
+					(node.hash && node.hash.pairs && node.hash.pairs.length > 0);
+				if (!isHelperCall) {
+					// Pure {{name}} or {{obj.prop}} — treat path as a variable.
+					tryAddPath(node.path, scope);
+				}
+				if (node.params) node.params.forEach((p) => walk(p, scope));
+				if (node.hash && node.hash.pairs) {
+					node.hash.pairs.forEach((h) => walk(h.value, scope));
+				}
+			};
+
 			const walk = (node, scope) => {
 				if (!node) return;
 				const currentScope = scope || new Set();
 
-				// Identifier head: collect unless it's a data-ref (@root/@index),
-				// a builtin, a block-local, or `this`.
-				if (node.type === 'PathExpression' && !node.data && node.parts && node.parts[0]) {
-					const head = node.parts[0];
-					if (!BUILTINS.has(head) && !currentScope.has(head) && head !== 'this') {
-						ids.add(head);
-					}
+				// MustacheStatement `{{…}}` and SubExpression `(…)` both
+				// carry a path + optional params/hash. Route them through
+				// the helper-aware walker so we don't mistake helper names
+				// for variables.
+				if (node.type === 'MustacheStatement' || node.type === 'SubExpression') {
+					walkInvocation(node, currentScope);
+					return;
 				}
 
-				// BlockStatement introduces a new scope with `as |x|` block params.
+				// BlockStatement `{{#each items as |item|}}` — subject lives
+				// in params at the outer scope, body runs under the
+				// block-param scope.
 				if (node.type === 'BlockStatement') {
 					const nextScope = new Set(currentScope);
 					if (node.program && Array.isArray(node.program.blockParams)) {
 						for (const p of node.program.blockParams) nextScope.add(p);
 					}
-					// Block subject + hash live at outer scope.
+					// Block heads are always helper calls (if/each/with/unless
+					// or a custom block helper) — never register the head as
+					// a variable. The SUBJECT lives in params[0].
 					if (node.params) node.params.forEach((p) => walk(p, currentScope));
 					if (node.hash && node.hash.pairs) {
 						node.hash.pairs.forEach((h) => walk(h.value, currentScope));
 					}
-					// Body runs under the block's scope.
 					if (node.program && node.program.body) {
 						node.program.body.forEach((s) => walk(s, nextScope));
 					}
@@ -140,14 +188,28 @@
 					return;
 				}
 
+				// PartialStatement `{{> partial x}}` — treat like an
+				// invocation so the partial name doesn't become a var.
+				if (node.type === 'PartialStatement' || node.type === 'PartialBlockStatement') {
+					if (node.params) node.params.forEach((p) => walk(p, currentScope));
+					if (node.hash && node.hash.pairs) {
+						node.hash.pairs.forEach((h) => walk(h.value, currentScope));
+					}
+					return;
+				}
+
+				// Raw PathExpression reached outside an invocation path —
+				// this is a variable reference (e.g., inside a SubExpression's
+				// params list).
+				if (node.type === 'PathExpression') {
+					tryAddPath(node, currentScope);
+					return;
+				}
+
+				// Container nodes: Program, top-level AST root.
 				if (node.body) node.body.forEach((s) => walk(s, currentScope));
 				if (node.program) walk(node.program, currentScope);
 				if (node.inverse) walk(node.inverse, currentScope);
-				if (node.params) node.params.forEach((p) => walk(p, currentScope));
-				if (node.path) walk(node.path, currentScope);
-				if (node.hash && node.hash.pairs) {
-					node.hash.pairs.forEach((h) => walk(h.value, currentScope));
-				}
 			};
 			walk(ast, new Set());
 			dispatch('referencesChange', { identifiers: Array.from(ids) });
