@@ -36,6 +36,47 @@ import { htmlLanguage } from '@codemirror/lang-html'
 // the first `}}` so it can't run past an unclosed expression.
 const TOKEN_RE = /\{\{\{?([\s\S]+?)\}?\}\}/g
 
+// Names the click resolver must treat as helper/builtin heads — i.e.
+// when these appear first inside `{{ … }}` and there's a positional
+// arg after them, the arg is the variable, not the head itself. Kept
+// in lockstep with service/template-helpers.js HELPERS on the backend
+// + Handlebars built-in block helpers.
+const BUILTIN_OR_HELPER = new Set([
+	// Handlebars built-ins
+	'if', 'unless', 'each', 'with', 'lookup', 'log',
+	// Pictify safelisted helpers (see service/template-helpers.js HELPERS)
+	'length', 'isEmpty', 'isNotEmpty', 'isDefined', 'isUndefined',
+	'isArray', 'isString', 'isNumber', 'isBoolean', 'isObject',
+	'contains', 'first', 'last', 'indexOf', 'join', 'slice',
+	'lowercase', 'uppercase', 'capitalize', 'titleCase',
+	'trim', 'truncate', 'padStart', 'padEnd', 'replace', 'split',
+	'startsWith', 'endsWith',
+	'round', 'floor', 'ceil', 'abs', 'min', 'max', 'sum', 'average',
+	'currency', 'number', 'percent', 'date', 'time',
+	'default', 'coalesce',
+	'json', 'parseJson'
+])
+
+// Return the first token from `args` that looks like a variable
+// reference — not a quoted literal ("USD"), not a number (42), not
+// a subexpression opener ((foo …)), and not a hash pair (key=value).
+// Strips nested path accessors so `user.price` resolves to `user`.
+function firstVariableArg(args) {
+	for (const raw of args || []) {
+		if (!raw) continue
+		const t = raw.trim()
+		if (!t) continue
+		if (t.startsWith('"') || t.startsWith("'")) continue // string literal
+		if (/^-?\d/.test(t)) continue // numeric literal
+		if (t.startsWith('(')) continue // subexpression — caller should resolve deeper
+		if (t.includes('=')) continue // hash pair
+		const head = t.split('.')[0].replace(/[^\w$]/g, '')
+		if (!head) continue
+		return head
+	}
+	return null
+}
+
 const tokenMark = Decoration.mark({ class: 'cm-hbs-token' })
 const tokenMarkRaw = Decoration.mark({ class: 'cm-hbs-token-raw' })
 
@@ -87,26 +128,41 @@ export function resolveHandlebarsTokenAt(state, pos) {
 			const rawInner = m[1].trim()
 			const isOpener = rawInner.startsWith('#')
 			const isCloser = rawInner.startsWith('/')
-			// Split once the leading # / / marker is gone. The interesting
-			// NAME depends on the shape:
-			//   {{foo}}            → name = foo
-			//   {{titleCase foo}}  → name = titleCase (helper) + inline arg foo ignored
-			//   {{#each items}}    → name = items (the subject, not the helper)
-			//   {{#if user}}       → name = user
-			//   {{#with obj}}      → name = obj
-			//   {{/each}}          → name = each (closer — skip elsewhere)
+			// Split once the leading # or / marker is gone. The NAME
+			// we surface depends on shape:
+			//   {{foo}}              → name = foo   (plain var)
+			//   {{titleCase foo}}    → name = foo   (helper + arg; inspect the ARG)
+			//   {{percent x}}        → name = x
+			//   {{#each items}}      → name = items (block subject)
+			//   {{#if user}}         → name = user
+			//   {{#with obj}}        → name = obj
+			//   {{/each}}            → name = each  (closer — caller skips this)
+			//   {{default x "fall"}} → name = x     (first positional, skip literals)
 			const words = rawInner.replace(/^[#/]/, '').trim().split(/\s+/)
 			const helperHead = words[0] || ''
-			const BLOCK_HELPERS = ['each', 'if', 'unless', 'with']
 			let name
-			if (isOpener && BLOCK_HELPERS.includes(helperHead) && words[1]) {
-				// `{{#each items}}` → the variable the user reasons about IS
-				// the subject of the block, so surface that instead of the
-				// builtin helper name. Strip nested path accessors so
-				// `{{#each user.items}}` resolves to `user`.
-				name = words[1].split('.')[0]
-			} else {
+			if (isCloser) {
+				// Block closer — no variable here. Caller short-circuits
+				// on `block === 'close'`, so this name is never surfaced.
 				name = helperHead
+			} else if (isOpener) {
+				// Block opener. Any block form calls a helper (`if`,
+				// `each`, `with`, `unless`, or a custom block helper);
+				// the user-visible variable is the FIRST non-literal
+				// positional argument, not the block helper itself.
+				name = firstVariableArg(words.slice(1)) || helperHead
+			} else if (BUILTIN_OR_HELPER.has(helperHead) && words.length > 1) {
+				// Inline helper call like `{{titleCase x}}` or
+				// `{{percent trendValue}}` — the variable the user is
+				// reasoning about is the first positional arg, not the
+				// helper. Strip nested path accessors so `{{currency
+				// user.price}}` resolves to `user`.
+				name = firstVariableArg(words.slice(1)) || helperHead
+			} else {
+				// Plain variable reference like `{{title}}` or
+				// `{{user.name}}` — use the head directly (dropping
+				// nested path).
+				name = helperHead.split('.')[0]
 			}
 			return {
 				name,
