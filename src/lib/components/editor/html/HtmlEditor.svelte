@@ -246,6 +246,36 @@
 			changes: { from: 0, to: view.state.doc.length, insert: value }
 		});
 	}
+
+	/**
+	 * Insert a snippet body at the current caret position. Supports a `$0`
+	 * marker that signals where the caret should end up post-insert. This
+	 * is called from the parent (HtmlEditorLayout) when a user clicks a
+	 * snippet in the library — we do the CodeMirror thread dance here so
+	 * callers don't have to know about EditorView internals.
+	 */
+	export function insertAtCursor(body) {
+		if (!view || !body) return;
+		const state = view.state;
+		const { from, to } = state.selection.main;
+
+		// Extract caret placement from the snippet body.
+		const caretMarkerIdx = body.indexOf('$0');
+		const cleanBody = caretMarkerIdx >= 0 ? body.replace('$0', '') : body;
+		const caretOffset = caretMarkerIdx >= 0 ? caretMarkerIdx : cleanBody.length;
+
+		view.dispatch({
+			changes: { from, to, insert: cleanBody },
+			selection: { anchor: from + caretOffset },
+			scrollIntoView: true
+		});
+		view.focus();
+	}
+
+	/** Focus the editor programmatically (used when closing side panels). */
+	export function focus() {
+		if (view) view.focus();
+	}
 </script>
 
 <!--
