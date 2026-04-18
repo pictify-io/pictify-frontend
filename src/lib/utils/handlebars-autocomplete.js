@@ -221,50 +221,51 @@ const BLOCK_HELPERS = [
  * @param {() => string[]} deps.getVariables      current declared variable names
  * @param {() => string[]} deps.getHelpers        safelisted helper names from backend
  */
+/**
+ * The actual completion source. Extracted so both `autocompletion.override`
+ * and the explicit-trigger path (`startCompletion`) call the same function
+ * and can't fall out of sync.
+ *
+ * Returns null when the caret isn't inside a `{{…}}` opening — letting
+ * CodeMirror fall through to other completion sources (HTML tags, etc.).
+ */
+const buildHandlebarsCompletionSource =
+	({ getVariables, getHelpers }) =>
+	(ctx) => {
+		// Match: two opening braces, optional whitespace, optional block
+		// marker, then any word chars the user has started typing. We also
+		// accept the caret being positioned immediately after `{{` with an
+		// empty partial — without that, the popup would only show once the
+		// user typed a letter.
+		const before = ctx.matchBefore(/\{\{\s*[#/]?\w*$/)
+		if (!before) return null
+		const prefixMatch = /^\{\{\s*[#/]?/.exec(before.text)
+		const prefixLen = prefixMatch ? prefixMatch[0].length : 2
+		const partialStart = before.from + prefixLen
+		const vars = getVariables() || []
+		const helpers = getHelpers() || []
+		const options = [
+			...vars.map((name) => ({
+				label: name,
+				type: 'variable',
+				detail: 'variable',
+				boost: 10
+			})),
+			...helpers.map((name) => ({
+				label: name,
+				type: 'function',
+				detail: 'helper',
+				boost: 5
+			})),
+			...BLOCK_HELPERS
+		]
+		return { from: partialStart, options, validFor: /^\w*$/ }
+	}
+
 export const handlebarsAutocomplete = ({ getVariables, getHelpers }) =>
 	autocompletion({
-		// We install completionKeymap ourselves at the host level so Tab +
-		// Enter accept suggestions before falling through to the indent /
-		// default keymap. Turning defaultKeymap OFF here avoids a duplicate
-		// registration that can otherwise swallow key events in unexpected
-		// order.
-		defaultKeymap: false,
 		activateOnTyping: true,
-		override: [
-			(ctx) => {
-				// Trigger when the last characters before the caret look like
-				// a handlebars token opening. The `[#/]?` allows `{{#e` and
-				// `{{/e` (block helpers) to match — the old word-only regex
-				// silently dropped those.
-				const before = ctx.matchBefore(/\{\{\s*[#/]?\w*$/)
-				if (!before) return null
-				// Calculate where the user's partial name starts: after the
-				// `{{` opener plus any whitespace / block marker.
-				const prefixMatch = /^\{\{\s*[#/]?/.exec(before.text)
-				const prefixLen = prefixMatch ? prefixMatch[0].length : 2
-				const partialStart = before.from + prefixLen
-				const options = [
-					...getVariables().map((name) => ({
-						label: name,
-						type: 'variable',
-						detail: 'variable',
-						boost: 10
-					})),
-					...getHelpers().map((name) => ({
-						label: name,
-						type: 'function',
-						detail: 'helper',
-						boost: 5
-					})),
-					...BLOCK_HELPERS
-				]
-				return {
-					from: partialStart,
-					options,
-					validFor: /^\w*$/
-				}
-			}
-		]
+		override: [buildHandlebarsCompletionSource({ getVariables, getHelpers })]
 	})
 
 // --- Linter: consume externally-supplied compile errors ---
@@ -318,21 +319,23 @@ export const handlebarsLintGutter = () => lintGutter()
 export const handlebarsAutocompleteTriggers = () =>
 	EditorView.updateListener.of((v) => {
 		if (!v.docChanged) return
-		// Check whether any change inserted the `{{` sequence ending at
-		// the new caret position — if so, open the completion popup.
-		v.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
-			if (!inserted || inserted.length === 0) return
-			const insertedText = inserted.toString()
-			if (!insertedText.includes('{')) return
-			const caret = v.state.selection.main.head
-			if (caret < 2) return
-			const before = v.state.doc.sliceString(caret - 2, caret)
-			if (before === '{{') {
-				// Schedule in a microtask so we don't re-enter the
-				// transaction stack that's still settling.
-				queueMicrotask(() => startCompletion(v.view))
-			}
-		})
+		// Open the completion popup whenever the caret is immediately
+		// after `{{` — whether that's because the user just typed the
+		// second brace, pasted the pair, or the pair was auto-closed to
+		// `{{|}}` with the caret in between. CodeMirror's built-in
+		// activateOnTyping only fires on word characters, which is why
+		// the popup otherwise waits for the first letter inside the
+		// braces — feels like the autocomplete is "not working."
+		const caret = v.state.selection.main.head
+		if (caret < 2) return
+		const before = v.state.doc.sliceString(caret - 2, caret)
+		if (before !== '{{') return
+		// Don't re-trigger inside an already-filled token like `{{foo}}`
+		// when the caret lands between `{{` and `f`; only trigger when
+		// the next char is empty, whitespace, or the matching closer.
+		const after = v.state.doc.sliceString(caret, Math.min(caret + 1, v.state.doc.length))
+		if (after && !/[\s}]/.test(after)) return
+		queueMicrotask(() => startCompletion(v.view))
 	})
 
 export const handlebarsCompletionKeymap = completionKeymap

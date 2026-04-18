@@ -22,7 +22,13 @@
 	 */
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorState, Compartment } from '@codemirror/state';
-	import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
+	import {
+		EditorView,
+		keymap,
+		lineNumbers,
+		highlightActiveLine,
+		tooltips
+	} from '@codemirror/view';
 	import {
 		defaultKeymap,
 		indentWithTab,
@@ -44,7 +50,6 @@
 		handlebarsLinter,
 		handlebarsLintGutter,
 		handlebarsAutocompleteTriggers,
-		handlebarsCompletionKeymap,
 		handlebarsTokenClick
 	} from '../../../utils/handlebars-autocomplete';
 
@@ -209,19 +214,21 @@
 		const state = EditorState.create({
 			doc: value,
 			extensions: [
+				// Render tooltips (autocomplete, lint hover, etc.) into the
+				// document body so the editor shell's `overflow: hidden` —
+				// needed for the neobrutalist rounded frame — can't clip
+				// them. Fixed positioning then keeps them anchored to the
+				// caret as the user scrolls.
+				tooltips({ parent: document.body, position: 'fixed' }),
 				lineNumbers(),
 				highlightActiveLine(),
 				history(),
-				// Completion keymap (Tab/Enter accept, Escape close) MUST come
-				// before defaultKeymap so Tab hits the completion handler
-				// before it falls through to the indent command.
-				keymap.of([
-					saveKey,
-					...handlebarsCompletionKeymap,
-					indentWithTab,
-					...defaultKeymap,
-					...historyKeymap
-				]),
+				// handlebarsAutocomplete installs completionKeymap internally
+				// (defaultKeymap: true, CM6's default) so Tab/Enter/Escape
+				// already hit the completion handler first when the popup
+				// is open. Host-level keymap just covers Save + indent +
+				// the defaults.
+				keymap.of([saveKey, indentWithTab, ...defaultKeymap, ...historyKeymap]),
 				htmlLang(),
 				syntaxHighlighting(paperHighlight),
 				handlebarsHighlight(),
@@ -273,6 +280,8 @@
 					'.cm-cursor': {
 						borderLeft: '2px solid #1f2937'
 					},
+					// NB: tooltip styles are further mirrored in the
+					// `tooltipTheme` baseTheme below. Keep both in sync.
 					'.cm-tooltip': {
 						border: '3px solid #1f2937',
 						backgroundColor: '#FFFDF8',
@@ -410,5 +419,50 @@
 	}
 	.cm-html-editor :global(.cm-editor.cm-focused) {
 		outline: none;
+	}
+	/* Autocomplete + lint tooltips render into document.body (see
+	   `tooltips({ parent: document.body })` in setup) to escape the
+	   editor shell's overflow:hidden. That means our scoped styles
+	   above don't reach them — we rebrand at the global level here. */
+	:global(.cm-tooltip) {
+		border: 3px solid #1f2937 !important;
+		background-color: #fffdf8 !important;
+		box-shadow: 3px 3px 0 0 #1f2937 !important;
+		font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace !important;
+		border-radius: 6px;
+		z-index: 200;
+	}
+	:global(.cm-tooltip-autocomplete) {
+		max-height: 260px;
+		overflow: auto;
+	}
+	:global(.cm-tooltip-autocomplete > ul) {
+		max-height: 260px;
+		padding: 4px 0;
+		margin: 0;
+		font-size: 12px;
+	}
+	:global(.cm-tooltip-autocomplete > ul > li) {
+		padding: 4px 10px;
+		color: #1f2937;
+	}
+	:global(.cm-tooltip-autocomplete > ul > li[aria-selected]) {
+		background-color: #ffc480 !important;
+		color: #1f2937 !important;
+		font-weight: 700;
+	}
+	:global(.cm-completionLabel) {
+		color: #1f2937;
+	}
+	:global(.cm-completionDetail) {
+		margin-left: 10px;
+		color: #9ca3af;
+		font-style: normal;
+		font-size: 10px;
+	}
+	:global(.cm-completionIcon) {
+		width: 12px;
+		padding-right: 6px;
+		opacity: 0.6;
 	}
 </style>
