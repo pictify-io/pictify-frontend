@@ -116,13 +116,10 @@
 	function removeAtOpenIndex() {
 		if (openIndex === null) return;
 		const target = variableDefinitions[openIndex];
-		variableDefinitions = variableDefinitions.filter((_, i) => i !== openIndex);
-		if (target?.name) {
-			const next = { ...testValues };
-			delete next[target.name];
-			testValues = next;
-		}
-		emitChange();
+		if (!target?.name) return;
+		// Defer the actual removal to the parent — it owns template.html and
+		// can confirm + strip tokens before mutating variableDefinitions.
+		dispatch('requestRemove', { names: [target.name] });
 		closePanel();
 	}
 
@@ -186,11 +183,8 @@
 
 	function bulkDelete() {
 		if (selectedNames.size === 0) return;
-		variableDefinitions = variableDefinitions.filter((v) => !selectedNames.has(v.name));
-		const next = { ...testValues };
-		for (const n of selectedNames) delete next[n];
-		testValues = next;
-		emitChange();
+		// Parent handles the confirm + HTML strip; we just announce intent.
+		dispatch('requestRemove', { names: Array.from(selectedNames) });
 		exitSelectMode();
 		closePanel();
 	}
@@ -423,16 +417,36 @@
 							{/if}
 						</div>
 
-						<!-- Inline test value (stays on row — it's the most-edited field) -->
+						<!-- Inline test value (stays on row — it's the most-edited field).
+						     Array/object types edit their sample data in the floating
+						     inspector instead, so we show a read-only preview chip here. -->
 						{#if !selectMode}
-							<input
-								type="text"
-								value={testValues[v.name] || ''}
-								on:click|stopPropagation
-								on:input={(e) => setTestValue(v.name, e.target.value)}
-								placeholder={v.defaultValue || 'test value'}
-								class="hidden w-40 flex-shrink-0 rounded-md border-[1.5px] border-gray-300 bg-gray-50 px-2 py-1 font-mono text-[11px] text-gray-700 focus:-translate-y-0.5 focus:border-gray-900 focus:bg-white focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none sm:inline-block"
-							/>
+							{#if v.type === 'array' || v.type === 'object'}
+								<span
+									class="hidden w-40 flex-shrink-0 items-center gap-1.5 overflow-hidden rounded-md border-[1.5px] border-gray-300 bg-gray-50 px-2 py-1 font-mono text-[11px] text-gray-500 sm:inline-flex"
+									title="Edit {v.type} data in the inspector"
+								>
+									<i class="fa {v.type === 'array' ? 'fa-brackets-square' : 'fa-braces'} text-[9px]"></i>
+									<span class="truncate">
+										{#if v.type === 'array' && Array.isArray(v.defaultValue)}
+											{v.defaultValue.length} item{v.defaultValue.length === 1 ? '' : 's'}
+										{:else if v.type === 'object' && v.defaultValue && typeof v.defaultValue === 'object'}
+											{Object.keys(v.defaultValue).length} field{Object.keys(v.defaultValue).length === 1 ? '' : 's'}
+										{:else}
+											empty
+										{/if}
+									</span>
+								</span>
+							{:else}
+								<input
+									type="text"
+									value={testValues[v.name] || ''}
+									on:click|stopPropagation
+									on:input={(e) => setTestValue(v.name, e.target.value)}
+									placeholder={v.defaultValue || 'test value'}
+									class="hidden w-40 flex-shrink-0 rounded-md border-[1.5px] border-gray-300 bg-gray-50 px-2 py-1 font-mono text-[11px] text-gray-700 focus:-translate-y-0.5 focus:border-gray-900 focus:bg-white focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none sm:inline-block"
+								/>
+							{/if}
 						{/if}
 
 						<!-- Chevron affordance -->

@@ -73,6 +73,32 @@ export const sampleFor = async (variableDef) => {
 			return faker.image.avatar()
 		case 'color':
 			return faker.color.rgb()
+		case 'array':
+			// Prefer the user's default if it's an array — randomize is
+			// usually "give me realistic placeholder data", and overwriting
+			// their typed-out fixtures would destroy intent. Fall back to a
+			// three-item skeleton if they haven't set one.
+			if (Array.isArray(variableDef.defaultValue) && variableDef.defaultValue.length > 0) {
+				return variableDef.defaultValue
+			}
+			return [
+				{ name: faker.person.firstName(), value: faker.number.int({ min: 1, max: 100 }) },
+				{ name: faker.person.firstName(), value: faker.number.int({ min: 1, max: 100 }) },
+				{ name: faker.person.firstName(), value: faker.number.int({ min: 1, max: 100 }) }
+			]
+		case 'object':
+			if (
+				variableDef.defaultValue &&
+				typeof variableDef.defaultValue === 'object' &&
+				!Array.isArray(variableDef.defaultValue)
+			) {
+				return variableDef.defaultValue
+			}
+			return {
+				title: faker.lorem.words(3),
+				subtitle: faker.lorem.sentence(),
+				count: faker.number.int({ min: 1, max: 100 })
+			}
 		default:
 			return faker.lorem.words(3)
 	}

@@ -193,6 +193,15 @@
 								<code class="ml-1 rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{@last}}'}</code>
 								are handy for styling rows.
 							</p>
+							<div class="mt-3 rounded-lg border-[2px] border-gray-900 bg-[#ffe066] px-3 py-2">
+								<p class="text-[11px] font-bold leading-snug text-gray-900">
+									<i class="fa fa-cube mr-1 text-[10px]"></i>
+									Set <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">items</code> to type
+									<strong class="font-black">Array</strong> in the Variables panel so the API accepts JSON payloads. Use
+									<strong class="font-black">Object</strong> for nested
+									<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{user.name}}'}</code> access.
+								</p>
+							</div>
 						</section>
 					</div>
 
