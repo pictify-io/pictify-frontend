@@ -45,6 +45,25 @@
 
 	const dispatch = createEventDispatcher();
 
+	// Known helper names from service/template-helpers.js HELPERS. A
+	// pristine declaration whose name matches one of these is almost
+	// certainly detritus from the old AST walker (which mistakenly
+	// treated helper calls like `{{titleCase x}}` as variables named
+	// `titleCase`) — the prune pass in handleReferences uses this to
+	// clean up once the fixed walker confirms they're unreferenced.
+	const KNOWN_HELPER_NAMES = new Set([
+		'length', 'isEmpty', 'isNotEmpty', 'isDefined', 'isUndefined',
+		'isArray', 'isString', 'isNumber', 'isBoolean', 'isObject',
+		'contains', 'first', 'last', 'indexOf', 'join', 'slice',
+		'lowercase', 'uppercase', 'capitalize', 'titleCase',
+		'trim', 'truncate', 'padStart', 'padEnd', 'replace', 'split',
+		'startsWith', 'endsWith',
+		'round', 'floor', 'ceil', 'abs', 'min', 'max', 'sum', 'average',
+		'currency', 'number', 'percent', 'date', 'time',
+		'default', 'coalesce',
+		'json', 'parseJson'
+	]);
+
 	let activeTab = 'editor';
 	let isDirty = false;
 	let testValues = {};
@@ -262,16 +281,23 @@
 			additions.push({ name: id, type: 'text', defaultValue: '' });
 		}
 
-		// Compute prunable names: auto-added AND not referenced AND the
-		// user hasn't touched their row (no description, no custom type,
-		// no explicit defaultValue, no validation tweaks — we treat any
-		// customization as evidence the user adopted the entry).
+		// Compute prunable names. A declaration is prunable when:
+		//   1. It's orphaned (no longer referenced by the template), AND
+		//   2. It's pristine (no user customization), AND
+		//   3. EITHER it was auto-added in this session (tracked via
+		//      `autoAdded`) OR its name matches a known helper. The
+		//      helper-name check cleans up stale rows from earlier
+		//      templates saved while the AST walker mistakenly added
+		//      helper calls like `titleCase` or `uppercase` as
+		//      variables — those names can never be legitimate user
+		//      vars because the engine would reject them at render.
 		const referencedOrKept = new Set([...referenced, ...additions.map((a) => a.name)]);
 		const kept = [];
 		const prunedNames = [];
 		for (const def of template.variableDefinitions || []) {
 			if (!def || !def.name) continue;
 			const isAutoAdded = autoAdded.includes(def.name);
+			const isHelperName = KNOWN_HELPER_NAMES.has(def.name);
 			const isOrphan = !referencedOrKept.has(def.name);
 			const isPristine =
 				(!def.type || def.type === 'text') &&
@@ -279,7 +305,7 @@
 				(!def.description || def.description === '') &&
 				!def.allowRawHtml &&
 				!(def.validation && def.validation.required);
-			if (isAutoAdded && isOrphan && isPristine) {
+			if (isOrphan && isPristine && (isAutoAdded || isHelperName)) {
 				prunedNames.push(def.name);
 				continue;
 			}
