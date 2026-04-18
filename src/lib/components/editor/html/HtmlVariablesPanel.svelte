@@ -1,12 +1,18 @@
 <script>
 	/**
-	 * HtmlVariablesPanel — table-like editor for variableDefinitions.
+	 * HtmlVariablesPanel — card-based editor for variableDefinitions.
 	 *
-	 * Per design spec: name (mono) · type · default · required · allowRawHtml.
-	 * Auto-added variables show a yellow "AUTO" pill until the next user
-	 * interaction. Randomize cycles ephemeral `testValues` (NOT defaults).
+	 * Dialect matches the dashboard's loud-brutalist language used by
+	 * src/lib/components/dashboard/Template.svelte and the fabric
+	 * editor's TopBar. Variables render as rounded-lg bordered CARDS
+	 * (not a sharp table) so the overall surface feels like a sibling
+	 * of the dashboard's template list + filter chips.
+	 *
+	 * AUTO-added variables show a red pill (matches the NEW badge on
+	 * the engine picker modal). Randomize cycles ephemeral testValues
+	 * only — persisted defaults are never overwritten implicitly.
 	 */
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { sampleAll } from '../../../utils/sample-variable-generator';
 
 	/** @type {Array} — variableDefinitions persisted on the template */
@@ -18,7 +24,13 @@
 
 	const dispatch = createEventDispatcher();
 
-	const TYPES = ['text', 'image', 'color', 'chart', 'table'];
+	const TYPES = [
+		{ value: 'text', label: 'Text' },
+		{ value: 'image', label: 'Image' },
+		{ value: 'color', label: 'Color' },
+		{ value: 'chart', label: 'Chart' },
+		{ value: 'table', label: 'Table' }
+	];
 
 	function emitChange() {
 		dispatch('change', { variableDefinitions, testValues });
@@ -56,7 +68,6 @@
 		emitChange();
 	}
 
-	// Clear the "auto-added" pills on any user interaction with the panel.
 	function ackAutoAdded() {
 		if (autoAdded.length === 0) return;
 		autoAdded = [];
@@ -64,109 +75,146 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-brand-bg" on:click={ackAutoAdded} role="presentation">
-	<!-- Header -->
+<div class="flex h-full w-full flex-col bg-[#FFFDF8]" on:click={ackAutoAdded} role="presentation">
+	<!-- Header strip — accent bg matching the engine picker modal + fabric TopBar's
+	     yellow pills. Right side carries the two primary actions. -->
 	<div
-		class="flex items-center justify-between border-b-3 border-gray-800 px-6 py-4"
+		class="flex flex-col gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
 	>
-		<h2 class="font-heading text-xl text-gray-900">Variables</h2>
+		<div>
+			<h2 class="text-lg font-black uppercase tracking-widest text-gray-900">
+				Variables
+			</h2>
+			<p class="mt-0.5 text-[11px] font-bold text-gray-800">
+				Declare the values your template accepts. Auto-added on save.
+			</p>
+		</div>
+
 		<div class="flex items-center gap-2">
 			<button
 				type="button"
-				class="border-3 border-gray-800 bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider shadow-brutal-sm transition-transform duration-150 hover:-translate-y-[1px] hover:shadow-brutal-md focus-brutal"
 				on:click={randomize}
+				class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
 			>
+				<i class="fa fa-dice text-[11px]"></i>
 				Randomize
 			</button>
 			<button
 				type="button"
-				class="border-3 border-gray-800 bg-brand-accent px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider shadow-brutal-sm transition-transform duration-150 hover:-translate-y-[1px] hover:shadow-brutal-md focus-brutal"
 				on:click={addVar}
+				class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
 			>
-				+ Add variable
+				<i class="fa fa-plus text-[11px]"></i>
+				Add
 			</button>
 		</div>
 	</div>
 
-	<!-- Table -->
-	<div class="flex-1 overflow-auto">
+	<!-- Cards list -->
+	<div class="flex-1 overflow-auto p-6">
 		{#if variableDefinitions.length === 0}
 			<div
-				class="m-6 border-3 border-dashed border-gray-400 p-8 text-center text-sm text-gray-500"
+				class="mx-auto max-w-lg rounded-2xl border-[3px] border-dashed border-gray-300 bg-white p-10 text-center shadow-[6px_6px_0_0_#1f2937]/10"
 			>
-				<p class="font-mono">No variables declared yet.</p>
-				<p class="mt-2">
-					Type <code class="bg-gray-100 px-1">{'{{'}anything{'}}'}</code> in the editor —
-					variables auto-add on save.
+				<div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-[2px_2px_0_0_#1f2937]">
+					<i class="fa fa-cube text-gray-900"></i>
+				</div>
+				<p class="text-sm font-black uppercase tracking-wider text-gray-900">No variables yet</p>
+				<p class="mt-2 text-xs font-bold text-gray-600">
+					Type
+					<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-[#ffc480]"
+						>{'{{'}anything{'}}'}</code>
+					in the editor — we'll auto-declare on save.
 				</p>
 			</div>
 		{:else}
-			<table class="w-full border-separate border-spacing-0">
-				<thead class="sticky top-0 z-10 bg-brand-bg">
-					<tr class="border-b-2 border-gray-800">
-						<th
-							class="border-b-2 border-gray-800 px-4 py-3 text-left font-mono text-[11px] font-bold uppercase tracking-wider text-gray-700"
-						>Name</th>
-						<th
-							class="border-b-2 border-gray-800 px-4 py-3 text-left font-mono text-[11px] font-bold uppercase tracking-wider text-gray-700"
-						>Type</th>
-						<th
-							class="border-b-2 border-gray-800 px-4 py-3 text-left font-mono text-[11px] font-bold uppercase tracking-wider text-gray-700"
-						>Default</th>
-						<th
-							class="border-b-2 border-gray-800 px-4 py-3 text-left font-mono text-[11px] font-bold uppercase tracking-wider text-gray-700"
-						>Required</th>
-						<th
-							class="border-b-2 border-gray-800 px-4 py-3 text-left font-mono text-[11px] font-bold uppercase tracking-wider text-gray-700"
-						>Raw HTML</th>
-						<th
-							class="border-b-2 border-gray-800 px-4 py-3 text-left font-mono text-[11px] font-bold uppercase tracking-wider text-gray-700"
-						>Test value</th>
-						<th class="border-b-2 border-gray-800"></th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each variableDefinitions as v, i (i)}
-						<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
-							<td class="px-4 py-2">
+			<div class="space-y-3">
+				{#each variableDefinitions as v, i (i)}
+					<div
+						class="group rounded-xl border-[3px] border-gray-900 bg-white p-4 shadow-[3px_3px_0_0_#1f2937] transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_#1f2937]"
+					>
+						<!-- Top row: name + AUTO pill + remove -->
+						<div class="flex items-start gap-3">
+							<div class="flex-1 space-y-1">
 								<div class="flex items-center gap-2">
-									<input
-										type="text"
-										value={v.name}
-										on:input={(e) => updateVar(i, { name: e.target.value })}
-										class="w-full border-2 border-gray-800 bg-white px-2 py-1 font-mono text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-									/>
+									<label class="text-[10px] font-black uppercase tracking-widest text-gray-500"
+										>Name</label>
 									{#if autoAdded.includes(v.name)}
 										<span
-											class="border-2 border-gray-800 bg-brand-accent px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-gray-900"
+											class="inline-flex items-center gap-1 rounded border-[2px] border-gray-900 bg-[#ff6b6b] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937]"
 										>
+											<i class="fa fa-bolt text-[8px]"></i>
 											Auto
 										</span>
 									{/if}
 								</div>
-							</td>
-							<td class="px-4 py-2">
+								<input
+									type="text"
+									value={v.name}
+									on:input={(e) => updateVar(i, { name: e.target.value })}
+									class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-sm font-bold text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+								/>
+							</div>
+
+							<button
+								type="button"
+								on:click={() => removeVar(i)}
+								aria-label="Remove variable {v.name}"
+								class="mt-5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border-[2px] border-gray-900 bg-white text-gray-500 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#ff6b6b] hover:text-white hover:shadow-none"
+							>
+								<i class="fa fa-trash text-xs"></i>
+							</button>
+						</div>
+
+						<!-- Second row: type + default + test -->
+						<div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+							<div class="space-y-1">
+								<label class="text-[10px] font-black uppercase tracking-widest text-gray-500"
+									>Type</label>
 								<select
 									value={v.type || 'text'}
 									on:change={(e) => updateVar(i, { type: e.target.value })}
-									class="border-2 border-gray-800 bg-white px-2 py-1 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-accent"
+									class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 text-xs font-black uppercase tracking-wider text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 								>
 									{#each TYPES as t}
-										<option value={t}>{t}</option>
+										<option value={t.value}>{t.label}</option>
 									{/each}
 								</select>
-							</td>
-							<td class="px-4 py-2">
+							</div>
+
+							<div class="space-y-1">
+								<label class="text-[10px] font-black uppercase tracking-widest text-gray-500"
+									>Default</label>
 								<input
 									type="text"
 									value={v.defaultValue || ''}
-									on:input={(e) =>
-										updateVar(i, { defaultValue: e.target.value })}
-									class="w-full border-2 border-gray-800 bg-white px-2 py-1 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-accent"
+									on:input={(e) => updateVar(i, { defaultValue: e.target.value })}
+									class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-xs text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 									placeholder="—"
 								/>
-							</td>
-							<td class="px-4 py-2">
+							</div>
+
+							<div class="space-y-1">
+								<label class="text-[10px] font-black uppercase tracking-widest text-gray-500"
+									>Test value</label>
+								<input
+									type="text"
+									value={testValues[v.name] || ''}
+									on:input={(e) => {
+										testValues = { ...testValues, [v.name]: e.target.value };
+										emitChange();
+									}}
+									class="w-full rounded-lg border-[2px] border-gray-300 bg-gray-50 px-3 py-2 font-mono text-xs text-gray-700 transition-all focus:-translate-y-0.5 focus:border-gray-900 focus:bg-white focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+									placeholder="sample"
+								/>
+							</div>
+						</div>
+
+						<!-- Third row: toggles -->
+						<div class="mt-3 flex flex-wrap items-center gap-3">
+							<label
+								class="inline-flex cursor-pointer items-center gap-2 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 transition-all hover:shadow-[2px_2px_0_0_#1f2937]"
+							>
 								<input
 									type="checkbox"
 									checked={v.validation?.required || false}
@@ -177,55 +225,30 @@
 												required: e.target.checked
 											}
 										})}
-									class="h-4 w-4 border-2 border-gray-800 accent-brand-accent"
+									class="h-3.5 w-3.5 accent-[#ffc480]"
 								/>
-							</td>
-							<td class="px-4 py-2">
-								<label
-									class="inline-flex items-center gap-1.5"
-									title="Allow triple-brace {'{{{raw}}}'} rendering for this variable. DANGEROUS — user values become raw HTML."
-								>
-									<input
-										type="checkbox"
-										checked={v.allowRawHtml || false}
-										on:change={(e) =>
-											updateVar(i, { allowRawHtml: e.target.checked })}
-										class="h-4 w-4 border-2 border-gray-800 accent-brand-danger"
-									/>
-									{#if v.allowRawHtml}
-										<span
-											class="font-mono text-[10px] font-bold uppercase text-brand-danger"
-											>danger</span
-										>
-									{/if}
-								</label>
-							</td>
-							<td class="px-4 py-2">
+								Required
+							</label>
+
+							<label
+								class="inline-flex cursor-pointer items-center gap-2 rounded-lg border-[2px] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all
+									{v.allowRawHtml
+										? 'border-gray-900 bg-[#ff6b6b] text-white shadow-[2px_2px_0_0_#1f2937]'
+										: 'border-gray-900 bg-white text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+								title="Triple-brace raw HTML rendering — dangerous with untrusted values."
+							>
 								<input
-									type="text"
-									value={testValues[v.name] || ''}
-									on:input={(e) => {
-										testValues = { ...testValues, [v.name]: e.target.value };
-										emitChange();
-									}}
-									class="w-full border-2 border-gray-300 bg-white px-2 py-1 font-mono text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-									placeholder="sample"
+									type="checkbox"
+									checked={v.allowRawHtml || false}
+									on:change={(e) => updateVar(i, { allowRawHtml: e.target.checked })}
+									class="h-3.5 w-3.5 accent-white"
 								/>
-							</td>
-							<td class="px-4 py-2 text-right">
-								<button
-									type="button"
-									on:click={() => removeVar(i)}
-									class="font-mono text-xs text-gray-400 hover:text-brand-danger"
-									aria-label="Remove variable {v.name}"
-								>
-									×
-								</button>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+								{v.allowRawHtml ? '⚠ Raw HTML' : 'Raw HTML'}
+							</label>
+						</div>
+					</div>
+				{/each}
+			</div>
 		{/if}
 	</div>
 </div>

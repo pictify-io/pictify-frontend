@@ -2,13 +2,12 @@
 	/**
 	 * HtmlApiSnippetPanel — language-tabbed API snippet viewer.
 	 *
-	 * Uses the LAST-SAVED template uid and the CURRENT sample variable
-	 * values (lesson from commit 0fe1c32 — snippet must reflect what the
-	 * user is actually testing with, not stale defaults).
+	 * Dialect matches the dashboard: rounded-xl frames, press-in hover,
+	 * font-black uppercase labels. Code block itself keeps its dark
+	 * gray-900 fill + JetBrains Mono so it reads as "code" at a glance.
 	 *
-	 * v1 ships curl + JS fetch. Additional languages live behind the
-	 * SUPPORTED_LANGUAGES export in api-snippet-generator — add entries
-	 * there without touching this component.
+	 * Uses last-SAVED template uid + current sample variable values
+	 * (lesson from commit 0fe1c32).
 	 */
 	import { onDestroy } from 'svelte';
 	import {
@@ -26,11 +25,7 @@
 	let copyTimer = null;
 
 	$: snippet = templateUid
-		? generateSnippet(activeLanguage, {
-				uid: templateUid,
-				variables,
-				format
-			})
+		? generateSnippet(activeLanguage, { uid: templateUid, variables, format })
 		: '# Save the template first to generate a snippet with its uid.';
 
 	async function copyToClipboard() {
@@ -40,7 +35,7 @@
 			if (copyTimer) clearTimeout(copyTimer);
 			copyTimer = setTimeout(() => (copied = false), 600);
 		} catch {
-			/* noop — some browsers block clipboard without user gesture */
+			/* noop — clipboard may be blocked */
 		}
 	}
 
@@ -49,58 +44,97 @@
 	});
 </script>
 
-<div class="flex h-full w-full flex-col bg-brand-bg">
+<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+	<!-- Accent header strip -->
 	<div
-		class="flex items-center justify-between border-b-3 border-gray-800 px-6 py-4"
+		class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4"
 	>
-		<h2 class="font-heading text-xl text-gray-900">API</h2>
-		{#if isDirty}
+		<div>
+			<h2 class="text-lg font-black uppercase tracking-widest text-gray-900">API</h2>
+			<p class="mt-0.5 text-[11px] font-bold text-gray-800">
+				Render this template from your code.
+			</p>
+		</div>
+		{#if isDirty && templateUid}
 			<span
-				class="border-2 border-gray-800 bg-brand-danger/20 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-gray-900"
-				>Unsaved · snippet reflects last save</span
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 			>
+				<span class="relative flex h-2 w-2">
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff6b6b] opacity-75"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full border-[1.5px] border-gray-900 bg-[#ff5252]"></span>
+				</span>
+				Unsaved — snippet is stale
+			</span>
 		{/if}
 	</div>
 
-	<!-- Language tabs -->
-	<div class="flex gap-0 border-b-3 border-gray-800 bg-brand-bg">
-		{#each SUPPORTED_LANGUAGES as lang}
-			<button
-				type="button"
-				class="border-r-2 border-gray-800 px-5 py-3 font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-150 hover:bg-brand-accent/30 focus-brutal"
-				class:bg-brand-accent={activeLanguage === lang.key}
-				class:bg-white={activeLanguage !== lang.key}
-				on:click={() => (activeLanguage = lang.key)}
+	<div class="flex-1 overflow-auto p-6">
+		<div class="mx-auto max-w-3xl space-y-4">
+			<!-- Language tabs — same dialect as the main editor tabs -->
+			<div class="flex items-center gap-2">
+				{#each SUPPORTED_LANGUAGES as lang}
+					<button
+						type="button"
+						class="flex items-center gap-2 rounded-lg border-[2px] border-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all
+							{activeLanguage === lang.key
+								? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
+								: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
+						on:click={() => (activeLanguage = lang.key)}
+					>
+						{lang.label}
+					</button>
+				{/each}
+
+				<div class="flex-1"></div>
+
+				<button
+					type="button"
+					on:click={copyToClipboard}
+					class="flex items-center gap-2 rounded-lg border-[3px] border-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+						{copied ? 'bg-[#4ade80] text-gray-900' : 'bg-white text-gray-900'}"
+				>
+					<i class="fa {copied ? 'fa-check' : 'fa-copy'} text-[11px]"></i>
+					{copied ? 'Copied!' : 'Copy'}
+				</button>
+			</div>
+
+			<!-- Snippet body -->
+			<div
+				class="overflow-hidden rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
 			>
-				{lang.label}
-			</button>
-		{/each}
-	</div>
+				<div
+					class="flex items-center justify-between border-b-[2px] border-gray-800 bg-gray-800 px-4 py-2"
+				>
+					<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+						{activeLanguage === 'curl' ? 'bash' : 'javascript'}
+					</span>
+					<span class="text-[10px] font-mono text-gray-500">
+						POST /image
+					</span>
+				</div>
+				<pre
+					class="m-0 max-h-[50vh] overflow-auto bg-gray-900 p-5 font-mono text-[13px] leading-relaxed text-gray-100"
+				><code>{snippet}</code></pre>
+			</div>
 
-	<!-- Snippet body -->
-	<div class="relative flex-1 overflow-auto">
-		<button
-			type="button"
-			on:click={copyToClipboard}
-			class="absolute right-4 top-4 z-10 border-3 border-gray-800 px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider shadow-brutal-sm transition-transform duration-150 hover:-translate-y-[1px] focus-brutal"
-			class:bg-brand-accent={copied}
-			class:bg-white={!copied}
-		>
-			{copied ? 'Copied' : 'Copy'}
-		</button>
-		<pre
-			class="m-0 h-full overflow-auto border-3 border-gray-800 bg-gray-900 p-6 font-mono text-[13px] leading-relaxed text-gray-100"
-		><code>{snippet}</code></pre>
-	</div>
-
-	<!-- Footer hint -->
-	<div
-		class="flex items-center justify-between border-t-3 border-gray-800 bg-brand-bg px-6 py-3 font-mono text-[11px] text-gray-600"
-	>
-		<span>Replace <code class="text-brand-danger">YOUR_API_TOKEN</code> with a real API token</span>
-		<a
-			href="/dashboard/api-token"
-			class="font-semibold underline underline-offset-4 hover:text-gray-900"
-		>Manage tokens →</a>
+			<!-- Footer hint card -->
+			<div
+				class="flex items-start gap-3 rounded-xl border-[2px] border-dashed border-gray-300 bg-white p-4"
+			>
+				<i class="fa fa-key mt-0.5 text-sm text-[#ffc480]"></i>
+				<div class="flex-1 text-[11px] font-bold text-gray-600">
+					Replace
+					<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-[#ff6b6b]"
+						>YOUR_API_TOKEN</code>
+					with a real token.
+				</div>
+				<a
+					href="/dashboard/api-token"
+					class="rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+				>
+					Manage tokens →
+				</a>
+			</div>
+		</div>
 	</div>
 </div>

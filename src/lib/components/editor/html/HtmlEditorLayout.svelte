@@ -158,24 +158,28 @@
 
 <!-- Responsive banner (visible < 1024px) -->
 <div
-	class="flex items-center justify-center gap-3 border-b-3 border-gray-800 bg-brand-accent px-6 py-3 text-sm font-semibold text-gray-900 lg:hidden"
+	class="flex items-center justify-center gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-3 text-sm font-black uppercase tracking-wider text-gray-900 lg:hidden"
 >
-	<span>Editor works best on desktop.</span>
-	<code class="rounded-sm bg-gray-900 px-2 py-0.5 font-mono text-xs text-gray-100"
+	<span>Desktop-only editor</span>
+	<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-0.5 font-mono text-[11px] text-[#ffc480]"
 		>npx pictify</code
 	>
 </div>
 
 <!-- Below 768px: hide editor entirely -->
 <div
-	class="flex h-screen w-full flex-col bg-brand-bg md:block"
+	class="flex h-screen w-full flex-col bg-[#FFFDF8] md:block"
 >
 	<div class="md:hidden flex h-full items-center justify-center p-8 text-center">
-		<div>
-			<p class="font-heading text-2xl">The HTML editor needs a wider screen.</p>
-			<p class="mt-3 text-sm text-gray-700">
-				Use <code class="font-mono bg-gray-100 px-1">npx pictify</code> from your dev
-				machine, or switch to a tablet/laptop.
+		<div class="max-w-sm rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-[8px_8px_0_0_#1f2937]">
+			<div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937]">
+				<i class="fa fa-desktop text-xl text-gray-900"></i>
+			</div>
+			<p class="text-lg font-black uppercase tracking-wider text-gray-900">Wider screen needed</p>
+			<p class="mt-3 text-sm font-bold text-gray-600">
+				The HTML editor works best on desktop. Use
+				<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-0.5 font-mono text-[11px] text-[#ffc480]">npx pictify</code>
+				from your dev machine.
 			</p>
 		</div>
 	</div>
@@ -190,49 +194,57 @@
 			on:share={() => dispatch('share')}
 		/>
 
-		<div class="flex h-[calc(100vh-56px)] w-full">
+		<div class="flex h-[calc(100vh-64px)] w-full">
 			<!-- LEFT pane (56%) -->
 			<section
-				class="flex h-full w-[56%] flex-col border-r-3 border-gray-800"
+				class="flex h-full w-[56%] flex-col border-r-[3px] border-gray-900"
 			>
-				<!-- Tab bar -->
+				<!-- Tab bar — rounded-lg pill buttons matching the dashboard filter
+				     chips (see Template.svelte:285). Active tab uses a colored
+				     shadow and brand-accent fill, identical to how the dashboard
+				     marks the selected format filter. -->
 				<nav
-					class="flex items-stretch border-b-3 border-gray-800 bg-brand-bg"
+					class="flex items-center gap-2 border-b-[3px] border-gray-900 bg-[#FFFDF8] px-4 py-3"
 					role="tablist"
 					aria-label="Editor panels"
 				>
 					{#each [
-						{ k: 'editor', label: 'Editor' },
-						{ k: 'variables', label: 'Variables' },
-						{ k: 'api', label: 'API' },
-						{ k: 'settings', label: 'Settings' }
+						{ k: 'editor', label: 'Editor', icon: 'fa-code' },
+						{ k: 'variables', label: 'Variables', icon: 'fa-cube' },
+						{ k: 'api', label: 'API', icon: 'fa-plug' },
+						{ k: 'settings', label: 'Settings', icon: 'fa-sliders' }
 					] as tab}
 						<button
 							type="button"
 							role="tab"
 							aria-selected={activeTab === tab.k}
-							class="border-r-2 border-gray-800 px-5 py-3 font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-150 focus-brutal"
-							class:bg-brand-accent={activeTab === tab.k}
-							class:bg-white={activeTab !== tab.k}
-							class:text-gray-900={activeTab === tab.k}
+							class="flex items-center gap-2 rounded-lg border-[2px] border-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all
+								{activeTab === tab.k
+									? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
+									: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 							on:click={() => (activeTab = tab.k)}
 						>
+							<i class="fa {tab.icon} text-[10px]"></i>
 							{tab.label}
 						</button>
 					{/each}
-					<div class="flex-1 border-b-0 bg-brand-bg"></div>
-					<!--
-						Secondary save affordance alongside Cmd/Ctrl+S. Intentionally
-						low-contrast so it doesn't compete with the Publish CTA in
-						the topbar.
-					-->
+
+					<div class="flex-1"></div>
+
+					<!-- Save button — secondary to the Publish CTA in the topbar.
+					     White chip with accent-colored shadow that only appears
+					     when dirty so the affordance is self-evident. -->
 					<button
 						type="button"
 						on:click={save}
 						disabled={isSaving || !isDirty}
-						class="border-l-2 border-gray-800 bg-brand-bg px-5 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-gray-700 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40 focus-brutal"
+						class="flex items-center gap-2 rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all disabled:cursor-not-allowed disabled:opacity-40
+							{isDirty
+								? 'text-gray-900 shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+								: 'text-gray-500'}"
 					>
-						{isSaving ? 'Saving…' : 'Save (⌘S)'}
+						<i class="fa fa-floppy-disk text-[10px]"></i>
+						{isSaving ? 'Saving…' : 'Save ⌘S'}
 					</button>
 				</nav>
 
