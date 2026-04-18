@@ -42,6 +42,8 @@
 
 	let streamingIndex = -1;
 	let pendingApplyHtml = null;
+	/** @type {Array<{type:string, message:string}>} */
+	let pendingWarnings = [];
 
 	async function scrollToBottom() {
 		await tick();
@@ -53,6 +55,7 @@
 		active = null;
 		turns = [];
 		pendingApplyHtml = null;
+		pendingWarnings = [];
 		streamingIndex = -1;
 	}
 
@@ -68,6 +71,7 @@
 		];
 		streamingIndex = turns.length - 1;
 		pendingApplyHtml = null;
+		pendingWarnings = [];
 		scrollToBottom();
 
 		const messages = turns
@@ -102,6 +106,7 @@
 				turns = next;
 				streamingIndex = -1;
 				pendingApplyHtml = result.html || null;
+				pendingWarnings = Array.isArray(result.warnings) ? result.warnings : [];
 			},
 			onError: (err) => {
 				active = null;
@@ -142,6 +147,7 @@
 		if (!pendingApplyHtml) return;
 		dispatch('apply', { html: pendingApplyHtml });
 		pendingApplyHtml = null;
+		pendingWarnings = [];
 	}
 
 	function onKey(e) {
@@ -275,28 +281,49 @@
 
 	<!-- Apply banner — only appears after a successful generation. Stays visible until the user applies or skips. -->
 	{#if pendingApplyHtml && !active}
-		<div class="border-t-[3px] border-gray-900 bg-[#ffe066] px-6 py-3">
+		<div class="border-t-[3px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-[#ff6b6b]' : 'bg-[#ffe066]'} px-6 py-3">
 			<div class="mb-2 flex items-center justify-between gap-2">
-				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900">Ready to apply</p>
-				<span class="font-mono text-[10px] text-gray-700">
+				<p class="text-[11px] font-black uppercase tracking-widest {pendingWarnings.length > 0 ? 'text-white' : 'text-gray-900'}">
+					{pendingWarnings.length > 0 ? 'Ready — with warnings' : 'Ready to apply'}
+				</p>
+				<span class="font-mono text-[10px] {pendingWarnings.length > 0 ? 'text-white/90' : 'text-gray-700'}">
 					{pendingApplyHtml.split('\n').length} lines
 				</span>
 			</div>
-			<p class="mb-3 text-[11px] font-semibold leading-relaxed text-gray-700">
-				This replaces the editor buffer. Use <span class="font-mono">⌘Z</span> in the editor to undo.
-			</p>
+
+			{#if pendingWarnings.length > 0}
+				<!-- Unknown-helper (and similar) warnings come from a
+				     post-generation pass — the backend already tried a
+				     corrective retry, so anything here is persistent. -->
+				<div class="mb-3 space-y-1.5 rounded-md border-[2px] border-gray-900 bg-white/95 p-2.5">
+					{#each pendingWarnings as w}
+						<p class="text-[11px] font-bold leading-snug text-gray-900">
+							<i class="fa fa-triangle-exclamation mr-1 text-[10px] text-[#c62828]"></i>
+							{w.message}
+						</p>
+					{/each}
+					<p class="text-[10px] font-semibold text-gray-600">
+						You can still apply and fix by hand, or ask the copilot to retry.
+					</p>
+				</div>
+			{:else}
+				<p class="mb-3 text-[11px] font-semibold leading-relaxed text-gray-700">
+					This replaces the editor buffer. Use <span class="font-mono">⌘Z</span> in the editor to undo.
+				</p>
+			{/if}
+
 			<div class="flex items-center gap-2">
 				<button
 					type="button"
 					on:click={applyPending}
-					class="flex-1 rounded-md border-[2px] border-gray-900 bg-[#4ade80] px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="flex-1 rounded-md border-[2px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-white text-gray-900' : 'bg-[#4ade80] text-gray-900'} px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					<i class="fa fa-check mr-1 text-[10px]"></i>
-					Apply to editor
+					{pendingWarnings.length > 0 ? 'Apply anyway' : 'Apply to editor'}
 				</button>
 				<button
 					type="button"
-					on:click={() => (pendingApplyHtml = null)}
+					on:click={() => { pendingApplyHtml = null; pendingWarnings = []; }}
 					class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					Skip

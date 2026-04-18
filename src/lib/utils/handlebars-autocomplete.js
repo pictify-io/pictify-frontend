@@ -216,22 +216,32 @@ const BLOCK_HELPERS = [
 ]
 
 // Fallback helper list used when the host hasn't wired up the backend's
-// SAFELISTED_HELPERS yet. Keeps the autocomplete menu useful on fresh
-// templates that have no declared variables and before any API call.
-// Mirrors the most-common entries in service/template-helpers.js HELPERS
-// on the backend — the server re-validates on render so surfacing a
-// helper that was later removed is a loud error, not a silent failure.
+// SAFELISTED_HELPERS yet. Must stay in lockstep with service/template-
+// helpers.js HELPERS on the backend — surfacing a name that isn't
+// registered there causes a HELPER_NOT_ALLOWED error at render time.
+// Comparison/arithmetic helpers (eq, lt, multiply, etc.) are NOT on
+// the safelist — Handlebars out of the box has no such helpers, and
+// we haven't added them because the engine encourages pre-computing
+// booleans/numbers in the variable payload instead.
 const DEFAULT_HELPERS = [
-	'eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'and', 'or', 'not',
-	'length', 'isEmpty', 'isNotEmpty', 'isDefined',
-	'contains', 'first', 'last', 'join', 'slice',
-	'lowercase', 'uppercase', 'capitalize', 'titleCase', 'trim', 'truncate',
-	'replace', 'split', 'padStart', 'padEnd',
-	'add', 'subtract', 'multiply', 'divide', 'mod', 'round', 'floor', 'ceil',
-	'currency', 'percentage', 'number',
-	'date', 'dateAdd', 'now',
-	'default', 'ternary',
-	'encodeURIComponent', 'toJSON'
+	// length / boolean
+	'length', 'isEmpty', 'isNotEmpty', 'isDefined', 'isUndefined',
+	// type checks
+	'isArray', 'isString', 'isNumber', 'isBoolean', 'isObject',
+	// array
+	'contains', 'first', 'last', 'indexOf', 'join', 'slice',
+	// string
+	'lowercase', 'uppercase', 'capitalize', 'titleCase',
+	'trim', 'truncate', 'padStart', 'padEnd', 'replace', 'split',
+	'startsWith', 'endsWith',
+	// number
+	'round', 'floor', 'ceil', 'abs', 'min', 'max', 'sum', 'average',
+	// formatting
+	'currency', 'number', 'percent', 'date', 'time',
+	// conditional
+	'default', 'coalesce',
+	// json
+	'json', 'parseJson'
 ]
 
 /**
