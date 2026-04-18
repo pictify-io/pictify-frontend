@@ -28,6 +28,7 @@ import {
 	completionKeymap
 } from '@codemirror/autocomplete'
 import { linter, lintGutter } from '@codemirror/lint'
+import { htmlLanguage } from '@codemirror/lang-html'
 
 // --- Decoration: highlight {{...}} / {{{...}}} ranges inside HTML text ---
 
@@ -257,16 +258,6 @@ const buildHandlebarsCompletionSource =
 		// empty partial — without that, the popup would only show once the
 		// user typed a letter.
 		const before = ctx.matchBefore(/\{\{\s*[#/]?\w*$/)
-		// Visible debug: leave a trail on window so we can tell whether
-		// the source is even being invoked in the browser. Remove once
-		// the autocomplete regression is confirmed closed.
-		if (typeof window !== 'undefined') {
-			window.__hbsAutocomplete = window.__hbsAutocomplete || { calls: 0, lastMatch: null }
-			window.__hbsAutocomplete.calls += 1
-			window.__hbsAutocomplete.lastMatch = before
-				? { from: before.from, text: before.text, explicit: ctx.explicit }
-				: { missed: true, pos: ctx.pos, explicit: ctx.explicit }
-		}
 		if (!before) return null
 		const prefixMatch = /^\{\{\s*[#/]?/.exec(before.text)
 		const prefixLen = prefixMatch ? prefixMatch[0].length : 2
@@ -291,17 +282,26 @@ const buildHandlebarsCompletionSource =
 			})),
 			...BLOCK_HELPERS
 		]
-		if (typeof window !== 'undefined') {
-			window.__hbsAutocomplete.lastOptions = options.length
-		}
 		return { from: partialStart, options, validFor: /^\w*$/ }
 	}
 
-export const handlebarsAutocomplete = ({ getVariables, getHelpers }) =>
-	autocompletion({
-		activateOnTyping: true,
-		override: [buildHandlebarsCompletionSource({ getVariables, getHelpers })]
+/**
+ * Build the autocomplete wiring for the Handlebars editor.
+ *
+ * We register our completion source via `htmlLanguage.data.of(...)` instead
+ * of `autocompletion({ override: [...] })`. The `override` path replaces
+ * ALL completion sources — including lang-html's native tag + attribute
+ * completer — so users would lose `<div` → `<div>…</div>` suggestions.
+ * Registering as language data instead is additive: CM6 asks every
+ * registered source and merges their results, so the user gets HTML
+ * completions outside `{{}}` AND handlebars completions inside them.
+ */
+export const handlebarsAutocomplete = ({ getVariables, getHelpers }) => [
+	autocompletion({ activateOnTyping: true }),
+	htmlLanguage.data.of({
+		autocomplete: buildHandlebarsCompletionSource({ getVariables, getHelpers })
 	})
+]
 
 // --- Linter: consume externally-supplied compile errors ---
 
