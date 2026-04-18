@@ -19,6 +19,8 @@
 	import HtmlVariablesPanel from './HtmlVariablesPanel.svelte';
 	import HtmlSettingsPanel from './HtmlSettingsPanel.svelte';
 	import HtmlApiSnippetPanel from './HtmlApiSnippetPanel.svelte';
+	import HtmlSnippetLibrary from './HtmlSnippetLibrary.svelte';
+	import HtmlCommandPalette from './HtmlCommandPalette.svelte';
 
 	export let template = {
 		uid: null,
@@ -42,6 +44,22 @@
 	let testValues = {};
 	let autoAdded = [];
 	let savedTemplate = { ...template };
+
+	// Editor side-panels: snippet library + command palette overlay.
+	let showSnippetLibrary = false;
+	let showCommandPalette = false;
+	let htmlEditorRef;
+
+	function insertSnippet(event) {
+		const body = event.detail?.snippet?.body;
+		if (!body) return;
+		activeTab = 'editor';
+		// Give the Editor component a tick to be the active panel, then insert.
+		Promise.resolve().then(() => {
+			htmlEditorRef?.insertAtCursor(body);
+		});
+		markDirty();
+	}
 
 	// Derived format + dimensions exposed to preview.
 	$: previewFormat = template.outputFormat === 'pdf' ? 'pdf' : 'png';
@@ -145,14 +163,33 @@
 
 	// Warn on navigation with unsaved work.
 	onMount(() => {
-		const handler = (e) => {
+		const beforeunload = (e) => {
 			if (isDirty) {
 				e.preventDefault();
 				e.returnValue = '';
 			}
 		};
-		window.addEventListener('beforeunload', handler);
-		return () => window.removeEventListener('beforeunload', handler);
+		const keydown = (e) => {
+			const mod = e.metaKey || e.ctrlKey;
+			// ⌘K — open command palette (standard across Vercel/Linear/Figma).
+			if (mod && e.key === 'k') {
+				e.preventDefault();
+				showCommandPalette = true;
+				return;
+			}
+			// ⌘/ — toggle snippet library.
+			if (mod && e.key === '/') {
+				e.preventDefault();
+				showSnippetLibrary = !showSnippetLibrary;
+				return;
+			}
+		};
+		window.addEventListener('beforeunload', beforeunload);
+		window.addEventListener('keydown', keydown);
+		return () => {
+			window.removeEventListener('beforeunload', beforeunload);
+			window.removeEventListener('keydown', keydown);
+		};
 	});
 </script>
 
@@ -231,6 +268,32 @@
 
 					<div class="flex-1"></div>
 
+					<!-- Snippet library toggle (⌘/) -->
+					<button
+						type="button"
+						on:click={() => (showSnippetLibrary = !showSnippetLibrary)}
+						aria-pressed={showSnippetLibrary}
+						title="Insert snippet (⌘/)"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest transition-all
+							{showSnippetLibrary
+								? 'bg-[#ffe066] text-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+								: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
+					>
+						<i class="fa fa-wand-magic-sparkles text-[10px]"></i>
+						Snippets
+					</button>
+
+					<!-- Command palette trigger (⌘K) -->
+					<button
+						type="button"
+						on:click={() => (showCommandPalette = true)}
+						title="Command palette (⌘K)"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-700 transition-all hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]"
+					>
+						<i class="fa fa-terminal text-[10px]"></i>
+						⌘K
+					</button>
+
 					<!-- Save button — secondary to the Publish CTA in the topbar.
 					     White chip with accent-colored shadow that only appears
 					     when dirty so the affordance is self-evident. -->
@@ -253,17 +316,31 @@
 				     CodeMirror state. -->
 				<div class="relative flex-1 overflow-hidden">
 					<div
-						class="absolute inset-0"
+						class="absolute inset-0 flex"
 						class:hidden={activeTab !== 'editor'}
 					>
-						<HtmlEditor
-							bind:value={template.html}
-							variableDefinitions={template.variableDefinitions}
-							{safelistedHelpers}
-							on:change={handleHtmlChange}
-							on:referencesChange={handleReferences}
-							on:save={handleEditorSave}
-						/>
+						<!-- Snippet library slides in as a left rail when open -->
+						{#if showSnippetLibrary}
+							<aside
+								class="h-full w-[280px] flex-shrink-0 border-r-[3px] border-gray-900"
+							>
+								<HtmlSnippetLibrary
+									on:insert={insertSnippet}
+									on:close={() => (showSnippetLibrary = false)}
+								/>
+							</aside>
+						{/if}
+						<div class="h-full flex-1 min-w-0">
+							<HtmlEditor
+								bind:this={htmlEditorRef}
+								bind:value={template.html}
+								variableDefinitions={template.variableDefinitions}
+								{safelistedHelpers}
+								on:change={handleHtmlChange}
+								on:referencesChange={handleReferences}
+								on:save={handleEditorSave}
+							/>
+						</div>
 					</div>
 					{#if activeTab === 'variables'}
 						<HtmlVariablesPanel
@@ -310,3 +387,108 @@
 		</div>
 	</div>
 </div>
+
+<!-- Command palette overlay -->
+{#if showCommandPalette}
+	<HtmlCommandPalette
+		on:close={() => (showCommandPalette = false)}
+		commands={[
+			{
+				key: 'save',
+				label: 'Save template',
+				hint: 'Persist current edits',
+				icon: 'fa-floppy-disk',
+				shortcut: '⌘S',
+				disabled: !isDirty,
+				action: save
+			},
+			{
+				key: 'snippets',
+				label: showSnippetLibrary ? 'Close snippet library' : 'Open snippet library',
+				hint: 'Insert common Handlebars patterns',
+				icon: 'fa-wand-magic-sparkles',
+				shortcut: '⌘/',
+				action: () => (showSnippetLibrary = !showSnippetLibrary)
+			},
+			{
+				key: 'tab-editor',
+				label: 'Go to Editor',
+				icon: 'fa-code',
+				action: () => (activeTab = 'editor')
+			},
+			{
+				key: 'tab-variables',
+				label: 'Go to Variables',
+				icon: 'fa-cube',
+				action: () => (activeTab = 'variables')
+			},
+			{
+				key: 'tab-api',
+				label: 'Go to API snippets',
+				icon: 'fa-plug',
+				action: () => (activeTab = 'api')
+			},
+			{
+				key: 'tab-settings',
+				label: 'Go to Settings',
+				icon: 'fa-sliders',
+				action: () => (activeTab = 'settings')
+			},
+			{
+				key: 'format-png',
+				label: 'Set format: PNG',
+				icon: 'fa-image',
+				action: () => handleSettingsChange({ detail: { format: 'png' } })
+			},
+			{
+				key: 'format-jpeg',
+				label: 'Set format: JPEG',
+				icon: 'fa-image',
+				action: () => handleSettingsChange({ detail: { format: 'jpeg' } })
+			},
+			{
+				key: 'format-pdf',
+				label: 'Set format: PDF',
+				icon: 'fa-file-pdf',
+				action: () => handleSettingsChange({ detail: { format: 'pdf' } })
+			},
+			{
+				key: 'toggle-js',
+				label: template.jsEnabled
+					? 'Disable JavaScript at render'
+					: 'Enable JavaScript at render',
+				hint: 'Danger when on — allows scripts during Puppeteer render',
+				icon: 'fa-code-compare',
+				action: () =>
+					handleSettingsChange({ detail: { jsEnabled: !template.jsEnabled } })
+			},
+			{
+				key: 'toggle-strict',
+				label: template.strictVariables
+					? 'Disable strict variables'
+					: 'Enable strict variables',
+				icon: 'fa-bolt',
+				action: () =>
+					handleSettingsChange({
+						detail: { strictVariables: !template.strictVariables }
+					})
+			},
+			{
+				key: 'publish',
+				label: 'Publish template',
+				hint: 'Ship to production — opens preview',
+				icon: 'fa-rocket',
+				disabled: isDirty || !template.uid,
+				action: () => dispatch('publish')
+			},
+			{
+				key: 'back',
+				label: 'Back to templates',
+				icon: 'fa-arrow-left',
+				action: () => {
+					window.location.href = '/dashboard/template';
+				}
+			}
+		]}
+	/>
+{/if}
