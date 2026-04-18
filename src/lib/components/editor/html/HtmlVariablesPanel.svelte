@@ -296,7 +296,7 @@
 	<div class="flex-1 overflow-auto p-4">
 		{#if variableDefinitions.length === 0}
 			<div
-				class="mx-auto mt-8 max-w-lg rounded-2xl border-[3px] border-dashed border-gray-300 bg-white p-10 text-center shadow-[6px_6px_0_0_#1f2937]/10"
+				class="mx-auto mt-6 max-w-xl rounded-2xl border-[3px] border-gray-900 bg-white p-8 text-center shadow-[6px_6px_0_0_#1f2937]"
 			>
 				<div
 					class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-[2px_2px_0_0_#1f2937]"
@@ -306,12 +306,42 @@
 				<p class="text-sm font-black uppercase tracking-wider text-gray-900">
 					No variables yet
 				</p>
-				<p class="mt-2 text-xs font-bold text-gray-600">
-					Type <code
-						class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-[#ffc480]"
-						>{'{{'}anything{'}}'}</code>
-					in the editor — we'll auto-declare on save.
+				<p class="mt-2 text-[13px] font-bold leading-relaxed text-gray-600">
+					Two ways to declare a variable:
 				</p>
+
+				<!-- Two-path hint grid — shows both entry points so users don't
+				     have to guess whether they're supposed to type in code or
+				     click a button. -->
+				<div class="mt-4 grid grid-cols-2 gap-3 text-left">
+					<div class="rounded-lg border-[2px] border-gray-900 bg-[#FFFDF8] p-3">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#ffc480] text-[9px] font-black text-gray-900">1</span>
+							<span class="text-[10px] font-black uppercase tracking-widest text-gray-900">In code</span>
+						</div>
+						<p class="text-[11px] font-semibold leading-snug text-gray-700">
+							Type <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{'}name{'}}'}</code> anywhere. We auto-declare it.
+						</p>
+					</div>
+					<div class="rounded-lg border-[2px] border-gray-900 bg-[#FFFDF8] p-3">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#4ade80] text-[9px] font-black text-gray-900">2</span>
+							<span class="text-[10px] font-black uppercase tracking-widest text-gray-900">Right here</span>
+						</div>
+						<p class="text-[11px] font-semibold leading-snug text-gray-700">
+							Click <span class="font-mono text-gray-900">+ Add variable</span> below to declare manually.
+						</p>
+					</div>
+				</div>
+
+				<button
+					type="button"
+					on:click={addVar}
+					class="mt-5 inline-flex items-center gap-2 rounded-lg border-[2px] border-gray-900 bg-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0_0_#ffc480] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+				>
+					<i class="fa fa-plus text-[10px]"></i>
+					Add variable
+				</button>
 			</div>
 		{:else if filteredDefinitions.length === 0}
 			<div class="mt-6 text-center text-xs font-bold text-gray-500">

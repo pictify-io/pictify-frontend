@@ -177,6 +177,18 @@
 
 		<div class="hidden h-8 w-[3px] rounded-full bg-gray-900 sm:block"></div>
 
+		<!-- Help / primer drawer — discoverable ? button. Users who need the
+		     Handlebars reference shouldn't have to search for it. -->
+		<button
+			type="button"
+			on:click={() => dispatch('learn')}
+			title="Open template syntax reference"
+			aria-label="Template syntax reference"
+			class="hidden h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffe066] hover:shadow-none sm:flex"
+		>
+			<i class="fa fa-question text-[11px]"></i>
+		</button>
+
 		<!-- Share (text-link, not a button — matches fabric TopBar at line 191 era) -->
 		<button
 			type="button"

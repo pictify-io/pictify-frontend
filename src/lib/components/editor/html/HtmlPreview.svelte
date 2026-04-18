@@ -130,16 +130,19 @@
 				<span class="text-[11px] font-black uppercase tracking-widest">Rendering…</span>
 			</div>
 		{:else if !html}
-			<div class="flex flex-col items-center gap-3 text-center">
+			<div class="flex max-w-xs flex-col items-center gap-3 text-center">
 				<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-[3px_3px_0_0_#1f2937]">
 					<i class="fa fa-eye text-lg text-gray-900"></i>
 				</div>
-				<p class="font-mono text-xs text-gray-600">
+				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900">
+					Live preview
+				</p>
+				<p class="text-[12px] font-bold leading-relaxed text-gray-600">
+					Every keystroke renders here. Write HTML on the left, see the image on the right.
+				</p>
+				<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-1 font-mono text-[11px] text-[#ffc480]">
 					&lt;h1&gt;{'{{'}title{'}}'}&lt;/h1&gt;
-				</p>
-				<p class="text-[11px] font-black uppercase tracking-widest text-gray-500">
-					Start typing to see a preview
-				</p>
+				</code>
 			</div>
 		{/if}
 

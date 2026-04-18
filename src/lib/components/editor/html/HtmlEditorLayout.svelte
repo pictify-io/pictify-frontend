@@ -24,6 +24,8 @@
 	import HtmlCommandPalette from './HtmlCommandPalette.svelte';
 	import HtmlResizeModal from './HtmlResizeModal.svelte';
 	import VariablePropertyPanel from './VariablePropertyPanel.svelte';
+	import HtmlEditorTour from './HtmlEditorTour.svelte';
+	import HtmlLearnDrawer from './HtmlLearnDrawer.svelte';
 
 	export let template = {
 		uid: null,
@@ -52,6 +54,7 @@
 	let showSnippetLibrary = false;
 	let showCommandPalette = false;
 	let showResizeModal = false;
+	let showLearnDrawer = false;
 	let htmlEditorRef;
 	let canUndo = false;
 	let canRedo = false;
@@ -364,6 +367,7 @@
 			on:rename={handleRename}
 			on:publish={() => dispatch('publish')}
 			on:share={() => dispatch('share')}
+			on:learn={() => (showLearnDrawer = true)}
 			on:save={save}
 			on:undo={doUndo}
 			on:redo={doRedo}
@@ -395,6 +399,7 @@
 							type="button"
 							role="tab"
 							aria-selected={activeTab === tab.k}
+							data-tour-id={'tab-' + tab.k}
 							class="flex items-center gap-2 rounded-lg border-[2px] border-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all
 								{activeTab === tab.k
 									? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
@@ -414,6 +419,7 @@
 						on:click={() => (showSnippetLibrary = !showSnippetLibrary)}
 						aria-pressed={showSnippetLibrary}
 						title="Insert snippet (⌘/)"
+						data-tour-id="snippets-button"
 						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest transition-all
 							{showSnippetLibrary
 								? 'bg-[#ffe066] text-gray-900 shadow-[3px_3px_0_0_#1f2937]'
@@ -502,7 +508,7 @@
 			</section>
 
 			<!-- RIGHT pane (44%) -->
-			<section class="flex h-full w-[44%] flex-col">
+			<section class="flex h-full w-[44%] flex-col" data-tour-id="preview">
 				<HtmlPreview
 					html={template.html}
 					variableDefinitions={template.variableDefinitions}
@@ -668,3 +674,10 @@
 		]}
 	/>
 {/if}
+
+<!-- Learn / syntax reference drawer — triggered by the topbar ? button -->
+<HtmlLearnDrawer show={showLearnDrawer} on:close={() => (showLearnDrawer = false)} />
+
+<!-- First-run walkthrough. Mounts last so its overlay z-layer wins over
+     the editor chrome. Self-dismisses + persists in localStorage. -->
+<HtmlEditorTour />
