@@ -214,6 +214,25 @@ const BLOCK_HELPERS = [
 	{ label: '#with', detail: 'scope', type: 'keyword', apply: '#with $1}}$0{{/with' }
 ]
 
+// Fallback helper list used when the host hasn't wired up the backend's
+// SAFELISTED_HELPERS yet. Keeps the autocomplete menu useful on fresh
+// templates that have no declared variables and before any API call.
+// Mirrors the most-common entries in service/template-helpers.js HELPERS
+// on the backend — the server re-validates on render so surfacing a
+// helper that was later removed is a loud error, not a silent failure.
+const DEFAULT_HELPERS = [
+	'eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'and', 'or', 'not',
+	'length', 'isEmpty', 'isNotEmpty', 'isDefined',
+	'contains', 'first', 'last', 'join', 'slice',
+	'lowercase', 'uppercase', 'capitalize', 'titleCase', 'trim', 'truncate',
+	'replace', 'split', 'padStart', 'padEnd',
+	'add', 'subtract', 'multiply', 'divide', 'mod', 'round', 'floor', 'ceil',
+	'currency', 'percentage', 'number',
+	'date', 'dateAdd', 'now',
+	'default', 'ternary',
+	'encodeURIComponent', 'toJSON'
+]
+
 /**
  * Build the CodeMirror autocomplete extension.
  *
@@ -238,12 +257,25 @@ const buildHandlebarsCompletionSource =
 		// empty partial — without that, the popup would only show once the
 		// user typed a letter.
 		const before = ctx.matchBefore(/\{\{\s*[#/]?\w*$/)
+		// Visible debug: leave a trail on window so we can tell whether
+		// the source is even being invoked in the browser. Remove once
+		// the autocomplete regression is confirmed closed.
+		if (typeof window !== 'undefined') {
+			window.__hbsAutocomplete = window.__hbsAutocomplete || { calls: 0, lastMatch: null }
+			window.__hbsAutocomplete.calls += 1
+			window.__hbsAutocomplete.lastMatch = before
+				? { from: before.from, text: before.text, explicit: ctx.explicit }
+				: { missed: true, pos: ctx.pos, explicit: ctx.explicit }
+		}
 		if (!before) return null
 		const prefixMatch = /^\{\{\s*[#/]?/.exec(before.text)
 		const prefixLen = prefixMatch ? prefixMatch[0].length : 2
 		const partialStart = before.from + prefixLen
 		const vars = getVariables() || []
-		const helpers = getHelpers() || []
+		// Use the host-provided helper list if the backend has surfaced
+		// one, otherwise fall back to the common-helpers list so a fresh
+		// template still gets a useful autocomplete menu.
+		const helpers = (getHelpers() || []).length > 0 ? getHelpers() : DEFAULT_HELPERS
 		const options = [
 			...vars.map((name) => ({
 				label: name,
@@ -259,6 +291,9 @@ const buildHandlebarsCompletionSource =
 			})),
 			...BLOCK_HELPERS
 		]
+		if (typeof window !== 'undefined') {
+			window.__hbsAutocomplete.lastOptions = options.length
+		}
 		return { from: partialStart, options, validFor: /^\w*$/ }
 	}
 
