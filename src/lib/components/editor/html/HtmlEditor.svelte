@@ -23,7 +23,16 @@
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorState, Compartment } from '@codemirror/state';
 	import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
-	import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
+	import {
+		defaultKeymap,
+		indentWithTab,
+		history,
+		historyKeymap,
+		undo as cmUndo,
+		redo as cmRedo,
+		undoDepth,
+		redoDepth
+	} from '@codemirror/commands';
 	import { html as htmlLang } from '@codemirror/lang-html';
 	import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 	import { tags as t } from '@lezer/highlight';
@@ -160,6 +169,13 @@
 		recomputeCompileErrors(value);
 		emitVariableReferences(value);
 
+		const emitHistoryState = (state) => {
+			dispatch('historyState', {
+				canUndo: undoDepth(state) > 0,
+				canRedo: redoDepth(state) > 0
+			});
+		};
+
 		const updateListener = EditorView.updateListener.of((v) => {
 			if (v.docChanged) {
 				const next = v.state.doc.toString();
@@ -168,6 +184,10 @@
 				emitVariableReferences(next);
 				dispatch('change', { value: next });
 			}
+			// History state fires on every transaction so the topbar's
+			// undo/redo enabled state stays in sync (CodeMirror doesn't
+			// offer an event for history-only changes).
+			if (v.docChanged || v.selectionSet) emitHistoryState(v.state);
 		});
 
 		const state = EditorState.create({
@@ -275,6 +295,16 @@
 	/** Focus the editor programmatically (used when closing side panels). */
 	export function focus() {
 		if (view) view.focus();
+	}
+
+	/** Run undo against CodeMirror's history. */
+	export function undo() {
+		if (view) cmUndo(view);
+	}
+
+	/** Run redo against CodeMirror's history. */
+	export function redo() {
+		if (view) cmRedo(view);
 	}
 </script>
 

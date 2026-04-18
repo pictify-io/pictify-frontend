@@ -15,12 +15,14 @@
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import HtmlTopBar from './HtmlTopBar.svelte';
 	import HtmlEditor from './HtmlEditor.svelte';
+	import AnimatedBackground from '../AnimatedBackground.svelte';
 	import HtmlPreview from './HtmlPreview.svelte';
 	import HtmlVariablesPanel from './HtmlVariablesPanel.svelte';
 	import HtmlSettingsPanel from './HtmlSettingsPanel.svelte';
 	import HtmlApiSnippetPanel from './HtmlApiSnippetPanel.svelte';
 	import HtmlSnippetLibrary from './HtmlSnippetLibrary.svelte';
 	import HtmlCommandPalette from './HtmlCommandPalette.svelte';
+	import HtmlResizeModal from './HtmlResizeModal.svelte';
 
 	export let template = {
 		uid: null,
@@ -45,10 +47,37 @@
 	let autoAdded = [];
 	let savedTemplate = { ...template };
 
-	// Editor side-panels: snippet library + command palette overlay.
+	// Editor side-panels: snippet library + command palette overlay + resize modal.
 	let showSnippetLibrary = false;
 	let showCommandPalette = false;
+	let showResizeModal = false;
 	let htmlEditorRef;
+	let canUndo = false;
+	let canRedo = false;
+
+	function handleHistoryState(e) {
+		canUndo = !!e.detail?.canUndo;
+		canRedo = !!e.detail?.canRedo;
+	}
+
+	function doUndo() {
+		htmlEditorRef?.undo();
+	}
+	function doRedo() {
+		htmlEditorRef?.redo();
+	}
+
+	function applyResize(event) {
+		const { width, height } = event.detail;
+		template = { ...template, width, height };
+		markDirty();
+	}
+
+	function toggleFormat() {
+		const next = template.outputFormat === 'pdf' ? 'image' : 'pdf';
+		template = { ...template, outputFormat: next };
+		markDirty();
+	}
 
 	function insertSnippet(event) {
 		const body = event.detail?.snippet?.body;
@@ -205,7 +234,7 @@
 
 <!-- Below 768px: hide editor entirely -->
 <div
-	class="flex h-screen w-full flex-col bg-[#FFFDF8] md:block"
+	class="relative flex h-screen w-full flex-col overflow-hidden bg-[#FFFDF8] md:block"
 >
 	<div class="md:hidden flex h-full items-center justify-center p-8 text-center">
 		<div class="max-w-sm rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-[8px_8px_0_0_#1f2937]">
@@ -221,14 +250,31 @@
 		</div>
 	</div>
 
-	<div class="hidden md:flex md:h-full md:flex-col">
+	<!-- Soft color blur backdrop — same pattern the canvas editor uses
+	     so the two surfaces share atmosphere even when the foreground
+	     chrome differs. -->
+	<AnimatedBackground />
+
+	<div class="relative z-10 hidden md:flex md:h-full md:flex-col">
 		<HtmlTopBar
 			name={template.name}
 			saveStatus={isSaving ? 'saving' : isDirty ? 'unsaved' : 'saved'}
 			canPublish={!isDirty && !!template.uid}
+			{canUndo}
+			{canRedo}
+			width={template.width}
+			height={template.height}
+			outputFormat={template.outputFormat}
+			{isSaving}
+			{isDirty}
 			on:rename={handleRename}
 			on:publish={() => dispatch('publish')}
 			on:share={() => dispatch('share')}
+			on:save={save}
+			on:undo={doUndo}
+			on:redo={doRedo}
+			on:resize={() => (showResizeModal = true)}
+			on:toggleFormat={toggleFormat}
 		/>
 
 		<div class="flex h-[calc(100vh-64px)] w-full">
@@ -294,21 +340,9 @@
 						⌘K
 					</button>
 
-					<!-- Save button — secondary to the Publish CTA in the topbar.
-					     White chip with accent-colored shadow that only appears
-					     when dirty so the affordance is self-evident. -->
-					<button
-						type="button"
-						on:click={save}
-						disabled={isSaving || !isDirty}
-						class="flex items-center gap-2 rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all disabled:cursor-not-allowed disabled:opacity-40
-							{isDirty
-								? 'text-gray-900 shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-								: 'text-gray-500'}"
-					>
-						<i class="fa fa-floppy-disk text-[10px]"></i>
-						{isSaving ? 'Saving…' : 'Save ⌘S'}
-					</button>
+					<!-- Save is handled by the primary CTA in the topbar now.
+					     The tab bar used to carry a secondary save, but two Save
+					     buttons on one screen is confusing; the topbar owns it. -->
 				</nav>
 
 				<!-- Pane content. Each tab is mounted lazily except the editor,
@@ -339,6 +373,7 @@
 								on:change={handleHtmlChange}
 								on:referencesChange={handleReferences}
 								on:save={handleEditorSave}
+								on:historyState={handleHistoryState}
 							/>
 						</div>
 					</div>
@@ -388,6 +423,15 @@
 	</div>
 </div>
 
+<!-- Resize modal overlay -->
+<HtmlResizeModal
+	show={showResizeModal}
+	width={template.width}
+	height={template.height}
+	on:apply={applyResize}
+	on:close={() => (showResizeModal = false)}
+/>
+
 <!-- Command palette overlay -->
 {#if showCommandPalette}
 	<HtmlCommandPalette
@@ -409,6 +453,29 @@
 				icon: 'fa-wand-magic-sparkles',
 				shortcut: '⌘/',
 				action: () => (showSnippetLibrary = !showSnippetLibrary)
+			},
+			{
+				key: 'resize',
+				label: 'Resize template',
+				hint: 'Pick a platform preset or custom dimensions',
+				icon: 'fa-expand',
+				action: () => (showResizeModal = true)
+			},
+			{
+				key: 'undo',
+				label: 'Undo',
+				icon: 'fa-arrow-rotate-left',
+				shortcut: '⌘Z',
+				disabled: !canUndo,
+				action: doUndo
+			},
+			{
+				key: 'redo',
+				label: 'Redo',
+				icon: 'fa-arrow-rotate-right',
+				shortcut: '⌘⇧Z',
+				disabled: !canRedo,
+				action: doRedo
 			},
 			{
 				key: 'tab-editor',
