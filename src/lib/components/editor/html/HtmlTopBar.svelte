@@ -177,6 +177,20 @@
 
 		<div class="hidden h-8 w-[3px] rounded-full bg-gray-900 sm:block"></div>
 
+		<!-- Copilot trigger — opens the right-side AI drawer. Placed
+		     here so the AI entrypoint sits alongside share / save,
+		     not buried in the editor chrome. -->
+		<button
+			type="button"
+			on:click={() => dispatch('copilot')}
+			title="Open copilot (⌘I)"
+			aria-label="Open copilot"
+			class="hidden items-center gap-1.5 rounded-lg border-[3px] border-gray-900 bg-[#ffe066] px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffc480] hover:shadow-none sm:flex"
+		>
+			<i class="fa fa-wand-magic-sparkles text-[11px]"></i>
+			Copilot
+		</button>
+
 		<!-- Help / primer drawer — discoverable ? button. Users who need the
 		     Handlebars reference shouldn't have to search for it. -->
 		<button
