@@ -41,7 +41,8 @@
 		handlebarsHighlight,
 		handlebarsTheme,
 		handlebarsAutocomplete,
-		handlebarsLinter
+		handlebarsLinter,
+		handlebarsTokenClick
 	} from '../../../utils/handlebars-autocomplete';
 
 	/** @type {string} */
@@ -206,6 +207,15 @@
 					getHelpers: () => _helpers
 				}),
 				handlebarsLinter({ getErrors: () => _compileErrors }),
+				handlebarsTokenClick({
+					onTokenClick: (token) => {
+						// Forward to the host so it can anchor a VariablePropertyPanel
+						// at the clicked token. The host decides whether to add a
+						// variable definition on the fly (if the token references a
+						// name not yet in variableDefinitions) or edit an existing one.
+						dispatch('tokenClick', token);
+					}
+				}),
 				updateListener,
 				EditorView.theme({
 					'&': {
