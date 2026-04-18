@@ -7,7 +7,7 @@
 	 *     picker — skip the picker and show the fresh editor.
 	 *   - Otherwise, show the EnginePicker first.
 	 *
-	 * On save: POST to /template with engine='html', then redirect to
+	 * On save: POST to /templates with engine='html', then redirect to
 	 * /template-workspace/html/[uid] for the edit view.
 	 */
 	import { page } from '$app/stores';
@@ -42,7 +42,7 @@
 			// Strip fields the create route doesn't expect (uid is server-generated;
 			// engine is re-applied explicitly to avoid client drift).
 			const { uid: _ignore, ...rest } = event.detail.template;
-			const res = await backend.post('/template', {
+			const res = await backend.post('/templates', {
 				...rest,
 				engine: 'html',
 				// Legacy schema requires `variables` (array of names). Populate from

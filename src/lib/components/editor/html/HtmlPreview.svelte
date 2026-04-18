@@ -1,6 +1,6 @@
 <script>
 	/**
-	 * HtmlPreview — debounced live render via POST /template/preview.
+	 * HtmlPreview — debounced live render via POST /templates/preview.
 	 *
 	 * Dialect matches the dashboard: rounded-xl frame, press-in hover on
 	 * Retry, font-black uppercase status pills. Image itself keeps the
@@ -46,7 +46,7 @@
 
 		try {
 			const res = await backend.post(
-				'/template/preview',
+				'/templates/preview',
 				{
 					html,
 					variableDefinitions,
