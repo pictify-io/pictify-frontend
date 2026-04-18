@@ -26,6 +26,7 @@
 	import VariablePropertyPanel from './VariablePropertyPanel.svelte';
 	import HtmlEditorTour from './HtmlEditorTour.svelte';
 	import HtmlLearnDrawer from './HtmlLearnDrawer.svelte';
+	import HtmlCopilotDrawer from './HtmlCopilotDrawer.svelte';
 
 	export let template = {
 		uid: null,
@@ -55,6 +56,7 @@
 	let showCommandPalette = false;
 	let showResizeModal = false;
 	let showLearnDrawer = false;
+	let showCopilotDrawer = false;
 	let htmlEditorRef;
 	let canUndo = false;
 	let canRedo = false;
@@ -431,6 +433,18 @@
 		pendingRemoval = null;
 	}
 
+	// Copilot apply — replaces the entire buffer with the assistant's
+	// generated HTML. Uses the same imperative replaceAll path as the
+	// destructive-delete flow so the change becomes a single undoable
+	// ⌘Z entry instead of a flurry of keystroke-sized ones.
+	function applyCopilotHtml(e) {
+		const nextHtml = e.detail && e.detail.html;
+		if (!nextHtml || typeof nextHtml !== 'string') return;
+		if (htmlEditorRef) htmlEditorRef.replaceAll(nextHtml);
+		template = { ...template, html: nextHtml };
+		markDirty();
+	}
+
 	function handleSettingsChange(e) {
 		// Settings panel emits `format` (png | jpeg | pdf). Translate to the
 		// persisted `outputFormat` ('image' | 'pdf') so the save payload and
@@ -497,6 +511,12 @@
 				showSnippetLibrary = !showSnippetLibrary;
 				return;
 			}
+			// ⌘I — toggle copilot drawer (I for "assistant").
+			if (mod && (e.key === 'i' || e.key === 'I')) {
+				e.preventDefault();
+				showCopilotDrawer = !showCopilotDrawer;
+				return;
+			}
 		};
 		window.addEventListener('beforeunload', beforeunload);
 		window.addEventListener('keydown', keydown);
@@ -556,6 +576,7 @@
 			on:publish={() => dispatch('publish')}
 			on:share={() => dispatch('share')}
 			on:learn={() => (showLearnDrawer = true)}
+			on:copilot={() => (showCopilotDrawer = true)}
 			on:save={save}
 			on:undo={doUndo}
 			on:redo={doRedo}
@@ -830,10 +851,18 @@
 				action: save
 			},
 			{
+				key: 'copilot',
+				label: showCopilotDrawer ? 'Close copilot' : 'Open copilot',
+				hint: 'Ask AI to generate or revise the template',
+				icon: 'fa-wand-magic-sparkles',
+				shortcut: '⌘I',
+				action: () => (showCopilotDrawer = !showCopilotDrawer)
+			},
+			{
 				key: 'snippets',
 				label: showSnippetLibrary ? 'Close snippet library' : 'Open snippet library',
 				hint: 'Insert common Handlebars patterns',
-				icon: 'fa-wand-magic-sparkles',
+				icon: 'fa-shapes',
 				shortcut: '⌘/',
 				action: () => (showSnippetLibrary = !showSnippetLibrary)
 			},
@@ -945,6 +974,20 @@
 
 <!-- Learn / syntax reference drawer — triggered by the topbar ? button -->
 <HtmlLearnDrawer show={showLearnDrawer} on:close={() => (showLearnDrawer = false)} />
+
+<!-- Copilot drawer — AI assistant. Mounts conditionally so streams
+     are torn down when the user closes it. Apply routes through
+     applyCopilotHtml which uses the editor's imperative replaceAll
+     path (single undo entry, editor stays in sync). -->
+<HtmlCopilotDrawer
+	show={showCopilotDrawer}
+	currentHtml={template.html}
+	currentVariables={template.variableDefinitions}
+	width={template.width}
+	height={template.height}
+	on:close={() => (showCopilotDrawer = false)}
+	on:apply={applyCopilotHtml}
+/>
 
 <!-- First-run walkthrough. Mounts last so its overlay z-layer wins over
      the editor chrome. Self-dismisses + persists in localStorage. -->
