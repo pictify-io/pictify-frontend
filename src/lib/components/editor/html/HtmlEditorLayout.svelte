@@ -152,6 +152,12 @@
 		editingVariable = null;
 		editingAnchor = null;
 		editingIndex = -1;
+		// Return focus to CodeMirror so the user can keep typing
+		// immediately. Without this, focus lands on <body> and the
+		// next keystroke is swallowed — feels like the editor is
+		// frozen. Deferred to a microtask so the DOM unmount of the
+		// floating panel settles before we steal focus back.
+		queueMicrotask(() => htmlEditorRef?.focus());
 	}
 
 	function applyTokenInspectorPatch(event) {

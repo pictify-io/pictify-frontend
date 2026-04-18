@@ -188,8 +188,40 @@ export function resolveHandlebarsTokenAt(state, pos) {
  */
 export const handlebarsTokenClick = ({ onTokenClick }) =>
 	EditorView.domEventHandlers({
+		// Toggle a `cm-mod-click` class on the editor DOM while any
+		// inspector-opening modifier is held, so the token decoration
+		// upgrades (pointer cursor + thicker underline). Removed on
+		// keyup / blur so releasing the key puts the editor back into
+		// plain-text-editing affordance.
+		keydown(event, view) {
+			if (event.metaKey || event.ctrlKey || event.altKey) {
+				view.dom.classList.add('cm-mod-click')
+			}
+			return false
+		},
+		keyup(event, view) {
+			if (!event.metaKey && !event.ctrlKey && !event.altKey) {
+				view.dom.classList.remove('cm-mod-click')
+			}
+			return false
+		},
+		blur(event, view) {
+			view.dom.classList.remove('cm-mod-click')
+			return false
+		},
 		click(event, view) {
 			if (!onTokenClick) return false
+			// Only the modifier-click opens the inspector (⌘ on mac,
+			// Ctrl elsewhere). A plain click is too eager — the user
+			// is usually trying to place the caret inside the token
+			// for normal editing (renaming the variable, adjusting
+			// helper args, etc.), and popping a floating panel on
+			// every click makes inline editing impossible. Matches
+			// the "go to definition" convention in VS Code + most
+			// IDEs. alt-click also works for users on keyboards
+			// without a Cmd/Ctrl key handy for editor chords.
+			const modifierHeld = event.metaKey || event.ctrlKey || event.altKey
+			if (!modifierHeld) return false
 			// Ignore if the user was dragging to select.
 			if (view.state.selection.main.from !== view.state.selection.main.to) return false
 
@@ -208,6 +240,10 @@ export const handlebarsTokenClick = ({ onTokenClick }) =>
 			const coords = view.coordsAtPos(token.from)
 			if (!coords) return false
 
+			// Prevent the default click from also placing the caret
+			// at the click coordinates — we handled the intent.
+			event.preventDefault()
+
 			onTokenClick(
 				{
 					...token,
@@ -222,33 +258,43 @@ export const handlebarsTokenClick = ({ onTokenClick }) =>
 				},
 				event
 			)
-			return false
+			return true
 		}
 	})
 
 // Baseline theme rules applied alongside the decoration extension. Matches the
 // design spec: brand handlebars color for text, brand accent underline.
 export const handlebarsTheme = EditorView.baseTheme({
+	// Keep `text` cursor by default — a plain click should place the
+	// caret for normal editing. The pointer cursor switches on only
+	// when a modifier key is held (see cm-mod-click below) to signal
+	// the click is armed to open the inspector.
 	'.cm-hbs-token': {
 		color: '#c88a3b',
 		textDecoration: 'underline',
 		textDecorationColor: '#ffc480',
 		textDecorationThickness: '2px',
-		textUnderlineOffset: '3px',
-		cursor: 'pointer'
-	},
-	'.cm-hbs-token:hover': {
-		backgroundColor: 'rgba(255, 196, 128, 0.2)',
-		borderRadius: '2px'
+		textUnderlineOffset: '3px'
 	},
 	'.cm-hbs-token-raw': {
 		color: '#c88a3b',
 		textDecoration: 'underline wavy',
 		textDecorationColor: '#ffc480',
-		textDecorationThickness: '2px',
-		cursor: 'pointer'
+		textDecorationThickness: '2px'
 	},
-	'.cm-hbs-token-raw:hover': {
+	// When a modifier key is held, upgrade the token affordance to
+	// mimic a VS Code "go to definition" hover — thicker underline,
+	// pointer cursor, subtle background — so the user knows the
+	// click will open the inspector instead of placing the caret.
+	'.cm-mod-click .cm-hbs-token': {
+		cursor: 'pointer',
+		textDecorationThickness: '3px',
+		backgroundColor: 'rgba(255, 196, 128, 0.2)',
+		borderRadius: '2px'
+	},
+	'.cm-mod-click .cm-hbs-token-raw': {
+		cursor: 'pointer',
+		textDecorationThickness: '3px',
 		backgroundColor: 'rgba(255, 107, 107, 0.15)',
 		borderRadius: '2px'
 	},
