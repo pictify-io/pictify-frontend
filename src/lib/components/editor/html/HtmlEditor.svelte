@@ -177,12 +177,24 @@
 			});
 		};
 
+		// References are debounced because a keystroke-rate emit auto-adds
+		// partial identifiers ("cu", "cus", "cust"…) to the Variables panel
+		// while the user is mid-way typing a longer name. We wait for the
+		// burst to settle before snapshotting so only finished identifiers
+		// get surfaced.
+		let referencesDebounce = null;
+		const REFERENCES_DEBOUNCE_MS = 400;
+
 		const updateListener = EditorView.updateListener.of((v) => {
 			if (v.docChanged) {
 				const next = v.state.doc.toString();
 				value = next;
 				recomputeCompileErrors(next);
-				emitVariableReferences(next);
+				if (referencesDebounce) clearTimeout(referencesDebounce);
+				referencesDebounce = setTimeout(() => {
+					emitVariableReferences(next);
+					referencesDebounce = null;
+				}, REFERENCES_DEBOUNCE_MS);
 				dispatch('change', { value: next });
 			}
 			// History state fires on every transaction so the topbar's
