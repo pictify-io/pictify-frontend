@@ -110,17 +110,29 @@
 </script>
 
 <div class="flex h-full w-full flex-col gap-4 bg-[#FFFDF8] p-6">
-	<!-- Image frame -->
+	<!-- Image frame. The inner padding gives the rendered image some
+	     breathing room against the neobrutalist border so wide
+	     templates don't visually touch the frame corners. -->
 	<div
-		class="relative flex flex-1 items-center justify-center overflow-auto rounded-xl border-[3px] border-gray-900 bg-white shadow-[6px_6px_0_0_#1f2937]"
+		class="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border-[3px] border-gray-900 bg-[#f5f0e6] p-4 shadow-[6px_6px_0_0_#1f2937]"
 		aria-live="off"
 	>
 		{#if dataUrl}
+			<!--
+			  Scale the preview to FIT the frame on both axes while
+			  preserving the template's aspect ratio. Inline width/height
+			  (which were clipping tall/wide templates because they
+			  forced native px dimensions) are replaced with CSS
+			  `aspect-ratio` + `max-w/h: 100%` so the browser picks the
+			  largest axis that fits. `object-contain` is redundant here
+			  but kept as a belt-and-suspenders for browsers that
+			  render the img element at intrinsic size first.
+			-->
 			<img
 				src={dataUrl}
 				alt="Live template preview"
-				class="max-h-full max-w-full object-contain"
-				style="width: {width}px; height: {height}px;"
+				class="block h-auto w-auto max-h-full max-w-full rounded-md border-[2px] border-gray-900 bg-white object-contain shadow-[3px_3px_0_0_#1f2937]"
+				style="aspect-ratio: {width} / {height};"
 			/>
 		{:else if loading}
 			<div class="flex flex-col items-center gap-3 text-gray-500">
