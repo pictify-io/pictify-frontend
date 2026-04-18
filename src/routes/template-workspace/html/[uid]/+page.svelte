@@ -3,7 +3,7 @@
 	 * /template-workspace/html/[uid]
 	 *
 	 * Edit view for an existing engine='html' template. Fetches on mount,
-	 * hydrates the layout, persists via PUT /template/:uid on save.
+	 * hydrates the layout, persists via PUT /templates/:uid on save.
 	 *
 	 * If the server reports the template is NOT engine='html' (e.g. user
 	 * pasted a fabric template URL by mistake), we redirect them to the
@@ -25,7 +25,7 @@
 
 	onMount(async () => {
 		try {
-			const res = await backend.get(`/template/${uid}`);
+			const res = await backend.get(`/templates/${uid}`);
 			if (!res || !res.template) {
 				loadError = 'Template not found';
 				return;
@@ -58,7 +58,7 @@
 		isSaving = true;
 		try {
 			const { template: t } = event.detail;
-			const res = await backend.put(`/template/${uid}`, {
+			const res = await backend.put(`/templates/${uid}`, {
 				// Never send engine on update — it's immutable server-side
 				html: t.html,
 				name: t.name,
