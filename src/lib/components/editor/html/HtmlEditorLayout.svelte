@@ -26,7 +26,7 @@
 	import VariablePropertyPanel from './VariablePropertyPanel.svelte';
 	import HtmlEditorTour from './HtmlEditorTour.svelte';
 	import HtmlLearnDrawer from './HtmlLearnDrawer.svelte';
-	import HtmlCopilotDrawer from './HtmlCopilotDrawer.svelte';
+	import HtmlCopilotPanel from './HtmlCopilotPanel.svelte';
 
 	export let template = {
 		uid: null,
@@ -56,7 +56,6 @@
 	let showCommandPalette = false;
 	let showResizeModal = false;
 	let showLearnDrawer = false;
-	let showCopilotDrawer = false;
 	let htmlEditorRef;
 	let canUndo = false;
 	let canRedo = false;
@@ -511,10 +510,10 @@
 				showSnippetLibrary = !showSnippetLibrary;
 				return;
 			}
-			// ⌘I — toggle copilot drawer (I for "assistant").
+			// ⌘I — jump to the Copilot tab.
 			if (mod && (e.key === 'i' || e.key === 'I')) {
 				e.preventDefault();
-				showCopilotDrawer = !showCopilotDrawer;
+				activeTab = 'copilot';
 				return;
 			}
 		};
@@ -576,7 +575,6 @@
 			on:publish={() => dispatch('publish')}
 			on:share={() => dispatch('share')}
 			on:learn={() => (showLearnDrawer = true)}
-			on:copilot={() => (showCopilotDrawer = true)}
 			on:save={save}
 			on:undo={doUndo}
 			on:redo={doRedo}
@@ -600,6 +598,7 @@
 				>
 					{#each [
 						{ k: 'editor', label: 'Editor', icon: 'fa-code' },
+						{ k: 'copilot', label: 'Copilot', icon: 'fa-wand-magic-sparkles' },
 						{ k: 'variables', label: 'Variables', icon: 'fa-cube' },
 						{ k: 'api', label: 'API', icon: 'fa-plug' },
 						{ k: 'settings', label: 'Settings', icon: 'fa-sliders' }
@@ -686,6 +685,22 @@
 								on:tokenClick={handleTokenClick}
 							/>
 						</div>
+					</div>
+					<!-- Copilot tab — always mounted + toggled via class:hidden
+					     so the conversation survives tab switches. Mounting
+					     on-demand would dump context every time the user
+					     peeks at Variables or API. -->
+					<div
+						class="absolute inset-0"
+						class:hidden={activeTab !== 'copilot'}
+					>
+						<HtmlCopilotPanel
+							currentHtml={template.html}
+							currentVariables={template.variableDefinitions}
+							width={template.width}
+							height={template.height}
+							on:apply={applyCopilotHtml}
+						/>
 					</div>
 					{#if activeTab === 'variables'}
 						<HtmlVariablesPanel
@@ -852,11 +867,11 @@
 			},
 			{
 				key: 'copilot',
-				label: showCopilotDrawer ? 'Close copilot' : 'Open copilot',
+				label: 'Go to Copilot',
 				hint: 'Ask AI to generate or revise the template',
 				icon: 'fa-wand-magic-sparkles',
 				shortcut: '⌘I',
-				action: () => (showCopilotDrawer = !showCopilotDrawer)
+				action: () => (activeTab = 'copilot')
 			},
 			{
 				key: 'snippets',
@@ -974,20 +989,6 @@
 
 <!-- Learn / syntax reference drawer — triggered by the topbar ? button -->
 <HtmlLearnDrawer show={showLearnDrawer} on:close={() => (showLearnDrawer = false)} />
-
-<!-- Copilot drawer — AI assistant. Mounts conditionally so streams
-     are torn down when the user closes it. Apply routes through
-     applyCopilotHtml which uses the editor's imperative replaceAll
-     path (single undo entry, editor stays in sync). -->
-<HtmlCopilotDrawer
-	show={showCopilotDrawer}
-	currentHtml={template.html}
-	currentVariables={template.variableDefinitions}
-	width={template.width}
-	height={template.height}
-	on:close={() => (showCopilotDrawer = false)}
-	on:apply={applyCopilotHtml}
-/>
 
 <!-- First-run walkthrough. Mounts last so its overlay z-layer wins over
      the editor chrome. Self-dismisses + persists in localStorage. -->
