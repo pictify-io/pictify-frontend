@@ -22,8 +22,12 @@
 
 import { Decoration, ViewPlugin, EditorView } from '@codemirror/view'
 import { RangeSetBuilder } from '@codemirror/state'
-import { autocompletion } from '@codemirror/autocomplete'
-import { linter } from '@codemirror/lint'
+import {
+	autocompletion,
+	startCompletion,
+	completionKeymap
+} from '@codemirror/autocomplete'
+import { linter, lintGutter } from '@codemirror/lint'
 
 // --- Decoration: highlight {{...}} / {{{...}}} ranges inside HTML text ---
 
@@ -219,23 +223,38 @@ const BLOCK_HELPERS = [
  */
 export const handlebarsAutocomplete = ({ getVariables, getHelpers }) =>
 	autocompletion({
+		// We install completionKeymap ourselves at the host level so Tab +
+		// Enter accept suggestions before falling through to the indent /
+		// default keymap. Turning defaultKeymap OFF here avoids a duplicate
+		// registration that can otherwise swallow key events in unexpected
+		// order.
+		defaultKeymap: false,
+		activateOnTyping: true,
 		override: [
 			(ctx) => {
-				// Trigger when the last characters before the caret are `{{`.
-				// CodeMirror gives us `matchBefore` for lookbehind.
-				const before = ctx.matchBefore(/\{\{\s*\w*$/)
+				// Trigger when the last characters before the caret look like
+				// a handlebars token opening. The `[#/]?` allows `{{#e` and
+				// `{{/e` (block helpers) to match — the old word-only regex
+				// silently dropped those.
+				const before = ctx.matchBefore(/\{\{\s*[#/]?\w*$/)
 				if (!before) return null
-				const partialStart = before.from + (before.text.startsWith('{{') ? 2 : 0)
+				// Calculate where the user's partial name starts: after the
+				// `{{` opener plus any whitespace / block marker.
+				const prefixMatch = /^\{\{\s*[#/]?/.exec(before.text)
+				const prefixLen = prefixMatch ? prefixMatch[0].length : 2
+				const partialStart = before.from + prefixLen
 				const options = [
 					...getVariables().map((name) => ({
 						label: name,
 						type: 'variable',
-						detail: 'variable'
+						detail: 'variable',
+						boost: 10
 					})),
 					...getHelpers().map((name) => ({
 						label: name,
 						type: 'function',
-						detail: 'helper'
+						detail: 'helper',
+						boost: 5
 					})),
 					...BLOCK_HELPERS
 				]
@@ -260,21 +279,60 @@ export const handlebarsAutocomplete = ({ getVariables, getHelpers }) =>
  * @param {() => Array<{ line: number, col?: number, message: string }>} deps.getErrors
  */
 export const handlebarsLinter = ({ getErrors }) =>
-	linter((view) => {
-		const diagnostics = []
-		for (const err of getErrors() || []) {
-			if (!err || typeof err.line !== 'number') continue
-			// CodeMirror lines are 1-based; Doc.line returns the line from a number.
-			const lineNumber = Math.max(1, Math.min(view.state.doc.lines, err.line))
-			const line = view.state.doc.line(lineNumber)
-			const col = typeof err.col === 'number' ? Math.max(0, err.col) : 0
-			const from = Math.min(line.from + col, line.to)
-			diagnostics.push({
-				from,
-				to: line.to,
-				severity: 'error',
-				message: err.message || 'Compile error'
-			})
+	linter(
+		(view) => {
+			const diagnostics = []
+			for (const err of getErrors() || []) {
+				if (!err || typeof err.line !== 'number') continue
+				// CodeMirror lines are 1-based; Doc.line returns the line from a number.
+				const lineNumber = Math.max(1, Math.min(view.state.doc.lines, err.line))
+				const line = view.state.doc.line(lineNumber)
+				const col = typeof err.col === 'number' ? Math.max(0, err.col) : 0
+				const from = Math.min(line.from + col, line.to)
+				diagnostics.push({
+					from,
+					to: line.to,
+					severity: 'error',
+					message: err.message || 'Compile error'
+				})
+			}
+			return diagnostics
+		},
+		{
+			// Refresh diagnostics on every change — our compile-errors list is
+			// already debounce-free upstream so this just makes the squiggle
+			// follow the cursor. Delay `0` disables the default 750ms debounce.
+			delay: 100
 		}
-		return diagnostics
+	)
+
+/**
+ * Expose lint gutter markers + a trigger that auto-opens the autocomplete
+ * menu the moment the user types `{{`. Both are cosmetic-but-load-bearing
+ * ergonomics — without them the linter only renders squiggles (no gutter
+ * indicator), and the autocomplete only surfaces after a word-char, not
+ * after the opening braces alone.
+ */
+export const handlebarsLintGutter = () => lintGutter()
+
+export const handlebarsAutocompleteTriggers = () =>
+	EditorView.updateListener.of((v) => {
+		if (!v.docChanged) return
+		// Check whether any change inserted the `{{` sequence ending at
+		// the new caret position — if so, open the completion popup.
+		v.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+			if (!inserted || inserted.length === 0) return
+			const insertedText = inserted.toString()
+			if (!insertedText.includes('{')) return
+			const caret = v.state.selection.main.head
+			if (caret < 2) return
+			const before = v.state.doc.sliceString(caret - 2, caret)
+			if (before === '{{') {
+				// Schedule in a microtask so we don't re-enter the
+				// transaction stack that's still settling.
+				queueMicrotask(() => startCompletion(v.view))
+			}
+		})
 	})
+
+export const handlebarsCompletionKeymap = completionKeymap

@@ -42,6 +42,9 @@
 		handlebarsTheme,
 		handlebarsAutocomplete,
 		handlebarsLinter,
+		handlebarsLintGutter,
+		handlebarsAutocompleteTriggers,
+		handlebarsCompletionKeymap,
 		handlebarsTokenClick
 	} from '../../../utils/handlebars-autocomplete';
 
@@ -209,7 +212,16 @@
 				lineNumbers(),
 				highlightActiveLine(),
 				history(),
-				keymap.of([saveKey, indentWithTab, ...defaultKeymap, ...historyKeymap]),
+				// Completion keymap (Tab/Enter accept, Escape close) MUST come
+				// before defaultKeymap so Tab hits the completion handler
+				// before it falls through to the indent command.
+				keymap.of([
+					saveKey,
+					...handlebarsCompletionKeymap,
+					indentWithTab,
+					...defaultKeymap,
+					...historyKeymap
+				]),
 				htmlLang(),
 				syntaxHighlighting(paperHighlight),
 				handlebarsHighlight(),
@@ -218,7 +230,9 @@
 					getVariables: () => _variableNames,
 					getHelpers: () => _helpers
 				}),
+				handlebarsAutocompleteTriggers(),
 				handlebarsLinter({ getErrors: () => _compileErrors }),
+				handlebarsLintGutter(),
 				handlebarsTokenClick({
 					onTokenClick: (token) => {
 						// Forward to the host so it can anchor a VariablePropertyPanel
@@ -268,6 +282,31 @@
 					},
 					'.cm-tooltip-autocomplete > ul > li[aria-selected]': {
 						backgroundColor: '#ffc480',
+						color: '#1f2937'
+					},
+					// Lint gutter + inline diagnostics — styled to match the
+					// warm-cream/amber palette instead of CM6's default blues.
+					'.cm-gutter-lint': {
+						width: '18px'
+					},
+					'.cm-gutter-lint .cm-gutterElement': {
+						paddingLeft: '2px',
+						paddingRight: '2px',
+						cursor: 'pointer'
+					},
+					'.cm-lint-marker-error': {
+						content: '"!"',
+						color: '#c62828',
+						fontWeight: '900'
+					},
+					'.cm-diagnostic': {
+						padding: '6px 10px',
+						borderLeft: '3px solid #c62828',
+						fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+						fontSize: '12px'
+					},
+					'.cm-diagnostic-error': {
+						backgroundColor: '#fff5f5',
 						color: '#1f2937'
 					}
 				})
