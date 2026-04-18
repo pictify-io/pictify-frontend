@@ -81,7 +81,8 @@
 		if (idx < 0) {
 			// Token references a variable we haven't declared yet — add it
 			// immediately so the inspector has something to edit. Mirrors
-			// the server-side auto-add performed at save time.
+			// the server-side auto-add performed at save time. Clicking a
+			// token is an explicit "I want this" — lift any tombstone.
 			const next = {
 				name: token.name,
 				type: 'text',
@@ -95,6 +96,11 @@
 			};
 			idx = template.variableDefinitions.length - 1;
 			autoAdded = [...autoAdded, token.name];
+			if (explicitlyDeleted.has(token.name)) {
+				const next = new Set(explicitlyDeleted);
+				next.delete(token.name);
+				explicitlyDeleted = next;
+			}
 			markDirty();
 		}
 		editingIndex = idx;
@@ -205,6 +211,14 @@
 		markDirty();
 	}
 
+	// Names the user explicitly deleted — even if their tokens still live
+	// in the HTML (user chose "Keep tokens", or they live inside a block
+	// like {{#each items}}), we do NOT want the auto-add pipeline to
+	// resurrect the declaration on the next keystroke. The tombstone
+	// lifts the moment the user types the name again from scratch (we
+	// interpret a manual keystroke as "OK, yes, I want this").
+	let explicitlyDeleted = new Set();
+
 	function handleReferences(e) {
 		// The editor reports every identifier the template uses. We silently
 		// add any undeclared ones locally so autocomplete stays useful while
@@ -215,7 +229,9 @@
 		);
 		const additions = [];
 		for (const id of e.detail.identifiers || []) {
-			if (!current.has(id)) additions.push({ name: id, type: 'text', defaultValue: '' });
+			if (current.has(id)) continue;
+			if (explicitlyDeleted.has(id)) continue; // tombstoned — respect the user's delete
+			additions.push({ name: id, type: 'text', defaultValue: '' });
 		}
 		if (additions.length > 0) {
 			template = {
@@ -227,10 +243,25 @@
 	}
 
 	function handleVariablesChange(e) {
-		template = {
-			...template,
-			variableDefinitions: e.detail.variableDefinitions
-		};
+		const nextDefs = e.detail.variableDefinitions || [];
+		// If a name re-appears in the declaration set after having been
+		// tombstoned (user clicked + Add with a name they'd deleted, or
+		// renamed another variable to that name), the user has re-opted
+		// into it — lift the tombstone so future keystrokes can auto-add
+		// related occurrences without fighting the block.
+		if (explicitlyDeleted.size > 0) {
+			const declaredNow = new Set(nextDefs.map((v) => v && v.name).filter(Boolean));
+			let changed = false;
+			const nextTombstones = new Set(explicitlyDeleted);
+			for (const n of explicitlyDeleted) {
+				if (declaredNow.has(n)) {
+					nextTombstones.delete(n);
+					changed = true;
+				}
+			}
+			if (changed) explicitlyDeleted = nextTombstones;
+		}
+		template = { ...template, variableDefinitions: nextDefs };
 		testValues = e.detail.testValues || testValues;
 		markDirty();
 	}
@@ -289,20 +320,40 @@
 		const removeSet = new Set(names);
 		let nextHtml = template.html;
 		if (strip) {
-			for (const name of names) {
-				nextHtml = stripTokens(nextHtml, name);
-			}
+			for (const name of names) nextHtml = stripTokens(nextHtml, name);
 		}
 		const nextDefs = (template.variableDefinitions || []).filter(
 			(v) => v && !removeSet.has(v.name)
 		);
 		const nextTest = { ...testValues };
 		for (const name of names) delete nextTest[name];
+
+		// Tombstone the removed names so `handleReferences` doesn't auto-
+		// re-add them on the next keystroke. This matters even when we
+		// strip tokens, because {{#each name}} / {{#if name}} block uses
+		// stay in the HTML by design — we warned the user, they accepted.
+		explicitlyDeleted = new Set([...explicitlyDeleted, ...names]);
+
+		// Reassign the declaration set BEFORE mutating the editor buffer.
+		// `replaceAll` triggers CodeMirror's updateListener, which calls
+		// `handleReferences` with the surviving identifiers — if defs are
+		// still stale at that point the deleted name sneaks back in via
+		// auto-add. Ordering here matters.
 		template = { ...template, html: nextHtml, variableDefinitions: nextDefs };
 		testValues = nextTest;
-		// Prune the auto-added badges for removed names so they don't flash
-		// back as "auto-added" if the user re-types the token later.
 		autoAdded = autoAdded.filter((n) => !removeSet.has(n));
+
+		// Drive CodeMirror imperatively. Svelte's `bind:value` reactive-prop
+		// sync does NOT fire reliably in this case because the editor's own
+		// updateListener has already written `value` back through the bind
+		// during the user's click path, so `value !== view.state.doc` never
+		// evaluates true when we reassign `template.html` to the stripped
+		// string — the guard sees them as equal and skips the dispatch.
+		// Calling the editor's imperative surface sidesteps that entirely
+		// and also creates a proper undo entry.
+		if (strip && htmlEditorRef) {
+			htmlEditorRef.replaceAll(nextHtml);
+		}
 		markDirty();
 	}
 

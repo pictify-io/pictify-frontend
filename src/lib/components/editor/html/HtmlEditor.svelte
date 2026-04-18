@@ -316,6 +316,27 @@
 	export function redo() {
 		if (view) cmRedo(view);
 	}
+
+	/**
+	 * Replace the entire editor buffer with the given string. Unlike setting
+	 * `value` from the parent (which relies on Svelte's reactive-prop sync),
+	 * this runs a synchronous CodeMirror transaction that also records an
+	 * undo entry — so "Delete + strip tokens" can be ⌘Z'd by the user.
+	 *
+	 * Returning true on success lets the caller know the change landed; we
+	 * return false if the view isn't mounted yet (the caller should fall
+	 * back to prop assignment in that case).
+	 */
+	export function replaceAll(next) {
+		if (!view) return false;
+		const current = view.state.doc.toString();
+		if (current === next) return true;
+		view.dispatch({
+			changes: { from: 0, to: view.state.doc.length, insert: next },
+			userEvent: 'input.strip'
+		});
+		return true;
+	}
 </script>
 
 <!--
