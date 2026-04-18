@@ -43,23 +43,32 @@
 	let panelEl;
 	let style = '';
 
-	$: if (variable) {
+	// Seed draft only when the `variable` prop changes identity. If we
+	// reassigned on every reactive tick, bind:value={draft.name} would
+	// race the reseed on every keystroke and the input would appear to
+	// swallow keys (Svelte keeps reverting draft back to `variable`).
+	let lastSeededVariable = null;
+	$: if (variable && variable !== lastSeededVariable) {
 		draft = { ...variable };
+		lastSeededVariable = variable;
 	}
 
-	$: if (draft && draft.name !== variable?.name) {
-		if (!draft.name || !draft.name.trim()) {
-			nameError = 'Name is required';
-		} else if (!/^[a-zA-Z_][\w]*$/.test(draft.name)) {
-			nameError = 'Letters, numbers, underscores — start with a letter';
-		} else if (allNames.filter((n) => n !== variable?.name).includes(draft.name)) {
-			nameError = 'Another variable already uses this name';
-		} else {
-			nameError = null;
+	// Name validation runs on every draft change; independent from the
+	// draft-seeding statement above so the two reactive groups don't
+	// cross-invalidate.
+	$: nameError = (() => {
+		if (!draft || !draft.name) return draft ? 'Name is required' : null;
+		if (!draft.name.trim()) return 'Name is required';
+		if (!/^[a-zA-Z_][\w]*$/.test(draft.name)) {
+			return 'Letters, numbers, underscores — start with a letter';
 		}
-	} else {
-		nameError = null;
-	}
+		if (
+			allNames.filter((n) => n !== variable?.name).includes(draft.name)
+		) {
+			return 'Another variable already uses this name';
+		}
+		return null;
+	})();
 
 	/**
 	 * Compute panel position from the anchor rect.
@@ -179,7 +188,10 @@
 					>Name</label>
 				<input
 					type="text"
-					bind:value={draft.name}
+					value={draft.name ?? ''}
+					on:input={(e) => (draft = { ...draft, name: e.target.value })}
+					autocomplete="off"
+					spellcheck="false"
 					class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-sm font-bold text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 				/>
 				{#if nameError}
@@ -221,8 +233,10 @@
 					>Default</label>
 				<input
 					type="text"
-					bind:value={draft.defaultValue}
+					value={draft.defaultValue ?? ''}
+					on:input={(e) => (draft = { ...draft, defaultValue: e.target.value })}
 					placeholder="—"
+					autocomplete="off"
 					class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-xs text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 				/>
 			</div>
@@ -232,7 +246,8 @@
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-900"
 					>Description <span class="text-gray-400">(optional)</span></label>
 				<textarea
-					bind:value={draft.description}
+					value={draft.description ?? ''}
+					on:input={(e) => (draft = { ...draft, description: e.target.value })}
 					rows="2"
 					placeholder="What is this variable for?"
 					class="w-full resize-none rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 text-xs text-gray-700 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
