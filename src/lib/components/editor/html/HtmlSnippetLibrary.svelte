@@ -9,6 +9,7 @@
 	 */
 	import { createEventDispatcher } from 'svelte';
 	import { SNIPPETS, SNIPPET_CATEGORIES } from '../../../utils/html-snippets';
+	import SnippetThumbnail from './SnippetThumbnail.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -101,22 +102,28 @@
 			<button
 				type="button"
 				on:click={() => insert(snippet)}
-				class="group w-full rounded-lg border-[2px] border-gray-900 bg-white p-3 text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+				class="group w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
 			>
-				<div class="flex items-center justify-between gap-2">
-					<span class="text-xs font-black uppercase tracking-wider text-gray-900">
-						{snippet.label}
-					</span>
-					<span
-						class="inline-flex items-center rounded border-[1.5px] border-gray-900 bg-white px-1 py-0.5 text-[8px] font-black uppercase tracking-widest text-gray-700"
-					>
-						{snippet.category}
-					</span>
+				<!-- Live miniature preview. Lazy-mounts when scrolled
+				     into view; compiles the snippet body with
+				     Handlebars + stubbed sample vars inside a shadow
+				     root so its inline styles can't leak. -->
+				<div class="flex items-center justify-center bg-[#f5f0e6]">
+					<SnippetThumbnail body={snippet.body} cardWidth={240} cardHeight={130} />
 				</div>
-				<p class="mt-1 text-[10px] font-bold text-gray-500">{snippet.description}</p>
-				<pre
-					class="mt-2 max-h-16 overflow-hidden rounded border-[1.5px] border-gray-900 bg-gray-900 px-2 py-1 font-mono text-[10px] leading-tight text-[#ffc480]"
-				><code>{snippet.body.slice(0, 140).replace(/\$0/g, '')}{snippet.body.length > 140 ? '…' : ''}</code></pre>
+				<div class="p-3 pt-2 border-t-[2px] border-gray-900">
+					<div class="flex items-center justify-between gap-2">
+						<span class="text-xs font-black uppercase tracking-wider text-gray-900 truncate">
+							{snippet.label}
+						</span>
+						<span
+							class="inline-flex items-center rounded border-[1.5px] border-gray-900 bg-white px-1 py-0.5 text-[8px] font-black uppercase tracking-widest text-gray-700 flex-shrink-0"
+						>
+							{snippet.category}
+						</span>
+					</div>
+					<p class="mt-1 text-[10px] font-bold text-gray-500">{snippet.description}</p>
+				</div>
 			</button>
 		{/each}
 	</div>
