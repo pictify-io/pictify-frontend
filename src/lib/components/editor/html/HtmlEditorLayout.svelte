@@ -23,6 +23,7 @@
 	import HtmlSnippetLibrary from './HtmlSnippetLibrary.svelte';
 	import HtmlCommandPalette from './HtmlCommandPalette.svelte';
 	import HtmlResizeModal from './HtmlResizeModal.svelte';
+	import VariablePropertyPanel from './VariablePropertyPanel.svelte';
 
 	export let template = {
 		uid: null,
@@ -58,6 +59,99 @@
 	function handleHistoryState(e) {
 		canUndo = !!e.detail?.canUndo;
 		canRedo = !!e.detail?.canRedo;
+	}
+
+	// Token-click inspector — user clicks a `{{var}}` token inside the
+	// CodeMirror buffer and we anchor the same VariablePropertyPanel the
+	// Variables tab uses. Registers the variable on the fly if it's not
+	// already declared (matches the auto-add-on-save UX but gives
+	// instant feedback while the user is still typing).
+	let editingVariable = null;
+	let editingAnchor = null;
+	let editingIndex = -1;
+
+	function handleTokenClick(event) {
+		const token = event.detail;
+		if (!token || !token.name) return;
+		const defs = template.variableDefinitions || [];
+		let idx = defs.findIndex((v) => v && v.name === token.name);
+		if (idx < 0) {
+			// Token references a variable we haven't declared yet — add it
+			// immediately so the inspector has something to edit. Mirrors
+			// the server-side auto-add performed at save time.
+			const next = {
+				name: token.name,
+				type: 'text',
+				defaultValue: '',
+				description: '',
+				validation: { required: false }
+			};
+			template = {
+				...template,
+				variableDefinitions: [...defs, next]
+			};
+			idx = template.variableDefinitions.length - 1;
+			autoAdded = [...autoAdded, token.name];
+			markDirty();
+		}
+		editingIndex = idx;
+		editingVariable = template.variableDefinitions[idx];
+		editingAnchor = token.rect;
+	}
+
+	function closeTokenInspector() {
+		editingVariable = null;
+		editingAnchor = null;
+		editingIndex = -1;
+	}
+
+	function applyTokenInspectorPatch(event) {
+		if (editingIndex < 0) return;
+		const { patch } = event.detail;
+		const oldName = template.variableDefinitions[editingIndex]?.name;
+		const nextDefs = template.variableDefinitions.map((v, i) =>
+			i === editingIndex ? { ...v, ...patch } : v
+		);
+		template = { ...template, variableDefinitions: nextDefs };
+		// If the variable was renamed, also update its occurrences in the
+		// editor buffer so the template stays in sync. We do this via a
+		// simple full-token rewrite: `{{oldName}}` → `{{newName}}` and
+		// `{{{oldName}}}` → `{{{newName}}}` (word-boundary anchored).
+		if (patch.name && oldName && patch.name !== oldName) {
+			const safeOld = oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const pattern = new RegExp(
+				`(\\{\\{\\{?\\s*)${safeOld}(\\s*(?:\\|[^}]*)?\\}?\\}\\})`,
+				'g'
+			);
+			template = {
+				...template,
+				html: template.html.replace(pattern, `$1${patch.name}$2`)
+			};
+			if (testValues[oldName] !== undefined) {
+				const nv = { ...testValues };
+				nv[patch.name] = nv[oldName];
+				delete nv[oldName];
+				testValues = nv;
+			}
+		}
+		markDirty();
+		closeTokenInspector();
+	}
+
+	function removeFromTokenInspector() {
+		if (editingIndex < 0) return;
+		const target = template.variableDefinitions[editingIndex];
+		template = {
+			...template,
+			variableDefinitions: template.variableDefinitions.filter((_, i) => i !== editingIndex)
+		};
+		if (target?.name && testValues[target.name] !== undefined) {
+			const nv = { ...testValues };
+			delete nv[target.name];
+			testValues = nv;
+		}
+		markDirty();
+		closeTokenInspector();
 	}
 
 	function doUndo() {
@@ -374,6 +468,7 @@
 								on:referencesChange={handleReferences}
 								on:save={handleEditorSave}
 								on:historyState={handleHistoryState}
+								on:tokenClick={handleTokenClick}
 							/>
 						</div>
 					</div>
@@ -422,6 +517,20 @@
 		</div>
 	</div>
 </div>
+
+<!-- Token-click inspector overlay. Rendered here (not inside the editor
+     pane) so the floating panel can escape the pane's overflow + z-index
+     clipping and anchor against absolute screen coords. -->
+{#if editingVariable}
+	<VariablePropertyPanel
+		variable={editingVariable}
+		anchorRect={editingAnchor}
+		allNames={(template.variableDefinitions || []).map((v) => v && v.name).filter(Boolean)}
+		on:apply={applyTokenInspectorPatch}
+		on:remove={removeFromTokenInspector}
+		on:close={closeTokenInspector}
+	/>
+{/if}
 
 <!-- Resize modal overlay -->
 <HtmlResizeModal
