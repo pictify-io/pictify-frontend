@@ -27,6 +27,7 @@
 	import HtmlEditorTour from './HtmlEditorTour.svelte';
 	import HtmlLearnDrawer from './HtmlLearnDrawer.svelte';
 	import HtmlCopilotPanel from './HtmlCopilotPanel.svelte';
+	import HtmlBrandPanel from './HtmlBrandPanel.svelte';
 
 	export let template = {
 		uid: null,
@@ -221,7 +222,11 @@
 	}
 
 	function insertSnippet(event) {
-		const body = event.detail?.snippet?.body;
+		// Accept two payload shapes so every inserter (snippet library,
+		// brand panel, anything future) can pick the clearer one:
+		//   { snippet: { body } }  — matches the snippet library dialect
+		//   { body }                — flat, used by the brand panel
+		const body = event.detail?.snippet?.body ?? event.detail?.body;
 		if (!body) return;
 		activeTab = 'editor';
 		// Give the Editor component a tick to be the active panel, then insert.
@@ -632,6 +637,7 @@
 						{ k: 'editor', label: 'Editor', icon: 'fa-code' },
 						{ k: 'copilot', label: 'Copilot', icon: 'fa-wand-magic-sparkles' },
 						{ k: 'variables', label: 'Variables', icon: 'fa-cube' },
+						{ k: 'brand', label: 'Brand', icon: 'fa-palette' },
 						{ k: 'api', label: 'API', icon: 'fa-plug' },
 						{ k: 'settings', label: 'Settings', icon: 'fa-sliders' }
 					] as tab}
@@ -733,6 +739,17 @@
 							height={template.height}
 							on:apply={applyCopilotHtml}
 						/>
+					</div>
+					<!-- Brand tab — always mounted so the brand-assets fetch
+					     runs once per session even as the user flips between
+					     Variables / API. Inserting an asset dispatches back
+					     through the same `insert` event the snippet library
+					     uses, so the caret-position logic is shared. -->
+					<div
+						class="absolute inset-0"
+						class:hidden={activeTab !== 'brand'}
+					>
+						<HtmlBrandPanel on:insert={insertSnippet} />
 					</div>
 					{#if activeTab === 'variables'}
 						<HtmlVariablesPanel

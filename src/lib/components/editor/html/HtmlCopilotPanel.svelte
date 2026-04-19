@@ -22,13 +22,37 @@
 	 * tab uses). Unmount would kill the conversation on tab switch,
 	 * which defeats "follow-ups work across tabs."
 	 */
-	import { createEventDispatcher, tick, onDestroy } from 'svelte';
+	import { createEventDispatcher, tick, onDestroy, onMount } from 'svelte';
 	import { streamHtmlCopilot } from '../../../../api/copilot-html';
+	import {
+		brandAssets,
+		colors,
+		fonts,
+		fetchBrandAssets
+	} from '../../../../store/brand-assets.store';
 
 	export let currentHtml = '';
 	export let currentVariables = [];
 	export let width = 1080;
 	export let height = 1080;
+
+	// Brand context fed to the copilot so generated templates reach
+	// for the team's palette and typography instead of generic defaults.
+	// Only colors + fonts are surfaced — logos/images are too
+	// situational to auto-insert and would bloat the prompt. If the
+	// store hasn't loaded (brand tab never opened) we ship an empty
+	// payload; the backend system prompt handles the "no brand" case.
+	$: brandContext = {
+		colors: ($colors || []).slice(0, 24).map((c) => ({
+			name: c.name,
+			hex: c.value,
+			role: c.metadata?.colorCategory || null
+		})),
+		fonts: ($fonts || []).slice(0, 8).map((f) => ({
+			family: f.metadata?.fontFamily || f.name,
+			hosted: !!f.url
+		}))
+	};
 
 	const dispatch = createEventDispatcher();
 
@@ -82,6 +106,7 @@
 			messages,
 			currentHtml,
 			currentVariables,
+			brandContext,
 			width,
 			height,
 			onToken: (piece) => {
@@ -156,6 +181,19 @@
 			send();
 		}
 	}
+
+	onMount(() => {
+		// Fire a brand-assets fetch if the store hasn't loaded yet.
+		// The Brand tab does the same, but the copilot panel might be
+		// the user's first stop — without this, the first generation
+		// ships without brand context and the model picks generic
+		// colors. Store caches, so the Brand tab's fetch is a no-op.
+		if (!$brandAssets.assets.length && !$brandAssets.loading) {
+			fetchBrandAssets().catch(() => {
+				/* swallow — brand fetch failure is non-fatal */
+			});
+		}
+	});
 
 	onDestroy(() => {
 		if (active) active.abort();

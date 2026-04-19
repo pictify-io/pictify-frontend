@@ -38,6 +38,7 @@ export const streamHtmlCopilot = ({
 	messages,
 	currentHtml,
 	currentVariables = [],
+	brandContext = null,
 	width = 1080,
 	height = 1080,
 	onToken,
@@ -61,6 +62,7 @@ export const streamHtmlCopilot = ({
 					messages,
 					currentHtml,
 					currentVariables,
+					brandContext,
 					width,
 					height
 				}),
