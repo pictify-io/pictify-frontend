@@ -17,6 +17,7 @@
 	} from '../../store/onboarding.store';
 	import { fetchAuditLogs } from '../../api/audit';
 	import { getTemplates } from '../../api/template';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 	import { getApiToken, createApiToken } from '../../api/user';
 	import { analytics } from '$lib/analytics.js';
 	import {
@@ -956,6 +957,19 @@
 												alt={template.name}
 												class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
 											/>
+										{:else if template.engine === 'html' && template.html}
+											<!-- HTML templates never cache a backend thumbnail —
+											     render a live miniature via the shared shadow-
+											     DOM component instead of the blank placeholder. -->
+											<div class="w-full h-full flex items-center justify-center">
+												<SnippetThumbnail
+													body={template.html}
+													cardWidth={320}
+													cardHeight={180}
+													naturalWidth={template.width || 1080}
+													naturalHeight={template.height || 1080}
+												/>
+											</div>
 										{:else}
 											<div
 												class="w-full h-full flex items-center justify-center bg-gray-50 group-hover:bg-[#ffc480]/10 transition-colors"
@@ -1104,6 +1118,14 @@
 									>
 										{#if tpl.thumbnail}
 											<img src={tpl.thumbnail} alt={tpl.name} class="w-full h-full object-cover" />
+										{:else if tpl.engine === 'html' && tpl.html}
+											<SnippetThumbnail
+												body={tpl.html}
+												cardWidth={48}
+												cardHeight={48}
+												naturalWidth={tpl.width || 1080}
+												naturalHeight={tpl.height || 1080}
+											/>
 										{:else}
 											<div class="w-full h-full flex items-center justify-center bg-gray-50">
 												<svg
