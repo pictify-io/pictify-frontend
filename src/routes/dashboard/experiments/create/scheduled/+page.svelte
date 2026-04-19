@@ -248,8 +248,16 @@
 				templateVarCache[templateUid] = varDefs;
 				templateVarCache = templateVarCache;
 
-				if (tpl.fabricJSData) {
+				if (tpl.engine === 'html' && tpl.html) {
 					templateDataCache[templateUid] = {
+						engine: 'html',
+						html: tpl.html,
+						width: tpl.width || 1080,
+						height: tpl.height || 1080
+					};
+				} else if (tpl.fabricJSData) {
+					templateDataCache[templateUid] = {
+						engine: 'fabric',
 						fabricJSData: tpl.fabricJSData,
 						width: tpl.width || tpl.fabricJSData?.width || 800,
 						height: tpl.height || tpl.fabricJSData?.height || 600

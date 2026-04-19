@@ -22,6 +22,7 @@
 	import { StaticCanvas } from 'fabric';
 	import WizardStepper from '$lib/components/dashboard/WizardStepper.svelte';
 	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 
 	// ============== Wizard State ==============
 
@@ -296,9 +297,21 @@
 				templateVarCache[templateUid] = varDefs;
 				templateVarCache = templateVarCache; // trigger reactivity
 
-				// Cache fabricJSData for client-side preview
-				if (tpl.fabricJSData) {
+				// Cache preview-relevant fields. Fabric templates need
+				// fabricJSData for the client-side StaticCanvas renderer;
+				// HTML templates need the raw html body for the shadow-DOM
+				// SnippetThumbnail preview. Store both so the UI can pick
+				// the right branch without another fetch.
+				if (tpl.engine === 'html' && tpl.html) {
 					templateDataCache[templateUid] = {
+						engine: 'html',
+						html: tpl.html,
+						width: tpl.width || 1080,
+						height: tpl.height || 1080
+					};
+				} else if (tpl.fabricJSData) {
+					templateDataCache[templateUid] = {
+						engine: 'fabric',
 						fabricJSData: tpl.fabricJSData,
 						width: tpl.width || tpl.fabricJSData?.width || 800,
 						height: tpl.height || tpl.fabricJSData?.height || 600
@@ -1461,7 +1474,24 @@
 
 												<!-- Canvas Container -->
 												<div class="relative z-10 w-full h-full flex items-center justify-center">
-													{#if variantPreviews[index]?.url}
+													{#if templateDataCache[getResolvedTemplateUid(index)]?.engine === 'html'}
+														<!-- HTML-engine variant — live render through
+														     SnippetThumbnail. Follows variable edits in
+														     real time without the dataUrl roundtrip the
+														     fabric path needs. -->
+														<div class="drop-shadow-[0_20px_25px_rgba(0,0,0,0.2)]">
+															{#key getResolvedTemplateUid(index)}
+																<SnippetThumbnail
+																	body={templateDataCache[getResolvedTemplateUid(index)]?.html || ''}
+																	cardWidth={480}
+																	cardHeight={320}
+																	naturalWidth={templateDataCache[getResolvedTemplateUid(index)]?.width || 1080}
+																	naturalHeight={templateDataCache[getResolvedTemplateUid(index)]?.height || 1080}
+																	overrideVars={variant.variables || {}}
+																/>
+															{/key}
+														</div>
+													{:else if variantPreviews[index]?.url}
 														<img
 															src={variantPreviews[index].url}
 															alt="Preview {variant.name}"

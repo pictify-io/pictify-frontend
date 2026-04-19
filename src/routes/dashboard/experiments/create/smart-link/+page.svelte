@@ -21,6 +21,7 @@
 	import RuleBuilder from '$lib/components/experiments/RuleBuilder.svelte';
 	import IntegrationPreview from '$lib/components/experiments/IntegrationPreview.svelte';
 	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 
 	// ============== Condition Normalization ==============
 
@@ -354,8 +355,16 @@
 				templateVarCache[templateUid] = varDefs;
 				templateVarCache = templateVarCache;
 
-				if (tpl.fabricJSData) {
+				if (tpl.engine === 'html' && tpl.html) {
 					templateDataCache[templateUid] = {
+						engine: 'html',
+						html: tpl.html,
+						width: tpl.width || 1080,
+						height: tpl.height || 1080
+					};
+				} else if (tpl.fabricJSData) {
+					templateDataCache[templateUid] = {
+						engine: 'fabric',
 						fabricJSData: tpl.fabricJSData,
 						width: tpl.width || tpl.fabricJSData?.width || 800,
 						height: tpl.height || tpl.fabricJSData?.height || 600
@@ -1304,7 +1313,18 @@
 									<div
 										class="rounded-lg border-[2px] border-gray-200 bg-gray-100 overflow-hidden flex items-center justify-center p-3 min-h-[180px]"
 									>
-										{#if variantPreviews[fallbackIndex]?.url}
+										{#if templateDataCache[getResolvedTemplateUid(fallbackIndex)]?.engine === 'html'}
+											{#key getResolvedTemplateUid(fallbackIndex)}
+												<SnippetThumbnail
+													body={templateDataCache[getResolvedTemplateUid(fallbackIndex)]?.html || ''}
+													cardWidth={300}
+													cardHeight={180}
+													naturalWidth={templateDataCache[getResolvedTemplateUid(fallbackIndex)]?.width || 1080}
+													naturalHeight={templateDataCache[getResolvedTemplateUid(fallbackIndex)]?.height || 1080}
+													overrideVars={fallbackVariant.variables || {}}
+												/>
+											{/key}
+										{:else if variantPreviews[fallbackIndex]?.url}
 											<img
 												src={variantPreviews[fallbackIndex].url}
 												alt="Preview {fallbackVariant.name}"
@@ -1681,7 +1701,18 @@
 												<div
 													class="rounded-lg border-[2px] border-gray-200 bg-gray-100 overflow-hidden flex items-center justify-center p-3 min-h-[140px]"
 												>
-													{#if variantPreviews[index]?.url}
+													{#if templateDataCache[getResolvedTemplateUid(index)]?.engine === 'html'}
+														{#key getResolvedTemplateUid(index)}
+															<SnippetThumbnail
+																body={templateDataCache[getResolvedTemplateUid(index)]?.html || ''}
+																cardWidth={300}
+																cardHeight={180}
+																naturalWidth={templateDataCache[getResolvedTemplateUid(index)]?.width || 1080}
+																naturalHeight={templateDataCache[getResolvedTemplateUid(index)]?.height || 1080}
+																overrideVars={variant.variables || {}}
+															/>
+														{/key}
+													{:else if variantPreviews[index]?.url}
 														<img
 															src={variantPreviews[index].url}
 															alt="Preview {variant.name}"
