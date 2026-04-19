@@ -22,6 +22,7 @@
 		getFeatureUpgradePrompt
 	} from '../../../store/plg.store';
 	import FeatureGate from '$lib/components/plg/FeatureGate.svelte';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 
 	let isLoading = true;
 	let typeFilter = '';
@@ -498,6 +499,22 @@
 													alt="{exp.name} preview"
 													class="w-full h-full object-cover"
 												/>
+											{:else if exp.template?.engine === 'html' && exp.template?.html}
+												<!-- HTML-engine experiments never cache a backend
+												     thumbnail. Render a live miniature via the
+												     shared shadow-DOM component, seeded with the
+												     first variant's variables so the preview
+												     reflects real data. -->
+												<div class="w-full h-full flex items-center justify-center">
+													<SnippetThumbnail
+														body={exp.template.html}
+														cardWidth={320}
+														cardHeight={180}
+														naturalWidth={exp.template.width || 1080}
+														naturalHeight={exp.template.height || 1080}
+														overrideVars={exp.variants?.[0]?.variables || {}}
+													/>
+												</div>
 											{:else}
 												<div class="w-full h-full flex flex-col items-center justify-center bg-gray-50/80">
 													<div class="w-12 h-12 bg-white rounded-lg border-[2px] border-gray-200 flex items-center justify-center mb-2 shadow-sm rotate-[-5deg]">
