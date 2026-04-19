@@ -35,11 +35,19 @@
 	 *  `width:\s*<N>px` style found in the body. */
 	export let naturalWidth = 0;
 	export let naturalHeight = 0;
+	/** Values to merge on top of SAMPLE_VARS. Used by callers like the
+	 *  render page to show a LIVE preview that follows the user's
+	 *  variable edits. Empty / undefined entries fall back to the
+	 *  baked-in sample dictionary so the preview never has holes. */
+	export let overrideVars = null;
 
 	let hostEl; // the outer card div with the shadow root
-	let visible = false;
 	let io = null;
 	let mounted = false;
+	// Tracks the last rendered combination — used so the reactive
+	// re-render below only fires when body / overrideVars actually
+	// change, not on every parent update.
+	let lastRenderKey = null;
 
 	// Sample values used to stub {{variables}} before rendering. Covers
 	// every variable name used across the current snippet library so
@@ -375,10 +383,23 @@
 		return { w: cardWidth * 3, h: cardHeight * 3 };
 	}
 
+	// Merge overrideVars on top of SAMPLE_VARS, dropping empty strings
+	// / null / undefined so the user's half-typed values don't render as
+	// blanks — baked sample values hold the fort until the user finishes.
+	function buildContext() {
+		if (!overrideVars || typeof overrideVars !== 'object') return SAMPLE_VARS;
+		const merged = { ...SAMPLE_VARS };
+		for (const [k, v] of Object.entries(overrideVars)) {
+			if (v === undefined || v === null || v === '') continue;
+			merged[k] = v;
+		}
+		return merged;
+	}
+
 	function renderIntoShadow() {
-		if (!hostEl || mounted) return;
-		mounted = true;
+		if (!hostEl) return;
 		const shadow = hostEl.shadowRoot || hostEl.attachShadow({ mode: 'open' });
+		mounted = true;
 
 		let compiled;
 		try {
@@ -389,7 +410,7 @@
 			registerHelpers(hb);
 			// Strip `$0` caret markers that the snippet library uses.
 			const template = hb.compile(body.replace(/\$0/g, ''), { noEscape: false });
-			compiled = template(SAMPLE_VARS);
+			compiled = template(buildContext());
 		} catch (err) {
 			// Broken template — render a placeholder instead of leaving
 			// the shadow empty. Build the HTML via createElement/style
@@ -443,7 +464,6 @@
 		// off-screen cards don't pay the compile+paint cost.
 		if (typeof IntersectionObserver === 'undefined') {
 			// Very old browser — just render immediately.
-			visible = true;
 			renderIntoShadow();
 			return;
 		}
@@ -451,7 +471,6 @@
 			(entries) => {
 				for (const entry of entries) {
 					if (entry.isIntersecting) {
-						visible = true;
 						renderIntoShadow();
 						io?.disconnect();
 						io = null;
@@ -463,6 +482,25 @@
 		);
 		io.observe(hostEl);
 	});
+
+	// Live re-render when the body or overrideVars change AFTER the
+	// initial mount. Used by the render page so the preview tracks
+	// the user's variable edits in real time. Keyed by the JSON of
+	// both inputs so identical-string re-renders short-circuit.
+	$: {
+		if (mounted && hostEl) {
+			let key;
+			try {
+				key = body + '|' + JSON.stringify(overrideVars || null);
+			} catch {
+				key = body;
+			}
+			if (key !== lastRenderKey) {
+				lastRenderKey = key;
+				renderIntoShadow();
+			}
+		}
+	}
 
 	onDestroy(() => {
 		if (io) io.disconnect();

@@ -18,6 +18,7 @@
 	import { analytics } from '$lib/analytics.js';
 	import ModeTabs from '$lib/components/dashboard/ModeTabs.svelte';
 	import CopyAsCode from '$lib/components/render/CopyAsCode.svelte';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 
 	let template = null;
 	let variables = [];
@@ -844,7 +845,14 @@ console.log(result.url); // CDN URL of rendered image
 									{/if}
 								</div>
 							{:else}
-								<!-- Empty state: no render yet -->
+								<!-- Empty state: no render yet. We lead with a
+								     LIVE preview whenever possible so the user
+								     sees their template before spending a
+								     render credit. Priority:
+								       1. backend-cached thumbnail PNG (fabric templates)
+								       2. live HTML render via SnippetThumbnail
+								          (follows variable edits in real time)
+								       3. plain "Fill in…" placeholder -->
 								<div class="flex flex-col items-center justify-center py-12 text-center">
 									{#if template?.thumbnail}
 										<img
@@ -852,9 +860,22 @@ console.log(result.url); // CDN URL of rendered image
 											alt="Template preview"
 											class="max-w-full max-h-[200px] object-contain border-2 border-gray-200 rounded-lg mb-4 opacity-60"
 										/>
+									{:else if template?.engine === 'html' && template?.html}
+										<div class="mb-4">
+											<SnippetThumbnail
+												body={template.html}
+												cardWidth={360}
+												cardHeight={240}
+												naturalWidth={template.width || 1080}
+												naturalHeight={template.height || 1080}
+												overrideVars={variableValues}
+											/>
+										</div>
 									{/if}
 									<p class="text-sm font-bold text-gray-400 uppercase tracking-wide">
-										Fill in variables and click Render
+										{template?.engine === 'html' && template?.html
+											? 'Live preview · click Render for the real image'
+											: 'Fill in variables and click Render'}
 									</p>
 								</div>
 							{/if}
