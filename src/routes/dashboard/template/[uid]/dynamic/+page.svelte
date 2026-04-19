@@ -568,8 +568,7 @@
 			/>
 
 			<!-- Tab Content -->
-			<!-- Tab Content -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937]">
+			<div>
 				{#if activeTab === 'datasource'}
 					<DataSourceConfig
 						{dataSources}
