@@ -4,6 +4,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import DOMPurify from 'dompurify';
 	import { getPageNumbers as sharedGetPageNumbers } from '$lib/utils/format.js';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 
 	export let templates;
 	export let pagination = {
@@ -20,9 +21,18 @@
 	// Handle format filter change - dispatch to parent to refetch from API
 
 	const handleTemplateClick = (template) => {
-		// Route to format-specific editor based on outputFormat
-		const formatPath = template.outputFormat === 'pdf' ? 'pdf' : 'image';
-		const url = `/template-workspace/${formatPath}/${template.uid}`;
+		// Route by engine FIRST — HTML templates live on a separate
+		// editor that understands Handlebars + variables; sending them
+		// to the fabric editor's image/pdf route loads an empty canvas.
+		// Fabric templates fall back to the existing outputFormat
+		// branch (image vs pdf).
+		let url;
+		if (template.engine === 'html') {
+			url = `/template-workspace/html/${template.uid}`;
+		} else {
+			const formatPath = template.outputFormat === 'pdf' ? 'pdf' : 'image';
+			url = `/template-workspace/${formatPath}/${template.uid}`;
+		}
 		if (browser) {
 			window.open(url, '_blank', 'noopener,noreferrer');
 		} else {
@@ -313,6 +323,22 @@
 								class="w-full h-full object-contain drop-shadow-lg"
 								loading="lazy"
 							/>
+						{:else if template.engine === 'html' && template.html}
+							<!-- Live miniature render for HTML-engine templates.
+							     SnippetThumbnail lazy-mounts via IntersectionObserver
+							     + compiles the body with stubbed vars in a shadow
+							     root, same path the snippet library uses. We feed
+							     it the template's natural dimensions so aspect
+							     ratio is preserved. -->
+							<div class="w-full h-full flex items-center justify-center drop-shadow-lg">
+								<SnippetThumbnail
+									body={template.html}
+									cardWidth={240}
+									cardHeight={180}
+									naturalWidth={template.width || 1080}
+									naturalHeight={template.height || 1080}
+								/>
+							</div>
 						{:else if sanitizedPreview(template)}
 							<div class="w-full h-full drop-shadow-lg">
 								{@html sanitizedPreview(template)}

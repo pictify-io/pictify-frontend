@@ -18,7 +18,15 @@
 		// Set image mode immediately so UI shows correct panels
 		pageActions.setOutputFormat('image');
 
-		await getTemplateAction($page.params.uid);
+		const loaded = await getTemplateAction($page.params.uid);
+		// HTML templates are served by /template-workspace/html/<uid>
+		// and can't render in the fabric editor. Cross-redirect if a
+		// user lands here with an HTML uid (shared link, legacy
+		// bookmark, typo on the list page).
+		if (loaded?.engine === 'html') {
+			goto(`/template-workspace/html/${$page.params.uid}`, { replaceState: true });
+			return;
+		}
 		isLoading = false;
 	});
 </script>

@@ -18,7 +18,14 @@
 		// Set PDF mode immediately so UI shows correct panels
 		pageActions.setOutputFormat('pdf');
 
-		await getTemplateAction($page.params.uid);
+		const loaded = await getTemplateAction($page.params.uid);
+		// HTML templates live on /template-workspace/html/<uid>. If a
+		// user lands here with an HTML uid the fabric editor would
+		// render a blank canvas; cross-redirect instead.
+		if (loaded?.engine === 'html') {
+			goto(`/template-workspace/html/${$page.params.uid}`, { replaceState: true });
+			return;
+		}
 		isLoading = false;
 	});
 </script>
