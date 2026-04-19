@@ -10,6 +10,7 @@
 	import {
 		getTemplates,
 		getTemplateById,
+		createTemplate,
 		deleteTemplate,
 		searchTemplates,
 		getTemplateVariables,
@@ -212,6 +213,28 @@
 	// Template Management parameters
 	let getTemplateParams = {
 		uid: ''
+	};
+
+	// Create template parameters. The playground focuses on the HTML
+	// engine (the newer surface); fabric templates are authored in
+	// the visual editor, not via raw API. Engine switch still lets
+	// advanced users POST a fabric payload as JSON.
+	let createTemplateParams = {
+		name: 'My template',
+		engine: 'html',
+		// Starter content that exercises variables + a helper so the
+		// generated curl/response is self-explanatory.
+		html: '<div style="width:1080px;height:1080px;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;background:#FFFDF8;">\n  <h1 style="font-size:96px;font-weight:900;color:#1f2937;">{{title}}</h1>\n</div>',
+		fabricJSData: '{}',
+		width: 1080,
+		height: 1080,
+		outputFormat: 'image',
+		// Blank by default — backend auto-declares any {{names}} it
+		// finds in html. Shown as a JSON textarea for users who want
+		// to pre-specify types / defaults / descriptions.
+		variableDefinitions: '[]',
+		jsEnabled: false,
+		strictVariables: false
 	};
 
 	let deleteTemplateParams = {
@@ -480,6 +503,48 @@
 					data = await getTemplateById(getTemplateParams.uid);
 					break;
 
+				case 'create-template':
+					if (!createTemplateParams.name?.trim()) {
+						throw new Error('Template name is required');
+					}
+					if (createTemplateParams.engine === 'html' && !createTemplateParams.html?.trim()) {
+						throw new Error('HTML body is required for engine=html');
+					}
+					{
+						const body = {
+							name: createTemplateParams.name,
+							engine: createTemplateParams.engine,
+							width: Number(createTemplateParams.width) || 1080,
+							height: Number(createTemplateParams.height) || 1080,
+							outputFormat: createTemplateParams.outputFormat || 'image'
+						};
+						if (createTemplateParams.engine === 'html') {
+							body.html = createTemplateParams.html;
+							body.jsEnabled = !!createTemplateParams.jsEnabled;
+							body.strictVariables = !!createTemplateParams.strictVariables;
+						} else {
+							// Fabric path — advanced users paste a canvas JSON.
+							try {
+								body.fabricJSData = JSON.parse(createTemplateParams.fabricJSData || '{}');
+							} catch (err) {
+								throw new Error('fabricJSData must be valid JSON');
+							}
+						}
+						// variableDefinitions is optional; backend auto-declares for HTML.
+						if (createTemplateParams.variableDefinitions?.trim()) {
+							try {
+								const parsed = JSON.parse(createTemplateParams.variableDefinitions);
+								if (Array.isArray(parsed) && parsed.length > 0) {
+									body.variableDefinitions = parsed;
+								}
+							} catch (err) {
+								throw new Error('variableDefinitions must be a JSON array');
+							}
+						}
+						data = await createTemplate(body);
+					}
+					break;
+
 				case 'delete-template':
 					if (!deleteTemplateParams.uid) {
 						throw new Error('Template UID is required');
@@ -736,6 +801,39 @@
 		},
 		// Template Management
 		{
+			id: 'create-template',
+			method: 'POST',
+			path: '/templates',
+			payload: (() => {
+				const body = {
+					name: createTemplateParams.name,
+					engine: createTemplateParams.engine,
+					width: Number(createTemplateParams.width) || 1080,
+					height: Number(createTemplateParams.height) || 1080,
+					outputFormat: createTemplateParams.outputFormat || 'image'
+				};
+				if (createTemplateParams.engine === 'html') {
+					body.html = createTemplateParams.html;
+					body.jsEnabled = !!createTemplateParams.jsEnabled;
+					body.strictVariables = !!createTemplateParams.strictVariables;
+				} else {
+					try {
+						body.fabricJSData = JSON.parse(createTemplateParams.fabricJSData || '{}');
+					} catch {
+						body.fabricJSData = {};
+					}
+				}
+				try {
+					const parsed = JSON.parse(createTemplateParams.variableDefinitions || '[]');
+					if (Array.isArray(parsed) && parsed.length > 0) body.variableDefinitions = parsed;
+				} catch {
+					/* elided from curl preview if invalid */
+				}
+				return body;
+			})(),
+			requiresAuth: true
+		},
+		{
 			id: 'get-template',
 			method: 'GET',
 			path: `/templates/${getTemplateParams.uid || ':uid'}`,
@@ -835,6 +933,7 @@
 		{
 			name: 'Template Management',
 			endpoints: [
+				{ id: 'create-template', path: '/templates', method: 'POST', label: 'Create Template' },
 				{ id: 'get-template', path: '/templates/:uid', method: 'GET', label: 'Get Template' },
 				{
 					id: 'delete-template',
@@ -903,6 +1002,8 @@
 		const descriptions = {
 			image: 'Generate a static image from HTML',
 			gif: 'Generate an animated GIF from HTML',
+			'create-template':
+				'Create a reusable template. Engine=html runs Handlebars + Puppeteer; engine=fabric takes a canvas JSON payload.',
 			'get-template': 'Get details of a specific template',
 			'delete-template': 'Delete a template',
 			'search-templates': 'Search templates by name',
@@ -1233,6 +1334,160 @@
 										bind:value={imageParams.height}
 									/>
 								</div>
+							</div>
+						{:else if selectedEndpoint === 'create-template'}
+							<div class="space-y-4">
+								<!-- Name -->
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+										Name
+									</label>
+									<input
+										type="text"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										bind:value={createTemplateParams.name}
+										placeholder="My template"
+									/>
+								</div>
+
+								<!-- Engine toggle -->
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+										Engine
+									</label>
+									<div class="flex gap-2">
+										{#each ['html', 'fabric'] as eng}
+											<button
+												type="button"
+												on:click={() => (createTemplateParams.engine = eng)}
+												class="flex-1 px-4 py-2.5 border-[3px] border-gray-900 rounded-xl text-xs font-black uppercase tracking-widest transition-all
+													{createTemplateParams.engine === eng
+														? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
+														: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+											>
+												{eng === 'html' ? 'HTML + Handlebars' : 'FabricJS (canvas)'}
+											</button>
+										{/each}
+									</div>
+								</div>
+
+								<!-- Engine-specific body -->
+								{#if createTemplateParams.engine === 'html'}
+									<div>
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+											HTML
+										</label>
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+											<CodeMirror
+												bind:value={createTemplateParams.html}
+												lang={htmlLang()}
+												styles={{
+													'&': { height: '240px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+												}}
+											/>
+										</div>
+										<p class="mt-1 text-[10px] text-gray-500 font-medium">
+											Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared names auto-register on save.
+										</p>
+									</div>
+								{:else}
+									<div>
+										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+											fabricJSData (JSON)
+										</label>
+										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+											<CodeMirror
+												bind:value={createTemplateParams.fabricJSData}
+												lang={json()}
+												styles={{
+													'&': { height: '200px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+													'.cm-content': { padding: '12px' },
+													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+												}}
+											/>
+										</div>
+										<p class="mt-1 text-[10px] text-gray-500 font-medium">
+											Paste a FabricJS canvas JSON. Usually authored in the visual editor instead of the playground.
+										</p>
+									</div>
+								{/if}
+
+								<!-- Dimensions + format -->
+								<div class="grid grid-cols-3 gap-3">
+									<div>
+										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+											Width
+										</label>
+										<input
+											type="number"
+											min="32"
+											max="8192"
+											bind:value={createTemplateParams.width}
+											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-mono focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480]"
+										/>
+									</div>
+									<div>
+										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+											Height
+										</label>
+										<input
+											type="number"
+											min="32"
+											max="8192"
+											bind:value={createTemplateParams.height}
+											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-mono focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480]"
+										/>
+									</div>
+									<div>
+										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+											Format
+										</label>
+										<select
+											bind:value={createTemplateParams.outputFormat}
+											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none"
+										>
+											<option value="image">image</option>
+											<option value="pdf">pdf</option>
+										</select>
+									</div>
+								</div>
+
+								<!-- Variable definitions (optional) -->
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+										Variable definitions <span class="text-gray-500 font-medium normal-case">(optional · JSON array)</span>
+									</label>
+									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+										<CodeMirror
+											bind:value={createTemplateParams.variableDefinitions}
+											lang={json()}
+											styles={{
+												'&': { height: '120px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+												'.cm-content': { padding: '12px' },
+												'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+											}}
+										/>
+									</div>
+									<p class="mt-1 text-[10px] text-gray-500 font-medium">
+										Leave as <code class="font-mono">[]</code> to auto-declare variables from the HTML body.
+									</p>
+								</div>
+
+								<!-- HTML-only safety toggles -->
+								{#if createTemplateParams.engine === 'html'}
+									<div class="grid grid-cols-2 gap-3">
+										<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
+											<input type="checkbox" bind:checked={createTemplateParams.jsEnabled} class="h-4 w-4 accent-gray-900" />
+											<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">jsEnabled</span>
+										</label>
+										<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
+											<input type="checkbox" bind:checked={createTemplateParams.strictVariables} class="h-4 w-4 accent-gray-900" />
+											<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">strictVariables</span>
+										</label>
+									</div>
+								{/if}
 							</div>
 						{:else if selectedEndpoint === 'get-template'}
 							<div>
