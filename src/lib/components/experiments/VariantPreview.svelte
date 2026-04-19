@@ -1,6 +1,7 @@
 <script>
 	import { onDestroy } from 'svelte';
 	import { StaticCanvas } from 'fabric';
+	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 
 	export let templateUid = '';
 	export let variables = {};
@@ -11,8 +12,14 @@
 	let previewTimeout;
 
 	$: tplData = templateDataCache[templateUid];
-	// Single reactive trigger: depend on both tplData and variables to avoid double-render
-	$: if (templateUid && tplData?.fabricJSData && variables !== undefined) {
+	$: isHtml = tplData?.engine === 'html' && !!tplData?.html;
+	$: hasFabric = !!tplData?.fabricJSData;
+
+	// Fabric path: re-render to a dataUrl via StaticCanvas when tpl
+	// or variables change. HTML path is handled directly in the markup
+	// by <SnippetThumbnail>, which compiles handlebars in a shadow
+	// root reactively — no intermediate dataUrl needed.
+	$: if (templateUid && hasFabric && variables !== undefined) {
 		triggerRender();
 	}
 
@@ -22,12 +29,18 @@
 	}
 
 	async function renderPreview() {
-		if (!templateUid || !tplData?.fabricJSData) {
-			preview = {
-				url: null,
-				loading: false,
-				error: templateUid ? 'No canvas data available for this template' : null
-			};
+		if (!templateUid || !hasFabric) {
+			// Fabric renderer has nothing to draw. If the template is
+			// HTML-engine the markup branch below handles it instead;
+			// otherwise show the "no canvas data" error so users know
+			// to refetch.
+			if (!isHtml) {
+				preview = {
+					url: null,
+					loading: false,
+					error: templateUid ? 'No canvas data available for this template' : null
+				};
+			}
 			return;
 		}
 
@@ -137,7 +150,23 @@
 			/>
 
 			<div class="relative z-10 w-full h-full flex items-center justify-center">
-				{#if preview.url}
+				{#if isHtml}
+					<!-- HTML-engine templates render through the shared
+					     SnippetThumbnail — live, follows variable edits,
+					     preserves aspect ratio. No dataUrl roundtrip; the
+					     preview re-renders in place via the component's
+					     own reactive pipeline. -->
+					<div class="drop-shadow-[0_20px_25px_rgba(0,0,0,0.2)]">
+						<SnippetThumbnail
+							body={tplData.html}
+							cardWidth={480}
+							cardHeight={320}
+							naturalWidth={tplData.width || 1080}
+							naturalHeight={tplData.height || 1080}
+							overrideVars={variables}
+						/>
+					</div>
+				{:else if preview.url}
 					<img
 						src={preview.url}
 						alt="Preview {variantName}"
