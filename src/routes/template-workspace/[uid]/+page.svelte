@@ -16,8 +16,16 @@
 
 		const loadedTemplate = await getTemplateAction($page.params.uid);
 
-		// Redirect to format-specific route based on template's output format
-		// This ensures PDF templates open in PDF mode
+		// Redirect in priority order: engine first (HTML templates have
+		// a dedicated editor that speaks Handlebars + variables), then
+		// outputFormat for fabric templates (pdf vs image editors).
+		// This route is a catch-all landing page for legacy `/template-
+		// workspace/<uid>` links — it should not render the canvas
+		// editor directly.
+		if (loadedTemplate?.engine === 'html') {
+			goto(`/template-workspace/html/${$page.params.uid}`, { replaceState: true });
+			return;
+		}
 		if (loadedTemplate?.outputFormat === 'pdf') {
 			goto(`/template-workspace/pdf/${$page.params.uid}`, { replaceState: true });
 			return;
