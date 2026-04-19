@@ -215,17 +215,15 @@
 		uid: ''
 	};
 
-	// Create template parameters. The playground focuses on the HTML
-	// engine (the newer surface); fabric templates are authored in
-	// the visual editor, not via raw API. Engine switch still lets
-	// advanced users POST a fabric payload as JSON.
+	// Create template parameters. Playground exposes only the HTML
+	// engine; the fabric engine is an internal implementation detail
+	// powering the no-code canvas editor and isn't intended for raw
+	// API use.
 	let createTemplateParams = {
 		name: 'My template',
-		engine: 'html',
 		// Starter content that exercises variables + a helper so the
 		// generated curl/response is self-explanatory.
 		html: '<div style="width:1080px;height:1080px;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;background:#FFFDF8;">\n  <h1 style="font-size:96px;font-weight:900;color:#1f2937;">{{title}}</h1>\n</div>',
-		fabricJSData: '{}',
 		width: 1080,
 		height: 1080,
 		outputFormat: 'image',
@@ -507,30 +505,24 @@
 					if (!createTemplateParams.name?.trim()) {
 						throw new Error('Template name is required');
 					}
-					if (createTemplateParams.engine === 'html' && !createTemplateParams.html?.trim()) {
-						throw new Error('HTML body is required for engine=html');
+					if (!createTemplateParams.html?.trim()) {
+						throw new Error('HTML body is required');
 					}
 					{
 						const body = {
 							name: createTemplateParams.name,
-							engine: createTemplateParams.engine,
+							engine: 'html',
+							html: createTemplateParams.html,
 							width: Number(createTemplateParams.width) || 1080,
 							height: Number(createTemplateParams.height) || 1080,
-							outputFormat: createTemplateParams.outputFormat || 'image'
+							outputFormat: createTemplateParams.outputFormat || 'image',
+							jsEnabled: !!createTemplateParams.jsEnabled,
+							strictVariables: !!createTemplateParams.strictVariables
 						};
-						if (createTemplateParams.engine === 'html') {
-							body.html = createTemplateParams.html;
-							body.jsEnabled = !!createTemplateParams.jsEnabled;
-							body.strictVariables = !!createTemplateParams.strictVariables;
-						} else {
-							// Fabric path — advanced users paste a canvas JSON.
-							try {
-								body.fabricJSData = JSON.parse(createTemplateParams.fabricJSData || '{}');
-							} catch (err) {
-								throw new Error('fabricJSData must be valid JSON');
-							}
-						}
-						// variableDefinitions is optional; backend auto-declares for HTML.
+						// variableDefinitions is optional — backend auto-declares
+						// every referenced {{identifier}} on save. We only include
+						// the field when the user explicitly supplied non-empty
+						// entries, so the curl preview stays clean.
 						if (createTemplateParams.variableDefinitions?.trim()) {
 							try {
 								const parsed = JSON.parse(createTemplateParams.variableDefinitions);
@@ -807,27 +799,20 @@
 			payload: (() => {
 				const body = {
 					name: createTemplateParams.name,
-					engine: createTemplateParams.engine,
+					engine: 'html',
+					html: createTemplateParams.html,
 					width: Number(createTemplateParams.width) || 1080,
 					height: Number(createTemplateParams.height) || 1080,
-					outputFormat: createTemplateParams.outputFormat || 'image'
+					outputFormat: createTemplateParams.outputFormat || 'image',
+					jsEnabled: !!createTemplateParams.jsEnabled,
+					strictVariables: !!createTemplateParams.strictVariables
 				};
-				if (createTemplateParams.engine === 'html') {
-					body.html = createTemplateParams.html;
-					body.jsEnabled = !!createTemplateParams.jsEnabled;
-					body.strictVariables = !!createTemplateParams.strictVariables;
-				} else {
-					try {
-						body.fabricJSData = JSON.parse(createTemplateParams.fabricJSData || '{}');
-					} catch {
-						body.fabricJSData = {};
-					}
-				}
 				try {
 					const parsed = JSON.parse(createTemplateParams.variableDefinitions || '[]');
 					if (Array.isArray(parsed) && parsed.length > 0) body.variableDefinitions = parsed;
 				} catch {
-					/* elided from curl preview if invalid */
+					/* silently elided from curl preview when invalid;
+					   the handler raises a proper error on submit */
 				}
 				return body;
 			})(),
@@ -1003,7 +988,7 @@
 			image: 'Generate a static image from HTML',
 			gif: 'Generate an animated GIF from HTML',
 			'create-template':
-				'Create a reusable template. Engine=html runs Handlebars + Puppeteer; engine=fabric takes a canvas JSON payload.',
+				'Create a reusable HTML template. Handlebars + Puppeteer renders variables at request time.',
 			'get-template': 'Get details of a specific template',
 			'delete-template': 'Delete a template',
 			'search-templates': 'Search templates by name',
@@ -1350,69 +1335,26 @@
 									/>
 								</div>
 
-								<!-- Engine toggle -->
+								<!-- HTML body -->
 								<div>
 									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
-										Engine
+										HTML
 									</label>
-									<div class="flex gap-2">
-										{#each ['html', 'fabric'] as eng}
-											<button
-												type="button"
-												on:click={() => (createTemplateParams.engine = eng)}
-												class="flex-1 px-4 py-2.5 border-[3px] border-gray-900 rounded-xl text-xs font-black uppercase tracking-widest transition-all
-													{createTemplateParams.engine === eng
-														? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-														: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937]'}"
-											>
-												{eng === 'html' ? 'HTML + Handlebars' : 'FabricJS (canvas)'}
-											</button>
-										{/each}
+									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+										<CodeMirror
+											bind:value={createTemplateParams.html}
+											lang={htmlLang()}
+											styles={{
+												'&': { height: '240px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+												'.cm-content': { padding: '12px' },
+												'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+											}}
+										/>
 									</div>
+									<p class="mt-1 text-[10px] text-gray-500 font-medium">
+										Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared names auto-register on save.
+									</p>
 								</div>
-
-								<!-- Engine-specific body -->
-								{#if createTemplateParams.engine === 'html'}
-									<div>
-										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
-											HTML
-										</label>
-										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-											<CodeMirror
-												bind:value={createTemplateParams.html}
-												lang={htmlLang()}
-												styles={{
-													'&': { height: '240px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
-													'.cm-content': { padding: '12px' },
-													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
-												}}
-											/>
-										</div>
-										<p class="mt-1 text-[10px] text-gray-500 font-medium">
-											Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared names auto-register on save.
-										</p>
-									</div>
-								{:else}
-									<div>
-										<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
-											fabricJSData (JSON)
-										</label>
-										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-											<CodeMirror
-												bind:value={createTemplateParams.fabricJSData}
-												lang={json()}
-												styles={{
-													'&': { height: '200px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
-													'.cm-content': { padding: '12px' },
-													'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
-												}}
-											/>
-										</div>
-										<p class="mt-1 text-[10px] text-gray-500 font-medium">
-											Paste a FabricJS canvas JSON. Usually authored in the visual editor instead of the playground.
-										</p>
-									</div>
-								{/if}
 
 								<!-- Dimensions + format -->
 								<div class="grid grid-cols-3 gap-3">
@@ -1475,19 +1417,17 @@
 									</p>
 								</div>
 
-								<!-- HTML-only safety toggles -->
-								{#if createTemplateParams.engine === 'html'}
-									<div class="grid grid-cols-2 gap-3">
-										<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
-											<input type="checkbox" bind:checked={createTemplateParams.jsEnabled} class="h-4 w-4 accent-gray-900" />
-											<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">jsEnabled</span>
-										</label>
-										<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
-											<input type="checkbox" bind:checked={createTemplateParams.strictVariables} class="h-4 w-4 accent-gray-900" />
-											<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">strictVariables</span>
-										</label>
-									</div>
-								{/if}
+								<!-- Safety toggles -->
+								<div class="grid grid-cols-2 gap-3">
+									<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
+										<input type="checkbox" bind:checked={createTemplateParams.jsEnabled} class="h-4 w-4 accent-gray-900" />
+										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">jsEnabled</span>
+									</label>
+									<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
+										<input type="checkbox" bind:checked={createTemplateParams.strictVariables} class="h-4 w-4 accent-gray-900" />
+										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">strictVariables</span>
+									</label>
+								</div>
 							</div>
 						{:else if selectedEndpoint === 'get-template'}
 							<div>
