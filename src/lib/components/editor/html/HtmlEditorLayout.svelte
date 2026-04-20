@@ -239,6 +239,7 @@
 	// Derived format + dimensions exposed to preview.
 	$: previewFormat = template.outputFormat === 'pdf' ? 'pdf' : 'png';
 
+
 	const STARTER_HTML = `<div style="width:1080px;height:1080px;background:#FFFDF8;padding:48px;font-family:Inter,sans-serif;">
   <h1 style="font-size:64px;font-weight:800;">{{title}}</h1>
   <p style="font-size:24px;color:#6b7280;">{{subtitle}}</p>
@@ -773,6 +774,7 @@
 					{:else if activeTab === 'api'}
 						<HtmlApiSnippetPanel
 							templateUid={savedTemplate.uid}
+							variableDefinitions={template.variableDefinitions}
 							variables={previewVariables}
 							format={previewFormat}
 							{isDirty}
