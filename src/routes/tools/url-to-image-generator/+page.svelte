@@ -17,7 +17,7 @@
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
 
-	// Experiment: post-generation signup CTA variant
+	// Experiment: post-generation signup CTA variant (legacy, flag disabled 2026-04-21)
 	let stickyBar;
 
 	function getCtaVariant() {
@@ -31,17 +31,42 @@
 	$: ctaVariant = imageUrl ? getCtaVariant() : 'control';
 
 	let hasTrackedFirstInput = false;
+	let isPrefilled = false;
 
 	function handleFirstInput() {
+		// Once the user actually types, they're no longer in the prefilled state.
+		isPrefilled = false;
 		if (!hasTrackedFirstInput) {
 			hasTrackedFirstInput = true;
 			analytics.trackToolFirstInput({ tool_name: 'url_to_image_generator' });
 		}
 	}
 
-	// Track tool opened on mount
+	const PREFILL_URL = 'https://stripe.com';
+	const PREFILL_VARIANT_KEY = 'tool-prefilled-example-v1';
+
+	function applyPrefillIfEligible() {
+		if (!browser) return;
+		const variant = posthog.getFeatureFlag?.(PREFILL_VARIANT_KEY);
+		if (variant !== 'prefilled') return;
+		if (url) return; // user already typed something
+		isPrefilled = true;
+		url = PREFILL_URL;
+		// Auto-load the preview so the user sees the tool work on landing.
+		loadPreview().catch(() => {});
+	}
+
+	// Track tool opened on mount (trackToolOpened waits for flags internally)
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'url_to_image_generator' });
+		// Apply prefill once flags are ready; trackToolOpened already defers, so
+		// by the time the next tick runs the flag is usually available — but we
+		// still gate via onFeatureFlags to be safe in dev and slow networks.
+		if (typeof posthog.onFeatureFlags === 'function') {
+			posthog.onFeatureFlags(applyPrefillIfEligible);
+		} else {
+			applyPrefillIfEligible();
+		}
 	});
 
 	function trackSignupClick(ctaLocation) {

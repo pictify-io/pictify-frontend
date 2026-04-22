@@ -391,13 +391,31 @@ export const analytics = {
 	},
 
 	/**
-	 * Track tool opened (free tool page)
+	 * Track tool opened (free tool page).
+	 * Waits for PostHog feature flags to resolve so experiment variants
+	 * are attached to the event. Falls back after 1.5s so we never drop
+	 * the event if the flag service is slow.
 	 * @param {Object} params - { tool_name }
 	 */
 	trackToolOpened: (params = {}) => {
-		analytics.track('tool_opened', {
-			tool_name: params.tool_name
-		});
+		if (!browser || !isProd) {
+			analytics.track('tool_opened', { tool_name: params.tool_name });
+			return;
+		}
+
+		let fired = false;
+		const fire = () => {
+			if (fired) return;
+			fired = true;
+			analytics.track('tool_opened', { tool_name: params.tool_name });
+		};
+
+		if (typeof posthog.onFeatureFlags === 'function') {
+			posthog.onFeatureFlags(fire);
+			setTimeout(fire, 1500);
+		} else {
+			fire();
+		}
 	},
 
 	/**
