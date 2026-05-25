@@ -23,6 +23,7 @@
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
 	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
+	import { saveLastRender } from '$lib/lastRender.js';
 	import posthog from 'posthog-js';
 	let stickyBar;
 	$: format = $page.params.format;
@@ -338,6 +339,15 @@
 
 			imageUrl = image.url;
 			totalImagesGenerated++;
+
+			saveLastRender({
+				tool: `html_to_${format}`,
+				html: previewHtml,
+				width: widthToUse,
+				height: heightToUse,
+				format: fileExtension || format,
+				imageUrl: image.url
+			});
 
 			// Track image generation
 			analytics.trackImageGenerated({

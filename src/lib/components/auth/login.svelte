@@ -10,6 +10,7 @@
 	import { loginAction, signupAction, getUser, isLoggedIn } from '../../../store/user.store';
 	import { forgotPassword } from '../../../api/user';
 	import { analytics } from '$lib/analytics.js';
+	import posthog from 'posthog-js';
 
 	let email = '';
 	let password = '';
@@ -38,7 +39,25 @@
 		return null;
 	}
 
-	function safeRedirect() {
+	function safeRedirect({ justSignedUp = false } = {}) {
+		// Post-signup Experiment A (PIC-19): redirect new signups to /welcome
+		// to give them the inline API activation moment. Gated by PostHog flag
+		// `welcome-experiment-a` at 50/50, with control falling through to the
+		// existing safeRedirect behaviour.
+		if (justSignedUp) {
+			let variant = 'control';
+			try {
+				variant = posthog.getFeatureFlag?.('welcome-experiment-a') || 'control';
+			} catch {
+				variant = 'control';
+			}
+			if (variant === 'welcome') {
+				analytics.track('welcome_assigned', { variant });
+				goto('/welcome');
+				return;
+			}
+		}
+
 		const safeUrl = validateRedirectUrl(redirectUrl);
 		if (safeUrl) {
 			// External trusted redirect (e.g. OAuth flow back to API)
@@ -74,17 +93,19 @@
 
 	async function handleSubmit() {
 		try {
+			let justSignedUp = false;
 			if (isLogin) {
 				await loginAction(email, password);
 			} else {
 				await signupAction(email, password);
+				justSignedUp = true;
 				// Flag for post-signup welcome on tool pages
 				if (typeof sessionStorage !== 'undefined') {
 					sessionStorage.setItem('pictify_just_signed_up', '1');
 				}
 			}
 			if (isLoggedIn()) {
-				safeRedirect();
+				safeRedirect({ justSignedUp });
 			}
 		} catch (e) {
 			errorMessage = e.message;
@@ -102,10 +123,11 @@
 				await getUser();
 				if (isLoggedIn()) {
 					// If user wasn't logged in before, this is a new signup via Google
-					if (!wasLoggedIn && !isLogin && typeof sessionStorage !== 'undefined') {
+					const isFreshSignup = !wasLoggedIn && !isLogin;
+					if (isFreshSignup && typeof sessionStorage !== 'undefined') {
 						sessionStorage.setItem('pictify_just_signed_up', '1');
 					}
-					safeRedirect();
+					safeRedirect({ justSignedUp: isFreshSignup });
 				}
 			}
 		}, 1000);

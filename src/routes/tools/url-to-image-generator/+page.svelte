@@ -13,6 +13,7 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
 	import { createImagePublic } from '../../../api/image.js';
+	import { saveLastRender } from '$lib/lastRender.js';
 	import { analytics } from '$lib/analytics.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
@@ -483,6 +484,15 @@
 				watermark: !isUserLoggedIn
 			});
 			imageUrl = image.url;
+
+			saveLastRender({
+				tool: 'url_to_image_generator',
+				url,
+				width: captureWidth,
+				height: captureHeight,
+				format: fileFormat,
+				imageUrl: image.url
+			});
 
 			analytics.trackImageGenerated({
 				tool_name: 'url_to_image_generator',

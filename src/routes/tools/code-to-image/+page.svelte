@@ -2,6 +2,7 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
+	import { saveLastRender } from '$lib/lastRender.js';
 	import { user } from '../../../store/user.store';
 	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
@@ -748,6 +749,15 @@
 			});
 			generatedImage = image;
 			totalImagesGenerated++;
+
+			saveLastRender({
+				tool: 'code_to_image',
+				html,
+				width,
+				height,
+				format: 'png',
+				imageUrl: image.url
+			});
 
 			// Track image generation
 			analytics.trackImageGenerated({
