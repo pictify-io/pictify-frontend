@@ -1,15 +1,44 @@
 <script>
 	import { fade, scale, fly } from 'svelte/transition';
 	import { elasticOut, quintOut } from 'svelte/easing';
-	import { activeMilestone, dismissMilestone } from '../../../store/plg.store';
+	import { activeMilestone, dismissMilestone as dismissMilestoneStore } from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import { recordUpgradePrompt } from '../../../api/plg.js';
 	import { goto } from '$app/navigation';
 
 	// Confetti particles
 	let particles = [];
+	let lastShownId = null;
+
+	const UPSELL_TYPES = new Set(['soft_upsell', 'urgent_upsell', 'limit_reached']);
 
 	$: if ($activeMilestone) {
 		createConfetti();
+		recordShownIfUpsell($activeMilestone);
+	}
+
+	function recordShownIfUpsell(milestone) {
+		if (!milestone || !UPSELL_TYPES.has(milestone.type)) return;
+		const id = milestone.id || `${milestone.feature || 'renders'}-${milestone.count}`;
+		if (id === lastShownId) return;
+		lastShownId = id;
+		recordUpgradePrompt('shown', 'milestone', {
+			milestone_id: id,
+			milestone_type: milestone.type,
+			count: milestone.count,
+			discount: milestone.cta?.discount || null
+		});
+	}
+
+	async function dismissMilestone() {
+		const milestone = $activeMilestone;
+		if (milestone && UPSELL_TYPES.has(milestone.type)) {
+			recordUpgradePrompt('dismissed', 'milestone', {
+				milestone_id: milestone.id || `${milestone.feature || 'renders'}-${milestone.count}`,
+				milestone_type: milestone.type
+			});
+		}
+		await dismissMilestoneStore();
 	}
 
 	function createConfetti() {
@@ -41,6 +70,13 @@
 		switch (action) {
 			case 'upgrade':
 			case 'pricing':
+				if (UPSELL_TYPES.has(milestone.type)) {
+					recordUpgradePrompt('clicked', 'milestone', {
+						milestone_id: milestone.id || `${milestone.feature || 'renders'}-${milestone.count}`,
+						milestone_type: milestone.type,
+						discount: milestone.cta?.discount || null
+					});
+				}
 				dismissMilestone();
 				openUpgradeModal('milestone');
 				break;

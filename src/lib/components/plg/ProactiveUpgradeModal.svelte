@@ -11,6 +11,7 @@
 		getDiscountForUsage
 	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import { recordUpgradePrompt } from '../../../api/plg.js';
 	import { analytics } from '$lib/analytics.js';
 
 	let showModal = false;
@@ -44,6 +45,11 @@
 				time_saved: $plgStatus.timeSaved?.display,
 				discount_code: discountInfo.discountCode
 			});
+			recordUpgradePrompt('shown', 'proactive_modal', {
+				percentage: $usageWidget.percentage,
+				renders_completed: $usageWidget.current,
+				discount_code: discountInfo.discountCode
+			});
 		}
 	}
 
@@ -51,6 +57,9 @@
 		analytics.track('proactive_modal_dismissed', {
 			percentage: $usageWidget.percentage,
 			plan: $usageWidget.plan
+		});
+		recordUpgradePrompt('dismissed', 'proactive_modal', {
+			percentage: $usageWidget.percentage
 		});
 		showModal = false;
 	}
@@ -60,6 +69,10 @@
 			percentage: $usageWidget.percentage,
 			plan: $usageWidget.plan,
 			discount: discountInfo.discountPercent,
+			discount_code: discountInfo.discountCode
+		});
+		recordUpgradePrompt('clicked', 'proactive_modal', {
+			percentage: $usageWidget.percentage,
 			discount_code: discountInfo.discountCode
 		});
 		showModal = false;
