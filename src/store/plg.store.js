@@ -177,6 +177,8 @@ export const urgencyLevel = derived(usageWidget, ($usageWidget) => $usageWidget.
  */
 export const resetPLG = () => {
 	_initPLGPromise = null;
+	_lastSeenRenderCount = null;
+	_lastSeenPercentage = null;
 	plgStatus.set({
 		plan: 'starter',
 		isPaidPlan: false,
@@ -333,6 +335,13 @@ const _doInitPLG = async () => {
 	}
 };
 
+// Track previous render count so we can detect milestone/threshold crossings
+let _lastSeenRenderCount = null;
+let _lastSeenPercentage = null;
+
+const RENDER_MILESTONE_COUNTS = [1, 5, 10, 25, 40, 50];
+const UPSELL_THRESHOLDS = [50, 65, 75, 85, 95, 100];
+
 /**
  * Refresh usage widget (lightweight update)
  */
@@ -350,8 +359,35 @@ export const refreshUsageWidget = async () => {
 		const percentage = limit > 0 ? Math.round((usage / limit) * 100) : 0;
 		const remaining = Math.max(0, limit - usage);
 
-		// Use normalized plan from backend (single source of truth)
+		// Detect render milestone crossings (only on increase, paid users skipped)
 		const plan = planDetails.plan ? normalizePlan(planDetails.plan) : PLANS.STARTER;
+		const isFreePlan = plan === PLANS.STARTER;
+		if (isFreePlan && _lastSeenRenderCount !== null && usage > _lastSeenRenderCount) {
+			const crossed = RENDER_MILESTONE_COUNTS.find(
+				(c) => c > _lastSeenRenderCount && c <= usage
+			);
+			if (crossed) {
+				const milestone = getMilestoneConfig('renders', crossed);
+				if (milestone) {
+					showMilestoneCelebration({
+						...milestone,
+						id: `renders-${crossed}`,
+						feature: 'renders'
+					});
+				}
+			}
+			const crossedThreshold = UPSELL_THRESHOLDS.find(
+				(t) => (_lastSeenPercentage === null || t > _lastSeenPercentage) && t <= percentage
+			);
+			if (crossedThreshold) {
+				const threshold = getThresholdConfig(crossedThreshold);
+				if (threshold && threshold.showUpgrade) {
+					showThresholdPrompt(threshold);
+				}
+			}
+		}
+		_lastSeenRenderCount = usage;
+		_lastSeenPercentage = percentage;
 
 		const isPaidPlan = plan !== PLANS.STARTER;
 

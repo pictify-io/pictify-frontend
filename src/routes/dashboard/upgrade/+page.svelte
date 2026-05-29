@@ -6,6 +6,7 @@
 	import { getProducts } from '../../../api/product';
 	import Loader from '$lib/components/Loader.svelte';
 	import { analytics } from '$lib/analytics.js';
+	import { recordDiscountCodeUsed } from '../../../api/plg.js';
 	import { PLANS, FEATURES, PLAN_FEATURES, formatLimit } from '../../../config/plan-features.js';
 
 	let isLoading = true;
@@ -134,6 +135,16 @@
 			// Append discount code to LemonSqueezy checkout URL if present
 			if (discountCode) {
 				customParams.push(`checkout[discount_code]=${encodeURIComponent(discountCode)}`);
+				// Also pass through custom_data so the webhook can attribute the code on subscription_created
+				customParams.push(
+					`checkout[custom][discount_code]=${encodeURIComponent(discountCode)}`
+				);
+				// Fire-and-forget: record on plgEngagement.discountCodesUsed.
+				// Best-effort attribution at intent-to-checkout time — the webhook can confirm later.
+				recordDiscountCodeUsed(discountCode, {
+					plan: plan.name,
+					source: source || 'dashboard_upgrade'
+				});
 			}
 
 			// Join all parameters with the checkout URL

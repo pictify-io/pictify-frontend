@@ -12,11 +12,13 @@
 		getDiscountForUsage
 	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import { recordUpgradePrompt } from '../../../api/plg.js';
 	import { analytics } from '$lib/analytics.js';
 	import { goto } from '$app/navigation';
 
 	let showBanner = false;
 	let mounted = false;
+	let lastShownAtPercentage = null;
 
 	// Get discount info based on current usage
 	$: discountInfo = getDiscountForUsage($usageWidget.percentage);
@@ -78,12 +80,18 @@
 	});
 
 	function checkBannerVisibility() {
+		const wasShown = showBanner;
 		showBanner = shouldShowUsageBanner();
-		if (showBanner) {
+		if (showBanner && (!wasShown || lastShownAtPercentage !== $usageWidget.percentage)) {
+			lastShownAtPercentage = $usageWidget.percentage;
 			analytics.track('usage_banner_shown', {
 				percentage: $usageWidget.percentage,
 				plan: $usageWidget.plan,
 				discount_code: discountInfo?.discountCode
+			});
+			recordUpgradePrompt('shown', 'usage_banner', {
+				percentage: $usageWidget.percentage,
+				discount_code: discountInfo?.discountCode || null
 			});
 		}
 	}
@@ -98,6 +106,9 @@
 			percentage: $usageWidget.percentage,
 			plan: $usageWidget.plan
 		});
+		recordUpgradePrompt('dismissed', 'usage_banner', {
+			percentage: $usageWidget.percentage
+		});
 		dismissUsageBanner();
 		showBanner = false;
 	}
@@ -108,6 +119,10 @@
 			plan: $usageWidget.plan,
 			discount_code: discountInfo?.discountCode,
 			overage_enabled: overageEnabled
+		});
+		recordUpgradePrompt('clicked', 'usage_banner', {
+			percentage: $usageWidget.percentage,
+			discount_code: discountInfo?.discountCode || null
 		});
 
 		// If at limit with overages enabled, go to billing settings instead
