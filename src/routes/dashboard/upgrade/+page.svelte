@@ -13,6 +13,9 @@
 	let allPlans = [];
 	let error = null;
 	let showAnnual = false;
+	// Record a discount intent once per page visit, even if the user clicks
+	// multiple plan cards before navigation completes.
+	let discountRecorded = false;
 
 	$: isLoggedIn = !!$user.email;
 	$: currentPlan = $user.currentPlan || 'starter';
@@ -141,10 +144,14 @@
 				);
 				// Fire-and-forget: record on plgEngagement.discountCodesUsed.
 				// Best-effort attribution at intent-to-checkout time — the webhook can confirm later.
-				recordDiscountCodeUsed(discountCode, {
-					plan: plan.name,
-					source: source || 'dashboard_upgrade'
-				});
+				// Guard against double-recording on rapid multi-card clicks before navigation.
+				if (!discountRecorded) {
+					discountRecorded = true;
+					recordDiscountCodeUsed(discountCode, {
+						plan: plan.name,
+						source: source || 'dashboard_upgrade'
+					});
+				}
 			}
 
 			// Join all parameters with the checkout URL
