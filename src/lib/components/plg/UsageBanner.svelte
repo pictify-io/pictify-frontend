@@ -148,7 +148,7 @@
 
 {#if bannerVisible}
 	<div
-		class="w-full {bannerStyle} border-b-[3px] border-gray-900 shadow-sm relative z-40"
+		class="w-full {bannerStyle} border-b-[3px] border-gray-900 shadow-sm relative z-20"
 		transition:slide={{ duration: 200 }}
 	>
 		<div class="max-w-7xl mx-auto px-4 py-3">
