@@ -210,17 +210,6 @@ export const GETTING_STARTED_STEPS = {
 	exploring: [
 		{
 			number: 1,
-			title: 'Generate an image with HTML',
-			description: 'Paste any HTML/CSS below and get an image back — no signup or template needed.',
-			href: '/tools/html-to-image',
-			cta: 'Try It',
-			color: '#ffc480',
-			icon: 'code',
-			completedCheck: null,
-			code: null
-		},
-		{
-			number: 2,
 			title: 'Open the template editor',
 			description: 'Build a reusable template with the drag-and-drop editor.',
 			href: '/template-workspace/create',
@@ -231,14 +220,14 @@ export const GETTING_STARTED_STEPS = {
 			code: null
 		},
 		{
-			number: 3,
+			number: 2,
 			title: 'Try the API playground',
-			description: 'Test API endpoints interactively and see live responses.',
+			description: 'Test API endpoints interactively and generate your first image.',
 			href: '/dashboard/api-playground',
 			cta: 'Open Playground',
 			color: '#4ade80',
 			icon: 'code',
-			completedCheck: null,
+			completedCheck: 'hasImages',
 			code: null
 		}
 	]
