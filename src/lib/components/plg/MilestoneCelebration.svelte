@@ -1,7 +1,10 @@
 <script>
 	import { fade, scale, fly } from 'svelte/transition';
 	import { elasticOut, quintOut } from 'svelte/easing';
-	import { activeMilestone, dismissMilestone as dismissMilestoneStore } from '../../../store/plg.store';
+	import {
+		activeMilestone,
+		dismissMilestone as dismissMilestoneStore
+	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 	import { recordUpgradePrompt } from '../../../api/plg.js';
 	import { goto } from '$app/navigation';
@@ -30,6 +33,12 @@
 		});
 	}
 
+	// Close the celebration without recording a funnel event. The CTA path uses this
+	// and records 'clicked' instead — 'clicked' and 'dismissed' are mutually exclusive.
+	function closeMilestone() {
+		return dismissMilestoneStore();
+	}
+
 	async function dismissMilestone() {
 		const milestone = $activeMilestone;
 		if (milestone && UPSELL_TYPES.has(milestone.type)) {
@@ -38,7 +47,7 @@
 				milestone_type: milestone.type
 			});
 		}
-		await dismissMilestoneStore();
+		await closeMilestone();
 	}
 
 	function createConfetti() {
@@ -77,7 +86,7 @@
 						discount: milestone.cta?.discount || null
 					});
 				}
-				dismissMilestone();
+				closeMilestone();
 				openUpgradeModal('milestone');
 				break;
 			case 'templates':

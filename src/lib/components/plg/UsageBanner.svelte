@@ -18,7 +18,6 @@
 
 	let showBanner = false;
 	let mounted = false;
-	let lastShownAtPercentage = null;
 
 	// Get discount info based on current usage
 	$: discountInfo = getDiscountForUsage($usageWidget.percentage);
@@ -82,8 +81,9 @@
 	function checkBannerVisibility() {
 		const wasShown = showBanner;
 		showBanner = shouldShowUsageBanner();
-		if (showBanner && (!wasShown || lastShownAtPercentage !== $usageWidget.percentage)) {
-			lastShownAtPercentage = $usageWidget.percentage;
+		// Record one impression per appearance (hidden -> shown), not per percentage
+		// tick. Re-appearance after the 24h dismiss cooldown counts as a new impression.
+		if (showBanner && !wasShown) {
 			analytics.track('usage_banner_shown', {
 				percentage: $usageWidget.percentage,
 				plan: $usageWidget.plan,

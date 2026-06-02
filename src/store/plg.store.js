@@ -363,9 +363,12 @@ export const refreshUsageWidget = async () => {
 		const plan = planDetails.plan ? normalizePlan(planDetails.plan) : PLANS.STARTER;
 		const isFreePlan = plan === PLANS.STARTER;
 		if (isFreePlan && _lastSeenRenderCount !== null && usage > _lastSeenRenderCount) {
-			const crossed = RENDER_MILESTONE_COUNTS.find(
+			// If several milestones were crossed since the last poll, surface the
+			// highest one reached (a 0->50 jump should celebrate "maxed out", not
+			// "first render"). Counts are ascending, so pop() is the highest crossed.
+			const crossed = RENDER_MILESTONE_COUNTS.filter(
 				(c) => c > _lastSeenRenderCount && c <= usage
-			);
+			).pop();
 			if (crossed) {
 				const milestone = getMilestoneConfig('renders', crossed);
 				if (milestone) {
@@ -376,11 +379,13 @@ export const refreshUsageWidget = async () => {
 					});
 				}
 			}
-			const crossedThreshold = UPSELL_THRESHOLDS.find(
+			// Likewise, if usage jumped past several thresholds, show the prompt for
+			// the user's *current* urgency, not the lowest band we happened to cross.
+			const crossedThreshold = UPSELL_THRESHOLDS.some(
 				(t) => (_lastSeenPercentage === null || t > _lastSeenPercentage) && t <= percentage
 			);
 			if (crossedThreshold) {
-				const threshold = getThresholdConfig(crossedThreshold);
+				const threshold = getThresholdConfig(percentage);
 				if (threshold && threshold.showUpgrade) {
 					showThresholdPrompt(threshold);
 				}
