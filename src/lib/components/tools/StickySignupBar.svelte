@@ -5,6 +5,10 @@
 	import { browser } from '$app/environment';
 
 	export let toolName = '';
+	// When mounted by an experiment host (e.g. tool-signup-cta-v2 on the url-to-image tool),
+	// the parent passes the resolved variant and we show only for its 'sticky-bar' arm.
+	// Falls back to the standalone tool-sticky-signup-bar flag for any other host.
+	export let variant = null;
 
 	$: isLoggedIn = !!$user?.email;
 
@@ -12,17 +16,14 @@
 	let dismissed = false;
 	let hasGenerated = false;
 
-	function getVariant() {
+	function flagVariant() {
 		if (!browser) return 'control';
 		const flag = posthog.getFeatureFlag?.('tool-sticky-signup-bar');
-		// In dev (PostHog not loaded), treat as active so we can test
-		if (flag === undefined && !posthog.__loaded) return 'sticky-bar';
 		return flag || 'control';
 	}
 
-	$: if (hasGenerated && !isLoggedIn && !dismissed) {
-		showBar = getVariant() === 'sticky-bar';
-	}
+	$: effectiveVariant = variant != null ? variant : flagVariant();
+	$: showBar = hasGenerated && !isLoggedIn && !dismissed && effectiveVariant === 'sticky-bar';
 
 	export function triggerAfterGeneration() {
 		hasGenerated = true;
@@ -32,8 +33,8 @@
 		analytics.track('tool_signup_click', {
 			tool_name: toolName,
 			cta_location: 'sticky_bottom_bar',
-			experiment: 'tool-sticky-signup-bar',
-			variant: getVariant()
+			experiment: variant != null ? 'tool-signup-cta-v2' : 'tool-sticky-signup-bar',
+			variant: effectiveVariant
 		});
 	}
 

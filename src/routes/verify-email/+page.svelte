@@ -29,7 +29,7 @@
 			await verifyEmail({ token });
 			status = 'success';
 			message = 'Your email is verified. You can now log in to Pictify.';
-			analytics.trackEmailVerification({ success: true, method: 'link' });
+			analytics.trackEmailVerification({ success: true, method: 'link', source: 'token_link' });
 		} catch (error) {
 			status = 'error';
 			message =

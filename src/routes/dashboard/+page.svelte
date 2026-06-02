@@ -32,9 +32,12 @@
 	import GettingStartedGuide from '$lib/components/onboarding/GettingStartedGuide.svelte';
 	import WelcomeWizard from '$lib/components/onboarding/WelcomeWizard.svelte';
 	import { browser } from '$app/environment';
+	import posthog from 'posthog-js';
 
 	let isLoading = true;
 	let guideDismissed = false;
+	// Experiment: dashboard-checklist-value-first (SEQUENCED — flag dormant, defaults to control).
+	let checklistVariant = 'control';
 	let recentLogs = [];
 	let recentTemplates = [];
 	let totalTemplates = 0;
@@ -254,6 +257,24 @@
 
 	onMount(async () => {
 		analytics.page('Dashboard Home');
+		// Fire the canonical dashboard_page_viewed event on the main dashboard route.
+		// Previously only dashboard SUB-pages called this, so the funnel showed ~0%
+		// dashboard reach for signups — a measurement gap, not real behaviour.
+		analytics.trackDashboardPage({ page_name: 'dashboard_home' });
+
+		// Resolve the dashboard-checklist-value-first experiment variant once flags load.
+		const resolveChecklistVariant = () => {
+			try {
+				checklistVariant = posthog.getFeatureFlag?.('dashboard-checklist-value-first') || 'control';
+			} catch {
+				checklistVariant = 'control';
+			}
+		};
+		if (typeof posthog.onFeatureFlags === 'function') {
+			posthog.onFeatureFlags(resolveChecklistVariant);
+		} else {
+			resolveChecklistVariant();
+		}
 
 		// Check if Getting Started Guide was previously dismissed
 		if (browser) {
@@ -391,6 +412,7 @@
 				hasImages={guideHasImages}
 				intent={guideIntent}
 				apiKey={userApiKey}
+				variant={checklistVariant}
 				on:dismiss={handleDismissGuide}
 			/>
 		</div>
