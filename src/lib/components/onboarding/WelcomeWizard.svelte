@@ -1,4 +1,7 @@
 <script>
+	import { onMount } from 'svelte';
+	import posthog from 'posthog-js';
+	import { analytics } from '$lib/analytics.js';
 	import {
 		savePersonalizationAction,
 		skipPersonalizationAction
@@ -6,6 +9,35 @@
 
 	let selectedIntent = null;
 	let saving = false;
+
+	// Experiment: onboarding-value-first-skip (SEQUENCED — flag is dormant, defaults to control).
+	// control  = current dense intent wizard.
+	// value-skip = value-forward copy + a "show me my API key" skip that frames skipping as a
+	//              positive move toward value instead of a tiny grey "skip for now".
+	let variant = 'control';
+	$: isValueSkip = variant === 'value-skip';
+
+	onMount(() => {
+		// Ungated instrumentation: record the wizard impression so the skip rate is
+		// MEASURED against a real denominator, not inferred from skip/complete counts.
+		analytics.track('welcome_wizard_viewed', {});
+
+		const applyVariant = () => {
+			try {
+				variant = posthog.getFeatureFlag?.('onboarding-value-first-skip') || 'control';
+			} catch {
+				variant = 'control';
+			}
+		};
+		try {
+			if (typeof posthog.onFeatureFlags === 'function') {
+				posthog.onFeatureFlags(applyVariant);
+			}
+		} catch {
+			/* keep control */
+		}
+		applyVariant();
+	});
 
 	const intents = [
 		{
@@ -57,6 +89,10 @@
 
 	async function skip() {
 		if (saving) return;
+		if (isValueSkip) {
+			// Distinguish a value-seeking skip from a bounce.
+			analytics.track('personalization_skip_to_value_clicked', { variant });
+		}
 		saving = true;
 		try {
 			await skipPersonalizationAction();
@@ -80,15 +116,21 @@
 			<div
 				class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] border-[2px] border-black rounded-full shadow-[3px_3px_0_0_black] mb-4"
 			>
-				<span class="text-[10px] font-black text-black uppercase tracking-widest"
-					>Quick Setup</span
-				>
+				<span class="text-[10px] font-black text-black uppercase tracking-widest">Quick Setup</span>
 			</div>
 			<h2 class="text-3xl sm:text-4xl font-black text-black tracking-tight leading-tight">
-				How will you use Pictify?
+				{#if isValueSkip}
+					Your API key is ready — what should we set up first?
+				{:else}
+					How will you use Pictify?
+				{/if}
 			</h2>
 			<p class="text-sm font-bold text-gray-500 mt-2">
-				Pick the option that best describes you. We'll personalize your getting started guide.
+				{#if isValueSkip}
+					Pick one and we'll tailor your guide — or jump straight to your key.
+				{:else}
+					Pick the option that best describes you. We'll personalize your getting started guide.
+				{/if}
 			</p>
 		</div>
 
@@ -177,9 +219,11 @@
 			<button
 				on:click={skip}
 				disabled={saving}
-				class="text-sm font-bold text-gray-500 hover:text-black transition-colors underline underline-offset-2"
+				class="text-sm font-bold transition-colors underline underline-offset-2 {isValueSkip
+					? 'text-black hover:text-[#ff6b6b]'
+					: 'text-gray-500 hover:text-black'}"
 			>
-				Skip for now
+				{isValueSkip ? 'Just show me my API key →' : 'Skip for now'}
 			</button>
 
 			<button

@@ -39,7 +39,35 @@
 		return null;
 	}
 
-	function safeRedirect({ justSignedUp = false } = {}) {
+	// Wait for PostHog to (re)load feature flags for the freshly-identified user.
+	// On signup we identify a brand-new distinct_id, so flags for it are not yet
+	// resolved — reading getFeatureFlag synchronously returns undefined and the
+	// experiment mis-assigns ~everyone to control. Re-fetch and await, with a
+	// hard timeout so we never block the redirect on a slow/absent flag call.
+	function waitForFreshFlags(timeoutMs = 1500) {
+		return new Promise((resolve) => {
+			let settled = false;
+			const finish = () => {
+				if (!settled) {
+					settled = true;
+					resolve();
+				}
+			};
+			try {
+				posthog.reloadFeatureFlags?.();
+				if (typeof posthog.onFeatureFlags === 'function') {
+					posthog.onFeatureFlags(finish);
+				} else {
+					finish();
+				}
+			} catch {
+				finish();
+			}
+			setTimeout(finish, timeoutMs);
+		});
+	}
+
+	async function safeRedirect({ justSignedUp = false } = {}) {
 		// Post-signup Experiment A (PIC-19): redirect new signups to /welcome
 		// to give them the inline API activation moment. Gated by PostHog flag
 		// `welcome-experiment-a` at 50/50, with control falling through to the
@@ -47,12 +75,15 @@
 		if (justSignedUp) {
 			let variant = 'control';
 			try {
+				await waitForFreshFlags();
 				variant = posthog.getFeatureFlag?.('welcome-experiment-a') || 'control';
 			} catch {
 				variant = 'control';
 			}
+			// Track assignment for BOTH arms so the 1-week assignment-health read
+			// (welcome_assigned / signup_completed ≈ 50%) is computable.
+			analytics.track('welcome_assigned', { variant });
 			if (variant === 'welcome') {
-				analytics.track('welcome_assigned', { variant });
 				goto('/welcome');
 				return;
 			}

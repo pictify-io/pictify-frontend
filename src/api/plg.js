@@ -54,6 +54,18 @@ export const recordUpgradePrompt = async (action, promptType, context = {}) => {
 };
 
 /**
+ * Record that a discount code was applied at checkout
+ */
+export const recordDiscountCodeUsed = async (code, context = {}) => {
+	try {
+		const response = await backend.post('/api/plg/discount-code-used', { code, context });
+		return response;
+	} catch (error) {
+		return { success: false };
+	}
+};
+
+/**
  * Get discount code
  */
 export const getDiscountCode = async (percentage) => {

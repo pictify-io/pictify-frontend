@@ -9,14 +9,17 @@
 		shouldShowUsageBanner,
 		dismissUsageBanner,
 		initNudgeState,
-		getDiscountForUsage
+		getDiscountForUsage,
+		activePrompt
 	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import { recordUpgradePrompt } from '../../../api/plg.js';
 	import { analytics } from '$lib/analytics.js';
 	import { goto } from '$app/navigation';
 
 	let showBanner = false;
 	let mounted = false;
+	let impressionLogged = false;
 
 	// Get discount info based on current usage
 	$: discountInfo = getDiscountForUsage($usageWidget.percentage);
@@ -79,24 +82,43 @@
 
 	function checkBannerVisibility() {
 		showBanner = shouldShowUsageBanner();
-		if (showBanner) {
-			analytics.track('usage_banner_shown', {
-				percentage: $usageWidget.percentage,
-				plan: $usageWidget.plan,
-				discount_code: discountInfo?.discountCode
-			});
-		}
 	}
 
-	// Re-check when usage changes
+	// Re-check eligibility whenever usage changes.
 	$: if (mounted && $plgStatus.loaded) {
 		checkBannerVisibility();
+	}
+
+	// Reset the impression guard when the banner leaves the eligible state, so the
+	// next appearance (e.g. after the 24h dismiss cooldown) logs a fresh impression.
+	$: if (!showBanner) impressionLogged = false;
+
+	// Single-prompt coordinator: the banner yields to any active PLG modal. It only
+	// renders when eligible AND no modal currently holds the slot.
+	$: bannerVisible = showBanner && $activePrompt === null;
+
+	// Log exactly one impression the first time the banner is actually visible in an
+	// eligibility window (a modal transiently covering it must not double-count).
+	$: if (bannerVisible && !impressionLogged) {
+		impressionLogged = true;
+		analytics.track('usage_banner_shown', {
+			percentage: $usageWidget.percentage,
+			plan: $usageWidget.plan,
+			discount_code: discountInfo?.discountCode
+		});
+		recordUpgradePrompt('shown', 'usage_banner', {
+			percentage: $usageWidget.percentage,
+			discount_code: discountInfo?.discountCode || null
+		});
 	}
 
 	function handleDismiss() {
 		analytics.track('usage_banner_dismissed', {
 			percentage: $usageWidget.percentage,
 			plan: $usageWidget.plan
+		});
+		recordUpgradePrompt('dismissed', 'usage_banner', {
+			percentage: $usageWidget.percentage
 		});
 		dismissUsageBanner();
 		showBanner = false;
@@ -109,6 +131,10 @@
 			discount_code: discountInfo?.discountCode,
 			overage_enabled: overageEnabled
 		});
+		recordUpgradePrompt('clicked', 'usage_banner', {
+			percentage: $usageWidget.percentage,
+			discount_code: discountInfo?.discountCode || null
+		});
 
 		// If at limit with overages enabled, go to billing settings instead
 		if ($usageWidget.percentage >= 100 && overageEnabled) {
@@ -120,9 +146,9 @@
 	}
 </script>
 
-{#if showBanner}
+{#if bannerVisible}
 	<div
-		class="w-full {bannerStyle} border-b-[3px] border-gray-900 shadow-sm relative z-40"
+		class="w-full {bannerStyle} border-b-[3px] border-gray-900 shadow-sm relative z-20"
 		transition:slide={{ duration: 200 }}
 	>
 		<div class="max-w-7xl mx-auto px-4 py-3">

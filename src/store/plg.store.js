@@ -111,6 +111,27 @@ export const activeMilestone = writable(null);
 // Active upgrade prompt
 export const activeUpgradePrompt = writable(null);
 
+// ---- Single-prompt coordinator ----------------------------------------------
+// Only one interruptive PLG modal (milestone celebration, threshold/feature-limit
+// upgrade modal, or proactive upgrade modal) may be visible at a time. Each modal
+// claims the slot before showing and frees it on close. The ambient usage banner is
+// not a claimant — it observes `activePrompt` and steps aside while a modal is up.
+export const activePrompt = writable(null);
+
+// Claim the single modal slot for `surface`. Non-preemptive: returns false if a
+// different surface already holds it (the first claimant wins until it releases).
+export const requestPrompt = (surface) => {
+	const current = get(activePrompt);
+	if (current && current !== surface) return false;
+	activePrompt.set(surface);
+	return true;
+};
+
+// Release the slot, but only if `surface` is the current holder.
+export const releasePrompt = (surface) => {
+	if (get(activePrompt) === surface) activePrompt.set(null);
+};
+
 // Feature gate status (for checking before using features)
 export const featureGates = writable({});
 
@@ -177,6 +198,9 @@ export const urgencyLevel = derived(usageWidget, ($usageWidget) => $usageWidget.
  */
 export const resetPLG = () => {
 	_initPLGPromise = null;
+	_lastSeenRenderCount = null;
+	_lastSeenPercentage = null;
+	activePrompt.set(null);
 	plgStatus.set({
 		plan: 'starter',
 		isPaidPlan: false,
@@ -333,6 +357,13 @@ const _doInitPLG = async () => {
 	}
 };
 
+// Track previous render count so we can detect milestone/threshold crossings
+let _lastSeenRenderCount = null;
+let _lastSeenPercentage = null;
+
+const RENDER_MILESTONE_COUNTS = [1, 5, 10, 25, 40, 50];
+const UPSELL_THRESHOLDS = [50, 65, 75, 85, 95, 100];
+
 /**
  * Refresh usage widget (lightweight update)
  */
@@ -350,8 +381,44 @@ export const refreshUsageWidget = async () => {
 		const percentage = limit > 0 ? Math.round((usage / limit) * 100) : 0;
 		const remaining = Math.max(0, limit - usage);
 
-		// Use normalized plan from backend (single source of truth)
+		// Detect render milestone crossings (only on increase, paid users skipped)
 		const plan = planDetails.plan ? normalizePlan(planDetails.plan) : PLANS.STARTER;
+		const isFreePlan = plan === PLANS.STARTER;
+		if (isFreePlan && _lastSeenRenderCount !== null && usage > _lastSeenRenderCount) {
+			// Only one prompt is shown per crossing (single-prompt coordinator). Try the
+			// usage-threshold upgrade modal first: at high usage it's the actionable
+			// surface (tiered discount + upgrade CTA), so it should win the slot over the
+			// milestone celebration. Show the prompt for the user's *current* urgency,
+			// not the lowest band we happened to cross.
+			const crossedThreshold = UPSELL_THRESHOLDS.some(
+				(t) => (_lastSeenPercentage === null || t > _lastSeenPercentage) && t <= percentage
+			);
+			if (crossedThreshold) {
+				const threshold = getThresholdConfig(percentage);
+				if (threshold && threshold.showUpgrade) {
+					showThresholdPrompt(threshold);
+				}
+			}
+			// If several milestones were crossed since the last poll, surface the highest
+			// one reached (a 0->50 jump should celebrate "maxed out", not "first render").
+			// Counts are ascending, so pop() is the highest crossed. The coordinator drops
+			// this if the threshold modal above already claimed the slot.
+			const crossed = RENDER_MILESTONE_COUNTS.filter(
+				(c) => c > _lastSeenRenderCount && c <= usage
+			).pop();
+			if (crossed) {
+				const milestone = getMilestoneConfig('renders', crossed);
+				if (milestone) {
+					showMilestoneCelebration({
+						...milestone,
+						id: `renders-${crossed}`,
+						feature: 'renders'
+					});
+				}
+			}
+		}
+		_lastSeenRenderCount = usage;
+		_lastSeenPercentage = percentage;
 
 		const isPaidPlan = plan !== PLANS.STARTER;
 
@@ -598,6 +665,8 @@ export const isPaidUser = derived(plgStatus, ($plgStatus) => {
  * Show milestone celebration
  */
 export const showMilestoneCelebration = (milestone) => {
+	// Single-prompt coordinator: don't stack on top of another active PLG modal.
+	if (!requestPrompt('milestone')) return;
 	activeMilestone.set(milestone);
 
 	// Auto-dismiss after 8 seconds for celebrations
@@ -623,12 +692,15 @@ export const dismissMilestone = async () => {
 		}
 	}
 	activeMilestone.set(null);
+	releasePrompt('milestone');
 };
 
 /**
  * Show feature limit upgrade prompt
  */
 export const showFeatureLimitPrompt = (feature, result) => {
+	// Single-prompt coordinator: don't stack on top of another active PLG modal.
+	if (!requestPrompt('upgrade_modal')) return;
 	activeUpgradePrompt.set({
 		type: 'feature_limit',
 		feature,
@@ -655,6 +727,8 @@ export const showFeatureLimitPrompt = (feature, result) => {
  */
 export const showThresholdPrompt = (threshold) => {
 	if (!threshold || threshold.type === 'info') return;
+	// Single-prompt coordinator: don't stack on top of another active PLG modal.
+	if (!requestPrompt('upgrade_modal')) return;
 
 	activeUpgradePrompt.set({
 		type: 'threshold',
@@ -672,6 +746,15 @@ export const showThresholdPrompt = (threshold) => {
 };
 
 /**
+ * Close the upgrade prompt without recording a dismissal (used by the CTA path,
+ * which records 'clicked' instead) and free the single-prompt slot.
+ */
+export const closeUpgradePrompt = () => {
+	activeUpgradePrompt.set(null);
+	releasePrompt('upgrade_modal');
+};
+
+/**
  * Dismiss upgrade prompt
  */
 export const dismissUpgradePrompt = () => {
@@ -680,7 +763,7 @@ export const dismissUpgradePrompt = () => {
 		recordUpgradePrompt('dismissed', prompt.type, prompt);
 		analytics.trackUpgradePromptDismissed({ prompt_type: prompt.type });
 	}
-	activeUpgradePrompt.set(null);
+	closeUpgradePrompt();
 };
 
 // Discount percentage to code mapping
@@ -726,6 +809,10 @@ export const getDiscountForUsage = (usagePercentage) => {
  */
 export const handleUpgradeClick = async (prompt, discount = null) => {
 	recordUpgradePrompt('clicked', prompt?.type || 'general', prompt);
+
+	// Close the prompt (without logging a dismissal) and free the slot before
+	// navigating, so the modal doesn't linger over the upgrade page.
+	closeUpgradePrompt();
 
 	// Track in PostHog
 	analytics.trackUpgradePromptClicked({

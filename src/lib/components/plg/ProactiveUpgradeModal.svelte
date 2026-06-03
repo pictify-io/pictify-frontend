@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import {
@@ -8,9 +8,12 @@
 		shouldShowProactiveModal,
 		markProactiveModalShown,
 		initNudgeState,
-		getDiscountForUsage
+		getDiscountForUsage,
+		requestPrompt,
+		releasePrompt
 	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
+	import { recordUpgradePrompt } from '../../../api/plg.js';
 	import { analytics } from '$lib/analytics.js';
 
 	let showModal = false;
@@ -28,13 +31,20 @@
 		initNudgeState();
 	});
 
+	onDestroy(() => {
+		// Free the slot if the modal is torn down while open (e.g. route change).
+		releasePrompt('proactive_modal');
+	});
+
 	// Check when usage changes and hits 75%
 	$: if (mounted && $plgStatus.loaded && $usageWidget.percentage >= 75) {
 		checkModalVisibility();
 	}
 
 	function checkModalVisibility() {
-		if (shouldShowProactiveModal()) {
+		// Single-prompt coordinator: only show if no other PLG modal holds the slot.
+		// If denied, leave it un-marked so it can retry on the next usage update.
+		if (shouldShowProactiveModal() && requestPrompt('proactive_modal')) {
 			showModal = true;
 			markProactiveModalShown();
 			analytics.track('proactive_modal_shown', {
@@ -42,6 +52,11 @@
 				plan: $usageWidget.plan,
 				renders_completed: $usageWidget.current,
 				time_saved: $plgStatus.timeSaved?.display,
+				discount_code: discountInfo.discountCode
+			});
+			recordUpgradePrompt('shown', 'proactive_modal', {
+				percentage: $usageWidget.percentage,
+				renders_completed: $usageWidget.current,
 				discount_code: discountInfo.discountCode
 			});
 		}
@@ -52,7 +67,11 @@
 			percentage: $usageWidget.percentage,
 			plan: $usageWidget.plan
 		});
+		recordUpgradePrompt('dismissed', 'proactive_modal', {
+			percentage: $usageWidget.percentage
+		});
 		showModal = false;
+		releasePrompt('proactive_modal');
 	}
 
 	function handleUpgradeClick() {
@@ -62,7 +81,12 @@
 			discount: discountInfo.discountPercent,
 			discount_code: discountInfo.discountCode
 		});
+		recordUpgradePrompt('clicked', 'proactive_modal', {
+			percentage: $usageWidget.percentage,
+			discount_code: discountInfo.discountCode
+		});
 		showModal = false;
+		releasePrompt('proactive_modal');
 		openUpgradeModal('proactive_modal', discountInfo.discountCode);
 	}
 

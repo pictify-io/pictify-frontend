@@ -6,7 +6,7 @@
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
 	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
 	import { user } from '../../../store/user.store';
@@ -18,18 +18,52 @@
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
 
-	// Experiment: post-generation signup CTA variant (legacy, flag disabled 2026-04-21)
 	let stickyBar;
 
-	function getCtaVariant() {
-		if (!browser) return 'control';
-		const flag = posthog.getFeatureFlag?.('tool-signup-cta-experiment');
-		// In dev (PostHog not loaded), test with value-prop variant
-		if (flag === undefined && !posthog.__loaded) return 'value-prop';
-		return flag || 'control';
+	// ── Experiments (PostHog feature flags; default 'control', resolved once flags load) ──
+	// tool-signup-cta-v2:       post-generation signup CTA — control | inline-value-prop | sticky-bar
+	// url-tool-capture-flow-v1: capture affordance         — control | guided-capture | auto-capture
+	let ctaVariant = 'control';
+	let captureVariant = 'control';
+	let userInitiatedLoad = false;
+	let hasAutoCaptured = false;
+
+	function resolveExperimentVariants() {
+		if (!browser) return;
+		try {
+			ctaVariant = posthog.getFeatureFlag?.('tool-signup-cta-v2') || 'control';
+			captureVariant = posthog.getFeatureFlag?.('url-tool-capture-flow-v1') || 'control';
+		} catch {
+			ctaVariant = 'control';
+			captureVariant = 'control';
+		}
 	}
-	// Resolve lazily — by the time imageUrl is set, flags are loaded
-	$: ctaVariant = imageUrl ? getCtaVariant() : 'control';
+
+	// Capture-button enable logic differs by capture-flow arm. CONTROL keeps the legacy
+	// (buggy) check: iframeElement is truthy on mount, so the button LOOKS clickable before
+	// any preview exists — the verified #1 rageclick driver. Treatment arms gate on the real
+	// precondition (a preview must actually be loaded).
+	$: captureDisabled =
+		captureVariant === 'control'
+			? !url || !iframeElement || isImageGenerating
+			: !url || !isPreviewLoaded || isImageGenerating;
+
+	// auto-capture arm: fire ONE capture automatically after a user-initiated preview load.
+	function handleLoadPreviewClick() {
+		userInitiatedLoad = true;
+		loadPreview();
+	}
+
+	async function autoCaptureAfterSettle() {
+		// Let fonts + a paint settle so we don't capture a pre-render frame.
+		try {
+			if (document.fonts?.ready) await document.fonts.ready;
+		} catch {
+			/* fonts API unavailable */
+		}
+		await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+		if (!isImageGenerating) generateImage();
+	}
 
 	let hasTrackedFirstInput = false;
 	let isPrefilled = false;
@@ -60,13 +94,16 @@
 	// Track tool opened on mount (trackToolOpened waits for flags internally)
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'url_to_image_generator' });
-		// Apply prefill once flags are ready; trackToolOpened already defers, so
-		// by the time the next tick runs the flag is usually available — but we
-		// still gate via onFeatureFlags to be safe in dev and slow networks.
-		if (typeof posthog.onFeatureFlags === 'function') {
-			posthog.onFeatureFlags(applyPrefillIfEligible);
-		} else {
+		// Resolve experiment variants + apply prefill once flags are ready. trackToolOpened
+		// already defers, but we still gate via onFeatureFlags for dev and slow networks.
+		const onFlagsReady = () => {
+			resolveExperimentVariants();
 			applyPrefillIfEligible();
+		};
+		if (typeof posthog.onFeatureFlags === 'function') {
+			posthog.onFeatureFlags(onFlagsReady);
+		} else {
+			onFlagsReady();
 		}
 	});
 
@@ -74,7 +111,7 @@
 		analytics.track('tool_signup_click', {
 			tool_name: 'url_to_image_generator',
 			cta_location: ctaLocation,
-			experiment: 'tool-signup-cta-experiment',
+			experiment: 'tool-signup-cta-v2',
 			variant: ctaVariant
 		});
 	}
@@ -139,7 +176,12 @@
 
 	// ── Live API curl (reactive) ───────────────────────────
 	function buildLiveCurl(urlVal, sel, w, h, fmt) {
-		const payload = { url: urlVal || 'https://example.com', width: w, height: h, fileExtension: fmt };
+		const payload = {
+			url: urlVal || 'https://example.com',
+			width: w,
+			height: h,
+			fileExtension: fmt
+		};
 		if (sel) payload.selector = sel;
 		return `curl -X POST https://api.pictify.io/image \\
   -H "Content-Type: application/json" \\
@@ -334,11 +376,16 @@
 			return;
 		}
 		isPreviewLoaded = false;
+		hasAutoCaptured = false;
 		isLoading = true;
 		try {
 			const { content: html } = await getWebsiteHTML(url);
 			if (!html) {
-				toast.set({ message: 'No content returned. Check the URL and try again.', type: 'error', duration: 3000 });
+				toast.set({
+					message: 'No content returned. Check the URL and try again.',
+					type: 'error',
+					duration: 3000
+				});
 				return;
 			}
 
@@ -377,20 +424,34 @@
 			if (iframe) {
 				// Wait for iframe load instead of hardcoded 1s delay
 				const loadPromise = new Promise((resolve) => {
-					const onLoad = () => { iframe.removeEventListener('load', onLoad); resolve(); };
+					const onLoad = () => {
+						iframe.removeEventListener('load', onLoad);
+						resolve();
+					};
 					iframe.addEventListener('load', onLoad);
 				});
 				const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 10000));
 				iframe.srcdoc = modifiedHTML;
 				await Promise.race([loadPromise, timeoutPromise]);
 				iframe.contentWindow.postMessage({ type: 'checkReady' }, '*');
+				// Mitigation (guided/auto arms): enable Capture even if the iframe 'load'
+				// event never fires for a CORS-quirky page we successfully fetched.
+				isPreviewLoaded = true;
 			}
 		} catch (error) {
 			const msg = error?.message || '';
 			if (msg.includes('timeout') || msg.includes('TIMEOUT')) {
-				toast.set({ message: 'Page took too long to load. Try a simpler URL.', type: 'error', duration: 5000 });
+				toast.set({
+					message: 'Page took too long to load. Try a simpler URL.',
+					type: 'error',
+					duration: 5000
+				});
 			} else {
-				toast.set({ message: 'Could not fetch this page. Check the URL and try again.', type: 'error', duration: 4000 });
+				toast.set({
+					message: 'Could not fetch this page. Check the URL and try again.',
+					type: 'error',
+					duration: 4000
+				});
 			}
 		} finally {
 			isLoading = false;
@@ -400,6 +461,36 @@
 	function handleIframeLoad() {
 		isPreviewLoaded = true;
 		isIframeReady = true;
+
+		const treatment = captureVariant === 'guided-capture' || captureVariant === 'auto-capture';
+		// Bring the now-enabled Capture control into view — only after a user-initiated load
+		// (never on the prefill experiment's silent auto-load).
+		if (treatment && userInitiatedLoad) {
+			tick().then(() => {
+				try {
+					document
+						.getElementById('capture-button')
+						?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				} catch {
+					/* no-op */
+				}
+			});
+		}
+
+		// auto-capture: one automatic capture after a user-initiated preview load, with a
+		// settle delay, never on prefill, and reserving guest quota so we don't burn the last one.
+		if (
+			captureVariant === 'auto-capture' &&
+			userInitiatedLoad &&
+			!hasAutoCaptured &&
+			!isImageGenerating &&
+			(isUserLoggedIn || generationLimits.getRemaining() > 1)
+		) {
+			hasAutoCaptured = true;
+			autoCaptureAfterSettle();
+		}
+
+		userInitiatedLoad = false;
 	}
 
 	function sendSelectionScript() {
@@ -467,7 +558,11 @@
 		}
 
 		if (!isUserLoggedIn && !generationLimits.isWithinLimit()) {
-			toast.set({ message: 'Daily limit reached. Sign up for unlimited access.', type: 'warning', duration: 5000 });
+			toast.set({
+				message: 'Daily limit reached. Sign up for unlimited access.',
+				type: 'warning',
+				duration: 5000
+			});
 			return;
 		}
 
@@ -500,18 +595,30 @@
 				with_watermark: !isUserLoggedIn
 			});
 
-			// Trigger sticky bar experiment after generation
-			if (!isUserLoggedIn && stickyBar) {
+			// Trigger the sticky-bar arm of tool-signup-cta-v2 after generation
+			if (!isUserLoggedIn && stickyBar && ctaVariant === 'sticky-bar') {
 				stickyBar.triggerAfterGeneration();
 			}
 		} catch (error) {
 			const status = error?.status || error?.response?.status;
 			if (status === 429) {
-				toast.set({ message: 'Rate limit reached. Wait a moment and try again.', type: 'warning', duration: 5000 });
+				toast.set({
+					message: 'Rate limit reached. Wait a moment and try again.',
+					type: 'warning',
+					duration: 5000
+				});
 			} else if (status === 408 || error?.message?.includes('timeout')) {
-				toast.set({ message: 'Screenshot timed out. Try smaller dimensions or a simpler page.', type: 'error', duration: 5000 });
+				toast.set({
+					message: 'Screenshot timed out. Try smaller dimensions or a simpler page.',
+					type: 'error',
+					duration: 5000
+				});
 			} else {
-				toast.set({ message: 'Screenshot failed. Please try again.', type: 'error', duration: 4000 });
+				toast.set({
+					message: 'Screenshot failed. Please try again.',
+					type: 'error',
+					duration: 4000
+				});
 			}
 		}
 		isImageGenerating = false;
@@ -562,7 +669,10 @@
 		content="url to image, image url generator, url to picture converter, photo url generator, picture url maker, link to picture, image link generator, screenshot api, webpage to image"
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/url-to-image-generator" />
-	<meta property="og:title" content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify" />
+	<meta
+		property="og:title"
+		content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify"
+	/>
 	<meta
 		property="og:description"
 		content="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
@@ -571,7 +681,10 @@
 	<meta property="og:url" content="https://pictify.io/tools/url-to-image-generator" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:title" content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify" />
+	<meta
+		name="twitter:title"
+		content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify"
+	/>
 	<meta
 		name="twitter:description"
 		content="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
@@ -714,7 +827,7 @@
 						</div>
 						<div class="md:w-auto w-full">
 							<button
-								on:click={loadPreview}
+								on:click={handleLoadPreviewClick}
 								disabled={isLoading || !url}
 								class="w-full h-full px-8 py-4 bg-[#ffc480] text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
 							>
@@ -723,31 +836,74 @@
 						</div>
 					</div>
 
+					{#if captureVariant !== 'control' && url}
+						{#if isLoading}
+							<p class="mt-3 text-sm font-bold text-gray-500 flex items-center gap-2">
+								<span
+									class="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
+								/>
+								Loading preview… the Capture button unlocks once it's ready.
+							</p>
+						{:else if !isPreviewLoaded}
+							<p class="mt-3 text-sm font-bold text-gray-500">
+								Load the preview first — then the green
+								<span class="text-[#4ade80] font-black">Capture</span> button activates below.
+							</p>
+						{/if}
+					{/if}
+
 					<!-- Capture Settings -->
 					<div class="mt-6 border-t-[3px] border-black pt-6">
 						<div class="flex items-center gap-2 mb-4">
-							<div class="bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider">Capture Settings</div>
+							<div
+								class="bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
+							>
+								Capture Settings
+							</div>
 						</div>
 
 						<div class="flex flex-col md:flex-row gap-6">
 							<!-- Device Presets -->
 							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500">Device</span>
+								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
+									>Device</span
+								>
 								<div class="flex gap-2">
 									{#each devicePresets as preset}
 										<button
 											on:click={() => selectPreset(preset)}
 											class="px-3 py-2 border-[3px] border-black font-bold text-sm transition-all flex items-center gap-1.5
 												{activePreset === preset.id
-													? 'bg-black text-white shadow-none'
-													: 'bg-white text-black shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+												? 'bg-black text-white shadow-none'
+												: 'bg-white text-black shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px]'}"
 										>
 											{#if preset.id === 'desktop'}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+													/></svg
+												>
 											{:else if preset.id === 'tablet'}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+													/></svg
+												>
 											{:else}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+													/></svg
+												>
 											{/if}
 											{preset.label}
 										</button>
@@ -757,7 +913,9 @@
 
 							<!-- Custom Size -->
 							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500">Size (px)</span>
+								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
+									>Size (px)</span
+								>
 								<div class="flex items-center gap-1">
 									<input
 										type="number"
@@ -781,15 +939,15 @@
 
 							<!-- Format -->
 							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500">Format</span>
+								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
+									>Format</span
+								>
 								<div class="flex gap-0">
 									{#each ['png', 'jpg', 'webp'] as fmt}
 										<button
 											on:click={() => (fileFormat = fmt)}
 											class="px-4 py-2 border-[3px] border-black font-black text-sm uppercase transition-all -ml-[3px] first:ml-0
-												{fileFormat === fmt
-													? 'bg-black text-white z-10'
-													: 'bg-white text-black hover:bg-gray-50'}"
+												{fileFormat === fmt ? 'bg-black text-white z-10' : 'bg-white text-black hover:bg-gray-50'}"
 										>
 											{fmt}
 										</button>
@@ -805,8 +963,8 @@
 					>
 						<span class="text-xl">⚠️</span>
 						<p>
-							Due to CORS policies, live previews may be restricted for some domains.
-							The capture engine operates server-side and will bypass these limitations.
+							Due to CORS policies, live previews may be restricted for some domains. The capture
+							engine operates server-side and will bypass these limitations.
 						</p>
 					</div>
 				</div>
@@ -877,8 +1035,9 @@
 				</div>
 				<div class="w-full md:w-auto flex-shrink-0 pt-5">
 					<button
+						id="capture-button"
 						on:click={generateImage}
-						disabled={!url || !iframeElement || isImageGenerating}
+						disabled={captureDisabled}
 						class="w-full md:w-auto px-8 py-3 bg-[#4ade80] text-black border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
 					>
 						{#if isImageGenerating}
@@ -904,7 +1063,10 @@
 							</svg>
 							Rendering...
 						{:else}
-							<span>Capture {fileFormat.toUpperCase()}</span>
+							<span
+								>{captureVariant === 'auto-capture' && hasAutoCaptured ? 'Re-capture' : 'Capture'}
+								{fileFormat.toUpperCase()}</span
+							>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								class="h-5 w-5"
@@ -954,7 +1116,12 @@
 							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+								/></svg
 							>
 							Download {fileFormat.toUpperCase()}
 						</a>
@@ -963,17 +1130,31 @@
 							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+								/></svg
 							>
 							Copy URL
 						</button>
 					</div>
 
 					<!-- Experiment: Post-generation signup CTA -->
-					{#if !isUserLoggedIn && ctaVariant === 'value-prop'}
-						<div class="mt-8 border-[3px] border-black bg-[#ffc480]/20 p-6 flex flex-col items-center text-center gap-3">
-							<p class="font-black text-gray-900 text-base uppercase tracking-wide">Like it? Automate it.</p>
-							<p class="text-sm font-bold text-gray-600 max-w-md">Sign up to get your API key and capture unlimited screenshots programmatically — same quality, zero daily limits.</p>
+					<!-- Experiment tool-signup-cta-v2: inline-value-prop arm. The sticky-bar arm renders
+						 the fixed StickySignupBar (below); control renders neither. -->
+					{#if !isUserLoggedIn && ctaVariant === 'inline-value-prop'}
+						<div
+							class="mt-8 border-[3px] border-black bg-[#ffc480]/20 p-6 flex flex-col items-center text-center gap-3"
+						>
+							<p class="font-black text-gray-900 text-base uppercase tracking-wide">
+								Like it? Automate it.
+							</p>
+							<p class="text-sm font-bold text-gray-600 max-w-md">
+								Sign up to get your API key and capture unlimited screenshots programmatically —
+								same quality, zero daily limits.
+							</p>
 							<a
 								href="/signup?redirect=/tools/url-to-image-generator"
 								on:click={() => trackSignupClick('post_generation_value_prop')}
@@ -982,26 +1163,8 @@
 								Get Your API Key — Free
 							</a>
 						</div>
-					{:else if !isUserLoggedIn && ctaVariant === 'social-proof'}
-						<div class="mt-8 border-[3px] border-black bg-[#4ade80]/10 p-6 flex flex-col items-center text-center gap-3">
-							<div class="flex -space-x-2">
-								{#each ['#ff6b6b', '#ffc480', '#4ade80', '#60a5fa'] as color}
-									<div class="w-8 h-8 rounded-full border-[2px] border-white" style="background: {color};"></div>
-								{/each}
-							</div>
-							<p class="font-black text-gray-900 text-base">10,000+ developers capture screenshots via API</p>
-							<p class="text-sm font-bold text-gray-500 max-w-md">Sign up free to get unlimited captures, your own API key, and higher resolution output.</p>
-							<a
-								href="/signup?redirect=/tools/url-to-image-generator"
-								on:click={() => trackSignupClick('post_generation_social_proof')}
-								class="mt-1 px-6 py-3 bg-[#ff6b6b] text-white border-[3px] border-black font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								Sign Up Free
-							</a>
-						</div>
 					{/if}
 				</div>
-
 			</div>
 		{/if}
 
@@ -1010,7 +1173,9 @@
 			<div class="border-[3px] border-black shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
 				<div class="bg-black px-4 py-3 flex items-center justify-between">
 					<div class="flex items-center gap-3">
-						<span class="text-xs font-black uppercase tracking-widest text-[#ffc480]">Your API Request</span>
+						<span class="text-xs font-black uppercase tracking-widest text-[#ffc480]"
+							>Your API Request</span
+						>
 						<span class="text-xs text-gray-500 font-mono">— updates as you change settings</span>
 					</div>
 					<button
@@ -1022,13 +1187,16 @@
 				</div>
 				<div class="bg-[#1e1e1e]">
 					<div class="bg-[#2d2d2d] px-4 py-2 border-b border-gray-800 flex items-center gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-						<div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-						<div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-						<span class="ml-auto text-xs text-gray-500 font-mono font-bold uppercase tracking-wider">BASH</span>
+						<div class="w-3 h-3 rounded-full bg-[#ff5f56]" />
+						<div class="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+						<div class="w-3 h-3 rounded-full bg-[#27c93f]" />
+						<span class="ml-auto text-xs text-gray-500 font-mono font-bold uppercase tracking-wider"
+							>BASH</span
+						>
 					</div>
 					<div class="p-6 overflow-x-auto">
-						<pre class="font-mono text-sm leading-relaxed text-gray-300">{@html highlightedCurl}</pre>
+						<pre
+							class="font-mono text-sm leading-relaxed text-gray-300">{@html highlightedCurl}</pre>
 					</div>
 				</div>
 			</div>
@@ -1048,27 +1216,43 @@
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
 					<h3 class="font-black text-lg mb-2">Link Preview Images</h3>
-					<p class="text-gray-600 font-medium text-sm">Auto-generate thumbnail images from any URL for link previews, bookmarks, and content cards.</p>
+					<p class="text-gray-600 font-medium text-sm">
+						Auto-generate thumbnail images from any URL for link previews, bookmarks, and content
+						cards.
+					</p>
 				</div>
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
 					<h3 class="font-black text-lg mb-2">Visual QA Monitoring</h3>
-					<p class="text-gray-600 font-medium text-sm">Schedule periodic screenshots of your pages to catch visual regressions before users do.</p>
+					<p class="text-gray-600 font-medium text-sm">
+						Schedule periodic screenshots of your pages to catch visual regressions before users do.
+					</p>
 				</div>
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ff6b6b]">
 					<h3 class="font-black text-lg mb-2">Photo URL Generator</h3>
-					<p class="text-gray-600 font-medium text-sm">Turn any webpage into a hosted image URL. Share as a picture link on social media or embed in emails.</p>
+					<p class="text-gray-600 font-medium text-sm">
+						Turn any webpage into a hosted image URL. Share as a picture link on social media or
+						embed in emails.
+					</p>
 				</div>
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#1f2937]">
 					<h3 class="font-black text-lg mb-2">OG Image Fallbacks</h3>
-					<p class="text-gray-600 font-medium text-sm">Generate Open Graph images on-the-fly for pages that don't have custom social previews.</p>
+					<p class="text-gray-600 font-medium text-sm">
+						Generate Open Graph images on-the-fly for pages that don't have custom social previews.
+					</p>
 				</div>
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
 					<h3 class="font-black text-lg mb-2">Web Archiving</h3>
-					<p class="text-gray-600 font-medium text-sm">Capture and store visual snapshots of competitor pages, legal evidence, or content for compliance.</p>
+					<p class="text-gray-600 font-medium text-sm">
+						Capture and store visual snapshots of competitor pages, legal evidence, or content for
+						compliance.
+					</p>
 				</div>
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
 					<h3 class="font-black text-lg mb-2">Image Link Converter</h3>
-					<p class="text-gray-600 font-medium text-sm">Convert any URL to a picture URL that can be embedded anywhere — Notion, Confluence, Slack, or email.</p>
+					<p class="text-gray-600 font-medium text-sm">
+						Convert any URL to a picture URL that can be embedded anywhere — Notion, Confluence,
+						Slack, or email.
+					</p>
 				</div>
 			</div>
 		</section>
@@ -1300,13 +1484,21 @@
 			</div>
 		</div>
 
-		<RelatedTools tools={['html-email', 'blog-featured-image', 'og-image-generator', 'code-to-image', 'html-to-png']} />
+		<RelatedTools
+			tools={[
+				'html-email',
+				'blog-featured-image',
+				'og-image-generator',
+				'code-to-image',
+				'html-to-png'
+			]}
+		/>
 
 		<Toast />
 		<Footer />
 	</main>
 
-	<StickySignupBar bind:this={stickyBar} toolName="url_to_image_generator" />
+	<StickySignupBar bind:this={stickyBar} toolName="url_to_image_generator" variant={ctaVariant} />
 </div>
 
 <style>

@@ -1,4 +1,7 @@
 <script>
+	import { onMount } from 'svelte';
+	import posthog from 'posthog-js';
+	import { analytics } from '$lib/analytics.js';
 	import { resendVerificationEmail } from '../../../api/auth';
 
 	export let email = '';
@@ -7,11 +10,37 @@
 	let status = 'idle';
 	let message = '';
 
+	// Experiment: verify-copy-v1 (SEQUENCED — flag is dormant, defaults to control).
+	let variant = 'control';
+	$: isValueUnlock = variant === 'value-unlock';
+
 	$: isLoading = status === 'loading';
+
+	onMount(() => {
+		// Ungated instrumentation: this verification wall (imported in 5 gated paths)
+		// had ZERO tracking before.
+		const applyVariant = () => {
+			try {
+				variant = posthog.getFeatureFlag?.('verify-copy-v1') || 'control';
+			} catch {
+				variant = 'control';
+			}
+		};
+		applyVariant();
+		analytics.track('verify_wall_shown', { source: 'wall', feature, variant });
+		try {
+			if (typeof posthog.onFeatureFlags === 'function') {
+				posthog.onFeatureFlags(applyVariant);
+			}
+		} catch {
+			/* keep control */
+		}
+	});
 
 	async function handleResend() {
 		if (isLoading) return;
 
+		analytics.track('verify_resend_clicked', { source: 'wall', feature, variant, auto: false });
 		status = 'loading';
 		message = '';
 
@@ -19,9 +48,16 @@
 			await resendVerificationEmail();
 			status = 'success';
 			message = `Verification email sent to ${email || 'your inbox'}`;
+			analytics.track('verify_resend_succeeded', { source: 'wall', feature, variant });
 		} catch (error) {
 			status = 'error';
 			message = error?.message || 'Unable to resend verification email';
+			analytics.track('verify_resend_failed', {
+				source: 'wall',
+				feature,
+				variant,
+				error: error?.message || 'unknown'
+			});
 		}
 	}
 </script>
@@ -44,10 +80,14 @@
 		</div>
 		<div class="flex-1">
 			<h3 class="text-base font-black text-gray-900 uppercase tracking-widest mb-1.5">
-				Verification Required
+				{isValueUnlock ? 'Verify to Unlock Rendering' : 'Verification Required'}
 			</h3>
 			<p class="text-sm font-medium text-gray-600 leading-relaxed">
-				To use {feature}, please verify your email address.
+				{#if isValueUnlock}
+					Your {feature} is locked until you confirm your email — it takes one click.
+				{:else}
+					To use {feature}, please verify your email address.
+				{/if}
 				{#if email}
 					We sent a link to <span class="font-bold text-gray-900 bg-yellow-100 px-1 rounded"
 						>{email}</span
