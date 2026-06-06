@@ -91,8 +91,18 @@ export const plgStatus = writable({
 	threshold: null,
 	timeSaved: { value: 0, unit: 'minutes', display: '0 minutes' },
 	resetDate: null,
+	isOnTrial: false,
+	trialEndsAt: null,
+	trialDaysRemaining: null,
 	loaded: false
 });
+
+// Compact trial info for the dashboard header badge.
+export const trialInfo = derived(plgStatus, ($s) => ({
+	isOnTrial: $s.isOnTrial || false,
+	daysRemaining: $s.trialDaysRemaining ?? null,
+	endsAt: $s.trialEndsAt || null
+}));
 
 // Usage widget (compact version for header)
 export const usageWidget = writable({
@@ -328,6 +338,9 @@ const _doInitPLG = async () => {
 			threshold,
 			timeSaved,
 			resetDate: planDetails.nextReset,
+			isOnTrial: planDetails.isOnTrial || false,
+			trialEndsAt: planDetails.trialEndsAt || null,
+			trialDaysRemaining: planDetails.trialDaysRemaining ?? null,
 			loaded: true
 		};
 

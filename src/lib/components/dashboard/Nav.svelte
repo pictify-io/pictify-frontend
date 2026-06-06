@@ -1,6 +1,8 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import UsageWidget from '../plg/UsageWidget.svelte';
+	import { trialInfo } from '../../../store/plg.store';
+	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 
 	const dispatch = createEventDispatcher();
 
@@ -83,6 +85,20 @@
 
 	<!-- Right Side: System Status / Usage -->
 	<div class="flex items-stretch border-l-[3px] border-gray-900 flex-shrink-0">
+		{#if $trialInfo.isOnTrial}
+			<!-- Trial Badge -->
+			<button
+				type="button"
+				on:click={() => openUpgradeModal('trial_badge')}
+				title="You're on a free Basic trial. Upgrade to keep your higher limit."
+				class="hidden sm:flex items-center gap-2 px-3 md:px-4 min-h-[64px] sm:min-h-[80px] border-r-[3px] border-gray-900 bg-[#ffc480] hover:bg-[#ffb454] transition-colors font-bold text-gray-900 text-xs sm:text-sm whitespace-nowrap"
+			>
+				<span aria-hidden="true">⏳</span>
+				<span>
+					Trial · {$trialInfo.daysRemaining ?? 0} day{$trialInfo.daysRemaining === 1 ? '' : 's'} left
+				</span>
+			</button>
+		{/if}
 		<!-- Usage Widget Container -->
 		<div
 			class="flex items-center px-3 sm:px-4 md:px-6 min-h-[64px] sm:min-h-[80px] hover:bg-gray-50 transition-colors relative group"

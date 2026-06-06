@@ -1,10 +1,48 @@
 import { PUBLIC_BACKEND_URL } from '$env/static/public';
+import { openUpgradeModal } from '../store/upgrade-modal.store';
 
 class HttpError extends Error {
-	constructor(status, message) {
+	constructor(status, message, data = {}) {
 		super(message);
 		this.status = status;
+		this.data = data;
 	}
+}
+
+// On a quota_exceeded 429 the backend returns { code, upgradeUrl, checkoutUrl? }.
+// Surface the upgrade path automatically. Browser-only (no-op during SSR).
+function maybeHandleQuota(err) {
+	if (
+		typeof window !== 'undefined' &&
+		err.status === 429 &&
+		err.data &&
+		err.data.code === 'quota_exceeded'
+	) {
+		try {
+			openUpgradeModal('quota_exceeded', null, err.data.checkoutUrl || null);
+		} catch (e) {
+			/* ignore */
+		}
+	}
+}
+
+// Shared response handler: returns parsed JSON, or throws an HttpError that
+// carries the response body so callers (and maybeHandleQuota) can read
+// code / checkoutUrl / message.
+async function handleResponse(response) {
+	if (response.ok) return response.json();
+	let message = response.statusText;
+	let data = {};
+	try {
+		data = await response.json();
+		if (data && data.message) message = data.message;
+		else if (data && data.error) message = data.error;
+	} catch (e) {
+		/* ignore */
+	}
+	const err = new HttpError(response.status, message, data);
+	maybeHandleQuota(err);
+	throw err;
 }
 
 const backend = {
@@ -26,19 +64,7 @@ const backend = {
 				...options.headers
 			}
 		});
-		if (!response.ok) {
-			let message = response.statusText;
-			try {
-				const data = await response.json();
-				if (data && data.message) {
-					message = data.message;
-				}
-			} catch (e) {
-				// ignore
-			}
-			throw new HttpError(response.status, message);
-		}
-		return response.json();
+		return handleResponse(response);
 	},
 
 	post: async (url, data = {}, options = {}) => {
@@ -60,19 +86,7 @@ const backend = {
 			},
 			body: JSON.stringify(data)
 		});
-		if (!response.ok) {
-			let message = response.statusText;
-			try {
-				const data = await response.json();
-				if (data && data.message) {
-					message = data.message;
-				}
-			} catch (e) {
-				// ignore
-			}
-			throw new HttpError(response.status, message);
-		}
-		return response.json();
+		return handleResponse(response);
 	},
 
 	put: async (url, data, options = {}) => {
@@ -94,19 +108,7 @@ const backend = {
 			},
 			body: JSON.stringify(data)
 		});
-		if (!response.ok) {
-			let message = response.statusText;
-			try {
-				const data = await response.json();
-				if (data && data.message) {
-					message = data.message;
-				}
-			} catch (e) {
-				// ignore
-			}
-			throw new HttpError(response.status, message);
-		}
-		return response.json();
+		return handleResponse(response);
 	},
 
 	delete: async (url, options = {}) => {
@@ -126,19 +128,7 @@ const backend = {
 				...options.headers
 			}
 		});
-		if (!response.ok) {
-			let message = response.statusText;
-			try {
-				const data = await response.json();
-				if (data && data.message) {
-					message = data.message;
-				}
-			} catch (e) {
-				// ignore
-			}
-			throw new HttpError(response.status, message);
-		}
-		return response.json();
+		return handleResponse(response);
 	},
 
 	patch: async (url, data, options = {}) => {
@@ -160,19 +150,7 @@ const backend = {
 			},
 			body: JSON.stringify(data)
 		});
-		if (!response.ok) {
-			let message = response.statusText;
-			try {
-				const data = await response.json();
-				if (data && data.message) {
-					message = data.message;
-				}
-			} catch (e) {
-				// ignore
-			}
-			throw new HttpError(response.status, message);
-		}
-		return response.json();
+		return handleResponse(response);
 	},
 
 	// Upload FormData (for file uploads)
@@ -195,21 +173,7 @@ const backend = {
 			},
 			body: formData
 		});
-		if (!response.ok) {
-			let message = response.statusText;
-			try {
-				const data = await response.json();
-				if (data && data.message) {
-					message = data.message;
-				} else if (data && data.error) {
-					message = data.error;
-				}
-			} catch (e) {
-				// ignore
-			}
-			throw new HttpError(response.status, message);
-		}
-		return response.json();
+		return handleResponse(response);
 	}
 };
 
