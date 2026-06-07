@@ -282,7 +282,7 @@
 					disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{#if layoutThumbnails['__default__']}
-					<img loading="lazy" src={layoutThumbnails['__default__']} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
+					<img src={layoutThumbnails['__default__']} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
 				{/if}
 				<div class="text-left">
 					<div class="text-xs font-bold">Default</div>
@@ -301,7 +301,7 @@
 						disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{#if layoutThumbnails[key]}
-						<img loading="lazy" src={layoutThumbnails[key]} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
+						<img src={layoutThumbnails[key]} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
 					{/if}
 					<div class="text-left">
 						<div class="text-xs font-bold">{layout.name || key}</div>

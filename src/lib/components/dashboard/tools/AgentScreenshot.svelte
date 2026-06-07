@@ -318,7 +318,7 @@
 							<div class="space-y-4">
 								<!-- Screenshot -->
 								<div class="bg-white rounded-lg p-4 border-2 border-gray-200">
-									<img loading="lazy"
+									<img
 										src={finalResult.url}
 										alt="Generated screenshot"
 										class="w-full h-auto rounded-lg shadow-lg"

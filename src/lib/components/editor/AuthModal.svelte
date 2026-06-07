@@ -230,7 +230,7 @@
 						on:click={handleGoogleAuth}
 						disabled={isLoading}
 					>
-						<img loading="lazy"
+						<img
 							src="https://www.svgrepo.com/show/475656/google-color.svg"
 							alt="Google"
 							class="w-5 h-5"

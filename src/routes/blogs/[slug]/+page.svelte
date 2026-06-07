@@ -85,7 +85,7 @@
 			<div
 				class="flex-1 bg-white md:border-r-[3px] border-t-[3px] md:border-t-0 border-gray-900 relative overflow-hidden min-h-[400px] md:min-h-[500px]"
 			>
-				<img loading="lazy"
+				<img
 					src={blog?.heroImage}
 					class="object-cover w-full h-full absolute inset-0"
 					alt={blog?.title}

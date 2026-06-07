@@ -423,7 +423,7 @@
 				<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">Barcode Generated!</h3>
 
 				<div class="inline-block bg-white border-[3px] border-gray-900 p-4 shadow-brutal-2xl rotate-1 mb-8">
-					<img loading="lazy" src={imageUrl} alt="Generated barcode" class="max-w-full h-auto max-h-[200px]" />
+					<img src={imageUrl} alt="Generated barcode" class="max-w-full h-auto max-h-[200px]" />
 				</div>
 
 				<div class="flex flex-wrap justify-center gap-4">

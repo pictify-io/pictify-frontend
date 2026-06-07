@@ -304,7 +304,7 @@
 										<div
 											class="absolute inset-0 opacity-5 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px]"
 										/>
-										<img loading="lazy"
+										<img
 											src={asset.url}
 											alt={asset.name}
 											class="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-300"
@@ -412,7 +412,7 @@
 											<div
 												class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:4px_4px]"
 											/>
-											<img loading="lazy"
+											<img
 												src={asset.url}
 												alt={asset.name}
 												class="w-full h-full object-contain p-2"
@@ -476,7 +476,7 @@
 										<div
 											class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:4px_4px]"
 										/>
-										<img loading="lazy"
+										<img
 											src={asset.url}
 											alt={asset.name}
 											class="w-full h-full object-contain p-2"

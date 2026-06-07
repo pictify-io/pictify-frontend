@@ -198,7 +198,7 @@
 			<div class="p-6">
 				{#if generatedImageUrl}
 					<div class="mb-4 border-[3px] border-black p-2 bg-gray-50">
-						<img loading="lazy"
+						<img
 							src={generatedImageUrl}
 							alt="Your generated image"
 							class="w-full h-auto max-h-32 object-contain"

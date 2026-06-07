@@ -59,11 +59,11 @@
 	// Embed code snippets
 	$: embedSnippets = result
 		? {
-				img: `<img loading="lazy" src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${
+				img: `<img src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${
 					result.width
 				}" height="${result.height}" />`,
 				markdown: `![${result.title || 'Pictify image'}](${result.assetUrl})`,
-				html: `<picture><img loading="lazy" src="${result.assetUrl}" alt="${
+				html: `<picture><img src="${result.assetUrl}" alt="${
 					result.title || 'Pictify image'
 				}" width="${result.width}" height="${
 					result.height
@@ -456,13 +456,13 @@
 							/>
 
 							{#if result.contentType === 'gif'}
-								<img loading="lazy"
+								<img
 									src={result.assetUrl}
 									alt={result.title || 'Generated GIF'}
 									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
 								/>
 							{:else}
-								<img loading="lazy"
+								<img
 									src={result.assetUrl}
 									alt={result.title || 'Generated image'}
 									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"

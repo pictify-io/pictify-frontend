@@ -955,7 +955,7 @@
 							<div
 								class="aspect-[4/1] border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden mb-6"
 							>
-								<img loading="lazy"
+								<img
 									src={imageUrl}
 									alt="Generated LinkedIn Banner"
 									class="w-full h-full object-cover"

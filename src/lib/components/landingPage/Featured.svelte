@@ -27,7 +27,7 @@
 			class="group flex flex-col items-center p-6 bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 		>
 			<div class="w-20 h-20 md:w-24 md:h-24 mb-4 p-3 bg-white rounded-xl border-2 border-gray-900">
-				<img loading="lazy" src={PeerlistLogo} alt="Peerlist Logo" class="w-full h-full object-contain" />
+				<img src={PeerlistLogo} alt="Peerlist Logo" class="w-full h-full object-contain" />
 			</div>
 			<span
 				class="px-3 py-1 bg-brand-accent rounded-full border-2 border-gray-900 text-xs font-bold text-gray-900 mb-1"
@@ -43,7 +43,7 @@
 			class="group flex flex-col items-center p-6 bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 		>
 			<div class="w-20 h-20 md:w-24 md:h-24 mb-4 p-3 bg-white rounded-xl border-2 border-gray-900">
-				<img loading="lazy" src={BetalistLogo} alt="Betalist Logo" class="w-full h-full object-contain" />
+				<img src={BetalistLogo} alt="Betalist Logo" class="w-full h-full object-contain" />
 			</div>
 			<span
 				class="px-3 py-1 bg-brand-danger text-white rounded-full border-2 border-gray-900 text-xs font-bold mb-1"
@@ -59,7 +59,7 @@
 			class="group flex flex-col items-center p-6 bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 		>
 			<div class="w-20 h-20 md:w-24 md:h-24 mb-4 p-3 bg-white rounded-xl border-2 border-gray-900">
-				<img loading="lazy"
+				<img
 					src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1"
 					alt="SaaSHub Badge"
 					class="w-full h-full object-contain"

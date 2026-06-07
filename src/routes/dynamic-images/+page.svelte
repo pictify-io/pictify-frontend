@@ -87,7 +87,7 @@
 		},
 		{
 			q: 'Can I use Dynamic Links in emails?',
-			a: 'Absolutely! Embed the Dynamic Link URL as an <img loading="lazy"> src in your email. Each time the email is opened, the image renders with the latest data. Check our Email Personalization page for ESP-specific guides.'
+			a: 'Absolutely! Embed the Dynamic Link URL as an <img> src in your email. Each time the email is opened, the image renders with the latest data. Check our Email Personalization page for ESP-specific guides.'
 		}
 	];
 

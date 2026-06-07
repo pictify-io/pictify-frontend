@@ -143,7 +143,7 @@
 					>{`<!-- Customer.io email body: the image URL uses liquid interpolation
      to pass current recipient attributes to Pictify. -->
 
-<img loading="lazy" src="https://api.pictify.io/template/tpl_welcome_header/render?
+<img src="https://api.pictify.io/template/tpl_welcome_header/render?
         name={{ customer.first_name | url_encode }}&
         plan={{ customer.plan }}&
         avatar={{ customer.avatar_url | url_encode }}"

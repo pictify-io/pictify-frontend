@@ -405,7 +405,7 @@
 									class="flex items-center gap-3 p-3 bg-white border-[2px] border-gray-900 rounded-lg hover:shadow-brutal-md hover:-translate-y-0.5 transition-all"
 								>
 									{#if imp.previewPng}
-										<img loading="lazy"
+										<img
 											src={imp.previewPng}
 											alt={imp.metadata?.frameName || 'Preview'}
 											class="w-14 h-14 rounded border-[2px] border-gray-200 object-contain bg-gray-50 flex-shrink-0"

@@ -702,7 +702,7 @@
 							</div>
 						</div>
 						<div class="p-4">
-							<img loading="lazy"
+							<img
 								src={imageUrl}
 								alt="Invoice"
 								class="w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000]"

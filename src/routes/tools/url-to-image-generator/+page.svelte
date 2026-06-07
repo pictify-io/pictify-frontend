@@ -1101,7 +1101,7 @@
 						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
 						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
-							<img loading="lazy"
+							<img
 								src={imageUrl}
 								alt="Generated screenshot"
 								class="max-w-full h-auto max-h-[400px]"

@@ -495,7 +495,7 @@
 											class="aspect-[16/9] w-full bg-[#f8fafc] border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-lg relative"
 										>
 											{#if exp.template?.thumbnail || exp.variants?.[0]?.templateThumbnail || exp.variants?.[0]?.preRenderedUrl}
-												<img loading="lazy"
+												<img
 													src={exp.template?.thumbnail ||
 														exp.variants?.[0]?.templateThumbnail ||
 														exp.variants?.[0]?.preRenderedUrl}

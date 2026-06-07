@@ -679,7 +679,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 				<span class="inline-block px-4 py-1.5 bg-[#4ade80] text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6">Success</span>
 				<h3 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight mb-8">Your image is ready</h3>
 				<div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-10">
-					<img loading="lazy" src={generatedImageUrl} alt="Generated table" class="max-w-full h-auto max-h-[500px]" />
+					<img src={generatedImageUrl} alt="Generated table" class="max-w-full h-auto max-h-[500px]" />
 				</div>
 				<div class="flex flex-wrap justify-center gap-4">
 					<a href={generatedImageUrl} download="pictify-table.png" on:click={handleDownload}
@@ -692,7 +692,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
 						Copy Link
 					</button>
-					<button on:click={() => copyToClipboard(`<img loading="lazy" src="${generatedImageUrl}" alt="Table image" />`, 'HTML')}
+					<button on:click={() => copyToClipboard(`<img src="${generatedImageUrl}" alt="Table image" />`, 'HTML')}
 						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
 						Copy HTML

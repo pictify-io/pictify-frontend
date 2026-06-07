@@ -338,7 +338,7 @@
 									</div>
 								</div>
 							{:else}
-								<img loading="lazy"
+								<img
 									src={media.url}
 									alt="Media item"
 									class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
@@ -572,7 +572,7 @@
 							/>
 						</div>
 					{:else}
-						<img loading="lazy"
+						<img
 							src={selectedMedia.url}
 							alt="Full size media"
 							class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"

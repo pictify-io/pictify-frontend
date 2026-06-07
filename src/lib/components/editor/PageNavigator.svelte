@@ -57,7 +57,7 @@
 				>
 					<div class="thumb-preview">
 						{#if page.thumbnail}
-							<img loading="lazy" src={page.thumbnail} alt={page.name} />
+							<img src={page.thumbnail} alt={page.name} />
 						{:else}
 							<div class="thumb-placeholder">
 								<span class="page-number">{index + 1}</span>

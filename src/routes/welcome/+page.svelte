@@ -211,7 +211,7 @@
 
 				<div class="flex-1 min-h-[260px] border-[2px] border-black bg-gray-50 flex items-center justify-center overflow-hidden">
 					{#if lastRender?.imageUrl}
-						<img loading="lazy"
+						<img
 							src={lastRender.imageUrl}
 							alt="Your last render"
 							class="max-w-full max-h-[360px] object-contain"
@@ -318,7 +318,7 @@
 
 			{#if runState === 'success' && runResultUrl}
 				<div class="mt-4 border-[2px] border-black bg-white p-3 flex items-center gap-3">
-					<img loading="lazy" src={runResultUrl} alt="Result" class="w-20 h-20 object-contain border border-gray-300" />
+					<img src={runResultUrl} alt="Result" class="w-20 h-20 object-contain border border-gray-300" />
 					<div class="flex-1 min-w-0">
 						<div class="text-xs font-bold uppercase text-gray-500 mb-1">Rendered via API</div>
 						<a

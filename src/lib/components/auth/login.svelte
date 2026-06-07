@@ -394,7 +394,7 @@
 				on:click={handleGoogleLogin}
 				class="bg-white text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-bold text-lg flex items-center justify-center gap-3"
 			>
-				<img loading="lazy" src={GoogleIcon} alt="Google" class="w-6 h-6" />
+				<img src={GoogleIcon} alt="Google" class="w-6 h-6" />
 				<span>Google</span>
 			</button>
 		</div>

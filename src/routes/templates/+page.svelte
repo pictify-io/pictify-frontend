@@ -320,7 +320,7 @@
 						<!-- Thumbnail -->
 						<div class="aspect-video bg-gray-100 relative overflow-hidden">
 							{#if template.thumbnail}
-								<img loading="lazy"
+								<img
 									src={template.thumbnail}
 									alt={template.name}
 									class="w-full h-full object-cover"

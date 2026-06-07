@@ -126,7 +126,7 @@
 		},
 		{
 			q: 'Can I use experiments in emails?',
-			a: 'Yes. Embed the experiment slug URL as an <img loading="lazy"> src in your email. Each recipient gets a variant based on your experiment type — A/B split, smart link rules, or schedule. Works with all email clients.'
+			a: 'Yes. Embed the experiment slug URL as an <img> src in your email. Each recipient gets a variant based on your experiment type — A/B split, smart link rules, or schedule. Works with all email clients.'
 		},
 		{
 			q: 'What analytics do I get?',

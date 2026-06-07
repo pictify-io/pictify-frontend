@@ -1069,7 +1069,7 @@
 									? `aspect-ratio: ${dimWidth} / ${dimHeight}`
 									: 'aspect-ratio: 1200 / 630'}
 							>
-								<img loading="lazy"
+								<img
 									src={imageUrl}
 									alt="Generated output"
 									class="absolute inset-0 w-full h-full object-contain bg-white/50 backdrop-blur-[1px]"

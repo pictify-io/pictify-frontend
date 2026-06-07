@@ -720,7 +720,7 @@ function generateImage(markdown) {
 				</h3>
 
 				<div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-10">
-					<img loading="lazy" src={generatedImageUrl} alt="Generated markdown" class="max-w-full h-auto max-h-[400px]" />
+					<img src={generatedImageUrl} alt="Generated markdown" class="max-w-full h-auto max-h-[400px]" />
 				</div>
 
 				<div class="flex flex-wrap justify-center gap-4">
@@ -741,7 +741,7 @@ function generateImage(markdown) {
 						Copy Link
 					</button>
 					<button
-						on:click={() => copyToClipboard(`<img loading="lazy" src="${generatedImageUrl}" alt="Markdown image" />`, 'HTML')}
+						on:click={() => copyToClipboard(`<img src="${generatedImageUrl}" alt="Markdown image" />`, 'HTML')}
 						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>

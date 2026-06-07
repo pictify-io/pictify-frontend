@@ -274,7 +274,7 @@ print(res.json()['image']['url'])`;
 	}
 
 	// Inline an external image as a base64 data URL. Our HTML-to-image renderer
-	// waits for DOMContentLoaded only (not networkidle), so external <img loading="lazy"> tags
+	// waits for DOMContentLoaded only (not networkidle), so external <img> tags
 	// race the screenshot. Inlining them as data URLs guarantees they're painted
 	// before capture.
 	async function inlineImage(url) {

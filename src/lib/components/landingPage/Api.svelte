@@ -161,28 +161,28 @@ $image = json_decode($response);
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('js')}
 					>
-						<img loading="lazy" src={FileIcon} alt="File icon" class="w-4 h-4" />
+						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
 						<span class="ml-1">pictify.js</span>
 					</button>
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('go')}
 					>
-						<img loading="lazy" src={FileIcon} alt="File icon" class="w-4 h-4" />
+						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
 						<span class="ml-1">pictify.go</span>
 					</button>
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('py')}
 					>
-						<img loading="lazy" src={FileIcon} alt="File icon" class="w-4 h-4" />
+						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
 						<span class="ml-1">pictify.py</span>
 					</button>
 					<button
 						class="flex items-center bg-gray-200 border-r-2 border-gray-300 focus:bg-gray-300 p-1"
 						on:click={() => changeTab('php')}
 					>
-						<img loading="lazy" src={FileIcon} alt="File icon" class="w-4 h-4" />
+						<img src={FileIcon} alt="File icon" class="w-4 h-4" />
 						<span class="ml-1">pictify.php</span>
 					</button>
 				</div>

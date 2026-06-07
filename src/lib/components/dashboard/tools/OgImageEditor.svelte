@@ -562,7 +562,7 @@
 						/>
 						{#if settings.logo}
 							<div class="mt-2">
-								<img loading="lazy" src={settings.logo} alt="Logo Preview" class="h-12 object-contain" />
+								<img src={settings.logo} alt="Logo Preview" class="h-12 object-contain" />
 							</div>
 						{/if}
 					</div>
@@ -688,7 +688,7 @@
 			<div class="mt-8 p-4 border-2 border-gray-900 rounded-md">
 				<h3 class="text-lg font-bold mb-4">Generated Image</h3>
 				<div class="flex items-start gap-4">
-					<img loading="lazy"
+					<img
 						src={imageUrl}
 						alt="Generated OG Image"
 						class="w-48 rounded-md border-2 border-gray-900"
