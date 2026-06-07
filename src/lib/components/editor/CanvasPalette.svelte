@@ -41,7 +41,7 @@
 				{#each canvasColors as color}
 					<div class="flex flex-col items-center">
 						<div
-							class="w-12 h-12 rounded border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-12 h-12 rounded border-2 border-gray-900 shadow-brutal-sm"
 							style="background-color: {color}"
 							title={color}
 						/>
@@ -114,7 +114,7 @@
 						title="Click to copy {color}"
 					>
 						<div
-							class="w-10 h-10 rounded border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 transition-all cursor-pointer relative"
+							class="w-10 h-10 rounded border-2 border-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 transition-all cursor-pointer relative"
 							style="background-color: {color}"
 						>
 							{#if copiedColor === color}

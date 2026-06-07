@@ -78,17 +78,17 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="fixed inset-0 z-[120] flex items-start justify-center bg-black/40 p-4 pt-[12vh] backdrop-blur-sm"
+	class="fixed inset-0 z-[120] flex items-start justify-center bg-black/40 p-4 pt-[12vh]"
 	role="dialog"
 	aria-modal="true"
 	aria-label="Command palette"
 	on:click|self={close}
 >
 	<div
-		class="w-full max-w-xl overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-[8px_8px_0_0_#1f2937]"
+		class="w-full max-w-xl overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-2xl"
 	>
 		<!-- Search -->
-		<div class="flex items-center gap-3 border-b-[2px] border-gray-900 bg-[#FFFDF8] px-4 py-3">
+		<div class="flex items-center gap-3 border-b-[2px] border-gray-900 bg-brand-bg px-4 py-3">
 			<i class="fa fa-terminal text-sm text-gray-900"></i>
 			<input
 				bind:this={inputEl}
@@ -120,7 +120,7 @@
 					disabled={cmd.disabled}
 					class="flex w-full items-center gap-3 border-l-[3px] px-4 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40
 						{highlightIndex === idx
-							? 'border-[#ffc480] bg-[#ffc480]/20'
+							? 'border-brand-accent bg-brand-accent/20'
 							: 'border-transparent hover:bg-gray-50'}"
 				>
 					<div

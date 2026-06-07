@@ -100,7 +100,7 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -108,7 +108,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -132,7 +132,7 @@
 			>
 				<!-- Icon -->
 				<div
-					class="w-20 h-20 bg-[#ffc480] border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
+					class="w-20 h-20 bg-brand-accent border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-xl mb-8"
 				>
 					<svg
 						class="w-10 h-10 text-gray-900"
@@ -149,7 +149,7 @@
 					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
 				>
 					{category.label}
-					<span class="block text-[#ff6b6b]">Templates</span>
+					<span class="block text-brand-danger">Templates</span>
 				</h1>
 
 				<!-- Description -->
@@ -168,7 +168,7 @@
 						{#each category.recommendedSizes as size}
 							<a
 								href="/tools/html-to-png/{size}"
-								class="px-6 py-3 bg-white border-[3px] border-gray-900 font-bold shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+								class="px-6 py-3 bg-white border-[3px] border-gray-900 font-bold shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 							>
 								{size}
 							</a>
@@ -189,10 +189,10 @@
 						{#each relatedUseCases as uc}
 							<a
 								href="/tools/{uc.id}"
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all group"
+								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all group"
 							>
 								<h3
-									class="text-xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors"
+									class="text-xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
 								>
 									{uc.label}
 								</h3>
@@ -200,7 +200,7 @@
 									{uc.description}
 								</p>
 								<span
-									class="text-sm font-bold text-[#ff6b6b] uppercase tracking-wide flex items-center gap-2"
+									class="text-sm font-bold text-brand-danger uppercase tracking-wide flex items-center gap-2"
 								>
 									Try it free
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@
 
 			<!-- Browse All Templates CTA -->
 			<section
-				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
+				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
 			>
 				<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Browse All Templates</h2>
 				<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
@@ -229,7 +229,7 @@
 				</p>
 				<a
 					href="/templates"
-					class="inline-block px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="inline-block px-8 py-4 bg-brand-danger text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 				>
 					View All Templates
 				</a>
@@ -244,7 +244,7 @@
 					{#each otherCategories as cat}
 						<a
 							href="/templates/category/{cat.id}"
-							class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffc480] transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
 						>
 							<div class="flex items-center gap-3">
 								<div
@@ -287,7 +287,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -296,7 +296,7 @@
 				</h1>
 				<a
 					href="/templates"
-					class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Browse All Templates
 				</a>

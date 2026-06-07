@@ -90,7 +90,7 @@
 	<meta name="twitter:image" content="https://pictify.io/og/pages/free-account.png" />
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900">
+<div class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900">
 	<Nav />
 
 	<main class="flex-grow">
@@ -98,14 +98,14 @@
 		<section class="w-full py-16 md:py-24 px-6">
 			<div class="max-w-5xl mx-auto text-center">
 				<div
-					class="inline-block bg-[#4ade80] border-[3px] border-black shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1"
+					class="inline-block bg-data-green border-[3px] border-black shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">100% Free</span>
 				</div>
 
 				<h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter mb-6 uppercase">
 					Unlock the Full<br />
-					<span class="text-[#ff6b6b]">Pictify Experience</span>
+					<span class="text-brand-danger">Pictify Experience</span>
 				</h1>
 
 				<p class="text-xl md:text-2xl font-bold text-gray-700 max-w-2xl mx-auto mb-8">
@@ -115,13 +115,13 @@
 
 				<a
 					href="/signup"
-					class="inline-block px-8 py-4 bg-[#ff6b6b] text-white border-[4px] border-black font-black text-xl uppercase tracking-wide shadow-[6px_6px_0_0_#000] hover:shadow-[3px_3px_0_0_#000] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+					class="inline-block px-8 py-4 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wide shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 				>
 					Create Free Account
 				</a>
 
 				<p class="mt-4 text-sm font-bold text-gray-500">
-					Already have an account? <a href="/login" class="text-[#ff6b6b] underline">Log in</a>
+					Already have an account? <a href="/login" class="text-brand-danger underline">Log in</a>
 				</p>
 			</div>
 		</section>
@@ -140,14 +140,14 @@
                 border-[3px] border-black p-6 rounded-xl
                 ${
 									feature.highlight
-										? 'bg-[#ffc480] shadow-[6px_6px_0_0_#000]'
-										: 'bg-[#FFFDF8] shadow-[4px_4px_0_0_#ccc]'
+										? 'bg-brand-accent shadow-brutal-xl'
+										: 'bg-brand-bg shadow-[4px_4px_0_0_#ccc]'
 								}
               `}
 						>
 							<div
 								class={`w-12 h-12 border-[3px] border-black rounded-lg flex items-center justify-center mb-4 ${
-									feature.highlight ? 'bg-white' : 'bg-[#ffc480]'
+									feature.highlight ? 'bg-white' : 'bg-brand-accent'
 								}`}
 							>
 								{#if feature.icon === 'image'}
@@ -226,7 +226,7 @@
 				</p>
 
 				<div
-					class="border-[3px] border-black bg-white shadow-[8px_8px_0_0_#000] overflow-hidden rounded-xl"
+					class="border-[3px] border-black bg-white shadow-brutal-2xl overflow-hidden rounded-xl"
 				>
 					<div class="overflow-x-auto">
 						<table class="w-full">
@@ -235,7 +235,7 @@
 									<th class="text-left p-4 font-black uppercase tracking-wide">Feature</th>
 									<th class="text-center p-4 font-black uppercase tracking-wide">Guest</th>
 									<th
-										class="text-center p-4 font-black uppercase tracking-wide bg-[#ffc480] text-black border-x-[3px] border-black"
+										class="text-center p-4 font-black uppercase tracking-wide bg-brand-accent text-black border-x-[3px] border-black"
 									>
 										Free Account
 										<span class="block text-xs font-bold normal-case mt-1">Recommended</span>
@@ -245,7 +245,7 @@
 							</thead>
 							<tbody>
 								{#each comparisonTable as row, i}
-									<tr class={i % 2 === 0 ? 'bg-[#FFFDF8]' : 'bg-white'}>
+									<tr class={i % 2 === 0 ? 'bg-brand-bg' : 'bg-white'}>
 										<td class="p-4 font-bold border-t-[2px] border-gray-200">{row.feature}</td>
 										<td class="p-4 text-center border-t-[2px] border-gray-200">
 											{#if row.guest === 'No'}
@@ -255,11 +255,11 @@
 											{/if}
 										</td>
 										<td
-											class="p-4 text-center border-t-[2px] border-gray-200 bg-[#ffc480]/20 border-x-[3px] border-black"
+											class="p-4 text-center border-t-[2px] border-gray-200 bg-brand-accent/20 border-x-[3px] border-black"
 										>
 											{#if row.free === 'Yes'}
 												<span
-													class="inline-flex items-center justify-center w-6 h-6 bg-[#4ade80] border-[2px] border-black rounded-full"
+													class="inline-flex items-center justify-center w-6 h-6 bg-data-green border-[2px] border-black rounded-full"
 												>
 													<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
 														<path
@@ -278,7 +278,7 @@
 										<td class="p-4 text-center border-t-[2px] border-gray-200">
 											{#if row.paid === 'Yes'}
 												<span
-													class="inline-flex items-center justify-center w-6 h-6 bg-[#4ade80] border-[2px] border-black rounded-full"
+													class="inline-flex items-center justify-center w-6 h-6 bg-data-green border-[2px] border-black rounded-full"
 												>
 													<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
 														<path
@@ -302,7 +302,7 @@
 		</section>
 
 		<!-- CTA Section -->
-		<section class="w-full py-16 px-6 bg-[#ffc480] border-y-[3px] border-black">
+		<section class="w-full py-16 px-6 bg-brand-accent border-y-[3px] border-black">
 			<div class="max-w-3xl mx-auto text-center">
 				<h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-6">
 					Ready to Get Started?
@@ -314,13 +314,13 @@
 				<div class="flex flex-col sm:flex-row gap-4 justify-center">
 					<a
 						href="/signup"
-						class="px-8 py-4 bg-black text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+						class="px-8 py-4 bg-black text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 					>
 						Create Free Account
 					</a>
 					<a
 						href="/tools"
-						class="px-8 py-4 bg-white text-black border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+						class="px-8 py-4 bg-white text-black border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 					>
 						Try Tools First
 					</a>

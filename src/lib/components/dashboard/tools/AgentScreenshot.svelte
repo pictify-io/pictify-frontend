@@ -173,7 +173,7 @@
 <div class="h-full w-full max-w-6xl m-auto p-5">
 	<div class="space-y-8">
 		<!-- Header -->
-		<div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8">
+		<div class="bg-white/90 rounded-2xl border border-gray-200 p-8">
 			<div class="text-center">
 				<h1 class="text-3xl font-bold mb-4">AI Agent Screenshot</h1>
 				<p class="text-gray-600 max-w-2xl mx-auto">
@@ -184,13 +184,13 @@
 		</div>
 
 		<!-- Prompt Input -->
-		<div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8">
+		<div class="bg-white/90 rounded-2xl border border-gray-200 p-8">
 			<div class="max-w-4xl mx-auto">
 				<div class="space-y-6">
 					<div>
 						<label class="block text-sm font-medium text-gray-900 mb-2"> Screenshot Prompt </label>
 						<textarea
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-[#ff6b6b] focus:border-transparent"
+							class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-brand-danger focus:border-transparent"
 							rows="3"
 							placeholder="Enter a natural language description of what you want to screenshot..."
 							bind:value={prompt}
@@ -224,7 +224,7 @@
 					<!-- Generate Button -->
 					<div class="flex justify-center">
 						<button
-							class="bg-[#ff6b6b] text-white px-8 py-3 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+							class="bg-brand-danger text-white px-8 py-3 rounded-lg hover:bg-data-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 							on:click={generateScreenshot}
 							disabled={isGenerating ||
 								!prompt.trim() ||
@@ -264,7 +264,7 @@
 		<!-- Results -->
 		{#if streamingLogs.length > 0 || finalResult}
 			<div
-				class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8"
+				class="bg-white/90 rounded-2xl border border-gray-200 p-8"
 				transition:slide
 			>
 				<div class="max-w-4xl mx-auto">
@@ -318,7 +318,7 @@
 							<div class="space-y-4">
 								<!-- Screenshot -->
 								<div class="bg-white rounded-lg p-4 border-2 border-gray-200">
-									<img
+									<img loading="lazy"
 										src={finalResult.url}
 										alt="Generated screenshot"
 										class="w-full h-auto rounded-lg shadow-lg"
@@ -344,7 +344,7 @@
 												href={finalResult.metadata.url}
 												target="_blank"
 												rel="noopener noreferrer"
-												class="text-[#ff6b6b] hover:text-[#ff5252]"
+												class="text-brand-danger hover:text-data-red"
 											>
 												{finalResult.metadata.url}
 											</a>
@@ -370,7 +370,7 @@
 										href={finalResult.url}
 										target="_blank"
 										rel="noopener noreferrer"
-										class="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
+										class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-data-red transition-colors"
 									>
 										View Full Size
 									</a>
@@ -409,7 +409,7 @@
 			<div class="flex gap-3">
 				<a
 					href="/login"
-					class="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
+					class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-data-red transition-colors"
 				>
 					Login
 				</a>

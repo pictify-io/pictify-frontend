@@ -106,12 +106,12 @@
 		<!-- Header -->
 		<div class="text-center mb-12">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-[#ff6b6b] text-white rounded-full border-2 border-gray-900 text-sm font-bold mb-4"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-danger text-white rounded-full border-2 border-gray-900 text-sm font-bold mb-4"
 			>
 				<span>🤖</span> AI-Powered Feature
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				AI Agent <span class="text-[#ff6b6b]">Screenshots</span>
+				AI Agent <span class="text-brand-danger">Screenshots</span>
 			</h2>
 			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
 				Describe what you want in plain English. Our AI navigates any website and captures the
@@ -123,7 +123,7 @@
 		<div class="grid lg:grid-cols-2 gap-6 mb-12">
 			<!-- Input Panel -->
 			<div
-				class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden flex flex-col"
+				class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden flex flex-col"
 			>
 				<!-- Header -->
 				<div class="bg-gray-900 text-white px-4 py-3 flex items-center gap-2">
@@ -142,7 +142,7 @@
 						>
 							<span class="text-sm text-gray-900 font-mono">{displayedPrompt}</span>
 							{#if isTyping}
-								<span class="animate-pulse ml-1 text-[#ff6b6b] font-bold">|</span>
+								<span class="animate-pulse ml-1 text-brand-danger font-bold">|</span>
 							{/if}
 						</div>
 					</div>
@@ -151,12 +151,12 @@
 					<div class="flex-1 flex items-center">
 						{#if isProcessing}
 							<div
-								class="flex items-center gap-3 p-3 bg-[#ffc480]/30 rounded-xl border-2 border-gray-900 w-full"
+								class="flex items-center gap-3 p-3 bg-brand-accent/30 rounded-xl border-2 border-gray-900 w-full"
 							>
 								<div class="relative">
 									<div class="w-5 h-5 border-2 border-gray-200 rounded-full" />
 									<div
-										class="absolute top-0 left-0 w-5 h-5 border-2 border-[#ff6b6b] rounded-full animate-spin border-t-transparent"
+										class="absolute top-0 left-0 w-5 h-5 border-2 border-brand-danger rounded-full animate-spin border-t-transparent"
 									/>
 								</div>
 								<span class="text-sm font-medium text-gray-900"
@@ -179,7 +179,7 @@
 								<button
 									class="px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-gray-900 transition-all {selectedExample ===
 									index
-										? 'bg-[#ff6b6b] text-white shadow-[2px_2px_0_0_#1f293780]'
+										? 'bg-brand-danger text-white shadow-[2px_2px_0_0_#1f293780]'
 										: 'bg-white text-gray-900 hover:bg-gray-100'}"
 									on:click={() => {
 										isAutoCycling = false;
@@ -198,7 +198,7 @@
 
 			<!-- Result Panel -->
 			<div
-				class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden flex flex-col"
+				class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden flex flex-col"
 			>
 				<!-- Header -->
 				<div class="bg-gray-900 text-white px-4 py-3 flex items-center justify-between">
@@ -232,7 +232,7 @@
 								<div class="flex justify-center gap-2">
 									{#each examples[selectedExample].tags as tag}
 										<span
-											class="px-2 py-1 bg-[#ffc480] text-gray-900 text-xs font-bold rounded border-2 border-gray-900"
+											class="px-2 py-1 bg-brand-accent text-gray-900 text-xs font-bold rounded border-2 border-gray-900"
 											>{tag}</span
 										>
 									{/each}
@@ -254,13 +254,13 @@
 							<div class="text-sm font-bold text-gray-700">{processingSteps[currentStep].text}</div>
 							<div class="w-full max-w-[200px] bg-gray-200 rounded-full h-2">
 								<div
-									class="bg-[#ff6b6b] h-2 rounded-full transition-all duration-500"
+									class="bg-brand-danger h-2 rounded-full transition-all duration-500"
 									style="width: {((currentStep + 1) / processingSteps.length) * 100}%"
 								/>
 							</div>
 						</div>
 					{:else}
-						<div class="text-center space-y-3 text-gray-400">
+						<div class="text-center space-y-3 text-gray-600">
 							<div class="text-4xl">⚡</div>
 							<div class="text-sm">Waiting for input...</div>
 						</div>
@@ -271,12 +271,12 @@
 
 		<!-- Features -->
 		<div class="grid sm:grid-cols-3 gap-4 mb-10">
-			<div class="p-5 bg-[#ffc480]/20 rounded-xl border-[3px] border-gray-900 text-center">
+			<div class="p-5 bg-brand-accent/20 rounded-xl border-[3px] border-gray-900 text-center">
 				<div class="text-2xl mb-2">🧠</div>
 				<h3 class="font-bold text-gray-900 mb-1">Smart Navigation</h3>
 				<p class="text-xs text-gray-600">AI finds any element automatically</p>
 			</div>
-			<div class="p-5 bg-[#ff6b6b]/10 rounded-xl border-[3px] border-gray-900 text-center">
+			<div class="p-5 bg-brand-danger/10 rounded-xl border-[3px] border-gray-900 text-center">
 				<div class="text-2xl mb-2">🎯</div>
 				<h3 class="font-bold text-gray-900 mb-1">Precise Targeting</h3>
 				<p class="text-xs text-gray-600">Pixel-perfect element detection</p>
@@ -291,7 +291,7 @@
 		<!-- CTA -->
 		<div class="text-center">
 			<button
-				class="inline-flex items-center gap-2 px-6 py-3 bg-[#ff6b6b] text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="inline-flex items-center gap-2 px-6 py-3 bg-brand-danger text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				on:click={handleTryNow}
 			>
 				<span>🚀</span>

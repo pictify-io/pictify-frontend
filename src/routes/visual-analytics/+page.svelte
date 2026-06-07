@@ -19,37 +19,37 @@
 			title: 'Conversion Tracking',
 			description: 'Track impressions, clicks, and conversions for every image. Know exactly which visual drove the signup, sale, or click.',
 			iconPath: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
-			color: 'bg-[#4ade80]'
+			color: 'bg-data-green'
 		},
 		{
 			title: 'Channel Attribution',
 			description: 'See how images perform across web, email, ads, and social. Identify which channel delivers the highest conversion rate.',
 			iconPath: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			title: 'Device Performance',
 			description: 'Compare mobile vs desktop vs tablet performance. Optimize designs for the devices your audience actually uses.',
 			iconPath: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			title: 'Geographic Insights',
 			description: 'See which countries and regions engage most with your images. Tailor designs for your highest-converting markets.',
 			iconPath: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-			color: 'bg-[#a78bfa]'
+			color: 'bg-data-violet'
 		},
 		{
 			title: 'Statistical Significance',
 			description: 'Know when your results are real, not random. Chi-squared testing with configurable confidence thresholds.',
 			iconPath: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-			color: 'bg-[#60a5fa]'
+			color: 'bg-data-sky'
 		},
 		{
 			title: 'Industry Benchmarks',
 			description: 'Compare your image performance against anonymized industry averages. Know if your 3.2% CTR is good or great.',
 			iconPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-			color: 'bg-[#f472b6]',
+			color: 'bg-data-pink',
 			comingSoon: true
 		}
 	];
@@ -152,14 +152,14 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 	<!-- Hero Section -->
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform rotate-1 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-data-green border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform rotate-1 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -169,7 +169,7 @@
 
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Know Which Images<br />
-				<span class="relative inline-block text-[#4ade80] mt-2">
+				<span class="relative inline-block text-data-green mt-2">
 					Convert
 					<svg class="absolute w-full h-8 -bottom-3 left-0 text-black z-[-1] opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -180,7 +180,7 @@
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
 				Every image becomes a measurable performance asset. Track impressions, clicks, and conversions
 				across channels, devices, and geographies.
-				<span class="font-black text-gray-900 bg-[#ffc480] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Stop guessing. Start measuring.</span>
+				<span class="font-black text-gray-900 bg-brand-accent px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Stop guessing. Start measuring.</span>
 			</p>
 
 			<div class="flex flex-col sm:flex-row gap-6 justify-center">
@@ -200,7 +200,7 @@
 					href="/experiments"
 					on:click={() => trackCTA('See Experiments')}
 					class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+						shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center"
 				>
 					See Experiments
@@ -217,7 +217,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Capabilities</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -231,11 +231,11 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each features as feature, i}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden group"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden group"
 						in:fly={{ y: 20, duration: 400, delay: i * 80 }}
 					>
 						<div class="{feature.color} p-5 border-b-[3px] border-gray-900 flex items-center justify-between">
-							<div class="w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] group-hover:rotate-12 transition-transform">
+							<div class="w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg flex items-center justify-center shadow-brutal-md group-hover:rotate-12 transition-transform">
 								<svg class="w-5 h-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={feature.iconPath} />
 								</svg>
@@ -261,18 +261,18 @@
 		<div class="max-w-5xl mx-auto">
 			<div class="text-center mb-16">
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
-					From Render to <span class="text-[#4ade80]">Revenue</span>
+					From Render to <span class="text-data-green">Revenue</span>
 				</h2>
 			</div>
 
 			<div class="space-y-6">
 				{#each steps as step, i}
-					{@const colors = ['bg-[#4ade80]', 'bg-[#ffc480]', 'bg-[#ff6b6b]']}
+					{@const colors = ['bg-data-green', 'bg-brand-accent', 'bg-brand-danger']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
 					>
-						<div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 {colors[i]} border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3">
+						<div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 {colors[i]} border-[3px] border-gray-900 shadow-brutal-accent flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3">
 							<span class="text-2xl md:text-3xl font-black text-gray-900">{step.number}</span>
 						</div>
 						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#ffc480] rounded-2xl">
@@ -288,12 +288,12 @@
 	<SectionSeparator icon="star" />
 
 	<!-- The Flywheel -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#ffc480]/10 border-y-[3px] border-gray-900 relative overflow-hidden">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-brand-accent/10 border-y-[3px] border-gray-900 relative overflow-hidden">
 		<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 32px 32px;" />
 
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-danger text-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">The Flywheel</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -307,7 +307,7 @@
 			<div class="flex flex-wrap justify-center gap-4">
 				{#each flywheel as step, i}
 					<div class="flex items-center gap-3">
-						<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-xl p-4 w-40 text-center hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+						<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-xl p-4 w-40 text-center hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
 							in:fly={{ y: 15, duration: 300, delay: i * 100 }}>
 							<div class="w-10 h-10 bg-gray-100 border-2 border-gray-300 rounded-lg mx-auto mb-2 flex items-center justify-center">
 								<svg class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -327,8 +327,8 @@
 			</div>
 
 			<div class="text-center mt-8">
-				<div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] rounded-full">
-					<svg class="w-4 h-4 text-[#4ade80]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+				<div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-900 shadow-brutal-md rounded-full">
+					<svg class="w-4 h-4 text-data-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 					</svg>
 					<span class="text-sm font-bold text-gray-700">Repeat — each cycle compounds</span>
@@ -340,14 +340,14 @@
 	<SectionSeparator icon="bolt" />
 
 	<!-- Pricing CTA -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#4ade80] border-b-[3px] border-gray-900 relative overflow-hidden">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-data-green border-b-[3px] border-gray-900 relative overflow-hidden">
 		<div class="absolute inset-0 opacity-[0.15] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 24px 24px;" />
-		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce rounded-full" style="animation-duration: 3s;" />
+		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-brutal-lg animate-bounce rounded-full" style="animation-duration: 3s;" />
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-[12px_12px_0_0_#1f2937] hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow">
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6 leading-tight">
-					Start Measuring <span class="text-[#4ade80]">Today</span>
+					Start Measuring <span class="text-data-green">Today</span>
 				</h2>
 				<p class="text-xl text-gray-700 font-medium mb-10 max-w-2xl mx-auto">
 					Analytics included in all plans. Conversion tracking and channel attribution available on Standard and above.
@@ -369,7 +369,7 @@
 						href="/pricing"
 						on:click={() => trackCTA('View Pricing')}
 						class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-							shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+							shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 							transition-all duration-200 text-center"
 					>
 						View Pricing
@@ -387,7 +387,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900">
@@ -397,20 +397,20 @@
 
 			<div class="space-y-4">
 				{#each faqs as faq, i}
-					<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
+					<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
 						<button
 							on:click={() => (openFaq = openFaq === i ? -1 : i)}
-							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-[#4ade80]/10' : 'hover:bg-gray-50'}"
+							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-data-green/10' : 'hover:bg-gray-50'}"
 						>
 							<span>{faq.q}</span>
 							<div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center bg-white flex-shrink-0 ml-4 {openFaq === i ? 'shadow-[inset_2px_2px_0_0_#4ade80]' : ''}">
-								<svg class="w-5 h-5 transition-transform {openFaq === i ? 'rotate-180 text-[#4ade80]' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<svg class="w-5 h-5 transition-transform {openFaq === i ? 'rotate-180 text-data-green' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
 								</svg>
 							</div>
 						</button>
 						{#if openFaq === i}
-							<div class="px-6 pb-6 pt-2 text-gray-700 font-medium leading-relaxed bg-[#4ade80]/10 border-t-[3px] border-gray-900" transition:fly={{ y: -10, duration: 200 }}>
+							<div class="px-6 pb-6 pt-2 text-gray-700 font-medium leading-relaxed bg-data-green/10 border-t-[3px] border-gray-900" transition:fly={{ y: -10, duration: 200 }}>
 								{faq.a}
 							</div>
 						{/if}

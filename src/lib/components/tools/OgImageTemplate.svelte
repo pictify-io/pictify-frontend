@@ -45,7 +45,7 @@
 	{#if !loaded}
 		<div class="absolute inset-0 flex items-center justify-center z-10 bg-gray-50">
 			<div
-				class="w-8 h-8 border-[3px] border-gray-200 border-t-[#ff6b6b] rounded-full animate-spin"
+				class="w-8 h-8 border-[3px] border-gray-200 border-t-brand-danger rounded-full animate-spin"
 			/>
 		</div>
 	{/if}

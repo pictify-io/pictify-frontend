@@ -322,7 +322,7 @@
 	{@html `<script type="application/ld+json">${templateListSchemaJson}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -330,10 +330,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -342,7 +342,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -363,7 +363,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Free Tool
 				</div>
@@ -377,7 +377,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h1>
@@ -387,7 +387,7 @@
 				<p
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
-					Create <span class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black"
+					Create <span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>professional certificates</span
 					>
 					in seconds.
@@ -405,7 +405,7 @@
 		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
 			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">
 				<span
-					class="w-8 h-8 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -423,15 +423,15 @@
 				{#each certificateTemplates as template}
 					<button
 						class="flex-shrink-0 w-44 bg-white border-[3px] {selectedTemplate.id === template.id
-							? 'border-[#ff6b6b] shadow-[6px_6px_0_0_#ff6b6b]'
-							: 'border-black shadow-[4px_4px_0_0_#000]'} p-3 overflow-hidden hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
+							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
+							: 'border-black shadow-brutal-lg'} p-3 overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
 						on:click={() => selectTemplate(template)}
 						aria-label="{template.name} certificate template — {template.description}"
 						title="{template.name} certificate template"
 					>
 						{#if selectedTemplate.id === template.id}
 							<div
-								class="absolute top-2 right-2 z-10 w-6 h-6 bg-[#ff6b6b] border-[2px] border-black flex items-center justify-center rounded-full"
+								class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center rounded-full"
 							>
 								<span class="text-white font-black text-sm">&#10003;</span>
 							</div>
@@ -457,7 +457,7 @@
 		<div class="max-w-4xl mx-auto flex flex-col gap-6 sm:gap-8 items-stretch mb-10">
 			<!-- Left Column: Form -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] overflow-hidden rounded-xl"
+				class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
 			>
 				<!-- Terminal Header -->
 				<div
@@ -467,9 +467,9 @@
 						<span class="animate-pulse">_</span> CERTIFICATE DETAILS
 					</h2>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-[#ff6b6b] border border-black" />
-						<div class="w-3 h-3 bg-[#ffc480] border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-brand-danger border border-black" />
+						<div class="w-3 h-3 bg-brand-accent border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 
@@ -480,7 +480,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#ffc480] border-[2px] border-black flex items-center justify-center text-xs"
+								class="w-6 h-6 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
 								>1</span
 							>
 							Recipient Name
@@ -488,7 +488,7 @@
 						<input
 							bind:value={formValues.recipientName}
 							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
 							placeholder="John Doe"
 						/>
 					</div>
@@ -499,7 +499,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#60a5fa] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-data-sky border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>2</span
 							>
 							Organization Name
@@ -507,7 +507,7 @@
 						<input
 							bind:value={formValues.organizationName}
 							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
 							placeholder="Your Organization"
 						/>
 					</div>
@@ -518,7 +518,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#a78bfa] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-data-violet border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>3</span
 							>
 							Date
@@ -526,7 +526,7 @@
 						<input
 							bind:value={formValues.date}
 							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
 							placeholder="April 13, 2026"
 						/>
 					</div>
@@ -537,14 +537,14 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#ff6b6b] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>4</span
 							>
 							Achievement
 						</h3>
 						<textarea
 							bind:value={formValues.achievementText}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none rounded-lg"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none rounded-lg"
 							placeholder="for successfully completing the Advanced Training Program"
 							rows="3"
 						/>
@@ -554,7 +554,7 @@
 					<button
 						type="button"
 						on:click={openInCanvasEditor}
-						class="w-full py-3 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
+						class="w-full py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -572,21 +572,21 @@
 			<!-- Right Column: Canvas Preview -->
 			<div class="space-y-4 sm:space-y-6">
 				<div
-					class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] overflow-hidden rounded-xl"
+					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
 				>
 					<!-- Preview Header -->
 					<div
 						class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
 					>
 						<div class="flex items-center gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 						</div>
 						<div
 							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
 						>
-							<span class="px-2 py-0.5 bg-[#4ade80]/20 border border-[#4ade80] rounded text-gray-700">Interactive Editor</span>
+							<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700">Interactive Editor</span>
 							{selectedTemplate.width} x {selectedTemplate.height}px
 						</div>
 					</div>
@@ -609,7 +609,7 @@
 									height={selectedTemplate.height}
 								/>
 							{:else}
-								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]">
+								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl">
 									<p class="font-bold text-gray-400">Preview not available</p>
 								</div>
 							{/if}
@@ -621,7 +621,7 @@
 				<button
 					on:click={handleGenerate}
 					disabled={isGenerating}
-					class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
+					class="w-full bg-brand-danger hover:bg-data-red text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
 				>
 					{#if isGenerating}
 						<svg
@@ -664,18 +664,18 @@
 		{#if generatedImageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 				<div
-					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
+					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 						Your certificate is ready!
 					</h3>
 
 					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
+						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
-						<img
+						<img loading="lazy"
 							src={generatedImageUrl}
 							alt="Generated {selectedTemplate.name} certificate for {formValues.recipientName}"
 							class="max-w-full h-auto max-h-[400px]"
@@ -686,7 +686,7 @@
 						<a
 							href={generatedImageUrl}
 							download="certificate.png"
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -700,7 +700,7 @@
 						</a>
 						<button
 							on:click={openInCanvasEditor}
-							class="px-6 py-3 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -754,9 +754,9 @@
 		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
 			<!-- Separator -->
 			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-[#FFFDF8] px-4 sm:px-6">
+				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
 					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
 					>
 						<span class="font-black text-sm sm:text-lg">?</span>
 					</div>
@@ -770,17 +770,17 @@
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-2 sm:px-4">CERTIFICATES</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h2>
 
 			<!-- What is Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -807,10 +807,10 @@
 
 			<!-- Benefits Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -830,9 +830,9 @@
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					{#each ['5 professionally designed certificate templates', 'Real-time interactive canvas preview', 'Customize recipient name, organization, date, and achievement', 'High-resolution 1920x1080px PNG output', 'API available for bulk certificate generation', 'No signup required to get started'] as benefit}
 						<div
-							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-center gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
-							<span class="font-black text-[#4ade80]">&#10003;</span>
+							<span class="font-black text-data-green">&#10003;</span>
 							<span class="font-bold text-black text-sm">{benefit}</span>
 						</div>
 					{/each}
@@ -841,10 +841,10 @@
 
 			<!-- How to Use Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#60a5fa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -870,7 +870,7 @@
 					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive canvas editor' }, { num: '4', text: 'Click any text on the canvas to make direct edits' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate or open it in the full editor for further customization' }] as step}
 						<div class="flex items-start gap-4">
 							<span
-								class="bg-[#60a5fa] text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[2px_2px_0_0_#000]"
+								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
 								>{step.num}</span
 							>
 							<span class="font-bold text-black text-sm pt-1">{step.text}</span>
@@ -881,10 +881,10 @@
 
 			<!-- FAQ Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ff6b6b] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -904,7 +904,7 @@
 				<div class="space-y-3">
 					{#each faqs as faq}
 						<details
-							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							<summary
 								class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none text-sm"
@@ -933,10 +933,10 @@
 
 			<!-- Certificate Templates Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#a78bfa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-violet border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -957,25 +957,25 @@
 					Every certificate template works for any certificate type — award, achievement, completion, participation, or appreciation. Pick a design that matches your brand and customize the title, recipient name, date, and achievement text. All templates are free and come with commercial-use rights.
 				</p>
 				<div class="space-y-5">
-					<div class="border-l-[4px] border-[#ffc480] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-brand-accent pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Achievement Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong>Elegant</strong> template, with gold borders and serif typography, is our most popular certificate of achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-[#60a5fa] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-data-sky pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Completion Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Issue a certificate of completion for courses, training programs, workshops, and onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek, contemporary feel that reads well on-screen and in print.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-[#4ade80] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-data-green pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Participation Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Acknowledge attendance and engagement with a certificate of participation. The <strong>Corporate</strong> template's navy header and formal layout make it the right certificate of participation template for conferences, webinars, and corporate events.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-[#ff6b6b] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-brand-danger pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Award Certificate Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Celebrate winners and honorees with a bold award certificate. The <strong>Creative</strong> template — coral accents and playful geometry — works well for employee-of-the-month awards, tournament winners, and community recognition.
@@ -992,10 +992,10 @@
 
 			<!-- Online Certificate Maker Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1023,13 +1023,13 @@
 			<!-- Open in Editor CTA -->
 			<section class="mb-12 sm:mb-16 text-center">
 				<div
-					class="bg-gray-900 border-[3px] border-black rounded-3xl p-8 sm:p-12 relative overflow-hidden"
+					class="bg-gray-900 border-[3px] border-black rounded-2xl p-8 sm:p-12 relative overflow-hidden"
 				>
 					<div
-						class="absolute top-0 right-0 w-40 h-40 bg-[#ffc480]/20 rounded-full blur-2xl pointer-events-none"
+						class="absolute top-0 right-0 w-40 h-40 bg-brand-accent/20 rounded-full blur-2xl pointer-events-none"
 					/>
 					<div
-						class="absolute bottom-0 left-0 w-32 h-32 bg-[#ff6b6b]/20 rounded-full blur-2xl pointer-events-none"
+						class="absolute bottom-0 left-0 w-32 h-32 bg-brand-danger/20 rounded-full blur-2xl pointer-events-none"
 					/>
 
 					<h3
@@ -1044,7 +1044,7 @@
 					<button
 						type="button"
 						on:click={openInCanvasEditor}
-						class="px-8 py-4 bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
+						class="px-8 py-4 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

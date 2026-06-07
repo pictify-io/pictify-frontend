@@ -13,18 +13,18 @@
 	$: totalDeviceImpressions = deviceBreakdown.reduce((s, d) => s + (d.impressions || 0), 0);
 
 	const channelColors = {
-		web: 'bg-[#60a5fa]',
-		email: 'bg-[#ffc480]',
-		ad: 'bg-[#ff6b6b]',
-		social: 'bg-[#a78bfa]',
-		'in-app': 'bg-[#4ade80]',
+		web: 'bg-data-sky',
+		email: 'bg-brand-accent',
+		ad: 'bg-brand-danger',
+		social: 'bg-data-violet',
+		'in-app': 'bg-data-green',
 		other: 'bg-gray-400'
 	};
 
 	const deviceColors = {
-		desktop: 'bg-[#60a5fa]',
-		mobile: 'bg-[#4ade80]',
-		tablet: 'bg-[#ffc480]'
+		desktop: 'bg-data-sky',
+		mobile: 'bg-data-green',
+		tablet: 'bg-brand-accent'
 	};
 </script>
 
@@ -41,7 +41,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 			<!-- Channel Breakdown -->
 			{#if channelBreakdown.length > 0}
-				<div class="bg-white border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4">
+				<div class="bg-white border-2 border-gray-900 shadow-brutal-lg p-4">
 					<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">By Channel</h4>
 					<div class="space-y-2.5">
 						{#each channelBreakdown.slice(0, 5) as ch}
@@ -57,7 +57,7 @@
 										style="width: {pct}%"
 									/>
 								</div>
-								<div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
+								<div class="flex justify-between text-[10px] text-gray-600 mt-0.5">
 									<span>{(ch.impressions || 0).toLocaleString()} imp</span>
 									<span>{(ch.clicks || 0).toLocaleString()} clicks</span>
 								</div>
@@ -69,7 +69,7 @@
 
 			<!-- Device Breakdown -->
 			{#if deviceBreakdown.length > 0}
-				<div class="bg-white border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4">
+				<div class="bg-white border-2 border-gray-900 shadow-brutal-lg p-4">
 					<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">By Device</h4>
 					<div class="space-y-2.5">
 						{#each deviceBreakdown as dv}
@@ -85,7 +85,7 @@
 										style="width: {pct}%"
 									/>
 								</div>
-								<div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
+								<div class="flex justify-between text-[10px] text-gray-600 mt-0.5">
 									<span>{(dv.impressions || 0).toLocaleString()} imp</span>
 									<span>{(dv.clicks || 0).toLocaleString()} clicks</span>
 								</div>
@@ -97,7 +97,7 @@
 
 			<!-- Geographic Breakdown -->
 			{#if geoBreakdown.length > 0}
-				<div class="bg-white border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4">
+				<div class="bg-white border-2 border-gray-900 shadow-brutal-lg p-4">
 					<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Top Countries</h4>
 					<div class="space-y-2">
 						{#each geoBreakdown.slice(0, 6) as geo}
@@ -113,7 +113,7 @@
 
 		<!-- Referrer Breakdown -->
 		{#if referrerBreakdown.length > 0}
-			<div class="bg-white border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4">
+			<div class="bg-white border-2 border-gray-900 shadow-brutal-lg p-4">
 				<h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Top Referrers</h4>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
 					{#each referrerBreakdown.slice(0, 8) as ref}

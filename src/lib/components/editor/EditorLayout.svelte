@@ -249,7 +249,7 @@
 	});
 </script>
 
-<div class="flex flex-col h-full w-full bg-[#FFFDF8] overflow-hidden relative">
+<div class="flex flex-col h-full w-full bg-brand-bg overflow-hidden relative">
 	<!-- Animated Background -->
 	<AnimatedBackground />
 
@@ -277,12 +277,12 @@
 				disabled={isLayoutSwitching}
 				class="px-2 py-1.5 text-xs font-bold border-2 whitespace-nowrap transition-all flex items-center gap-2
 					{currentLayoutKey === null
-					? 'border-gray-900 bg-[#ffc480]/20 shadow-[2px_2px_0_0_#1f2937]'
+					? 'border-gray-900 bg-brand-accent/20 shadow-brutal-sm'
 					: 'border-gray-200 hover:border-gray-400'}
 					disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{#if layoutThumbnails['__default__']}
-					<img src={layoutThumbnails['__default__']} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
+					<img loading="lazy" src={layoutThumbnails['__default__']} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
 				{/if}
 				<div class="text-left">
 					<div class="text-xs font-bold">Default</div>
@@ -296,12 +296,12 @@
 					disabled={isLayoutSwitching}
 					class="px-2 py-1.5 text-xs font-bold border-2 whitespace-nowrap transition-all flex items-center gap-2
 						{currentLayoutKey === key
-						? 'border-gray-900 bg-[#ffc480]/20 shadow-[2px_2px_0_0_#1f2937]'
+						? 'border-gray-900 bg-brand-accent/20 shadow-brutal-sm'
 						: 'border-gray-200 hover:border-gray-400'}
 						disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{#if layoutThumbnails[key]}
-						<img src={layoutThumbnails[key]} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
+						<img loading="lazy" src={layoutThumbnails[key]} alt="" class="w-10 h-7 border border-gray-300 object-contain bg-white" />
 					{/if}
 					<div class="text-left">
 						<div class="text-xs font-bold">{layout.name || key}</div>
@@ -319,7 +319,7 @@
 
 		<!-- Asset Panel -->
 		<div
-			class="asset-panel-container h-full flex-shrink-0 z-10 relative bg-[#FFFDF8] border-gray-900 transition-all duration-300 overflow-hidden border-r-[3px]"
+			class="asset-panel-container h-full flex-shrink-0 z-10 relative bg-brand-bg border-gray-900 transition-all duration-300 overflow-hidden border-r-[3px]"
 			style="width: {$activeSidebarTab ? '288px' : '0px'}; border-right-width: {$activeSidebarTab
 				? '3px'
 				: '0px'};"
@@ -346,14 +346,14 @@
 
 		<!-- Right Sidebar Container (Full Height) -->
 		<div
-			class="right-sidebar-container flex flex-col h-full bg-[#FFFDF8] border-l-[3px] border-gray-900 z-10 transition-all duration-300 flex-shrink-0"
+			class="right-sidebar-container flex flex-col h-full bg-brand-bg border-l-[3px] border-gray-900 z-10 transition-all duration-300 flex-shrink-0"
 			style="width: {$activeRightSidebarTab ? '280px' : '48px'};"
 		>
 			<!-- Right Sidebar Tabs -->
 			<div
 				class="{$activeRightSidebarTab
 					? 'flex gap-1 p-1 border-b-[2px] border-gray-300'
-					: 'flex flex-col border-b-[3px] border-gray-900'} bg-[#FFFDF8]"
+					: 'flex flex-col border-b-[3px] border-gray-900'} bg-brand-bg"
 				role="tablist"
 			>
 				<button
@@ -362,7 +362,7 @@
 						? 'flex-1 rounded border-[2px]'
 						: 'w-full border-b-[2px] border-gray-900 hover:bg-gray-100'}
 					{$activeRightSidebarTab === 'properties'
-						? 'bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#000]'
+						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'
 						: $activeRightSidebarTab
 						? 'text-gray-500 hover:text-gray-900 border-transparent hover:border-gray-300'
 						: 'text-gray-500'}"
@@ -382,7 +382,7 @@
 						? 'flex-1 rounded border-[2px]'
 						: 'w-full border-b-[2px] border-gray-900 hover:bg-gray-100'}
 					{$activeRightSidebarTab === 'layers'
-						? 'bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#000]'
+						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'
 						: $activeRightSidebarTab
 						? 'text-gray-500 hover:text-gray-900 border-transparent hover:border-gray-300'
 						: 'text-gray-500'}"
@@ -402,7 +402,7 @@
 						? 'flex-1 rounded border-[2px]'
 						: 'w-full border-b-[2px] border-gray-900 hover:bg-gray-100'}
 					{$activeRightSidebarTab === 'variables'
-						? 'bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#000]'
+						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'
 						: $activeRightSidebarTab
 						? 'text-gray-500 hover:text-gray-900 border-transparent hover:border-gray-300'
 						: 'text-gray-500'}"
@@ -419,7 +419,7 @@
 			</div>
 
 			<!-- Right Sidebar Content -->
-			<div class="flex-1 overflow-hidden relative bg-[#FFFDF8]">
+			<div class="flex-1 overflow-hidden relative bg-brand-bg">
 				{#if $activeRightSidebarTab === 'properties'}
 					<div class="absolute inset-0 overflow-y-auto custom-scrollbar">
 						<PropertiesPanel />
@@ -439,7 +439,7 @@
 
 	<!-- Keyboard Shortcuts Button -->
 	<button
-		class="fixed bottom-4 right-4 z-30 w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-full text-gray-900 font-black text-sm shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all hover:bg-[#ffc480]"
+		class="fixed bottom-4 right-4 z-30 w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-full text-gray-900 font-black text-sm shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all hover:bg-brand-accent"
 		on:click={() => (showShortcutsModal = true)}
 		title="Keyboard Shortcuts"
 	>
@@ -455,12 +455,12 @@
 			transition:fly={{ y: 0, duration: 150 }}
 		>
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] w-full max-w-sm mx-4"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl w-full max-w-sm mx-4"
 				transition:fly={{ y: 20, duration: 200 }}
 			>
 				<!-- Header -->
 				<div
-					class="flex items-center justify-between px-5 py-3 border-b-[3px] border-gray-900 bg-[#FFFDF8] rounded-t-lg"
+					class="flex items-center justify-between px-5 py-3 border-b-[3px] border-gray-900 bg-brand-bg rounded-t-lg"
 				>
 					<h3 class="text-sm font-black uppercase tracking-widest text-gray-900">
 						Keyboard Shortcuts
@@ -487,7 +487,7 @@
 				</div>
 
 				<!-- Footer -->
-				<div class="px-5 py-3 border-t-[2px] border-gray-200 bg-[#FFFDF8] rounded-b-lg">
+				<div class="px-5 py-3 border-t-[2px] border-gray-200 bg-brand-bg rounded-b-lg">
 					<p class="text-[10px] text-gray-400 text-center uppercase tracking-widest font-bold">
 						Press Escape to close
 					</p>

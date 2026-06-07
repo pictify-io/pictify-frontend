@@ -3421,8 +3421,8 @@
 	}
 </script>
 
-<div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
-	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+<div class="w-full bg-brand-bg h-full flex flex-col z-10">
+	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-brand-bg">
 		<div class="flex items-center justify-between">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Properties</h3>
 		</div>
@@ -3441,7 +3441,7 @@
 			/>
 		</div>
 	{/if}
-	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar space-y-4 bg-[#FFFDF8]">
+	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar space-y-4 bg-brand-bg">
 		{#if $selectedComponent}
 			<!-- Element Type Badge -->
 			<div class="flex items-center gap-2 pb-3 border-b border-gray-200">
@@ -3480,7 +3480,7 @@
 									/>{/if}</label
 							>
 							<button
-								class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-1.5 text-left bg-white flex items-center justify-between shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 focus:outline-none hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
+								class="w-full text-sm border-[2px] border-gray-900 rounded-lg px-3 py-1.5 text-left bg-white flex items-center justify-between shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-brutal-accent-sm focus:ring-0 focus:outline-none hover:shadow-brutal-accent-sm transition-all"
 								on:click|stopPropagation={() => (isFontDropdownOpen = !isFontDropdownOpen)}
 							>
 								<span style="font-family: {styles.fontFamily}">{styles.fontFamily}</span>
@@ -3489,7 +3489,7 @@
 
 							{#if isFontDropdownOpen}
 								<div
-									class="absolute z-[100] w-full mt-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] max-h-[400px] flex flex-col"
+									class="absolute z-[100] w-full mt-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg max-h-[400px] flex flex-col"
 								>
 									<!-- Search & Custom Font -->
 									<div class="p-3 border-b border-gray-100 sticky top-0 bg-white z-10">
@@ -3519,7 +3519,7 @@
 														Add Font
 													</button>
 													<button
-														class="flex-1 bg-white text-gray-700 text-sm py-1.5 border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 font-medium transition-all"
+														class="flex-1 bg-white text-gray-700 text-sm py-1.5 border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 font-medium transition-all"
 														on:click={() => {
 															showCustomFontInput = false;
 															addFontError = '';
@@ -3538,7 +3538,7 @@
 													<input
 														type="text"
 														placeholder="Search any Google Font..."
-														class="w-full text-sm border-[2px] border-gray-900 rounded-lg pl-8 pr-8 py-1.5 shadow-[2px_2px_0_0_#e5e5e5] focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
+														class="w-full text-sm border-[2px] border-gray-900 rounded-lg pl-8 pr-8 py-1.5 shadow-[2px_2px_0_0_#e5e5e5] focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-brutal-accent-sm hover:shadow-brutal-accent-sm transition-all"
 														value={fontSearchQuery}
 														on:input={(e) => handleFontSearch(e.target.value)}
 													/>
@@ -3562,8 +3562,8 @@
 												<button
 													class="px-2 py-0.5 text-xs rounded-md transition-all {selectedCategory ===
 													'all'
-														? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000]'
-														: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000] hover:shadow-[1px_1px_0_0_#ffc480]'}"
+														? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937]'
+														: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#ffc480]'}"
 													on:click={() => (selectedCategory = 'all')}
 												>
 													All
@@ -3572,8 +3572,8 @@
 													<button
 														class="px-2 py-0.5 text-xs rounded-md transition-all {selectedCategory ===
 														category
-															? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000]'
-															: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000] hover:shadow-[1px_1px_0_0_#ffc480]'}"
+															? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937]'
+															: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#ffc480]'}"
 														on:click={() => (selectedCategory = category)}
 													>
 														{CATEGORY_LABELS[category] || category}
@@ -3845,7 +3845,7 @@
 
 							{#if isWeightDropdownOpen}
 								<div
-									class="absolute z-[100] w-full mt-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] max-h-60 overflow-y-auto"
+									class="absolute z-[100] w-full mt-1 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg max-h-60 overflow-y-auto"
 								>
 									{#each fontWeights as weight}
 										<button
@@ -3887,8 +3887,8 @@
 									<button
 										class="flex-1 py-1.5 text-sm border-[2px] border-gray-900 rounded-lg transition-all {styles.textAlign ===
 										align.value
-											? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#ffc480]'
-											: 'bg-white text-gray-700 shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5'}"
+											? 'bg-gray-900 text-white shadow-brutal-accent-sm'
+											: 'bg-white text-gray-700 shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5'}"
 										on:click={() => updateProperty('textAlign', align.value)}
 									>
 										<i class="fa {align.icon}" />
@@ -3920,49 +3920,49 @@
 								<label class={fieldLabelClass}>Presets</label>
 								<div class="grid grid-cols-4 gap-1.5">
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('none')}
 										title="None"
 									>
 										None
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('soft-shadow')}
 										title="Soft Shadow"
 									>
 										Soft
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('hard-shadow')}
 										title="Hard Shadow"
 									>
 										Hard
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('outline')}
 										title="Outline"
 									>
 										Outline
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('glow')}
 										title="Glow"
 									>
 										Glow
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('neon')}
 										title="Neon"
 									>
 										Neon
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium col-span-2"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium col-span-2"
 										on:click={() => applyTextEffectPreset('bold-outline')}
 										title="Bold Outline"
 									>
@@ -4339,7 +4339,7 @@
 										/>
 										<input
 											type="number"
-											class="w-14 text-sm border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
+											class="w-14 text-sm border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-brutal-accent-sm focus:ring-0 hover:shadow-brutal-accent-sm transition-all"
 											value={styles.radius}
 											min="0"
 											max="500"
@@ -4444,7 +4444,7 @@
 								class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape ===
 								'none'
 									? 'border-gray-900 bg-gray-900 text-white'
-									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-500'}"
+									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm text-gray-500'}"
 								on:click={() => applyClipShape('none')}
 								title="No clipping"
 							>
@@ -4464,7 +4464,7 @@
 								class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape ===
 								'circle'
 									? 'border-gray-900 bg-gray-900 text-white'
-									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-500'}"
+									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm text-gray-500'}"
 								on:click={() => applyClipShape('circle')}
 								title="Circle clip"
 							>
@@ -4484,7 +4484,7 @@
 								class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape ===
 								'ellipse'
 									? 'border-gray-900 bg-gray-900 text-white'
-									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-500'}"
+									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm text-gray-500'}"
 								on:click={() => applyClipShape('ellipse')}
 								title="Ellipse clip"
 							>
@@ -4504,7 +4504,7 @@
 								class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all {currentClipShape ===
 								'rounded-rect'
 									? 'border-gray-900 bg-gray-900 text-white'
-									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-500'}"
+									: 'border-gray-900 bg-white shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm text-gray-500'}"
 								on:click={() => applyClipShape('rounded-rect')}
 								title="Rounded rectangle clip"
 							>
@@ -4616,10 +4616,10 @@
 						{#if !hasBgRemoverAccess}
 							<!-- Locked state for non-subscribers -->
 							<div
-								class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex flex-col items-center text-center mt-2"
+								class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-brutal-lg flex flex-col items-center text-center mt-2"
 							>
 								<div
-									class="w-10 h-10 rounded-xl bg-[#ffc480] border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center mb-3"
+									class="w-10 h-10 rounded-xl bg-brand-accent border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center mb-3"
 								>
 									<i class="fa fa-magic text-gray-900 text-base" />
 								</div>
@@ -4631,7 +4631,7 @@
 								</p>
 								<a
 									href="/pricing"
-									class="block w-full py-2.5 px-3 bg-[#b4f0a7] border-[2px] border-gray-900 text-gray-900 text-xs font-black rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all uppercase tracking-wide"
+									class="block w-full py-2.5 px-3 bg-[#b4f0a7] border-[2px] border-gray-900 text-gray-900 text-xs font-black rounded-lg shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all uppercase tracking-wide"
 								>
 									Upgrade Now
 								</a>
@@ -4639,7 +4639,7 @@
 						{:else}
 							<div class="space-y-2.5 mt-2">
 								<button
-									class="w-full py-2.5 px-3 bg-[#ffc480] border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-[3px_3px_0_0_#1f2937]"
+									class="w-full py-2.5 px-3 bg-brand-accent border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-brutal-md hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-brutal-md"
 									on:click={removeBackground}
 									disabled={isRemovingBackground}
 								>
@@ -4654,7 +4654,7 @@
 
 								{#if originalImageUrl}
 									<button
-										class="w-full py-2 px-3 bg-white border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all font-bold text-xs flex items-center justify-center gap-2"
+										class="w-full py-2 px-3 bg-white border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all font-bold text-xs flex items-center justify-center gap-2"
 										on:click={restoreOriginalBackground}
 									>
 										<i class="fa fa-undo" />
@@ -4664,7 +4664,7 @@
 
 								{#if backgroundRemovalError}
 									<div
-										class="bg-[#ff6b6b] border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#1f2937]"
+										class="bg-brand-danger border-[2px] border-gray-900 rounded-lg p-2.5 shadow-brutal-sm"
 									>
 										<p class="text-xs font-bold text-white">
 											<i class="fa fa-exclamation-triangle mr-1" />{backgroundRemovalError}
@@ -4683,49 +4683,49 @@
 								<label class={fieldLabelClass}>Quick Filters</label>
 								<div class="grid grid-cols-2 gap-2">
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('none')}
 									>
 										Original
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('grayscale')}
 									>
 										B&W
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('sepia')}
 									>
 										Sepia
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('vintage')}
 									>
 										Vintage
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('cool')}
 									>
 										Cool
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('warm')}
 									>
 										Warm
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('dramatic')}
 									>
 										Dramatic
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('fade')}
 									>
 										Fade
@@ -4918,7 +4918,7 @@
 
 								{#if chartDataFormat === 'json'}
 									<div
-										class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1"
+										class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-brutal-accent-sm transition-all bg-white pb-1"
 									>
 										<CodeMirror
 											bind:value={chartDataInput}
@@ -4943,7 +4943,7 @@
 									</div>
 								{:else}
 									<textarea
-										class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all p-2"
+										class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-brutal-accent-sm focus:ring-0 hover:shadow-brutal-accent-sm transition-all p-2"
 										placeholder="label,value\nJan,30\nFeb,45"
 										bind:value={chartDataInput}
 									/>
@@ -5122,7 +5122,7 @@
 										class="flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all {tableStyle ===
 										key
 											? 'border-gray-900 bg-gray-50 shadow-sm'
-											: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480]'}"
+											: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm'}"
 										on:click={() => changeTableStyle(key)}
 										title={style.name}
 									>
@@ -5323,7 +5323,7 @@
 
 								{#if tableDataFormat === 'json'}
 									<div
-										class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-[2px_2px_0_0_#ffc480] transition-all bg-white pb-1"
+										class="border-[2px] border-gray-900 rounded-lg overflow-hidden shadow-[2px_2px_0_0_#e5e5e5] focus-within:border-gray-900 focus-within:shadow-brutal-accent-sm transition-all bg-white pb-1"
 									>
 										<CodeMirror
 											bind:value={tableDataInput}
@@ -5348,7 +5348,7 @@
 									</div>
 								{:else}
 									<textarea
-										class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] focus:ring-0 hover:shadow-[2px_2px_0_0_#ffc480] transition-all p-2"
+										class="w-full h-36 text-xs font-mono border-gray-900 border-[2px] rounded-lg shadow-[2px_2px_0_0_#e5e5e5] focus:border-gray-900 focus:shadow-brutal-accent-sm focus:ring-0 hover:shadow-brutal-accent-sm transition-all p-2"
 										placeholder="Header1,Header2,Header3\nValue1,Value2,Value3"
 										bind:value={tableDataInput}
 									/>
@@ -5465,7 +5465,7 @@
 											class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.patternStyle ===
 											style.type
 												? 'border-gray-900 bg-gray-50 shadow-sm'
-												: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-600'}"
+												: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm text-gray-600'}"
 											on:click={() => updateQRCodeConfig('patternStyle', style.type)}
 										>
 											<span class="text-base">{style.preview}</span>
@@ -5484,7 +5484,7 @@
 											class="flex flex-col items-center gap-1 p-2 rounded-lg border transition-all {qrConfig.cornerStyle ===
 											style.type
 												? 'border-gray-900 bg-gray-50 shadow-sm'
-												: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] text-gray-600'}"
+												: 'border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm text-gray-600'}"
 											on:click={() => updateQRCodeConfig('cornerStyle', style.type)}
 										>
 											<span class="text-base">{style.preview}</span>
@@ -5838,7 +5838,7 @@
 								<!-- Add Another Binding Button -->
 								{#if getAvailablePropertiesForType().length > variableBindings.length}
 									<button
-										class="w-full py-2 px-3 border-2 border-dashed border-gray-900 rounded-lg text-xs text-gray-500 hover:text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#ffc480] transition-all flex items-center justify-center gap-2"
+										class="w-full py-2 px-3 border-2 border-dashed border-gray-900 rounded-lg text-xs text-gray-500 hover:text-gray-700 hover:border-gray-900 hover:shadow-brutal-accent-sm transition-all flex items-center justify-center gap-2"
 										on:click={addVariableBinding}
 									>
 										<i class="fa fa-plus text-[10px]" />
@@ -6112,7 +6112,7 @@
 								on:click={confirmDestructiveAction}>Confirm</button
 							>
 							<button
-								class="flex-1 py-1.5 px-3 text-[11px] font-medium bg-white text-gray-700 border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
+								class="flex-1 py-1.5 px-3 text-[11px] font-medium bg-white text-gray-700 border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all"
 								on:click={cancelDestructiveAction}>Cancel</button
 							>
 						</div>
@@ -6151,7 +6151,7 @@
 				<label class={fieldLabelClass}>Layer Arrangement</label>
 				<div class="flex items-center justify-between gap-1.5">
 					<button
-						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 flex-1 transition-all"
+						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 flex-1 transition-all"
 						title="Bring to Front"
 						aria-label="Bring to Front"
 						on:click={bringToFront}
@@ -6159,7 +6159,7 @@
 						<i class="fa fa-angle-double-up" />
 					</button>
 					<button
-						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 flex-1 transition-all"
+						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 flex-1 transition-all"
 						title="Bring Forward"
 						aria-label="Bring Forward"
 						on:click={bringForward}
@@ -6167,7 +6167,7 @@
 						<i class="fa fa-angle-up" />
 					</button>
 					<button
-						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 flex-1 transition-all"
+						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 flex-1 transition-all"
 						title="Send Backward"
 						aria-label="Send Backward"
 						on:click={sendBackwards}
@@ -6175,7 +6175,7 @@
 						<i class="fa fa-angle-down" />
 					</button>
 					<button
-						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 flex-1 transition-all"
+						class="p-1.5 text-gray-500 hover:text-gray-900 rounded-lg border-[2px] border-gray-900 shadow-[1px_1px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 flex-1 transition-all"
 						title="Send to Back"
 						aria-label="Send to Back"
 						on:click={sendToBack}
@@ -6365,7 +6365,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeChartEditor = false)}
 	>
 		<div
@@ -6375,7 +6375,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[2px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[2px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -6455,7 +6455,7 @@
 			<div class="flex-1 min-h-0 p-5">
 				{#if chartDataFormat === 'json'}
 					<div
-						class="border-[2px] border-gray-900 rounded-lg overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+						class="border-[2px] border-gray-900 rounded-lg overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 					>
 						<CodeMirror
 							bind:value={chartDataInput}
@@ -6480,7 +6480,7 @@
 					</div>
 				{:else}
 					<textarea
-						class="w-full h-full text-sm font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] focus:ring-0 p-4 resize-none overflow-auto"
+						class="w-full h-full text-sm font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-brutal-accent focus:ring-0 p-4 resize-none overflow-auto"
 						placeholder="label,value&#10;Jan,30&#10;Feb,45"
 						bind:value={chartDataInput}
 					/>
@@ -6510,7 +6510,7 @@
 						<i class="fa fa-undo mr-1" />Load Current
 					</button>
 					<button
-						class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						on:click={() => {
 							applyChartDataFromInput();
 							if (!chartDataError) maximizeChartEditor = false;
@@ -6529,7 +6529,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeTableEditor = false)}
 	>
 		<div
@@ -6619,7 +6619,7 @@
 			<div class="flex-1 min-h-0 p-5">
 				{#if tableDataFormat === 'json'}
 					<div
-						class="border-[2px] border-gray-900 rounded-lg overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+						class="border-[2px] border-gray-900 rounded-lg overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 					>
 						<CodeMirror
 							bind:value={tableDataInput}
@@ -6644,7 +6644,7 @@
 					</div>
 				{:else}
 					<textarea
-						class="w-full h-full text-sm font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] focus:ring-0 p-4 resize-none overflow-auto"
+						class="w-full h-full text-sm font-mono border-gray-900 border-[2px] rounded-lg focus:border-gray-900 focus:shadow-brutal-accent focus:ring-0 p-4 resize-none overflow-auto"
 						placeholder="Header1,Header2,Header3&#10;Value1,Value2,Value3"
 						bind:value={tableDataInput}
 					/>
@@ -6677,7 +6677,7 @@
 						<i class="fa fa-undo mr-1" />Load Current
 					</button>
 					<button
-						class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						on:click={() => {
 							applyTableDataFromInput();
 							if (!tableDataError) maximizeTableEditor = false;

@@ -152,17 +152,17 @@
 	$: selectedItem = canvasItems.find((i) => i.id === selectedId);
 </script>
 
-<section class="w-full py-20 md:py-32 bg-[#FFFDF8] relative overflow-hidden">
+<section class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<div class="max-w-7xl mx-auto px-6">
 		<div class="text-center mb-16">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc480] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-6 transform rotate-1"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Visual Editor</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Build Templates <br />
-				<span class="relative inline-block text-[#ff6b6b]">
+				<span class="relative inline-block text-brand-danger">
 					Without Writing HTML.
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -182,7 +182,7 @@
 		<div class="relative mx-auto max-w-5xl perspective-1000">
 			<!-- Browser Frame -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] overflow-hidden relative z-10 transform transition-transform duration-500 hover:rotate-1"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-3xl overflow-hidden relative z-10 transform transition-transform duration-500 hover:rotate-1"
 				on:mouseenter={() => (isHovering = true)}
 				on:mouseleave={() => (isHovering = false)}
 			>
@@ -191,9 +191,9 @@
 					class="h-12 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 gap-3 select-none"
 				>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
-						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 					</div>
 					<div class="flex-1 flex justify-center">
 						<div
@@ -209,12 +209,12 @@
 					<!-- Try Canvas Editor CTA Overlay -->
 					{#if isHovering}
 						<div
-							class="absolute inset-0 z-40 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300"
+							class="absolute inset-0 z-40 bg-gray-900/60 flex items-center justify-center transition-all duration-300"
 							in:fade={{ duration: 200 }}
 						>
 							<button
 								on:click={() => goto('/canvas/try')}
-								class="group relative px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
+								class="group relative px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl transform hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-lg transition-all duration-200"
 							>
 								<div class="flex items-center gap-3">
 									<span>Try Canvas Editor</span>
@@ -233,7 +233,7 @@
 									</svg>
 								</div>
 								<div
-									class="absolute -top-2 -right-2 px-2 py-1 bg-[#4ade80] text-[10px] font-bold text-gray-900 border-[2px] border-gray-900 rounded animate-pulse"
+									class="absolute -top-2 -right-2 px-2 py-1 bg-data-green text-[10px] font-bold text-gray-900 border-[2px] border-gray-900 rounded animate-pulse"
 								>
 									NEW
 								</div>
@@ -265,9 +265,9 @@
 					>
 						{#each tools as tool, i}
 							<div
-								class="w-10 h-10 rounded-lg border-[2px] border-gray-900 flex items-center justify-center transition-all cursor-pointer shadow-[2px_2px_0_0_#000]
+								class="w-10 h-10 rounded-lg border-[2px] border-gray-900 flex items-center justify-center transition-all cursor-pointer shadow-brutal-sm
 								{activeTool === i
-									? 'bg-[#ffc480] translate-x-0.5 translate-y-0.5 shadow-none'
+									? 'bg-brand-accent translate-x-0.5 translate-y-0.5 shadow-none'
 									: 'bg-white hover:bg-gray-50'}"
 								on:mouseenter={() => (activeTool = i)}
 							>
@@ -329,31 +329,31 @@
 												/></svg
 											>
 											{#if selectedId === item.id}
-												<div class="absolute inset-0 bg-[#4ade80] opacity-10" />
+												<div class="absolute inset-0 bg-data-green opacity-10" />
 											{/if}
 										</div>
 									{/if}
 
 									<!-- Selection Box (Active Element Overlay) -->
 									{#if selectedId === item.id}
-										<div class="absolute inset-0 border-[3px] border-[#4ade80] pointer-events-none">
+										<div class="absolute inset-0 border-[3px] border-data-green pointer-events-none">
 											<!-- Resize Handles -->
 											<div
-												class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 											<div
-												class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 											<div
-												class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 											<div
-												class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 
 											<!-- Label -->
 											<span
-												class="bg-[#4ade80] text-[10px] font-bold px-2 py-0.5 border-[2px] border-gray-900 absolute -top-6 left-0 shadow-[2px_2px_0_0_#000] uppercase tracking-wider whitespace-nowrap"
+												class="bg-data-green text-[10px] font-bold px-2 py-0.5 border-[2px] border-gray-900 absolute -top-6 left-0 shadow-brutal-sm uppercase tracking-wider whitespace-nowrap"
 											>
 												{item.type} Layer
 											</span>
@@ -416,7 +416,7 @@
 									<div class="space-y-2">
 										<label class="text-xs font-bold text-gray-500 uppercase">Content</label>
 										<div
-											class="w-full h-8 bg-white border-[2px] border-gray-900 rounded shadow-[2px_2px_0_0_#000] flex items-center px-2 text-xs"
+											class="w-full h-8 bg-white border-[2px] border-gray-900 rounded shadow-brutal-sm flex items-center px-2 text-xs"
 										>
 											{selectedItem.text}
 										</div>
@@ -434,7 +434,7 @@
 
 								<div class="pt-4">
 									<div
-										class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] font-bold text-center text-xs hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer rounded"
+										class="w-full py-2 bg-brand-danger text-white border-[2px] border-gray-900 shadow-brutal-sm font-bold text-center text-xs hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer rounded"
 									>
 										DELETE LAYER
 									</div>
@@ -453,7 +453,7 @@
 			<div class="md:hidden mt-6 flex justify-center">
 				<button
 					on:click={() => goto('/canvas/try')}
-					class="px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0_0_#1f2937] transition-all uppercase tracking-wider flex items-center gap-3"
+					class="px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-xl active:translate-x-1 active:translate-y-1 active:shadow-brutal-sm transition-all uppercase tracking-wider flex items-center gap-3"
 				>
 					<span>Try Canvas Editor</span>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -469,10 +469,10 @@
 
 			<!-- Decorative Elements -->
 			<div
-				class="hidden md:block absolute -top-10 -right-10 w-32 h-32 bg-[#ffc480] border-[3px] border-gray-900 -z-10 rotate-12 animate-[float_6s_ease-in-out_infinite]"
+				class="hidden md:block absolute -top-10 -right-10 w-32 h-32 bg-brand-accent border-[3px] border-gray-900 -z-10 rotate-12 animate-[float_6s_ease-in-out_infinite]"
 			/>
 			<div
-				class="hidden md:block absolute -bottom-10 -left-10 w-40 h-40 bg-[#ff6b6b] border-[3px] border-gray-900 -z-10 rotate-[-12deg] animate-[float_7s_ease-in-out_infinite_reverse]"
+				class="hidden md:block absolute -bottom-10 -left-10 w-40 h-40 bg-brand-danger border-[3px] border-gray-900 -z-10 rotate-[-12deg] animate-[float_7s_ease-in-out_infinite_reverse]"
 			>
 				<div
 					class="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,#000_45%,#000_55%,transparent_55%)] [background-size:10px_10px] opacity-10"
@@ -483,15 +483,15 @@
 		<!-- Figma Import Showcase -->
 		<div class="mt-24 max-w-5xl mx-auto group relative">
 			<!-- Decorative offset background -->
-			<div class="hidden sm:block absolute inset-0 bg-[#a259ff] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
+			<div class="hidden sm:block absolute inset-0 bg-[#a259ff] rounded-2xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 			
-			<div class="relative bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300">
+			<div class="relative bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300">
 				<!-- Mac Header -->
 				<div class="bg-[#facc15] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">
 					<div class="flex gap-2">
-						<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-black"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-black"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-2 border-black"></div>
-						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-black"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-black"></div>
 					</div>
 					<div class="flex items-center gap-2 bg-white/40 px-3 py-1 rounded-md border-[2px] border-black">
 						<svg width="10" height="10" viewBox="0 0 38 57" fill="none"><path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="black"/><path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="black"/><path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="black"/><path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="black"/><path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="black"/></svg>
@@ -499,7 +499,7 @@
 					</div>
 				</div>
 
-				<div class="flex flex-col md:flex-row bg-[#FFFDF8]">
+				<div class="flex flex-col md:flex-row bg-brand-bg">
 					<!-- Left: Visual Flow -->
 					<div class="flex-1 p-8 md:p-14 flex items-center justify-center border-b-[3px] md:border-b-0 md:border-r-[3px] border-black relative overflow-hidden">
 						<!-- Grid Background -->
@@ -517,31 +517,31 @@
 										<svg class="w-10 h-10 md:w-12 md:h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 									</div>
 									<div class="flex gap-2">
-										<div class="flex-1 h-3 bg-[#4ade80] rounded-sm border-2 border-black"></div>
-										<div class="w-8 h-3 bg-[#ff6b6b] rounded-sm border-2 border-black"></div>
+										<div class="flex-1 h-3 bg-data-green rounded-sm border-2 border-black"></div>
+										<div class="w-8 h-3 bg-brand-danger rounded-sm border-2 border-black"></div>
 									</div>
 								</div>
 								<!-- Figma logo badge -->
-								<div class="absolute -top-4 -left-4 w-10 h-10 bg-[#a259ff] rounded-lg border-[3px] border-black shadow-[4px_4px_0_0_black] flex items-center justify-center z-20 group-hover/frame:scale-110 transition-transform">
+								<div class="absolute -top-4 -left-4 w-10 h-10 bg-[#a259ff] rounded-lg border-[3px] border-black shadow-brutal-lg flex items-center justify-center z-20 group-hover/frame:scale-110 transition-transform">
 									<svg width="16" height="16" viewBox="0 0 38 57" fill="none"><path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="white"/><path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="white"/><path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="white"/><path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="white"/><path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="white"/></svg>
 								</div>
 							</div>
 
 							<!-- Arrow -->
 							<div class="flex flex-col items-center gap-2 relative">
-								<div class="bg-black text-white px-3 py-1.5 rounded text-[11px] font-black uppercase tracking-widest border-[3px] border-black transform rotate-3 z-10 shadow-[4px_4px_0_0_#ffc480]">1-Click</div>
+								<div class="bg-black text-white px-3 py-1.5 rounded text-[11px] font-black uppercase tracking-widest border-[3px] border-black transform rotate-3 z-10 shadow-brutal-accent">1-Click</div>
 							</div>
 
 							<!-- Pictify Template -->
 							<div class="relative group/template hover:-translate-y-2 hover:-rotate-3 transition-transform duration-300">
 								<div class="w-28 h-36 md:w-40 md:h-48 bg-white rounded-xl border-[3px] border-black shadow-[6px_6px_0_0_#4ade80] overflow-hidden p-3 flex flex-col gap-2 relative z-10">
 									<!-- Pictify mini template mockup -->
-									<div class="w-full h-4 bg-[#ffc480] rounded-sm border-2 border-black"></div>
+									<div class="w-full h-4 bg-brand-accent rounded-sm border-2 border-black"></div>
 									<div class="flex-1 bg-gray-100 rounded-sm border-2 border-black relative overflow-hidden flex flex-col items-center justify-center">
 										<!-- Graphic lines -->
 										<div class="absolute -left-4 -top-4 w-12 h-12 border-4 border-black rounded-full text-transparent"></div>
 										<!-- Template variable indicators -->
-										<div class="px-2 py-1 bg-[#4ade80] border-[2px] border-black shadow-[2px_2px_0_0_black] rounded text-[9px] font-black text-black transform -rotate-2 relative z-10">{'{{name}}'}</div>
+										<div class="px-2 py-1 bg-data-green border-[2px] border-black shadow-brutal-sm rounded text-[9px] font-black text-black transform -rotate-2 relative z-10">{'{{name}}'}</div>
 									</div>
 									<div class="flex gap-2">
 										<div class="flex-1 h-3 bg-gray-300 rounded-sm border-2 border-black"></div>
@@ -549,7 +549,7 @@
 									</div>
 								</div>
 								<!-- Pictify logo badge -->
-								<div class="absolute -bottom-4 -right-4 w-10 h-10 bg-[#4ade80] rounded-lg border-[3px] border-black shadow-[4px_4px_0_0_black] flex items-center justify-center z-20 group-hover/template:scale-110 transition-transform">
+								<div class="absolute -bottom-4 -right-4 w-10 h-10 bg-data-green rounded-lg border-[3px] border-black shadow-brutal-lg flex items-center justify-center z-20 group-hover/template:scale-110 transition-transform">
 									<span class="text-lg font-black text-black">P</span>
 								</div>
 							</div>
@@ -558,7 +558,7 @@
 
 					<!-- Right: Copy + CTA -->
 					<div class="flex-1 p-8 md:p-14 flex flex-col justify-center">
-						<div class="inline-block px-4 py-1.5 bg-[#a259ff] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform rotate-2 mb-6 self-start">
+						<div class="inline-block px-4 py-1.5 bg-[#a259ff] border-[3px] border-black shadow-brutal-lg rounded-full transform rotate-2 mb-6 self-start">
 							<span class="text-[11px] font-black text-white uppercase tracking-wider">Figma Plugin</span>
 						</div>
 
@@ -583,19 +583,19 @@
 						<!-- Steps -->
 						<div class="space-y-4 mb-10">
 							<div class="flex items-center gap-4 group/step">
-								<div class="w-8 h-8 bg-[#a259ff] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+								<div class="w-8 h-8 bg-[#a259ff] border-[3px] border-black flex items-center justify-center shrink-0 shadow-brutal-sm group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-brutal-lg transition-all">
 									<span class="text-sm font-black text-white">1</span>
 								</div>
 								<span class="text-base font-bold text-black">Install the plugin</span>
 							</div>
 							<div class="flex items-center gap-4 group/step">
-								<div class="w-8 h-8 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+								<div class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shrink-0 shadow-brutal-sm group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-brutal-lg transition-all">
 									<span class="text-sm font-black text-black">2</span>
 								</div>
 								<span class="text-base font-bold text-black">Select frames</span>
 							</div>
 							<div class="flex items-center gap-4 group/step">
-								<div class="w-8 h-8 bg-[#4ade80] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+								<div class="w-8 h-8 bg-data-green border-[3px] border-black flex items-center justify-center shrink-0 shadow-brutal-sm group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-brutal-lg transition-all">
 									<span class="text-sm font-black text-black">3</span>
 								</div>
 								<span class="text-base font-bold text-black">Send to Pictify</span>

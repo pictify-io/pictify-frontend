@@ -13,7 +13,7 @@
 	} from '../../../store/experiments.store';
 	import { toast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { formatRelativeDate } from '$lib/utils/format.js';
 	import { user } from '../../../store/user.store';
 	import {
@@ -48,17 +48,17 @@
 
 	// Type badge colors
 	const typeColors = {
-		ab_test: 'bg-[#ffc480] text-gray-900 border-gray-900',
-		smart_link: 'bg-[#4ade80] text-gray-900 border-gray-900',
-		scheduled: 'bg-[#a78bfa] text-gray-900 border-gray-900'
+		ab_test: 'bg-brand-accent text-gray-900 border-gray-900',
+		smart_link: 'bg-data-green text-gray-900 border-gray-900',
+		scheduled: 'bg-data-violet text-gray-900 border-gray-900'
 	};
 
 	// Status badge config
 	const statusConfig = {
 		draft: { bg: 'bg-white text-gray-900 border-gray-900', dot: 'bg-gray-400' },
-		running: { bg: 'bg-[#4ade80] text-gray-900 border-gray-900', dot: 'bg-white' },
-		paused: { bg: 'bg-[#ffc480] text-gray-900 border-gray-900', dot: 'bg-white' },
-		completed: { bg: 'bg-[#60a5fa] text-gray-900 border-gray-900', dot: 'bg-white' },
+		running: { bg: 'bg-data-green text-gray-900 border-gray-900', dot: 'bg-white' },
+		paused: { bg: 'bg-brand-accent text-gray-900 border-gray-900', dot: 'bg-white' },
+		completed: { bg: 'bg-data-sky text-gray-900 border-gray-900', dot: 'bg-white' },
 		archived: { bg: 'bg-gray-200 text-gray-500 border-gray-900', dot: 'bg-gray-400' }
 	};
 
@@ -201,14 +201,11 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full" />
 					Lab
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					Experi<span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>ments</span
-					>
+					Experi<span class="text-gray-900">ments</span>
 				</h1>
 			</div>
 
@@ -256,8 +253,8 @@
 					}}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[3px] border-gray-900 transition-all
 					{typeFilter === filter.value
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[3px_3px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-md'}"
 				>
 					{filter.label}
 				</button>
@@ -270,7 +267,7 @@
 				<select
 					bind:value={statusFilter}
 					on:change={handleFilterChange}
-					class="appearance-none pl-4 pr-10 py-2.5 bg-white border-[3px] border-gray-900 rounded-lg text-xs font-black uppercase tracking-wide text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] cursor-pointer shadow-[3px_3px_0_0_rgba(0,0,0,0.1)] hover:shadow-[3px_3px_0_0_#1f2937] transition-all"
+					class="appearance-none pl-4 pr-10 py-2.5 bg-white border-[3px] border-gray-900 rounded-lg text-xs font-black uppercase tracking-wide text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] cursor-pointer shadow-[3px_3px_0_0_rgba(0,0,0,0.1)] hover:shadow-brutal-md transition-all"
 				>
 					{#each statusFilters as sf}
 						<option value={sf.value}>{sf.label}</option>
@@ -294,7 +291,7 @@
 			<div class="relative">
 				<button
 					on:click={handleCreate}
-					class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+					class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -323,7 +320,7 @@
 					<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 					<div class="fixed inset-0 z-40" on:click={closeCreateDropdown} />
 					<div
-						class="absolute right-0 top-full mt-2 z-50 w-72 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+						class="absolute right-0 top-full mt-2 z-50 w-72 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden"
 					>
 						<div class="px-4 py-3 bg-gray-50 border-b-[2px] border-gray-200">
 							<span class="text-[10px] font-black uppercase tracking-widest text-gray-500"
@@ -333,10 +330,10 @@
 						<div class="p-2">
 							<button
 								on:click={() => handleCreateType('ab_test')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#4ade80]/10 transition-colors flex items-start gap-3 group"
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-data-green/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="w-8 h-8 bg-data-green/20 border-[2px] border-data-green rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
 								>
 									<span class="text-sm">&#9878;</span>
 								</div>
@@ -351,13 +348,13 @@
 							</button>
 							<button
 								on:click={() => handleCreateType('smart_link')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#3b82f6]/10 transition-colors flex items-start gap-3 group"
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-data-blue/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#3b82f6]/20 border-[2px] border-[#3b82f6] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="w-8 h-8 bg-data-blue/20 border-[2px] border-data-blue rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
 								>
 									<svg
-										class="w-4 h-4 text-[#3b82f6]"
+										class="w-4 h-4 text-data-blue"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -380,13 +377,13 @@
 							</button>
 							<button
 								on:click={() => handleCreateType('scheduled')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#f59e0b]/10 transition-colors flex items-start gap-3 group"
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-data-amber/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#f59e0b]/20 border-[2px] border-[#f59e0b] rounded-lg flex items-center justify-center shrink-0"
+									class="w-8 h-8 bg-data-amber/20 border-[2px] border-data-amber rounded-lg flex items-center justify-center shrink-0"
 								>
 									<svg
-										class="w-4 h-4 text-[#f59e0b]"
+										class="w-4 h-4 text-data-amber"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -417,20 +414,40 @@
 		<FeatureGate feature={FEATURES.AB_TESTING}>
 			<div class="relative min-h-[400px]">
 				{#if isLoading}
-					<div
-						class="absolute inset-0 flex items-center justify-center z-20 bg-[#FFFDF8]/80 backdrop-blur-sm"
-					>
-						<Loader size="16" show={isLoading} />
+					<!-- Skeleton rows — mirrors the real 2-col experiment card grid -->
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+						{#each Array(4) as _}
+							<div
+								class="bg-white border-[3px] border-gray-200 rounded-2xl overflow-hidden shadow-brutal-xl flex flex-col"
+							>
+								<!-- Image / preview area -->
+								<div class="p-4 border-b-[3px] border-gray-200">
+									<Skeleton class="aspect-[16/9] w-full rounded-xl" />
+								</div>
+								<!-- Body -->
+								<div class="p-5 flex flex-col gap-3">
+									<Skeleton class="h-6 w-2/3" />
+									<div class="flex gap-2">
+										<Skeleton class="h-5 w-20" />
+										<Skeleton class="h-5 w-24" />
+									</div>
+									<div class="flex gap-3 pt-2 border-t-[2px] border-gray-100 mt-1">
+										<Skeleton class="h-10 flex-1 rounded-xl" />
+										<Skeleton class="h-10 w-12 rounded-xl" />
+									</div>
+								</div>
+							</div>
+						{/each}
 					</div>
 				{/if}
 
 				{#if filteredExperiments.length === 0 && !isLoading}
 					<!-- Empty State -->
 					<div
-						class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
+						class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border-[3px] border-gray-900 border-dashed shadow-sm"
 					>
 						<div
-							class="w-24 h-24 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-[6px_6px_0_0_#1f2937] -rotate-3 hover:rotate-0 transition-transform duration-300"
+							class="w-24 h-24 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-xl -rotate-3 hover:rotate-0 transition-transform duration-300"
 						>
 							<!-- Beaker Icon -->
 							<svg
@@ -447,20 +464,28 @@
 								/>
 							</svg>
 						</div>
-						<h3 class="text-xl font-black text-gray-900 uppercase tracking-tight mb-3">
+						<h3 class="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">
 							No experiments yet
 						</h3>
-						<p class="text-gray-500 font-bold max-w-md text-center mb-10 text-sm">
-							Create A/B tests, smart links, and scheduled experiments to optimize your image
-							performance and find the best performing variants.
+						<p class="text-gray-500 font-bold max-w-sm text-center mb-8 text-sm">
+							A/B tests, smart links, and scheduled swaps live here. Run your first experiment to
+							find the variant that converts best.
 						</p>
 						<button
 							on:click={() => handleCreateType('ab_test')}
-							class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
+							class="px-5 py-3 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-[3px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
 						>
-							Create Your First Experiment
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M12 4v16m8-8H4"
+								/></svg
+							>
+							Start your first A/B test
 							<svg
-								class="w-5 h-5 group-hover:translate-x-1 transition-transform"
+								class="w-4 h-4 group-hover:translate-x-1 transition-transform"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -478,24 +503,30 @@
 					<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8">
 						{#each filteredExperiments as exp (exp.uid)}
 							<div
-								class="group bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
+								class="group bg-brand-bg border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
 								on:click={() => handleView(exp.uid)}
 								on:keydown={(e) => e.key === 'Enter' && handleView(exp.uid)}
 								role="button"
 								tabindex="0"
 							>
 								<!-- Background Pattern -->
-								<div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
+								<div
+									class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"
+								/>
 
 								<!-- Card Content Container -->
 								<div class="relative z-10 flex flex-col h-full">
 									<!-- Top Section: Image & Badges -->
 									<div class="relative p-4 sm:p-5 border-b-[3px] border-gray-900 bg-white">
 										<!-- Image Container (Neo brutalist container) -->
-										<div class="aspect-[16/9] w-full bg-[#f8fafc] border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] relative">
+										<div
+											class="aspect-[16/9] w-full bg-[#f8fafc] border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-lg relative"
+										>
 											{#if exp.template?.thumbnail || exp.variants?.[0]?.templateThumbnail || exp.variants?.[0]?.preRenderedUrl}
-												<img
-													src={exp.template?.thumbnail || exp.variants?.[0]?.templateThumbnail || exp.variants?.[0]?.preRenderedUrl}
+												<img loading="lazy"
+													src={exp.template?.thumbnail ||
+														exp.variants?.[0]?.templateThumbnail ||
+														exp.variants?.[0]?.preRenderedUrl}
 													alt="{exp.name} preview"
 													class="w-full h-full object-cover"
 												/>
@@ -516,11 +547,29 @@
 													/>
 												</div>
 											{:else}
-												<div class="w-full h-full flex flex-col items-center justify-center bg-gray-50/80">
-													<div class="w-12 h-12 bg-white rounded-lg border-[2px] border-gray-200 flex items-center justify-center mb-2 shadow-sm rotate-[-5deg]">
-														<svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+												<div
+													class="w-full h-full flex flex-col items-center justify-center bg-gray-50/80"
+												>
+													<div
+														class="w-12 h-12 bg-white rounded-lg border-[2px] border-gray-200 flex items-center justify-center mb-2 shadow-sm rotate-[-5deg]"
+													>
+														<svg
+															class="w-6 h-6 text-gray-300"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+															><path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2.5"
+																d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+															/></svg
+														>
 													</div>
-													<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">No Preview</span>
+													<span
+														class="text-[10px] font-black uppercase tracking-widest text-gray-400"
+														>No Preview</span
+													>
 												</div>
 											{/if}
 										</div>
@@ -528,7 +577,9 @@
 										<!-- Floating Badges Top Left -->
 										<div class="absolute top-6 left-6 flex flex-col items-start gap-2">
 											<span
-												class="inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-[3px_3px_0_0_#1f2937] {typeColors[exp.type] || 'bg-white text-gray-900 border-gray-900'}"
+												class="inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-brutal-md {typeColors[
+													exp.type
+												] || 'bg-white text-gray-900 border-gray-900'}"
 											>
 												{typeLabels[exp.type] || exp.type}
 											</span>
@@ -537,10 +588,16 @@
 										<!-- Floating Status Top Right -->
 										<div class="absolute top-6 right-6">
 											<span
-												class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-[3px_3px_0_0_#000] {statusConfig[exp.status]?.bg || 'bg-white text-gray-900 border-gray-900'}"
+												class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-brutal-md {statusConfig[
+													exp.status
+												]?.bg || 'bg-white text-gray-900 border-gray-900'}"
 											>
 												<span
-													class="w-2 h-2 rounded-full border-[1.5px] border-white {statusConfig[exp.status]?.dot || 'bg-gray-400'} {exp.status === 'running' ? 'animate-pulse' : ''}"
+													class="w-2 h-2 rounded-full border-[1.5px] border-white {statusConfig[
+														exp.status
+													]?.dot || 'bg-gray-400'} {exp.status === 'running'
+														? 'animate-pulse'
+														: ''}"
 												/>
 												{exp.status}
 											</span>
@@ -548,85 +605,164 @@
 									</div>
 
 									<!-- Bottom Section: Details & Actions -->
-									<div class="p-4 sm:p-5 flex-grow flex flex-col bg-[#FFFDF8] relative">
-										
+									<div class="p-4 sm:p-5 flex-grow flex flex-col bg-brand-bg relative">
 										<!-- Quick actions on the right (delete) positioned absolutely for clean layout -->
-										<div class="absolute top-4 right-4 sm:top-5 sm:right-5 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+										<div
+											class="absolute top-4 right-4 sm:top-5 sm:right-5 opacity-0 group-hover:opacity-100 transition-opacity z-20"
+										>
 											<button
 												on:click|stopPropagation={() => confirmDelete(exp)}
-												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-[#ff6b6b] hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
+												class="min-w-[44px] min-h-[44px] sm:w-8 sm:h-8 sm:min-w-0 sm:min-h-0 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-brutal-md hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
 												title="Delete"
+												aria-label="Delete experiment"
 											>
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2.5"
+														d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+													/></svg
+												>
 											</button>
 										</div>
 
 										<!-- Name & Title -->
 										<div class="mb-4 pr-10">
 											<h3
-												class="text-xl sm:text-2xl font-black text-gray-900 leading-tight mb-3 line-clamp-2 decoration-[3px] decoration-[#ffc480]/50 group-hover:underline underline-offset-[6px]"
+												class="text-xl sm:text-2xl font-black text-gray-900 leading-tight mb-3 line-clamp-2 decoration-[3px] decoration-brand-accent/50 group-hover:underline underline-offset-[6px]"
 												title={exp.name}
 											>
 												{exp.name}
 											</h3>
-											
-											<div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-bold uppercase tracking-wider text-gray-500">
-												<span class="flex items-center gap-1.5 px-2 py-1 bg-white border-[2px] border-gray-200 rounded-md">
-													<svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-													{exp.variants?.length || 0} Variant{(exp.variants?.length || 0) !== 1 ? 's' : ''}
+
+											<div
+												class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-bold uppercase tracking-wider text-gray-500"
+											>
+												<span
+													class="flex items-center gap-1.5 px-2 py-1 bg-white border-[2px] border-gray-200 rounded-md"
+												>
+													<svg
+														class="w-3.5 h-3.5 text-gray-400"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+														><path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2.5"
+															d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+														/></svg
+													>
+													{exp.variants?.length || 0} Variant{(exp.variants?.length || 0) !== 1
+														? 's'
+														: ''}
 												</span>
-												
+
 												{#if exp.banditConfig?.enabled}
-													<span class="flex items-center gap-1.5 px-2 py-1 bg-purple-50 border-[2px] border-purple-200 rounded-md text-purple-600 shadow-[1px_1px_0_0_#d8b4fe]">
-														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+													<span
+														class="flex items-center gap-1.5 px-2 py-1 bg-purple-50 border-[2px] border-purple-200 rounded-md text-purple-600 shadow-[1px_1px_0_0_#d8b4fe]"
+													>
+														<svg
+															class="w-3 h-3"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+															><path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2.5"
+																d="M13 10V3L4 14h7v7l9-11h-7z"
+															/></svg
+														>
 														Auto-Optimize
 													</span>
 												{/if}
 
 												{#if exp.status === 'running'}
-													<span class="flex items-center gap-1.5 text-green-700 bg-green-50 border-[2px] border-green-200 px-2 py-1 rounded-md shadow-[1px_1px_0_0_#bbf7d0]">
+													<span
+														class="flex items-center gap-1.5 text-green-700 bg-green-50 border-[2px] border-green-200 px-2 py-1 rounded-md shadow-[1px_1px_0_0_#bbf7d0]"
+													>
 														<span class="relative flex h-2 w-2">
-															<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-															<span class="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
+															<span
+																class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"
+															/>
+															<span
+																class="relative inline-flex rounded-full h-2 w-2 bg-green-600"
+															/>
 														</span>
-														{(exp.variants || []).reduce((s, v) => s + (v.impressions || 0), 0).toLocaleString()} Views
+														{(exp.variants || [])
+															.reduce((s, v) => s + (v.impressions || 0), 0)
+															.toLocaleString()} Views
 													</span>
 												{:else}
-													<span class="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border-[2px] border-gray-200 rounded-md">
-														<svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+													<span
+														class="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border-[2px] border-gray-200 rounded-md"
+													>
+														<svg
+															class="w-3.5 h-3.5 text-gray-400"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+															><path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2.5"
+																d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+															/></svg
+														>
 														{formatRelativeDate(exp.createdAt)}
 													</span>
 												{/if}
 											</div>
 										</div>
 
-										<div class="flex-grow"></div>
+										<div class="flex-grow" />
 
 										<!-- Actions Bar -->
-										<div class="mt-4 pt-4 border-t-[3px] border-gray-900 border-dashed flex items-center justify-between gap-3">
+										<div
+											class="mt-4 pt-4 border-t-[3px] border-gray-900 border-dashed flex items-center justify-between gap-3"
+										>
 											<button
 												on:click|stopPropagation={() => handleView(exp.uid)}
-												class="flex-1 bg-white text-gray-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 hover:bg-gray-900 hover:text-white group/btn"
+												class="flex-1 bg-white text-gray-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 hover:bg-gray-900 hover:text-white group/btn"
 											>
 												<span>Open Editor</span>
-												<svg class="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+												<svg
+													class="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform"
+													fill="none"
+													stroke="currentColor"
+													viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="3"
+														d="M14 5l7 7m0 0l-7 7m7-7H3"
+													/></svg
+												>
 											</button>
 
 											{#if exp.status === 'draft' || exp.status === 'paused'}
 												<button
 													on:click|stopPropagation={() => handleStart(exp.uid)}
-													class="w-12 h-12 bg-[#4ade80] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													class="w-12 h-12 bg-data-green text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Start"
+													aria-label="Start experiment"
 												>
-													<svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+													<svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"
+														><path d="M8 5v14l11-7z" /></svg
+													>
 												</button>
 											{:else if exp.status === 'running'}
 												<button
 													on:click|stopPropagation={() => handlePause(exp.uid)}
-													class="w-12 h-12 bg-[#ffc480] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													class="w-12 h-12 bg-brand-accent text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Pause"
+													aria-label="Pause experiment"
 												>
-													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
+														><path d="M6 4h4v16H6zm8 0h4v16h-4z" /></svg
+													>
 												</button>
 											{/if}
 										</div>
@@ -645,27 +781,34 @@
 {#if showDeleteConfirm && experimentToDelete}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity"
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 transition-opacity"
 		on:click={closeDeleteConfirm}
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-md w-full overflow-hidden animate-fade-in-up"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-md w-full overflow-hidden animate-fade-in-up"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="delete-experiment-title"
 			on:click|stopPropagation
 		>
 			<!-- Modal Header -->
 			<div class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-3 h-3 bg-[#ff6b6b] rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]"
+						class="w-3 h-3 bg-brand-danger rounded-full border-[2px] border-gray-900 shadow-brutal-sm"
 					/>
-					<h2 class="font-black text-sm uppercase tracking-widest text-[#ff6b6b]">
+					<h2
+						id="delete-experiment-title"
+						class="font-black text-sm uppercase tracking-widest text-brand-danger"
+					>
 						Delete Experiment?
 					</h2>
 				</div>
 				<button
 					class="text-gray-400 hover:text-white transition-colors"
 					on:click={closeDeleteConfirm}
+					aria-label="Close dialog"
 				>
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -682,7 +825,7 @@
 			<div class="p-6">
 				<div class="flex items-start gap-4 mb-8">
 					<div
-						class="w-14 h-14 bg-[#ff6b6b] rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] -rotate-3"
+						class="w-14 h-14 bg-brand-danger rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] -rotate-3"
 					>
 						<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -714,13 +857,13 @@
 				<div class="flex gap-4">
 					<button
 						on:click={closeDeleteConfirm}
-						class="flex-1 px-4 py-3.5 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs"
+						class="flex-1 px-4 py-3.5 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs"
 					>
 						Cancel
 					</button>
 					<button
 						on:click={handleDelete}
-						class="flex-[1.5] px-4 py-3.5 bg-[#ff6b6b] text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center justify-center gap-2"
+						class="flex-[1.5] px-4 py-3.5 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center justify-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

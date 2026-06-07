@@ -39,7 +39,7 @@
 	<meta name="twitter:image" content="https://media.pictify.io/fbap2-1775406920888.png" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -47,14 +47,14 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative z-10">
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -67,10 +67,10 @@
 			<!-- Animated Icon -->
 			<div class="relative mb-10 group">
 				<div
-					class="absolute inset-0 bg-[#ffc480] rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-brutal-lg"
 				/>
 				<div
-					class="relative w-24 h-24 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-300"
+					class="relative w-24 h-24 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-lg group-hover:-translate-y-2 transition-transform duration-300"
 				>
 					<svg
 						class="w-12 h-12 text-gray-900"
@@ -92,8 +92,8 @@
 			<h1
 				class="text-5xl sm:text-7xl font-black text-gray-900 tracking-tighter mb-8 max-w-4xl mx-auto leading-[0.9]"
 			>
-				Supercharge Your <br />
-				<span class="text-[#ff6b6b] decoration-clone">Workflow</span>
+				Connect Pictify to <br />
+				<span class="text-brand-danger decoration-clone">Your Stack</span>
 			</h1>
 
 			<!-- Description -->
@@ -114,7 +114,7 @@
 				</a>
 				<a
 					href="https://docs.pictify.io"
-					class="px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 rounded-xl font-black uppercase tracking-wider hover:bg-gray-50 hover:-translate-y-1 transition-all shadow-[6px_6px_0_0_#1f2937]"
+					class="px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 rounded-xl font-black uppercase tracking-wider hover:bg-gray-50 hover:-translate-y-1 transition-all shadow-brutal-xl"
 				>
 					Read Docs
 				</a>
@@ -132,7 +132,7 @@
 						>
 							<div>
 								<div
-									class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 text-xs font-black uppercase tracking-widest rounded mb-3"
+									class="inline-flex items-center gap-2 px-3 py-1 bg-brand-accent text-gray-900 border-[2px] border-gray-900 text-xs font-black uppercase tracking-widest rounded mb-3"
 								>
 									{category.label}
 								</div>
@@ -150,7 +150,7 @@
 								{@const icon = brandIcons[integration.icon] || brandIcons.default}
 								<a
 									href="/integrations/{integration.slug}"
-									class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
+									class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
 								>
 									<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
 										<div class="flex justify-between items-start mb-6">
@@ -159,7 +159,7 @@
 												style="color: {icon.color || '#1f2937'}"
 											>
 												{#if icon.type === 'url'}
-													<img src={icon.url} alt={integration.name} class="w-8 h-8" />
+													<img loading="lazy" src={icon.url} alt={integration.name} class="w-8 h-8" />
 												{:else if icon.type === 'text'}
 													<span class="text-lg font-black" style="color: {icon.color}"
 														>{icon.text}</span
@@ -195,7 +195,7 @@
 
 										<div class="mb-4">
 											<h3
-												class="text-2xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors"
+												class="text-2xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
 											>
 												{integration.name}
 											</h3>
@@ -217,7 +217,7 @@
 
 									<!-- Hover Effect Background -->
 									<div
-										class="absolute inset-0 bg-[#FFFDF8] opacity-0 group-hover:opacity-100 transition-opacity z-0"
+										class="absolute inset-0 bg-brand-bg opacity-0 group-hover:opacity-100 transition-opacity z-0"
 									/>
 								</a>
 							{/each}
@@ -230,14 +230,14 @@
 		<!-- Developer CTA -->
 		<section class="mt-32">
 			<div
-				class="bg-gray-900 rounded-3xl p-1 border-[4px] border-gray-900 shadow-[12px_12px_0_0_#ff6b6b]"
+				class="bg-gray-900 rounded-2xl p-1 border-[4px] border-gray-900 shadow-[12px_12px_0_0_#ff6b6b]"
 			>
 				<div
 					class="bg-gray-900 rounded-[20px] p-8 md:p-12 border border-gray-800 overflow-hidden relative"
 				>
 					<!-- Code Background -->
 					<div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none select-none">
-						<pre class="text-[#4ade80] font-mono text-sm leading-relaxed">
+						<pre class="text-data-green font-mono text-sm leading-relaxed">
 const pictify = new Pictify(API_KEY);
 await pictify.render(&#123;
   template: 'marketing-v1',
@@ -250,14 +250,14 @@ await pictify.render(&#123;
 					<div class="relative z-10 grid md:grid-cols-2 gap-12 items-center">
 						<div>
 							<div
-								class="inline-flex items-center gap-2 px-3 py-1 bg-gray-800 text-[#4ade80] border border-gray-700 text-xs font-mono font-bold uppercase tracking-widest rounded mb-6"
+								class="inline-flex items-center gap-2 px-3 py-1 bg-gray-800 text-data-green border border-gray-700 text-xs font-mono font-bold uppercase tracking-widest rounded mb-6"
 							>
-								<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+								<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 								Developers
 							</div>
 							<h2 class="text-4xl md:text-5xl font-black text-white tracking-tight mb-6">
 								Build Custom <br />
-								<span class="text-[#4ade80]">Integrations</span>
+								<span class="text-data-green">Integrations</span>
 							</h2>
 							<p class="text-gray-400 font-medium text-lg mb-8 max-w-md leading-relaxed">
 								Use our powerful REST API and SDKs to integrate Pictify generation into any
@@ -266,7 +266,7 @@ await pictify.render(&#123;
 							<div class="flex flex-wrap gap-4">
 								<a
 									href="https://docs.pictify.io"
-									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider hover:bg-[#4ade80] hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]"
+									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider hover:bg-data-green hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]"
 								>
 									Read Documentation
 								</a>
@@ -284,24 +284,24 @@ await pictify.render(&#123;
 							class="bg-[#0f1117] rounded-xl border-2 border-gray-800 shadow-2xl overflow-hidden font-mono text-sm group transform transition-transform hover:scale-[1.02]"
 						>
 							<div class="px-4 py-3 bg-[#1f2937] border-b border-gray-800 flex items-center gap-2">
-								<div class="w-3 h-3 rounded-full bg-[#ff6b6b]" />
-								<div class="w-3 h-3 rounded-full bg-[#ffc480]" />
-								<div class="w-3 h-3 rounded-full bg-[#4ade80]" />
+								<div class="w-3 h-3 rounded-full bg-brand-danger" />
+								<div class="w-3 h-3 rounded-full bg-brand-accent" />
+								<div class="w-3 h-3 rounded-full bg-data-green" />
 								<div class="ml-2 text-xs text-gray-500 font-bold">bash</div>
 							</div>
 							<div class="p-6 space-y-4">
 								<div class="flex gap-2">
-									<span class="text-[#ff6b6b]">➜</span>
-									<span class="text-[#4ade80]">~</span>
+									<span class="text-brand-danger">➜</span>
+									<span class="text-data-green">~</span>
 									<span class="text-gray-300 typing-effect"
 										>curl -X POST https://api.pictify.io/image \</span
 									>
 								</div>
 								<div class="pl-4 text-gray-400">
-									-H <span class="text-[#ffc480]">'Authorization: Bearer sk_live_...'</span> \
+									-H <span class="text-brand-accent">'Authorization: Bearer sk_live_...'</span> \
 								</div>
 								<div class="pl-4 text-gray-400">
-									-d <span class="text-[#ffc480]">'&#123;"template": "reciept-v2"&#125;'</span>
+									-d <span class="text-brand-accent">'&#123;"template": "reciept-v2"&#125;'</span>
 								</div>
 								<div class="flex gap-2 text-gray-500 pt-2">
 									<span>✓</span>

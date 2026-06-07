@@ -24,7 +24,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden transition-colors duration-700 {isPictify
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden transition-colors duration-700 {isPictify
 		? ''
 		: 'bg-gray-900'}"
 >
@@ -38,7 +38,7 @@
 			class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]"
 		/>
 		<div
-			class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-[#ff6b6b]/5 via-[#4ade80]/5 to-[#ffc480]/5 rounded-full blur-3xl"
+			class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-brand-danger/5 via-data-green/5 to-brand-accent/5 rounded-full blur-3xl"
 		/>
 	</div>
 
@@ -70,8 +70,8 @@
 					<!-- Sliding Brick -->
 					<div
 						class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] border-[3px] border-gray-900 rounded-lg shadow-sm transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10 flex items-center justify-center font-black uppercase text-sm tracking-widest pointer-events-none {isPictify
-							? 'bg-[#4ade80] shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'
-							: 'bg-[#ff6b6b] shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'}"
+							? 'bg-data-green shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'
+							: 'bg-brand-danger shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'}"
 						style="transform: translateX({isPictify ? '100%' : '0%'})"
 					>
 						<span class="text-black">{isPictify ? 'Pictify Cloud' : 'Puppeteer Stack'}</span>
@@ -104,7 +104,7 @@
 			>
 				{#if isPictify}
 					Stop Wrestling with<br />
-					<span class="relative inline-block text-[#ff6b6b]">
+					<span class="relative inline-block text-brand-danger">
 						Headless Chrome.
 						<svg
 							class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -115,7 +115,7 @@
 						</svg>
 					</span>
 				{:else}
-					<span class="text-[#ff6b6b] bg-black px-2">SYSTEM OVERLOAD</span> <br />
+					<span class="text-brand-danger bg-black px-2">SYSTEM OVERLOAD</span> <br />
 					<span class="opacity-50 text-3xl sm:text-4xl">Puppeteer Cluster Failure</span>
 				{/if}
 			</h2>
@@ -138,8 +138,8 @@
 			<!-- Card 1: Cold Starts -->
 			<!-- Card 1: Cold Starts -->
 			<div
-				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
-					? 'shadow-[8px_8px_0_0_#1f2937]'
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
+					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
 				<div class="flex justify-between items-start mb-4">
@@ -151,7 +151,7 @@
 						Cold Starts
 					</div>
 					<div
-						class="w-3 h-3 rounded-full animate-pulse {isPictify ? 'bg-[#4ade80]' : 'bg-red-500'}"
+						class="w-3 h-3 rounded-full animate-pulse {isPictify ? 'bg-data-green' : 'bg-red-500'}"
 					/>
 				</div>
 				<div
@@ -168,7 +168,7 @@
 				>
 					<div
 						class="h-full transition-all duration-300 {isPictify
-							? 'bg-[#4ade80] w-[15%]'
+							? 'bg-data-green w-[15%]'
 							: 'bg-red-500 w-[95%]'}"
 					/>
 				</div>
@@ -186,8 +186,8 @@
 			<!-- Card 2: Designer Flow -->
 			<!-- Card 2: Designer Flow -->
 			<div
-				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
-					? 'shadow-[8px_8px_0_0_#1f2937]'
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
+					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
 				<div class="flex justify-between items-start mb-4">
@@ -222,10 +222,10 @@
 					{#if isPictify}
 						<div class="flex gap-2">
 							<div
-								class="w-8 h-8 rounded bg-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] transform -rotate-3"
+								class="w-8 h-8 rounded bg-white border-2 border-gray-900 shadow-brutal-sm transform -rotate-3"
 							/>
 							<div
-								class="w-8 h-8 rounded bg-[#ff6b6b] border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] transform rotate-3 flex items-center justify-center text-white font-bold text-xs"
+								class="w-8 h-8 rounded bg-brand-danger border-2 border-gray-900 shadow-brutal-sm transform rotate-3 flex items-center justify-center text-white font-bold text-xs"
 							>
 								P
 							</div>
@@ -253,8 +253,8 @@
 			<!-- Card 3: Maintenance -->
 			<!-- Card 3: Maintenance -->
 			<div
-				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
-					? 'shadow-[8px_8px_0_0_#1f2937]'
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
+					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
 				<div class="flex justify-between items-start mb-4">
@@ -267,7 +267,7 @@
 					</div>
 					<div
 						class="text-xs font-bold px-2 py-0.5 rounded border {isPictify
-							? 'bg-[#4ade80]/20 text-[#166534] border-[#166534]'
+							? 'bg-data-green/20 text-[#166534] border-[#166534]'
 							: 'bg-red-900/20 text-red-500 border-red-500'}"
 					>
 						{isPictify ? 'ZERO' : 'HIGH'}
@@ -292,7 +292,7 @@
 					</div>
 				{:else}
 					<div
-						class="text-[10px] items-center font-bold flex gap-2 text-gray-400 mb-6 uppercase tracking-wider"
+						class="text-[10px] items-center font-bold flex gap-2 text-gray-600 mb-6 uppercase tracking-wider"
 					>
 						<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
 						vs headless Chrome

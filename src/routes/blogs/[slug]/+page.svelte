@@ -75,7 +75,7 @@
 </svelte:head>
 
 <div
-	class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black"
+	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
 >
 	<Nav />
 
@@ -85,7 +85,7 @@
 			<div
 				class="flex-1 bg-white md:border-r-[3px] border-t-[3px] md:border-t-0 border-gray-900 relative overflow-hidden min-h-[400px] md:min-h-[500px]"
 			>
-				<img
+				<img loading="lazy"
 					src={blog?.heroImage}
 					class="object-cover w-full h-full absolute inset-0"
 					alt={blog?.title}
@@ -95,13 +95,13 @@
 
 			<!-- Title & Info -->
 			<div
-				class="flex-1 flex flex-col w-full bg-[#FFFDF8] justify-center p-8 md:p-16 relative pattern-grid"
+				class="flex-1 flex flex-col w-full bg-brand-bg justify-center p-8 md:p-16 relative pattern-grid"
 			>
 				<div class="relative z-10">
 					{#if blog?.tags?.length > 0}
 						<div class="mb-6">
 							<span
-								class="bg-[#ff6b6b] text-white border-[3px] border-gray-900 px-4 py-1.5 font-black uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#1f2937] inline-block transform -rotate-1"
+								class="bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1.5 font-black uppercase tracking-widest text-sm shadow-brutal-lg inline-block transform -rotate-1"
 							>
 								{blog?.tags[0]}
 							</span>
@@ -142,14 +142,14 @@
 						<a
 							href={`https://twitter.com/intent/tweet?url=https://pictify.io/blogs/${$page.params.slug}`}
 							target="_blank"
-							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-none transition-all rounded-lg"
+							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-y-0 active:shadow-none transition-all rounded-lg"
 						>
 							<i class="fa-brands fa-twitter text-xl" />
 						</a>
 						<a
 							href={`https://www.linkedin.com/shareArticle?mini=true&url=https://pictify.io/blogs/${$page.params.slug}`}
 							target="_blank"
-							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-none transition-all rounded-lg"
+							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-y-0 active:shadow-none transition-all rounded-lg"
 						>
 							<i class="fa-brands fa-linkedin-in text-xl" />
 						</a>
@@ -160,7 +160,7 @@
 								alert('Link copied to clipboard');
 							}}
 							aria-label="Copy link to clipboard"
-							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-none transition-all rounded-lg"
+							class="w-12 h-12 flex items-center justify-center bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-y-0 active:shadow-none transition-all rounded-lg"
 						>
 							<i class="fa fa-link text-xl" />
 						</button>

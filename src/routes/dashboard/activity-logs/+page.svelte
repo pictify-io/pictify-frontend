@@ -80,7 +80,7 @@
 		},
 		batch: {
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />',
-			color: 'bg-[#ffc480] text-gray-900 border-gray-900'
+			color: 'bg-brand-accent text-gray-900 border-gray-900'
 		},
 		auth: {
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />',
@@ -109,9 +109,9 @@
 	};
 
 	const statusConfig = {
-		success: { color: 'bg-[#4ade80]/20 text-[#15803d] border-[#15803d]', dot: 'bg-[#15803d]' },
-		failure: { color: 'bg-[#ff6b6b]/20 text-[#b91c1c] border-[#b91c1c]', dot: 'bg-[#b91c1c]' },
-		pending: { color: 'bg-[#ffc480]/20 text-[#b45309] border-[#b45309]', dot: 'bg-[#b45309]' }
+		success: { color: 'bg-data-green/20 text-[#15803d] border-[#15803d]', dot: 'bg-[#15803d]' },
+		failure: { color: 'bg-brand-danger/20 text-[#b91c1c] border-[#b91c1c]', dot: 'bg-[#b91c1c]' },
+		pending: { color: 'bg-brand-accent/20 text-[#b45309] border-[#b45309]', dot: 'bg-[#b45309]' }
 	};
 
 	onMount(async () => {
@@ -206,14 +206,11 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-danger rounded-full" />
 					System Monitor
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					Activity <span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Logs</span
-					>
+					Activity <span class="text-gray-900">Logs</span>
 				</h1>
 			</div>
 			<div class="flex items-center gap-4">
@@ -228,13 +225,13 @@
 		{#if !isSummaryLoading && summary.totalLogs > 0}
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
 							>Success Rate</span
 						>
-						<div class="w-2 h-2 bg-[#4ade80] rounded-full" />
+						<div class="w-2 h-2 bg-data-green rounded-full" />
 					</div>
 					<div class="text-3xl font-black text-gray-900">
 						{Math.round(((summary.byStatus?.success || 0) / summary.totalLogs) * 100)}%
@@ -243,7 +240,7 @@
 						class="w-full bg-gray-200 h-2 mt-2 rounded-full overflow-hidden border border-gray-900"
 					>
 						<div
-							class="h-full bg-[#4ade80]"
+							class="h-full bg-data-green"
 							style="width: {Math.round(
 								((summary.byStatus?.success || 0) / summary.totalLogs) * 100
 							)}%"
@@ -252,13 +249,13 @@
 				</div>
 
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
 							>Error Rate</span
 						>
-						<div class="w-2 h-2 bg-[#ff6b6b] rounded-full" />
+						<div class="w-2 h-2 bg-brand-danger rounded-full" />
 					</div>
 					<div class="text-3xl font-black text-gray-900">
 						{Math.round(((summary.byStatus?.failure || 0) / summary.totalLogs) * 100)}%
@@ -267,7 +264,7 @@
 						class="w-full bg-gray-200 h-2 mt-2 rounded-full overflow-hidden border border-gray-900"
 					>
 						<div
-							class="h-full bg-[#ff6b6b]"
+							class="h-full bg-brand-danger"
 							style="width: {Math.round(
 								((summary.byStatus?.failure || 0) / summary.totalLogs) * 100
 							)}%"
@@ -276,7 +273,7 @@
 				</div>
 
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
@@ -295,7 +292,7 @@
 				</div>
 
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
@@ -317,7 +314,7 @@
 
 		<!-- Main Control Panel -->
 		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col"
+			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden flex flex-col"
 		>
 			<!-- Toolbar -->
 			<div
@@ -325,7 +322,7 @@
 			>
 				<div class="flex items-center gap-2 w-full sm:w-auto">
 					<button
-						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-all shadow-[2px_2px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
+						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-all shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
 						on:click={() => (showFilters = !showFilters)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -340,7 +337,7 @@
 					</button>
 					<div class="relative">
 						<button
-							class="px-4 py-2 bg-[#ffc480] border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-[#ffb356] transition-all shadow-[2px_2px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
+							class="px-4 py-2 bg-brand-accent border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-[#ffb356] transition-all shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
 							on:click={() => (showExportMenu = !showExportMenu)}
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -355,7 +352,7 @@
 						</button>
 						{#if showExportMenu}
 							<div
-								class="absolute top-full left-0 mt-2 w-32 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] z-20"
+								class="absolute top-full left-0 mt-2 w-32 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg z-20"
 							>
 								<button
 									class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-100 border-b border-gray-100"
@@ -428,7 +425,7 @@
 							<select
 								bind:value={category}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							>
 								{#each categories as cat}<option value={cat.value}>{cat.label}</option>{/each}
 							</select>
@@ -443,7 +440,7 @@
 							<select
 								bind:value={status}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							>
 								{#each statuses as stat}<option value={stat.value}>{stat.label}</option>{/each}
 							</select>
@@ -459,7 +456,7 @@
 								type="date"
 								bind:value={startDate}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							/>
 						</label>
 					</div>
@@ -473,13 +470,13 @@
 								type="date"
 								bind:value={endDate}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							/>
 						</label>
 					</div>
 					<div class="col-span-full flex justify-end">
 						<button
-							class="text-xs font-bold text-[#ff6b6b] underline decoration-2 underline-offset-4 hover:text-red-600"
+							class="text-xs font-bold text-brand-danger underline decoration-2 underline-offset-4 hover:text-red-600"
 							on:click={handleClearFilters}>Reset Filters</button
 						>
 					</div>
@@ -487,7 +484,7 @@
 			{/if}
 
 			<!-- Log Stream -->
-			<div class="flex-1 overflow-x-auto bg-[#FFFDF8]">
+			<div class="flex-1 overflow-x-auto bg-brand-bg">
 				{#if isLoading}
 					<div class="p-12 flex flex-col items-center justify-center">
 						<Loader size="8" show={true} />
@@ -500,7 +497,7 @@
 				{:else if logs.length === 0}
 					<div class="p-12 flex flex-col items-center justify-center text-center">
 						<div
-							class="w-16 h-16 bg-gray-100 border-[3px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#1f2937] rounded-xl"
+							class="w-16 h-16 bg-gray-100 border-[3px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg rounded-xl"
 						>
 							<svg
 								class="w-8 h-8 text-gray-400"
@@ -544,7 +541,7 @@
 						</thead>
 						<tbody class="divide-y divide-gray-200">
 							{#each logs as log}
-								<tr class="group hover:bg-[#ffc480]/10 transition-colors font-mono text-sm">
+								<tr class="group hover:bg-brand-accent/10 transition-colors font-mono text-sm">
 									<td class="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
 										{new Date(log.createdAt).toLocaleString()}
 									</td>
@@ -580,7 +577,7 @@
 												{log.resourceId.substring(0, 8)}...
 											</span>
 										{:else}
-											<span class="text-gray-300">-</span>
+											<span class="text-gray-600">-</span>
 										{/if}
 									</td>
 									<td class="px-4 py-3 text-gray-600 text-xs">
@@ -618,18 +615,18 @@
 {#if showLogDetail && selectedLog}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
 		on:click={() => (showLogDetail = false)}
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
 			on:click|stopPropagation
 		>
 			<!-- Modal Header -->
 			<div class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between shrink-0">
 				<div class="flex items-center gap-3">
-					<div class="w-3 h-3 bg-[#ff6b6b] rounded-full border border-white/20" />
+					<div class="w-3 h-3 bg-brand-danger rounded-full border border-white/20" />
 					<h2 class="font-mono font-bold text-sm uppercase tracking-widest">Event Log Details</h2>
 				</div>
 				<button
@@ -680,9 +677,9 @@
 				<!-- Grid Data -->
 				<div class="grid grid-cols-2 gap-4">
 					<div
-						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 					>
-						<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+						<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 							>Event ID</span
 						>
 						<code
@@ -691,9 +688,9 @@
 						>
 					</div>
 					<div
-						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 					>
-						<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+						<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 							>Timestamp</span
 						>
 						<span class="text-xs font-mono font-bold text-gray-900 block"
@@ -702,9 +699,9 @@
 					</div>
 					{#if selectedLog.resourceId}
 						<div
-							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 						>
-							<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+							<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 								>Resource ID</span
 							>
 							<code class="text-xs font-mono font-bold text-gray-900 block truncate"
@@ -714,9 +711,9 @@
 					{/if}
 					{#if selectedLog.duration}
 						<div
-							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 						>
-							<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+							<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 								>Duration</span
 							>
 							<span class="text-xs font-mono font-bold text-gray-900 block"
@@ -728,8 +725,8 @@
 
 				<!-- Error Trace -->
 				{#if selectedLog.error}
-					<div class="p-4 bg-red-50 border-[2px] border-[#ff6b6b] rounded-xl">
-						<h4 class="text-xs font-black text-[#ff6b6b] uppercase tracking-widest mb-2">
+					<div class="p-4 bg-red-50 border-[2px] border-brand-danger rounded-xl">
+						<h4 class="text-xs font-black text-brand-danger uppercase tracking-widest mb-2">
 							Error Trace
 						</h4>
 						<pre class="text-xs font-mono text-red-900 whitespace-pre-wrap">{selectedLog.error
@@ -746,7 +743,7 @@
 				{#if selectedLog.metadata && Object.keys(selectedLog.metadata).length > 0}
 					<div class="bg-gray-900 rounded-xl border-[2px] border-gray-900 p-4 overflow-hidden">
 						<div class="flex items-center justify-between mb-2">
-							<h4 class="text-xs font-black text-[#4ade80] uppercase tracking-widest">
+							<h4 class="text-xs font-black text-data-green uppercase tracking-widest">
 								Metadata Payload
 							</h4>
 							<span class="text-[10px] text-gray-500 font-mono">JSON</span>

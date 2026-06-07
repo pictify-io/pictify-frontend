@@ -168,9 +168,9 @@
 		<!-- Main Mapping Section -->
 		<div class="lg:col-span-8">
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden"
 			>
-				<div class="bg-[#60a5fa] border-b-[3px] border-gray-900 px-6 py-4">
+				<div class="bg-data-sky border-b-[3px] border-gray-900 px-6 py-4">
 					<h2
 						class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2 text-shadow-sm"
 					>
@@ -255,7 +255,7 @@
 												<!-- Dropdown suggestions -->
 												{#if openDropdown === variable.name && suggestedPaths.length > 0}
 													<div
-														class="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] max-h-64 overflow-y-auto"
+														class="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl max-h-64 overflow-y-auto"
 													>
 														<div
 															class="sticky top-0 bg-gray-50 px-3 py-2 border-b-[3px] border-gray-100 flex justify-between items-center"
@@ -279,7 +279,7 @@
 															>
 																<div class="flex-1 min-w-0">
 																	<span
-																		class="font-mono text-xs font-bold text-gray-900 block truncate group-hover/item:text-[#3b82f6] transition-colors"
+																		class="font-mono text-xs font-bold text-gray-900 block truncate group-hover/item:text-data-blue transition-colors"
 																		>{path}</span
 																	>
 																	{#if isLeaf}
@@ -366,7 +366,7 @@
 		<div class="lg:col-span-4 space-y-6">
 			<!-- Tips Box (Matches Bulk) -->
 			<div
-				class="bg-[#eff6ff] border-[3px] border-[#60a5fa] rounded-xl p-6 shadow-[6px_6px_0_0_#bfdbfe]"
+				class="bg-[#eff6ff] border-[3px] border-data-sky rounded-xl p-6 shadow-[6px_6px_0_0_#bfdbfe]"
 			>
 				<h3 class="font-black text-blue-900 uppercase tracking-widest text-sm mb-4">
 					JSON Mapping Tips
@@ -399,7 +399,7 @@
 
 			<!-- Source Data Preview -->
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col max-h-[500px]"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden flex flex-col max-h-[500px]"
 			>
 				<div
 					class="bg-gray-100 border-b-[3px] border-gray-900 px-4 py-3 flex justify-between items-center shrink-0"
@@ -413,7 +413,7 @@
 				</div>
 				<div class="p-4 overflow-auto bg-[#1a1a1a] flex-1">
 					{#if sampleData}
-						<pre class="text-xs font-mono text-[#4ade80]/90 whitespace-pre-wrap">{JSON.stringify(
+						<pre class="text-xs font-mono text-data-green/90 whitespace-pre-wrap">{JSON.stringify(
 								sampleData,
 								null,
 								2
@@ -450,7 +450,7 @@
 			Back
 		</button>
 		<button
-			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-5 py-2.5 bg-data-blue hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Refresh Strategy

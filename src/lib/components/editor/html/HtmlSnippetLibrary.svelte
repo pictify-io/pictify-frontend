@@ -36,11 +36,11 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+<div class="flex h-full w-full flex-col bg-brand-bg">
 	<!-- Header -->
 	<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffe066] px-4 py-3">
 		<div class="flex items-center gap-2">
-			<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+			<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 				<i class="fa fa-wand-magic-sparkles text-[11px] text-gray-900"></i>
 			</div>
 			<h3 class="text-[11px] font-black uppercase tracking-widest text-gray-900">
@@ -51,7 +51,7 @@
 			type="button"
 			on:click={close}
 			aria-label="Close snippets"
-			class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+			class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 		>
 			<i class="fa fa-xmark text-[11px]"></i>
 		</button>
@@ -64,7 +64,7 @@
 			on:click={() => (activeCategory = 'all')}
 			class="flex-shrink-0 rounded-md border-[2px] border-gray-900 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest transition-all
 				{activeCategory === 'all'
-					? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#1f2937]'
+					? 'bg-gray-900 text-white shadow-brutal-sm'
 					: 'bg-white text-gray-700 hover:shadow-[1px_1px_0_0_#1f2937]'}"
 		>All</button>
 		{#each SNIPPET_CATEGORIES as cat}
@@ -73,7 +73,7 @@
 				on:click={() => (activeCategory = cat.key)}
 				class="flex-shrink-0 rounded-md border-[2px] border-gray-900 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest transition-all
 					{activeCategory === cat.key
-						? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#1f2937]'
+						? 'bg-gray-900 text-white shadow-brutal-sm'
 						: 'bg-white text-gray-700 hover:shadow-[1px_1px_0_0_#1f2937]'}"
 			>{cat.label}</button>
 		{/each}
@@ -86,7 +86,7 @@
 			type="text"
 			bind:value={searchQuery}
 			placeholder="SEARCH SNIPPETS..."
-			class="w-full rounded-md border-[2px] border-gray-900 bg-white py-1.5 pl-7 pr-2 text-[10px] font-black uppercase tracking-widest text-gray-900 placeholder-gray-400 focus:-translate-y-0.5 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+			class="w-full rounded-md border-[2px] border-gray-900 bg-white py-1.5 pl-7 pr-2 text-[10px] font-black uppercase tracking-widest text-gray-900 placeholder-gray-400 focus:-translate-y-0.5 focus:shadow-brutal-accent-sm focus:outline-none"
 		/>
 	</div>
 
@@ -102,7 +102,7 @@
 			<button
 				type="button"
 				on:click={() => insert(snippet)}
-				class="group w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+				class="group w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-md"
 			>
 				<!-- Live miniature preview. Lazy-mounts when scrolled
 				     into view; compiles the snippet body with

@@ -175,13 +175,13 @@
 	<!-- Popup -->
 	<div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
 		<div
-			class="bg-white border-[4px] border-black shadow-[12px_12px_0_0_#000] max-w-lg w-full pointer-events-auto animate-slideUp"
+			class="bg-white border-[4px] border-black shadow-brutal-3xl max-w-lg w-full pointer-events-auto animate-slideUp"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="exit-popup-title"
 		>
 			<!-- Header -->
-			<div class="bg-[#ff6b6b] text-white px-6 py-4 border-b-[4px] border-black relative">
+			<div class="bg-brand-danger text-white px-6 py-4 border-b-[4px] border-black relative">
 				<button
 					on:click={closePopup}
 					class="absolute top-3 right-3 w-8 h-8 bg-white text-black border-[2px] border-black flex items-center justify-center font-black hover:bg-gray-100 transition-colors"
@@ -198,7 +198,7 @@
 			<div class="p-6">
 				{#if generatedImageUrl}
 					<div class="mb-4 border-[3px] border-black p-2 bg-gray-50">
-						<img
+						<img loading="lazy"
 							src={generatedImageUrl}
 							alt="Your generated image"
 							class="w-full h-auto max-h-32 object-contain"
@@ -213,7 +213,7 @@
 				<ul class="space-y-2 mb-6">
 					<li class="flex items-center gap-3 font-bold">
 						<span
-							class="w-6 h-6 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-white text-sm"
+							class="w-6 h-6 bg-data-green border-[2px] border-black flex items-center justify-center text-white text-sm"
 						>
 							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
 								><path
@@ -227,7 +227,7 @@
 					</li>
 					<li class="flex items-center gap-3 font-bold">
 						<span
-							class="w-6 h-6 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-white text-sm"
+							class="w-6 h-6 bg-data-green border-[2px] border-black flex items-center justify-center text-white text-sm"
 						>
 							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
 								><path
@@ -241,7 +241,7 @@
 					</li>
 					<li class="flex items-center gap-3 font-bold">
 						<span
-							class="w-6 h-6 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-white text-sm"
+							class="w-6 h-6 bg-data-green border-[2px] border-black flex items-center justify-center text-white text-sm"
 						>
 							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
 								><path
@@ -261,12 +261,12 @@
 						bind:value={email}
 						placeholder="your@email.com"
 						required
-						class="w-full px-4 py-3 border-[3px] border-black font-bold text-lg placeholder-gray-400 focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480]"
+						class="w-full px-4 py-3 border-[3px] border-black font-bold text-lg placeholder-gray-400 focus:outline-none focus:shadow-brutal-accent"
 					/>
 					<button
 						type="submit"
 						disabled={isSubmitting}
-						class="w-full py-4 bg-[#ffc480] text-black border-[3px] border-black font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="w-full py-4 bg-brand-accent text-black border-[3px] border-black font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 					>
 						{isSubmitting ? 'Saving...' : 'Get Free Access'}
 					</button>

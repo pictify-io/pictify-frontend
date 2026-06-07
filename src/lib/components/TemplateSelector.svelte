@@ -262,7 +262,7 @@
 
 		const wrapper = document.createElement('div');
 		wrapper.className =
-			'bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden';
+			'bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden';
 		wrapper.style.fontFamily = 'inherit';
 
 		// Search bar
@@ -300,7 +300,7 @@
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 			</svg>
-			<span class="ml-2 text-[10px] font-bold text-gray-400">Loading more...</span>
+			<span class="ml-2 text-[10px] font-bold text-gray-600">Loading more...</span>
 		</div>`;
 
 	function renderLoadMoreIndicator() {
@@ -322,7 +322,7 @@
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 					</svg>
-					<span class="ml-2 text-xs font-bold text-gray-400">Loading templates...</span>
+					<span class="ml-2 text-xs font-bold text-gray-600">Loading templates...</span>
 				</div>`;
 			return;
 		}
@@ -330,8 +330,8 @@
 		if (templates.length === 0) {
 			listEl.innerHTML = `
 				<div class="py-8 text-center">
-					<p class="text-sm font-bold text-gray-400">No templates found</p>
-					${query ? '<p class="text-xs text-gray-300 mt-1">Try a different search term</p>' : ''}
+					<p class="text-sm font-bold text-gray-600">No templates found</p>
+					${query ? '<p class="text-xs text-gray-600 mt-1">Try a different search term</p>' : ''}
 				</div>`;
 			return;
 		}
@@ -345,7 +345,7 @@
 			}`;
 
 			const thumbHtml = tpl.thumbnail
-				? `<img src="${escapeHtml(
+				? `<img loading="lazy" src="${escapeHtml(
 						tpl.thumbnail
 				  )}" alt="" class="w-12 h-9 object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100" />`
 				: `<div class="w-12 h-9 rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
@@ -403,12 +403,12 @@
 		{disabled
 		? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
 		: open
-		? 'border-[#ffc480] shadow-[4px_4px_0_0_#ffc480]'
-		: 'border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] cursor-pointer'}"
+		? 'border-brand-accent shadow-brutal-accent'
+		: 'border-gray-900 hover:shadow-brutal-lg cursor-pointer'}"
 >
 	{#if displayTemplate}
 		{#if displayTemplate.thumbnail}
-			<img
+			<img loading="lazy"
 				src={displayTemplate.thumbnail}
 				alt=""
 				class="w-10 h-[30px] object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100"

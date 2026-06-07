@@ -71,7 +71,7 @@
 				<div class="relative w-20 h-20 mx-auto mb-6">
 					<div class="absolute inset-0 border-[6px] border-gray-200 rounded-full" />
 					<div
-						class="absolute inset-0 border-[6px] border-[#ff6b6b] rounded-full border-t-transparent animate-spin"
+						class="absolute inset-0 border-[6px] border-brand-danger rounded-full border-t-transparent animate-spin"
 					/>
 				</div>
 				<p class="text-sm font-black text-gray-900 uppercase tracking-widest animate-pulse">
@@ -84,7 +84,7 @@
 					class="w-20 h-20 mx-auto mb-6 bg-red-100 border-[3px] border-red-200 rounded-full flex items-center justify-center"
 				>
 					<svg
-						class="w-10 h-10 text-[#ff6b6b]"
+						class="w-10 h-10 text-brand-danger"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -102,7 +102,7 @@
 			</div>
 		{:else if renderResult?.url}
 			<div
-				class="relative w-full h-full p-6 flex items-center justify-center bg-[#FFFDF8]"
+				class="relative w-full h-full p-6 flex items-center justify-center bg-brand-bg"
 				style="min-height: 400px;"
 			>
 				{#if !imgLoaded}
@@ -110,7 +110,7 @@
 						<div class="relative w-16 h-16 mx-auto mb-4">
 							<div class="absolute inset-0 border-[5px] border-gray-200 rounded-full" />
 							<div
-								class="absolute inset-0 border-[5px] border-[#ffc480] rounded-full border-t-transparent animate-spin"
+								class="absolute inset-0 border-[5px] border-brand-accent rounded-full border-t-transparent animate-spin"
 							/>
 						</div>
 						<p class="text-xs font-black text-gray-500 uppercase tracking-widest">
@@ -118,7 +118,7 @@
 						</p>
 					</div>
 				{/if}
-				<img
+				<img loading="lazy"
 					src={imgSrc}
 					alt="Rendered output"
 					class="max-w-full max-h-[500px] object-contain shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] border-[2px] border-gray-200"
@@ -129,12 +129,12 @@
 			</div>
 		{:else if templateThumbnail}
 			<div class="text-center py-8 relative z-10 opacity-60 hover:opacity-100 transition-opacity">
-				<img
+				<img loading="lazy"
 					src={templateThumbnail}
 					alt="Template thumbnail"
 					class="max-w-[80%] max-h-[300px] object-contain mx-auto mb-6 border-[2px] border-gray-300 shadow-sm"
 				/>
-				<p class="text-xs font-black text-gray-400 uppercase tracking-widest">Template Preview</p>
+				<p class="text-xs font-black text-gray-600 uppercase tracking-widest">Template Preview</p>
 			</div>
 		{:else}
 			<div class="text-center py-12 relative z-10">
@@ -150,7 +150,7 @@
 						/>
 					</svg>
 				</div>
-				<p class="text-sm font-black text-gray-400 uppercase tracking-widest">
+				<p class="text-sm font-black text-gray-600 uppercase tracking-widest">
 					Waiting for input...
 				</p>
 			</div>
@@ -160,12 +160,12 @@
 	<!-- Result Info & Actions -->
 	{#if renderResult?.url}
 		<div
-			class="bg-[#f0fdf4] border-[3px] border-[#4ade80] rounded-xl p-5 shadow-[4px_4px_0_0_#166534]"
+			class="bg-[#f0fdf4] border-[3px] border-data-green rounded-xl p-5 shadow-[4px_4px_0_0_#166534]"
 		>
 			<div class="flex items-start justify-between gap-4">
 				<div class="flex-1 min-w-0">
 					<div class="flex items-center gap-2 mb-2">
-						<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+						<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 						<p class="text-xs font-black text-green-800 uppercase tracking-widest">
 							Success (200 OK)
 						</p>
@@ -181,7 +181,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<button
-						class="p-3 bg-white border-[3px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="p-3 bg-white border-[3px] border-gray-900 rounded-lg shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 						on:click={handleCopyUrl}
 						disabled={isCopyingUrl}
 						title="Copy share link"

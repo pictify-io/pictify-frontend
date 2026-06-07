@@ -276,10 +276,10 @@
 	<!-- Discount Banner -->
 	{#if discountCode}
 		<div
-			class="mb-8 max-w-2xl p-4 bg-[#10b981]/10 border-[3px] border-[#10b981] rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
+			class="mb-8 max-w-2xl p-4 bg-brand-success/10 border-[3px] border-brand-success rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
 		>
 			<div
-				class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -292,7 +292,7 @@
 			</div>
 			<div>
 				<p class="font-black text-gray-900 text-lg uppercase tracking-tight">
-					Code Applied: <span class="text-[#10b981]">{discountCode}</span>
+					Code Applied: <span class="text-brand-success">{discountCode}</span>
 				</p>
 				<p class="text-sm font-bold text-gray-600">
 					Your discount will be applied at checkout automatically.
@@ -307,14 +307,11 @@
 			<div
 				class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 			>
-				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse" />
+				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full" />
 				Account
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				Plans & <span
-					class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-					>Billing</span
-				>
+				Plans & <span class="text-gray-900">Billing</span>
 			</h1>
 		</div>
 		<div class="flex items-center gap-4">
@@ -337,7 +334,7 @@
 			<section>
 				{#if $billingState.loading && !$billingState.loaded}
 					<div
-						class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+						class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 					>
 						<Loader size="10" show={true} />
 						<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">
@@ -346,13 +343,13 @@
 					</div>
 				{:else if $billingState.error}
 					<div
-						class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+						class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 					>
 						<div
-							class="w-12 h-12 bg-[#ff6b6b]/20 rounded-xl border-[3px] border-[#ff6b6b] flex items-center justify-center mb-4"
+							class="w-12 h-12 bg-brand-danger/20 rounded-xl border-[3px] border-brand-danger flex items-center justify-center mb-4"
 						>
 							<svg
-								class="w-6 h-6 text-[#ff6b6b]"
+								class="w-6 h-6 text-brand-danger"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -371,7 +368,7 @@
 						<p class="text-gray-600 font-medium text-sm mb-6">{$billingState.error}</p>
 						<button
 							on:click={() => initBilling()}
-							class="px-6 py-2.5 text-sm font-black text-gray-900 bg-[#ffc480] uppercase tracking-widest rounded-xl border-[3px] border-gray-900 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0_0_#1f2937] transition-all"
+							class="px-6 py-2.5 text-sm font-black text-gray-900 bg-brand-accent uppercase tracking-widest rounded-xl border-[3px] border-gray-900 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-brutal-lg transition-all"
 						>
 							Retry
 						</button>
@@ -430,7 +427,7 @@
 					<div class="bg-gray-800 border-b-[3px] border-gray-900 p-4">
 						<div class="flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 rounded-lg bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -466,7 +463,7 @@
 
 						<a
 							href="/dashboard/upgrade"
-							class="w-full py-3 px-4 rounded-lg font-black text-xs uppercase tracking-widest transition-all bg-[#ffc480] text-gray-900 hover:bg-[#ffb360] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] text-center mt-auto"
+							class="w-full py-3 px-4 rounded-lg font-black text-xs uppercase tracking-widest transition-all bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm text-center mt-auto"
 						>
 							View Plans
 						</a>

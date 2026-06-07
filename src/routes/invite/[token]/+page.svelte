@@ -92,18 +92,18 @@
 	<title>Team Invitation | Pictify</title>
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8] flex items-center justify-center p-4">
+<div class="min-h-screen bg-brand-bg flex items-center justify-center p-4">
 	<div class="w-full max-w-md">
 		<!-- Logo -->
 		<div class="text-center mb-8">
 			<a href="/" class="inline-block">
-				<img src="/logo.svg" alt="Pictify" class="h-10 mx-auto" />
+				<img loading="lazy" src="/logo.svg" alt="Pictify" class="h-10 mx-auto" />
 			</a>
 		</div>
 
 		{#if loading}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-8"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-8"
 			>
 				<div class="flex items-center justify-center">
 					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
@@ -138,10 +138,10 @@
 			</div>
 		{:else if invitation}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-hidden"
 			>
 				<!-- Header -->
-				<div class="px-8 py-6 bg-[#ffc480] border-b-[3px] border-gray-900 text-center">
+				<div class="px-8 py-6 bg-brand-accent border-b-[3px] border-gray-900 text-center">
 					<h1 class="text-2xl font-black text-gray-900">You're Invited!</h1>
 				</div>
 
@@ -153,7 +153,7 @@
 							class="w-16 h-16 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center"
 						>
 							{#if invitation.team?.avatar}
-								<img
+								<img loading="lazy"
 									src={invitation.team.avatar}
 									alt={invitation.team.name}
 									class="w-full h-full rounded-xl object-cover"
@@ -238,7 +238,7 @@
 		{/if}
 
 		<!-- Footer -->
-		<p class="text-center text-gray-400 text-sm mt-6">
+		<p class="text-center text-gray-600 text-sm mt-6">
 			By accepting, you agree to Pictify's <a href="/terms" class="underline hover:text-gray-600"
 				>Terms of Service</a
 			>

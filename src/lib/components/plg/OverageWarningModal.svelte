@@ -34,14 +34,14 @@
 {#if show}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
 		on:click={handleCancel}
 		on:keydown={(e) => e.key === 'Escape' && handleCancel()}
 		role="presentation"
 	>
 		<!-- Modal -->
 		<div
-			class="bg-[#FFFDF8] border-3 border-gray-900 rounded-xl shadow-brutal-2xl max-w-md w-full overflow-hidden"
+			class="bg-brand-bg border-3 border-gray-900 rounded-xl shadow-brutal-2xl max-w-md w-full overflow-hidden"
 			on:click|stopPropagation
 			on:keydown|stopPropagation
 			role="dialog"
@@ -49,10 +49,10 @@
 			aria-labelledby="overage-warning-title"
 		>
 			<!-- Header -->
-			<div class="p-6 border-b-3 border-gray-900 bg-[#ff6b6b]/10">
+			<div class="p-6 border-b-3 border-gray-900 bg-brand-danger/10">
 				<div class="flex items-start gap-4">
 					<div
-						class="w-12 h-12 bg-[#ffc480] border-2 border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
+						class="w-12 h-12 bg-brand-accent border-2 border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 					>
 						<svg
 							class="w-6 h-6 text-gray-900"
@@ -101,7 +101,7 @@
 
 				<!-- Cost breakdown -->
 				<div
-					class="flex items-center justify-between p-3 bg-[#ffc480]/20 border-2 border-[#ffc480] rounded-lg"
+					class="flex items-center justify-between p-3 bg-brand-accent/20 border-2 border-brand-accent rounded-lg"
 				>
 					<span class="text-gray-700 font-medium">This render will cost:</span>
 					<span class="text-lg font-black text-gray-900">{overageCostFormatted}</span>
@@ -123,7 +123,7 @@
 
 				<button
 					on:click={handleUpgrade}
-					class="w-full px-4 py-2.5 bg-[#ffc480] text-gray-900 font-bold text-sm
+					class="w-full px-4 py-2.5 bg-brand-accent text-gray-900 font-bold text-sm
                  border-2 border-gray-900 rounded-xl
                  hover:bg-[#ffb560] transition-colors"
 				>

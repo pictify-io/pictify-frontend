@@ -19,7 +19,7 @@
 		default: {
 			icon: 'text-gray-600',
 			iconBg: 'bg-gray-100',
-			button: 'bg-[#ffc480] text-gray-900 border-gray-900 hover:bg-[#ffb347]'
+			button: 'bg-brand-accent text-gray-900 border-gray-900 hover:bg-[#ffb347]'
 		},
 		danger: {
 			icon: 'text-red-600',
@@ -59,7 +59,7 @@
 {#if open}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
 		on:click={handleBackdropClick}
 		role="dialog"
 		aria-modal="true"

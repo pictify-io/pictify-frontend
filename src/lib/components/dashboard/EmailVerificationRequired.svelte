@@ -63,11 +63,11 @@
 </script>
 
 <div
-	class="bg-white border-[3px] border-gray-900 rounded-xl p-6 space-y-5 shadow-[6px_6px_0_0_#1f2937]"
+	class="bg-white border-[3px] border-gray-900 rounded-xl p-6 space-y-5 shadow-brutal-xl"
 >
 	<div class="flex items-start gap-4">
 		<div
-			class="flex-shrink-0 w-12 h-12 bg-[#ffc480] rounded-xl flex items-center justify-center border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+			class="flex-shrink-0 w-12 h-12 bg-brand-accent rounded-xl flex items-center justify-center border-[3px] border-gray-900 shadow-brutal-md"
 		>
 			<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path

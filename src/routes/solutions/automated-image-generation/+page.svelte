@@ -18,7 +18,7 @@
 			title: 'Personalized social cards',
 			description: 'Every blog post, customer win, or launch lands as on-brand social assets — generated from the content record itself.',
 			iconPath: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
-			color: 'bg-[#ff6b6b]',
+			color: 'bg-brand-danger',
 			slug: 'automate-social-media-images',
 			mock: 'social'
 		},
@@ -26,7 +26,7 @@
 			title: 'Dynamic product images',
 			description: 'Catalog-scale product cards with live prices, stock-aware badges, and seasonal variants — rendered from your inventory data.',
 			iconPath: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
-			color: 'bg-[#4ade80]',
+			color: 'bg-data-green',
 			slug: 'automate-product-images',
 			mock: 'product'
 		},
@@ -34,7 +34,7 @@
 			title: 'Automated OG images',
 			description: 'Unique Open Graph image per page — rendered on first fetch, CDN-cached after. Zero build-time cost, infinite variety.',
 			iconPath: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
-			color: 'bg-[#ffc480]',
+			color: 'bg-brand-accent',
 			slug: 'automate-og-images',
 			mock: 'og'
 		},
@@ -42,7 +42,7 @@
 			title: 'Personalized email headers',
 			description: 'Every recipient sees their name, plan, and stats in the email hero. Open rates climb because the image is about them.',
 			iconPath: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-			color: 'bg-[#a78bfa]',
+			color: 'bg-data-violet',
 			slug: 'automate-email-headers',
 			mock: 'email'
 		}
@@ -60,7 +60,7 @@
 	const approaches = [
 		{
 			tag: 'OPTION 1',
-			tagColor: 'bg-[#ff6b6b]',
+			tagColor: 'bg-brand-danger',
 			title: 'DIY headless browser',
 			sub: 'Puppeteer / Playwright',
 			verdict: 'Full control. Ops-heavy. Stops scaling around 1,000 renders/day.',
@@ -70,7 +70,7 @@
 		},
 		{
 			tag: 'OPTION 2',
-			tagColor: 'bg-[#ffc480]',
+			tagColor: 'bg-brand-accent',
 			title: 'Design-tool APIs',
 			sub: 'Canva Connect / Figma REST',
 			verdict: 'Designer-friendly. Rate-limited. Expensive per render at volume.',
@@ -80,7 +80,7 @@
 		},
 		{
 			tag: 'OPTION 3',
-			tagColor: 'bg-[#a78bfa]',
+			tagColor: 'bg-data-violet',
 			title: 'AI image generators',
 			sub: 'DALL-E / Gemini / SD',
 			verdict: 'Great for novelty. Catastrophic for brand consistency.',
@@ -90,7 +90,7 @@
 		},
 		{
 			tag: 'OPTION 4',
-			tagColor: 'bg-[#4ade80]',
+			tagColor: 'bg-data-green',
 			title: 'Template-based API',
 			sub: 'Pictify · Bannerbear · Placid · RenderForm',
 			verdict: 'Design once. POST data. Repeat forever.',
@@ -106,25 +106,25 @@
 			title: 'Expression engine',
 			description: '{{ price * 0.9 | currency }} is a first-class template feature. Conditionals, filters, nested lookups — built in.',
 			badge: 'LOGIC',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			title: 'Live data bindings',
 			description: 'Templates fetch variables from HTTP, webhooks, or Sheets at render time. Images update when data does.',
 			badge: 'DATA',
-			color: 'bg-[#4ade80]'
+			color: 'bg-data-green'
 		},
 		{
 			title: 'A/B experiments',
 			description: 'Ship variants, track impressions, declare a winner — all from the same API that renders the image.',
 			badge: 'TEST',
-			color: 'bg-[#a78bfa]'
+			color: 'bg-data-violet'
 		},
 		{
 			title: 'One API, many outputs',
 			description: 'PNG, JPEG, WebP, multi-page PDF, GIF. Same template, different fileExtension.',
 			badge: 'FORMAT',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			title: 'API + no-code duality',
@@ -249,7 +249,7 @@
 	<header class="text-center mb-20 pt-6" in:fly={{ y: 30, duration: 600 }}>
 		<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8 max-w-5xl mx-auto">
 			Automated image generation,<br />
-			<span class="relative inline-block text-[#ff6b6b] mt-2">
+			<span class="relative inline-block text-brand-danger mt-2">
 				done right.
 				<svg
 					class="absolute w-full h-4 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -264,7 +264,7 @@
 		<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-10 leading-relaxed">
 			An image generation API with templates, expressions, live data bindings, and experiments. One endpoint. Any scale. <br class="hidden sm:block" />
 			<span
-				class="font-black text-gray-900 bg-[#4ade80] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
+				class="font-black text-gray-900 bg-data-green px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
 				>No Canva. No Puppeteer fleet. No stitched stack.</span
 			>
 		</p>
@@ -272,13 +272,13 @@
 		<div class="flex flex-col sm:flex-row gap-4 justify-center">
 			<a
 				href="/signup"
-				class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#ffc480] hover:shadow-[4px_4px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1 transition-all duration-200 text-center"
+				class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#ffc480] hover:shadow-brutal-accent hover:translate-x-1 hover:translate-y-1 transition-all duration-200 text-center"
 			>
 				Start Free
 			</a>
 			<a
 				href="#render"
-				class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all duration-200 inline-flex items-center justify-center gap-2 group"
+				class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1 transition-all duration-200 inline-flex items-center justify-center gap-2 group"
 			>
 				See the code
 				<svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -296,7 +296,7 @@
 	<section class="py-20 px-4 relative">
 		<div class="max-w-4xl mx-auto text-center">
 			<div
-				class="inline-block px-4 py-1.5 bg-[#ff6b6b]/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+				class="inline-block px-4 py-1.5 bg-brand-danger/20 border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Why we built this</span>
 			</div>
@@ -330,7 +330,7 @@
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Where this fits</span>
 				</div>
@@ -346,14 +346,14 @@
 				{#each useCases as u, i}
 					<a
 						href="/solutions/{u.slug}"
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden"
 						in:fly={{ y: 20, duration: 400, delay: i * 100 }}
 					>
 						<div
 							class="{u.color} p-6 border-b-[3px] border-gray-900 flex items-center justify-between"
 						>
 							<div
-								class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-12 transition-transform"
+								class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-12 transition-transform"
 							>
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={u.iconPath} />
@@ -373,8 +373,8 @@
 							{#if u.mock === 'social'}
 								<!-- Social card mock -->
 								<div class="w-full max-w-[240px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] overflow-hidden relative z-10 group-hover:-translate-y-1 transition-transform">
-									<div class="h-20 bg-gradient-to-br from-[#ff6b6b] to-[#ec4899] border-b-[2px] border-gray-900 relative flex items-end p-2">
-										<div class="text-[9px] font-black text-white uppercase tracking-widest bg-black/30 backdrop-blur px-1.5 py-0.5 rounded">Customer Win</div>
+									<div class="h-20 bg-gradient-to-br from-brand-danger to-[#ec4899] border-b-[2px] border-gray-900 relative flex items-end p-2">
+										<div class="text-[9px] font-black text-white uppercase tracking-widest bg-black/30 px-1.5 py-0.5 rounded">Customer Win</div>
 									</div>
 									<div class="p-3 bg-white">
 										<div class="h-2 w-full bg-gray-900 rounded mb-1.5"></div>
@@ -382,7 +382,7 @@
 										<div class="flex items-center gap-1.5 text-[9px] text-gray-500 font-bold">
 											<div class="w-4 h-4 rounded-full bg-gray-200 border border-gray-900"></div>
 											<span>@you</span>
-											<span class="ml-auto bg-[#4ade80] text-gray-900 px-1.5 py-0.5 rounded border border-gray-900 font-black">LIVE</span>
+											<span class="ml-auto bg-data-green text-gray-900 px-1.5 py-0.5 rounded border border-gray-900 font-black">LIVE</span>
 										</div>
 									</div>
 								</div>
@@ -393,31 +393,31 @@
 										<svg class="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
 										</svg>
-										<div class="absolute top-1.5 right-1.5 bg-[#ff6b6b] text-white text-[8px] font-black px-1.5 py-0.5 rounded border border-gray-900">-20%</div>
+										<div class="absolute top-1.5 right-1.5 bg-brand-danger text-white text-[8px] font-black px-1.5 py-0.5 rounded border border-gray-900">-20%</div>
 									</div>
 									<div class="p-2.5 bg-white">
 										<div class="h-2 w-3/4 bg-gray-300 rounded mb-1.5"></div>
 										<div class="flex items-center justify-between">
 											<div class="font-black text-gray-900 text-sm">$39.<span class="text-[10px]">20</span></div>
-											<div class="text-[9px] font-black text-[#4ade80] bg-gray-900 px-1.5 py-0.5 rounded">In stock</div>
+											<div class="text-[9px] font-black text-data-green bg-gray-900 px-1.5 py-0.5 rounded">In stock</div>
 										</div>
 									</div>
 								</div>
 							{:else if u.mock === 'og'}
 								<!-- OG image mock -->
 								<div class="w-full max-w-[260px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] overflow-hidden relative z-10 group-hover:-translate-y-1 transition-transform">
-									<div class="h-16 bg-gradient-to-r from-[#ffc480] to-[#ff6b6b] border-b-[2px] border-gray-900 flex flex-col justify-center px-3 relative">
+									<div class="h-16 bg-gradient-to-r from-brand-accent to-brand-danger border-b-[2px] border-gray-900 flex flex-col justify-center px-3 relative">
 										<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:8px_8px]"></div>
 										<div class="font-black text-white text-sm leading-tight relative z-10 drop-shadow-sm">Your Blog Post Title</div>
 										<div class="text-[9px] text-white/90 font-bold uppercase tracking-wider relative z-10 mt-0.5">pictify.io · 1200×630</div>
 									</div>
 									<div class="px-3 py-2 bg-gray-50 flex items-center gap-1.5">
 										<div class="flex gap-0.5">
-											<div class="w-2 h-2 rounded bg-[#ff6b6b] border border-gray-900"></div>
-											<div class="w-2 h-2 rounded bg-[#4ade80] border border-gray-900"></div>
+											<div class="w-2 h-2 rounded bg-brand-danger border border-gray-900"></div>
+											<div class="w-2 h-2 rounded bg-data-green border border-gray-900"></div>
 										</div>
 										<div class="text-[9px] font-mono text-gray-500 ml-1 truncate">og:image</div>
-										<div class="text-[9px] font-black text-[#4ade80] ml-auto bg-white border border-gray-900 px-1.5 rounded">200</div>
+										<div class="text-[9px] font-black text-data-green ml-auto bg-white border border-gray-900 px-1.5 rounded">200</div>
 									</div>
 								</div>
 							{:else if u.mock === 'email'}
@@ -427,7 +427,7 @@
 										<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
 										<span>Inbox · you@team.com</span>
 									</div>
-									<div class="h-16 bg-gradient-to-br from-[#a78bfa] to-[#7dd3fc] border-b-[2px] border-gray-900 flex items-center px-3 gap-2 relative">
+									<div class="h-16 bg-gradient-to-br from-data-violet to-[#7dd3fc] border-b-[2px] border-gray-900 flex items-center px-3 gap-2 relative">
 										<div class="w-8 h-8 rounded-full bg-white border-[2px] border-gray-900 flex items-center justify-center text-xs font-black text-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">A</div>
 										<div class="flex-1">
 											<div class="font-black text-white text-xs leading-tight drop-shadow-sm">Welcome, Ada</div>
@@ -459,7 +459,7 @@
 		<div class="max-w-6xl mx-auto">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
+					class="inline-block px-4 py-1.5 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2"
 				>
 					<span class="text-sm font-bold text-white uppercase tracking-wider">The Honest Breakdown</span>
 				</div>
@@ -474,12 +474,12 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 pt-4">
 				{#each approaches as a, i}
 					<div
-						class="relative flex flex-col {a.recommended ? 'ring-4 ring-[#4ade80]/40 rounded-2xl' : ''}"
+						class="relative flex flex-col {a.recommended ? 'ring-4 ring-data-green/40 rounded-2xl' : ''}"
 						in:fly={{ y: 20, duration: 400, delay: i * 80 }}
 					>
 						{#if a.recommended}
 							<div
-								class="absolute -top-4 -right-4 bg-[#4ade80] border-[3px] border-gray-900 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-[3px_3px_0_0_#1f2937] z-20 transform rotate-6 inline-flex items-center gap-1.5 whitespace-nowrap"
+								class="absolute -top-4 -right-4 bg-data-green border-[3px] border-gray-900 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-brutal-md z-20 transform rotate-6 inline-flex items-center gap-1.5 whitespace-nowrap"
 							>
 								<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -487,7 +487,7 @@
 								This is us
 							</div>
 						{/if}
-						<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden flex-1">
+						<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden flex-1">
 						<div class="{a.tagColor} px-5 py-2 border-b-[3px] border-gray-900">
 							<span class="text-xs font-black uppercase tracking-widest text-gray-900">{a.tag}</span>
 						</div>
@@ -499,7 +499,7 @@
 							<p class="text-lg font-bold text-gray-900 mb-5 leading-snug">"{a.verdict}"</p>
 							<div class="space-y-3">
 								<div class="flex items-start gap-3">
-									<span class="flex-shrink-0 w-6 h-6 rounded-lg bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">
+									<span class="flex-shrink-0 w-6 h-6 rounded-lg bg-data-green border-2 border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">
 										<svg class="w-3.5 h-3.5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
@@ -507,7 +507,7 @@
 									<span class="text-gray-700 font-medium pt-0.5">{a.good}</span>
 								</div>
 								<div class="flex items-start gap-3">
-									<span class="flex-shrink-0 w-6 h-6 rounded-lg bg-[#ff6b6b] border-2 border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">
+									<span class="flex-shrink-0 w-6 h-6 rounded-lg bg-brand-danger border-2 border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">
 										<svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 										</svg>
@@ -533,7 +533,7 @@
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-white uppercase tracking-wider">Six differentiators</span>
 				</div>
@@ -548,7 +548,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each differentiators as d, i}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
 						in:fly={{ y: 20, duration: 400, delay: i * 60 }}
 					>
 						<div class="{d.color} px-5 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
@@ -556,7 +556,7 @@
 							<div class="w-2.5 h-2.5 rounded-full bg-white border-2 border-gray-900"></div>
 						</div>
 						<div class="p-6">
-							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] mb-4 group-hover:rotate-6 transition-transform">
+							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-md mb-4 group-hover:rotate-6 transition-transform">
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={differentiatorIcons[d.badge]} />
 								</svg>
@@ -573,7 +573,7 @@
 	<SectionSeparator icon="arrow" />
 
 	<!-- How it works: visual template + API -->
-	<section class="py-24 px-4 bg-[#FFFDF8] border-b-[3px] border-gray-900 relative overflow-hidden" id="render">
+	<section class="py-24 px-4 bg-brand-bg border-b-[3px] border-gray-900 relative overflow-hidden" id="render">
 		<div
 			class="absolute inset-0 opacity-[0.05] pointer-events-none"
 			style="background-image: linear-gradient(rgba(31,41,55,1) 1px, transparent 1px), linear-gradient(90deg, rgba(31,41,55,1) 1px, transparent 1px); background-size: 48px 48px;"
@@ -581,7 +581,7 @@
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-14">
 				<div
-					class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6"
+					class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6"
 				>
 					<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -590,7 +590,7 @@
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6 leading-tight">
 					Design once in the canvas.<br />
-					<span class="text-[#ff6b6b]">POST data to render.</span>
+					<span class="text-brand-danger">POST data to render.</span>
 				</h2>
 				<p class="text-xl text-gray-700 font-medium max-w-3xl mx-auto">
 					Every text, image, and shape layer on the canvas can bind to a variable, show conditionally, or format with an expression — all configured in the UI. Your API just sends the data.
@@ -601,7 +601,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr,auto,1fr] gap-4 md:gap-3 items-stretch mb-14">
 				<!-- Step 1: Design -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#ffc480]" in:fly={{ y: 20, duration: 400, delay: 0 }}>
-					<div class="w-12 h-12 bg-[#ffc480] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-[3px_3px_0_0_#1f2937]">
+					<div class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
 						</svg>
@@ -620,7 +620,7 @@
 
 				<!-- Step 2: POST data -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#4ade80]" in:fly={{ y: 20, duration: 400, delay: 120 }}>
-					<div class="w-12 h-12 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-[3px_3px_0_0_#1f2937]">
+					<div class="w-12 h-12 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 19v-8m0 0l-4 4m4-4l4 4M3 7h18M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />
 						</svg>
@@ -639,7 +639,7 @@
 
 				<!-- Step 3: CDN URL -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#a78bfa]" in:fly={{ y: 20, duration: 400, delay: 240 }}>
-					<div class="w-12 h-12 bg-[#a78bfa] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-[3px_3px_0_0_#1f2937]">
+					<div class="w-12 h-12 bg-data-violet border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
@@ -665,9 +665,9 @@
 
 					<div class="flex flex-col md:flex-row flex-1 min-h-[420px]">
 						<!-- Canvas preview -->
-						<div class="flex-1 bg-[#FFFDF8] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] p-6 md:border-r-[3px] border-b-[3px] md:border-b-0 border-gray-900 relative flex items-center justify-center">
+						<div class="flex-1 bg-brand-bg bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] p-6 md:border-r-[3px] border-b-[3px] md:border-b-0 border-gray-900 relative flex items-center justify-center">
 							<!-- Selected-layer indicator -->
-							<div class="absolute top-3 left-3 bg-[#ff6b6b] text-white text-[9px] font-black px-2 py-0.5 rounded border-2 border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.25)] flex items-center gap-1">
+							<div class="absolute top-3 left-3 bg-brand-danger text-white text-[9px] font-black px-2 py-0.5 rounded border-2 border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.25)] flex items-center gap-1">
 								<span class="w-1.5 h-1.5 rounded-full bg-white"></span>
 								Selected: Text layer
 							</div>
@@ -675,7 +675,7 @@
 							<div class="w-full max-w-[260px] bg-white border-[3px] border-gray-900 rounded-xl shadow-[5px_5px_0_0_rgba(0,0,0,0.2)] overflow-hidden relative">
 								<!-- Text layer: product -->
 								<div class="px-4 pt-4 pb-2 relative">
-									<div class="absolute inset-x-2 top-2 bottom-1 border-2 border-dashed border-[#ff6b6b] rounded pointer-events-none"></div>
+									<div class="absolute inset-x-2 top-2 bottom-1 border-2 border-dashed border-brand-danger rounded pointer-events-none"></div>
 									<div class="font-black text-lg text-gray-900 relative">Pro plan</div>
 								</div>
 								<!-- Text layer: price -->
@@ -684,14 +684,14 @@
 								</div>
 								<!-- Conditional badge -->
 								<div class="px-4 pt-1 pb-3">
-									<div class="inline-flex items-center gap-1 bg-[#ffc480] border-2 border-gray-900 rounded text-[10px] font-black uppercase tracking-wider text-gray-900 px-2 py-0.5">
-										<span class="w-1.5 h-1.5 rounded-full bg-[#ff6b6b]"></span>
+									<div class="inline-flex items-center gap-1 bg-brand-accent border-2 border-gray-900 rounded text-[10px] font-black uppercase tracking-wider text-gray-900 px-2 py-0.5">
+										<span class="w-1.5 h-1.5 rounded-full bg-brand-danger"></span>
 										New
 									</div>
 								</div>
 								<!-- Footer / avatar -->
 								<div class="border-t-2 border-gray-200 px-4 py-2.5 flex items-center gap-2">
-									<div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#a78bfa] to-[#7dd3fc] border border-gray-900 flex-shrink-0"></div>
+									<div class="w-7 h-7 rounded-full bg-gradient-to-br from-data-violet to-[#7dd3fc] border border-gray-900 flex-shrink-0"></div>
 									<div class="text-[10px] font-bold text-gray-700">by team</div>
 								</div>
 							</div>
@@ -706,7 +706,7 @@
 							<div class="space-y-2">
 								<div class="bg-white border-2 border-gray-900 rounded p-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
 									<div class="flex items-center gap-1.5 mb-1">
-										<div class="w-2 h-2 rounded-sm bg-[#ff6b6b] border border-gray-900"></div>
+										<div class="w-2 h-2 rounded-sm bg-brand-danger border border-gray-900"></div>
 										<code class="font-mono font-black text-gray-900">product</code>
 										<span class="ml-auto text-[9px] text-gray-500 font-bold uppercase">text</span>
 									</div>
@@ -714,7 +714,7 @@
 								</div>
 								<div class="bg-white border-2 border-gray-900 rounded p-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
 									<div class="flex items-center gap-1.5 mb-1">
-										<div class="w-2 h-2 rounded-sm bg-[#4ade80] border border-gray-900"></div>
+										<div class="w-2 h-2 rounded-sm bg-data-green border border-gray-900"></div>
 										<code class="font-mono font-black text-gray-900">price</code>
 										<span class="ml-auto text-[9px] text-gray-500 font-bold uppercase">number</span>
 									</div>
@@ -722,7 +722,7 @@
 								</div>
 								<div class="bg-white border-2 border-gray-900 rounded p-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
 									<div class="flex items-center gap-1.5 mb-1">
-										<div class="w-2 h-2 rounded-sm bg-[#a78bfa] border border-gray-900"></div>
+										<div class="w-2 h-2 rounded-sm bg-data-violet border border-gray-900"></div>
 										<code class="font-mono font-black text-gray-900">featured</code>
 										<span class="ml-auto text-[9px] text-gray-500 font-bold uppercase">bool</span>
 									</div>
@@ -747,7 +747,7 @@
 						<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] border border-black/40"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] border border-black/40"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f] border border-black/40"></div>
-						<span class="ml-3 text-xs text-[#4ade80] font-mono font-bold uppercase tracking-wider">render.sh</span>
+						<span class="ml-3 text-xs text-data-green font-mono font-bold uppercase tracking-wider">render.sh</span>
 						<span class="ml-auto text-[10px] text-gray-500 font-mono font-bold uppercase tracking-widest">Your backend</span>
 					</div>
 					<pre class="p-6 overflow-x-auto text-sm text-gray-300 leading-relaxed flex-1"><code>{`curl -X POST \\
@@ -768,9 +768,9 @@
 			</div>
 
 			<!-- The punchline: logic lives on layers, not in your code -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 md:p-8 shadow-[6px_6px_0_0_#1f2937]">
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 md:p-8 shadow-brutal-xl">
 				<div class="flex flex-col md:flex-row items-start gap-5">
-					<div class="flex-shrink-0 w-14 h-14 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937]">
+					<div class="flex-shrink-0 w-14 h-14 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg">
 						<svg class="w-7 h-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
@@ -778,7 +778,7 @@
 					<div class="flex-1">
 						<div class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">The payoff</div>
 						<p class="text-lg text-gray-700 font-medium leading-relaxed">
-							Each layer carries its own binding. The <code class="bg-gray-900 px-2 py-0.5 rounded text-[#4ade80] font-mono">price</code> text layer runs the <code class="bg-gray-900 px-2 py-0.5 rounded text-[#ffc480] font-mono">| currency</code> filter on render — <code class="bg-gray-900 px-2 py-0.5 rounded text-[#4ade80] font-mono">49</code> becomes <code class="bg-gray-900 px-2 py-0.5 rounded text-[#4ade80] font-mono">$49.00</code>. The "New" badge has a <code class="bg-gray-900 px-2 py-0.5 rounded text-[#a78bfa] font-mono">showWhen: featured</code> rule, so it appears only when the flag is true. In Pictify, logic lives with the design. In Bannerbear, Placid, and RenderForm, it lives scattered across your app code.
+							Each layer carries its own binding. The <code class="bg-gray-900 px-2 py-0.5 rounded text-data-green font-mono">price</code> text layer runs the <code class="bg-gray-900 px-2 py-0.5 rounded text-brand-accent font-mono">| currency</code> filter on render — <code class="bg-gray-900 px-2 py-0.5 rounded text-data-green font-mono">49</code> becomes <code class="bg-gray-900 px-2 py-0.5 rounded text-data-green font-mono">$49.00</code>. The "New" badge has a <code class="bg-gray-900 px-2 py-0.5 rounded text-data-violet font-mono">showWhen: featured</code> rule, so it appears only when the flag is true. In Pictify, logic lives with the design. In Bannerbear, Placid, and RenderForm, it lives scattered across your app code.
 						</p>
 					</div>
 				</div>
@@ -789,11 +789,11 @@
 	<SectionSeparator icon="star" />
 
 	<!-- FAQ with aesthetic accordion -->
-	<section class="py-24 px-4 bg-[#FFFDF8] border-b-[3px] border-gray-900 relative">
+	<section class="py-24 px-4 bg-brand-bg border-b-[3px] border-gray-900 relative">
 		<div class="max-w-4xl mx-auto">
 			<div class="text-center mb-12">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Questions?</span>
 				</div>
@@ -805,7 +805,7 @@
 			<div class="space-y-4">
 				{#each faqs as faq, i}
 					<details
-						class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1 transition-all duration-200"
+						class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-lg overflow-hidden open:shadow-brutal-2xl open:-translate-y-1 transition-all duration-200"
 						in:fly={{ y: 10, duration: 300, delay: i * 40 }}
 					>
 						<summary
@@ -813,7 +813,7 @@
 						>
 							<span class="font-black text-lg text-gray-900 pr-6">{faq.q}</span>
 							<span
-								class="flex-shrink-0 w-8 h-8 rounded-lg border-[2px] border-gray-900 bg-[#ffc480] flex items-center justify-center font-black text-xl text-gray-900 group-open:rotate-45 transition-transform duration-200"
+								class="flex-shrink-0 w-8 h-8 rounded-lg border-[2px] border-gray-900 bg-brand-accent flex items-center justify-center font-black text-xl text-gray-900 group-open:rotate-45 transition-transform duration-200"
 							>+</span>
 						</summary>
 						<div class="px-5 pb-5 pt-0 border-t-2 border-gray-100">
@@ -838,7 +838,7 @@
 			<div class="max-w-6xl mx-auto relative z-10">
 				<div class="text-center mb-14">
 					<div
-						class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
+						class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2"
 					>
 						<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Go deeper</span>
 					</div>
@@ -852,16 +852,16 @@
 
 				<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 					{#each related as r, i}
-						{@const colors = ['bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-[#ffc480]', 'bg-[#a78bfa]', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
+						{@const colors = ['bg-brand-danger', 'bg-data-green', 'bg-brand-accent', 'bg-data-violet', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
 						{@const rotations = ['-rotate-1', 'rotate-1', '-rotate-1', 'rotate-1', '-rotate-1', 'rotate-1']}
 						<a
 							href="/solutions/{r.slug}"
-							class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden {rotations[i % rotations.length]}"
+							class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden {rotations[i % rotations.length]}"
 							in:fly={{ y: 20, duration: 400, delay: i * 60 }}
 						>
 							<div class="{colors[i % colors.length]} h-2 border-b-[3px] border-gray-900"></div>
 							<div class="p-6">
-								<h3 class="font-black text-gray-900 mb-2 text-lg leading-tight group-hover:text-[#ff6b6b] transition-colors">
+								<h3 class="font-black text-gray-900 mb-2 text-lg leading-tight group-hover:text-brand-danger transition-colors">
 									{r.label}
 								</h3>
 								<p class="text-sm text-gray-600 leading-relaxed mb-4">{r.summary}</p>

@@ -20,28 +20,28 @@
 			title: 'A/B Testing',
 			description: 'Create variants with different copy, colors, or layouts. Split traffic and measure which image drives more clicks.',
 			iconPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-			color: 'bg-[#ffc480]',
+			color: 'bg-brand-accent',
 			tag: 'CORE'
 		},
 		{
 			title: 'Smart Links',
 			description: 'Route visitors to different image variants based on device, country, browser, or custom rules. One URL, many experiences.',
 			iconPath: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
-			color: 'bg-[#ff6b6b]',
+			color: 'bg-brand-danger',
 			tag: 'TARGETING'
 		},
 		{
 			title: 'Scheduled Variants',
 			description: 'Swap image variants on a schedule. Run a morning banner until noon, then switch to an afternoon offer automatically.',
 			iconPath: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-			color: 'bg-[#a78bfa]',
+			color: 'bg-data-violet',
 			tag: 'AUTOMATION'
 		},
 		{
 			title: 'Auto-Optimize',
 			description: 'Thompson Sampling algorithm automatically shifts traffic to the winning variant. No manual intervention needed.',
 			iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
-			color: 'bg-[#4ade80]',
+			color: 'bg-data-green',
 			tag: 'AI-POWERED'
 		}
 	];
@@ -183,7 +183,7 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 <!-- Hero Section -->
@@ -194,7 +194,7 @@
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Badge -->
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-data-green border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<svg
 					class="w-4 h-4 text-gray-900"
@@ -216,7 +216,7 @@
 
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Test Your Images<br />
-				<span class="relative inline-block text-[#ff6b6b] mt-2">
+				<span class="relative inline-block text-brand-danger mt-2">
 					Like You Test Your Copy
 					<svg
 						class="absolute w-full h-8 -bottom-3 left-0 text-black z-[-1] opacity-20"
@@ -231,7 +231,7 @@
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12">
 				Stop guessing which image performs best. Run experiments with multiple variants, target by
 				device and location, and let our algorithm pick the winner. <br class="hidden sm:block" />
-				<span class="font-black text-gray-900 bg-[#ffc480] px-2 border-b-[3px] border-gray-900"
+				<span class="font-black text-gray-900 bg-brand-accent px-2 border-b-[3px] border-gray-900"
 					>One URL. Data-driven visuals.</span
 				>
 			</p>
@@ -241,7 +241,7 @@
 					href="/signup"
 					on:click={() => trackCTA('Start Testing Free')}
 					class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#ffc480] hover:shadow-[4px_4px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1
+						shadow-[8px_8px_0_0_#ffc480] hover:shadow-brutal-accent hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center flex items-center justify-center gap-2"
 				>
 					Start Testing Free
@@ -253,7 +253,7 @@
 					href="/templates"
 					on:click={() => trackCTA('Browse Templates')}
 					class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+						shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center"
 				>
 					Browse Templates
@@ -274,7 +274,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Features</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -288,7 +288,7 @@
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{#each capabilities as cap, i}
 					<div
-						class="flex flex-col sm:flex-row gap-6 p-8 bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 group"
+						class="flex flex-col sm:flex-row gap-6 p-8 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 group"
 						style="transform: rotate({i % 2 === 0 ? '-1deg' : '1deg'})"
 						role="region"
 						aria-label={cap.title}
@@ -297,7 +297,7 @@
 						in:fly={{ y: 20, duration: 400, delay: i * 100 }}
 					>
 						<div class="flex-shrink-0">
-							<div class="{cap.color} w-16 h-16 rounded-2xl flex items-center justify-center border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform">
+							<div class="{cap.color} w-16 h-16 rounded-2xl flex items-center justify-center border-[3px] border-gray-900 shadow-brutal-lg group-hover:-rotate-6 transition-transform">
 								<svg class="w-8 h-8 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={cap.iconPath} />
 								</svg>
@@ -328,7 +328,7 @@
 
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Workflow</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -342,18 +342,18 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0"></div>
 
 				{#each howItWorks as step, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#4ade80]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet', 'bg-data-green']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
 					>
 						<!-- Number Badge -->
-						<div class="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 {colors[i]} border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3 z-10">
+						<div class="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 {colors[i]} border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3 z-10">
 							<span class="text-2xl md:text-4xl font-black text-gray-900">{step.number}</span>
 						</div>
 
 						<!-- Content Card -->
-						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] group-hover:shadow-[12px_12px_0_0_#1f2937] rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
+						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-2xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
 							<h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-3">{step.title}</h3>
 							<p class="text-gray-700 text-lg md:text-xl font-medium leading-relaxed">{step.description}</p>
 						</div>
@@ -377,7 +377,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Use Cases</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl border-[3px] border-transparent font-black text-gray-900 mb-6">
@@ -390,15 +390,15 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
 				{#each useCases as uc, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#ff6b6b]', 'bg-[#a78bfa]', 'bg-[#4ade80]', 'bg-[#7dd3fc]', 'bg-[#f43f5e]']}
+					{@const colors = ['bg-brand-accent', 'bg-brand-danger', 'bg-data-violet', 'bg-data-green', 'bg-[#7dd3fc]', 'bg-[#f43f5e]']}
 					{@const rotations = ['rotate-1', '-rotate-1', 'rotate-2', '-rotate-2', 'rotate-1', '-rotate-1']}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
 						in:fly={{ y: 20, duration: 400, delay: i * 100 }}
 					>
 						<!-- Colorful Header Block -->
 						<div class="{colors[i % colors.length]} p-6 border-b-[3px] border-gray-900 flex items-center justify-between">
-							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-12 transition-transform">
+							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-12 transition-transform">
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={uc.iconPath} />
 								</svg>
@@ -414,17 +414,17 @@
 								<!-- Email Header Images -->
 								<div class="w-full max-w-[200px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all">
 									<div class="bg-gray-100 border-b-[2px] border-gray-900 px-2 py-1 flex items-center gap-1.5">
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-danger border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-accent border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-data-green border border-gray-900"></div>
 									</div>
-									<div class="h-16 bg-[#ffc480] border-b-[2px] border-gray-900 flex items-center justify-center overflow-hidden relative">
+									<div class="h-16 bg-brand-accent border-b-[2px] border-gray-900 flex items-center justify-center overflow-hidden relative">
 										<!-- AB Test Split Visual inside Email -->
 										<div class="absolute inset-0 flex">
-											<div class="w-1/2 h-full bg-[#ffc480] flex items-center justify-center border-r-[2px] border-gray-900">
+											<div class="w-1/2 h-full bg-brand-accent flex items-center justify-center border-r-[2px] border-gray-900">
 												<span class="font-black text-xs">V1</span>
 											</div>
-											<div class="w-1/2 h-full bg-[#a78bfa] flex items-center justify-center">
+											<div class="w-1/2 h-full bg-data-violet flex items-center justify-center">
 												<span class="font-black text-xs text-white">V2</span>
 											</div>
 										</div>
@@ -439,7 +439,7 @@
 								<!-- OG Images for Social -->
 								<div class="w-full max-w-[220px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all">
 									<div class="h-20 bg-gradient-to-br from-[#7dd3fc] to-blue-500 border-b-[3px] border-gray-900 flex items-center justify-center">
-										<div class="w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center border-2 border-white/50">
+										<div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/50">
 											<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
 										</div>
 									</div>
@@ -458,7 +458,7 @@
 										</div>
 										<span class="text-[7px] font-bold text-gray-400">Sponsored</span>
 									</div>
-									<div class="h-20 bg-gradient-to-r from-[#f43f5e] to-[#ffc480] flex flex-col justify-center items-center text-center p-2 relative">
+									<div class="h-20 bg-gradient-to-r from-[#f43f5e] to-brand-accent flex flex-col justify-center items-center text-center p-2 relative">
 										<div class="absolute inset-0 flex items-center justify-center opacity-20">
 											<div class="w-full h-2 bg-white rotate-45 scale-150"></div>
 											<div class="w-full h-2 bg-white -rotate-45 scale-150 absolute"></div>
@@ -470,7 +470,7 @@
 							{:else if i === 3}
 								<!-- Geo-Targeted Promotions -->
 								<div class="w-full max-w-[200px] h-24 bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
-									<div class="w-1/2 h-full bg-[#4ade80]/20 flex flex-col justify-center items-center border-r-[3px] border-gray-900 border-dashed relative">
+									<div class="w-1/2 h-full bg-data-green/20 flex flex-col justify-center items-center border-r-[3px] border-gray-900 border-dashed relative">
 										<span class="text-xl mb-1">🇺🇸</span>
 										<div class="bg-black text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-gray-900">$129</div>
 										<!-- Routing arrow -->
@@ -480,7 +480,7 @@
 									</div>
 									<div class="w-1/2 h-full bg-[#7dd3fc]/20 flex flex-col justify-center items-center">
 										<span class="text-xl mb-1">🇪🇺</span>
-										<div class="bg-[#ff6b6b] text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-gray-900">€119</div>
+										<div class="bg-brand-danger text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-gray-900">€119</div>
 									</div>
 								</div>
 							{:else if i === 4}
@@ -513,25 +513,25 @@
 										<div class="w-8 h-2 bg-gray-300 rounded-full ml-auto"></div>
 									</div>
 									<div class="p-3 grid grid-cols-2 gap-2">
-										<div class="col-span-2 bg-[#a78bfa]/20 border-[2px] border-[#a78bfa] rounded p-2 flex items-center justify-between">
+										<div class="col-span-2 bg-data-violet/20 border-[2px] border-data-violet rounded p-2 flex items-center justify-between">
 											<div class="w-1/2 space-y-1">
-												<div class="w-8 h-1 bg-[#a78bfa] rounded"></div>
+												<div class="w-8 h-1 bg-data-violet rounded"></div>
 												<div class="w-12 h-2.5 bg-gray-900 rounded"></div>
 											</div>
-											<div class="w-6 h-6 rounded-full border-2 border-[#a78bfa] flex items-center justify-center">
-												<div class="w-2 h-2 bg-[#a78bfa] rounded-full"></div>
+											<div class="w-6 h-6 rounded-full border-2 border-data-violet flex items-center justify-center">
+												<div class="w-2 h-2 bg-data-violet rounded-full"></div>
 											</div>
 										</div>
-										<div class="bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded p-1.5">
+										<div class="bg-data-green/20 border-[2px] border-data-green rounded p-1.5">
 											<div class="w-full h-8 flex items-end gap-[1px]">
-												<div class="w-1/5 h-[30%] bg-[#4ade80]"></div>
-												<div class="w-1/5 h-[50%] bg-[#4ade80]"></div>
-												<div class="w-1/5 h-[40%] bg-[#4ade80]"></div>
-												<div class="w-1/5 h-[80%] bg-[#4ade80]"></div>
+												<div class="w-1/5 h-[30%] bg-data-green"></div>
+												<div class="w-1/5 h-[50%] bg-data-green"></div>
+												<div class="w-1/5 h-[40%] bg-data-green"></div>
+												<div class="w-1/5 h-[80%] bg-data-green"></div>
 												<div class="w-1/5 h-[100%] bg-gray-900"></div>
 											</div>
 										</div>
-										<div class="bg-[#ffc480]/20 border-[2px] border-[#ffc480] rounded p-2 flex flex-col justify-center items-center">
+										<div class="bg-brand-accent/20 border-[2px] border-brand-accent rounded p-2 flex flex-col justify-center items-center">
 											<div class="text-xs font-black text-gray-900">82%</div>
 											<div class="text-[6px] font-bold text-gray-500 uppercase">Score</div>
 										</div>
@@ -563,7 +563,7 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Analytics</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -577,9 +577,9 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each analyticsFeatures as feature, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-white']}
-					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] rounded-2xl transition-all group">
-						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform">
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet', 'bg-brand-danger', 'bg-data-green', 'bg-white']}
+					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] rounded-2xl transition-all group">
+						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d={feature.iconPath} />
 							</svg>
@@ -594,7 +594,7 @@
 	<SectionSeparator icon="arrow" />
 
 	<!-- Pricing CTA -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#4ade80] border-b-[3px] border-gray-900 overflow-hidden relative">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-data-green border-b-[3px] border-gray-900 overflow-hidden relative">
 		<!-- Dynamic Background Pattern -->
 		<div
 			class="absolute inset-0 opacity-[0.15] pointer-events-none"
@@ -602,20 +602,20 @@
 		/>
 
 		<!-- Floating decorative elements -->
-		<div class="absolute top-10 left-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
-		<div class="absolute bottom-10 right-10 w-20 h-20 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4s;"></div>
+		<div class="absolute top-10 left-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-brutal-lg animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
+		<div class="absolute bottom-10 right-10 w-20 h-20 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full animate-bounce" style="animation-duration: 4s;"></div>
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-[12px_12px_0_0_#1f2937] hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
-				<div class="inline-block px-4 py-1.5 bg-gray-900 text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] rounded-full mb-6 transform -rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-gray-900 text-white border-[3px] border-gray-900 shadow-brutal-accent rounded-full mb-6 transform -rotate-1">
 					<span class="text-sm font-bold uppercase tracking-wider">Get Started</span>
 				</div>
 
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 					Start Experimenting <br class="hidden sm:block" />
-					<span class="text-[#4ade80] drop-shadow-[2px_2px_0_#1f2937] relative inline-block">
+					<span class="text-data-green drop-shadow-[2px_2px_0_#1f2937] relative inline-block">
 						Today
 						<svg class="absolute w-full h-4 -bottom-2 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 							<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -644,7 +644,7 @@
 						href="/pricing"
 						on:click={() => trackCTA('View Pricing')}
 						class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-							shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+							shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 							transition-all duration-200 text-center"
 					>
 						View Pricing
@@ -666,7 +666,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -676,7 +676,7 @@
 
 			<div class="space-y-4">
 				{#each faqs as faq, i}
-					<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
+					<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
 						<button
 							on:click={() => (openFaq = openFaq === i ? -1 : i)}
 							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-[#fdf2f8]' : 'hover:bg-gray-50'}"

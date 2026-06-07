@@ -257,12 +257,15 @@
 {#if isOpen}
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh]"
+		class="fixed inset-0 bg-black/50 z-[100] flex items-start justify-center pt-[15vh]"
 		on:click={close}
 	>
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
-			class="w-full max-w-xl bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden animate-palette-in"
+			class="w-full max-w-xl bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden animate-palette-in"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Command palette"
 			on:click|stopPropagation
 			on:keydown={handlePaletteKeydown}
 		>
@@ -298,7 +301,7 @@
 			<div class="max-h-[50vh] overflow-y-auto py-2" role="listbox">
 				{#if filteredItems.length === 0}
 					<div class="px-5 py-8 text-center">
-						<p class="text-sm font-bold text-gray-400">No results for "{query}"</p>
+						<p class="text-sm font-bold text-gray-600">No results for "{query}"</p>
 					</div>
 				{:else}
 					{#each filteredItems as item, i}
@@ -307,17 +310,17 @@
 							role="option"
 							aria-selected={i === selectedIndex}
 							class="flex items-center gap-3 px-5 py-3 cursor-pointer transition-colors
-								{i === selectedIndex ? 'bg-[#ffc480]/30' : 'hover:bg-gray-50'}"
+								{i === selectedIndex ? 'bg-brand-accent/30' : 'hover:bg-gray-50'}"
 							on:click={() => selectItem(item)}
 							on:mouseenter={() => (selectedIndex = i)}
 							on:keydown
 						>
 							{#if item.type === 'action'}
 								<div
-									class="w-8 h-8 rounded-lg bg-[#4ecdc4]/10 border-2 border-[#4ecdc4]/30 flex items-center justify-center flex-shrink-0"
+									class="w-8 h-8 rounded-lg bg-data-teal/10 border-2 border-data-teal/30 flex items-center justify-center flex-shrink-0"
 								>
 									<svg
-										class="w-4 h-4 text-[#4ecdc4]"
+										class="w-4 h-4 text-data-teal"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -357,7 +360,7 @@
 
 							{#if item.type === 'action'}
 								<span
-									class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#4ecdc4]/10 text-[#0d9488] rounded-full border border-[#4ecdc4]/30"
+									class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-data-teal/10 text-[#0d9488] rounded-full border border-data-teal/30"
 									>Action</span
 								>
 							{/if}
@@ -377,7 +380,7 @@
 			<div
 				class="flex items-center justify-between px-5 py-2.5 border-t border-gray-100 bg-gray-50/50"
 			>
-				<div class="flex gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+				<div class="flex gap-3 text-[10px] font-bold text-gray-600 uppercase tracking-wide">
 					<span class="flex items-center gap-1">
 						<kbd class="px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[9px] font-mono"
 							>&#8593;&#8595;</kbd

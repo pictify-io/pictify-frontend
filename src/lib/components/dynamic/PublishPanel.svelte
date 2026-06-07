@@ -38,7 +38,7 @@
 
 	const generateEmbedCode = () => {
 		if (!dynamicUrl) return '';
-		return `<img src="${dynamicUrl}" alt="${template?.name || 'Live Image'}" />`;
+		return `<img loading="lazy" src="${dynamicUrl}" alt="${template?.name || 'Live Image'}" />`;
 	};
 
 	const handlePublish = () => {
@@ -132,7 +132,7 @@
 		<!-- Pre-publish Summary / Edit Mode -->
 		<div class="space-y-6">
 			<div
-				class="p-6 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+				class="p-6 bg-gray-50 border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
 			>
 				<p class="text-sm text-gray-900 font-bold mb-6 flex items-center gap-2">
 					{#if isEditing}
@@ -188,7 +188,7 @@
 					{isEditing ? 'Cancel' : 'Back'}
 				</button>
 				<button
-					class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-2 group"
+					class="px-5 py-2.5 bg-data-blue hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-2 group"
 					on:click={handlePublish}
 					disabled={isEditing ? isUpdating : isPublishing}
 				>
@@ -265,7 +265,7 @@
 		<div class="space-y-6">
 			<!-- Live URL -->
 			<div
-				class="p-6 bg-gradient-to-br from-gray-50 to-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+				class="p-6 bg-gradient-to-br from-gray-50 to-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
 			>
 				<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-200 mb-4">
 					<span class="w-3 h-3 bg-gray-900 rounded-full border-2 border-black" />
@@ -300,7 +300,7 @@
 
 			<!-- Embed Code -->
 			<div
-				class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+				class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
 			>
 				<h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">
 					Embed Code (HTML)
@@ -325,9 +325,9 @@
 				<div class="space-y-3">
 					<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Live Preview</h3>
 					<div
-						class="bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-[3px] border-gray-900 rounded-xl p-6 flex items-center justify-center min-h-[300px] shadow-[4px_4px_0_0_#1f2937] bg-white"
+						class="bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-[3px] border-gray-900 rounded-xl p-6 flex items-center justify-center min-h-[300px] shadow-brutal-lg bg-white"
 					>
-						<img
+						<img loading="lazy"
 							src={dynamicUrl}
 							alt="Live asset preview"
 							class="max-w-full max-h-[300px] object-contain shadow-2xl rounded-lg border-2 border-gray-900"

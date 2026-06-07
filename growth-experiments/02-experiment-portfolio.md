@@ -41,7 +41,10 @@ Baseline data: [`00-funnel-diagnosis.md`](./00-funnel-diagnosis.md). Tracking sh
 - `dashboard-checklist-value-first` → shares dashboard population; weak read; needs the `dashboard_page_viewed` fix already shipped.
 - `verify-copy-v1` → instrumentation ships now; the A/B may be too low-traffic to ever read — defer the copy test, keep the measurement.
 
-**PLG coordination (pic-30 upsell engine):** the tool CTAs are guest-only and the PLG usage-banner/proactive-modal are logged-in-only — no on-screen collision on tool pages. But **suppress the pic-30 proactive modal / usage banner on a new user's first `/welcome` session and first dashboard paint** while the welcome/onboarding tests run, so two "look here" treatments don't fight. Confirm with the pic-30 owner before launching #3/#4.
+**PLG coordination (pic-30 upsell engine) — RESOLVED 2026-06-04, no action needed (code-verified after #3 launched):** the tool CTAs are guest-only and the PLG usage-banner/proactive-modal are logged-in-only — no on-screen collision on tool pages. The earlier worry about suppressing pic-30 on a new user's first `/welcome` / first dashboard paint is moot:
+- pic-30 mounts **only** in `src/routes/dashboard/+layout@.svelte` (UsageBanner L88, ProactiveUpgradeModal L144). `/welcome` and the root layout import zero PLG code → the welcome treatment surface is pic-30-free.
+- Both nudges are purely usage-gated on the free plan: banner `percentage >= 65` (`plg.store.js:1071`), modal `>= 75` (`plg.store.js:1107`). A fresh signup (~0 usage; welcome does ≤1 render) can't reach the threshold on first paint — would need 33+ renders in session one.
+- Experiment reads (`api_render_completed`, assignment health, `welcome_skipped`) fire on `/welcome` *before* the dashboard; pic-30 fires later on `/dashboard`, and both arms converge on the same usage-gated dashboard → any exposure is symmetric across arms and cancels in the A/B. No "first session" guard exists in code to gate on anyway, so suppression would mean building gating for a non-problem. **Left running as-is.**
 
 ---
 

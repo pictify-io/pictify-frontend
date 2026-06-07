@@ -1133,13 +1133,13 @@
 	}
 </script>
 
-<div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
+<div class="w-full bg-brand-bg h-full flex flex-col z-10">
 	<!-- Header with Tabs -->
-	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-brand-bg">
 		<div class="flex items-center justify-between">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Variables</h3>
 			<button
-				class="text-xs px-2.5 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 flex items-center gap-1.5 uppercase font-bold tracking-wide border-[2px] border-gray-900"
+				class="text-xs px-2.5 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 flex items-center gap-1.5 uppercase font-bold tracking-wide border-[2px] border-gray-900"
 				on:click={startCreate}
 			>
 				<i class="fa fa-plus text-[10px]" />
@@ -1161,7 +1161,7 @@
 		/>
 	</div>
 
-	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar bg-[#FFFDF8]">
+	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar bg-brand-bg">
 		<!-- Create/Edit Form -->
 		{#if activeTab === 'create'}
 			<div class="space-y-4">
@@ -1242,7 +1242,7 @@
 						<div class="flex gap-2">
 							<input
 								type="color"
-								class="w-12 h-10 border-[2px] border-gray-900 rounded-lg cursor-pointer shadow-[2px_2px_0_0_#1f2937]"
+								class="w-12 h-10 border-[2px] border-gray-900 rounded-lg cursor-pointer shadow-brutal-sm"
 								bind:value={formDefaultValue}
 							/>
 							<input
@@ -1296,13 +1296,13 @@
 				<!-- Actions -->
 				<div class="flex gap-2 pt-2">
 					<button
-						class="flex-1 py-2.5 px-4 bg-gray-900 text-white rounded-lg text-xs font-black uppercase tracking-wider border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
+						class="flex-1 py-2.5 px-4 bg-gray-900 text-white rounded-lg text-xs font-black uppercase tracking-wider border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 transition-all"
 						on:click={saveVariable}
 					>
 						{editingVariable ? 'Update' : 'Create'} Variable
 					</button>
 					<button
-						class="py-2.5 px-4 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-black uppercase tracking-wider text-gray-900 hover:bg-gray-50 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 transition-all"
+						class="py-2.5 px-4 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-black uppercase tracking-wider text-gray-900 hover:bg-gray-50 shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-0.5 transition-all"
 						on:click={cancelEdit}
 					>
 						Cancel
@@ -1315,7 +1315,7 @@
 			{#if $variables.length === 0}
 				<div class="text-center py-8">
 					<div
-						class="w-16 h-16 mx-auto mb-4 bg-[#FFFDF8] border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#e5e5e5]"
+						class="w-16 h-16 mx-auto mb-4 bg-brand-bg border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#e5e5e5]"
 					>
 						<i class="fa fa-code text-2xl text-gray-900" />
 					</div>
@@ -1326,7 +1326,7 @@
 						Create variables to make your template dynamic.
 					</p>
 					<button
-						class="text-xs px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 uppercase font-bold"
+						class="text-xs px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 rounded-lg hover:bg-black transition-all shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 uppercase font-bold"
 						on:click={startCreate}
 					>
 						<i class="fa fa-plus mr-1.5" />
@@ -1392,7 +1392,7 @@
 											variable.name
 										)
 											? 'border-blue-400 shadow-[2px_2px_0_0_#93c5fd] bg-blue-50/30'
-											: 'border-gray-900 shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480]'}"
+											: 'border-gray-900 shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm'}"
 										on:click={() => {
 											if (isSelectMode) toggleVariableSelection(variable.name);
 										}}
@@ -1513,7 +1513,7 @@
 					{#if showApiExample}
 						<div class="space-y-3" transition:slide={{ duration: 150 }}>
 							<div
-								class="bg-gray-900 rounded-lg p-4 relative border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+								class="bg-gray-900 rounded-lg p-4 relative border-[2px] border-gray-900 shadow-brutal-sm"
 							>
 								<button
 									class="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
@@ -1571,7 +1571,7 @@
 
 					{#if $variables.length === 0}
 						<div
-							class="text-center py-6 bg-[#FFFDF8] rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
+							class="text-center py-6 bg-brand-bg rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
 						>
 							<div class="block mb-2">
 								<i class="fa fa-info-circle text-gray-400 text-xl" />
@@ -1627,7 +1627,7 @@
 										<input
 											type="color"
 											id={'preview-color-' + variable.name}
-											class="w-10 h-9 border-[2px] border-gray-900 rounded-lg cursor-pointer hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
+											class="w-10 h-9 border-[2px] border-gray-900 rounded-lg cursor-pointer hover:shadow-brutal-accent-sm transition-all"
 											value={testValues[variable.name] || '#000000'}
 											on:input={(e) => updateTestValue(variable.name, e.target.value)}
 											aria-label={'Color picker for ' + variable.name}
@@ -1715,7 +1715,7 @@
 				<div class="pt-3 border-t border-gray-200">
 					<div class="flex items-center justify-between mb-3">
 						<div class="flex items-center gap-2">
-							<i class="fa fa-eye text-[#ff6b6b] text-sm" />
+							<i class="fa fa-eye text-brand-danger text-sm" />
 							<span class={sectionHeaderClass}>Canvas Preview</span>
 						</div>
 						{#if $isPreviewActive}
@@ -1736,7 +1736,7 @@
 					<button
 						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-[2px] border-gray-900 {$isPreviewActive
 							? 'bg-gray-200 text-gray-900 shadow-[2px_2px_0_0_#d1d5db] hover:shadow-[4px_4px_0_0_#d1d5db] hover:-translate-y-0.5'
-							: 'bg-[#4ade80] text-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5'}"
+							: 'bg-data-green text-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5'}"
 						on:click={togglePreview}
 						aria-pressed={$isPreviewActive}
 						aria-label={$isPreviewActive ? 'Stop canvas preview' : 'Start canvas preview'}
@@ -2019,7 +2019,7 @@
 									<div class="flex gap-2">
 										<input
 											type="color"
-											class="w-10 h-8 border-[2px] border-gray-900 rounded-lg cursor-pointer hover:shadow-[2px_2px_0_0_#ffc480] transition-all"
+											class="w-10 h-8 border-[2px] border-gray-900 rounded-lg cursor-pointer hover:shadow-brutal-accent-sm transition-all"
 											value={testValues[variable.name] || '#000000'}
 											on:input={(e) => updateTestValue(variable.name, e.target.value)}
 										/>
@@ -2086,7 +2086,7 @@
 					</div>
 				{:else}
 					<div
-						class="text-center py-6 bg-[#FFFDF8] rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
+						class="text-center py-6 bg-brand-bg rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
 					>
 						<i class="fa fa-flask text-gray-300 text-xl mb-2" />
 						<p class="text-xs font-bold text-gray-500 uppercase">No variables to test</p>
@@ -2124,7 +2124,7 @@
 							<button
 								class="px-2 py-1 text-[10px] font-bold border-2 rounded transition-all
 									{selectedRenderLayouts.has('default')
-									? 'border-gray-900 bg-[#ffc480]/20 shadow-[1px_1px_0_0_#1f2937]'
+									? 'border-gray-900 bg-brand-accent/20 shadow-[1px_1px_0_0_#1f2937]'
 									: 'border-gray-200 text-gray-400 hover:border-gray-400'}"
 								on:click={() => toggleRenderLayout('default')}
 							>
@@ -2135,7 +2135,7 @@
 								<button
 									class="px-2 py-1 text-[10px] font-bold border-2 rounded transition-all
 										{selectedRenderLayouts.has(key)
-										? 'border-gray-900 bg-[#ffc480]/20 shadow-[1px_1px_0_0_#1f2937]'
+										? 'border-gray-900 bg-brand-accent/20 shadow-[1px_1px_0_0_#1f2937]'
 										: 'border-gray-200 text-gray-400 hover:border-gray-400'}"
 									on:click={() => toggleRenderLayout(key)}
 								>
@@ -2150,12 +2150,12 @@
 				<!-- Render Button -->
 				<button
 					class="w-full py-2.5 px-3 {guestMode && !$user?.email
-						? 'bg-[#ffc480]'
+						? 'bg-brand-accent'
 						: guestMode
-						? 'bg-[#4ade80]'
+						? 'bg-data-green'
 						: 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email
 						? 'gray-900'
-						: 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_{guestMode &&
+						: 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-brutal-sm hover:shadow-[4px_4px_0_0_{guestMode &&
 					!$user?.email
 						? '#ff6b6b'
 						: '#ffc480'}] hover:-translate-y-0.5 font-black uppercase tracking-wider border-[2px] border-gray-900"
@@ -2206,7 +2206,7 @@
 									</div>
 								</div>
 							{/if}
-							<img
+							<img loading="lazy"
 								src={imgSrc}
 								alt="Rendered template"
 								class="w-full rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#e5e5e5]"
@@ -2216,17 +2216,17 @@
 							/>
 							{#if imgLoaded}
 								<div
-									class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2 backdrop-blur-sm"
+									class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2"
 								>
 									<button
-										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
+										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-brutal-sm"
 										on:click={openImageInNewTab}
 										title="Open in new tab"
 									>
 										<i class="fa fa-external-link-alt text-gray-900" />
 									</button>
 									<button
-										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
+										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-brutal-sm"
 										on:click={downloadImage}
 										title="Download image"
 									>
@@ -2251,7 +2251,7 @@
 								className="flex-1"
 							/>
 							<button
-								class="px-3 py-1.5 bg-white border-[2px] border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="px-3 py-1.5 bg-white border-[2px] border-gray-900 font-black text-xs uppercase shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								on:click={downloadImage}
 								title="Download"
 							>
@@ -2263,11 +2263,11 @@
 						{#if guestMode}
 							<div class="bg-[#f0fdf4] border-[2px] border-green-300 rounded-lg p-3">
 								<p class="text-xs font-bold text-gray-700 mb-2">
-									<i class="fa fa-star text-[#ffc480] mr-1" />
+									<i class="fa fa-star text-brand-accent mr-1" />
 									Sign up to save your template and automate variants via API.
 								</p>
 								<button
-									class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="w-full py-2 bg-brand-danger text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={saveAndShowAuth}
 								>
 									Create free account
@@ -2305,7 +2305,7 @@
 											<span class="text-[10px] font-bold text-gray-500 uppercase">Loading...</span>
 										</div>
 									{/if}
-									<img
+									<img loading="lazy"
 										src={imgState.src}
 										alt="{layoutResult.name} render"
 										class="w-full rounded border border-gray-300 bg-white"
@@ -2377,7 +2377,7 @@
 							<!-- Action Buttons -->
 							<div class="flex gap-2">
 								<button
-									class="flex-1 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
+									class="flex-1 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#e5e5e5] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
 									on:click={() => {
 										navigator.clipboard.writeText(renderedPdfUrl);
 										toast.set({ message: 'PDF URL copied!', type: 'success', duration: 1500 });
@@ -2387,7 +2387,7 @@
 									Copy URL
 								</button>
 								<button
-									class="flex-1 py-2 bg-[#ffc480] border-[2px] border-amber-500 rounded-lg font-black text-xs uppercase hover:border-amber-600 transition-all flex items-center justify-center gap-1.5"
+									class="flex-1 py-2 bg-brand-accent border-[2px] border-amber-500 rounded-lg font-black text-xs uppercase hover:border-amber-600 transition-all flex items-center justify-center gap-1.5"
 									on:click={() => window.open(renderedPdfUrl, '_blank')}
 								>
 									<i class="fa fa-external-link-alt" />
@@ -2400,11 +2400,11 @@
 						{#if guestMode}
 							<div class="bg-[#f0fdf4] border-[2px] border-green-300 rounded-lg p-3">
 								<p class="text-xs font-bold text-gray-700 mb-2">
-									<i class="fa fa-star text-[#ffc480] mr-1" />
+									<i class="fa fa-star text-brand-accent mr-1" />
 									Sign up to save your template and automate PDF generation via API.
 								</p>
 								<button
-									class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="w-full py-2 bg-brand-danger text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={saveAndShowAuth}
 								>
 									Create free account
@@ -2444,7 +2444,7 @@
 					{#if showRequestDetails}
 						<div class="space-y-2" transition:slide={{ duration: 150 }}>
 							<div
-								class="bg-gray-900 rounded-lg p-3 relative border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+								class="bg-gray-900 rounded-lg p-3 relative border-[2px] border-gray-900 shadow-brutal-sm"
 							>
 								<button
 									class="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
@@ -2482,7 +2482,7 @@
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 			role="alertdialog"
 			aria-modal="true"
 			aria-labelledby="delete-dialog-title"
@@ -2498,11 +2498,11 @@
 			}}
 		>
 			<div
-				class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-sm w-full relative overflow-hidden"
+				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-sm w-full relative overflow-hidden"
 			>
 				<!-- Red header strip -->
 				<div
-					class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b-[3px] border-gray-900 z-10"
+					class="absolute top-0 left-0 w-full h-1.5 bg-brand-danger border-b-[3px] border-gray-900 z-10"
 				/>
 				<!-- Decorative bg pattern -->
 				<div
@@ -2524,7 +2524,7 @@
 
 					<div class="text-center">
 						<div
-							class="w-14 h-14 mx-auto mb-4 mt-2 bg-red-100 border-[3px] border-gray-900 rounded-full flex items-center justify-center shadow-[4px_4px_0_0_#1f2937]"
+							class="w-14 h-14 mx-auto mb-4 mt-2 bg-red-100 border-[3px] border-gray-900 rounded-full flex items-center justify-center shadow-brutal-lg"
 						>
 							<i class="fa fa-trash text-red-600 text-xl" />
 						</div>
@@ -2541,14 +2541,14 @@
 							<div class="flex flex-wrap gap-1.5 justify-center mb-5">
 								{#each [...selectedVariableNames] as name}
 									<span
-										class="font-mono font-bold text-gray-900 bg-[#ffc480] px-2 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]"
+										class="font-mono font-bold text-gray-900 bg-brand-accent px-2 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-brutal-sm"
 										>{name}</span
 									>
 								{/each}
 							</div>
 							<div class="flex gap-3">
 								<button
-									class="flex-1 py-2.5 px-4 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-black text-gray-900 uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex-1 py-2.5 px-4 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-black text-gray-900 uppercase tracking-wider shadow-brutal-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={() => {
 										showDeleteConfirm = false;
 									}}
@@ -2556,7 +2556,7 @@
 									Cancel
 								</button>
 								<button
-									class="flex-1 py-2.5 px-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex-1 py-2.5 px-4 bg-brand-danger text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-brutal-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={deleteSelectedVariables}
 								>
 									Delete {selectedCount}
@@ -2573,7 +2573,7 @@
 							<p class="text-sm font-medium text-gray-600 mb-5">
 								Are you sure you want to delete
 								<span
-									class="font-mono font-bold text-gray-900 bg-[#ffc480] px-1.5 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]"
+									class="font-mono font-bold text-gray-900 bg-brand-accent px-1.5 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-brutal-sm"
 									>"{variableToDelete?.name}"</span
 								>&nbsp;&nbsp;?
 								{#if variableToDelete?.source === 'property'}
@@ -2584,7 +2584,7 @@
 							</p>
 							<div class="flex gap-3">
 								<button
-									class="flex-1 py-2.5 px-4 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-black text-gray-900 uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex-1 py-2.5 px-4 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-black text-gray-900 uppercase tracking-wider shadow-brutal-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={() => {
 										showDeleteConfirm = false;
 										variableToDelete = null;
@@ -2593,7 +2593,7 @@
 									Cancel
 								</button>
 								<button
-									class="flex-1 py-2.5 px-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex-1 py-2.5 px-4 bg-brand-danger text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-brutal-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={deleteVariable}
 								>
 									Delete

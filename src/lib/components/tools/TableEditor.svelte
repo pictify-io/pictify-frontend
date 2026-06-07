@@ -520,7 +520,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 <div class="max-w-5xl mx-auto px-4 mb-20">
 	<!-- Input Mode Toggle + Title -->
 	<div class="flex flex-wrap items-center gap-4 mb-6">
-		<div class="flex bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden">
+		<div class="flex bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-hidden">
 			<button
 				on:click={() => { inputMode = 'csv'; srcdocKey++; }}
 				class="px-5 py-2.5 text-sm font-black uppercase tracking-wider transition-colors
@@ -537,7 +537,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 			</button>
 		</div>
 
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-[4px_4px_0_0_#1f2937] flex-1 min-w-[200px]">
+		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg flex-1 min-w-[200px]">
 			<span class="text-xs font-black uppercase tracking-widest text-gray-500 whitespace-nowrap">Title</span>
 			<input
 				type="text"
@@ -551,7 +551,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 
 	<!-- Controls Bar -->
 	<div class="flex flex-wrap gap-3 mb-6">
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-[4px_4px_0_0_#1f2937]">
+		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg">
 			<span class="text-xs font-black uppercase tracking-widest text-gray-500 whitespace-nowrap">Theme</span>
 			<select bind:value={themeId} class="text-sm font-bold bg-transparent outline-none cursor-pointer">
 				<optgroup label="Light">
@@ -567,7 +567,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 			</select>
 		</div>
 
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-[4px_4px_0_0_#1f2937]">
+		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg">
 			<span class="text-xs font-black uppercase tracking-widest text-gray-500">Font</span>
 			<select bind:value={fontId} class="text-sm font-bold bg-transparent outline-none cursor-pointer">
 				{#each fonts as f}
@@ -576,7 +576,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 			</select>
 		</div>
 
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-[4px_4px_0_0_#1f2937]">
+		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg">
 			<span class="text-xs font-black uppercase tracking-widest text-gray-500">Size</span>
 			<input type="number" bind:value={previewWidth} min="200" max="2400" class="w-16 text-sm font-bold bg-transparent outline-none text-center" />
 			<span class="text-gray-400 font-bold">x</span>
@@ -587,12 +587,12 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	<!-- Editor + Preview Grid -->
 	<div class="grid grid-cols-1 gap-6">
 		<!-- Input Panel -->
-		<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
+		<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
 			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 				</div>
 				<span class="font-mono text-xs font-bold text-gray-500 uppercase tracking-widest">
 					{inputMode === 'csv' ? 'CSV Data' : 'HTML Table'}
@@ -606,15 +606,15 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		</div>
 
 		<!-- Preview Panel -->
-		<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
+		<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
 			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 				</div>
 				<div class="flex items-center gap-2">
-					<span class="px-2 py-0.5 bg-[#4ade80]/20 border border-[#4ade80] rounded text-[10px] font-bold text-gray-700 uppercase tracking-wider">Live Preview</span>
+					<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-[10px] font-bold text-gray-700 uppercase tracking-wider">Live Preview</span>
 					<span class="font-mono text-xs font-bold text-gray-500">{previewWidth}x{previewHeight}</span>
 				</div>
 			</div>
@@ -638,7 +638,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 			<a
 				href="/signup?redirect=/tools/table"
 				on:click={handleSignupClick}
-				class="px-10 py-5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
+				class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
 			>
 				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
 				Sign Up to Continue
@@ -648,7 +648,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 				type="button"
 				on:click={handleGenerate}
 				disabled={isGenerating}
-				class="px-10 py-5 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-10 py-5 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{#if isGenerating}
 					<svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
@@ -674,26 +674,26 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	<!-- Generated Result -->
 	{#if generatedImageUrl}
 		<div class="mt-12">
-			<div class="bg-white border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[8px_8px_0_0_#1f2937] text-center relative overflow-hidden">
-				<div class="absolute top-0 right-0 w-40 h-40 bg-[#4ade80]/10 rounded-full -mr-10 -mt-10" />
-				<span class="inline-block px-4 py-1.5 bg-[#4ade80] text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6">Success</span>
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-2xl text-center relative overflow-hidden">
+				<div class="absolute top-0 right-0 w-40 h-40 bg-data-green/10 rounded-full -mr-10 -mt-10" />
+				<span class="inline-block px-4 py-1.5 bg-data-green text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6">Success</span>
 				<h3 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight mb-8">Your image is ready</h3>
-				<div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-10">
-					<img src={generatedImageUrl} alt="Generated table" class="max-w-full h-auto max-h-[500px]" />
+				<div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-10">
+					<img loading="lazy" src={generatedImageUrl} alt="Generated table" class="max-w-full h-auto max-h-[500px]" />
 				</div>
 				<div class="flex flex-wrap justify-center gap-4">
 					<a href={generatedImageUrl} download="pictify-table.png" on:click={handleDownload}
-						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
+						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 						Download PNG
 					</a>
 					<button on:click={() => copyToClipboard(generatedImageUrl, 'Link')}
-						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
+						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
 						Copy Link
 					</button>
-					<button on:click={() => copyToClipboard(`<img src="${generatedImageUrl}" alt="Table image" />`, 'HTML')}
-						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
+					<button on:click={() => copyToClipboard(`<img loading="lazy" src="${generatedImageUrl}" alt="Table image" />`, 'HTML')}
+						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
 						Copy HTML
 					</button>
@@ -702,14 +702,14 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		</div>
 	{:else if generationError}
 		<div class="mt-8">
-			<div class="bg-white border-[3px] border-gray-900 rounded-3xl p-6 shadow-[8px_8px_0_0_#1f2937] flex items-center gap-4">
-				<div class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-white font-black shadow-[3px_3px_0_0_#1f2937]">!</div>
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-brutal-2xl flex items-center gap-4">
+				<div class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-white font-black shadow-brutal-md">!</div>
 				<div class="flex-1">
 					<h4 class="font-black text-gray-900 uppercase tracking-wide">Generation Failed</h4>
 					<p class="text-gray-600 font-medium">{generationError}</p>
 				</div>
 				<button on:click={handleGenerate}
-					class="px-5 py-2.5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg text-sm">
+					class="px-5 py-2.5 bg-brand-danger text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg text-sm">
 					Retry
 				</button>
 			</div>
@@ -719,11 +719,11 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	<!-- Programmatic Usage Section -->
 	<section class="mt-20">
 		<div class="text-center mb-12">
-			<div class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform rotate-1 rounded-lg">
+			<div class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg">
 				<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 			</div>
 			<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-				Automate with the <span class="text-[#ff6b6b]">API</span>
+				Automate with the <span class="text-brand-danger">API</span>
 			</h2>
 			<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
 				Generate table images programmatically. Render KPI dashboards, reports, and data snapshots as images for Slack, email, and presentations.
@@ -754,7 +754,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		</div>
 
 		<!-- Code Snippet -->
-		<div class="bg-[#1e1e1e] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#1e1e1e] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
@@ -968,7 +968,7 @@ Bob,Designer,Active"""</span>
 				<a
 					href="/signup"
 					on:click={handleSignupClick}
-					class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Get API Key
 				</a>
@@ -976,7 +976,7 @@ Bob,Designer,Active"""</span>
 					href="https://docs.pictify.io"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Read API Docs
 				</a>
@@ -987,23 +987,23 @@ Bob,Designer,Active"""</span>
 	<!-- First Generation Prompt (Modal) -->
 	{#if showFirstGenerationPrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
-				<div class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
+			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
+				<div class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-black uppercase tracking-wider">Great First Image!</h3>
-					<button class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-[#ff6b6b] hover:text-white transition-colors" on:click={() => (showFirstGenerationPrompt = false)}>
+					<button class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors" on:click={() => (showFirstGenerationPrompt = false)}>
 						<span class="font-black">x</span>
 					</button>
 				</div>
 				<div class="p-6">
 					<p class="text-black font-bold mb-4">Create a free account to unlock:</p>
 					<ul class="space-y-2 mb-6">
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">Unlimited image generations</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">No watermarks</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-data-green">✓</span><span class="font-bold text-black text-sm">Unlimited image generations</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-data-green">✓</span><span class="font-bold text-black text-sm">No watermarks</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-data-green">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
 					</ul>
 					<div class="space-y-3">
-						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Create Free Account</a>
-						<button class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide" on:click={() => (showFirstGenerationPrompt = false)}>Continue as Guest</button>
+						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Create Free Account</a>
+						<button class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide" on:click={() => (showFirstGenerationPrompt = false)}>Continue as Guest</button>
 					</div>
 				</div>
 			</div>
@@ -1013,8 +1013,8 @@ Bob,Designer,Active"""</span>
 	<!-- Upgrade Prompt (Modal) -->
 	{#if showUpgradePrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
-				<div class="bg-[#ff6b6b] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
+			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
+				<div class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-white uppercase tracking-wider">Ready to Create More?</h3>
 					<button class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors" on:click={() => (showUpgradePrompt = false)}>
 						<span class="font-black">x</span>
@@ -1023,14 +1023,14 @@ Bob,Designer,Active"""</span>
 				<div class="p-6">
 					<p class="text-black font-bold mb-4">You've reached the guest limit. Sign up to unlock:</p>
 					<ul class="space-y-2 mb-6">
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#ff6b6b]">✓</span><span class="font-bold text-black text-sm">Unlimited image generations</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#ff6b6b]">✓</span><span class="font-bold text-black text-sm">No watermarks</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#ff6b6b]">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#ff6b6b]">✓</span><span class="font-bold text-black text-sm">Priority support</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-brand-danger">✓</span><span class="font-bold text-black text-sm">Unlimited image generations</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-brand-danger">✓</span><span class="font-bold text-black text-sm">No watermarks</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-brand-danger">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-brand-danger">✓</span><span class="font-bold text-black text-sm">Priority support</span></li>
 					</ul>
 					<div class="space-y-3">
-						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Sign Up Free</a>
-						<button class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide" on:click={() => (showUpgradePrompt = false)}>Maybe Later</button>
+						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Sign Up Free</a>
+						<button class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide" on:click={() => (showUpgradePrompt = false)}>Maybe Later</button>
 					</div>
 				</div>
 			</div>

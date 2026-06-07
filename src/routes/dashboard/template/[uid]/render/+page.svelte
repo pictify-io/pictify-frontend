@@ -354,7 +354,7 @@ console.log(result.url); // CDN URL of rendered image
 
 // === Option 2: URL Parameter Render (for <img> tags & emails) ===
 // Returns binary image directly — use as an img src:
-// <img src="${urlParamUrl}" />`;
+// <img loading="lazy" src="${urlParamUrl}" />`;
 
 		navigator.clipboard.writeText(code);
 		toast.set({ message: 'API code copied to clipboard', type: 'success', duration: 2000 });
@@ -401,7 +401,7 @@ console.log(result.url); // CDN URL of rendered image
 					{/if}
 				</h1>
 				<div
-					class="px-2 py-1 bg-[#4ecdc4] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+					class="px-2 py-1 bg-data-teal text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-brutal-sm"
 				>
 					Render Mode
 				</div>
@@ -425,7 +425,7 @@ console.log(result.url); // CDN URL of rendered image
 				<!-- Left: Variable Form -->
 				<div class="lg:col-span-5 flex flex-col gap-6">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<!-- Card Header -->
 						<div
@@ -434,7 +434,7 @@ console.log(result.url); // CDN URL of rendered image
 							<h2
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#ffc480] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-brand-accent border-2 border-gray-900 rounded-full" />
 								Variables
 							</h2>
 						</div>
@@ -451,13 +451,13 @@ console.log(result.url); // CDN URL of rendered image
 
 					<!-- Output Options -->
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
 							<h3
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#a78bfa] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-data-violet border-2 border-gray-900 rounded-full" />
 								Output Options
 							</h3>
 						</div>
@@ -501,7 +501,7 @@ console.log(result.url); // CDN URL of rendered image
 										<!-- Default layout -->
 										<button
 											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has('default')
-												? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 												: 'bg-white border-gray-200 hover:border-gray-900'}"
 											on:click={() => toggleLayout('default')}
 										>
@@ -526,7 +526,7 @@ console.log(result.url); // CDN URL of rendered image
 										{#each templateLayouts as [key, layout]}
 											<button
 												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has(key)
-													? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 													: 'bg-white border-gray-200 hover:border-gray-900'}"
 												on:click={() => toggleLayout(key)}
 											>
@@ -559,13 +559,13 @@ console.log(result.url); // CDN URL of rendered image
 
 					<!-- API Key Selection -->
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
 							<h3
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#60a5fa] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-data-sky border-2 border-gray-900 rounded-full" />
 								Authentication
 							</h3>
 						</div>
@@ -640,7 +640,7 @@ console.log(result.url); // CDN URL of rendered image
 										<EmailVerificationRequired email={userEmail} feature="template rendering" />
 									{:else}
 										<button
-											class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+											class="w-full bg-brand-danger hover:bg-data-red text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
 											on:click={handleRender}
 											disabled={isRendering || !selectedApiKey}
 										>
@@ -697,7 +697,7 @@ console.log(result.url); // CDN URL of rendered image
 									</p>
 									<button
 										type="button"
-										class="w-full bg-amber-400 hover:bg-amber-500 text-black font-black py-3 px-4 rounded-lg border-[3px] border-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-xs"
+										class="w-full bg-amber-400 hover:bg-amber-500 text-black font-black py-3 px-4 rounded-lg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-xs"
 										on:click={handleCreateToken}
 										disabled={isCreatingToken}
 									>
@@ -739,7 +739,7 @@ console.log(result.url); // CDN URL of rendered image
 				<!-- Right: Preview -->
 				<div class="lg:col-span-7">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden sticky top-32"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden sticky top-32"
 					>
 						<div
 							class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
@@ -747,7 +747,7 @@ console.log(result.url); // CDN URL of rendered image
 							<h2
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#4ade80] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-data-green border-2 border-gray-900 rounded-full" />
 								Live Preview
 							</h2>
 							<div class="flex gap-1">
@@ -808,7 +808,7 @@ console.log(result.url); // CDN URL of rendered image
 														<span class="text-xs font-bold text-gray-500 uppercase">Loading image...</span>
 													</div>
 												{/if}
-												<img
+												<img loading="lazy"
 													src={imgState.src}
 													alt="{layoutResult.name} render"
 													class="max-w-full max-h-[300px] object-contain border border-gray-300 bg-white"
@@ -855,7 +855,7 @@ console.log(result.url); // CDN URL of rendered image
 								       3. plain "Fill in…" placeholder -->
 								<div class="flex flex-col items-center justify-center py-12 text-center">
 									{#if template?.thumbnail}
-										<img
+										<img loading="lazy"
 											src={template.thumbnail}
 											alt="Template preview"
 											class="max-w-full max-h-[200px] object-contain border-2 border-gray-200 rounded-lg mb-4 opacity-60"
@@ -872,7 +872,7 @@ console.log(result.url); // CDN URL of rendered image
 											/>
 										</div>
 									{/if}
-									<p class="text-sm font-bold text-gray-400 uppercase tracking-wide">
+									<p class="text-sm font-bold text-gray-600 uppercase tracking-wide">
 										{template?.engine === 'html' && template?.html
 											? 'Live preview · click Render for the real image'
 											: 'Fill in variables and click Render'}

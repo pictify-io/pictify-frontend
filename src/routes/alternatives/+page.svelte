@@ -38,7 +38,7 @@
 	<meta name="twitter:image:alt" content="Pictify alternatives — 34 tools compared" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -46,7 +46,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#4ade80]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-data-green/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -68,7 +68,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 			>
 				<div
-					class="px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
+					class="px-6 py-2 bg-data-green border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
 				>
 					Switch to Better
 				</div>
@@ -79,7 +79,7 @@
 				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
 			>
 				Pictify as Your
-				<span class="block text-[#4ade80]">Alternative</span>
+				<span class="block text-data-green">Alternative</span>
 			</h1>
 
 			<!-- Description -->
@@ -92,7 +92,7 @@
 		<!-- Why Teams Switch Section -->
 		<section class="mb-16">
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-[6px_6px_0_0_#1f2937]"
+				class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl"
 			>
 				<h2 class="text-2xl font-black text-gray-900 mb-6 text-center">
 					Why Teams Switch to Pictify
@@ -100,7 +100,7 @@
 				<div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
 					<div class="text-center">
 						<div
-							class="w-12 h-12 bg-[#4ade80] border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
+							class="w-12 h-12 bg-data-green border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
 						>
 							<svg
 								class="w-6 h-6 text-gray-900"
@@ -121,7 +121,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-12 h-12 bg-[#ffc480] border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
+							class="w-12 h-12 bg-brand-accent border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
 						>
 							<svg
 								class="w-6 h-6 text-gray-900"
@@ -142,7 +142,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-12 h-12 bg-[#ff6b6b] border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
+							class="w-12 h-12 bg-brand-danger border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
 						>
 							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -186,18 +186,18 @@
 					{@const icon = brandIcons[alt.slug] || brandIcons.default}
 					<a
 						href="/alternatives/{alt.slug}"
-						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
+						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
 					>
 						<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
 							<!-- VS Header -->
 							<div class="flex items-center justify-between mb-8">
 								<!-- Competitor Icon -->
 								<div
-									class="w-14 h-14 bg-gray-50 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] group-hover:scale-110 transition-transform"
+									class="w-14 h-14 bg-gray-50 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-md group-hover:scale-110 transition-transform"
 									style="color: {icon.color || '#1f2937'}"
 								>
 									{#if icon.type === 'url'}
-										<img src={icon.url} alt={alt.competitor} class="w-8 h-8" />
+										<img loading="lazy" src={icon.url} alt={alt.competitor} class="w-8 h-8" />
 									{:else if icon.type === 'text'}
 										<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
 									{:else if icon.type === 'svg'}
@@ -211,7 +211,7 @@
 
 								<div class="flex flex-col items-center gap-1">
 									<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
-									<div class="text-xs font-black text-[#4ade80] uppercase tracking-widest">ALT</div>
+									<div class="text-xs font-black text-data-green uppercase tracking-widest">ALT</div>
 									<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
 								</div>
 
@@ -237,11 +237,11 @@
 
 							<div class="mb-4">
 								<h3
-									class="text-2xl font-black text-gray-900 mb-2 group-hover:text-[#4ade80] transition-colors leading-tight"
+									class="text-2xl font-black text-gray-900 mb-2 group-hover:text-data-green transition-colors leading-tight"
 								>
 									{alt.competitor} <br />Alternative
 								</h3>
-								<div class="h-1 w-12 bg-[#4ade80] mb-4" />
+								<div class="h-1 w-12 bg-data-green mb-4" />
 								<p class="text-gray-500 font-medium leading-relaxed line-clamp-3">
 									{alt.metaDescription}
 								</p>
@@ -253,7 +253,7 @@
 								>
 									Compare Now
 									<svg
-										class="w-4 h-4 text-[#4ade80]"
+										class="w-4 h-4 text-data-green"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -281,19 +281,19 @@
 			<div class="flex flex-wrap justify-center gap-4">
 				<a
 					href="/compare"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					All Comparisons
 				</a>
 				<a
 					href="/pricing"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Pricing
 				</a>
 				<a
 					href="/tools"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Free Tools
 				</a>
@@ -302,7 +302,7 @@
 
 		<!-- Bottom CTA -->
 		<section
-			class="bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
+			class="bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
 		>
 			<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Ready to Switch?</h2>
 			<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
@@ -310,7 +310,7 @@
 			</p>
 			<a
 				href="/signup"
-				class="inline-block px-8 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+				class="inline-block px-8 py-4 bg-data-green text-gray-900 border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 			>
 				Get Started Free
 			</a>

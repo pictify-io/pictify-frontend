@@ -126,13 +126,13 @@
 </script>
 
 <div
-	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden relative group"
+	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden relative group"
 >
 	<!-- Header -->
 	<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-3">
-				<div class="w-2 h-2 rounded-full bg-gray-900 animate-pulse" />
+				<div class="w-2 h-2 rounded-full bg-gray-900" />
 				<h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">
 					{#if hasLemonSqueezySubscription}
 						Manage Subscription
@@ -154,7 +154,7 @@
 				</div>
 			{:else if isPaidPlanWithoutLS}
 				<div
-					class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 bg-[#10b981] text-gray-900"
+					class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 bg-brand-success text-gray-900"
 				>
 					Active
 				</div>
@@ -180,7 +180,7 @@
 						<p class="text-2xl font-black text-gray-900 tracking-tight">
 							{formatCurrency(subscription.price)}
 						</p>
-						<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+						<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 							/ {subscription.interval || 'month'}
 						</p>
 					</div>
@@ -220,7 +220,7 @@
 				{:else if subscription.renewsAt}
 					<div class="flex items-center gap-3">
 						<div
-							class="w-8 h-8 rounded-lg bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-8 h-8 rounded-lg bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 						>
 							<svg
 								class="w-4 h-4 text-gray-900"
@@ -246,7 +246,7 @@
 				{#if isPaused && subscription.resumesAt}
 					<div class="flex items-center gap-3 mt-3 pt-3 border-t-2 border-dashed border-gray-200">
 						<div
-							class="w-8 h-8 rounded-lg bg-[#f59e0b] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-8 h-8 rounded-lg bg-data-amber border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 						>
 							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -297,7 +297,7 @@
 										Card ending in {subscription.cardLastFour}
 									</p>
 								</div>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									{subscription.cardBrand}
 								</p>
 							</div>
@@ -309,7 +309,7 @@
 							</div>
 							<div>
 								<p class="text-xs font-black text-gray-900 uppercase">PayPal</p>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									Connected
 								</p>
 							</div>
@@ -318,7 +318,7 @@
 					<button
 						on:click={updatePaymentMethod}
 						disabled={loadingPortalUrl}
-						class="text-[10px] font-black text-gray-900 hover:text-[#ff6b6b] uppercase tracking-wider hover:underline decoration-2 underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-wait"
+						class="text-[10px] font-black text-gray-900 hover:text-brand-danger uppercase tracking-wider hover:underline decoration-2 underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-wait"
 					>
 						{#if loadingPortalUrl}
 							<span class="inline-flex items-center gap-1">
@@ -352,7 +352,7 @@
 					<button
 						on:click={handlePause}
 						disabled={pausing}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if pausing}
 							<span class="inline-flex items-center gap-2">
@@ -383,7 +383,7 @@
 					<button
 						on:click={handleResume}
 						disabled={resuming}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-[#10b981] rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if resuming}
 							<span class="inline-flex items-center gap-2">
@@ -414,7 +414,7 @@
 					<button
 						on:click={handleReactivate}
 						disabled={reactivating}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-[#10b981] rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if reactivating}
 							<span class="inline-flex items-center gap-2">
@@ -445,7 +445,7 @@
 					<button
 						on:click={handleCancel}
 						disabled={cancelling}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-red-50 hover:text-red-900 hover:border-red-900 shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-red-50 hover:text-red-900 hover:border-red-900 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if cancelling}
 							<span class="inline-flex items-center gap-2">
@@ -514,7 +514,7 @@
 			</div>
 
 			{#if isPayPal && !canPause}
-				<p class="text-[10px] font-bold text-gray-400 italic text-center">
+				<p class="text-[10px] font-bold text-gray-600 italic text-center">
 					* Pausing is not available for PayPal subscriptions.
 				</p>
 			{/if}
@@ -533,7 +533,7 @@
 					</p>
 				</div>
 				<div
-					class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center shadow-[3px_3px_0_0_#1f2937]"
+					class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center shadow-brutal-md"
 				>
 					<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -581,7 +581,7 @@
 			<div class="flex flex-wrap gap-2 pt-2">
 				<a
 					href="/dashboard/upgrade"
-					class="w-full text-center px-4 py-3 text-xs font-black text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-widest"
+					class="w-full text-center px-4 py-3 text-xs font-black text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all uppercase tracking-widest"
 				>
 					View all plans
 				</a>
@@ -591,7 +591,7 @@
 		<!-- Free Plan -->
 		<div class="p-8 text-center">
 			<div
-				class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-4 shadow-[4px_4px_0_0_#1f2937]"
+				class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-4 shadow-brutal-lg"
 			>
 				<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -608,7 +608,7 @@
 			</p>
 			<a
 				href="/dashboard/upgrade"
-				class="inline-flex items-center gap-2 px-6 py-3 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+				class="inline-flex items-center gap-2 px-6 py-3 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all"
 			>
 				Upgrade to Pro
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

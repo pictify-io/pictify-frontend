@@ -241,7 +241,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -249,26 +249,18 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ff6b6b]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-danger/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Main Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
-			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
-			>
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Advanced Capabilities</span
-				>
-			</div>
-
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Optimize Every <br />
-				<span class="relative inline-block text-[#ff6b6b] transform rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					Visual
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
@@ -291,7 +283,7 @@
 		<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
 			<!-- Block 1: A/B Testing (Spans 7 cols) -->
 			<div
-				class="xl:col-span-7 bg-white rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col"
+				class="xl:col-span-7 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 			>
 				<div
 					class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"
@@ -300,7 +292,7 @@
 				<div class="p-8 md:p-10 flex-1 flex flex-col">
 					<div class="flex items-center gap-4 mb-6">
 						<div
-							class="w-14 h-14 bg-[#ffc480] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform"
+							class="w-14 h-14 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:-rotate-6 transition-transform"
 						>
 							<span class="font-black text-2xl">A/B</span>
 						</div>
@@ -318,7 +310,7 @@
 						<div class="flex flex-col sm:flex-row gap-4">
 							<!-- Variant A -->
 							<div
-								class="flex-1 rounded-xl border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] overflow-hidden transform transition-all {showingVariant ===
+								class="flex-1 rounded-xl border-[3px] border-gray-900 bg-white shadow-brutal-lg overflow-hidden transform transition-all {showingVariant ===
 								'A'
 									? '-translate-y-2 shadow-[8px_8px_0_0_#3b82f6]'
 									: 'opacity-60 grayscale'}"
@@ -329,14 +321,14 @@
 									<span class="font-black text-xs uppercase tracking-wider">Variant A</span>
 									{#if showingVariant === 'A'}
 										<span
-											class="px-2 py-0.5 bg-white text-blue-500 text-[10px] font-black rounded border border-gray-900 shadow-[2px_2px_0_0_#1f2937] animate-pulse"
+											class="px-2 py-0.5 bg-white text-blue-500 text-[10px] font-black rounded border border-gray-900 shadow-brutal-sm animate-pulse"
 											>LIVE</span
 										>
 									{/if}
 								</div>
 								<div class="aspect-[1200/630] flex items-center justify-center p-2">
 									{#if abVariantAImage}
-										<img
+										<img loading="lazy"
 											src={abVariantAImage}
 											alt="A/B Variant A"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/10"
@@ -355,7 +347,7 @@
 
 							<!-- Variant B -->
 							<div
-								class="flex-1 rounded-xl border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] overflow-hidden transform transition-all {showingVariant ===
+								class="flex-1 rounded-xl border-[3px] border-gray-900 bg-white shadow-brutal-lg overflow-hidden transform transition-all {showingVariant ===
 								'B'
 									? '-translate-y-2 shadow-[8px_8px_0_0_#a855f7]'
 									: 'opacity-60 grayscale'}"
@@ -366,14 +358,14 @@
 									<span class="font-black text-xs uppercase tracking-wider">Variant B</span>
 									{#if showingVariant === 'B'}
 										<span
-											class="px-2 py-0.5 bg-white text-purple-500 text-[10px] font-black rounded border border-gray-900 shadow-[2px_2px_0_0_#1f2937] animate-pulse"
+											class="px-2 py-0.5 bg-white text-purple-500 text-[10px] font-black rounded border border-gray-900 shadow-brutal-sm animate-pulse"
 											>LIVE</span
 										>
 									{/if}
 								</div>
 								<div class="aspect-[1200/630] flex items-center justify-center p-2">
 									{#if abVariantBImage}
-										<img
+										<img loading="lazy"
 											src={abVariantBImage}
 											alt="A/B Variant B"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/10"
@@ -392,7 +384,7 @@
 						</div>
 
 						<button
-							class="w-full mt-4 py-3 bg-[#ffc480] text-black font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+							class="w-full mt-4 py-3 bg-brand-accent text-black font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
 							on:click={switchVariant}
 						>
 							Force Switch Traffic
@@ -403,14 +395,14 @@
 
 			<!-- Block 2: Auto-Optimize (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-[#4ade80] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col"
+				class="xl:col-span-5 bg-data-green rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 			>
 				<div class="absolute inset-0 bg-white/10 pointer-events-none" />
 
 				<div class="p-8 md:p-10 flex-1 flex flex-col">
 					<div class="flex items-center gap-4 mb-6">
 						<div
-							class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-6 transition-transform"
+							class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-7 h-7 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 								><path
@@ -430,7 +422,7 @@
 
 					<!-- Visual -->
 					<div
-						class="mt-auto bg-white rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-5"
+						class="mt-auto bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg p-5"
 					>
 						<div
 							class="inline-block px-3 py-1 bg-black text-white text-[10px] font-black uppercase tracking-wider rounded border-[2px] border-gray-900 mb-5 shadow-[2px_2px_0_0_white]"
@@ -439,7 +431,7 @@
 						</div>
 
 						<div class="space-y-5">
-							{#each [{ label: 'Variant A', color: 'bg-blue-500', width: barWidths[0] }, { label: 'Variant B', color: 'bg-purple-500', width: barWidths[1] }, { label: 'Variant C', color: 'bg-[#ff6b6b]', width: barWidths[2] }] as bar}
+							{#each [{ label: 'Variant A', color: 'bg-blue-500', width: barWidths[0] }, { label: 'Variant B', color: 'bg-purple-500', width: barWidths[1] }, { label: 'Variant C', color: 'bg-brand-danger', width: barWidths[2] }] as bar}
 								<div>
 									<div class="flex justify-between text-xs font-black text-black mb-1.5 uppercase">
 										<span>{bar.label}</span>
@@ -462,7 +454,7 @@
 
 			<!-- Block 3: Live URL / Data Binding (Spans 12 cols) -->
 			<div
-				class="xl:col-span-12 bg-[#bfdbfe] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative group"
+				class="xl:col-span-12 bg-[#bfdbfe] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Text Content (Left, 5 columns) -->
@@ -470,7 +462,7 @@
 						class="lg:col-span-5 p-8 md:p-10 lg:p-12 flex flex-col justify-center relative z-20 border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-gray-900 bg-white/30"
 					>
 						<div
-							class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] mb-8 transform rotate-3 group-hover:-rotate-3 transition-transform"
+							class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg mb-8 transform rotate-3 group-hover:-rotate-3 transition-transform"
 						>
 							<svg
 								class="w-7 h-7 text-black transform rotate-45"
@@ -502,7 +494,7 @@
 								>
 							</div>
 							<button
-								class="w-full sm:w-auto px-8 py-3.5 bg-[#6366f1] text-white text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-0.5 hover:translate-y-0.5 transition-all text-center inline-flex justify-center"
+								class="w-full sm:w-auto px-8 py-3.5 bg-[#6366f1] text-white text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all text-center inline-flex justify-center"
 								on:click={switchLiveUrlData}
 								disabled={liveUrlLoading}
 							>
@@ -522,10 +514,10 @@
 						<div class="relative z-10 w-full max-w-2xl mx-auto mt-4 md:mt-0">
 							<!-- Floating Pipeline Widget -->
 							<div
-								class="hidden sm:flex absolute -top-6 md:-top-8 left-4 md:-left-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-2 items-center gap-2 z-20 transform -rotate-2 group-hover:rotate-0 transition-transform"
+								class="hidden sm:flex absolute -top-6 md:-top-8 left-4 md:-left-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-2 items-center gap-2 z-20 transform -rotate-2 group-hover:rotate-0 transition-transform"
 							>
 								<span
-									class="px-2 py-1 bg-black text-white text-[10px] font-black rounded uppercase border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+									class="px-2 py-1 bg-black text-white text-[10px] font-black rounded uppercase border-[2px] border-gray-900 shadow-brutal-sm"
 									>API</span
 								>
 								<svg
@@ -541,7 +533,7 @@
 									/></svg
 								>
 								<span
-									class="px-2 py-1 bg-[#ffc480] text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-[2px_2px_0_0_#1f2937]"
+									class="px-2 py-1 bg-brand-accent text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-brutal-sm"
 									>Map</span
 								>
 								<svg
@@ -557,22 +549,22 @@
 									/></svg
 								>
 								<span
-									class="px-2 py-1 bg-[#4ade80] text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-[2px_2px_0_0_#1f2937]"
+									class="px-2 py-1 bg-data-green text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-brutal-sm"
 									>Render</span
 								>
 							</div>
 
 							<!-- Browser Frame -->
 							<div
-								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-[8px_8px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-0 sm:mt-6 md:mt-4"
+								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-brutal-2xl group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-0 sm:mt-6 md:mt-4"
 							>
 								<div
 									class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 								>
 									<div class="px-4 flex gap-1.5 h-full items-center py-3">
-										<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#ffc480] border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-data-green border-[2px] border-gray-900" />
 									</div>
 									<div
 										class="flex-1 border-l-[3px] border-gray-900 bg-white px-4 py-2.5 font-mono text-[10px] sm:text-xs text-black font-bold flex items-center gap-2 truncate"
@@ -597,7 +589,7 @@
 									class="relative bg-gray-50 aspect-[1200/630] flex items-center justify-center p-2"
 								>
 									{#if liveUrlImageSrc}
-										<img
+										<img loading="lazy"
 											src={liveUrlImageSrc}
 											alt="Live URL Preview"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/5 transition-opacity duration-300"
@@ -615,10 +607,10 @@
 									{/if}
 									{#if liveUrlLoading}
 										<div
-											class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm z-10 transition-opacity"
+											class="absolute inset-0 flex items-center justify-center bg-white/40 z-10 transition-opacity"
 										>
 											<div
-												class="px-4 py-2 bg-black text-white font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-white shadow-[4px_4px_0_0_#1f2937] animate-pulse"
+												class="px-4 py-2 bg-black text-white font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-white shadow-brutal-lg animate-pulse"
 											>
 												Rendering...
 											</div>
@@ -633,7 +625,7 @@
 
 			<!-- Block 4: Target Context (Spans 12 cols, Flipped Layout) -->
 			<div
-				class="xl:col-span-12 bg-[#fce7f3] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative group"
+				class="xl:col-span-12 bg-[#fce7f3] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Visual (Left, 7 columns) -->
@@ -647,7 +639,7 @@
 						<div class="relative z-10 w-full max-w-2xl mx-auto mt-4 md:mt-0">
 							<!-- Floating Detection Widget -->
 							<div
-								class="hidden sm:flex absolute -top-10 md:-top-12 right-4 md:-right-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-3 flex-col gap-2 z-20 transform rotate-2 group-hover:rotate-0 transition-transform"
+								class="hidden sm:flex absolute -top-10 md:-top-12 right-4 md:-right-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-3 flex-col gap-2 z-20 transform rotate-2 group-hover:rotate-0 transition-transform"
 							>
 								<div class="flex items-center gap-2">
 									<div
@@ -658,18 +650,18 @@
 									<div class="flex gap-1.5 flex-wrap">
 										{#if viewerContext}
 											<span
-												class="px-2 py-0.5 bg-black text-white text-[9px] sm:text-[10px] font-bold rounded shadow-[2px_2px_0_0_#1f2937] border-[2px] border-gray-900"
+												class="px-2 py-0.5 bg-black text-white text-[9px] sm:text-[10px] font-bold rounded shadow-brutal-sm border-[2px] border-gray-900"
 											>
 												{#if viewerContext.device?.type === 'mobile'} Mobile {:else} Desktop {/if}
 											</span>
 											<span
-												class="px-2 py-0.5 bg-[#ffc480] text-black text-[9px] sm:text-[10px] font-bold rounded shadow-[2px_2px_0_0_#1f2937] border-[2px] border-gray-900"
+												class="px-2 py-0.5 bg-brand-accent text-black text-[9px] sm:text-[10px] font-bold rounded shadow-brutal-sm border-[2px] border-gray-900"
 												>{viewerContext.geo?.country ||
 													CONTINENT_NAMES[viewerContext.geo?.continent] ||
 													'Earth'}</span
 											>
 											<span
-												class="px-2 py-0.5 bg-[#4ade80] text-black text-[9px] sm:text-[10px] font-bold rounded shadow-[2px_2px_0_0_#1f2937] border-[2px] border-gray-900"
+												class="px-2 py-0.5 bg-data-green text-black text-[9px] sm:text-[10px] font-bold rounded shadow-brutal-sm border-[2px] border-gray-900"
 												>{getTimeOfDay(viewerContext.time?.hour ?? 12)}</span
 											>
 										{/if}
@@ -685,15 +677,15 @@
 
 							<!-- Browser Frame -->
 							<div
-								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-[8px_8px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-0 sm:mt-10 md:mt-8"
+								class="rounded-xl border-[3px] border-gray-900 bg-white overflow-hidden shadow-brutal-2xl group-hover:-translate-y-2 transition-transform duration-500 flex flex-col mt-0 sm:mt-10 md:mt-8"
 							>
 								<div
 									class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 								>
 									<div class="px-4 flex gap-1.5 h-full items-center py-3">
-										<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#ffc480] border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-data-green border-[2px] border-gray-900" />
 									</div>
 									<div
 										class="flex-1 border-l-[3px] border-gray-900 bg-white px-4 py-2.5 font-mono text-[10px] sm:text-xs text-black font-bold flex items-center gap-2 truncate"
@@ -718,7 +710,7 @@
 									class="relative bg-gray-50 aspect-[1200/630] flex items-center justify-center p-2"
 								>
 									{#if smartLinkImageSrc}
-										<img
+										<img loading="lazy"
 											src={smartLinkImageSrc}
 											alt="Smart Link Preview"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/5 transition-opacity"
@@ -736,10 +728,10 @@
 									{/if}
 									{#if smartLinkLoading}
 										<div
-											class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm z-10 transition-opacity"
+											class="absolute inset-0 flex items-center justify-center bg-white/40 z-10 transition-opacity"
 										>
 											<div
-												class="px-4 py-2 bg-black text-[#4ade80] font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-[#4ade80] shadow-[4px_4px_0_0_#1f2937] animate-pulse"
+												class="px-4 py-2 bg-black text-data-green font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-data-green shadow-brutal-lg animate-pulse"
 											>
 												Computing...
 											</div>
@@ -755,7 +747,7 @@
 						class="lg:col-span-5 p-8 md:p-10 lg:p-12 flex flex-col justify-center relative z-20 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-gray-900 bg-white/30 order-1 lg:order-2"
 					>
 						<div
-							class="w-14 h-14 bg-[#f43f5e] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] mb-8 transform -rotate-3 group-hover:rotate-0 transition-transform"
+							class="w-14 h-14 bg-[#f43f5e] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg mb-8 transform -rotate-3 group-hover:rotate-0 transition-transform"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 								><path
@@ -783,7 +775,7 @@
 								>
 							</div>
 							<button
-								class="w-full sm:w-auto px-8 py-3.5 bg-black text-[#4ade80] text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-0.5 hover:translate-y-0.5 transition-all text-center inline-flex justify-center"
+								class="w-full sm:w-auto px-8 py-3.5 bg-black text-data-green text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all text-center inline-flex justify-center"
 								on:click={switchDemoContext}
 								disabled={smartLinkLoading}
 							>

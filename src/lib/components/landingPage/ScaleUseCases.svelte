@@ -11,7 +11,7 @@
 			status: 'GOLD',
 			points: '450',
 			nextReward: 'Free Ship',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			id: 'silver',
@@ -29,7 +29,7 @@
 			status: 'PLATINUM',
 			points: '890',
 			nextReward: '$50 Credit',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		}
 	];
 
@@ -68,7 +68,7 @@
 			rating: '4.8',
 			image:
 				'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			product: 'Adidas Ultra',
@@ -83,7 +83,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -91,25 +91,18 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
-			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#ffc480] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform rotate-2 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
-			>
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Dynamic Generation</span
-				>
-			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template. <br />
-				<span class="relative inline-block text-[#ff6b6b] transform -rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
 					Million Variations
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
@@ -122,7 +115,7 @@
 				.
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				OG images, social cards, product visuals, email headers — every team builds these
+				OG images, social cards, product visuals, email headers: every team builds these
 				eventually. We did it right so you don't have to.
 			</p>
 		</div>
@@ -131,7 +124,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-8">
 			<!-- Block 1: Social Automation (Spans 7 cols) -->
 			<div
-				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
+				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<!-- Subtle texture -->
 				<div
@@ -139,11 +132,11 @@
 				/>
 
 				<div
-					class="p-6 md:p-8 relative z-10 flex items-center justify-between border-b-[3px] border-gray-900 bg-[#7dd3fc]/50 backdrop-blur-sm"
+					class="p-6 md:p-8 relative z-10 flex items-center justify-between border-b-[3px] border-gray-900 bg-[#7dd3fc]/50"
 				>
 					<div class="flex items-center gap-4">
 						<div
-							class="w-12 h-12 md:w-14 md:h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-3 transition-transform"
+							class="w-12 h-12 md:w-14 md:h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:-rotate-3 transition-transform"
 						>
 							<svg
 								class="w-6 h-6 md:w-7 md:h-7 text-black"
@@ -272,10 +265,10 @@
 										: 'translate-x-3 md:translate-x-4 translate-y-4 md:translate-y-6'}
 
 								<div
-									class="absolute w-full h-full left-0 top-0 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden flex flex-col justify-end p-2.5 md:p-3 bg-black transition-all duration-300 hover:scale-[1.05] group-hover:shadow-[8px_8px_0_0_#1f2937] {rotate} {zIndex} {translateX} hover:!z-20 origin-bottom"
+									class="absolute w-full h-full left-0 top-0 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden flex flex-col justify-end p-2.5 md:p-3 bg-black transition-all duration-300 hover:scale-[1.05] group-hover:shadow-brutal-2xl {rotate} {zIndex} {translateX} hover:!z-20 origin-bottom"
 								>
 									<div class="absolute inset-0 pointer-events-none">
-										<img
+										<img loading="lazy"
 											src={variant.bgImg}
 											alt="abstract"
 											class="w-full h-full object-cover filter grayscale contrast-125 opacity-70"
@@ -297,7 +290,7 @@
 											{variant.title}
 										</h2>
 										<div class="flex items-center gap-1.5">
-											<img
+											<img loading="lazy"
 												src={variant.author.img}
 												alt="author"
 												class="w-4 h-4 md:w-5 md:h-5 bg-white border border-white shadow-[1px_1px_0_0_rgba(255,255,255,0.5)] rounded-none"
@@ -318,7 +311,7 @@
 
 			<!-- Block 2: Dynamic Retail (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-white rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
+				class="xl:col-span-5 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<div
 					class="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.15] pointer-events-none"
@@ -327,7 +320,7 @@
 				<div class="p-8 md:p-10 flex flex-col relative z-10 text-gray-900">
 					<div class="flex items-center gap-4">
 						<div
-							class="w-14 h-14 bg-[#ff6b6b] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-6 transition-transform"
+							class="w-14 h-14 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -347,7 +340,7 @@
 				<div class="flex-1 flex flex-col justify-end items-center gap-4 px-6 md:px-10 z-10 pb-10">
 					{#each retailVariations as variant, i}
 						<div
-							class="w-full bg-[#f8f9fa] rounded-[1rem] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4 flex items-center gap-2 relative overflow-hidden transition-all duration-300 group-hover:scale-[1.03] {i ===
+							class="w-full bg-[#f8f9fa] rounded-[1rem] border-[3px] border-gray-900 shadow-brutal-lg p-4 flex items-center gap-2 relative overflow-hidden transition-all duration-300 group-hover:scale-[1.03] {i ===
 							0
 								? '-rotate-1 group-hover:-translate-y-2 group-hover:-rotate-2'
 								: 'rotate-1 group-hover:-translate-y-1 group-hover:rotate-2'}"
@@ -372,7 +365,7 @@
 							<div
 								class="w-[100px] md:w-[130px] relative z-10 h-full flex flex-col justify-center items-center"
 							>
-								<img
+								<img loading="lazy"
 									src={variant.image}
 									alt="product"
 									class="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500"
@@ -385,7 +378,7 @@
 
 			<!-- Block 3: Email Personalization (Spans 12 cols, Split) -->
 			<div
-				class="xl:col-span-12 bg-[#4ade80] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group"
+				class="xl:col-span-12 bg-data-green rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Interactive Selector (Right via order, Left in DOM, 5 columns) -->
@@ -394,7 +387,7 @@
 					>
 						<div class="flex items-center gap-4 mb-6">
 							<div
-								class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] transform rotate-3 transition-transform group-hover:rotate-0"
+								class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg transform rotate-3 transition-transform group-hover:rotate-0"
 							>
 								<svg
 									class="w-7 h-7 text-black"
@@ -427,8 +420,8 @@
 								<button
 									class="flex items-center gap-4 px-5 py-3.5 rounded-xl border-[3px] border-gray-900 font-bold transition-all text-left w-full max-w-sm
 										{activeEmailTier === i
-										? 'bg-black text-white shadow-[4px_4px_0_0_#ffc480] translate-x-2'
-										: 'bg-white text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#1f2937]'}"
+										? 'bg-black text-white shadow-brutal-accent translate-x-2'
+										: 'bg-white text-gray-900 shadow-brutal-lg hover:-translate-y-0.5 hover:shadow-brutal-xl'}"
 									on:click={() => (activeEmailTier = i)}
 									on:keydown={(e) =>
 										(e.key === 'Enter' || e.key === ' ') && (() => (activeEmailTier = i))()}
@@ -436,7 +429,7 @@
 									<div class="w-4 h-4 rounded-full {tier.color} border-[2px] border-gray-900" />
 									<div class="flex-1 text-sm uppercase tracking-wider font-black">{tier.label}</div>
 									{#if activeEmailTier === i}
-										<div class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
+										<div class="w-2 h-2 rounded-full bg-data-green animate-pulse" />
 									{/if}
 								</button>
 							{/each}
@@ -453,13 +446,13 @@
 
 						<!-- Floating JSON Card -->
 						<div
-							class="absolute top-8 left-8 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-3 md:p-4 w-[200px] md:w-[240px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
+							class="absolute top-8 left-8 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 md:p-4 w-[200px] md:w-[240px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
 						>
 							<div
 								class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
 							>
 								<div
-									class="w-2 h-2 bg-[#4ade80] rounded-full border border-gray-900 animate-pulse"
+									class="w-2 h-2 bg-data-green rounded-full border border-gray-900 animate-pulse"
 								/>
 								Incoming payload
 							</div>
@@ -478,20 +471,20 @@
 
 						<!-- Output Render Card -->
 						<div
-							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-0 xl:ml-32"
+							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-0 xl:ml-32"
 						>
 							<div
 								class="h-8 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 justify-between"
 							>
 								<div class="flex flex-1 gap-1.5 h-full items-center">
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-[#ff6b6b] border-[1.5px] border-gray-900"
+										class="w-2.5 h-2.5 rounded-full bg-brand-danger border-[1.5px] border-gray-900"
 									/>
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-[#ffc480] border-[1.5px] border-gray-900"
+										class="w-2.5 h-2.5 rounded-full bg-brand-accent border-[1.5px] border-gray-900"
 									/>
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-[#4ade80] border-[1.5px] border-gray-900"
+										class="w-2.5 h-2.5 rounded-full bg-data-green border-[1.5px] border-gray-900"
 									/>
 								</div>
 								<div
@@ -502,7 +495,7 @@
 							</div>
 
 							<div
-								class="w-full bg-[#4ade80] relative flex flex-col items-center justify-center text-center p-8 overflow-hidden aspect-[4/3]"
+								class="w-full bg-data-green relative flex flex-col items-center justify-center text-center p-8 overflow-hidden aspect-[4/3]"
 							>
 								<div
 									class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/30 to-transparent"
@@ -536,7 +529,7 @@
 												>
 													Points
 												</div>
-												<div class="text-xl md:text-2xl font-black text-[#4ade80] leading-none">
+												<div class="text-xl md:text-2xl font-black text-data-green leading-none">
 													{emailTiers[activeEmailTier].points}
 												</div>
 											</div>

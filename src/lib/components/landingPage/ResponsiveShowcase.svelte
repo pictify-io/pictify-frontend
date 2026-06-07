@@ -10,32 +10,24 @@
 	let isHovering = false;
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-b-[3px] border-gray-900">
+<section class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-b-[3px] border-gray-900">
 	<!-- Background Pattern from Integrations/Experiments -->
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#3b82f6]/10 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-data-blue/10 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-16 max-w-3xl mx-auto relative">
-			<div
-				class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-1 hover:rotate-2 transition-transform cursor-default"
-			>
-				<span class="text-sm font-black text-gray-900 uppercase tracking-wider"
-					>Responsive Engine</span
-				>
-			</div>
-			
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template.<br />
-				<span class="relative inline-block text-[#3b82f6]">
+				<span class="relative inline-block text-data-blue">
 					Every Platform.
 					<svg
-						class="absolute w-full h-3 -bottom-1 left-0 text-[#3b82f6] opacity-30 z-[-1]"
+						class="absolute w-full h-3 -bottom-1 left-0 text-data-blue opacity-30 z-[-1]"
 						viewBox="0 0 100 10"
 						preserveAspectRatio="none"
 					>
@@ -44,7 +36,7 @@
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 font-medium">
-				Design once, generate images for Instagram, Twitter, LinkedIn, YouTube, and OG tags — all from a
+				Design once, generate images for Instagram, Twitter, LinkedIn, YouTube, and OG tags. All from a
 				single template with shared variables.
 			</p>
 		</div>
@@ -52,29 +44,29 @@
 		<!-- Main Split Pane Showcase -->
 		<div class="max-w-5xl mx-auto group relative mt-12 block">
 			<!-- Decorative offset background -->
-			<div class="absolute inset-0 bg-[#3b82f6] rounded-3xl border-[3px] border-gray-900 transform translate-x-3 translate-y-3 z-0 pointer-events-none transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300"></div>
+			<div class="absolute inset-0 bg-data-blue rounded-2xl border-[3px] border-gray-900 transform translate-x-3 translate-y-3 z-0 pointer-events-none transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300"></div>
 			
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div 
-				class="relative bg-white rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden z-10 flex flex-col transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300"
+				class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden z-10 flex flex-col transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300"
 				on:mouseenter={() => isHovering = true}
 				on:mouseleave={() => isHovering = false}
 			>
 				
 				<!-- Mac Header -->
-				<div class="bg-[#ffc480] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between z-20">
+				<div class="bg-brand-accent px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between z-20">
 					<div class="flex gap-2">
-						<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-[2px] border-gray-900"></div>
-						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-[2px] border-gray-900"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-data-green border-[2px] border-gray-900"></div>
 					</div>
-					<div class="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-md border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+					<div class="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-md border-[2px] border-gray-900 shadow-brutal-sm">
 						<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
 						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Auto-Resize API</span>
 					</div>
 				</div>
 
-				<div class="flex flex-col lg:flex-row lg:items-stretch bg-[#FFFDF8]">
+				<div class="flex flex-col lg:flex-row lg:items-stretch bg-brand-bg">
 					<!-- Left: Visual Illustration -->
 					<div class="w-full lg:w-[55%] min-h-[350px] lg:min-h-[400px] flex items-center justify-center border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-gray-900 relative overflow-hidden">
 						
@@ -93,7 +85,7 @@
 						<!-- Center Data Node -->
 						<div class="absolute z-30 flex flex-col items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 							<div class="w-20 h-20 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#ff6b6b] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[8px_8px_0_0_#ff6b6b] transition-all duration-300 relative">
-								<div class="absolute -top-3 -right-3 w-8 h-8 bg-[#ffc480] border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#1f2937] z-10">
+								<div class="absolute -top-3 -right-3 w-8 h-8 bg-brand-accent border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-brutal-sm z-10">
 									<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 								</div>
 								<span class="font-black text-3xl text-gray-900">{`{}`}</span>
@@ -115,7 +107,7 @@
 								"
 							>
 								<div 
-									class="bg-white border-[3px] border-gray-900 p-2 rounded-xl shadow-[4px_4px_0_0_#1f2937] group-hover/card:scale-110 group-hover/card:z-40 transition-all duration-300 w-28 md:w-32 flex flex-col gap-1.5"
+									class="bg-white border-[3px] border-gray-900 p-2 rounded-xl shadow-brutal-lg group-hover/card:scale-110 group-hover/card:z-40 transition-all duration-300 w-28 md:w-32 flex flex-col gap-1.5"
 									style="transform: rotate({platform.rotation}deg);"
 								>
 									<!-- Mock Image Header -->
@@ -135,12 +127,12 @@
 					<!-- Right: Code Info -->
 					<div class="w-full lg:w-[45%] flex flex-col relative bg-white p-8 lg:p-10 justify-center group/rightpane">
 						<div class="mb-6">
-							<div class="inline-block px-3 py-1 bg-[#3b82f6] text-white font-black text-[10px] uppercase tracking-widest border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded mb-4 transform -rotate-2">
+							<div class="inline-block px-3 py-1 bg-data-blue text-white font-black text-[10px] uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm rounded mb-4 transform -rotate-2">
 								Multi-Format Output
 							</div>
 							<h3 class="text-3xl font-black text-gray-900 mb-3 leading-tight">Generate All Sizes At Once</h3>
 							<p class="text-sm font-medium text-gray-600 leading-relaxed max-w-sm">
-								Send a single API request with an array of <span class="text-gray-900 font-bold bg-[#ffc480] px-1 border border-gray-900 rounded">layouts</span> and receive optimized images formatted for every social channel instantly.
+								Send a single API request with an array of <span class="text-gray-900 font-bold bg-brand-accent px-1 border border-gray-900 rounded">layouts</span> and receive optimized images formatted for every social channel instantly.
 							</p>
 						</div>
 
@@ -152,19 +144,19 @@
 							</div>
 							
 							<!-- The Code Block -->
-							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-[#4ade80] relative">
+							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-data-green relative">
 								<!-- Top Mac Dots inside code editor -->
 								<div class="flex gap-1.5 mb-3 border-b border-gray-700 pb-3">
-									<div class="w-2.5 h-2.5 rounded-full bg-[#ff6b6b]"></div>
-									<div class="w-2.5 h-2.5 rounded-full bg-[#ffc480]"></div>
-									<div class="w-2.5 h-2.5 rounded-full bg-[#4ade80]"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-brand-danger"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-brand-accent"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-data-green"></div>
 								</div>
 								<div class="space-y-1.5 overflow-x-auto whitespace-nowrap pb-2">
 									<div class="text-gray-500">// Request multiple sizes!</div>
 									<div><span class="text-white">POST</span> https://api.pictify.io/v1/render</div>
 									<div class="mt-2 text-white">{`{`}</div>
 									<div class="pl-4 text-[#93c5fd]">"template_id": "tp_12345",</div>
-									<div class="pl-4 pb-1"><span class="text-[#ffc480]">"layouts": ["ig", "x", "og"],</span></div>
+									<div class="pl-4 pb-1"><span class="text-brand-accent">"layouts": ["ig", "x", "og"],</span></div>
 									<div class="pl-4 text-[#93c5fd]">"data": {`{`}</div>
 									<div class="pl-8 text-white">"title": "Launch Day 🚀",</div>
 									<div class="pl-8 text-white">"author": "Suyash"</div>

@@ -135,9 +135,9 @@
 	<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 sm:mb-12 pt-4">
 		<div>
 			<div
-				class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#c4b5fd] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-1 mb-6"
+				class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#c4b5fd] border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-1 mb-6"
 			>
-				<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-black" />
+				<span class="w-2 h-2 bg-data-green rounded-full border border-black" />
 				<span class="text-xs font-black text-black uppercase tracking-widest">Analytics</span>
 			</div>
 			<h1
@@ -157,8 +157,8 @@
 					on:click={() => changeRange(range)}
 					class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] transition-all duration-200
 						{timeRange === range
-						? 'bg-black text-white border-black shadow-[4px_4px_0_0_#ffc480]'
-						: 'bg-white text-black border-black hover:shadow-[3px_3px_0_0_black] hover:-translate-y-0.5'}"
+						? 'bg-black text-white border-black shadow-brutal-accent'
+						: 'bg-white text-black border-black hover:shadow-brutal-md hover:-translate-y-0.5'}"
 				>
 					{range === '7d' ? 'Week' : range === '30d' ? 'Month' : 'Quarter'}
 				</button>
@@ -180,7 +180,7 @@
 		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
 			<!-- Period Views -->
 			<div
-				class="bg-[#ffc480] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-brand-accent rounded-2xl border-[3px] border-black shadow-brutal-xl p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -right-8 -top-8 w-28 h-28 bg-white/20 rounded-full blur-2xl group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-700"
@@ -200,7 +200,7 @@
 
 			<!-- Bandwidth -->
 			<div
-				class="bg-[#c4b5fd] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-[#c4b5fd] rounded-2xl border-[3px] border-black shadow-brutal-xl p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -left-6 -bottom-6 w-24 h-24 bg-black/5 transform rotate-12 group-hover:rotate-45 transition-transform duration-700"
@@ -220,7 +220,7 @@
 
 			<!-- Unique Visitors -->
 			<div
-				class="bg-[#4ade80] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-data-green rounded-2xl border-[3px] border-black shadow-brutal-xl p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/30 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"
@@ -237,7 +237,7 @@
 
 			<!-- Total Assets -->
 			<div
-				class="bg-[#ff6b6b] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-brand-danger rounded-2xl border-[3px] border-black shadow-brutal-xl p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -left-10 -top-10 w-32 h-32 bg-white/20 rounded-full blur-xl group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700"
@@ -255,7 +255,7 @@
 
 		<!-- Chart Section -->
 		<div
-			class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden mb-10"
+			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden mb-10"
 		>
 			<!-- Chart Header -->
 			<div
@@ -263,13 +263,13 @@
 			>
 				<div class="flex items-center gap-3">
 					<div
-						class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-black shadow-[1px_1px_0_0_black]"
+						class="w-3 h-3 rounded-full bg-brand-danger border border-black shadow-[1px_1px_0_0_#1f2937]"
 					/>
 					<div
-						class="w-3 h-3 rounded-full bg-[#ffc480] border border-black shadow-[1px_1px_0_0_black]"
+						class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_#1f2937]"
 					/>
 					<div
-						class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_black]"
+						class="w-3 h-3 rounded-full bg-data-green border border-black shadow-[1px_1px_0_0_#1f2937]"
 					/>
 					<div class="ml-2">
 						<span class="text-sm font-black text-black uppercase tracking-widest"
@@ -288,14 +288,14 @@
 						class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
 							{chartMode === 'views'
 							? 'bg-black text-white border-black shadow-[2px_2px_0_0_#c4b5fd]'
-							: 'bg-white text-black border-black hover:shadow-[2px_2px_0_0_black]'}">Views</button
+							: 'bg-white text-black border-black hover:shadow-brutal-sm'}">Views</button
 					>
 					<button
 						on:click={() => (chartMode = 'bandwidth')}
 						class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
 							{chartMode === 'bandwidth'
 							? 'bg-black text-white border-black shadow-[2px_2px_0_0_#c4b5fd]'
-							: 'bg-white text-black border-black hover:shadow-[2px_2px_0_0_black]'}"
+							: 'bg-white text-black border-black hover:shadow-brutal-sm'}"
 						>Bandwidth</button
 					>
 				</div>
@@ -320,7 +320,7 @@
 									>
 										{#if tick !== 0}
 											<div
-												class="absolute -top-[10px] right-0 translate-x-4 sm:translate-x-6 bg-white px-2 py-0.5 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_black] rounded-md"
+												class="absolute -top-[10px] right-0 translate-x-4 sm:translate-x-6 bg-white px-2 py-0.5 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider border-[2px] border-black shadow-brutal-sm rounded-md"
 											>
 												{chartMode === 'views'
 													? formatNumber(currentMax * tick)
@@ -364,8 +364,8 @@
 										<div
 											class="w-full border-[2px] border-b-0 border-black rounded-t-sm transition-all duration-300 group-hover:-translate-y-1 relative overflow-hidden
 											{chartMode === 'views'
-												? 'bg-[#c4b5fd] group-hover:bg-[#a78bfa]'
-												: 'bg-[#ffc480] group-hover:bg-[#f59e0b]'}"
+												? 'bg-[#c4b5fd] group-hover:bg-data-violet'
+												: 'bg-brand-accent group-hover:bg-data-amber'}"
 											style="height: {Math.max(
 												((chartMode === 'views' ? stat.hits : stat.bytes) / currentMax) * 100,
 												1
@@ -384,19 +384,19 @@
 						<!-- X-Axis Labels -->
 						<div class="flex justify-between items-center mt-3 z-10 px-1 pr-12 sm:pr-16">
 							<div
-								class="bg-white rounded-md border-[2px] border-black shadow-[2px_2px_0_0_black] px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
+								class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
 							>
 								{formatDate(filteredDailyStats[0].date)}
 							</div>
 							{#if filteredDailyStats.length > 2}
 								<div
-									class="bg-white rounded-md border-[2px] border-black shadow-[2px_2px_0_0_black] px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
+									class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
 								>
 									{formatDate(filteredDailyStats[Math.floor(filteredDailyStats.length / 2)].date)}
 								</div>
 							{/if}
 							<div
-								class="bg-white rounded-md border-[2px] border-black shadow-[2px_2px_0_0_black] px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
+								class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
 							>
 								{formatDate(filteredDailyStats[filteredDailyStats.length - 1].date)}
 							</div>
@@ -404,10 +404,10 @@
 					{/if}
 				{:else}
 					<div
-						class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50 backdrop-blur-sm"
+						class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50"
 					>
 						<div
-							class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-[4px_4px_0_0_black] rotate-3"
+							class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-brutal-lg rotate-3"
 						>
 							<svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -433,12 +433,12 @@
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 mb-10">
 			<!-- Top Referrers -->
 			<div
-				class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden"
 			>
 				<div class="flex items-center justify-between p-5 border-b-[3px] border-black bg-gray-50">
 					<div class="flex items-center gap-3">
 						<div
-							class="w-7 h-7 rounded-lg bg-[#ffc480] border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+							class="w-7 h-7 rounded-lg bg-brand-accent border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-black"
@@ -461,7 +461,7 @@
 					{#if topReferrers.length > 10}
 						<button
 							on:click={() => (expandedReferrers = !expandedReferrers)}
-							class="text-[10px] font-black text-[#ff6b6b] uppercase tracking-wider"
+							class="text-[10px] font-black text-brand-danger uppercase tracking-wider"
 						>
 							{expandedReferrers ? 'Show less' : 'Show all'}
 						</button>
@@ -479,13 +479,13 @@
 											>{ref.referrer || 'Direct'}</span
 										>
 										<span
-											class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black] text-[10px] ml-2 flex-shrink-0"
+											class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937] text-[10px] ml-2 flex-shrink-0"
 											>{formatNumber(ref.hits)}</span
 										>
 									</div>
 									<div class="w-full bg-gray-200 rounded-full h-1.5 border border-gray-300">
 										<div
-											class="bg-[#ffc480] h-full rounded-full border-r border-black/20 transition-all duration-500"
+											class="bg-brand-accent h-full rounded-full border-r border-black/20 transition-all duration-500"
 											style="width: {getPercentage(ref.hits, topReferrers[0]?.hits)}%"
 										/>
 									</div>
@@ -502,12 +502,12 @@
 
 			<!-- Top Countries -->
 			<div
-				class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden"
 			>
 				<div class="flex items-center justify-between p-5 border-b-[3px] border-black bg-gray-50">
 					<div class="flex items-center gap-3">
 						<div
-							class="w-7 h-7 rounded-lg bg-[#4ade80] border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+							class="w-7 h-7 rounded-lg bg-data-green border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-black"
@@ -530,7 +530,7 @@
 					{#if topCountries.length > 10}
 						<button
 							on:click={() => (expandedCountries = !expandedCountries)}
-							class="text-[10px] font-black text-[#ff6b6b] uppercase tracking-wider"
+							class="text-[10px] font-black text-brand-danger uppercase tracking-wider"
 						>
 							{expandedCountries ? 'Show less' : 'Show all'}
 						</button>
@@ -548,13 +548,13 @@
 											>{country.country}</span
 										>
 										<span
-											class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black] text-[10px] ml-2 flex-shrink-0"
+											class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937] text-[10px] ml-2 flex-shrink-0"
 											>{formatNumber(country.hits)}</span
 										>
 									</div>
 									<div class="w-full bg-gray-200 rounded-full h-1.5 border border-gray-300">
 										<div
-											class="bg-[#4ade80] h-full rounded-full border-r border-black/20 transition-all duration-500"
+											class="bg-data-green h-full rounded-full border-r border-black/20 transition-all duration-500"
 											style="width: {getPercentage(country.hits, topCountries[0]?.hits)}%"
 										/>
 									</div>
@@ -571,11 +571,11 @@
 
 			<!-- Status Code Breakdown -->
 			<div
-				class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden"
 			>
 				<div class="flex items-center gap-3 p-5 border-b-[3px] border-black bg-gray-50">
 					<div
-						class="w-7 h-7 rounded-lg bg-[#c4b5fd] border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+						class="w-7 h-7 rounded-lg bg-[#c4b5fd] border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
 					>
 						<svg
 							class="w-3.5 h-3.5 text-black"
@@ -599,11 +599,11 @@
 					{#if totalStatusHits > 0}
 						<!-- Visual Bar -->
 						<div
-							class="flex rounded-xl overflow-hidden h-8 border-[3px] border-black shadow-[3px_3px_0_0_black] mb-6"
+							class="flex rounded-xl overflow-hidden h-8 border-[3px] border-black shadow-brutal-md mb-6"
 						>
 							{#if statusCodes._200 > 0}
 								<div
-									class="bg-[#4ade80] flex items-center justify-center transition-all duration-500"
+									class="bg-data-green flex items-center justify-center transition-all duration-500"
 									style="width: {getPercentage(statusCodes._200, totalStatusHits)}%"
 								>
 									{#if getPercentage(statusCodes._200, totalStatusHits) > 15}
@@ -613,7 +613,7 @@
 							{/if}
 							{#if statusCodes._304 > 0}
 								<div
-									class="bg-[#ffc480] flex items-center justify-center transition-all duration-500"
+									class="bg-brand-accent flex items-center justify-center transition-all duration-500"
 									style="width: {getPercentage(statusCodes._304, totalStatusHits)}%"
 								>
 									{#if getPercentage(statusCodes._304, totalStatusHits) > 15}
@@ -623,7 +623,7 @@
 							{/if}
 							{#if statusCodes._other > 0}
 								<div
-									class="bg-[#ff6b6b] flex items-center justify-center transition-all duration-500"
+									class="bg-brand-danger flex items-center justify-center transition-all duration-500"
 									style="width: {getPercentage(statusCodes._other, totalStatusHits)}%"
 								>
 									{#if getPercentage(statusCodes._other, totalStatusHits) > 15}
@@ -637,7 +637,7 @@
 						<div class="space-y-3">
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="w-4 h-4 bg-[#4ade80] rounded border-[2px] border-black" />
+									<div class="w-4 h-4 bg-data-green rounded border-[2px] border-black" />
 									<span class="text-xs font-black text-black uppercase tracking-wider">200 OK</span>
 								</div>
 								<div class="flex items-center gap-2">
@@ -645,14 +645,14 @@
 										>{getPercentage(statusCodes._200, totalStatusHits)}%</span
 									>
 									<span
-										class="text-xs font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black]"
+										class="text-xs font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937]"
 										>{formatNumber(statusCodes._200)}</span
 									>
 								</div>
 							</div>
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="w-4 h-4 bg-[#ffc480] rounded border-[2px] border-black" />
+									<div class="w-4 h-4 bg-brand-accent rounded border-[2px] border-black" />
 									<span class="text-xs font-black text-black uppercase tracking-wider"
 										>304 Cached</span
 									>
@@ -662,14 +662,14 @@
 										>{getPercentage(statusCodes._304, totalStatusHits)}%</span
 									>
 									<span
-										class="text-xs font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black]"
+										class="text-xs font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937]"
 										>{formatNumber(statusCodes._304)}</span
 									>
 								</div>
 							</div>
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="w-4 h-4 bg-[#ff6b6b] rounded border-[2px] border-black" />
+									<div class="w-4 h-4 bg-brand-danger rounded border-[2px] border-black" />
 									<span class="text-xs font-black text-black uppercase tracking-wider">Other</span>
 								</div>
 								<div class="flex items-center gap-2">
@@ -677,7 +677,7 @@
 										>{getPercentage(statusCodes._other, totalStatusHits)}%</span
 									>
 									<span
-										class="text-xs font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black]"
+										class="text-xs font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937]"
 										>{formatNumber(statusCodes._other)}</span
 									>
 								</div>
@@ -690,7 +690,7 @@
 								statusCodes._200 + statusCodes._304,
 								totalStatusHits
 							)}
-							<div class="mt-6 p-4 bg-[#4ade80]/10 rounded-xl border-[2px] border-[#4ade80]">
+							<div class="mt-6 p-4 bg-data-green/10 rounded-xl border-[2px] border-data-green">
 								<div class="text-[10px] font-black text-black/60 uppercase tracking-widest mb-1">
 									Success Rate
 								</div>
@@ -708,7 +708,7 @@
 
 		<!-- Asset-Level Breakdown Table -->
 		<div
-			class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden"
 		>
 			<!-- Table Header -->
 			<div
@@ -716,7 +716,7 @@
 			>
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 rounded-xl bg-[#ffc480] border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+						class="w-8 h-8 rounded-xl bg-brand-accent border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
 					>
 						<svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -746,8 +746,8 @@
 							on:click={() => changeSort(opt.key)}
 							class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
 								{sortBy === opt.key
-								? 'bg-black text-white border-black shadow-[2px_2px_0_0_#ffc480]'
-								: 'bg-white text-black border-black hover:shadow-[2px_2px_0_0_black]'}"
+								? 'bg-black text-white border-black shadow-brutal-accent-sm'
+								: 'bg-white text-black border-black hover:shadow-brutal-sm'}"
 							>{opt.label}</button
 						>
 					{/each}
@@ -759,7 +759,7 @@
 				{#if assets.length > 0}
 					{#each assets as asset, i}
 						<div
-							class="flex items-center gap-4 p-4 md:p-5 hover:bg-[#ffc480]/10 transition-colors group"
+							class="flex items-center gap-4 p-4 md:p-5 hover:bg-brand-accent/10 transition-colors group"
 						>
 							<!-- Rank -->
 							<div class="w-6 font-black text-gray-400 text-sm text-center flex-shrink-0">
@@ -770,13 +770,13 @@
 							<div class="flex items-center gap-3 flex-1 min-w-0">
 								{#if asset.templateThumbnail}
 									<div
-										class="w-10 h-10 rounded-lg border-[2px] border-black overflow-hidden flex-shrink-0 shadow-[2px_2px_0_0_black] group-hover:shadow-[3px_3px_0_0_black] transition-all"
+										class="w-10 h-10 rounded-lg border-[2px] border-black overflow-hidden flex-shrink-0 shadow-brutal-sm group-hover:shadow-brutal-md transition-all"
 									>
-										<img src={asset.templateThumbnail} alt="" class="w-full h-full object-cover" />
+										<img loading="lazy" src={asset.templateThumbnail} alt="" class="w-full h-full object-cover" />
 									</div>
 								{:else}
 									<div
-										class="w-10 h-10 rounded-lg border-[2px] border-black flex items-center justify-center bg-gray-50 flex-shrink-0 shadow-[2px_2px_0_0_black]"
+										class="w-10 h-10 rounded-lg border-[2px] border-black flex items-center justify-center bg-gray-50 flex-shrink-0 shadow-brutal-sm"
 									>
 										<svg
 											class="w-5 h-5 text-gray-400"
@@ -797,12 +797,12 @@
 									{#if asset.templateName}
 										<a
 											href="/dashboard/template/{asset.templateUid}"
-											class="text-sm font-black text-black truncate block hover:text-[#ff6b6b] transition-colors"
+											class="text-sm font-black text-black truncate block hover:text-brand-danger transition-colors"
 											>{asset.templateName}</a
 										>
 									{/if}
 									<p
-										class="text-[10px] font-bold text-gray-400 truncate max-w-[200px] sm:max-w-[300px]"
+										class="text-[10px] font-bold text-gray-600 truncate max-w-[200px] sm:max-w-[300px]"
 									>
 										{getAssetFilename(asset.assetKey)}
 									</p>
@@ -812,7 +812,7 @@
 							<!-- Period Views -->
 							<div class="text-right flex-shrink-0 hidden sm:block">
 								<div class="text-sm font-black text-black">{formatNumber(asset.periodHits)}</div>
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									views
 								</div>
 							</div>
@@ -820,7 +820,7 @@
 							<!-- Period Bandwidth -->
 							<div class="text-right flex-shrink-0 hidden md:block">
 								<div class="text-sm font-black text-black">{formatBytes(asset.periodBytes)}</div>
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									bandwidth
 								</div>
 							</div>
@@ -828,14 +828,14 @@
 							<!-- All-time Views -->
 							<div class="text-right flex-shrink-0 hidden lg:block">
 								<div class="text-sm font-black text-gray-600">{formatNumber(asset.totalHits)}</div>
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									all time
 								</div>
 							</div>
 
 							<!-- Last Seen -->
 							<div class="text-right flex-shrink-0 hidden lg:block w-20">
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									{timeAgo(asset.lastSeen)}
 								</div>
 							</div>
@@ -843,7 +843,7 @@
 							<!-- Mobile summary -->
 							<div class="text-right flex-shrink-0 sm:hidden">
 								<div class="text-sm font-black text-black">{formatNumber(asset.periodHits)}</div>
-								<div class="text-[10px] font-bold text-gray-400">
+								<div class="text-[10px] font-bold text-gray-600">
 									{formatBytes(asset.periodBytes)}
 								</div>
 							</div>
@@ -889,7 +889,7 @@
 							class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[2px] border-black transition-all duration-200
 								{currentPage === 1
 								? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-								: 'bg-white text-black hover:shadow-[2px_2px_0_0_black] hover:-translate-y-0.5'}"
+								: 'bg-white text-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
 						>
 							Prev
 						</button>
@@ -903,8 +903,8 @@
 								on:click={() => goToPage(pageNum)}
 								class="w-8 h-8 text-[10px] font-black uppercase rounded-lg border-[2px] border-black transition-all duration-200
 									{pageNum === currentPage
-									? 'bg-black text-white shadow-[2px_2px_0_0_#ffc480]'
-									: 'bg-white text-black hover:shadow-[2px_2px_0_0_black]'}">{pageNum}</button
+									? 'bg-black text-white shadow-brutal-accent-sm'
+									: 'bg-white text-black hover:shadow-brutal-sm'}">{pageNum}</button
 							>
 						{/each}
 						<button
@@ -913,7 +913,7 @@
 							class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[2px] border-black transition-all duration-200
 								{currentPage === pagination.totalPages
 								? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-								: 'bg-white text-black hover:shadow-[2px_2px_0_0_black] hover:-translate-y-0.5'}"
+								: 'bg-white text-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
 						>
 							Next
 						</button>

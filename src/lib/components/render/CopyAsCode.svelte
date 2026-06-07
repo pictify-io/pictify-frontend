@@ -51,7 +51,7 @@
 			iconPath: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
 			generate: () => {
 				const url = sanitizeForHtml(getUrlRenderUrl());
-				return `<img src="${url}" alt="Generated image" />`;
+				return `<img loading="lazy" src="${url}" alt="Generated image" />`;
 			}
 		},
 		{
@@ -130,7 +130,7 @@
 	<button
 		on:click|stopPropagation={toggleDropdown}
 		class="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-900 text-gray-900 font-bold text-sm
-			shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]
+			shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]
 			transition-all duration-150 active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
 	>
 		<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -144,12 +144,12 @@
 
 	{#if isOpen}
 		<div
-			class="absolute right-0 mt-2 w-56 bg-white border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] z-50"
+			class="absolute right-0 mt-2 w-56 bg-white border-2 border-gray-900 shadow-brutal-lg z-50"
 		>
 			{#each snippetFormats as fmt}
 				<button
 					on:click|stopPropagation={() => copySnippet(fmt)}
-					class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-[#ffc480]/20 border-b border-gray-200 last:border-b-0 transition-colors"
+					class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-brand-accent/20 border-b border-gray-200 last:border-b-0 transition-colors"
 				>
 					<svg class="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={fmt.iconPath} />

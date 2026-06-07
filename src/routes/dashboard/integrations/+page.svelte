@@ -10,7 +10,7 @@
 			iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
 			category: 'Core',
 			href: '/dashboard/integrations/webhooks',
-			bgColor: 'bg-[#ffc480]'
+			bgColor: 'bg-brand-accent'
 		},
 		{
 			id: 'storage',
@@ -21,7 +21,7 @@
 				'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
 			category: 'Core',
 			href: '/dashboard/integrations/storage',
-			bgColor: 'bg-[#4ade80]'
+			bgColor: 'bg-data-green'
 		},
 		{
 			id: 'zapier',
@@ -32,7 +32,7 @@
 			url: 'https://zapier.com/apps/pictify',
 			external: true,
 			comingSoon: true,
-			bgColor: 'bg-[#ff6b6b]'
+			bgColor: 'bg-brand-danger'
 		},
 		{
 			id: 'make',
@@ -44,7 +44,7 @@
 			url: 'https://make.com/en/integrations/pictify',
 			external: true,
 			comingSoon: true,
-			bgColor: 'bg-[#a78bfa]'
+			bgColor: 'bg-data-violet'
 		},
 		{
 			id: 'n8n',
@@ -67,7 +67,7 @@
 			url: 'https://pipedream.com/apps/pictify',
 			external: true,
 			comingSoon: true,
-			bgColor: 'bg-[#60a5fa]'
+			bgColor: 'bg-data-sky'
 		}
 	];
 
@@ -87,7 +87,7 @@
 			<div
 				class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 			>
-				<span class="w-2 h-2 bg-[#ffc480] rounded-full" />
+				<span class="w-2 h-2 bg-brand-accent rounded-full" />
 				Directory
 			</div>
 
@@ -119,9 +119,9 @@
 				<button
 					disabled={item.comingSoon}
 					on:click={() => handleCardClick(item)}
-					class="group text-left h-full relative bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 flex flex-col {item.comingSoon
+					class="group text-left h-full relative bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-brutal-xl transition-all duration-200 flex flex-col {item.comingSoon
 						? 'opacity-75 cursor-not-allowed'
-						: 'hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px]'}"
+						: 'hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px]'}"
 				>
 					<!-- Icon Badge -->
 					<div class="mb-6 flex justify-between items-start w-full">
@@ -166,7 +166,7 @@
 					<!-- Text -->
 					<div class="flex-grow">
 						<h3
-							class="text-xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors"
+							class="text-xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
 						>
 							{item.name}
 						</h3>
@@ -205,7 +205,7 @@
 			<p class="text-gray-500 font-bold mb-4">Don't see the tool you use?</p>
 			<a
 				href="mailto:support@pictify.io?subject=Integration Request"
-				class="inline-flex items-center gap-2 text-sm font-black text-gray-900 border-b-2 border-gray-900 hover:text-[#ff6b6b] hover:border-[#ff6b6b] transition-colors pb-0.5"
+				class="inline-flex items-center gap-2 text-sm font-black text-gray-900 border-b-2 border-gray-900 hover:text-brand-danger hover:border-brand-danger transition-colors pb-0.5"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 					><path

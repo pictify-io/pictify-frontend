@@ -110,9 +110,7 @@
 			question: 'What happens if I exceed the monthly limit?',
 			answer: `All paid plans can enable <strong>overage billing</strong> to keep rendering beyond their limit. Basic: ${formatOverageRate(
 				PLANS.BASIC
-			)}/render, Pro: ${formatOverageRate(
-				PLANS.STANDARD
-			)}/render, Business: ${formatOverageRate(
+			)}/render, Pro: ${formatOverageRate(PLANS.STANDARD)}/render, Business: ${formatOverageRate(
 				PLANS.BUSINESS
 			)}/render. Set a monthly spending cap to control costs. Free tier users need to upgrade to continue.`,
 			isOpened: false
@@ -391,7 +389,7 @@
 	<meta name="twitter:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
 </svelte:head>
 
-<section class="bg-[#FFFDF8] min-h-screen overflow-x-hidden">
+<section class="bg-brand-bg min-h-screen overflow-x-hidden">
 	<Nav />
 	<main class="relative z-10">
 		<div class="relative py-24 lg:py-32">
@@ -407,9 +405,9 @@
 				>
 					<!-- Pill Badge -->
 					<div
-						class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-4 transform -rotate-1 hover:rotate-0 transition-transform"
+						class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-4 transform -rotate-1 hover:rotate-0 transition-transform"
 					>
-						<span class="w-2.5 h-2.5 bg-[#ff6b6b] rounded-full animate-pulse" />
+						<span class="w-2.5 h-2.5 bg-brand-danger rounded-full animate-pulse" />
 						<span class="text-xs font-black text-gray-900 uppercase tracking-widest"
 							>No Hidden Fees</span
 						>
@@ -419,7 +417,7 @@
 						class="text-5xl md:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
 					>
 						Simple, transparent <br />
-						<span class="relative inline-block text-[#ff6b6b] mt-1">
+						<span class="relative inline-block text-brand-danger mt-1">
 							Pricing
 							<svg
 								class="absolute w-[105%] h-6 -bottom-2 -left-[2.5%] text-gray-900 opacity-100"
@@ -438,7 +436,7 @@
 						high-performance infrastructure, and
 						<span class="relative inline-block px-2 mx-1">
 							<span
-								class="absolute inset-0 bg-[#4ade80]/30 -skew-y-2 rounded-lg border-2 border-transparent"
+								class="absolute inset-0 bg-data-green/30 -skew-y-2 rounded-lg border-2 border-transparent"
 							/>
 							<span class="relative text-gray-900">scale as you grow.</span>
 						</span>
@@ -446,11 +444,11 @@
 
 					<!-- Chunky Billing Toggle -->
 					<div
-						class="mt-10 relative inline-flex p-2 bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]"
+						class="mt-10 relative inline-flex p-2 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl"
 					>
 						<div class="absolute -top-4 -right-4 z-20">
 							<span
-								class="px-3 py-1.5 bg-[#ff6b6b] text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
+								class="px-3 py-1.5 bg-brand-danger text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-brutal-sm rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
 							>
 								Save 20%
 							</span>
@@ -458,7 +456,7 @@
 
 						<button
 							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
-								? 'bg-[#ffc480] text-gray-900 shadow-sm border-2 border-gray-900'
+								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = false)}
 						>
@@ -466,7 +464,7 @@
 						</button>
 						<button
 							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
-								? 'bg-[#ffc480] text-gray-900 shadow-sm border-2 border-gray-900'
+								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = true)}
 						>
@@ -492,7 +490,7 @@
 					<p class="text-base font-bold text-gray-500">
 						Just exploring? Start with our <button
 							on:click={() => selectPlanHandler(PLANS.STARTER)}
-							class="text-[#ff6b6b] underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black"
+							class="text-brand-danger underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black"
 							>Free plan — 50 renders/mo</button
 						>. No credit card needed.
 					</p>
@@ -510,12 +508,12 @@
 						<div
 							class="relative flex flex-col p-6 h-full bg-white rounded-2xl border-[3px] border-gray-900 transition-all duration-300
 							{isPopular
-								? 'shadow-[12px_12px_0_0_#1f2937] lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-[#FFFDF8]'
-								: 'shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-1'}"
+								? 'shadow-brutal-3xl lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-brand-bg'
+								: 'shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1'}"
 						>
 							{#if isPopular}
 								<div
-									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] whitespace-nowrap z-30"
+									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-brutal-md whitespace-nowrap z-30"
 								>
 									Most Popular
 								</div>
@@ -558,7 +556,7 @@
 									{@const annualCost = PLAN_PRICING[planId].annual}
 									{@const yearlySavings = (monthlyCost - annualCost) * 12}
 									<div
-										class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-[#10b981]/10 text-[#10b981] text-xs font-bold rounded-md border border-[#10b981]/30"
+										class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-brand-success/10 text-brand-success text-xs font-bold rounded-md border border-brand-success/30"
 									>
 										<svg
 											class="w-3.5 h-3.5"
@@ -628,7 +626,7 @@
 								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_BACKGROUND_REMOVER]}
 									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
 										<div
-											class="w-6 h-6 rounded bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+											class="w-6 h-6 rounded bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 										>
 											<svg
 												class="w-3.5 h-3.5 text-gray-900"
@@ -696,7 +694,7 @@
 								{#if PLAN_FEATURES[planId]?.[FEATURES.SSO_SAML]}
 									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
 										<div
-											class="w-6 h-6 rounded bg-[#ff6b6b]/20 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+											class="w-6 h-6 rounded bg-brand-danger/20 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 										>
 											<svg
 												class="w-3.5 h-3.5 text-gray-900"
@@ -720,8 +718,8 @@
 							<button
 								class="w-full py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
 								{isPopular
-									? 'bg-[#ffc480] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'
-									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'}"
+									? 'bg-brand-accent text-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
+									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'}"
 								on:click={() => selectPlanHandler(planId)}
 							>
 								Get Started
@@ -747,7 +745,7 @@
 					</div>
 
 					<div
-						class="overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-[8px_8px_0_0_#1f2937]"
+						class="overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-2xl"
 					>
 						<div class="overflow-x-auto">
 							<table class="w-full min-w-[1000px] border-collapse">
@@ -762,7 +760,7 @@
 											{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
 											<th
 												class="p-6 text-center border-b-[3px] border-r-[3px] last:border-r-0 border-gray-900 {isPopular
-													? 'bg-[#ffc480]/10'
+													? 'bg-brand-accent/10'
 													: 'bg-white'}"
 											>
 												<span class="font-black text-lg text-gray-900 block uppercase tracking-wide"
@@ -771,7 +769,7 @@
 												<span class="text-sm font-bold text-gray-500 mt-1 block">
 													{getPlanPrice(planId, showAnnual)}/mo
 													{#if showAnnual && PLAN_PRICING[planId]?.monthly > 0}
-														<span class="text-[#10b981] text-xs block">billed annually</span>
+														<span class="text-brand-success text-xs block">billed annually</span>
 													{/if}
 												</span>
 											</th>
@@ -809,12 +807,12 @@
 														: formatFeatureValue(planId, row.feature, row.unit || '')}
 													<td
 														class="p-5 text-center border-b border-r-[3px] last:border-r-0 last:border-b-0 border-gray-900 {isPopular
-															? 'bg-[#ffc480]/5'
+															? 'bg-brand-accent/5'
 															: ''}"
 													>
 														{#if value === true}
 															<div
-																class="w-8 h-8 rounded-lg bg-[#a2ffc1] border-2 border-gray-900 flex items-center justify-center mx-auto shadow-[2px_2px_0_0_#1f2937]"
+																class="w-8 h-8 rounded-lg bg-[#a2ffc1] border-2 border-gray-900 flex items-center justify-center mx-auto shadow-brutal-sm"
 															>
 																<svg
 																	class="w-5 h-5 text-gray-900"
@@ -864,7 +862,7 @@
 
 				<!-- Enterprise CTA -->
 				<div
-					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] p-10 md:p-16 shadow-[8px_8px_0_0_#1f2937] text-center z-10"
+					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg p-10 md:p-16 shadow-brutal-2xl text-center z-10"
 				>
 					<!-- Geometric Decorations -->
 					<div
@@ -881,7 +879,7 @@
 						</p>
 						<a
 							href="mailto:support@pictify.io"
-							class="inline-flex items-center gap-3 mt-4 px-8 py-5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#ffc480] hover:bg-gray-800 transition-all text-lg uppercase tracking-widest"
+							class="inline-flex items-center gap-3 mt-4 px-8 py-5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg uppercase tracking-widest"
 						>
 							<span>Contact Sales</span>
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -909,19 +907,26 @@
 
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						{#each FAQs as faq}
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
 							<div
-								class="group flex flex-col bg-white rounded-xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f2937] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937]"
+								class="group flex flex-col bg-white rounded-xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f2937] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-brutal-2xl"
+								role="button"
+								tabindex="0"
+								aria-expanded={faq.isOpened}
 								on:click={() => (faq.isOpened = !faq.isOpened)}
+								on:keydown={(e) => {
+									if (e.key === 'Enter' || e.key === ' ') {
+										e.preventDefault();
+										faq.isOpened = !faq.isOpened;
+									}
+								}}
 							>
 								<div class="flex items-start justify-between gap-4 p-6">
 									<h3 class="text-lg font-black text-gray-900 leading-tight pr-4">
 										{faq.question}
 									</h3>
 									<div
-										class="w-10 h-10 rounded-lg bg-gray-50 border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 transition-all duration-300 shadow-[2px_2px_0_0_#1f2937] {faq.isOpened
-											? 'rotate-180 bg-[#ffc480]'
+										class="w-10 h-10 rounded-lg bg-gray-50 border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 transition-all duration-300 shadow-brutal-sm {faq.isOpened
+											? 'rotate-180 bg-brand-accent'
 											: 'group-hover:translate-x-[1px] group-hover:translate-y-[1px]'}"
 									>
 										<svg

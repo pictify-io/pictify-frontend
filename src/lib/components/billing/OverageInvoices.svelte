@@ -39,7 +39,7 @@
 
 {#if loading}
 	<div
-		class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 text-center"
+		class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 text-center"
 	>
 		<div class="inline-flex items-center gap-2 text-gray-500">
 			<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@
 	<!-- Don't render anything if no overage invoices -->
 {:else}
 	<div
-		class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+		class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 	>
 		<!-- Header -->
 		<div class="px-5 py-4 border-b-2 border-gray-200 flex items-center justify-between">
@@ -147,7 +147,7 @@
 										class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all
 											{isOverdue(invoice)
 											? 'bg-red-600 text-white hover:bg-red-700 shadow-[3px_3px_0_0_#991b1b]'
-											: 'bg-[#ffc480] text-gray-900 hover:bg-[#ffb360] border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937]'}
+											: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] border-2 border-gray-900 shadow-brutal-md'}
 											hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937]"
 									>
 										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,11 +161,11 @@
 										Pay now
 									</a>
 								{:else if invoice.status === 'paid'}
-									<span class="text-xs text-gray-400 font-medium">
+									<span class="text-xs text-gray-600 font-medium">
 										{invoice.paidAt ? formatDate(invoice.paidAt) : 'Settled'}
 									</span>
 								{:else}
-									<span class="text-sm text-gray-400">-</span>
+									<span class="text-sm text-gray-600">-</span>
 								{/if}
 							</td>
 						</tr>

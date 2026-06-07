@@ -764,7 +764,7 @@
 	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -772,17 +772,17 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -803,7 +803,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					★ Free Tool
 				</div>
@@ -817,13 +817,13 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 				{#if isPlatform}
 					<span class="block mt-2 sm:mt-4">
 						<span
-							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]"
+							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-brutal-md sm:shadow-brutal-lg"
 						>
 							for {platformLabel}
 						</span>
@@ -837,7 +837,7 @@
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
 					Create stunning <span
-						class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black"
+						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>Open Graph images</span
 					>
 					for your website.
@@ -865,9 +865,9 @@
 						<span class="animate-pulse">_</span> SELECT_MODE
 					</h3>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-[#ff6b6b] border border-black" />
-						<div class="w-3 h-3 bg-[#ffc480] border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-brand-danger border border-black" />
+						<div class="w-3 h-3 bg-brand-accent border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 
@@ -885,8 +885,8 @@
 								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
                 ${
 									creationMode === 'website'
-										? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]'
+										? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
 								}`}
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -912,8 +912,8 @@
 								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
                 ${
 									creationMode === 'direct'
-										? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]'
+										? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
 								}`}
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -945,14 +945,14 @@
 									bind:value={url}
 									on:input={handleFirstInput}
 									type="text"
-									class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] py-4 px-5 transition-all bg-white"
+									class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-brutal-accent py-4 px-5 transition-all bg-white"
 									placeholder="https://yourwebsite.com"
 									on:keydown={(e) => e.key === 'Enter' && submitUrl(url)}
 								/>
 								<button
 									on:click={() => submitUrl(url)}
 									disabled={isFetchingWebsiteInfo}
-									class="py-4 px-8 bg-[#ffc480] border-[3px] border-black font-black uppercase tracking-wide text-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+									class="py-4 px-8 bg-brand-accent border-[3px] border-black font-black uppercase tracking-wide text-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
 								>
 									{#if isFetchingWebsiteInfo}
 										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -985,7 +985,7 @@
 							</div>
 							{#if error}
 								<div
-									class="mt-4 p-4 bg-[#ff6b6b]/10 border-[3px] border-[#ff6b6b] text-[#ff6b6b] font-bold flex items-center gap-2"
+									class="mt-4 p-4 bg-brand-danger/10 border-[3px] border-brand-danger text-brand-danger font-bold flex items-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -1001,7 +1001,7 @@
 						</div>
 					{:else}
 						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] p-6 text-center">
+							<div class="bg-data-green/10 border-[3px] border-data-green p-6 text-center">
 								<p class="text-black font-bold text-lg">
 									✓ Select a template below to start designing
 								</p>
@@ -1021,7 +1021,7 @@
 				class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0"
 				bind:this={ogImageTemplateWrapper}
 			>
-				<div class="border-[3px] md:border-[4px] border-black bg-white shadow-[8px_8px_0_0_#000]">
+				<div class="border-[3px] md:border-[4px] border-black bg-white shadow-brutal-2xl">
 					<!-- Editor Header -->
 					<div
 						class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] md:border-b-[4px] border-black"
@@ -1030,9 +1030,9 @@
 							/// CUSTOMIZE_IMAGE
 						</h3>
 						<div class="flex gap-2">
-							<div class="w-3 h-3 bg-[#ff6b6b] border border-white/20" />
-							<div class="w-3 h-3 bg-[#ffc480] border border-white/20" />
-							<div class="w-3 h-3 bg-[#4ade80] border border-white/20" />
+							<div class="w-3 h-3 bg-brand-danger border border-white/20" />
+							<div class="w-3 h-3 bg-brand-accent border border-white/20" />
+							<div class="w-3 h-3 bg-data-green border border-white/20" />
 						</div>
 					</div>
 
@@ -1040,7 +1040,7 @@
 					<div class="p-6 md:p-8 bg-gray-100 border-b-[3px] border-black">
 						<div class="flex justify-center items-center">
 							<div
-								class="border-[3px] border-black shadow-[6px_6px_0_0_#000] overflow-hidden bg-white"
+								class="border-[3px] border-black shadow-brutal-xl overflow-hidden bg-white"
 							>
 								<OgImageTemplate
 									html={typeof selectedTemplate === 'string'
@@ -1061,7 +1061,7 @@
 							<div class="space-y-4">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#ffc480] flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-brand-accent flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1080,7 +1080,7 @@
 											{#if websiteInfo.logo.startsWith('<svg')}
 												<div style="width: 120px;">{@html websiteInfo.logo}</div>
 											{:else}
-												<img
+												<img loading="lazy"
 													src={websiteInfo.logo}
 													style="width: 120px;"
 													alt="Logo"
@@ -1098,7 +1098,7 @@
 									/>
 									<label
 										for="logoInput"
-										class="block w-full px-4 py-3 bg-white border-[3px] border-black text-black font-bold cursor-pointer hover:bg-gray-50 hover:shadow-[4px_4px_0_0_#000] transition-all text-center uppercase tracking-wide"
+										class="block w-full px-4 py-3 bg-white border-[3px] border-black text-black font-bold cursor-pointer hover:bg-gray-50 hover:shadow-brutal-lg transition-all text-center uppercase tracking-wide"
 									>
 										Upload Logo
 									</label>
@@ -1110,7 +1110,7 @@
 											type="range"
 											min="50"
 											max="400"
-											class="w-full h-2 bg-gray-200 appearance-none cursor-pointer accent-[#ff6b6b]"
+											class="w-full h-2 bg-gray-200 appearance-none cursor-pointer accent-brand-danger"
 											value={logoWidth}
 											on:input={updateLogoWidth}
 										/>
@@ -1122,7 +1122,7 @@
 							<div class="space-y-4">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#ff6b6b] text-white flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-brand-danger text-white flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1144,7 +1144,7 @@
 										<input
 											id="og-heading"
 											type="text"
-											class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black focus:shadow-[4px_4px_0_0_#ffc480] py-3 px-4 transition-all"
+											class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black focus:shadow-brutal-accent py-3 px-4 transition-all"
 											placeholder="Enter heading"
 											value={websiteInfo.heading}
 											on:input={updateHeading}
@@ -1158,7 +1158,7 @@
 										>
 										<textarea
 											id="og-description"
-											class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black focus:shadow-[4px_4px_0_0_#ffc480] py-3 px-4 transition-all resize-none"
+											class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black focus:shadow-brutal-accent py-3 px-4 transition-all resize-none"
 											rows="3"
 											value={websiteInfo.subHeading}
 											on:input={updateSubHeading}
@@ -1171,7 +1171,7 @@
 							<div class="space-y-4 lg:col-span-2">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#4ade80] flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-data-green flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1237,12 +1237,12 @@
 							<!-- Image preview -->
 							<div class="p-4 md:p-6 bg-white">
 								<div class="border-[3px] border-black bg-white p-2">
-									<img src={imageUrl} alt="Generated OG" class="w-full" />
+									<img loading="lazy" src={imageUrl} alt="Generated OG" class="w-full" />
 								</div>
 							</div>
 							<!-- Action bar -->
 							<div
-								class="bg-[#4ade80] border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+								class="bg-data-green border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
 							>
 								<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2">
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1253,7 +1253,7 @@
 								<div class="flex items-center gap-2">
 									<button
 										on:click={() => copyToClipboard(imageUrl)}
-										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white font-bold uppercase text-xs border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Copy URL
 									</button>
@@ -1261,7 +1261,7 @@
 										href={imageUrl}
 										download="og-image.png"
 										target="_blank"
-										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Download
 									</a>
@@ -1273,12 +1273,12 @@
 					<!-- Generate Button (hidden once image is generated) -->
 					{#if !imageUrl}
 						<div
-							class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-[#FFFDF8] to-[#fff5e6]"
+							class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-brand-bg to-[#fff5e6]"
 						>
 							<button
 								on:click={generateImage}
 								disabled={isImageGenerating}
-								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-[#ff6b6b] border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
 							>
 								<div class="flex items-center justify-center gap-3 md:gap-4">
 									{#if isImageGenerating}
@@ -1346,7 +1346,7 @@
 					<a
 						href="/signup"
 						on:click={() => analytics.track('tool_signup_click', { tool_name: 'og_image_generator', cta_location: 'view_all_templates' })}
-						class="font-bold text-black hover:text-[#ff6b6b] transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
+						class="font-bold text-black hover:text-brand-danger transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
 					>
 						View All Templates →
 					</a>
@@ -1356,16 +1356,16 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2 md:px-0">
 				{#each templates.slice(0, 6) as template, i}
 					<div
-						class="group bg-white border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#000] transition-all duration-200 cursor-pointer"
+						class="group bg-white border-[3px] border-black overflow-hidden shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all duration-200 cursor-pointer"
 						on:click={() => selectTemplate(template)}
 						on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
 						role="button"
 						tabindex="0"
 					>
 						<div class="p-2 bg-gray-100 border-b-[3px] border-black flex gap-1.5">
-							<div class="w-2.5 h-2.5 bg-[#ff6b6b] border border-black" />
-							<div class="w-2.5 h-2.5 bg-[#ffc480] border border-black" />
-							<div class="w-2.5 h-2.5 bg-[#4ade80] border border-black" />
+							<div class="w-2.5 h-2.5 bg-brand-danger border border-black" />
+							<div class="w-2.5 h-2.5 bg-brand-accent border border-black" />
+							<div class="w-2.5 h-2.5 bg-data-green border border-black" />
 						</div>
 						<div class="relative bg-white overflow-hidden" style="height: 180px;">
 							<OgImageTemplate
@@ -1413,7 +1413,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
 				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
 					<div
-						class="w-12 h-12 bg-[#ffc480] border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
+						class="w-12 h-12 bg-brand-accent border-[3px] border-black flex items-center justify-center mb-6 shadow-brutal-md"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1433,7 +1433,7 @@
 
 				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
 					<div
-						class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
+						class="w-12 h-12 bg-brand-danger border-[3px] border-black flex items-center justify-center mb-6 shadow-brutal-md"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1468,7 +1468,7 @@
 				<div class="space-y-4">
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase"
 								>How do I add an OG image?</span
@@ -1498,7 +1498,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">What size should it be?</span
 							>
@@ -1527,7 +1527,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">Is there an API?</span>
 							<span

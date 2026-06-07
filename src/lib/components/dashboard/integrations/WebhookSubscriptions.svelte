@@ -184,13 +184,13 @@
 			<div class="space-y-4 select-none opacity-50 grayscale transition-all duration-500">
 				{#each MOCK_SUBSCRIPTIONS as sub}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] p-4"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-md p-4"
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
 								<div class="flex items-center gap-3 mb-2">
 									<div
-										class="w-10 h-10 flex items-center justify-center bg-gray-50 border-2 border-gray-900 rounded-lg text-gray-700 shadow-[2px_2px_0_0_#1f2937]"
+										class="w-10 h-10 flex items-center justify-center bg-gray-50 border-2 border-gray-900 rounded-lg text-gray-700 shadow-brutal-sm"
 									>
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -213,7 +213,7 @@
 										class="ml-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 {getStatusColor(
 											sub.status
 										)
-											.replace('border-green-300', 'border-green-900 bg-[#10b981]')
+											.replace('border-green-300', 'border-green-900 bg-brand-success')
 											.replace('text-green-800', 'text-white')
 											.replace('bg-green-100', '')}"
 									>
@@ -238,7 +238,7 @@
 								</div>
 							</div>
 							<div class="flex items-center gap-2 opacity-50">
-								<button class="p-2 text-gray-400 border-2 border-transparent"
+								<button aria-label="Pause webhook" class="p-2 text-gray-400 border-2 border-transparent"
 									><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
@@ -248,7 +248,7 @@
 										/></svg
 									></button
 								>
-								<button class="p-2 text-gray-400 border-2 border-transparent"
+								<button aria-label="Delete webhook" class="p-2 text-gray-400 border-2 border-transparent"
 									><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
@@ -273,10 +273,10 @@
 			</div>
 		{:else if subscriptions.length === 0}
 			<div
-				class="text-center py-12 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="text-center py-12 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center"
+					class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center"
 				>
 					<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -293,7 +293,7 @@
 				</p>
 				<button
 					on:click={() => (showCreateModal = true)}
-					class="px-5 py-2 text-xs font-bold text-gray-900 bg-[#ffc480] rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+					class="px-5 py-2 text-xs font-bold text-gray-900 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 				>
 					Create Webhook
 				</button>
@@ -303,13 +303,13 @@
 			<div class="space-y-4">
 				{#each subscriptions as sub}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4 transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0_0_#1f2937]"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-4 transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0_0_#1f2937]"
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
 								<div class="flex items-center gap-3 mb-2">
 									<div
-										class="w-10 h-10 flex items-center justify-center bg-gray-50 border-2 border-gray-900 rounded-lg text-gray-700 shadow-[2px_2px_0_0_#1f2937]"
+										class="w-10 h-10 flex items-center justify-center bg-gray-50 border-2 border-gray-900 rounded-lg text-gray-700 shadow-brutal-sm"
 									>
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -332,7 +332,7 @@
 										class="ml-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 {getStatusColor(
 											sub.status
 										)
-											.replace('border-green-300', 'border-green-900 bg-[#10b981]')
+											.replace('border-green-300', 'border-green-900 bg-brand-success')
 											.replace('text-green-800', 'text-white')
 											.replace('bg-green-100', '')}"
 									>
@@ -362,8 +362,9 @@
 								{#if sub.status === 'active'}
 									<button
 										on:click={() => handlePause(sub.uid)}
-										class="p-2 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors border-2 border-transparent hover:border-yellow-900"
+										class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors border-2 border-transparent hover:border-yellow-900"
 										title="Pause"
+										aria-label="Pause webhook"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -377,8 +378,9 @@
 								{:else}
 									<button
 										on:click={() => handleResume(sub.uid)}
-										class="p-2 text-green-700 hover:bg-green-100 rounded-lg transition-colors border-2 border-transparent hover:border-green-900"
+										class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-green-700 hover:bg-green-100 rounded-lg transition-colors border-2 border-transparent hover:border-green-900"
 										title="Resume"
+										aria-label="Resume webhook"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -398,8 +400,9 @@
 								{/if}
 								<button
 									on:click={() => handleDelete(sub.uid)}
-									class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors border-2 border-transparent hover:border-red-900"
+									class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors border-2 border-transparent hover:border-red-900"
 									title="Delete"
+									aria-label="Delete webhook"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -422,18 +425,18 @@
 <!-- Create Modal -->
 {#if showCreateModal}
 	<div
-		class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+		class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="webhook-modal-title"
 		on:keydown={(e) => e.key === 'Escape' && closeModal()}
 	>
 		<div
-			class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
+			class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
 		>
 			<!-- Header Strip -->
 			<div
-				class="absolute top-0 left-0 w-full h-1.5 bg-[#ffc480] border-b-[3px] border-gray-900 z-10"
+				class="absolute top-0 left-0 w-full h-1.5 bg-brand-accent border-b-[3px] border-gray-900 z-10"
 			/>
 			<!-- Decorative bg pattern -->
 			<div
@@ -450,7 +453,8 @@
 					</h3>
 					<button
 						on:click={closeModal}
-						class="p-1.5 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						aria-label="Close dialog"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -467,13 +471,13 @@
 					<!-- Success: Show secret -->
 					<div class="space-y-6">
 						<div
-							class="p-4 bg-[#10b981]/10 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+							class="p-4 bg-brand-success/10 border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
 						>
 							<div
 								class="text-gray-900 font-black mb-2 flex items-center gap-2 uppercase tracking-wide"
 							>
 								<div
-									class="p-1 bg-[#10b981] rounded text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+									class="p-1 bg-brand-success rounded text-white border-2 border-gray-900 shadow-brutal-sm"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -504,6 +508,7 @@
 								<button
 									on:click={() => navigator.clipboard.writeText(createdSecret)}
 									class="p-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 border-2 border-gray-900 shadow-[3px_3px_0_0_#ffc480] hover:shadow-[1px_1px_0_0_#ffc480] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+									aria-label="Copy webhook secret"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -518,7 +523,7 @@
 						</div>
 						<button
 							on:click={closeModal}
-							class="w-full px-4 py-3 text-sm font-black text-white bg-gray-900 rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gray-800 transition-all uppercase tracking-widest"
+							class="w-full px-4 py-3 text-sm font-black text-white bg-gray-900 rounded-lg border-2 border-gray-900 shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gray-800 transition-all uppercase tracking-widest"
 						>
 							Done
 						</button>
@@ -541,7 +546,7 @@
 							<div class="relative">
 								<select
 									bind:value={newSubscription.event}
-									class="w-full px-4 py-3 bg-white border-2 border-gray-900 rounded-lg focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] transition-shadow appearance-none font-bold text-gray-900"
+									class="w-full px-4 py-3 bg-white border-2 border-gray-900 rounded-lg focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-brutal-accent transition-shadow appearance-none font-bold text-gray-900"
 								>
 									{#each WEBHOOK_EVENTS as event}
 										<option value={event.value}>{event.label}</option>
@@ -576,7 +581,7 @@
 								bind:value={newSubscription.targetUrl}
 								placeholder="https://hooks.zapier.com/..."
 								required
-								class="w-full px-4 py-3 bg-white border-2 border-gray-900 rounded-lg focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#ffc480] transition-shadow font-mono text-sm placeholder:text-gray-400"
+								class="w-full px-4 py-3 bg-white border-2 border-gray-900 rounded-lg focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-brutal-accent transition-shadow font-mono text-sm placeholder:text-gray-400"
 							/>
 						</div>
 
@@ -591,7 +596,7 @@
 							<button
 								type="submit"
 								disabled={creating || !newSubscription.targetUrl}
-								class="flex-1 px-4 py-3 text-xs font-black text-white bg-gray-900 rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest"
+								class="flex-1 px-4 py-3 text-xs font-black text-white bg-gray-900 rounded-lg border-2 border-gray-900 shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest"
 							>
 								{creating ? 'Creating...' : 'Create Subscription'}
 							</button>

@@ -78,7 +78,7 @@
     <div class="main">
       <div class="container">
         <div>
-          <img src="https://res.cloudinary.com/diroilukd/image/upload/v1702766105/shape-1_wld59w.png" class="side-element-1">
+          <img loading="lazy" src="https://res.cloudinary.com/diroilukd/image/upload/v1702766105/shape-1_wld59w.png" class="side-element-1">
         </div>
         <div class="text">
           <h1>Pictify</h1>
@@ -87,7 +87,7 @@
         <div class="bottom-img-container">
           <div></div>
           <div>
-            <img src="https://res.cloudinary.com/diroilukd/image/upload/v1702766150/shape-2_phblyh.png" class="side-element-2">
+            <img loading="lazy" src="https://res.cloudinary.com/diroilukd/image/upload/v1702766150/shape-2_phblyh.png" class="side-element-2">
           </div>
         </div>
       </div>
@@ -230,8 +230,8 @@
 			<!-- Preview Header -->
 			<div class="flex bg-[#1a1a2e] px-4 py-3 justify-between items-center">
 				<div class="flex items-center gap-3">
-					<span class="text-[#4ade80] text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-						<span class="w-2 h-2 rounded-full bg-[#4ade80] inline-block"></span>
+					<span class="text-data-green text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+						<span class="w-2 h-2 rounded-full bg-data-green inline-block"></span>
 						Live Preview
 					</span>
 					{#if isGifEnabled}
@@ -239,7 +239,7 @@
 							on:click={() => {
 								createGif();
 							}}
-							class="bg-[#ffc480] hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+							class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -262,7 +262,7 @@
 				<!-- Size Controls -->
 				<div class="flex items-center gap-2">
 					<select
-						class="px-2 py-1 border border-gray-600 text-xs font-bold bg-[#2a2a3e] text-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b] cursor-pointer"
+						class="px-2 py-1 border border-gray-600 text-xs font-bold bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger cursor-pointer"
 						value={`${previewWidth}x${previewHeight}`}
 						on:change={(e) => {
 							const val = e.target.value;
@@ -283,7 +283,7 @@
 					<div class="flex items-center gap-1">
 						<input
 							type="number"
-							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
+							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
 							value={previewWidth}
 							min="100"
 							max="1920"
@@ -295,7 +295,7 @@
 						<span class="text-gray-400 text-xs font-bold">×</span>
 						<input
 							type="number"
-							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
+							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
 							value={previewHeight}
 							min="100"
 							max="1080"

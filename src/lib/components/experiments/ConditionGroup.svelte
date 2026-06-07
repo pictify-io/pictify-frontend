@@ -80,7 +80,7 @@
 <div
 	class="rounded-xl border-[3px] {borderColor} {bgColor} {isRoot
 		? 'p-6'
-		: 'ml-3 sm:ml-5 p-6 shadow-[4px_4px_0_0_black]'}"
+		: 'ml-3 sm:ml-5 p-6 shadow-brutal-lg'}"
 >
 	<!-- Group header -->
 	<div class="flex items-center justify-between {isRoot ? 'mb-1' : 'mb-3 px-1'}">
@@ -91,12 +91,12 @@
 					type="button"
 					on:click={toggleOperator}
 					{disabled}
-					class="px-3 py-1.5 border-[3px] border-black rounded-lg text-[10px] font-black uppercase tracking-widest bg-white text-black shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] hover:bg-black hover:text-white transition-all cursor-pointer"
+					class="px-3 py-1.5 border-[3px] border-black rounded-lg text-[10px] font-black uppercase tracking-widest bg-white text-black shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[2px] hover:bg-black hover:text-white transition-all cursor-pointer"
 					title="Click to toggle AND/OR"
 				>
 					{group.operator || 'AND'}
 				</button>
-				<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Group</span>
+				<span class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Group</span>
 			{/if}
 		</div>
 		<div class="flex items-center gap-2">
@@ -148,7 +148,7 @@
 				{#if index < group.children.length - 1}
 					<div class="flex items-center justify-center py-2">
 						<span
-							class="px-3 py-1 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-md text-[9px] font-black uppercase tracking-widest bg-white text-black"
+							class="px-3 py-1 border-[3px] border-black shadow-brutal-sm rounded-md text-[9px] font-black uppercase tracking-widest bg-white text-black"
 						>
 							{group.operator || 'AND'}
 						</span>
@@ -164,8 +164,8 @@
 			type="button"
 			on:click={handleAddCondition}
 			{disabled}
-			class="px-3.5 py-2 border-[3px] border-black rounded-lg bg-white text-black shadow-[2px_2px_0_0_black]
-				hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
+			class="px-3.5 py-2 border-[3px] border-black rounded-lg bg-white text-black shadow-brutal-sm
+				hover:shadow-brutal-lg hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 				transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest cursor-pointer"
 		>
 			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,8 +184,8 @@
 				type="button"
 				on:click={addGroup}
 				{disabled}
-				class="px-3.5 py-2 border-[3px] border-black rounded-lg bg-[#ffc480] text-black shadow-[2px_2px_0_0_black]
-					hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
+				class="px-3.5 py-2 border-[3px] border-black rounded-lg bg-brand-accent text-black shadow-brutal-sm
+					hover:shadow-brutal-lg hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 					transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest cursor-pointer"
 			>
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

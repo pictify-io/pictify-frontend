@@ -704,7 +704,7 @@
 </svelte:head>
 
 <div
-	class="min-h-screen bg-[#FFFDF8] relative overflow-hidden font-sans text-gray-900 selection:bg-[#ff6b6b] selection:text-white"
+	class="min-h-screen bg-brand-bg relative overflow-hidden font-sans text-gray-900 selection:bg-brand-danger selection:text-white"
 >
 	<!-- Background Pattern -->
 	<div
@@ -720,7 +720,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -741,7 +741,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					★ Free Tool
 				</div>
@@ -755,7 +755,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h1>
@@ -766,7 +766,7 @@
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
 					Convert any webpage URL into a high-quality <span
-						class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
+						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
 					>
 					instantly.
 					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
@@ -784,15 +784,15 @@
 
 		<div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
 			<!-- Control Board -->
-			<div class="bg-white border-[3px] border-black shadow-[8px_8px_0_0_#000] relative">
+			<div class="bg-white border-[3px] border-black shadow-brutal-2xl relative">
 				<!-- Header/Window Bar -->
 				<div
 					class="bg-black text-white px-4 py-2 flex justify-between items-center border-b-[3px] border-black"
 				>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-white" />
-						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-white" />
-						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white" />
+						<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
+						<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
+						<div class="w-3 h-3 rounded-full bg-data-green border border-white" />
 					</div>
 					<div class="font-mono font-bold tracking-widest text-sm uppercase">
 						SYSTEM_INPUT_TERMINAL
@@ -829,7 +829,7 @@
 							<button
 								on:click={handleLoadPreviewClick}
 								disabled={isLoading || !url}
-								class="w-full h-full px-8 py-4 bg-[#ffc480] text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+								class="w-full h-full px-8 py-4 bg-brand-accent text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-brutal-lg hover:bg-[#ffb050] hover:shadow-brutal-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
 							>
 								{#if isLoading}Loading...{:else}Load Preview{/if}
 							</button>
@@ -847,7 +847,7 @@
 						{:else if !isPreviewLoaded}
 							<p class="mt-3 text-sm font-bold text-gray-500">
 								Load the preview first — then the green
-								<span class="text-[#4ade80] font-black">Capture</span> button activates below.
+								<span class="text-data-green font-black">Capture</span> button activates below.
 							</p>
 						{/if}
 					{/if}
@@ -875,7 +875,7 @@
 											class="px-3 py-2 border-[3px] border-black font-bold text-sm transition-all flex items-center gap-1.5
 												{activePreset === preset.id
 												? 'bg-black text-white shadow-none'
-												: 'bg-white text-black shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+												: 'bg-white text-black shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
 										>
 											{#if preset.id === 'desktop'}
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -923,7 +923,7 @@
 										on:input={handleDimensionInput}
 										min="1"
 										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-[#ff6b6b]"
+										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
 									/>
 									<span class="font-black text-gray-400">×</span>
 									<input
@@ -932,7 +932,7 @@
 										on:input={handleDimensionInput}
 										min="1"
 										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-[#ff6b6b]"
+										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
 									/>
 								</div>
 							</div>
@@ -978,7 +978,7 @@
 			</h3>
 			<div
 				bind:this={iframeWrapper}
-				class="border-[4px] border-black bg-white p-2 shadow-[12px_12px_0_0_#000] relative cursor-crosshair mx-auto"
+				class="border-[4px] border-black bg-white p-2 shadow-brutal-3xl relative cursor-crosshair mx-auto"
 				style="height: 600px; transition: max-width 0.3s ease;"
 			>
 				{#if isLoading}
@@ -1038,7 +1038,7 @@
 						id="capture-button"
 						on:click={generateImage}
 						disabled={captureDisabled}
-						class="w-full md:w-auto px-8 py-3 bg-[#4ade80] text-black border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
+						class="w-full md:w-auto px-8 py-3 bg-data-green text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
 					>
 						{#if isImageGenerating}
 							<svg
@@ -1089,19 +1089,19 @@
 		{#if imageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 mt-16">
 				<div
-					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
+					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 						Screenshot Captured!
 					</h3>
 
 					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
+						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
 						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
-							<img
+							<img loading="lazy"
 								src={imageUrl}
 								alt="Generated screenshot"
 								class="max-w-full h-auto max-h-[400px]"
@@ -1113,7 +1113,7 @@
 						<a
 							href={imageUrl}
 							download="pictify-screenshot.{fileFormat}"
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -1127,7 +1127,7 @@
 						</a>
 						<button
 							on:click={() => copyToClipboard(imageUrl)}
-							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -1146,7 +1146,7 @@
 						 the fixed StickySignupBar (below); control renders neither. -->
 					{#if !isUserLoggedIn && ctaVariant === 'inline-value-prop'}
 						<div
-							class="mt-8 border-[3px] border-black bg-[#ffc480]/20 p-6 flex flex-col items-center text-center gap-3"
+							class="mt-8 border-[3px] border-black bg-brand-accent/20 p-6 flex flex-col items-center text-center gap-3"
 						>
 							<p class="font-black text-gray-900 text-base uppercase tracking-wide">
 								Like it? Automate it.
@@ -1158,7 +1158,7 @@
 							<a
 								href="/signup?redirect=/tools/url-to-image-generator"
 								on:click={() => trackSignupClick('post_generation_value_prop')}
-								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Get Your API Key — Free
 							</a>
@@ -1170,17 +1170,17 @@
 
 		<!-- Live API Request Builder -->
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-16 mb-8">
-			<div class="border-[3px] border-black shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+			<div class="border-[3px] border-black shadow-brutal-2xl overflow-hidden">
 				<div class="bg-black px-4 py-3 flex items-center justify-between">
 					<div class="flex items-center gap-3">
-						<span class="text-xs font-black uppercase tracking-widest text-[#ffc480]"
+						<span class="text-xs font-black uppercase tracking-widest text-brand-accent"
 							>Your API Request</span
 						>
 						<span class="text-xs text-gray-500 font-mono">— updates as you change settings</span>
 					</div>
 					<button
 						on:click={() => copyToClipboard(liveCurlSnippet)}
-						class="px-3 py-1 bg-[#ffc480] text-black border-[2px] border-[#ffc480] font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
+						class="px-3 py-1 bg-brand-accent text-black border-[2px] border-brand-accent font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
 					>
 						Copy
 					</button>
@@ -1214,7 +1214,7 @@
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
 			<h2 class="text-3xl font-black mb-8 text-black uppercase text-center">What You Can Build</h2>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
+				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
 					<h3 class="font-black text-lg mb-2">Link Preview Images</h3>
 					<p class="text-gray-600 font-medium text-sm">
 						Auto-generate thumbnail images from any URL for link previews, bookmarks, and content
@@ -1234,13 +1234,13 @@
 						embed in emails.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#1f2937]">
+				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-lg">
 					<h3 class="font-black text-lg mb-2">OG Image Fallbacks</h3>
 					<p class="text-gray-600 font-medium text-sm">
 						Generate Open Graph images on-the-fly for pages that don't have custom social previews.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
+				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
 					<h3 class="font-black text-lg mb-2">Web Archiving</h3>
 					<p class="text-gray-600 font-medium text-sm">
 						Capture and store visual snapshots of competitor pages, legal evidence, or content for
@@ -1264,7 +1264,7 @@
 				<div class="space-y-4 w-full">
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">What is URL to Image?</span>
 							<span
@@ -1292,7 +1292,7 @@
 					</details>
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">How does it work?</span>
 							<span
@@ -1320,7 +1320,7 @@
 					</details>
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">Can I customize it?</span>
 							<span
@@ -1348,7 +1348,7 @@
 					</details>
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">Privacy?</span>
 							<span
@@ -1381,7 +1381,7 @@
 		<!-- Content Grid -->
 		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
 			<!-- Learn More -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-[8px_8px_0_0_#000]">
+			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
 				<h3 class="text-2xl font-black mb-6 uppercase">Why Use This Tool?</h3>
 				<ul class="space-y-4">
 					<li class="flex gap-4 items-start">
@@ -1427,19 +1427,19 @@
 			</section>
 
 			<!-- Best Practices -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-[#fffdf8] shadow-[8px_8px_0_0_#000]">
+			<section class="border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-brutal-2xl">
 				<h3 class="text-2xl font-black mb-6 uppercase">Pro Tips</h3>
 				<ul class="space-y-4">
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-[#ff6b6b] text-xl">01.</span>
+						<span class="font-black text-brand-danger text-xl">01.</span>
 						<span class="font-bold text-lg">Ensure the URL is publicly accessible.</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-[#ffc480] text-xl">02.</span>
+						<span class="font-black text-brand-accent text-xl">02.</span>
 						<span class="font-bold text-lg">Use the selector to remove ads/navbars.</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-[#4ade80] text-xl">03.</span>
+						<span class="font-black text-data-green text-xl">03.</span>
 						<span class="font-bold text-lg">Check mobile viewports for responsive sites.</span>
 					</li>
 				</ul>
@@ -1450,7 +1450,7 @@
 			<p class="font-bold text-gray-500 uppercase tracking-widest mb-6">Spread the word</p>
 			<div class="flex flex-col md:flex-row justify-center md:space-x-6">
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#1DA1F2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#1DA1F2] transition-all shadow-[4px_4px_0_0_#000] mb-4 md:mb-0"
+					class="flex items-center justify-center px-8 py-4 bg-[#1DA1F2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#1DA1F2] transition-all shadow-brutal-lg mb-4 md:mb-0"
 					on:click={() => sharePage('twitter')}
 				>
 					<svg
@@ -1466,7 +1466,7 @@
 					Share on Twitter
 				</button>
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-[4px_4px_0_0_#000]"
+					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-brutal-lg"
 					on:click={() => sharePage('linkedin')}
 				>
 					<svg

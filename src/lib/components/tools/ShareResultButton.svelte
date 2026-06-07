@@ -96,7 +96,7 @@
 	<button
 		on:click={handleShare}
 		disabled={isSharing || !assetUrl}
-		class="p-2 bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed {className}"
+		class="p-2 bg-white border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed {className}"
 		title="Share result"
 		aria-label="Share result"
 	>
@@ -132,7 +132,7 @@
 	<button
 		on:click={handleShare}
 		disabled={isSharing || !assetUrl}
-		class="px-3 py-1.5 bg-white border-[2px] border-gray-900 font-black text-xs uppercase shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 {className}"
+		class="px-3 py-1.5 bg-white border-[2px] border-gray-900 font-black text-xs uppercase shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 {className}"
 	>
 		{#if isSharing}
 			<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@
 	<button
 		on:click={handleShare}
 		disabled={isSharing || !assetUrl}
-		class="px-4 py-2 bg-white border-[3px] border-gray-900 font-black text-sm uppercase shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 {className}"
+		class="px-4 py-2 bg-white border-[3px] border-gray-900 font-black text-sm uppercase shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 {className}"
 	>
 		{#if isSharing}
 			<svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24">

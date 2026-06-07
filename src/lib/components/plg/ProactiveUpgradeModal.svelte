@@ -97,7 +97,7 @@
 {#if showModal}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+		class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
 		transition:fade={{ duration: 150 }}
 		on:click={handleDismiss}
 		on:keydown={(e) => e.key === 'Escape' && handleDismiss()}
@@ -105,7 +105,7 @@
 	>
 		<!-- Modal -->
 		<div
-			class="relative bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
+			class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-md w-full overflow-hidden"
 			transition:scale={{ duration: 300, easing: quintOut, start: 0.95 }}
 			on:click|stopPropagation
 			on:keydown|stopPropagation
@@ -114,7 +114,7 @@
 			aria-labelledby="proactive-modal-title"
 		>
 			<!-- Header with solid color -->
-			<div class="bg-[#ffc480] p-6 relative border-b-[3px] border-gray-900">
+			<div class="bg-brand-accent p-6 relative border-b-[3px] border-gray-900">
 				<!-- Decorative pattern -->
 				<div
 					class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px]"
@@ -122,7 +122,7 @@
 
 				<!-- Discount badge -->
 				<div
-					class="absolute top-5 right-5 px-3 py-1 bg-white rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] transform rotate-3 z-10"
+					class="absolute top-5 right-5 px-3 py-1 bg-white rounded-lg border-2 border-gray-900 shadow-brutal-md transform rotate-3 z-10"
 				>
 					<span class="text-xs font-black text-gray-900 tracking-wide"
 						>{discountInfo.discountPercent}% OFF</span
@@ -131,9 +131,9 @@
 
 				<div class="relative z-10 pr-16">
 					<div
-						class="mb-3 transform -rotate-6 w-fit bg-white p-2 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+						class="mb-3 transform -rotate-6 w-fit bg-white p-2 rounded-lg border-2 border-gray-900 shadow-brutal-sm"
 					>
-						<svg class="w-8 h-8 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24">
+						<svg class="w-8 h-8 text-brand-accent" fill="currentColor" viewBox="0 0 24 24">
 							<path
 								d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
 								stroke="black"
@@ -163,7 +163,7 @@
 						class="p-4 bg-white rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#10b981] text-center transform -rotate-1 hover:rotate-0 transition-transform"
 					>
 						<div
-							class="w-10 h-10 bg-[#10b981] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-10 h-10 bg-brand-success rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-brutal-sm"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -184,7 +184,7 @@
 						class="p-4 bg-white rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#6366f1] text-center transform rotate-1 hover:rotate-0 transition-transform"
 					>
 						<div
-							class="w-10 h-10 bg-[#6366f1] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-10 h-10 bg-[#6366f1] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-brutal-sm"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -208,7 +208,7 @@
 				>
 					<div class="flex items-center gap-3 text-sm font-bold text-gray-800">
 						<div
-							class="w-5 h-5 rounded bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+							class="w-5 h-5 rounded bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-gray-900"
@@ -228,7 +228,7 @@
 					</div>
 					<div class="flex items-center gap-3 text-sm font-bold text-gray-800">
 						<div
-							class="w-5 h-5 rounded bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+							class="w-5 h-5 rounded bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-gray-900"
@@ -248,7 +248,7 @@
 					</div>
 					<div class="flex items-center gap-3 text-sm font-bold text-gray-800">
 						<div
-							class="w-5 h-5 rounded bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+							class="w-5 h-5 rounded bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-gray-900"
@@ -302,7 +302,7 @@
 
 				<!-- Trust signals -->
 				<div
-					class="mt-6 pt-0 flex items-center justify-center gap-6 text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+					class="mt-6 pt-0 flex items-center justify-center gap-6 text-[10px] text-gray-600 font-bold uppercase tracking-wider"
 				>
 					<span class="flex items-center gap-1.5">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

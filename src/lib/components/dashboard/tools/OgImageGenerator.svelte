@@ -560,13 +560,13 @@
 	});
 </script>
 
-<div class="min-h-screen w-full bg-[#FFFDF8] font-['Manrope']">
+<div class="min-h-screen w-full bg-brand-bg font-['Manrope']">
 	<div class="max-w-7xl mx-auto px-6 py-12">
 		<!-- Header Section -->
 		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
 			<div>
 				<h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight mb-2">
-					OG Image <span class="text-[#ff6b6b] relative inline-block">
+					OG Image <span class="text-brand-danger relative inline-block">
 						Generator
 						<svg
 							class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -585,7 +585,7 @@
 
 			<!-- Navigation Tabs -->
 			<div
-				class="flex gap-2 p-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-x-auto max-w-full"
+				class="flex gap-2 p-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-x-auto max-w-full"
 			>
 				<button
 					class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all whitespace-nowrap {activeTab ===
@@ -633,7 +633,7 @@
 				<!-- Editor Area -->
 				{#if showEditor && activeTab !== 'api'}
 					<div
-						class="mb-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="mb-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 						transition:slide
 					>
 						<OgImageEditor
@@ -656,7 +656,7 @@
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 						{#each defaultTemplatesList as template}
 							<div
-								class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative"
+								class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all duration-200 relative"
 							>
 								<div class="p-2 bg-gray-50 border-b-[3px] border-gray-900">
 									<div class="flex gap-1.5">
@@ -670,7 +670,7 @@
 
 									{#if template === selectedTemplate}
 										<div
-											class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
+											class="absolute top-3 left-3 bg-brand-danger text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-brutal-sm text-xs font-bold uppercase tracking-wider z-10"
 										>
 											Selected
 										</div>
@@ -699,7 +699,7 @@
 				{:else if activeTab === 'saved' && isUserLoggedIn}
 					{#if savedTemplates.length === 0}
 						<div
-							class="flex flex-col items-center justify-center min-h-[400px] text-center bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] p-12"
+							class="flex flex-col items-center justify-center min-h-[400px] text-center bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl p-12"
 						>
 							<div
 								class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 border-[3px] border-gray-900"
@@ -722,7 +722,7 @@
 								Start by customizing one of our default templates and save it to reuse later.
 							</p>
 							<button
-								class="px-6 py-3 bg-[#ff6b6b] text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
+								class="px-6 py-3 bg-brand-danger text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all"
 								on:click={() => (activeTab = 'templates')}
 							>
 								Browse Templates
@@ -732,7 +732,7 @@
 						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 							{#each savedTemplates as template}
 								<div
-									class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 relative"
+									class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all duration-200 relative"
 								>
 									<div
 										class="p-2 bg-gray-50 border-b-[3px] border-gray-900 flex justify-between items-center px-3"
@@ -768,7 +768,7 @@
 
 										{#if template === selectedTemplate}
 											<div
-												class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
+												class="absolute top-3 left-3 bg-brand-danger text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-brutal-sm text-xs font-bold uppercase tracking-wider z-10"
 											>
 												Selected
 											</div>
@@ -800,7 +800,7 @@
 					<!-- API Playground -->
 				{:else if activeTab === 'api'}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="p-8 md:p-10">
 							<!-- API Header -->
@@ -819,7 +819,7 @@
 									>
 										<div
 											class={`h-3 w-3 rounded-full shadow-sm ${
-												isApiOperational ? 'bg-[#4ade80]' : 'bg-[#ff6b6b]'
+												isApiOperational ? 'bg-data-green' : 'bg-brand-danger'
 											}`}
 										/>
 										<span class="text-sm font-bold text-gray-700"
@@ -828,7 +828,7 @@
 									</div>
 									{#if isUserLoggedIn}
 										<button
-											class="px-4 py-2 bg-[#ffc480] text-gray-900 font-bold rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
+											class="px-4 py-2 bg-brand-accent text-gray-900 font-bold rounded-lg border-[3px] border-gray-900 shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal-lg transition-all"
 											on:click={() => {
 												/* Get API Key */
 											}}
@@ -862,13 +862,14 @@
 												<div class="relative">
 													<input
 														type={showApiKey ? 'text' : 'password'}
-														class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg text-sm font-mono bg-white focus:border-gray-900 focus:outline-none transition-colors"
+														class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg text-sm font-mono bg-white focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors"
 														value={apiKey}
 														readonly
 													/>
 													<button
 														class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
 														on:click={() => (showApiKey = !showApiKey)}
+														aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
 													>
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
@@ -896,7 +897,7 @@
 												</div>
 											{:else}
 												<div class="text-sm font-medium text-gray-600 text-center py-2">
-													Please <a href="/login" class="text-[#ff6b6b] hover:underline font-bold"
+													Please <a href="/login" class="text-brand-danger hover:underline font-bold"
 														>login</a
 													> to get your API key.
 												</div>
@@ -957,10 +958,10 @@
 										{#if endpoint}
 											<!-- Parameters Card -->
 											<div
-												class="bg-white rounded-xl border-[3px] border-gray-900 p-6 shadow-[4px_4px_0_0_#1f2937]"
+												class="bg-white rounded-xl border-[3px] border-gray-900 p-6 shadow-brutal-lg"
 											>
 												<h3 class="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-													<div class="w-2 h-6 bg-[#ff6b6b] rounded-full" />
+													<div class="w-2 h-6 bg-brand-danger rounded-full" />
 													Request Parameters
 												</h3>
 												<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -970,7 +971,7 @@
 																<span>{param.name}</span>
 																{#if param.required}
 																	<span
-																		class="text-[10px] text-[#ff6b6b] bg-[#ff6b6b]/10 px-2 py-0.5 rounded-full uppercase tracking-wider"
+																		class="text-[10px] text-brand-danger bg-brand-danger/10 px-2 py-0.5 rounded-full uppercase tracking-wider"
 																		>Required</span
 																	>
 																{/if}
@@ -978,7 +979,7 @@
 
 															{#if param.name === 'template'}
 																<select
-																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none transition-colors bg-white cursor-pointer"
+																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors bg-white cursor-pointer"
 																	bind:value={settings[param.name]}
 																>
 																	<option value="">Select a template</option>
@@ -991,7 +992,7 @@
 															{:else}
 																<input
 																	type="text"
-																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none transition-colors"
+																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors"
 																	placeholder={param.description}
 																	bind:value={settings[param.name]}
 																/>
@@ -1003,7 +1004,7 @@
 
 											<!-- Request Preview -->
 											<div
-												class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+												class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 											>
 												<div
 													class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center justify-between"
@@ -1063,7 +1064,7 @@
 
 											<!-- Action Button -->
 											<button
-												class="w-full py-4 bg-[#ff6b6b] text-white font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+												class="w-full py-4 bg-brand-danger text-white font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl active:translate-y-0 active:shadow-brutal-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
 												on:click={handleTestEndpoint}
 												disabled={!apiKey ||
 													(selectedEndpoint === 'generate' &&
@@ -1109,8 +1110,8 @@
 														<span
 															class={`px-3 py-1 text-xs font-bold rounded-full border-2 border-gray-900 ${
 																testResponse.status >= 200 && testResponse.status < 300
-																	? 'bg-[#4ade80] text-gray-900'
-																	: 'bg-[#ff6b6b] text-white'
+																	? 'bg-data-green text-gray-900'
+																	: 'bg-brand-danger text-white'
 															}`}
 														>
 															Status: {testResponse.status}
@@ -1132,10 +1133,10 @@
 													<!-- Generated Image Preview -->
 													{#if testResponse.status === 200 && imageUrl}
 														<div
-															class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_0_#1f2937] space-y-4"
+															class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-brutal-lg space-y-4"
 														>
 															<h4 class="font-bold text-gray-900">Generated Asset</h4>
-															<img
+															<img loading="lazy"
 																src={imageUrl}
 																alt="Generated Result"
 																class="w-full rounded-lg border-2 border-gray-200"
@@ -1180,10 +1181,10 @@
 <!-- Signup Prompt Modal -->
 {#if showSignupPrompt}
 	<div
-		class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+		class="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 p-4"
 	>
 		<div
-			class="bg-[#FFFDF8] rounded-3xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
+			class="bg-brand-bg rounded-2xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
 		>
 			<!-- Decorative elements -->
 			<div class="absolute -top-6 -right-6 text-6xl">✨</div>
@@ -1196,7 +1197,7 @@
 			<div class="space-y-3 mb-8">
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
 					<div
-						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+						class="w-6 h-6 rounded-full bg-data-green border-2 border-gray-900 flex items-center justify-center text-xs"
 					>
 						✓
 					</div>
@@ -1204,7 +1205,7 @@
 				</div>
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
 					<div
-						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+						class="w-6 h-6 rounded-full bg-data-green border-2 border-gray-900 flex items-center justify-center text-xs"
 					>
 						✓
 					</div>
@@ -1212,7 +1213,7 @@
 				</div>
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
 					<div
-						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+						class="w-6 h-6 rounded-full bg-data-green border-2 border-gray-900 flex items-center justify-center text-xs"
 					>
 						✓
 					</div>
@@ -1223,7 +1224,7 @@
 			<div class="space-y-3">
 				<a
 					href="/signup"
-					class="block w-full py-4 bg-gray-900 text-white font-black text-center rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
+					class="block w-full py-4 bg-gray-900 text-white font-black text-center rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all"
 				>
 					Create Free Account
 				</a>

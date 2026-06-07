@@ -163,22 +163,22 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<section class="min-h-screen w-full bg-[#FFFDF8] relative overflow-hidden">
+<section class="min-h-screen w-full bg-brand-bg relative overflow-hidden">
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-0 right-0 w-96 h-96 bg-[#ffc480]/30 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 right-0 w-96 h-96 bg-brand-accent/30 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 left-0 w-96 h-96 bg-[#4ade80]/15 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute bottom-0 left-0 w-96 h-96 bg-data-green/15 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<div class="relative z-10 mx-auto max-w-5xl px-4 py-10 md:py-14">
 		<div class="mb-8 flex items-center justify-between">
 			<div
-				class="inline-block px-5 py-1.5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full -rotate-1"
+				class="inline-block px-5 py-1.5 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full -rotate-1"
 			>
 				<span class="text-xl font-black tracking-tight">Pictify</span>
 			</div>
@@ -191,7 +191,7 @@
 		</div>
 
 		<h1 class="text-4xl md:text-5xl font-black leading-tight mb-3">
-			You're in. Now render it <span class="bg-[#4ade80] px-2 border-[2px] border-black">from your terminal</span>.
+			You're in. Now render it <span class="bg-data-green px-2 border-[2px] border-black">from your terminal</span>.
 		</h1>
 		<p class="text-lg font-medium text-gray-700 max-w-3xl mb-8">
 			The image you just made is one cURL away from being automated. Run it now, then put the same call inside the app you're actually building.
@@ -200,7 +200,7 @@
 		<div class="grid md:grid-cols-2 gap-6 mb-6">
 			<!-- Left: render preview -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 flex flex-col"
+				class="bg-white border-[3px] border-black shadow-brutal-xl p-5 flex flex-col"
 			>
 				<div class="flex items-center justify-between mb-3">
 					<h2 class="font-black uppercase tracking-tight text-sm">What you just rendered</h2>
@@ -211,7 +211,7 @@
 
 				<div class="flex-1 min-h-[260px] border-[2px] border-black bg-gray-50 flex items-center justify-center overflow-hidden">
 					{#if lastRender?.imageUrl}
-						<img
+						<img loading="lazy"
 							src={lastRender.imageUrl}
 							alt="Your last render"
 							class="max-w-full max-h-[360px] object-contain"
@@ -223,7 +223,7 @@
 								href={lastRender.url}
 								target="_blank"
 								rel="noopener"
-								class="text-sm font-mono break-all text-[#ff6b6b] hover:underline"
+								class="text-sm font-mono break-all text-brand-danger hover:underline"
 							>
 								{lastRender.url}
 							</a>
@@ -233,7 +233,7 @@
 							<p class="text-sm font-bold text-gray-500 mb-2">
 								No prior render found — we filled in a placeholder.
 							</p>
-							<a href="/tools" class="text-sm font-black text-[#ff6b6b] hover:underline"
+							<a href="/tools" class="text-sm font-black text-brand-danger hover:underline"
 								>Try a free tool first →</a
 							>
 						</div>
@@ -243,7 +243,7 @@
 
 			<!-- Right: API key + cURL -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 flex flex-col"
+				class="bg-white border-[3px] border-black shadow-brutal-xl p-5 flex flex-col"
 			>
 				<h2 class="font-black uppercase tracking-tight text-sm mb-3">Your API key</h2>
 
@@ -265,7 +265,7 @@
 							on:click={copyKey}
 							class="flex-shrink-0 px-3 py-2 border-[2px] border-black font-black text-xs uppercase
 								{copied
-								? 'bg-[#4ade80] text-black'
+								? 'bg-data-green text-black'
 								: 'bg-black text-white shadow-[3px_3px_0_0_#4ade80] hover:shadow-[1px_1px_0_0_#4ade80] hover:translate-x-[2px] hover:translate-y-[2px] transition-all'}"
 						>
 							{copied ? 'Copied' : 'Copy'}
@@ -279,7 +279,7 @@
 						class="bg-[#1e1e1e] text-[#dcdcaa] text-xs font-mono p-4 overflow-auto border-[2px] border-black h-full max-h-[260px] whitespace-pre">{curlCommand}</pre>
 					<button
 						on:click={copyCurl}
-						class="absolute top-2 right-2 px-2 py-1 bg-white border-[2px] border-black font-black text-[10px] uppercase tracking-wide hover:bg-[#ffc480] transition-colors"
+						class="absolute top-2 right-2 px-2 py-1 bg-white border-[2px] border-black font-black text-[10px] uppercase tracking-wide hover:bg-brand-accent transition-colors"
 					>
 						Copy cURL
 					</button>
@@ -289,7 +289,7 @@
 
 		<!-- Run from browser button (server-fires api_render_completed) -->
 		<div
-			class="bg-[#4ade80]/15 border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 mb-6"
+			class="bg-data-green/15 border-[3px] border-black shadow-brutal-xl p-5 md:p-6 mb-6"
 		>
 			<div class="flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
 				<div>
@@ -318,14 +318,14 @@
 
 			{#if runState === 'success' && runResultUrl}
 				<div class="mt-4 border-[2px] border-black bg-white p-3 flex items-center gap-3">
-					<img src={runResultUrl} alt="Result" class="w-20 h-20 object-contain border border-gray-300" />
+					<img loading="lazy" src={runResultUrl} alt="Result" class="w-20 h-20 object-contain border border-gray-300" />
 					<div class="flex-1 min-w-0">
 						<div class="text-xs font-bold uppercase text-gray-500 mb-1">Rendered via API</div>
 						<a
 							href={runResultUrl}
 							target="_blank"
 							rel="noopener"
-							class="text-sm font-mono truncate block text-[#ff6b6b] hover:underline"
+							class="text-sm font-mono truncate block text-brand-danger hover:underline"
 						>
 							{runResultUrl}
 						</a>
@@ -333,14 +333,14 @@
 				</div>
 			{/if}
 			{#if runState === 'error'}
-				<div class="mt-4 border-[2px] border-[#ff6b6b] bg-[#ff6b6b]/10 p-3 text-sm font-bold text-[#ff6b6b]">
+				<div class="mt-4 border-[2px] border-brand-danger bg-brand-danger/10 p-3 text-sm font-bold text-brand-danger">
 					{runError}
 				</div>
 			{/if}
 		</div>
 
 		<!-- Pricing CTA -->
-		<div class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
+		<div class="bg-white border-[3px] border-black shadow-brutal-xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
 			<div>
 				<h3 class="font-black text-lg mb-1">Render in production →</h3>
 				<p class="text-sm font-medium text-gray-700 max-w-xl">
@@ -350,14 +350,14 @@
 			<a
 				href="/pricing"
 				on:click={ctaClicked}
-				class="flex-shrink-0 px-6 py-3 border-[3px] border-black font-black text-base uppercase tracking-wide bg-[#ff6b6b] text-black shadow-[4px_4px_0_0_black] hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="flex-shrink-0 px-6 py-3 border-[3px] border-black font-black text-base uppercase tracking-wide bg-brand-danger text-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				See pricing →
 			</a>
 		</div>
 
 		<div class="mt-8 text-center text-sm font-medium text-gray-500">
-			Already comfortable? <a href="/dashboard" on:click={skipToDashboard} class="font-black text-black hover:text-[#ff6b6b] hover:underline"
+			Already comfortable? <a href="/dashboard" on:click={skipToDashboard} class="font-black text-black hover:text-brand-danger hover:underline"
 				>Jump to the dashboard</a
 			>
 		</div>

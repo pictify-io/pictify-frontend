@@ -63,7 +63,7 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#c084fc]/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-[#c084fc]/20 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">Lifecycle Marketing</span>
 		</div>
@@ -99,37 +99,37 @@
 			Seven high-ROI personalization patterns
 		</h2>
 		<div class="grid md:grid-cols-2 gap-5">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Year-in-Review cards</h3>
 				<p class="text-gray-700">
 					Once-a-year viral distribution. Every user's card shows their stats; they share voluntarily because it's about them.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Onboarding milestones</h3>
 				<p class="text-gray-700">
 					"You've completed your first 10 tasks" with the user's name and actual task count. Celebratory graphics that embed the user's progress.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Monthly recap emails</h3>
 				<p class="text-gray-700">
 					Per-user stats card in every monthly email — hours saved, tasks done, team activity. Higher open rates from the preview alone.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Upgrade prompts</h3>
 				<p class="text-gray-700">
 					"You've hit the limit on your current plan" with the user's actual usage. Far more persuasive than generic upgrade CTAs.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Referral reward posters</h3>
 				<p class="text-gray-700">
 					"Ada invited you — here's $20 off" with Ada's actual name and the actual reward. Shares better than text-only referrals.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Community spotlight cards</h3>
 				<p class="text-gray-700">
 					Customer of the week / top contributor of the month. Rendered from CRM data, delivered as social assets the customer shares.
@@ -142,7 +142,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			The canonical example: Year-in-Review at scale
 		</h2>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#282c34] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
@@ -196,7 +196,7 @@ const batch = await fetch('https://api.pictify.io/template/tpl_wrapped/batch', {
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

@@ -19,25 +19,25 @@
 			title: 'E-commerce',
 			description: 'Live product pricing, stock indicators, and personalized product recommendations that update automatically.',
 			iconPath: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			title: 'Dashboards',
 			description: 'KPI snapshots for Slack, email, or embeds. Share live metric images that always show current data.',
 			iconPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-			color: 'bg-[#4ade80]'
+			color: 'bg-data-green'
 		},
 		{
 			title: 'Email',
 			description: 'Open-time personalization with live data — city, weather, countdown timers, and more.',
 			iconPath: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			title: 'Social Media',
 			description: 'Auto-updating social cards with live stats, follower counts, or real-time event data.',
 			iconPath: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
-			color: 'bg-[#a78bfa]'
+			color: 'bg-data-violet'
 		}
 	];
 
@@ -145,14 +145,14 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 	<!-- Hero Section -->
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#ffc480] border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-brand-accent border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<span class="w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-gray-900" />
 				<span class="text-sm font-black uppercase tracking-wider text-gray-900">Live Data · Auto-Refresh</span>
@@ -160,7 +160,7 @@
 
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Images That<br />
-				<span class="relative inline-block text-[#ff6b6b] mt-2">
+				<span class="relative inline-block text-brand-danger mt-2">
 					Update Themselves
 					<svg class="absolute w-full h-4 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -170,7 +170,7 @@
 
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
 				Connect your data. Your images stay fresh. Dynamic Links pull live data from any API, database, or spreadsheet — and render a new image on every request. <br class="hidden sm:block" />
-				<span class="font-black text-gray-900 bg-[#4ade80] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">No cron jobs. No stale content.</span>
+				<span class="font-black text-gray-900 bg-data-green px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">No cron jobs. No stale content.</span>
 			</p>
 
 			<div class="flex flex-col sm:flex-row gap-6 justify-center">
@@ -178,7 +178,7 @@
 					href="/signup"
 					on:click={() => trackCTA('Try Dynamic Links')}
 					class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#ffc480] hover:shadow-[4px_4px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1
+						shadow-[8px_8px_0_0_#ffc480] hover:shadow-brutal-accent hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center flex items-center justify-center gap-2 group"
 				>
 					Try Dynamic Links Free
@@ -190,7 +190,7 @@
 					href="/templates"
 					on:click={() => trackCTA('Browse Templates')}
 					class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+						shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center"
 				>
 					Browse Templates
@@ -208,7 +208,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Capabilities</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -221,15 +221,15 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
 				{#each useCases as useCase, i}
-					{@const colors = ['bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-[#ffc480]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-danger', 'bg-data-green', 'bg-brand-accent', 'bg-data-violet']}
 					{@const rotations = ['rotate-1', '-rotate-1', '-rotate-1', 'rotate-1']}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
 						in:fly={{ y: 20, duration: 400, delay: i * 100 }}
 					>
 						<!-- Colorful Header Block -->
 						<div class="{colors[i % colors.length]} p-6 border-b-[3px] border-gray-900 flex items-center justify-between">
-							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-12 transition-transform">
+							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-12 transition-transform">
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={useCase.iconPath} />
 								</svg>
@@ -246,7 +246,7 @@
 								<div class="w-full max-w-[220px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all">
 									<div class="h-24 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
 										<div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-200 transform -rotate-6 flex items-center justify-center">👟</div>
-										<div class="absolute top-2 right-2 bg-[#ff6b6b] text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-gray-900 shadow-sm animate-pulse">Low Stock</div>
+										<div class="absolute top-2 right-2 bg-brand-danger text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-gray-900 shadow-sm animate-pulse">Low Stock</div>
 									</div>
 									<div class="p-3 bg-white">
 										<div class="h-2 w-3/4 bg-gray-200 rounded mb-2"></div>
@@ -260,8 +260,8 @@
 								<!-- Dashboards Visual -->
 								<div class="w-full max-w-[240px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
 									<div class="bg-gray-900 px-3 py-2 flex items-center justify-between">
-										<div class="text-[10px] font-black tracking-widest text-[#4ade80] uppercase">MRR Growth</div>
-										<div class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse"></div>
+										<div class="text-[10px] font-black tracking-widest text-data-green uppercase">MRR Growth</div>
+										<div class="w-2 h-2 rounded-full bg-data-green animate-pulse"></div>
 									</div>
 									<div class="p-4 bg-gray-50 flex flex-col items-center">
 										<div class="font-black text-3xl text-gray-900 mb-2">$84.2K</div>
@@ -269,8 +269,8 @@
 											<div class="flex-1 bg-gray-300 h-1/4 rounded-t"></div>
 											<div class="flex-1 bg-gray-300 h-2/4 rounded-t"></div>
 											<div class="flex-1 bg-gray-300 h-1/3 rounded-t"></div>
-											<div class="flex-1 bg-[#4ade80] h-3/4 rounded-t border-t-[2px] border-x-[2px] border-gray-900"></div>
-											<div class="flex-1 bg-[#4ade80] h-full rounded-t border-t-[2px] border-x-[2px] border-gray-900 relative">
+											<div class="flex-1 bg-data-green h-3/4 rounded-t border-t-[2px] border-x-[2px] border-gray-900"></div>
+											<div class="flex-1 bg-data-green h-full rounded-t border-t-[2px] border-x-[2px] border-gray-900 relative">
 												<div class="absolute -top-4 w-full text-center text-[8px] font-bold text-gray-900">Today</div>
 											</div>
 										</div>
@@ -280,9 +280,9 @@
 								<!-- Email Visual -->
 								<div class="w-full max-w-[200px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
 									<div class="bg-gray-100 border-b-[2px] border-gray-900 px-2 py-1 flex items-center gap-1.5">
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-danger border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-accent border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-data-green border border-gray-900"></div>
 									</div>
 									<div class="p-3 bg-white space-y-2">
 										<div class="w-1/2 h-2 bg-gray-200 rounded"></div>
@@ -290,7 +290,7 @@
 										
 										<!-- Live Countdown Image -->
 										<div class="bg-gray-900 text-white rounded p-3 text-center border-2 border-gray-900 mt-2 shadow-sm">
-											<div class="text-[8px] font-bold text-[#ffc480] uppercase tracking-widest mb-1 shadow-[0_0_4px_rgba(255,196,128,0.5)]">Sale Ends In</div>
+											<div class="text-[8px] font-bold text-brand-accent uppercase tracking-widest mb-1 shadow-[0_0_4px_rgba(255,196,128,0.5)]">Sale Ends In</div>
 											<div class="flex justify-center gap-2 font-black font-mono text-lg leading-none">
 												<div class="flex flex-col"><span class="animate-pulse">04</span><span class="text-[6px] text-gray-400 tracking-wider">HRS</span></div>
 												<div class="text-gray-500">:</div>
@@ -302,10 +302,10 @@
 							{:else if i === 3}
 								<!-- Social Visual -->
 								<div class="w-full max-w-[220px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
-									<div class="h-24 bg-gradient-to-r from-[#a78bfa] to-[#ffb6ff] border-b-[3px] border-gray-900 flex items-center justify-center flex-col relative pt-2">
+									<div class="h-24 bg-gradient-to-r from-data-violet to-[#ffb6ff] border-b-[3px] border-gray-900 flex items-center justify-center flex-col relative pt-2">
 										<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:10px_10px]"></div>
 										<div class="font-black text-3xl text-gray-900 drop-shadow-[2px_2px_0_#fff] relative z-10 mix-blend-hard-light">+1,200</div>
-										<div class="text-[10px] font-bold text-gray-900 uppercase tracking-widest bg-white/50 backdrop-blur px-2 py-0.5 rounded border border-gray-900 mt-1 shadow-sm relative z-10">New Followers</div>
+										<div class="text-[10px] font-bold text-gray-900 uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded border border-gray-900 mt-1 shadow-sm relative z-10">New Followers</div>
 									</div>
 									<div class="p-2.5 bg-gray-100 flex items-center gap-2">
 										<div class="w-4 h-4 rounded-full bg-gray-300"></div>
@@ -338,7 +338,7 @@
 
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Workflow</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -352,18 +352,18 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0 border-l-[3px] border-dashed border-gray-900"></div>
 
 				{#each steps as step, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
 					>
 						<!-- Number Badge -->
-						<div class="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 {colors[i]} border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3 z-10">
+						<div class="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 {colors[i]} border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3 z-10">
 							<span class="text-2xl md:text-4xl font-black text-gray-900">{step.number}</span>
 						</div>
 
 						<!-- Content Card -->
-						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] group-hover:shadow-[12px_12px_0_0_#1f2937] rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
+						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-2xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
 							<h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-3">{step.title}</h3>
 							<p class="text-gray-700 text-lg md:text-xl font-medium leading-relaxed">{step.description}</p>
 						</div>
@@ -382,7 +382,7 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Integrations</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl border-[3px] border-transparent font-black text-gray-900 mb-6">
@@ -395,9 +395,9 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each dataSources as source, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-white']}
-					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 rounded-2xl transition-all group">
-						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform">
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet', 'bg-brand-danger', 'bg-data-green', 'bg-white']}
+					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 rounded-2xl transition-all group">
+						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d={source.iconPath} />
 							</svg>
@@ -406,7 +406,7 @@
 							<div class="flex items-center gap-2 mb-1">
 								<h3 class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">{source.name}</h3>
 								{#if source.status === 'coming'}
-									<span class="text-[10px] px-2 py-0.5 bg-[#ffc480] border-[2px] border-gray-900 font-black tracking-wider uppercase rounded transform -rotate-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Soon</span>
+									<span class="text-[10px] px-2 py-0.5 bg-brand-accent border-[2px] border-gray-900 font-black tracking-wider uppercase rounded transform -rotate-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Soon</span>
 								{/if}
 							</div>
 							<p class="text-sm text-gray-700 font-medium leading-tight">{source.description}</p>
@@ -429,12 +429,12 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Playground</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 					See It <br class="hidden sm:block" />
-					<span class="text-[#ff6b6b]">In Action</span>
+					<span class="text-brand-danger">In Action</span>
 				</h2>
 				<p class="text-xl text-gray-700 font-medium max-w-2xl mx-auto">
 					Edit the JSON data below and watch the image update in real-time.
@@ -443,22 +443,22 @@
 
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 				<!-- Data Source Input -->
-				<div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden flex flex-col group transition-shadow hover:shadow-[12px_12px_0_0_#1f2937]">
+				<div class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl overflow-hidden flex flex-col group transition-shadow hover:shadow-brutal-3xl">
 					<div class="px-5 py-3 bg-gray-100 border-b-[3px] border-gray-900 text-gray-900 font-black text-sm flex items-center gap-2">
-						<span class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
-						<span class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
-						<span class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
+						<span class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
+						<span class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
+						<span class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
 						<span class="ml-3 tracking-wide uppercase text-xs">api-response.json</span>
 					</div>
 					<textarea
 						bind:value={demoData}
-						class="w-full h-56 p-6 font-mono text-sm text-gray-900 bg-white border-none resize-none focus:outline-none focus:ring-4 focus:ring-[#ffc480]/30 transition-shadow transition-colors placeholder-gray-400"
+						class="w-full h-56 p-6 font-mono text-sm text-gray-900 bg-white border-none resize-none focus:outline-none focus:ring-4 focus:ring-brand-accent/30 transition-shadow transition-colors placeholder-gray-400"
 						spellcheck="false"
 					/>
 					<div class="p-5 border-t-[3px] border-gray-900 bg-gray-50 flex-none">
 						<button
 							on:click={runDemo}
-							class="w-full px-6 py-4 bg-[#7dd3fc] text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-lg shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-150 flex items-center justify-center gap-2"
+							class="w-full px-6 py-4 bg-[#7dd3fc] text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-lg shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-150 flex items-center justify-center gap-2"
 						>
 							Render Preview
 							<svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -469,7 +469,7 @@
 				</div>
 
 				<!-- Rendered Output -->
-				<div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden flex flex-col transition-shadow hover:shadow-[12px_12px_0_0_#1f2937]">
+				<div class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl overflow-hidden flex flex-col transition-shadow hover:shadow-brutal-3xl">
 					<div class="px-5 py-3 bg-gray-900 text-white font-black text-sm tracking-wide uppercase text-center border-b-[3px] border-gray-900 relative">
 						Output Preview
 					</div>
@@ -479,14 +479,14 @@
 								{#if demoData}
 									{@const parsed = (() => { try { return JSON.parse(demoData); } catch { return null; } })()}
 									{#if parsed}
-										<div class="bg-gradient-to-br from-[#ffc480] to-[#ff6b6b] p-8 md:p-10 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] text-left max-w-sm mx-auto rounded-xl transform rotate-1 hover:rotate-0 transition-transform">
+										<div class="bg-gradient-to-br from-brand-accent to-brand-danger p-8 md:p-10 border-[3px] border-gray-900 shadow-brutal-2xl text-left max-w-sm mx-auto rounded-xl transform rotate-1 hover:rotate-0 transition-transform">
 											<p class="text-3xl md:text-4xl font-black text-white mb-2 leading-none">{parsed.product_name || 'Product'}</p>
 											<p class="text-4xl md:text-5xl font-black text-gray-900 mb-4">{parsed.price || '$0'}</p>
 											{#if parsed.discount}
-												<span class="inline-block px-4 py-2 bg-white text-gray-900 font-black text-sm border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-2">{parsed.discount}</span>
+												<span class="inline-block px-4 py-2 bg-white text-gray-900 font-black text-sm border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-2">{parsed.discount}</span>
 											{/if}
 										</div>
-										<div class="mt-8 inline-block px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 text-xs font-black uppercase tracking-wider rounded shadow-[4px_4px_0_0_#ffc480] animate-bounce" style="animation-duration: 2s;">
+										<div class="mt-8 inline-block px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 text-xs font-black uppercase tracking-wider rounded shadow-brutal-accent animate-bounce" style="animation-duration: 2s;">
 											This image updates instantly!
 										</div>
 									{:else}
@@ -499,7 +499,7 @@
 							</div>
 						{:else}
 							<div class="text-center text-gray-400 max-w-[200px] mx-auto">
-								<svg class="w-20 h-20 mx-auto mb-6 opacity-40 hover:opacity-100 hover:text-[#ffc480] transition-colors cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" on:click={runDemo} on:keydown={(e) => e.key === 'Enter' && runDemo()} role="button" tabindex="0">
+								<svg class="w-20 h-20 mx-auto mb-6 opacity-40 hover:opacity-100 hover:text-brand-accent transition-colors cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" on:click={runDemo} on:keydown={(e) => e.key === 'Enter' && runDemo()} role="button" tabindex="0">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z" />
 								</svg>
 								<p class="font-bold text-gray-500 text-lg uppercase tracking-wider">Awaiting Render</p>
@@ -522,12 +522,12 @@
 		/>
 
 		<!-- Floating decorative elements -->
-		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
-		<div class="absolute bottom-10 left-10 w-24 h-24 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
+		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-brutal-lg animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
+		<div class="absolute bottom-10 left-10 w-24 h-24 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-[12px_12px_0_0_#1f2937] hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
 				<div class="inline-block px-4 py-1.5 bg-gray-900 text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#4ade80] rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold uppercase tracking-wider">Get Started</span>
@@ -564,7 +564,7 @@
 						href="/pricing"
 						on:click={() => trackCTA('View Pricing')}
 						class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-							shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+							shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 							transition-all duration-200 text-center"
 					>
 						View Pricing
@@ -586,7 +586,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -596,7 +596,7 @@
 
 			<div class="space-y-4">
 				{#each faqs as faq, i}
-					<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
+					<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
 						<button
 							on:click={() => (openFaq = openFaq === i ? -1 : i)}
 							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-[#fdf2f8]' : 'hover:bg-gray-50'}"

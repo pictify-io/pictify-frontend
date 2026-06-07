@@ -254,13 +254,13 @@
 <!-- Barcode Generator Tool -->
 <div class="w-full max-w-6xl mx-auto">
 	<!-- Editor Window -->
-	<div class="bg-white border-[3px] border-black shadow-[8px_8px_0_0_#000]">
+	<div class="bg-white border-[3px] border-black shadow-brutal-2xl">
 		<!-- Window Header -->
 		<div class="bg-black text-white px-4 py-2.5 flex justify-between items-center border-b-[3px] border-black">
 			<div class="flex gap-2">
-				<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-white" />
-				<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-white" />
-				<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white" />
+				<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
+				<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
+				<div class="w-3 h-3 rounded-full bg-data-green border border-white" />
 			</div>
 			<div class="font-mono font-bold tracking-widest text-xs uppercase">BARCODE_GENERATOR</div>
 			<div class="w-16" />
@@ -277,10 +277,10 @@
 						bind:value={barcodeValue}
 						type="text"
 						placeholder={activeFormat.placeholder}
-						class="w-full border-[3px] border-black px-3 py-2.5 font-mono font-bold text-sm focus:outline-none focus:border-[#ff6b6b] focus:shadow-[3px_3px_0_0_#ff6b6b] transition-all"
+						class="w-full border-[3px] border-black px-3 py-2.5 font-mono font-bold text-sm focus:outline-none focus:border-brand-danger focus:shadow-[3px_3px_0_0_#ff6b6b] transition-all"
 					/>
 					{#if barcodeError}
-						<p class="text-xs font-bold text-[#ff6b6b] mt-1">{barcodeError}</p>
+						<p class="text-xs font-bold text-brand-danger mt-1">{barcodeError}</p>
 					{/if}
 				</div>
 
@@ -395,7 +395,7 @@
 			<button
 				on:click={generateImage}
 				disabled={!!barcodeError || isGenerating || !barcodeValue}
-				class="px-8 py-3 bg-[#4ade80] text-black border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center gap-2"
+				class="px-8 py-3 bg-data-green text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center gap-2"
 			>
 				{#if isGenerating}
 					<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
@@ -407,7 +407,7 @@
 			<button
 				on:click={downloadSvg}
 				disabled={!!barcodeError || !barcodeValue}
-				class="px-6 py-3 bg-white text-black border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center gap-2"
+				class="px-6 py-3 bg-white text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center gap-2"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
 				Download SVG
@@ -418,26 +418,26 @@
 	<!-- Result -->
 	{#if imageUrl}
 		<div class="mt-12">
-			<div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden">
-				<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+			<div class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden">
+				<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 				<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">Barcode Generated!</h3>
 
-				<div class="inline-block bg-white border-[3px] border-gray-900 p-4 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8">
-					<img src={imageUrl} alt="Generated barcode" class="max-w-full h-auto max-h-[200px]" />
+				<div class="inline-block bg-white border-[3px] border-gray-900 p-4 shadow-brutal-2xl rotate-1 mb-8">
+					<img loading="lazy" src={imageUrl} alt="Generated barcode" class="max-w-full h-auto max-h-[200px]" />
 				</div>
 
 				<div class="flex flex-wrap justify-center gap-4">
 					<a
 						href={imageUrl}
 						download="barcode.{fileFormat}"
-						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
 						Download {fileFormat.toUpperCase()}
 					</a>
 					<button
 						on:click={() => copyToClipboard(imageUrl)}
-						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
 						Copy URL
@@ -451,14 +451,14 @@
 	<section class="mt-20 mb-12">
 		<div class="text-center mb-10">
 			<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">
-				Barcode Types <span class="text-[#ff6b6b]">Explained</span>
+				Barcode Types <span class="text-brand-danger">Explained</span>
 			</h2>
 			<p class="text-lg font-bold text-gray-600 mt-3 max-w-2xl mx-auto">
 				Choose the right barcode format for your use case. Each type has different data capacity, character support, and industry applications.
 			</p>
 		</div>
 
-		<div class="overflow-x-auto border-[3px] border-black shadow-[8px_8px_0_0_#1f2937]">
+		<div class="overflow-x-auto border-[3px] border-black shadow-brutal-2xl">
 			<table class="w-full text-left border-collapse bg-white">
 				<thead>
 					<tr class="bg-black text-white">
@@ -469,55 +469,55 @@
 					</tr>
 				</thead>
 				<tbody class="text-sm font-medium text-gray-700">
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Code 128</td>
 						<td class="p-3">Alphanumeric + symbols</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Shipping labels, logistics, general purpose</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">EAN-13</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">13 digits</td>
 						<td class="p-3">Retail products worldwide (international standard)</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">UPC-A</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">12 digits</td>
 						<td class="p-3">Retail products in North America</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Code 39</td>
 						<td class="p-3">Alphanumeric</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Manufacturing, military, healthcare IDs</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">ITF-14</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">14 digits</td>
 						<td class="p-3">Shipping containers, carton-level tracking</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Code 93</td>
 						<td class="p-3">Alphanumeric</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Postal services, electronic components</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Codabar</td>
 						<td class="p-3">Numeric + A-D delimiters</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Blood banks, libraries, FedEx airbills</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">MSI</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Warehouse shelves, inventory management</td>
 					</tr>
-					<tr class="hover:bg-[#ffc480]/10">
+					<tr class="hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Pharmacode</td>
 						<td class="p-3">Numeric (3-131070)</td>
 						<td class="p-3">1-6 digits</td>
@@ -530,23 +530,23 @@
 
 	<!-- How to Create a Barcode -->
 	<section class="mb-12">
-		<div class="border-[3px] border-black bg-white shadow-[8px_8px_0_0_#1f2937] p-6 md:p-10">
+		<div class="border-[3px] border-black bg-white shadow-brutal-2xl p-6 md:p-10">
 			<h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tighter mb-6">
-				How to Create a <span class="text-[#ff6b6b]">Barcode</span>
+				How to Create a <span class="text-brand-danger">Barcode</span>
 			</h2>
 
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="border-[3px] border-black p-5 bg-[#ffc480]/10">
+				<div class="border-[3px] border-black p-5 bg-brand-accent/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">1</div>
 					<h3 class="font-black text-lg mb-2">Enter Your Data</h3>
 					<p class="text-sm font-medium text-gray-600">Type the text or numbers you want to encode. Choose a barcode format that matches your use case — Code 128 for general purpose, EAN-13 for retail products, UPC-A for US retail.</p>
 				</div>
-				<div class="border-[3px] border-black p-5 bg-[#4ade80]/10">
+				<div class="border-[3px] border-black p-5 bg-data-green/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">2</div>
 					<h3 class="font-black text-lg mb-2">Customize Appearance</h3>
 					<p class="text-sm font-medium text-gray-600">Adjust bar width, height, colors, and choose whether to display the encoded text below the bars. Enable transparent background for overlay use.</p>
 				</div>
-				<div class="border-[3px] border-black p-5 bg-[#ff6b6b]/10">
+				<div class="border-[3px] border-black p-5 bg-brand-danger/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">3</div>
 					<h3 class="font-black text-lg mb-2">Download or Automate</h3>
 					<p class="text-sm font-medium text-gray-600">Download as PNG, JPG, WebP, or SVG. For bulk generation, use the Pictify API to create thousands of unique barcodes programmatically from your inventory or product data.</p>
@@ -557,9 +557,9 @@
 
 	<!-- Bulk Barcode Generation -->
 	<section class="mb-12">
-		<div class="border-[3px] border-black bg-[#0b0b1f] text-white shadow-[8px_8px_0_0_#1f2937] p-6 md:p-10">
+		<div class="border-[3px] border-black bg-[#0b0b1f] text-white shadow-brutal-2xl p-6 md:p-10">
 			<div class="flex items-start gap-4 mb-4">
-				<span class="px-3 py-1 bg-[#4ade80] text-black text-xs font-black uppercase tracking-wider border-[2px] border-[#4ade80] rounded">API</span>
+				<span class="px-3 py-1 bg-data-green text-black text-xs font-black uppercase tracking-wider border-[2px] border-data-green rounded">API</span>
 			</div>
 			<h2 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-3">
 				Bulk Barcode Generation
@@ -568,7 +568,7 @@
 				Need thousands of barcodes? Use the Pictify batch API to generate unique barcode images for every product, bin, or shipment in your system. Feed a CSV of SKUs and get back CDN-hosted barcode images in seconds.
 			</p>
 			<div class="flex flex-wrap gap-4">
-				<a href="/signup" class="px-6 py-3 bg-[#4ade80] text-black font-black border-[3px] border-[#4ade80] rounded-xl uppercase tracking-wide hover:bg-[#22c55e] transition-colors">
+				<a href="/signup" class="px-6 py-3 bg-data-green text-black font-black border-[3px] border-data-green rounded-xl uppercase tracking-wide hover:bg-[#22c55e] transition-colors">
 					Get API Key
 				</a>
 				<a href="https://docs.pictify.io" target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-transparent text-white font-black border-[3px] border-white rounded-xl uppercase tracking-wide hover:bg-white/10 transition-colors">

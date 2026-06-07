@@ -58,14 +58,14 @@
 {#if variant === 'minimal'}
 	<!-- Minimal: just the counter -->
 	<div class="inline-flex items-center gap-2 text-sm font-bold text-gray-600">
-		<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+		<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 		<span>{formatNumber(Math.floor($animatedCount))}+ images generated</span>
 	</div>
 {:else if variant === 'compact'}
 	<!-- Compact: counter with brief social proof -->
 	<div class="flex items-center justify-center gap-4 py-2 px-4 bg-gray-50 border-y border-gray-200">
 		<div class="flex items-center gap-2">
-			<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+			<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 			<span class="text-sm font-bold">
 				<span class="text-black">{formatNumber(Math.floor($animatedCount))}</span>
 				<span class="text-gray-500"> images generated</span>
@@ -83,7 +83,7 @@
 				<div class="flex items-center gap-6">
 					<div class="flex items-center gap-3">
 						<div
-							class="w-10 h-10 bg-[#4ade80] border-[2px] border-black flex items-center justify-center"
+							class="w-10 h-10 bg-data-green border-[2px] border-black flex items-center justify-center"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -108,7 +108,7 @@
 
 					<div class="hidden sm:flex items-center gap-3">
 						<div
-							class="w-10 h-10 bg-[#ffc480] border-[2px] border-black flex items-center justify-center"
+							class="w-10 h-10 bg-brand-accent border-[2px] border-black flex items-center justify-center"
 						>
 							<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -129,13 +129,13 @@
 				<!-- Recent Activity -->
 				{#if showRecentActivity}
 					<div class="flex items-center gap-2 px-4 py-2 bg-gray-50 border-[2px] border-gray-200">
-						<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+						<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 						<span class="text-sm font-medium text-gray-600">
 							<span class="font-bold text-gray-800"
 								>{recentActivity[currentActivityIndex].user}</span
 							>
 							{recentActivity[currentActivityIndex].action}
-							<span class="text-gray-400">· {recentActivity[currentActivityIndex].time}</span>
+							<span class="text-gray-600">· {recentActivity[currentActivityIndex].time}</span>
 						</span>
 					</div>
 				{/if}

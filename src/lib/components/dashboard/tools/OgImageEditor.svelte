@@ -472,7 +472,7 @@
 				>
 					<span>UID: {template.uid}</span>
 					<button
-						class="hover:text-[#ff6b6b] transition-colors"
+						class="hover:text-brand-danger transition-colors"
 						on:click={() => {
 							navigator.clipboard.writeText(template.uid);
 							toast.set({ message: 'UID copied to clipboard', type: 'success', duration: 1500 });
@@ -562,7 +562,7 @@
 						/>
 						{#if settings.logo}
 							<div class="mt-2">
-								<img src={settings.logo} alt="Logo Preview" class="h-12 object-contain" />
+								<img loading="lazy" src={settings.logo} alt="Logo Preview" class="h-12 object-contain" />
 							</div>
 						{/if}
 					</div>
@@ -688,7 +688,7 @@
 			<div class="mt-8 p-4 border-2 border-gray-900 rounded-md">
 				<h3 class="text-lg font-bold mb-4">Generated Image</h3>
 				<div class="flex items-start gap-4">
-					<img
+					<img loading="lazy"
 						src={imageUrl}
 						alt="Generated OG Image"
 						class="w-48 rounded-md border-2 border-gray-900"

@@ -63,14 +63,11 @@
 				<div
 					class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 				>
-					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#4ade80] rounded-full animate-pulse" />
+					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-data-green rounded-full" />
 					Live Console
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					API <span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Access</span
-					>
+					API <span class="text-gray-900">Access</span>
 				</h1>
 			</div>
 			<div class="flex items-center gap-4">
@@ -90,7 +87,7 @@
 			<div class="lg:col-span-1 space-y-4 sm:space-y-6 lg:space-y-8">
 				<!-- Usage Monitor -->
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden relative group"
+					class="bg-white rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden relative group"
 				>
 					<!-- Monitor Header -->
 					<div
@@ -125,7 +122,7 @@
 							<div
 								class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 leading-none tracking-tighter"
 							>
-								{Math.round(usagePercent)}<span class="text-lg sm:text-xl md:text-2xl text-gray-400"
+								{Math.round(usagePercent)}<span class="text-lg sm:text-xl md:text-2xl text-gray-600"
 									>%</span
 								>
 							</div>
@@ -154,7 +151,7 @@
 
 						<div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 border-dashed border-gray-200">
 							<button
-								class="w-full py-2.5 sm:py-3 bg-gray-900 text-white font-bold uppercase tracking-wider text-xs sm:text-sm rounded-lg hover:bg-[#ffc480] hover:text-gray-900 transition-colors flex items-center justify-center gap-2 group/btn"
+								class="w-full py-2.5 sm:py-3 bg-gray-900 text-white font-bold uppercase tracking-wider text-xs sm:text-sm rounded-lg hover:bg-brand-accent hover:text-gray-900 transition-colors flex items-center justify-center gap-2 group/btn"
 							>
 								Increase Limits
 								<svg
@@ -176,14 +173,14 @@
 
 				<!-- Efficiency Ticket -->
 				<div
-					class="bg-[#ffc480] rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
+					class="bg-brand-accent rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl relative overflow-hidden"
 				>
 					<!-- Ticket Perforations -->
 					<div
-						class="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-[#FFFDF8] rounded-full border-[2px] sm:border-[3px] border-gray-900"
+						class="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-brand-bg rounded-full border-[2px] sm:border-[3px] border-gray-900"
 					/>
 					<div
-						class="absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-[#FFFDF8] rounded-full border-[2px] sm:border-[3px] border-gray-900"
+						class="absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-brand-bg rounded-full border-[2px] sm:border-[3px] border-gray-900"
 					/>
 
 					<div class="p-4 sm:p-6 text-center">
@@ -209,11 +206,11 @@
 			<!-- Right Column: Tokens (The "Key Rack") -->
 			<div class="lg:col-span-2">
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] sm:shadow-[12px_12px_0_0_#1f2937] h-full flex flex-col relative overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl lg:rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl sm:shadow-brutal-3xl h-full flex flex-col relative overflow-hidden"
 				>
 					<!-- Header -->
 					<div
-						class="p-4 sm:p-6 md:p-8 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
+						class="p-4 sm:p-6 md:p-8 border-b-[3px] border-gray-900 bg-brand-bg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
 					>
 						<div>
 							<h2
@@ -231,7 +228,7 @@
 						</div>
 						<button
 							on:click={createAPITokenAction}
-							class="group relative px-4 sm:px-6 py-2 sm:py-3 bg-[#4ade80] text-gray-900 font-black text-xs sm:text-sm uppercase tracking-wide rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[4px_4px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] sm:hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all w-full sm:w-auto"
+							class="group relative px-4 sm:px-6 py-2 sm:py-3 bg-data-green text-gray-900 font-black text-xs sm:text-sm uppercase tracking-wide rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-lg hover:shadow-[1px_1px_0_0_#1f2937] sm:hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all w-full sm:w-auto"
 						>
 							<span class="flex items-center justify-center gap-2">
 								<svg
@@ -267,10 +264,10 @@
 											<!-- Left: Status Indicator -->
 											<div class="flex items-center gap-2 sm:gap-3 md:gap-4">
 												<div
-													class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-900 flex items-center justify-center border-2 border-gray-900 shadow-[2px_2px_0_0_#ffc480]"
+													class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-900 flex items-center justify-center border-2 border-gray-900 shadow-brutal-accent-sm"
 												>
 													<svg
-														class="w-5 h-5 sm:w-6 sm:h-6 text-[#ffc480]"
+														class="w-5 h-5 sm:w-6 sm:h-6 text-brand-accent"
 														fill="none"
 														stroke="currentColor"
 														viewBox="0 0 24 24"
@@ -317,11 +314,12 @@
 													{token.token.slice(0, 12)}...{token.token.slice(-4)}
 												</code>
 												<button
-													class="p-1.5 sm:p-2 hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"
+													class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"
 													on:click={() => copyToClipboard(token.token)}
 													title="Copy to clipboard"
+													aria-label="Copy API key to clipboard"
 												>
-													<img
+													<img loading="lazy"
 														src={CopyIcon}
 														alt="Copy"
 														class="w-3 h-3 sm:w-4 sm:h-4 opacity-60 hover:opacity-100"
@@ -331,7 +329,7 @@
 
 											<!-- Right: Actions -->
 											<button
-												class="text-[10px] sm:text-xs font-bold text-gray-400 hover:text-red-600 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide border-2 border-transparent hover:border-red-100 w-full md:w-auto"
+												class="text-[10px] sm:text-xs font-bold text-gray-400 hover:text-red-600 px-2 sm:px-3 md:px-4 min-h-[44px] sm:py-2 rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide border-2 border-transparent hover:border-red-100 w-full md:w-auto flex items-center justify-center md:inline-flex"
 												on:click={() => confirmRevoke(token)}
 											>
 												Revoke
@@ -376,21 +374,21 @@
 	<!-- Revoke Confirmation Modal -->
 	{#if showRevokeConfirm}
 		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 		>
 			<div
-				class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full relative overflow-hidden"
+				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-md w-full relative overflow-hidden"
 			>
 				<!-- Header Strip -->
 				<div
-					class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b-[3px] border-gray-900 z-10"
+					class="absolute top-0 left-0 w-full h-1.5 bg-brand-danger border-b-[3px] border-gray-900 z-10"
 				/>
 
 				<div class="p-6 pt-8">
 					<!-- Warning Icon -->
 					<div class="flex justify-center mb-4">
 						<div
-							class="w-14 h-14 rounded-xl bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center"
+							class="w-14 h-14 rounded-xl bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -428,7 +426,7 @@
 						</button>
 						<button
 							on:click={executeRevoke}
-							class="flex-1 px-4 py-3 text-xs font-black text-white bg-[#ff6b6b] rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+							class="flex-1 px-4 py-3 text-xs font-black text-white bg-brand-danger rounded-lg border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 						>
 							Revoke Key
 						</button>
