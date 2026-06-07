@@ -86,18 +86,43 @@
 	<!-- Right Side: System Status / Usage -->
 	<div class="flex items-stretch border-l-[3px] border-gray-900 flex-shrink-0">
 		{#if $trialInfo.isOnTrial}
-			<!-- Trial Badge -->
-			<button
-				type="button"
-				on:click={() => openUpgradeModal('trial_badge')}
-				title="You're on a free Basic trial. Upgrade to keep your higher limit."
-				class="hidden sm:flex items-center gap-2 px-3 md:px-4 min-h-[64px] sm:min-h-[80px] border-r-[3px] border-gray-900 bg-[#ffc480] hover:bg-[#ffb454] transition-colors font-bold text-gray-900 text-xs sm:text-sm whitespace-nowrap"
-			>
-				<span aria-hidden="true">⏳</span>
-				<span>
-					Trial · {$trialInfo.daysRemaining ?? 0} day{$trialInfo.daysRemaining === 1 ? '' : 's'} left
-				</span>
-			</button>
+			{@const days = $trialInfo.daysRemaining ?? 0}
+			{@const iconColor =
+				days <= 3 ? 'text-[#ff6b6b]' : days <= 7 ? 'text-[#c88a3b]' : 'text-gray-900'}
+			<!-- Trial countdown -->
+			<div class="hidden items-center px-3 sm:flex md:px-4 border-r-[3px] border-gray-900">
+				<button
+					type="button"
+					on:click={() => openUpgradeModal('trial_badge')}
+					aria-label={`Free trial: ${days} day${days === 1 ? '' : 's'} left. Upgrade your plan.`}
+					class="group flex items-stretch overflow-hidden rounded-lg border-2 border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937] transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffc480] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
+				>
+					<span class="flex items-center gap-1.5 py-1.5 pl-2.5 pr-2.5">
+						<svg
+							class="h-4 w-4 shrink-0 {iconColor}"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							aria-hidden="true"
+						>
+							<circle cx="12" cy="12" r="9" />
+							<path d="M12 7.5V12l2.5 1.5" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+						<span class="whitespace-nowrap leading-none">
+							<span class="text-sm font-bold tabular-nums text-gray-900">{days}</span>
+							<span class="ml-0.5 hidden text-[11px] font-medium text-gray-600 md:inline"
+								>day{days === 1 ? '' : 's'} left</span
+							>
+						</span>
+					</span>
+					<span
+						class="flex items-center border-l-2 border-gray-900 bg-[#ffc480] px-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-900 transition-colors group-hover:bg-[#ffb968]"
+					>
+						Upgrade
+					</span>
+				</button>
+			</div>
 		{/if}
 		<!-- Usage Widget Container -->
 		<div
