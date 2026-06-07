@@ -1089,7 +1089,7 @@
 
 			<!-- Status Badge -->
 			<div
-				class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[4px_4px_0_0_#1f2937]"
+				class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-lg"
 			>
 				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-[#4ade80] rounded-full animate-pulse" />
 				<span class="text-[10px] sm:text-xs font-black text-gray-900 uppercase tracking-wider"
@@ -1104,7 +1104,7 @@
 			<div class="col-span-12 lg:col-span-4 space-y-4 sm:space-y-6 md:space-y-8">
 				<!-- Auth Card -->
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2"
@@ -1137,7 +1137,7 @@
 								</div>
 								<input
 									type="password"
-									class="w-full pl-8 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-3 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-mono font-bold text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] sm:focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									class="w-full pl-8 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-3 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-mono font-bold text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] sm:focus:shadow-brutal-accent transition-all"
 									value={apiToken}
 									readonly
 								/>
@@ -1168,7 +1168,7 @@
 								</p>
 								<a
 									href="/dashboard/api-token"
-									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-danger text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-danger text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									Get API Key
 								</a>
@@ -1179,7 +1179,7 @@
 
 				<!-- Endpoints Menu -->
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2"
@@ -1292,7 +1292,7 @@
 
 				<!-- Request Builder -->
 				<div
-					class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 p-4 border-b-[3px] border-gray-900 flex items-center justify-between"
@@ -1317,7 +1317,7 @@
 									>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={imageParams.html}
@@ -1363,7 +1363,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={imageParams.width}
 									/>
 								</div>
@@ -1373,7 +1373,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={imageParams.height}
 									/>
 								</div>
@@ -1389,7 +1389,7 @@
 									</label>
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={createTemplateParams.name}
 										placeholder="My template"
 									/>
@@ -1563,7 +1563,7 @@
 								{#if manualTemplateInput['get-template']}
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={getTemplateParams.uid}
 										placeholder="Enter template UID manually"
 									/>
@@ -1608,7 +1608,7 @@
 								{#if manualTemplateInput['delete-template']}
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={deleteTemplateParams.uid}
 										placeholder="Enter template UID to delete"
 									/>
@@ -1660,7 +1660,7 @@
 									</div>
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={searchTemplatesParams.q}
 										placeholder="Search templates by name, type, or tags"
 									/>
@@ -1674,7 +1674,7 @@
 										<input
 											type="number"
 											min="1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={searchTemplatesParams.page}
 										/>
 									</div>
@@ -1687,7 +1687,7 @@
 											type="number"
 											min="1"
 											max="100"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={searchTemplatesParams.limit}
 										/>
 									</div>
@@ -1723,7 +1723,7 @@
 									{#if manualTemplateInput['render-template']}
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={renderTemplateParams.templateUid}
 											placeholder="Enter template UID manually"
 										/>
@@ -1773,7 +1773,7 @@
 									</div>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={renderTemplateParams.variables}
@@ -1820,7 +1820,7 @@
 											>Format</label
 										>
 										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
 											bind:value={renderTemplateParams.format}
 										>
 											<option value="png">PNG</option>
@@ -1838,7 +1838,7 @@
 											min="0.1"
 											max="1"
 											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={renderTemplateParams.quality}
 										/>
 									</div>
@@ -1865,7 +1865,7 @@
 													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(
 														layout.key
 													)
-														? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => togglePlaygroundLayout(layout.key)}
 												>
@@ -1914,7 +1914,7 @@
 										>
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={renderTemplateParams.layout}
 											placeholder="e.g. twitter-post, facebook-post"
 										/>
@@ -1950,7 +1950,7 @@
 									{#if manualTemplateInput['batch-render']}
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderParams.templateUid}
 											placeholder="Enter template UID"
 										/>
@@ -2000,7 +2000,7 @@
 									</div>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={batchRenderParams.variableSets}
@@ -2047,7 +2047,7 @@
 											>Format</label
 										>
 										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
 											bind:value={batchRenderParams.format}
 										>
 											<option value="png">PNG</option>
@@ -2065,7 +2065,7 @@
 											min="0.1"
 											max="1"
 											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderParams.quality}
 										/>
 									</div>
@@ -2078,7 +2078,7 @@
 											type="number"
 											min="1"
 											max="10"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderParams.concurrency}
 										/>
 									</div>
@@ -2108,7 +2108,7 @@
 													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(
 														layout.key
 													)
-														? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchLayout(layout.key)}
 												>
@@ -2181,7 +2181,7 @@
 									{#if manualTemplateInput['batch-render-csv']}
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderCsvParams.templateUid}
 											placeholder="Enter template UID"
 										/>
@@ -2199,7 +2199,7 @@
 									>
 									<input
 										type="url"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={batchRenderCsvParams.csvUrl}
 										placeholder="https://example.com/data.csv"
 									/>
@@ -2242,7 +2242,7 @@
 									</div>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={batchRenderCsvParams.mappings}
@@ -2289,7 +2289,7 @@
 											>Format</label
 										>
 										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
 											bind:value={batchRenderCsvParams.format}
 										>
 											<option value="png">PNG</option>
@@ -2307,7 +2307,7 @@
 											min="0.1"
 											max="1"
 											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderCsvParams.quality}
 										/>
 									</div>
@@ -2320,7 +2320,7 @@
 											type="number"
 											min="1"
 											max="10"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderCsvParams.concurrency}
 										/>
 									</div>
@@ -2352,7 +2352,7 @@
 													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(
 														layout.key
 													)
-														? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchCsvLayout(layout.key)}
 												>
@@ -2402,7 +2402,7 @@
 								>
 								<input
 									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 									bind:value={batchStatusParams.batchId}
 									placeholder="Enter batch ID (e.g., batch_ABC123)"
 								/>
@@ -2414,7 +2414,7 @@
 								>
 								<input
 									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 									bind:value={cancelBatchParams.batchId}
 									placeholder="Enter batch ID to cancel"
 								/>
@@ -2446,7 +2446,7 @@
 								{#if manualTemplateInput['get-variables']}
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={getVariablesParams.uid}
 										placeholder="Enter template UID"
 									/>
@@ -2466,7 +2466,7 @@
 									>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={gifParams.html}
@@ -2512,7 +2512,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={gifParams.width}
 									/>
 								</div>
@@ -2522,7 +2522,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={gifParams.height}
 									/>
 								</div>
@@ -2534,7 +2534,7 @@
 										type="number"
 										min="1"
 										max="30"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={gifParams.framesPerSecond}
 									/>
 								</div>
@@ -2549,7 +2549,7 @@
 								/>
 							{/if}
 							<button
-								class="w-full py-4 bg-brand-danger text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-[4px_4px_0_0_#1f2937]"
+								class="w-full py-4 bg-brand-danger text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-brutal-lg"
 								on:click={() => testEndpoint(selectedEndpoint)}
 								disabled={loading || requiresEmailVerification}
 							>
@@ -2584,7 +2584,7 @@
 				<div class="relative group">
 					<!-- Terminal Window -->
 					<div
-						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col min-h-[400px]"
+						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px]"
 					>
 						<!-- Terminal Header -->
 						<div
@@ -2603,7 +2603,7 @@
 
 							{#if curlExample && !response}
 								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-brand-accent text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center gap-2 px-3 py-1.5 bg-brand-accent text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={handleCopyCurl}
 								>
 									{#if copiedCurl}
@@ -2630,7 +2630,7 @@
 								</button>
 							{:else if response}
 								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-600 hover:text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-600 hover:text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={() => {
 										response = null;
 										responseJson = '';
@@ -2676,7 +2676,7 @@
 										<!-- Generated Asset Preview -->
 										{#if response.url || response.gif?.url}
 											<div
-												class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+												class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 											>
 												<!-- Header -->
 												<div
@@ -2776,7 +2776,7 @@
 
 										<!-- JSON Response -->
 										<div
-											class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+											class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 										>
 											<div class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900">
 												<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
@@ -2792,7 +2792,7 @@
 								{:else if curlExample}
 									<!-- cURL View -->
 									<div
-										class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+										class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 									>
 										<div
 											class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900 flex items-center gap-2"
@@ -2891,7 +2891,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={imageParams.html}
@@ -2977,7 +2977,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={gifParams.html}
@@ -3063,7 +3063,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={renderTemplateParams.variables}
@@ -3151,7 +3151,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={batchRenderParams.variableSets}
@@ -3240,7 +3240,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={batchRenderCsvParams.mappings}

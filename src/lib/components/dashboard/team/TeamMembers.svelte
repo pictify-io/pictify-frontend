@@ -188,14 +188,14 @@
 		</div>
 	{:else if !$currentTeam}
 		<div
-			class="bg-brand-bg border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-[4px_4px_0_0_#1f2937]"
+			class="bg-brand-bg border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-brutal-lg"
 		>
 			<p class="text-xl font-black text-gray-900">No team selected</p>
 		</div>
 	{:else}
 		<!-- Seat Usage -->
 		<div
-			class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-10 transition-transform hover:-translate-y-1"
+			class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden mb-10 transition-transform hover:-translate-y-1"
 		>
 			<div class="p-8">
 				<div
@@ -213,7 +213,7 @@
 					{#if seatUsage >= seatLimit && $isTeamOwner}
 						<a
 							href="/dashboard/upgrade"
-							class="px-6 py-3 text-sm font-black uppercase tracking-wider text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+							class="px-6 py-3 text-sm font-black uppercase tracking-wider text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
 						>
 							Add More Seats
 						</a>
@@ -237,7 +237,7 @@
 			<!-- Main Content: Member List -->
 			<div class="lg:col-span-2 space-y-8">
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="px-8 py-6 border-b-[3px] border-gray-900 bg-gray-50 flex justify-between items-center"
@@ -255,7 +255,7 @@
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
-											class="w-12 h-12 rounded-xl bg-brand-accent border-[3px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+											class="w-12 h-12 rounded-xl bg-brand-accent border-[3px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 										>
 											<span class="text-lg font-black text-gray-900">
 												{member.user?.email?.charAt(0)?.toUpperCase() || '?'}
@@ -314,7 +314,7 @@
 				<!-- Pending Invitations -->
 				<!-- Debug: invitations count = {$teamInvitations.length}, isOwner = {$isTeamOwner} -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div class="px-8 py-6 border-b-[3px] border-gray-900 bg-gray-50">
 						<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">

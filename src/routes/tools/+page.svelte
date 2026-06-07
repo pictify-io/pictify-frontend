@@ -171,7 +171,7 @@
 				class="relative w-full mx-auto flex flex-col justify-center items-center text-center space-y-6"
 			>
 				<div
-					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform -rotate-2"
+					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-4 transform -rotate-2"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">Dev Tools</span>
 				</div>
@@ -197,7 +197,7 @@
 				{#each tools as tool}
 					<a href={tool.url} class="block group relative h-full">
 						<div
-							class="h-full bg-white border-[3px] border-gray-900 p-8 rounded-xl shadow-[8px_8px_0_0_#1f2937] transition-all duration-200 group-hover:-translate-y-2 group-hover:shadow-[12px_12px_0_0_#1f2937] flex flex-col items-start relative overflow-hidden"
+							class="h-full bg-white border-[3px] border-gray-900 p-8 rounded-xl shadow-brutal-2xl transition-all duration-200 group-hover:-translate-y-2 group-hover:shadow-brutal-3xl flex flex-col items-start relative overflow-hidden"
 						>
 							<!-- Background Pattern -->
 							<div
@@ -205,7 +205,7 @@
 							/>
 
 							<div
-								class="w-16 h-16 bg-brand-bg border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-[4px_4px_0_0_#1f2937] group-hover:bg-brand-accent transition-colors duration-200 text-gray-900"
+								class="w-16 h-16 bg-brand-bg border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-brutal-lg group-hover:bg-brand-accent transition-colors duration-200 text-gray-900"
 							>
 								<i class={tool.icon} />
 							</div>
@@ -237,7 +237,7 @@
 		<div id="workflows" class="w-full py-20 px-6 max-w-6xl mx-auto scroll-mt-24">
 			<div class="text-center space-y-4 mb-12">
 				<div
-					class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-2 transform rotate-1"
+					class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-2 transform rotate-1"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">Workflows</span>
 				</div>
@@ -256,7 +256,7 @@
 						on:click={() => activeCategory = cat.id}
 						class="px-4 py-2 text-sm font-bold border-2 whitespace-nowrap transition-all rounded-lg
 							{activeCategory === cat.id
-								? 'border-gray-900 bg-brand-accent shadow-[3px_3px_0_0_#1f2937] text-gray-900'
+								? 'border-gray-900 bg-brand-accent shadow-brutal-md text-gray-900'
 								: 'border-gray-200 hover:border-gray-400 bg-white text-gray-600'}"
 					>
 						{cat.label}
@@ -270,7 +270,7 @@
 				{#each useCases as uc}
 					<a
 						href={`/tools/${uc.id}`}
-						class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all group"
+						class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all group"
 						class:hidden={hiddenIds.has(uc.id)}
 					>
 						<div class="flex items-start justify-between gap-4">
@@ -290,7 +290,7 @@
 							</div>
 							<div class="flex flex-col items-end gap-2 flex-shrink-0">
 								<span
-									class="px-4 py-2 bg-[#4ade80] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[3px_3px_0_0_#1f2937] group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all text-xs flex items-center gap-2"
+									class="px-4 py-2 bg-[#4ade80] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-md group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all text-xs flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -313,7 +313,7 @@
 		<div class="py-24 bg-brand-accent border-y-[3px] border-gray-900 pattern-grid">
 			<div class="max-w-6xl mx-auto px-6">
 				<div
-					class="bg-white border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] rounded-2xl overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 shadow-brutal-3xl rounded-2xl overflow-hidden"
 				>
 					<div class="p-8 md:p-12 border-b-[3px] border-gray-900 bg-gray-50">
 						<h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6">
@@ -329,7 +329,7 @@
 					<div class="p-8 md:p-12 bg-white">
 						<ul class="grid md:grid-cols-2 gap-6">
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">⚡️</div>
 								<p class="font-bold text-lg">
@@ -337,7 +337,7 @@
 								</p>
 							</li>
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">🌏</div>
 								<p class="font-bold text-lg">
@@ -345,7 +345,7 @@
 								</p>
 							</li>
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">🔄</div>
 								<p class="font-bold text-lg">
@@ -353,7 +353,7 @@
 								</p>
 							</li>
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">📸</div>
 								<p class="font-bold text-lg">
@@ -378,7 +378,7 @@
 		<div class="w-full max-w-4xl mx-auto px-6 py-24">
 			<div class="flex items-center justify-center mb-12">
 				<h2
-					class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-center bg-white px-6 py-2 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] transform -rotate-1 inline-block"
+					class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-center bg-white px-6 py-2 border-[3px] border-gray-900 shadow-brutal-xl transform -rotate-1 inline-block"
 				>
 					Frequently Asked Questions
 				</h2>
@@ -386,7 +386,7 @@
 
 			<div class="space-y-6">
 				<details
-					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
+					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
 				>
 					<summary
 						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
@@ -408,7 +408,7 @@
 				</details>
 
 				<details
-					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
+					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
 				>
 					<summary
 						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
@@ -432,7 +432,7 @@
 				</details>
 
 				<details
-					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
+					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
 				>
 					<summary
 						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"

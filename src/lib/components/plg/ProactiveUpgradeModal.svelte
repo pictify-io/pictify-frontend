@@ -105,7 +105,7 @@
 	>
 		<!-- Modal -->
 		<div
-			class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
+			class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-md w-full overflow-hidden"
 			transition:scale={{ duration: 300, easing: quintOut, start: 0.95 }}
 			on:click|stopPropagation
 			on:keydown|stopPropagation
@@ -122,7 +122,7 @@
 
 				<!-- Discount badge -->
 				<div
-					class="absolute top-5 right-5 px-3 py-1 bg-white rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] transform rotate-3 z-10"
+					class="absolute top-5 right-5 px-3 py-1 bg-white rounded-lg border-2 border-gray-900 shadow-brutal-md transform rotate-3 z-10"
 				>
 					<span class="text-xs font-black text-gray-900 tracking-wide"
 						>{discountInfo.discountPercent}% OFF</span
@@ -131,7 +131,7 @@
 
 				<div class="relative z-10 pr-16">
 					<div
-						class="mb-3 transform -rotate-6 w-fit bg-white p-2 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+						class="mb-3 transform -rotate-6 w-fit bg-white p-2 rounded-lg border-2 border-gray-900 shadow-brutal-sm"
 					>
 						<svg class="w-8 h-8 text-brand-accent" fill="currentColor" viewBox="0 0 24 24">
 							<path
@@ -163,7 +163,7 @@
 						class="p-4 bg-white rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#10b981] text-center transform -rotate-1 hover:rotate-0 transition-transform"
 					>
 						<div
-							class="w-10 h-10 bg-brand-success rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-10 h-10 bg-brand-success rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-brutal-sm"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -184,7 +184,7 @@
 						class="p-4 bg-white rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#6366f1] text-center transform rotate-1 hover:rotate-0 transition-transform"
 					>
 						<div
-							class="w-10 h-10 bg-[#6366f1] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-10 h-10 bg-[#6366f1] rounded-lg border-2 border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-brutal-sm"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path

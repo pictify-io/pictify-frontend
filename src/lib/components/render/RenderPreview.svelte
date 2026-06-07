@@ -181,7 +181,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<button
-						class="p-3 bg-white border-[3px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="p-3 bg-white border-[3px] border-gray-900 rounded-lg shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 						on:click={handleCopyUrl}
 						disabled={isCopyingUrl}
 						title="Copy share link"

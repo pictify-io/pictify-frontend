@@ -47,7 +47,7 @@
 				{#each items as item}
 					<a
 						href={getHref(item)}
-						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
+						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 					>
 						<h3 class="font-black text-gray-900 mb-1 group-hover:text-brand-danger transition-colors">
 							{getTitle(item)}
@@ -81,7 +81,7 @@
 				{#each items as item}
 					<a
 						href={getHref(item)}
-						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-gray-900 hover:bg-brand-accent transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
+						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-gray-900 hover:bg-brand-accent transition-colors shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
 					>
 						{getTitle(item)}
 					</a>

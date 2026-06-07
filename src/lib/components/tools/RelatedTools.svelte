@@ -15,7 +15,7 @@
 					{#if useCaseDetails[toolId]}
 						<a
 							href="/tools/{toolId}"
-							class="p-5 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all block rounded-xl"
+							class="p-5 bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all block rounded-xl"
 						>
 							<h4 class="font-black text-gray-900 mb-1">{useCaseDetails[toolId].label}</h4>
 							<p class="text-xs text-gray-500 line-clamp-2">{useCaseDetails[toolId].description}</p>

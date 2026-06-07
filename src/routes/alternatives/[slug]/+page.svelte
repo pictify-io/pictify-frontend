@@ -166,7 +166,7 @@
 					class="inline-flex transform -rotate-1 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 				>
 					<div
-						class="px-5 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
+						class="px-5 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
 					>
 						{alt.competitor} Alternative · 2026
 					</div>
@@ -188,7 +188,7 @@
 
 				<!-- TL;DR -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#ffc480] max-w-3xl"
+					class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-brutal-accent max-w-3xl"
 				>
 					<p class="text-gray-700 font-bold leading-relaxed">
 						<span class="text-brand-danger font-black">TL;DR:</span>
@@ -322,7 +322,7 @@
 				<section class="mb-12">
 					<h2 class="text-2xl font-black text-gray-900 mb-6">Pricing Comparison</h2>
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-xl"
 					>
 						<table class="w-full">
 							<thead class="bg-gray-900 text-white">
@@ -465,7 +465,7 @@
 						{@const otherIcon = brandIcons[other.slug] || brandIcons.default}
 						<a
 							href="/alternatives/{other.slug}"
-							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all group"
 						>
 							<div class="flex items-center gap-3">
 								<div
@@ -498,7 +498,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#4ade80] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-[#4ade80] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-gray-900 shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -507,7 +507,7 @@
 				</h1>
 				<a
 					href="/alternatives"
-					class="px-8 py-4 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					View All Alternatives
 				</a>

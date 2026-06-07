@@ -645,7 +645,7 @@
 			<!-- Feature Gate: Batch Rendering not available -->
 			<div class="max-w-2xl mx-auto">
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div class="bg-brand-accent border-b-[3px] border-gray-900 p-6 text-center">
 						<div class="text-5xl mb-3">📦</div>
@@ -710,7 +710,7 @@
 							</ul>
 						</div>
 						<button
-							class="px-8 py-3 bg-brand-accent text-gray-900 font-black rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide"
+							class="px-8 py-3 bg-brand-accent text-gray-900 font-black rounded-full border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide"
 							on:click={() => openUpgradeModal('batch_render')}
 						>
 							Upgrade to {PLAN_DISPLAY_NAMES[targetPlan]}
@@ -734,7 +734,7 @@
 				<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 					<div class="lg:col-span-7">
 						<div
-							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 						>
 							<div
 								class="bg-brand-accent border-b-[3px] border-gray-900 px-6 py-4 flex justify-between items-center"
@@ -766,7 +766,7 @@
 
 								<label
 									class="block relative border-[3px] border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer
-									hover:border-gray-900 hover:bg-gray-50 hover:shadow-[4px_4px_0_0_#1f2937] transition-all group overflow-hidden"
+									hover:border-gray-900 hover:bg-gray-50 hover:shadow-brutal-lg transition-all group overflow-hidden"
 								>
 									<input type="file" accept=".csv" on:change={handleFileSelect} class="hidden" />
 
@@ -774,7 +774,7 @@
 
 									<div class="relative z-10">
 										<div
-											class="w-20 h-20 mx-auto bg-white border-[3px] border-gray-900 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-[4px_4px_0_0_#ccc] group-hover:shadow-[6px_6px_0_0_#1f2937]"
+											class="w-20 h-20 mx-auto bg-white border-[3px] border-gray-900 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-[4px_4px_0_0_#ccc] group-hover:shadow-brutal-xl"
 										>
 											<svg
 												class="w-10 h-10 text-gray-900"
@@ -851,7 +851,7 @@
 					<!-- Variables Preview -->
 					<div class="lg:col-span-5">
 						<div
-							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden sticky top-8"
+							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden sticky top-8"
 						>
 							<div class="bg-gray-100 border-b-[3px] border-gray-900 px-6 py-4">
 								<h2
@@ -871,7 +871,7 @@
 									<div class="space-y-3">
 										{#each variables as variable}
 											<div
-												class="flex items-center justify-between p-3 bg-white rounded-lg border-[2px] border-gray-200 hover:border-gray-900 hover:shadow-[3px_3px_0_0_#1f2937] transition-all group"
+												class="flex items-center justify-between p-3 bg-white rounded-lg border-[2px] border-gray-200 hover:border-gray-900 hover:shadow-brutal-md transition-all group"
 											>
 												<span class="font-bold text-gray-900 flex items-center gap-2">
 													<div
@@ -917,7 +917,7 @@
 				<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 					<div class="lg:col-span-8">
 						<div
-							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 						>
 							<div class="bg-[#60a5fa] border-b-[3px] border-gray-900 px-6 py-4">
 								<h2
@@ -1103,7 +1103,7 @@
 											<div class="relative flex-1">
 												<select
 													bind:value={selectedApiKey}
-													class="w-full pl-4 pr-10 py-3 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#1f2937] transition-all appearance-none"
+													class="w-full pl-4 pr-10 py-3 bg-white border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-brutal-lg transition-all appearance-none"
 												>
 													{#each apiTokens as token}
 														<option value={token.token}>
@@ -1200,7 +1200,7 @@
 									<div class="grid grid-cols-2 gap-2">
 										<button
 											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedBulkLayouts.has('default')
-												? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 												: 'bg-white border-gray-200 hover:border-gray-900'}"
 											on:click={() => toggleBulkLayout('default')}
 										>
@@ -1222,7 +1222,7 @@
 										{#each bulkTemplateLayouts as [key, layout]}
 											<button
 												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedBulkLayouts.has(key)
-													? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 													: 'bg-white border-gray-200 hover:border-gray-900'}"
 												on:click={() => toggleBulkLayout(key)}
 											>
@@ -1256,7 +1256,7 @@
 									Cancel
 								</button>
 								<button
-									class="px-8 py-3 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 uppercase tracking-widest text-sm"
+									class="px-8 py-3 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 uppercase tracking-widest text-sm"
 									on:click={startBatch}
 									disabled={!canStartBatch || isBatchSubmitting}
 								>
@@ -1351,7 +1351,7 @@
 			{:else if step === 'progress'}
 				<div class="max-w-3xl mx-auto">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-900 text-white px-8 py-6 text-center">
 							<h2 class="text-2xl font-black tracking-tighter mb-1">Computing Batch</h2>
@@ -1452,7 +1452,7 @@
 				<div class="flex flex-col gap-8">
 					<!-- Header Summary -->
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6"
 					>
 						<div class="flex items-center gap-4">
 							<div
@@ -1488,7 +1488,7 @@
 								Start New Batch
 							</button>
 							<button
-								class="px-8 py-3 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 font-black rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
+								class="px-8 py-3 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
 								on:click={downloadAsZip}
 								disabled={isDownloading || totalRenderedImages === 0}
 							>

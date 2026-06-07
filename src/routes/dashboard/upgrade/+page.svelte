@@ -176,7 +176,7 @@
 			class="mb-8 p-4 bg-brand-success/10 border-[3px] border-brand-success rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
 		>
 			<div
-				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -218,12 +218,12 @@
 		<!-- Monthly/Annual Toggle -->
 		<div class="flex flex-col items-start md:items-end gap-2 shrink-0">
 			<div
-				class="flex items-center p-1 bg-gray-100 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="flex items-center p-1 bg-gray-100 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<button
 					class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all {showAnnual
 						? 'text-gray-500 hover:text-gray-700'
-						: 'bg-white text-gray-900 shadow-[2px_2px_0_0_#1f2937] border-2 border-gray-900'}"
+						: 'bg-white text-gray-900 shadow-brutal-sm border-2 border-gray-900'}"
 					on:click={() => (showAnnual = false)}
 				>
 					Monthly
@@ -231,7 +231,7 @@
 				<div class="relative">
 					<button
 						class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all {showAnnual
-							? 'bg-brand-accent text-gray-900 shadow-[2px_2px_0_0_#1f2937] border-2 border-gray-900'
+							? 'bg-brand-accent text-gray-900 shadow-brutal-sm border-2 border-gray-900'
 							: 'text-gray-500 hover:text-gray-700'}"
 						on:click={() => (showAnnual = true)}
 					>
@@ -239,7 +239,7 @@
 					</button>
 					{#if !showAnnual}
 						<span
-							class="absolute -top-3 -right-3 px-1.5 py-0.5 bg-brand-success text-white text-[10px] font-black uppercase tracking-widest rounded border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] rotate-12"
+							class="absolute -top-3 -right-3 px-1.5 py-0.5 bg-brand-success text-white text-[10px] font-black uppercase tracking-widest rounded border-2 border-gray-900 shadow-brutal-sm rotate-12"
 						>
 							-20%
 						</span>
@@ -259,7 +259,7 @@
 	<div class="flex-1 flex flex-col">
 		{#if isLoading}
 			<div
-				class="flex flex-col items-center justify-center py-16 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+				class="flex flex-col items-center justify-center py-16 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 			>
 				<Loader size="10" show={true} />
 				<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">
@@ -268,7 +268,7 @@
 			</div>
 		{:else if error}
 			<div
-				class="flex flex-col items-center justify-center py-12 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+				class="flex flex-col items-center justify-center py-12 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 			>
 				<div
 					class="w-12 h-12 bg-brand-danger/20 rounded-xl border-[3px] border-brand-danger flex items-center justify-center mb-4"
@@ -301,11 +301,11 @@
 					<div
 						class="flex flex-col relative bg-white rounded-2xl border-[3px] {isPopular
 							? 'border-brand-danger shadow-[8px_8px_0_0_#ff6b6b]'
-							: 'border-gray-900 shadow-[8px_8px_0_0_#1f2937]'} {isCurrent ? 'opacity-70' : ''}"
+							: 'border-gray-900 shadow-brutal-2xl'} {isCurrent ? 'opacity-70' : ''}"
 					>
 						{#if isPopular}
 							<div
-								class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-brand-danger text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+								class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-brand-danger text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 							>
 								Most Popular
 							</div>
@@ -350,8 +350,8 @@
 									on:click={() => handlePurchase(plan)}
 									class="w-full py-4 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all mb-8
 										{isPopular
-										? 'bg-brand-danger text-white hover:bg-[#ff5252] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
-										: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+										? 'bg-brand-danger text-white hover:bg-[#ff5252] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
+										: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 								>
 									Upgrade to {plan.name === 'Standard' ? 'Pro' : plan.name}
 								</button>

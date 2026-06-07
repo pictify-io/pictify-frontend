@@ -105,8 +105,8 @@
 
 {#if loadError}
 	<div class="flex h-screen items-center justify-center bg-brand-bg p-6">
-		<div class="max-w-md rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-[8px_8px_0_0_#1f2937]">
-			<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-danger shadow-[3px_3px_0_0_#1f2937]">
+		<div class="max-w-md rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-brutal-2xl">
+			<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-danger shadow-brutal-md">
 				<i class="fa fa-triangle-exclamation text-white"></i>
 			</div>
 			<h2 class="text-xl font-black uppercase tracking-widest text-gray-900">
@@ -115,7 +115,7 @@
 			<p class="mt-2 font-mono text-xs text-gray-600">{loadError}</p>
 			<a
 				href="/dashboard/template"
-				class="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-brand-accent px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+				class="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-brand-accent px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
 			>
 				<i class="fa fa-arrow-left text-[10px]"></i>
 				Back to templates
@@ -127,7 +127,7 @@
 {:else}
 	<div class="flex h-screen items-center justify-center bg-brand-bg">
 		<div class="flex flex-col items-center gap-3 text-gray-700">
-			<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-[3px_3px_0_0_#1f2937]">
+			<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-brutal-md">
 				<i class="fa fa-hourglass-half"></i>
 			</div>
 			<p class="text-[11px] font-black uppercase tracking-widest">Loading template…</p>

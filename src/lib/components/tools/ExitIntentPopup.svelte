@@ -261,7 +261,7 @@
 						bind:value={email}
 						placeholder="your@email.com"
 						required
-						class="w-full px-4 py-3 border-[3px] border-black font-bold text-lg placeholder-gray-400 focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480]"
+						class="w-full px-4 py-3 border-[3px] border-black font-bold text-lg placeholder-gray-400 focus:outline-none focus:shadow-brutal-accent"
 					/>
 					<button
 						type="submit"

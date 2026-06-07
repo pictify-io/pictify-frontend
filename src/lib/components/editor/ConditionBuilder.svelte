@@ -238,7 +238,7 @@
 		<span class="text-[11px] font-bold text-gray-900 uppercase min-w-[36px]">When</span>
 		<div class="relative flex-1">
 			<button
-				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all"
+				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-brutal-accent-sm transition-all"
 				aria-expanded={showVarDropdown}
 				aria-label="Select variable"
 				on:click|stopPropagation={() => {
@@ -262,7 +262,7 @@
 						<div class="flex gap-1.5 p-2">
 							<input
 								type="text"
-								class="flex-1 px-2 py-1.5 border-[2px] border-gray-300 rounded-lg text-xs focus:outline-none focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="flex-1 px-2 py-1.5 border-[2px] border-gray-300 rounded-lg text-xs focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent-sm"
 								placeholder="Variable name"
 								bind:value={customVarInput}
 								on:keydown={(e) => {
@@ -313,7 +313,7 @@
 	<div class="flex items-center gap-2">
 		<div class="relative flex-1">
 			<button
-				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs font-medium text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] transition-all"
+				class="w-full flex items-center justify-between px-3 py-1.5 bg-white border-[2px] border-gray-300 rounded-lg text-xs font-medium text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-brutal-accent-sm transition-all"
 				aria-expanded={showOpDropdown}
 				aria-label="Select operator"
 				on:click|stopPropagation={() => {
@@ -351,7 +351,7 @@
 		{#if operatorNeedsValue(selectedOperator)}
 			<input
 				type="text"
-				class="flex-1 min-w-0 px-3 py-1.5 border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-[2px_2px_0_0_#ffc480] hover:border-gray-400 transition-all"
+				class="flex-1 min-w-0 px-3 py-1.5 border-[2px] border-gray-300 rounded-lg text-xs text-gray-900 focus:outline-none focus:ring-0 focus:border-gray-900 focus:shadow-brutal-accent-sm hover:border-gray-400 transition-all"
 				placeholder="value"
 				aria-label="Condition value"
 				value={conditionValue}

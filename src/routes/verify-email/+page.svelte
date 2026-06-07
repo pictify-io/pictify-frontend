@@ -57,7 +57,7 @@
 
 <section class="flex justify-center items-center w-screen h-screen px-4 bg-brand-bg">
 	<div
-		class="w-full max-w-lg bg-white border-[3px] border-gray-900 rounded-xl p-8 sm:p-10 shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
+		class="w-full max-w-lg bg-white border-[3px] border-gray-900 rounded-xl p-8 sm:p-10 shadow-brutal-2xl relative overflow-hidden"
 	>
 		<!-- Decorative blobs -->
 		<div
@@ -71,7 +71,7 @@
 			<div class="mb-8 relative">
 				<div class="flex items-center gap-4 justify-center relative z-10">
 					<div
-						class="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center shadow-[4px_4px_0_0_#ffc480] border-[3px] border-transparent"
+						class="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center shadow-brutal-accent border-[3px] border-transparent"
 					>
 						<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -109,7 +109,7 @@
 				<!-- Status Messages -->
 				{#if status === 'success'}
 					<div
-						class="border-[3px] border-gray-900 bg-[#4ade80] text-gray-900 rounded-xl p-5 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transform rotate-1"
+						class="border-[3px] border-gray-900 bg-[#4ade80] text-gray-900 rounded-xl p-5 shadow-brutal-lg flex items-start gap-4 transform rotate-1"
 					>
 						<div class="bg-white rounded-full p-1 border-[2px] border-gray-900 flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +127,7 @@
 					</div>
 				{:else if status === 'error'}
 					<div
-						class="border-[3px] border-gray-900 bg-brand-danger text-white rounded-xl p-5 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transform -rotate-1"
+						class="border-[3px] border-gray-900 bg-brand-danger text-white rounded-xl p-5 shadow-brutal-lg flex items-start gap-4 transform -rotate-1"
 					>
 						<div
 							class="bg-white text-gray-900 rounded-full p-1 border-[2px] border-gray-900 flex-shrink-0"
@@ -157,7 +157,7 @@
 				<div class="flex flex-col gap-3 pt-2">
 					{#if canRetry}
 						<button
-							class="w-full bg-white text-gray-900 font-black uppercase tracking-widest py-3 rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="w-full bg-white text-gray-900 font-black uppercase tracking-widest py-3 rounded-lg border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							on:click={attemptVerification}
 							disabled={isVerifying}
 						>

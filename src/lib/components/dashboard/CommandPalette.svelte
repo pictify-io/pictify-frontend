@@ -262,7 +262,7 @@
 	>
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
-			class="w-full max-w-xl bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden animate-palette-in"
+			class="w-full max-w-xl bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden animate-palette-in"
 			role="dialog"
 			aria-modal="true"
 			aria-label="Command palette"

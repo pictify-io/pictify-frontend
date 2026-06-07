@@ -103,7 +103,7 @@
 						<!-- Mini FAQ -->
 						<div class="grid sm:grid-cols-3 gap-5 text-left max-w-3xl mx-auto">
 							<div
-								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md"
 							>
 								<h4 class="font-black text-gray-900 text-base mb-2">How long to integrate?</h4>
 								<p class="text-sm text-gray-600 font-medium">
@@ -111,7 +111,7 @@
 								</p>
 							</div>
 							<div
-								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md"
 							>
 								<h4 class="font-black text-gray-900 text-base mb-2">What about my data?</h4>
 								<p class="text-sm text-gray-600 font-medium">
@@ -119,7 +119,7 @@
 								</p>
 							</div>
 							<div
-								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]"
+								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md"
 							>
 								<h4 class="font-black text-gray-900 text-base mb-2">Can I cancel anytime?</h4>
 								<p class="text-sm text-gray-600 font-medium">

@@ -68,7 +68,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 			>
 				<div
-					class="px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
+					class="px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
 				>
 					Switch to Better
 				</div>
@@ -92,7 +92,7 @@
 		<!-- Why Teams Switch Section -->
 		<section class="mb-16">
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-[6px_6px_0_0_#1f2937]"
+				class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl"
 			>
 				<h2 class="text-2xl font-black text-gray-900 mb-6 text-center">
 					Why Teams Switch to Pictify
@@ -186,14 +186,14 @@
 					{@const icon = brandIcons[alt.slug] || brandIcons.default}
 					<a
 						href="/alternatives/{alt.slug}"
-						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
+						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
 					>
 						<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
 							<!-- VS Header -->
 							<div class="flex items-center justify-between mb-8">
 								<!-- Competitor Icon -->
 								<div
-									class="w-14 h-14 bg-gray-50 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] group-hover:scale-110 transition-transform"
+									class="w-14 h-14 bg-gray-50 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-md group-hover:scale-110 transition-transform"
 									style="color: {icon.color || '#1f2937'}"
 								>
 									{#if icon.type === 'url'}
@@ -281,19 +281,19 @@
 			<div class="flex flex-wrap justify-center gap-4">
 				<a
 					href="/compare"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					All Comparisons
 				</a>
 				<a
 					href="/pricing"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Pricing
 				</a>
 				<a
 					href="/tools"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Free Tools
 				</a>

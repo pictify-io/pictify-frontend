@@ -157,7 +157,7 @@
 					on:click={() => changeRange(range)}
 					class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] transition-all duration-200
 						{timeRange === range
-						? 'bg-black text-white border-black shadow-[4px_4px_0_0_#ffc480]'
+						? 'bg-black text-white border-black shadow-brutal-accent'
 						: 'bg-white text-black border-black hover:shadow-[3px_3px_0_0_black] hover:-translate-y-0.5'}"
 				>
 					{range === '7d' ? 'Week' : range === '30d' ? 'Month' : 'Quarter'}
@@ -746,7 +746,7 @@
 							on:click={() => changeSort(opt.key)}
 							class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
 								{sortBy === opt.key
-								? 'bg-black text-white border-black shadow-[2px_2px_0_0_#ffc480]'
+								? 'bg-black text-white border-black shadow-brutal-accent-sm'
 								: 'bg-white text-black border-black hover:shadow-[2px_2px_0_0_black]'}"
 							>{opt.label}</button
 						>
@@ -903,7 +903,7 @@
 								on:click={() => goToPage(pageNum)}
 								class="w-8 h-8 text-[10px] font-black uppercase rounded-lg border-[2px] border-black transition-all duration-200
 									{pageNum === currentPage
-									? 'bg-black text-white shadow-[2px_2px_0_0_#ffc480]'
+									? 'bg-black text-white shadow-brutal-accent-sm'
 									: 'bg-white text-black hover:shadow-[2px_2px_0_0_black]'}">{pageNum}</button
 							>
 						{/each}

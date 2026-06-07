@@ -425,7 +425,7 @@ console.log(result.url); // CDN URL of rendered image
 				<!-- Left: Variable Form -->
 				<div class="lg:col-span-5 flex flex-col gap-6">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<!-- Card Header -->
 						<div
@@ -451,7 +451,7 @@ console.log(result.url); // CDN URL of rendered image
 
 					<!-- Output Options -->
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
 							<h3
@@ -501,7 +501,7 @@ console.log(result.url); // CDN URL of rendered image
 										<!-- Default layout -->
 										<button
 											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has('default')
-												? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 												: 'bg-white border-gray-200 hover:border-gray-900'}"
 											on:click={() => toggleLayout('default')}
 										>
@@ -526,7 +526,7 @@ console.log(result.url); // CDN URL of rendered image
 										{#each templateLayouts as [key, layout]}
 											<button
 												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has(key)
-													? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 													: 'bg-white border-gray-200 hover:border-gray-900'}"
 												on:click={() => toggleLayout(key)}
 											>
@@ -559,7 +559,7 @@ console.log(result.url); // CDN URL of rendered image
 
 					<!-- API Key Selection -->
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
 							<h3
@@ -640,7 +640,7 @@ console.log(result.url); // CDN URL of rendered image
 										<EmailVerificationRequired email={userEmail} feature="template rendering" />
 									{:else}
 										<button
-											class="w-full bg-brand-danger hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+											class="w-full bg-brand-danger hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
 											on:click={handleRender}
 											disabled={isRendering || !selectedApiKey}
 										>
@@ -739,7 +739,7 @@ console.log(result.url); // CDN URL of rendered image
 				<!-- Right: Preview -->
 				<div class="lg:col-span-7">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden sticky top-32"
+						class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden sticky top-32"
 					>
 						<div
 							class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"

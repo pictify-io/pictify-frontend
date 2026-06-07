@@ -136,7 +136,7 @@
 		<!-- Header -->
 		<div class="text-center mb-10 md:mb-14">
 			<div
-				class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-2"
+				class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-2"
 			>
 				<span class="font-black uppercase tracking-widest text-sm">Template Gallery</span>
 			</div>
@@ -147,7 +147,7 @@
 		</div>
 
 		<!-- Filters and Search -->
-		<div class="bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-4 md:p-6 mb-8">
+		<div class="bg-white border-[3px] border-gray-900 shadow-brutal-xl p-4 md:p-6 mb-8">
 			<div class="flex flex-col lg:flex-row gap-4">
 				<!-- Search -->
 				<div class="flex-1">
@@ -299,7 +299,7 @@
 			<div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
 				{#each Array(8) as _}
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] animate-pulse"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-xl animate-pulse"
 					>
 						<div class="aspect-video bg-gray-200" />
 						<div class="p-4">
@@ -315,7 +315,7 @@
 				{#each templates as template}
 					<a
 						href={`/templates/${template.uid}`}
-						class="group block bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#1f2937] transition-all overflow-hidden"
+						class="group block bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#1f2937] transition-all overflow-hidden"
 					>
 						<!-- Thumbnail -->
 						<div class="aspect-video bg-gray-100 relative overflow-hidden">
@@ -396,7 +396,7 @@
 						<!-- Hover CTA -->
 						<div class="px-4 pb-4">
 							<div
-								class="w-full py-2 bg-brand-danger text-white text-center font-black text-sm uppercase tracking-wider border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all"
+								class="w-full py-2 bg-brand-danger text-white text-center font-black text-sm uppercase tracking-wider border-[2px] border-gray-900 shadow-brutal-md group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all"
 							>
 								View Template →
 							</div>
@@ -469,7 +469,7 @@
 				<p class="text-gray-600 font-medium mb-6">Try adjusting your filters or search query.</p>
 				<button
 					on:click={clearFilters}
-					class="px-6 py-3 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Clear all filters
 				</button>
@@ -478,7 +478,7 @@
 
 		<!-- CTA Section -->
 		<section
-			class="mt-16 bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 md:p-12 text-center"
+			class="mt-16 bg-white border-[3px] border-gray-900 shadow-brutal-2xl p-8 md:p-12 text-center"
 		>
 			<h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-4">
 				Don't see what you need?
@@ -490,13 +490,13 @@
 			<div class="flex flex-col sm:flex-row gap-4 justify-center">
 				<a
 					href="/template-workspace/create"
-					class="px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Create from scratch
 				</a>
 				<a
 					href="/tools"
-					class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Browse free tools
 				</a>

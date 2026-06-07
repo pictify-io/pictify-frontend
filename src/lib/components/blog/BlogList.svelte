@@ -7,7 +7,7 @@
 <section>
 	<div class="flex items-center gap-4 mb-12">
 		<div
-			class="py-3 px-6 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1"
+			class="py-3 px-6 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-1"
 		>
 			<h2 class="text-2xl font-black uppercase tracking-tighter text-gray-900">{title}</h2>
 		</div>
@@ -18,7 +18,7 @@
 		{#each blogs as blog}
 			<a href="/blogs/{blog.slug}" class="block group h-full">
 				<div
-					class="flex flex-col h-full bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="flex flex-col h-full bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl transition-all duration-200 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:shadow-brutal-2xl overflow-hidden"
 					role="button"
 				>
 					<!-- Image Container -->
@@ -48,7 +48,7 @@
 						<div class="mt-auto pt-4 border-t-2 border-gray-100 flex items-center justify-between">
 							<div class="flex items-center gap-3">
 								<div
-									class="w-8 h-8 rounded-full bg-brand-accent border-2 border-gray-900 flex items-center justify-center text-xs font-black shadow-[2px_2px_0_0_#1f2937]"
+									class="w-8 h-8 rounded-full bg-brand-accent border-2 border-gray-900 flex items-center justify-center text-xs font-black shadow-brutal-sm"
 								>
 									{blog.author.charAt(0)}
 								</div>

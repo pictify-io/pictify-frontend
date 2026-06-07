@@ -171,7 +171,7 @@
 				{#if textMode === 'basic'}
 					<div class="space-y-3">
 						<button
-							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 transition-all group shadow-sm"
+							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-brutal-lg hover:-translate-y-1 transition-all group shadow-sm"
 							on:click={() => addText('h1', 'Heading', '32px')}
 						>
 							<h1 class="text-2xl font-black text-gray-900 group-hover:text-black">
@@ -179,7 +179,7 @@
 							</h1>
 						</button>
 						<button
-							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 transition-all group shadow-sm"
+							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-brutal-lg hover:-translate-y-1 transition-all group shadow-sm"
 							on:click={() => addText('h2', 'Subheading', '24px')}
 						>
 							<h2 class="text-xl font-bold text-gray-800 group-hover:text-black">
@@ -187,7 +187,7 @@
 							</h2>
 						</button>
 						<button
-							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 transition-all group shadow-sm"
+							class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-brutal-lg hover:-translate-y-1 transition-all group shadow-sm"
 							on:click={() => addText('p', 'Body text', '16px')}
 						>
 							<p class="text-base font-medium text-gray-700 group-hover:text-black">
@@ -201,7 +201,7 @@
 								Text Area (auto-wrap)
 							</p>
 							<button
-								class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-1 transition-all group shadow-sm"
+								class="w-full p-4 bg-white border-[2px] border-gray-900 rounded-xl text-left hover:shadow-brutal-accent hover:-translate-y-1 transition-all group shadow-sm"
 								on:click={() =>
 									addTextArea(
 										'Type your paragraph text here. This text area will automatically wrap within its bounds.',
@@ -238,7 +238,7 @@
 							class="w-full py-10 border-[3px] border-dashed border-gray-900 rounded-xl hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-3 group bg-brand-bg"
 						>
 							<div
-								class="w-12 h-12 rounded-lg bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[4px_4px_0_0_#ffc480]"
+								class="w-12 h-12 rounded-lg bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform shadow-brutal-accent"
 							>
 								<i class="fa fa-cloud-upload text-xl text-white" />
 							</div>
@@ -258,11 +258,11 @@
 							type="text"
 							bind:value={imageUrlInput}
 							placeholder="PASTE IMAGE URL..."
-							class="flex-1 px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all uppercase tracking-wide"
+							class="flex-1 px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:shadow-brutal-accent transition-all uppercase tracking-wide"
 							on:keydown={(e) => e.key === 'Enter' && handleUrlImageImport()}
 						/>
 						<button
-							class="px-4 py-2 bg-gray-900 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] border-[2px] border-gray-900"
+							class="px-4 py-2 bg-gray-900 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] border-[2px] border-gray-900"
 							on:click={handleUrlImageImport}
 							disabled={!imageUrlInput.trim()}
 						>
@@ -280,7 +280,7 @@
 						>
 							<div class="flex items-center gap-3">
 								<div
-									class="w-10 h-10 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937] group-hover:shadow-none group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all"
+									class="w-10 h-10 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm group-hover:shadow-none group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all"
 								>
 									<svg
 										width="18"

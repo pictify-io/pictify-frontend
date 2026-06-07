@@ -37,7 +37,7 @@
 
 	<main class="max-w-6xl mx-auto px-4 py-20">
 		<nav class="mb-8 flex justify-center">
-			<ol class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]">
+			<ol class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg">
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
 				<li class="text-gray-900">Solutions</li>
@@ -81,7 +81,7 @@
 				{@const colors = ['bg-brand-danger', 'bg-[#4ade80]', 'bg-brand-accent', 'bg-[#a78bfa]', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
 				<a
 					href="/solutions/{s.slug}"
-					class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+					class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
 				>
 					<div class="{colors[i % colors.length]} h-2 border-b-[3px] border-gray-900"></div>
 					<div class="p-6">

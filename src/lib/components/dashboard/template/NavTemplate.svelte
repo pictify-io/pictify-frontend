@@ -49,7 +49,7 @@
 				<input
 					type="text"
 					placeholder="Search templates..."
-					class="w-full pl-12 pr-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-medium focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_0_#ffc480] transition-all duration-200"
+					class="w-full pl-12 pr-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-medium focus:outline-none focus:ring-0 focus:shadow-brutal-accent transition-all duration-200"
 					bind:value={searchQuery}
 					on:input={handleSearch}
 				/>

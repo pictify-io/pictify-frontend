@@ -98,7 +98,7 @@
 			<!-- Breadcrumb -->
 			<nav class="mb-12 flex justify-center">
 				<ol
-					class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+					class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 				>
 					<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 					<li class="text-gray-300">/</li>
@@ -119,10 +119,10 @@
 					<!-- Integration Icon -->
 					<div class="relative group">
 						<div
-							class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+							class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-brutal-lg"
 						/>
 						<div
-							class="relative w-20 h-20 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center text-4xl shadow-[4px_4px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-300"
+							class="relative w-20 h-20 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center text-4xl shadow-brutal-lg group-hover:-translate-y-2 transition-transform duration-300"
 							style="color: {icon.color || '#1f2937'}"
 						>
 							{#if icon.type === 'url'}
@@ -151,10 +151,10 @@
 					<!-- Pictify Icon -->
 					<div class="relative group">
 						<div
-							class="absolute inset-0 bg-brand-accent rounded-2xl -rotate-6 group-hover:-rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+							class="absolute inset-0 bg-brand-accent rounded-2xl -rotate-6 group-hover:-rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-brutal-lg"
 						/>
 						<div
-							class="relative w-20 h-20 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#ffc480] group-hover:-translate-y-2 transition-transform duration-300"
+							class="relative w-20 h-20 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-accent group-hover:-translate-y-2 transition-transform duration-300"
 						>
 							<svg
 								class="w-10 h-10 text-white"
@@ -189,7 +189,7 @@
 				<!-- Category Badge -->
 				<div class="inline-flex">
 					<span
-						class="px-4 py-1 bg-white border-[3px] border-gray-900 rounded-full text-sm font-black uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937]"
+						class="px-4 py-1 bg-white border-[3px] border-gray-900 rounded-full text-sm font-black uppercase tracking-widest shadow-brutal-lg"
 					>
 						{category?.label || 'Integration'}
 					</span>
@@ -199,7 +199,7 @@
 			<!-- Long Description -->
 			<section class="mb-20">
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-2xl relative overflow-hidden"
 				>
 					<div
 						class="absolute top-0 left-0 w-full h-3 bg-brand-accent border-b-[3px] border-gray-900"
@@ -224,7 +224,7 @@
 					<div class="grid sm:grid-cols-2 gap-6">
 						{#each integration.features as feature}
 							<div
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
+								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-brutal-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-lg transition-all"
 							>
 								<div class="flex items-start gap-4">
 									<div
@@ -256,7 +256,7 @@
 			{#if integration.useCases?.length}
 				<section class="mb-20">
 					<div
-						class="bg-brand-accent border-[3px] border-gray-900 rounded-3xl p-1 shadow-[8px_8px_0_0_#1f2937]"
+						class="bg-brand-accent border-[3px] border-gray-900 rounded-3xl p-1 shadow-brutal-2xl"
 					>
 						<div class="bg-brand-bg rounded-[20px] p-8 md:p-12 border border-[#b45309]">
 							<h2 class="text-3xl font-black uppercase tracking-tighter text-gray-900 mb-8">
@@ -302,7 +302,7 @@
 						</h2>
 						{#if integration.tutorial.estimatedTime}
 							<div
-								class="inline-flex items-center gap-2 px-6 py-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+								class="inline-flex items-center gap-2 px-6 py-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
 							>
 								<svg
 									class="w-5 h-5 text-gray-900"
@@ -329,7 +329,7 @@
 						<!-- Prerequisites -->
 						{#if integration.tutorial.prerequisites?.length}
 							<div
-								class="bg-[#e0f7fa] border-[3px] border-gray-900 rounded-2xl p-8 shadow-[6px_6px_0_0_#1f2937]"
+								class="bg-[#e0f7fa] border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl"
 							>
 								<h4
 									class="text-lg font-black uppercase tracking-wide text-cyan-900 mb-4 bg-cyan-200 inline-block px-2 py-1 rounded border-2 border-cyan-800"
@@ -365,14 +365,14 @@
 
 						{#each integration.tutorial.steps as step, i}
 							<div
-								class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[8px_8px_0_0_#1f2937]"
+								class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-2xl"
 							>
 								<!-- Step Header -->
 								<div
 									class="border-b-[3px] border-gray-900 bg-gray-50 p-6 sm:p-8 flex items-center gap-6"
 								>
 									<div
-										class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+										class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 									>
 										<span class="text-white font-black text-xl">{i + 1}</span>
 									</div>
@@ -516,7 +516,7 @@
 							{@const relatedIcon = brandIcons[related.icon] || brandIcons.default}
 							<a
 								href="/integrations/{related.slug}"
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
+								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
 							>
 								<div class="flex items-center gap-4">
 									<div
@@ -552,7 +552,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-32 h-32 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-6xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-32 h-32 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-6xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -564,7 +564,7 @@
 				</p>
 				<a
 					href="/integrations"
-					class="px-10 py-5 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-10 py-5 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Browse Integrations
 				</a>

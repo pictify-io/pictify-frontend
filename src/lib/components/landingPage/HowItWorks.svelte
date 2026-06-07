@@ -36,7 +36,7 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-24">
 			<div
-				class="inline-block px-4 py-1.5 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
+				class="inline-block px-4 py-1.5 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2"
 			>
 				<span class="text-sm font-bold text-white uppercase tracking-wider">How It Works</span>
 			</div>
@@ -80,7 +80,7 @@
 				>
 					<div class="flex items-center gap-6 mb-4">
 						<div
-							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
+							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
 							0
 								? 'scale-110'
 								: 'scale-100'}"
@@ -115,7 +115,7 @@
 				>
 					<div class="flex items-center gap-6 mb-4">
 						<div
-							class="w-16 h-16 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-white rounded-xl transition-transform duration-300 {activeStep ===
+							class="w-16 h-16 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center text-3xl font-bold text-white rounded-xl transition-transform duration-300 {activeStep ===
 							1
 								? 'scale-110'
 								: 'scale-100'}"
@@ -150,7 +150,7 @@
 				>
 					<div class="flex items-center gap-6 mb-4">
 						<div
-							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
+							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
 							2
 								? 'scale-110'
 								: 'scale-100'}"
@@ -187,7 +187,7 @@
 								: 'translate-y-full opacity-0'} flex items-center justify-center bg-[#f3f4f6] p-8"
 						>
 							<div
-								class="w-full h-full bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-xl flex flex-col overflow-hidden"
+								class="w-full h-full bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-xl flex flex-col overflow-hidden"
 							>
 								<!-- Toolbar -->
 								<div

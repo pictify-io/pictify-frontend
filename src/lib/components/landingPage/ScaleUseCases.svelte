@@ -101,7 +101,7 @@
 		<!-- Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
 			<div
-				class="inline-block mb-6 px-6 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform rotate-2 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-block mb-6 px-6 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-xl rounded-full transform rotate-2 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
 					>Dynamic Generation</span
@@ -131,7 +131,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-8">
 			<!-- Block 1: Social Automation (Spans 7 cols) -->
 			<div
-				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
+				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<!-- Subtle texture -->
 				<div
@@ -143,7 +143,7 @@
 				>
 					<div class="flex items-center gap-4">
 						<div
-							class="w-12 h-12 md:w-14 md:h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-3 transition-transform"
+							class="w-12 h-12 md:w-14 md:h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:-rotate-3 transition-transform"
 						>
 							<svg
 								class="w-6 h-6 md:w-7 md:h-7 text-black"
@@ -272,7 +272,7 @@
 										: 'translate-x-3 md:translate-x-4 translate-y-4 md:translate-y-6'}
 
 								<div
-									class="absolute w-full h-full left-0 top-0 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden flex flex-col justify-end p-2.5 md:p-3 bg-black transition-all duration-300 hover:scale-[1.05] group-hover:shadow-[8px_8px_0_0_#1f2937] {rotate} {zIndex} {translateX} hover:!z-20 origin-bottom"
+									class="absolute w-full h-full left-0 top-0 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden flex flex-col justify-end p-2.5 md:p-3 bg-black transition-all duration-300 hover:scale-[1.05] group-hover:shadow-brutal-2xl {rotate} {zIndex} {translateX} hover:!z-20 origin-bottom"
 								>
 									<div class="absolute inset-0 pointer-events-none">
 										<img
@@ -318,7 +318,7 @@
 
 			<!-- Block 2: Dynamic Retail (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-white rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
+				class="xl:col-span-5 bg-white rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<div
 					class="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.15] pointer-events-none"
@@ -327,7 +327,7 @@
 				<div class="p-8 md:p-10 flex flex-col relative z-10 text-gray-900">
 					<div class="flex items-center gap-4">
 						<div
-							class="w-14 h-14 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-6 transition-transform"
+							class="w-14 h-14 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -347,7 +347,7 @@
 				<div class="flex-1 flex flex-col justify-end items-center gap-4 px-6 md:px-10 z-10 pb-10">
 					{#each retailVariations as variant, i}
 						<div
-							class="w-full bg-[#f8f9fa] rounded-[1rem] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-4 flex items-center gap-2 relative overflow-hidden transition-all duration-300 group-hover:scale-[1.03] {i ===
+							class="w-full bg-[#f8f9fa] rounded-[1rem] border-[3px] border-gray-900 shadow-brutal-lg p-4 flex items-center gap-2 relative overflow-hidden transition-all duration-300 group-hover:scale-[1.03] {i ===
 							0
 								? '-rotate-1 group-hover:-translate-y-2 group-hover:-rotate-2'
 								: 'rotate-1 group-hover:-translate-y-1 group-hover:rotate-2'}"
@@ -385,7 +385,7 @@
 
 			<!-- Block 3: Email Personalization (Spans 12 cols, Split) -->
 			<div
-				class="xl:col-span-12 bg-[#4ade80] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group"
+				class="xl:col-span-12 bg-[#4ade80] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Interactive Selector (Right via order, Left in DOM, 5 columns) -->
@@ -394,7 +394,7 @@
 					>
 						<div class="flex items-center gap-4 mb-6">
 							<div
-								class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] transform rotate-3 transition-transform group-hover:rotate-0"
+								class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg transform rotate-3 transition-transform group-hover:rotate-0"
 							>
 								<svg
 									class="w-7 h-7 text-black"
@@ -427,8 +427,8 @@
 								<button
 									class="flex items-center gap-4 px-5 py-3.5 rounded-xl border-[3px] border-gray-900 font-bold transition-all text-left w-full max-w-sm
 										{activeEmailTier === i
-										? 'bg-black text-white shadow-[4px_4px_0_0_#ffc480] translate-x-2'
-										: 'bg-white text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#1f2937]'}"
+										? 'bg-black text-white shadow-brutal-accent translate-x-2'
+										: 'bg-white text-gray-900 shadow-brutal-lg hover:-translate-y-0.5 hover:shadow-brutal-xl'}"
 									on:click={() => (activeEmailTier = i)}
 									on:keydown={(e) =>
 										(e.key === 'Enter' || e.key === ' ') && (() => (activeEmailTier = i))()}
@@ -453,7 +453,7 @@
 
 						<!-- Floating JSON Card -->
 						<div
-							class="absolute top-8 left-8 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-3 md:p-4 w-[200px] md:w-[240px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
+							class="absolute top-8 left-8 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 md:p-4 w-[200px] md:w-[240px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
 						>
 							<div
 								class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
@@ -478,7 +478,7 @@
 
 						<!-- Output Render Card -->
 						<div
-							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-0 xl:ml-32"
+							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-0 xl:ml-32"
 						>
 							<div
 								class="h-8 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 justify-between"

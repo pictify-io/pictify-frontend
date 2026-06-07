@@ -152,7 +152,7 @@
 		<div class="text-center mb-20 relative max-w-4xl mx-auto">
 			<!-- Rotated Eyebrow Pill -->
 			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default relative"
+				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-xl rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default relative"
 			>
 				<!-- Sparkle SVG -->
 				<svg
@@ -250,15 +250,15 @@
 				<div class="w-full lg:w-[42%] flex flex-col justify-center relative">
 					<!-- Accent background block -->
 					<div
-						class="absolute inset-0 bg-brand-danger rounded-3xl transform -rotate-2 -translate-x-2 -translate-y-2 pointer-events-none shadow-[8px_8px_0_0_#1f2937]"
+						class="absolute inset-0 bg-brand-danger rounded-3xl transform -rotate-2 -translate-x-2 -translate-y-2 pointer-events-none shadow-brutal-2xl"
 					/>
 
 					<div
-						class="bg-white rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 sm:p-10 relative z-10 flex flex-col h-full group"
+						class="bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 sm:p-10 relative z-10 flex flex-col h-full group"
 					>
 						<!-- Quirky Floating Label -->
 						<div
-							class="absolute -top-4 -right-4 bg-brand-accent border-[3px] border-gray-900 rounded-xl px-4 py-1.5 shadow-[4px_4px_0_0_#1f2937] transform rotate-6 group-hover:-rotate-3 transition-transform duration-300"
+							class="absolute -top-4 -right-4 bg-brand-accent border-[3px] border-gray-900 rounded-xl px-4 py-1.5 shadow-brutal-lg transform rotate-6 group-hover:-rotate-3 transition-transform duration-300"
 						>
 							<span class="text-xs font-black uppercase text-gray-900 whitespace-nowrap"
 								>Edit JSON</span
@@ -281,7 +281,7 @@
 									id="hero-header"
 									bind:value={header}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
@@ -294,7 +294,7 @@
 									id="hero-header2"
 									bind:value={heading_2}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
@@ -307,7 +307,7 @@
 									id="hero-header3"
 									bind:value={header_3}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
@@ -320,7 +320,7 @@
 									id="hero-subheading"
 									bind:value={subheading}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 						</div>
@@ -339,7 +339,7 @@
 					aria-hidden="true"
 				>
 					<div
-						class="bg-white rounded-3xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 overflow-hidden flex flex-col h-full relative z-10 group/canvas"
+						class="bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 overflow-hidden flex flex-col h-full relative z-10 group/canvas"
 					>
 						<!-- Light macOS Header -->
 						<div
@@ -401,7 +401,7 @@
 									<img
 										src={imageSrc}
 										alt="Live Pictify Demo"
-										class="w-full h-full object-contain rounded border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transition-opacity duration-300 relative z-10 bg-white"
+										class="w-full h-full object-contain rounded border-[3px] border-gray-900 shadow-brutal-2xl transition-opacity duration-300 relative z-10 bg-white"
 										class:opacity-50={loading}
 									/>
 								{:else}

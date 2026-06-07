@@ -110,7 +110,7 @@
 
 				{#if showSolutionsDropdown}
 					<div
-						class="absolute top-full left-0 mt-0 w-80 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] z-50"
+						class="absolute top-full left-0 mt-0 w-80 bg-white border-[3px] border-gray-900 shadow-brutal-xl z-50"
 						transition:fly={{ y: -8, duration: 150 }}
 					>
 						<a

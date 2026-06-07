@@ -165,15 +165,15 @@
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
 		aria-label="Switch team"
-		class="w-full flex items-center justify-between px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all {isOpen
-			? 'translate-x-[2px] translate-y-[2px] shadow-[2px_2px_0_0_#1f2937] bg-gray-50'
+		class="w-full flex items-center justify-between px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all {isOpen
+			? 'translate-x-[2px] translate-y-[2px] shadow-brutal-sm bg-gray-50'
 			: ''}"
 		disabled={loading}
 	>
 		<div class="flex items-center min-w-0">
 			<!-- Team Avatar/Icon -->
 			<div
-				class="w-9 h-9 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-9 h-9 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				{#if $currentTeam?.avatar}
 					<img
@@ -212,7 +212,7 @@
 	<!-- Dropdown Menu -->
 	{#if isOpen}
 		<div
-			class="absolute left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top"
+			class="absolute left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top"
 			role="listbox"
 			aria-label="Teams"
 			on:keydown={(e) => {
@@ -244,7 +244,7 @@
 					<button
 						on:click={handleMigrate}
 						disabled={loading}
-						class="w-full px-3 py-2 text-xs font-black uppercase tracking-wider bg-yellow-400 border-2 border-gray-900 rounded-lg hover:bg-yellow-500 transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] disabled:opacity-50"
+						class="w-full px-3 py-2 text-xs font-black uppercase tracking-wider bg-yellow-400 border-2 border-gray-900 rounded-lg hover:bg-yellow-500 transition-colors shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] disabled:opacity-50"
 					>
 						{loading ? 'Migrating...' : 'Migrate Now'}
 					</button>
@@ -356,7 +356,7 @@
 								on:click={() => {
 									isOpen = false;
 								}}
-								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-brand-danger rounded-lg border-2 border-gray-900 hover:bg-[#ff5252] shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
+								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-brand-danger rounded-lg border-2 border-gray-900 hover:bg-[#ff5252] shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
 							>
 								Upgrade
 							</a>

@@ -63,7 +63,7 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#a7f3d0]/30 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-[#a7f3d0]/30 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">Data Bindings</span>
 		</div>
@@ -100,31 +100,31 @@
 			Five binding patterns that work
 		</h2>
 		<div class="space-y-4">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-lg mb-2">Template ↔ Product API</h3>
 				<p class="text-gray-700">
 					Template binds to <code class="bg-gray-100 px-1 rounded">/api/products/:id</code>. Render URL identifies the product; template pulls current name/price/stock and paints.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-lg mb-2">Template ↔ Google Sheet</h3>
 				<p class="text-gray-700">
 					Non-technical content team maintains rows in a Sheet. Template renders each row as a graphic. Edit the cell, next render reflects it.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-lg mb-2">Template ↔ CRM</h3>
 				<p class="text-gray-700">
 					Template binds to your HubSpot / Salesforce / Stripe record. Personalized customer images (upgrade prompts, renewal nudges) pull from the single source of truth.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-lg mb-2">Template ↔ Analytics</h3>
 				<p class="text-gray-700">
 					Template binds to your PostHog / Mixpanel API. Renders a per-user or per-cohort stats card with live numbers — embed in dashboards, emails, Slack bots.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-lg mb-2">Template ↔ Webhook receiver</h3>
 				<p class="text-gray-700">
 					Your app POSTs data to a Pictify webhook endpoint; the template renders whatever the latest POST contained. Perfect for event-triggered images (deploy notifications, incident alerts, build status badges).
@@ -137,7 +137,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			Example: bind a template to your product API
 		</h2>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
@@ -188,7 +188,7 @@ curl -X POST https://api.pictify.io/template/tpl_product/render \\
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

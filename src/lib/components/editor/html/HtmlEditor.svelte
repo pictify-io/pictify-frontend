@@ -504,7 +504,7 @@
 <div class="flex h-full w-full flex-col bg-brand-bg p-6">
 	<div
 		bind:this={container}
-		class="cm-html-editor h-full w-full overflow-hidden rounded-xl border-[3px] border-gray-900 bg-brand-bg shadow-[4px_4px_0_0_#1f2937]"
+		class="cm-html-editor h-full w-full overflow-hidden rounded-xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-lg"
 	></div>
 </div>
 

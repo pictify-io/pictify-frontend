@@ -543,7 +543,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -599,12 +599,12 @@
 			<!-- Stats -->
 			<div class="flex items-center justify-center gap-4 mt-8">
 				<div
-					class="px-4 py-2 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] font-black text-sm"
+					class="px-4 py-2 bg-white border-[3px] border-gray-900 shadow-brutal-lg font-black text-sm"
 				>
 					<span class="text-brand-danger">{totalBannersCreated.toLocaleString()}</span> banners created
 				</div>
 				<div
-					class="px-4 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] font-black text-sm flex items-center gap-1"
+					class="px-4 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg font-black text-sm flex items-center gap-1"
 				>
 					<span class="text-yellow-700">★★★★★</span>
 					<span>4.9/5</span>
@@ -619,8 +619,8 @@
 					on:click={() => (selectedCategory = 'all')}
 					class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all {selectedCategory ===
 					'all'
-						? 'bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480] -translate-x-1 -translate-y-1'
-						: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+						? 'bg-gray-900 text-white shadow-brutal-accent -translate-x-1 -translate-y-1'
+						: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 				>
 					All Templates
 				</button>
@@ -629,8 +629,8 @@
 						on:click={() => (selectedCategory = category.id)}
 						class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all flex items-center gap-2 {selectedCategory ===
 						category.id
-							? 'bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480] -translate-x-1 -translate-y-1'
-							: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+							? 'bg-gray-900 text-white shadow-brutal-accent -translate-x-1 -translate-y-1'
+							: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 					>
 						{@html categoryIcons[category.icon]}
 						{category.label}
@@ -645,14 +645,14 @@
 				{#each filteredTemplates as template}
 					<button
 						on:click={() => selectTemplate(template)}
-						class="group relative bg-white border-[3px] border-gray-900 p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden {selectedTemplate?.id ===
+						class="group relative bg-white border-[3px] border-gray-900 p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden {selectedTemplate?.id ===
 						template.id
 							? 'ring-4 ring-brand-accent ring-offset-2'
 							: ''}"
 					>
 						{#if template.popular}
 							<div
-								class="absolute top-3 left-3 z-10 bg-brand-accent text-black text-xs font-black uppercase tracking-wider px-3 py-1 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+								class="absolute top-3 left-3 z-10 bg-brand-accent text-black text-xs font-black uppercase tracking-wider px-3 py-1 border-[2px] border-gray-900 shadow-brutal-sm"
 							>
 								Popular
 							</div>
@@ -739,7 +739,7 @@
 							style="background-image: repeating-linear-gradient(45deg, #e5e5e5 25%, transparent 25%, transparent 75%, #e5e5e5 75%, #e5e5e5), repeating-linear-gradient(45deg, #e5e5e5 25%, #f0f0f0 25%, #f0f0f0 75%, #e5e5e5 75%, #e5e5e5); background-position: 0 0, 10px 10px; background-size: 20px 20px;"
 						>
 							<div
-								class="relative inline-block border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+								class="relative inline-block border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden"
 							>
 								<OgImageTemplate
 									html={selectedTemplate.html}
@@ -787,7 +787,7 @@
 												type="text"
 												value={variable.value}
 												on:input={(e) => handleVariableChange(variableId, e)}
-												class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+												class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-brutal-accent transition-all bg-white"
 												placeholder={variable.label}
 											/>
 										</div>
@@ -801,7 +801,7 @@
 											type="file"
 											accept="image/*"
 											on:change={handleLogoUpload}
-											class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-brand-accent file:text-black file:font-black file:uppercase file:text-xs file:tracking-wider file:cursor-pointer"
+											class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-brutal-accent transition-all bg-white file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-brand-accent file:text-black file:font-black file:uppercase file:text-xs file:tracking-wider file:cursor-pointer"
 										/>
 									</div>
 								</div>
@@ -953,7 +953,7 @@
 						<div class="p-6 md:p-8">
 							<!-- Banner Preview -->
 							<div
-								class="aspect-[4/1] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden mb-6"
+								class="aspect-[4/1] border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden mb-6"
 							>
 								<img
 									src={imageUrl}
@@ -965,7 +965,7 @@
 							<!-- Watermark Notice -->
 							{#if !isUserLoggedIn && generationCount > 2}
 								<div
-									class="bg-brand-accent border-[3px] border-gray-900 p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]"
+									class="bg-brand-accent border-[3px] border-gray-900 p-5 mb-6 shadow-brutal-lg"
 								>
 									<p class="font-black text-gray-900 uppercase tracking-wide">
 										Free downloads include a small Pictify watermark
@@ -987,7 +987,7 @@
 							<div class="flex flex-wrap gap-4">
 								<button
 									on:click={downloadBanner}
-									class="flex-1 sm:flex-none px-8 py-4 bg-[#4ade80] text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-[#4ade80] text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1001,7 +1001,7 @@
 								</button>
 								<button
 									on:click={() => copyToClipboard(imageUrl)}
-									class="flex-1 sm:flex-none px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1021,7 +1021,7 @@
 		{/if}
 
 		<!-- How to Use Section -->
-		<div class="mb-16 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]">
+		<div class="mb-16 bg-white border-[4px] border-gray-900 shadow-brutal-2xl">
 			<div class="bg-gray-900 text-white px-6 py-4 border-b-[4px] border-gray-900">
 				<h2 class="text-2xl font-black uppercase tracking-tight">
 					How to Add Your Banner to LinkedIn
@@ -1032,7 +1032,7 @@
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							01
 						</div>
@@ -1045,7 +1045,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-brand-danger text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-brand-danger text-white border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							02
 						</div>
@@ -1056,7 +1056,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							03
 						</div>

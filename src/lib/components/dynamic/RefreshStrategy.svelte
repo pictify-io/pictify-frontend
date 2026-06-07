@@ -47,7 +47,7 @@
 			</div>
 
 			<div
-				class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+				class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
 			>
 				<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-4">Select Duration</p>
 
@@ -101,7 +101,7 @@
 				<label
 					class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
 					{refreshPolicy.onError === 'serve_stale'
-						? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50'
+						? 'border-gray-900 shadow-brutal-lg bg-blue-50'
 						: 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}"
 				>
 					<div class="relative flex items-center justify-center">
@@ -133,7 +133,7 @@
 				<label
 					class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
 					{refreshPolicy.onError === 'serve_default'
-						? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50'
+						? 'border-gray-900 shadow-brutal-lg bg-blue-50'
 						: 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}"
 				>
 					<div class="relative flex items-center justify-center">
@@ -165,7 +165,7 @@
 				<label
 					class="flex items-center gap-4 p-4 bg-white border-[3px] rounded-xl cursor-pointer transition-all group
 					{refreshPolicy.onError === 'error'
-						? 'border-gray-900 shadow-[4px_4px_0_0_#1f2937] bg-blue-50'
+						? 'border-gray-900 shadow-brutal-lg bg-blue-50'
 						: 'border-gray-200 hover:border-gray-400 hover:shadow-sm'}"
 				>
 					<div class="relative flex items-center justify-center">
@@ -202,7 +202,7 @@
 			<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Output Format</h3>
 		</div>
 
-		<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]">
+		<div class="p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg">
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 				<div>
 					<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
@@ -272,7 +272,7 @@
 			Back
 		</button>
 		<button
-			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Publish

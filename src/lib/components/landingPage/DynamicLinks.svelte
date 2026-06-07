@@ -204,7 +204,7 @@
 		<!-- Header -->
 		<div class="text-center mb-16 md:mb-20">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-danger rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 -rotate-2"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-danger rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-6 -rotate-2"
 			>
 				<span class="text-sm font-bold text-white uppercase tracking-wider">Live Data Bindings</span
 				>
@@ -403,7 +403,7 @@
 						class="relative h-full bg-white border-[3px] border-gray-900 rounded-xl p-6 flex flex-col items-start gap-4 transition-transform group-hover:-translate-y-1"
 					>
 						<div
-							class="w-10 h-10 {step.color} border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-white shadow-[3px_3px_0_0_#1f2937]"
+							class="w-10 h-10 {step.color} border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-white shadow-brutal-md"
 						>
 							{step.num}
 						</div>

@@ -422,7 +422,7 @@
 				<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
 				<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">Barcode Generated!</h3>
 
-				<div class="inline-block bg-white border-[3px] border-gray-900 p-4 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8">
+				<div class="inline-block bg-white border-[3px] border-gray-900 p-4 shadow-brutal-2xl rotate-1 mb-8">
 					<img src={imageUrl} alt="Generated barcode" class="max-w-full h-auto max-h-[200px]" />
 				</div>
 
@@ -430,14 +430,14 @@
 					<a
 						href={imageUrl}
 						download="barcode.{fileFormat}"
-						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
 						Download {fileFormat.toUpperCase()}
 					</a>
 					<button
 						on:click={() => copyToClipboard(imageUrl)}
-						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
 						Copy URL
@@ -458,7 +458,7 @@
 			</p>
 		</div>
 
-		<div class="overflow-x-auto border-[3px] border-black shadow-[8px_8px_0_0_#1f2937]">
+		<div class="overflow-x-auto border-[3px] border-black shadow-brutal-2xl">
 			<table class="w-full text-left border-collapse bg-white">
 				<thead>
 					<tr class="bg-black text-white">
@@ -530,7 +530,7 @@
 
 	<!-- How to Create a Barcode -->
 	<section class="mb-12">
-		<div class="border-[3px] border-black bg-white shadow-[8px_8px_0_0_#1f2937] p-6 md:p-10">
+		<div class="border-[3px] border-black bg-white shadow-brutal-2xl p-6 md:p-10">
 			<h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 				How to Create a <span class="text-brand-danger">Barcode</span>
 			</h2>
@@ -557,7 +557,7 @@
 
 	<!-- Bulk Barcode Generation -->
 	<section class="mb-12">
-		<div class="border-[3px] border-black bg-[#0b0b1f] text-white shadow-[8px_8px_0_0_#1f2937] p-6 md:p-10">
+		<div class="border-[3px] border-black bg-[#0b0b1f] text-white shadow-brutal-2xl p-6 md:p-10">
 			<div class="flex items-start gap-4 mb-4">
 				<span class="px-3 py-1 bg-[#4ade80] text-black text-xs font-black uppercase tracking-wider border-[2px] border-[#4ade80] rounded">API</span>
 			</div>

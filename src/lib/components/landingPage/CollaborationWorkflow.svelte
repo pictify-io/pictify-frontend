@@ -40,7 +40,7 @@
 		<!-- Header -->
 		<div class="text-center mb-20">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-6 transform rotate-1"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
 					>Unified Workflow</span
@@ -98,7 +98,7 @@
 					</div>
 
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-6 relative overflow-hidden"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-6 relative overflow-hidden"
 					>
 						<!-- Editor Interface Mockup -->
 						<div class="flex justify-between items-center mb-4 border-b-2 border-gray-100 pb-2">
@@ -157,7 +157,7 @@
 					</div>
 
 					<div
-						class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-6 relative overflow-hidden"
+						class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-6 relative overflow-hidden"
 					>
 						<!-- Terminal Header -->
 						<div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
@@ -198,7 +198,7 @@
 		<!-- Value Props -->
 		<div class="grid md:grid-cols-3 gap-6 mt-20">
 			<div
-				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
 					class="w-10 h-10 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
@@ -218,7 +218,7 @@
 				</p>
 			</div>
 			<div
-				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
 					class="w-10 h-10 bg-brand-danger rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
@@ -238,7 +238,7 @@
 				</p>
 			</div>
 			<div
-				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
 					class="w-10 h-10 bg-[#4ade80] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"

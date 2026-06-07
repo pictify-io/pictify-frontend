@@ -73,7 +73,7 @@
 	<!-- Hero -->
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-gray-900 text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-gray-900 text-white border-[3px] border-gray-900 shadow-brutal-accent px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 		</div>
@@ -113,7 +113,7 @@
 		<p class="text-lg text-gray-700 leading-relaxed mb-6">
 			Get your API key from the dashboard, and hit the render endpoint:
 		</p>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
@@ -151,7 +151,7 @@
 			What sets this apart
 		</h2>
 		<div class="space-y-5">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">Expression engine in the template</h3>
 				<p class="text-gray-700 leading-relaxed">
 					<code class="bg-gray-100 px-1.5 py-0.5 rounded">{`{{ price * 0.9 | currency }}`}</code>
@@ -161,7 +161,7 @@
 					and nested lookups.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">Live data bindings</h3>
 				<p class="text-gray-700 leading-relaxed">
 					Templates can fetch variables from an HTTP endpoint, a webhook, or a static JSON URL at
@@ -169,14 +169,14 @@
 					rendered image is current. No other template API ships this.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">Batch rendering with webhooks</h3>
 				<p class="text-gray-700 leading-relaxed">
 					For bulk workloads, POST an array of variable sets to the batch endpoint. A webhook fires
 					when the job completes. We benchmark 100× faster than N individual calls.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">One API, six formats</h3>
 				<p class="text-gray-700 leading-relaxed">
 					Same template renders PNG, JPEG, WebP, single-page PDF, multi-page PDF, and GIF. Switching
@@ -240,7 +240,7 @@
 			integration path — no SDK needed. For convenience, the docs show curl, Node, Python, Ruby,
 			Go, and PHP examples.
 		</p>
-		<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+		<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 			<p class="text-gray-700 leading-relaxed">
 				<strong>No SDK lock-in.</strong> If you prefer to keep your dependency tree clean, just use
 				<code class="bg-gray-100 px-1.5 py-0.5 rounded">fetch</code>,
@@ -267,7 +267,7 @@
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

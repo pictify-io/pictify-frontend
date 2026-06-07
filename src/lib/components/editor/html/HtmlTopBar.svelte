@@ -75,7 +75,7 @@
 		<a
 			href={backHref}
 			aria-label="Back to templates"
-			class="group flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+			class="group flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-brutal-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 		>
 			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
@@ -92,7 +92,7 @@
 					bind:value={draftName}
 					on:blur={commitName}
 					on:keydown={onKey}
-					class="w-full rounded-lg border-2 border-gray-900 bg-white p-2 text-sm font-black uppercase tracking-wider text-gray-900 transition-all focus:-translate-y-1 focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] focus:outline-none sm:text-base"
+					class="w-full rounded-lg border-2 border-gray-900 bg-white p-2 text-sm font-black uppercase tracking-wider text-gray-900 transition-all focus:-translate-y-1 focus:bg-white focus:shadow-brutal-accent focus:outline-none sm:text-base"
 					autofocus
 				/>
 			{:else}
@@ -110,7 +110,7 @@
 
 		<!-- Save status pill -->
 		<div
-			class="hidden items-center gap-2 rounded-md border-[2px] border-gray-900 px-3 py-1.5 shadow-[2px_2px_0_0_#1f2937] transition-all sm:flex {statusMeta.bg}"
+			class="hidden items-center gap-2 rounded-md border-[2px] border-gray-900 px-3 py-1.5 shadow-brutal-sm transition-all sm:flex {statusMeta.bg}"
 		>
 			<span class="relative flex h-2.5 w-2.5">
 				{#if saveStatus === 'unsaved'}
@@ -134,7 +134,7 @@
 				disabled={!canUndo}
 				title="Undo (⌘Z)"
 				aria-label="Undo"
-				class="flex h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+				class="flex h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-brutal-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none"
 			>
 				<i class="fa fa-arrow-rotate-left text-[11px]"></i>
 			</button>
@@ -144,7 +144,7 @@
 				disabled={!canRedo}
 				title="Redo (⌘⇧Z)"
 				aria-label="Redo"
-				class="flex h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+				class="flex h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-brutal-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none"
 			>
 				<i class="fa fa-arrow-rotate-right text-[11px]"></i>
 			</button>
@@ -157,7 +157,7 @@
 			type="button"
 			on:click={() => dispatch('resize')}
 			title="Resize template"
-			class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+			class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-lg transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
 		>
 			<i class="fa fa-expand text-[11px]"></i>
 			<span class="font-mono">{width}×{height}</span>
@@ -168,7 +168,7 @@
 			type="button"
 			on:click={toggleFormat}
 			title="Toggle output format"
-			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none sm:flex
+			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-brutal-lg transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none sm:flex
 				{outputFormat === 'pdf' ? 'bg-brand-danger text-white' : 'bg-brand-accent text-gray-900'}"
 		>
 			<i class="fa {outputFormat === 'pdf' ? 'fa-file-pdf' : 'fa-image'} text-[11px]"></i>
@@ -184,7 +184,7 @@
 			on:click={() => dispatch('learn')}
 			title="Open template syntax reference"
 			aria-label="Template syntax reference"
-			class="hidden h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffe066] hover:shadow-none sm:flex"
+			class="hidden h-9 w-9 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-white text-gray-900 shadow-brutal-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffe066] hover:shadow-none sm:flex"
 		>
 			<i class="fa fa-question text-[11px]"></i>
 		</button>
@@ -205,9 +205,9 @@
 			disabled={isSaving || !isDirty}
 			class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all disabled:cursor-default sm:px-6
 				{isSaving
-					? 'bg-[#ffe066] text-gray-900 shadow-[4px_4px_0_0_#1f2937]'
+					? 'bg-[#ffe066] text-gray-900 shadow-brutal-lg'
 					: isDirty
-						? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none'
+						? 'bg-[#4ade80] text-gray-900 shadow-brutal-lg hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none'
 						: 'bg-gray-100 text-gray-400'}"
 		>
 			{#if isSaving}
@@ -228,7 +228,7 @@
 			on:click={() => dispatch('publish')}
 			disabled={!canPublish}
 			title="Publish template"
-			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-gray-400 disabled:hover:shadow-[4px_4px_0_0_#1f2937] lg:flex
+			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-brutal-lg transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-gray-400 disabled:hover:shadow-brutal-lg lg:flex
 				{canPublish ? 'bg-brand-danger' : 'bg-gray-400'}"
 		>
 			<i class="fa fa-rocket text-[11px]"></i>

@@ -292,7 +292,7 @@
 			<!-- Breadcrumb -->
 			<nav class="mb-12 flex justify-center">
 				<ol
-					class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+					class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 				>
 					<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 					<li class="text-gray-300">/</li>
@@ -313,7 +313,7 @@
 					class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 				>
 					<div
-						class="px-6 py-2 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg"
+						class="px-6 py-2 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg"
 					>
 						★ Workflow
 					</div>
@@ -356,7 +356,7 @@
 			<!-- Template Preview Section (Window Style) -->
 			<div class="max-w-5xl mx-auto px-4 mb-20">
 				<div
-					class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group"
+					class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-3xl overflow-hidden relative group"
 				>
 					<!-- Window Header -->
 					<div
@@ -394,7 +394,7 @@
 									height={templateHeight}
 								/>
 							{:else}
-								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]">
+								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl">
 									<p class="font-bold text-gray-400">Preview not available</p>
 								</div>
 							{/if}
@@ -404,7 +404,7 @@
 								<button
 									type="button"
 									on:click={openInCanvasEditor}
-									class="flex-1 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
+									class="flex-1 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -420,7 +420,7 @@
 									type="button"
 									on:click={handleQuickGenerate}
 									disabled={isGenerating}
-									class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+									class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
 								>
 									{#if isGenerating}
 										<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"
@@ -469,7 +469,7 @@
 						</h3>
 
 						<div
-							class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
+							class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 						>
 							<img
 								src={generatedImageUrl}
@@ -482,7 +482,7 @@
 							<a
 								href={generatedImageUrl}
 								download="pictify-result.png"
-								class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+								class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -537,7 +537,7 @@
 			<section class="py-20 relative">
 				<div class="text-center mb-16 px-4">
 					<div
-						class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform rotate-1 rounded-lg"
+						class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg"
 					>
 						<span class="font-black uppercase tracking-widest text-sm">Overview</span>
 					</div>
@@ -549,13 +549,13 @@
 				<div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6">
 					{#each config.overview as paragraph, i}
 						<div
-							class="bg-white border-[3px] border-gray-900 p-8 rounded-3xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-1 transition-all relative overflow-hidden group"
+							class="bg-white border-[3px] border-gray-900 p-8 rounded-3xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1 transition-all relative overflow-hidden group"
 						>
 							<div
 								class="absolute top-0 right-0 w-32 h-32 bg-brand-accent/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"
 							/>
 							<div
-								class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-xl font-black mb-6 shadow-[3px_3px_0_0_#1f2937] relative z-10"
+								class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-xl font-black mb-6 shadow-brutal-md relative z-10"
 							>
 								{i + 1}
 							</div>
@@ -587,10 +587,10 @@
 									: 'lg:col-span-12'}
 							>
 								<div
-									class="bg-brand-bg border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[12px_12px_0_0_#1f2937] h-full"
+									class="bg-brand-bg border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-brutal-3xl h-full"
 								>
 									<span
-										class="inline-block px-4 py-1.5 bg-brand-danger text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6"
+										class="inline-block px-4 py-1.5 bg-brand-danger text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6"
 										>Deep Dive</span
 									>
 
@@ -611,7 +611,7 @@
 						{#if config.useCaseScenarios && config.useCaseScenarios.length}
 							<div class={config.longDescription ? 'lg:col-span-5' : 'lg:col-span-12'}>
 								<div
-									class="bg-[#4ade80] border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[12px_12px_0_0_#1f2937] h-full relative overflow-hidden"
+									class="bg-[#4ade80] border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-brutal-3xl h-full relative overflow-hidden"
 								>
 									<!-- Decorative Circle -->
 									<div
@@ -619,7 +619,7 @@
 									/>
 
 									<span
-										class="inline-block px-4 py-1.5 bg-white text-gray-900 border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6"
+										class="inline-block px-4 py-1.5 bg-white text-gray-900 border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6"
 										>Perfect For</span
 									>
 
@@ -632,7 +632,7 @@
 									<ul class="space-y-4">
 										{#each config.useCaseScenarios as scenario}
 											<li
-												class="flex items-start gap-4 p-4 bg-white/90 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
+												class="flex items-start gap-4 p-4 bg-white/90 border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all"
 											>
 												<div
 													class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-accent border-2 border-gray-900 flex items-center justify-center mt-1"
@@ -678,7 +678,7 @@
 					<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{#each config.painPoints as point}
 							<div
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[5px_5px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[5px_5px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all"
 							>
 								<div class="flex items-start gap-4">
 									<span class="text-brand-danger text-2xl font-black">✗</span>
@@ -701,7 +701,7 @@
 				<div class="max-w-4xl mx-auto px-6 space-y-8">
 					{#each config.workflow as step, i}
 						<div
-							class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden hover:-translate-y-1 transition-all group"
+							class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-brutal-2xl overflow-hidden hover:-translate-y-1 transition-all group"
 						>
 							<div class="flex flex-col md:flex-row items-stretch">
 								<div
@@ -724,7 +724,7 @@
 					<button
 						type="button"
 						on:click={openInCanvasEditor}
-						class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
+						class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
 					>
 						Start Creating Now
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -745,14 +745,14 @@
 			<section class="py-20 px-4">
 				<div class="max-w-6xl mx-auto">
 					<div
-						class="rounded-[2.5rem] border-[3px] border-gray-900 bg-white shadow-[12px_12px_0_0_#1f2937] overflow-hidden"
+						class="rounded-[2.5rem] border-[3px] border-gray-900 bg-white shadow-brutal-3xl overflow-hidden"
 					>
 						<div class="grid gap-10 lg:grid-cols-[1fr,1.2fr] p-8 md:p-16 items-center">
 							<!-- Left: Pitch -->
 							<div class="flex flex-col gap-8">
 								<div>
 									<span
-										class="px-4 py-2 bg-brand-accent border-2 border-gray-900 rounded-lg text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937]"
+										class="px-4 py-2 bg-brand-accent border-2 border-gray-900 rounded-lg text-xs font-black uppercase tracking-widest shadow-brutal-sm"
 										>Developer Friendly</span
 									>
 									<h2 class="mt-6 text-3xl md:text-5xl font-black text-gray-900 leading-[1.1]">
@@ -787,7 +787,7 @@
 									class="absolute -inset-4 bg-gradient-to-r from-brand-danger to-brand-accent rounded-[2rem] opacity-20 blur-xl group-hover:opacity-30 transition-opacity"
 								/>
 								<div
-									class="relative rounded-2xl border-[3px] border-gray-900 bg-[#1e1e1e] shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+									class="relative rounded-2xl border-[3px] border-gray-900 bg-[#1e1e1e] shadow-brutal-2xl overflow-hidden"
 								>
 									<div
 										class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center gap-2"
@@ -825,7 +825,7 @@
 					<div class="space-y-4">
 						{#each config.faqs as faq}
 							<details
-								class="group bg-white rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
+								class="group bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
 							>
 								<summary
 									class="flex items-center justify-between p-6 cursor-pointer list-none bg-white hover:bg-gray-50 transition-colors"
@@ -863,7 +863,7 @@
 						{#each config.related as relatedId}
 							<a
 								href={`/tools/${relatedId}`}
-								class="px-6 py-3 bg-brand-bg border-[3px] border-gray-900 font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all rounded-xl"
+								class="px-6 py-3 bg-brand-bg border-[3px] border-gray-900 font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all rounded-xl"
 							>
 								{useCaseDetails[relatedId]?.label || relatedId}
 							</a>
@@ -883,7 +883,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -892,7 +892,7 @@
 				</h1>
 				<a
 					href="/tools"
-					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Explore All Tools
 				</a>

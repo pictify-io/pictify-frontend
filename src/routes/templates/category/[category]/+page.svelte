@@ -132,7 +132,7 @@
 			>
 				<!-- Icon -->
 				<div
-					class="w-20 h-20 bg-brand-accent border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
+					class="w-20 h-20 bg-brand-accent border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-xl mb-8"
 				>
 					<svg
 						class="w-10 h-10 text-gray-900"
@@ -168,7 +168,7 @@
 						{#each category.recommendedSizes as size}
 							<a
 								href="/tools/html-to-png/{size}"
-								class="px-6 py-3 bg-white border-[3px] border-gray-900 font-bold shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+								class="px-6 py-3 bg-white border-[3px] border-gray-900 font-bold shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 							>
 								{size}
 							</a>
@@ -189,7 +189,7 @@
 						{#each relatedUseCases as uc}
 							<a
 								href="/tools/{uc.id}"
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all group"
+								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all group"
 							>
 								<h3
 									class="text-xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
@@ -244,7 +244,7 @@
 					{#each otherCategories as cat}
 						<a
 							href="/templates/category/{cat.id}"
-							class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
 						>
 							<div class="flex items-center gap-3">
 								<div
@@ -287,7 +287,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -296,7 +296,7 @@
 				</h1>
 				<a
 					href="/templates"
-					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Browse All Templates
 				</a>

@@ -194,7 +194,7 @@ const image = await pictify.render({
 				<a
 					href="https://docs.pictify.io"
 					target="_blank"
-					class="inline-flex items-center gap-3 px-8 py-5 bg-black text-white text-lg font-black uppercase tracking-wider rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1 transition-all"
+					class="inline-flex items-center gap-3 px-8 py-5 bg-black text-white text-lg font-black uppercase tracking-wider rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_#ffc480] hover:shadow-brutal-accent-sm hover:translate-x-1 hover:translate-y-1 transition-all"
 				>
 					<span>View API Docs</span>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

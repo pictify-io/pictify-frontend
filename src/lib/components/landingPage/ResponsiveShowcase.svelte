@@ -23,7 +23,7 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-16 max-w-3xl mx-auto relative">
 			<div
-				class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-1 hover:rotate-2 transition-transform cursor-default"
+				class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-1 hover:rotate-2 transition-transform cursor-default"
 			>
 				<span class="text-sm font-black text-gray-900 uppercase tracking-wider"
 					>Responsive Engine</span
@@ -56,7 +56,7 @@
 			
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div 
-				class="relative bg-white rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden z-10 flex flex-col transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300"
+				class="relative bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden z-10 flex flex-col transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300"
 				on:mouseenter={() => isHovering = true}
 				on:mouseleave={() => isHovering = false}
 			>
@@ -68,7 +68,7 @@
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-[2px] border-gray-900"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-[2px] border-gray-900"></div>
 					</div>
-					<div class="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-md border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]">
+					<div class="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-md border-[2px] border-gray-900 shadow-brutal-sm">
 						<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
 						<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Auto-Resize API</span>
 					</div>
@@ -93,7 +93,7 @@
 						<!-- Center Data Node -->
 						<div class="absolute z-30 flex flex-col items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 							<div class="w-20 h-20 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#ff6b6b] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[8px_8px_0_0_#ff6b6b] transition-all duration-300 relative">
-								<div class="absolute -top-3 -right-3 w-8 h-8 bg-brand-accent border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#1f2937] z-10">
+								<div class="absolute -top-3 -right-3 w-8 h-8 bg-brand-accent border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-brutal-sm z-10">
 									<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 								</div>
 								<span class="font-black text-3xl text-gray-900">{`{}`}</span>
@@ -115,7 +115,7 @@
 								"
 							>
 								<div 
-									class="bg-white border-[3px] border-gray-900 p-2 rounded-xl shadow-[4px_4px_0_0_#1f2937] group-hover/card:scale-110 group-hover/card:z-40 transition-all duration-300 w-28 md:w-32 flex flex-col gap-1.5"
+									class="bg-white border-[3px] border-gray-900 p-2 rounded-xl shadow-brutal-lg group-hover/card:scale-110 group-hover/card:z-40 transition-all duration-300 w-28 md:w-32 flex flex-col gap-1.5"
 									style="transform: rotate({platform.rotation}deg);"
 								>
 									<!-- Mock Image Header -->
@@ -135,7 +135,7 @@
 					<!-- Right: Code Info -->
 					<div class="w-full lg:w-[45%] flex flex-col relative bg-white p-8 lg:p-10 justify-center group/rightpane">
 						<div class="mb-6">
-							<div class="inline-block px-3 py-1 bg-[#3b82f6] text-white font-black text-[10px] uppercase tracking-widest border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] rounded mb-4 transform -rotate-2">
+							<div class="inline-block px-3 py-1 bg-[#3b82f6] text-white font-black text-[10px] uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm rounded mb-4 transform -rotate-2">
 								Multi-Format Output
 							</div>
 							<h3 class="text-3xl font-black text-gray-900 mb-3 leading-tight">Generate All Sizes At Once</h3>
@@ -152,7 +152,7 @@
 							</div>
 							
 							<!-- The Code Block -->
-							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-[#4ade80] relative">
+							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-[#4ade80] relative">
 								<!-- Top Mac Dots inside code editor -->
 								<div class="flex gap-1.5 mb-3 border-b border-gray-700 pb-3">
 									<div class="w-2.5 h-2.5 rounded-full bg-brand-danger"></div>

@@ -405,7 +405,7 @@
 				>
 					<!-- Pill Badge -->
 					<div
-						class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-4 transform -rotate-1 hover:rotate-0 transition-transform"
+						class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-4 transform -rotate-1 hover:rotate-0 transition-transform"
 					>
 						<span class="w-2.5 h-2.5 bg-brand-danger rounded-full animate-pulse" />
 						<span class="text-xs font-black text-gray-900 uppercase tracking-widest"
@@ -444,7 +444,7 @@
 
 					<!-- Chunky Billing Toggle -->
 					<div
-						class="mt-10 relative inline-flex p-2 bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]"
+						class="mt-10 relative inline-flex p-2 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl"
 					>
 						<div class="absolute -top-4 -right-4 z-20">
 							<span
@@ -508,12 +508,12 @@
 						<div
 							class="relative flex flex-col p-6 h-full bg-white rounded-2xl border-[3px] border-gray-900 transition-all duration-300
 							{isPopular
-								? 'shadow-[12px_12px_0_0_#1f2937] lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-brand-bg'
-								: 'shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-1'}"
+								? 'shadow-brutal-3xl lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-brand-bg'
+								: 'shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1'}"
 						>
 							{#if isPopular}
 								<div
-									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] whitespace-nowrap z-30"
+									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-brutal-md whitespace-nowrap z-30"
 								>
 									Most Popular
 								</div>
@@ -718,8 +718,8 @@
 							<button
 								class="w-full py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
 								{isPopular
-									? 'bg-brand-accent text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'
-									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'}"
+									? 'bg-brand-accent text-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
+									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'}"
 								on:click={() => selectPlanHandler(planId)}
 							>
 								Get Started
@@ -745,7 +745,7 @@
 					</div>
 
 					<div
-						class="overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-[8px_8px_0_0_#1f2937]"
+						class="overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-2xl"
 					>
 						<div class="overflow-x-auto">
 							<table class="w-full min-w-[1000px] border-collapse">
@@ -812,7 +812,7 @@
 													>
 														{#if value === true}
 															<div
-																class="w-8 h-8 rounded-lg bg-[#a2ffc1] border-2 border-gray-900 flex items-center justify-center mx-auto shadow-[2px_2px_0_0_#1f2937]"
+																class="w-8 h-8 rounded-lg bg-[#a2ffc1] border-2 border-gray-900 flex items-center justify-center mx-auto shadow-brutal-sm"
 															>
 																<svg
 																	class="w-5 h-5 text-gray-900"
@@ -862,7 +862,7 @@
 
 				<!-- Enterprise CTA -->
 				<div
-					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg p-10 md:p-16 shadow-[8px_8px_0_0_#1f2937] text-center z-10"
+					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg p-10 md:p-16 shadow-brutal-2xl text-center z-10"
 				>
 					<!-- Geometric Decorations -->
 					<div
@@ -879,7 +879,7 @@
 						</p>
 						<a
 							href="mailto:support@pictify.io"
-							class="inline-flex items-center gap-3 mt-4 px-8 py-5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#ffc480] hover:bg-gray-800 transition-all text-lg uppercase tracking-widest"
+							class="inline-flex items-center gap-3 mt-4 px-8 py-5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg uppercase tracking-widest"
 						>
 							<span>Contact Sales</span>
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -908,7 +908,7 @@
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						{#each FAQs as faq}
 							<div
-								class="group flex flex-col bg-white rounded-xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f2937] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937]"
+								class="group flex flex-col bg-white rounded-xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f2937] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-brutal-2xl"
 								role="button"
 								tabindex="0"
 								aria-expanded={faq.isOpened}
@@ -925,7 +925,7 @@
 										{faq.question}
 									</h3>
 									<div
-										class="w-10 h-10 rounded-lg bg-gray-50 border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 transition-all duration-300 shadow-[2px_2px_0_0_#1f2937] {faq.isOpened
+										class="w-10 h-10 rounded-lg bg-gray-50 border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 transition-all duration-300 shadow-brutal-sm {faq.isOpened
 											? 'rotate-180 bg-brand-accent'
 											: 'group-hover:translate-x-[1px] group-hover:translate-y-[1px]'}"
 									>

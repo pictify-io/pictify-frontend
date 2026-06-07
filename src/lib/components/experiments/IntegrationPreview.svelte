@@ -11,7 +11,7 @@
 </script>
 
 <div
-	class="bg-gray-900 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937] flex flex-col"
+	class="bg-gray-900 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl flex flex-col"
 >
 	<!-- Terminal Header -->
 	<div class="h-10 border-b-[3px] border-gray-700 flex items-center px-4 bg-gray-800 shrink-0">

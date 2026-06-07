@@ -242,7 +242,7 @@
 
 		<!-- Callout card -->
 		<div
-			class="w-[360px] overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-[8px_8px_0_0_#1f2937]"
+			class="w-[360px] overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-2xl"
 			style={calloutStyle}
 			role="dialog"
 			aria-modal="true"
@@ -251,7 +251,7 @@
 			<!-- Header strip -->
 			<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-4 py-3">
 				<div class="flex items-center gap-2">
-					<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+					<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 						<i class="fa {currentStep.icon} text-[11px] text-gray-900"></i>
 					</div>
 					<span class="text-[10px] font-black uppercase tracking-widest text-gray-900">
@@ -262,7 +262,7 @@
 					type="button"
 					on:click={dismiss}
 					aria-label="Skip tour"
-					class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+					class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 				>
 					<i class="fa fa-xmark text-[11px]"></i>
 				</button>
@@ -298,13 +298,13 @@
 						<button
 							type="button"
 							on:click={prev}
-							class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+							class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 						>Back</button>
 					{/if}
 					<button
 						type="button"
 						on:click={next}
-						class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+						class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 					>
 						{currentStep.cta || (currentIndex === STEPS.length - 1 ? 'Finish' : 'Next')}
 					</button>

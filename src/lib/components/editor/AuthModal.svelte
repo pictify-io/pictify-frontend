@@ -162,7 +162,7 @@
 		>
 			<!-- Main Modal -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 			>
 				<!-- Close Button -->
 				<button
@@ -226,7 +226,7 @@
 					<!-- Google Auth -->
 					<button
 						type="button"
-						class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold text-sm"
+						class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold text-sm"
 						on:click={handleGoogleAuth}
 						disabled={isLoading}
 					>
@@ -256,7 +256,7 @@
 							id="email"
 							type="email"
 							bind:value={email}
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all text-sm font-medium"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-brutal-accent transition-all text-sm font-medium"
 							disabled={isLoading}
 							required
 						/>
@@ -274,7 +274,7 @@
 							id="password"
 							type="password"
 							bind:value={password}
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all text-sm font-medium"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-brutal-accent transition-all text-sm font-medium"
 							disabled={isLoading}
 							required
 						/>
@@ -341,7 +341,7 @@
 					<!-- Submit Button -->
 					<button
 						type="submit"
-						class="w-full py-3 px-6 bg-gray-900 text-white font-bold text-base uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="w-full py-3 px-6 bg-gray-900 text-white font-bold text-base uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 						disabled={isLoading ||
 							!email ||
 							!password ||

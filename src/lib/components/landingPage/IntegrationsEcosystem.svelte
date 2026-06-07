@@ -77,7 +77,7 @@
 		<!-- Main Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
 			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-xl rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Infrastructure</span>
 			</div>
@@ -106,7 +106,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 xl:gap-8">
 			{#each categories as cat}
 				<div
-					class="{cat.cols} {cat.color} rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col"
+					class="{cat.cols} {cat.color} rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 				>
 					<!-- Optional Gradient Overlay for non-white cards -->
 					{#if cat.color !== 'bg-white'}
@@ -120,7 +120,7 @@
 					<div class="p-8 md:p-10 flex-1 flex flex-col relative z-10">
 						<div class="flex items-center gap-4 mb-6">
 							<div
-								class="w-14 h-14 {cat.iconBg} border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform"
+								class="w-14 h-14 {cat.iconBg} border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:-rotate-6 transition-transform"
 							>
 								{#if cat.title === 'Automation'}
 									<svg
@@ -217,7 +217,7 @@
 						<div class="mt-auto flex flex-wrap gap-3">
 							{#each cat.items as item}
 								<span
-									class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-black text-black shadow-[2px_2px_0_0_#1f2937] group-hover:-translate-y-0.5 group-hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
+									class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-black text-black shadow-brutal-sm group-hover:-translate-y-0.5 group-hover:shadow-brutal-lg transition-all"
 								>
 									{#if cat.title === 'Webhooks'}
 										<code class="font-mono text-xs uppercase tracking-wider">{item}</code>
@@ -236,7 +236,7 @@
 		<div class="text-center mt-20">
 			<a
 				href="/integrations"
-				class="inline-flex items-center gap-3 px-8 py-4 bg-brand-accent text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all group"
+				class="inline-flex items-center gap-3 px-8 py-4 bg-brand-accent text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-1 hover:translate-y-1 transition-all group"
 			>
 				<span class="text-lg">View All Integrations</span>
 				<div

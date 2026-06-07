@@ -168,7 +168,7 @@
 		<!-- Main Mapping Section -->
 		<div class="lg:col-span-8">
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden"
 			>
 				<div class="bg-[#60a5fa] border-b-[3px] border-gray-900 px-6 py-4">
 					<h2
@@ -255,7 +255,7 @@
 												<!-- Dropdown suggestions -->
 												{#if openDropdown === variable.name && suggestedPaths.length > 0}
 													<div
-														class="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] max-h-64 overflow-y-auto"
+														class="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl max-h-64 overflow-y-auto"
 													>
 														<div
 															class="sticky top-0 bg-gray-50 px-3 py-2 border-b-[3px] border-gray-100 flex justify-between items-center"
@@ -399,7 +399,7 @@
 
 			<!-- Source Data Preview -->
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col max-h-[500px]"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden flex flex-col max-h-[500px]"
 			>
 				<div
 					class="bg-gray-100 border-b-[3px] border-gray-900 px-4 py-3 flex justify-between items-center shrink-0"
@@ -450,7 +450,7 @@
 			Back
 		</button>
 		<button
-			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Refresh Strategy

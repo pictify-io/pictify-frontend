@@ -219,7 +219,7 @@
 					<button
 						type="button"
 						on:click={toggleSelectAll}
-						class="rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+						class="rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 					>
 						{selectedNames.size === variableDefinitions.length ? 'Clear' : 'All'}
 					</button>
@@ -227,7 +227,7 @@
 						type="button"
 						on:click={bulkDelete}
 						disabled={selectedNames.size === 0}
-						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						<i class="fa fa-trash text-[10px]"></i>
 						Delete ({selectedNames.size})
@@ -235,7 +235,7 @@
 					<button
 						type="button"
 						on:click={exitSelectMode}
-						class="rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+						class="rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 					>
 						Done
 					</button>
@@ -244,7 +244,7 @@
 						type="button"
 						on:click={randomize}
 						title="Fill test values with faker data"
-						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 					>
 						<i class="fa fa-dice text-[10px]"></i>
 						Randomize
@@ -253,7 +253,7 @@
 						type="button"
 						on:click={() => (selectMode = true)}
 						title="Bulk select"
-						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 					>
 						<i class="fa fa-list-check text-[10px]"></i>
 						Select
@@ -261,7 +261,7 @@
 					<button
 						type="button"
 						on:click={addVar}
-						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 					>
 						<i class="fa fa-plus text-[10px]"></i>
 						Add
@@ -280,7 +280,7 @@
 					type="text"
 					bind:value={searchQuery}
 					placeholder="SEARCH VARIABLES..."
-					class="w-full rounded-lg border-[2px] border-gray-900 bg-white py-2 pl-9 pr-3 text-[11px] font-black uppercase tracking-widest text-gray-900 placeholder-gray-400 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#1f2937] focus:outline-none"
+					class="w-full rounded-lg border-[2px] border-gray-900 bg-white py-2 pl-9 pr-3 text-[11px] font-black uppercase tracking-widest text-gray-900 placeholder-gray-400 transition-all focus:-translate-y-0.5 focus:shadow-brutal-md focus:outline-none"
 				/>
 			</div>
 		{/if}
@@ -290,10 +290,10 @@
 	<div class="flex-1 overflow-auto p-4">
 		{#if variableDefinitions.length === 0}
 			<div
-				class="mx-auto mt-6 max-w-xl rounded-2xl border-[3px] border-gray-900 bg-white p-8 text-center shadow-[6px_6px_0_0_#1f2937]"
+				class="mx-auto mt-6 max-w-xl rounded-2xl border-[3px] border-gray-900 bg-white p-8 text-center shadow-brutal-xl"
 			>
 				<div
-					class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-[2px_2px_0_0_#1f2937]"
+					class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-brutal-sm"
 				>
 					<i class="fa fa-cube text-gray-900"></i>
 				</div>
@@ -358,10 +358,10 @@
 						}}
 						class="group flex cursor-pointer items-center gap-3 rounded-lg border-[2px] px-3 py-2 transition-all
 							{openIndex === i
-								? 'border-gray-900 bg-brand-accent/20 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
+								? 'border-gray-900 bg-brand-accent/20 shadow-brutal-md -translate-x-[1px] -translate-y-[1px]'
 								: selectMode && selectedNames.has(v.name)
-									? 'border-gray-900 bg-brand-accent/30 shadow-[2px_2px_0_0_#1f2937]'
-									: 'border-gray-900 bg-white hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
+									? 'border-gray-900 bg-brand-accent/30 shadow-brutal-sm'
+									: 'border-gray-900 bg-white hover:shadow-brutal-sm hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 					>
 						<!-- Selection checkbox (visible only in select mode) -->
 						{#if selectMode}
@@ -444,7 +444,7 @@
 									on:click|stopPropagation
 									on:input={(e) => setTestValue(v.name, e.target.value)}
 									placeholder={v.defaultValue || 'test value'}
-									class="hidden w-40 flex-shrink-0 rounded-md border-[1.5px] border-gray-300 bg-gray-50 px-2 py-1 font-mono text-[11px] text-gray-700 focus:-translate-y-0.5 focus:border-gray-900 focus:bg-white focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none sm:inline-block"
+									class="hidden w-40 flex-shrink-0 rounded-md border-[1.5px] border-gray-300 bg-gray-50 px-2 py-1 font-mono text-[11px] text-gray-700 focus:-translate-y-0.5 focus:border-gray-900 focus:bg-white focus:shadow-brutal-accent-sm focus:outline-none sm:inline-block"
 								/>
 							{/if}
 						{/if}

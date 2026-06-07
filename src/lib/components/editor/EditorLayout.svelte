@@ -277,7 +277,7 @@
 				disabled={isLayoutSwitching}
 				class="px-2 py-1.5 text-xs font-bold border-2 whitespace-nowrap transition-all flex items-center gap-2
 					{currentLayoutKey === null
-					? 'border-gray-900 bg-brand-accent/20 shadow-[2px_2px_0_0_#1f2937]'
+					? 'border-gray-900 bg-brand-accent/20 shadow-brutal-sm'
 					: 'border-gray-200 hover:border-gray-400'}
 					disabled:opacity-50 disabled:cursor-not-allowed"
 			>
@@ -296,7 +296,7 @@
 					disabled={isLayoutSwitching}
 					class="px-2 py-1.5 text-xs font-bold border-2 whitespace-nowrap transition-all flex items-center gap-2
 						{currentLayoutKey === key
-						? 'border-gray-900 bg-brand-accent/20 shadow-[2px_2px_0_0_#1f2937]'
+						? 'border-gray-900 bg-brand-accent/20 shadow-brutal-sm'
 						: 'border-gray-200 hover:border-gray-400'}
 						disabled:opacity-50 disabled:cursor-not-allowed"
 				>
@@ -439,7 +439,7 @@
 
 	<!-- Keyboard Shortcuts Button -->
 	<button
-		class="fixed bottom-4 right-4 z-30 w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-full text-gray-900 font-black text-sm shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all hover:bg-brand-accent"
+		class="fixed bottom-4 right-4 z-30 w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-full text-gray-900 font-black text-sm shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all hover:bg-brand-accent"
 		on:click={() => (showShortcutsModal = true)}
 		title="Keyboard Shortcuts"
 	>
@@ -455,7 +455,7 @@
 			transition:fly={{ y: 0, duration: 150 }}
 		>
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] w-full max-w-sm mx-4"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl w-full max-w-sm mx-4"
 				transition:fly={{ y: 20, duration: 200 }}
 			>
 				<!-- Header -->

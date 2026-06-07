@@ -35,7 +35,7 @@
 </script>
 
 <div
-	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 >
 	<!-- Header -->
 	<div class="px-5 py-4 border-b-2 border-gray-200 flex items-center justify-between">

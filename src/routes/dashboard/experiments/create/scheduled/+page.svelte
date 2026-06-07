@@ -515,7 +515,7 @@
 						value={form.name}
 						on:input={handleNameInput}
 						placeholder="e.g. Holiday Banner Schedule"
-						class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:border-brand-accent transition-all"
+						class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 					/>
 				</div>
 
@@ -530,7 +530,7 @@
 							value={form.slug}
 							on:input={handleSlugInput}
 							placeholder="holiday-banner"
-							class="flex-1 px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:border-brand-accent transition-all"
+							class="flex-1 px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 						/>
 						{#if slugStatus === 'checking'}
 							<span class="text-xs font-bold text-gray-400">Checking...</span>
@@ -567,7 +567,7 @@
 								on:click={() => (form.outputConfig.format = fmt.value)}
 								class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 									{form.outputConfig.format === fmt.value
-									? 'border-brand-accent bg-brand-accent/10 shadow-[4px_4px_0_0_#ffc480]'
+									? 'border-brand-accent bg-brand-accent/10 shadow-brutal-accent'
 									: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
 							>
 								<span class="text-sm font-black">{fmt.label}</span>
@@ -662,7 +662,7 @@
 							<input
 								type="text"
 								bind:value={variant.name}
-								class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:border-brand-accent transition-all"
+								class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 							/>
 						</div>
 
@@ -793,7 +793,7 @@
 							on:click={() => (form.goalConfig.type = 'impressions_only')}
 							class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 								{form.goalConfig.type === 'impressions_only'
-								? 'border-brand-accent bg-brand-accent/10 shadow-[4px_4px_0_0_#ffc480]'
+								? 'border-brand-accent bg-brand-accent/10 shadow-brutal-accent'
 								: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
 						>
 							<span class="text-sm font-black">Views Only</span>
@@ -804,7 +804,7 @@
 							on:click={() => (form.goalConfig.type = 'click_through')}
 							class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 								{form.goalConfig.type === 'click_through'
-								? 'border-brand-accent bg-brand-accent/10 shadow-[4px_4px_0_0_#ffc480]'
+								? 'border-brand-accent bg-brand-accent/10 shadow-brutal-accent'
 								: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
 						>
 							<span class="text-sm font-black">Click-through</span>
@@ -823,7 +823,7 @@
 							type="url"
 							bind:value={form.goalConfig.destinationUrl}
 							placeholder="https://yoursite.com/landing-page"
-							class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:border-brand-accent transition-all placeholder:text-gray-300 placeholder:font-sans"
+							class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all placeholder:text-gray-300 placeholder:font-sans"
 						/>
 					</div>
 				{/if}

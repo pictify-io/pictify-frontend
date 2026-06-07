@@ -225,7 +225,7 @@
 		{#if !isSummaryLoading && summary.totalLogs > 0}
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
@@ -249,7 +249,7 @@
 				</div>
 
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
@@ -273,7 +273,7 @@
 				</div>
 
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
@@ -292,7 +292,7 @@
 				</div>
 
 				<div
-					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="bg-white p-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 				>
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
@@ -314,7 +314,7 @@
 
 		<!-- Main Control Panel -->
 		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col"
+			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden flex flex-col"
 		>
 			<!-- Toolbar -->
 			<div
@@ -322,7 +322,7 @@
 			>
 				<div class="flex items-center gap-2 w-full sm:w-auto">
 					<button
-						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-all shadow-[2px_2px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
+						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-all shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
 						on:click={() => (showFilters = !showFilters)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -337,7 +337,7 @@
 					</button>
 					<div class="relative">
 						<button
-							class="px-4 py-2 bg-brand-accent border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-[#ffb356] transition-all shadow-[2px_2px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
+							class="px-4 py-2 bg-brand-accent border-[2px] border-gray-900 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-[#ffb356] transition-all shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-2"
 							on:click={() => (showExportMenu = !showExportMenu)}
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -352,7 +352,7 @@
 						</button>
 						{#if showExportMenu}
 							<div
-								class="absolute top-full left-0 mt-2 w-32 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] z-20"
+								class="absolute top-full left-0 mt-2 w-32 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg z-20"
 							>
 								<button
 									class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-100 border-b border-gray-100"
@@ -425,7 +425,7 @@
 							<select
 								bind:value={category}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							>
 								{#each categories as cat}<option value={cat.value}>{cat.label}</option>{/each}
 							</select>
@@ -440,7 +440,7 @@
 							<select
 								bind:value={status}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							>
 								{#each statuses as stat}<option value={stat.value}>{stat.label}</option>{/each}
 							</select>
@@ -456,7 +456,7 @@
 								type="date"
 								bind:value={startDate}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							/>
 						</label>
 					</div>
@@ -470,7 +470,7 @@
 								type="date"
 								bind:value={endDate}
 								on:change={handleFilterChange}
-								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-[2px_2px_0_0_#ffc480]"
+								class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-xs font-bold focus:outline-none focus:shadow-brutal-accent-sm"
 							/>
 						</label>
 					</div>
@@ -497,7 +497,7 @@
 				{:else if logs.length === 0}
 					<div class="p-12 flex flex-col items-center justify-center text-center">
 						<div
-							class="w-16 h-16 bg-gray-100 border-[3px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#1f2937] rounded-xl"
+							class="w-16 h-16 bg-gray-100 border-[3px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg rounded-xl"
 						>
 							<svg
 								class="w-8 h-8 text-gray-400"
@@ -620,7 +620,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
 			on:click|stopPropagation
 		>
 			<!-- Modal Header -->
@@ -677,7 +677,7 @@
 				<!-- Grid Data -->
 				<div class="grid grid-cols-2 gap-4">
 					<div
-						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 					>
 						<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
 							>Event ID</span
@@ -688,7 +688,7 @@
 						>
 					</div>
 					<div
-						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 					>
 						<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
 							>Timestamp</span
@@ -699,7 +699,7 @@
 					</div>
 					{#if selectedLog.resourceId}
 						<div
-							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 						>
 							<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
 								>Resource ID</span
@@ -711,7 +711,7 @@
 					{/if}
 					{#if selectedLog.duration}
 						<div
-							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937]"
+							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 						>
 							<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
 								>Duration</span

@@ -203,7 +203,7 @@
 			>
 				{#each MOCK_CONNECTORS as connector}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] p-4"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-md p-4"
 					>
 						<div class="flex items-start justify-between mb-3">
 							<div class="flex items-center gap-3">
@@ -285,10 +285,10 @@
 			</div>
 		{:else if connectors.length === 0}
 			<div
-				class="text-center py-12 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="text-center py-12 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center"
+					class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center"
 				>
 					<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -305,7 +305,7 @@
 				</p>
 				<button
 					on:click={() => (showCreateModal = true)}
-					class="px-5 py-2 text-xs font-bold text-gray-900 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+					class="px-5 py-2 text-xs font-bold text-gray-900 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 				>
 					Add Connector
 				</button>
@@ -315,7 +315,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{#each connectors as connector}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] p-4"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-md p-4"
 					>
 						<div class="flex items-start justify-between mb-3">
 							<div class="flex items-center gap-3">
@@ -415,7 +415,7 @@
 		on:keydown={(e) => e.key === 'Escape' && closeModal()}
 	>
 		<div
-			class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
+			class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
 		>
 			<!-- Header Strip -->
 			<div
@@ -455,7 +455,7 @@
 						{#each STORAGE_PROVIDERS as provider}
 							<button
 								on:click={() => selectProvider(provider)}
-								class="p-4 border-[3px] border-gray-200 rounded-xl text-left hover:border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] transition-all bg-white"
+								class="p-4 border-[3px] border-gray-200 rounded-xl text-left hover:border-gray-900 hover:shadow-brutal-lg transition-all bg-white"
 							>
 								<span
 									class="w-8 h-8 mb-2 flex items-center justify-center bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700"
@@ -631,7 +631,7 @@
 							<button
 								type="submit"
 								disabled={creating}
-								class="flex-1 px-4 py-3 text-sm font-bold text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+								class="flex-1 px-4 py-3 text-sm font-bold text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{creating ? 'Saving...' : 'Save Connector'}
 							</button>

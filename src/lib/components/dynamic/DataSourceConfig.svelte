@@ -114,7 +114,7 @@
 						class="text-left p-5 border-[3px] rounded-xl transition-all relative group overflow-hidden
 							{selectedDataSource?.uid === ds.uid
 							? 'border-gray-900 bg-gray-50 shadow-[4px_4px_0_0_#9ca3af]'
-							: 'border-gray-200 hover:border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937]'}"
+							: 'border-gray-200 hover:border-gray-900 bg-white hover:shadow-brutal-lg'}"
 						on:click={() => selectDataSource(ds)}
 					>
 						<div class="flex items-start justify-between relative z-10">
@@ -141,7 +141,7 @@
 	{#if showNewForm || dataSources.length === 0}
 		<!-- New Data Source Form -->
 		<div
-			class="space-y-6 p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937]"
+			class="space-y-6 p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl"
 		>
 			<div class="flex items-center gap-3 pb-4 border-b-[3px] border-gray-900">
 				<span class="w-3 h-3 bg-[#3b82f6] border-2 border-gray-900 rounded-full" />
@@ -434,7 +434,7 @@
 	<!-- Actions -->
 	<div class="flex justify-end gap-4 pt-6 mt-6 border-t-[3px] border-gray-900">
 		<button
-			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
+			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
 			on:click={handleNext}
 			disabled={!canProceed}
 		>

@@ -108,7 +108,7 @@
 	<div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 mr-4">
 		<a
 			href={guestMode ? '/tools#workflows' : backHref}
-			class="flex items-center justify-center w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0_0_#1f2937] transition-all flex-shrink-0 group"
+			class="flex items-center justify-center w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-brutal-lg transition-all flex-shrink-0 group"
 		>
 			<i class="fa fa-arrow-left text-sm group-hover:-translate-x-0.5 transition-transform" />
 		</a>
@@ -118,7 +118,7 @@
 				type="text"
 				bind:value={templateName}
 				placeholder="UNTITLED DESIGN"
-				class="w-full text-sm sm:text-base font-black uppercase tracking-wider text-gray-900 border-2 border-transparent focus:border-gray-900 focus:bg-white focus:shadow-[4px_4px_0_0_#ffc480] p-2 bg-transparent rounded-lg transition-all placeholder-gray-400 hover:bg-white hover:border-gray-200"
+				class="w-full text-sm sm:text-base font-black uppercase tracking-wider text-gray-900 border-2 border-transparent focus:border-gray-900 focus:bg-white focus:shadow-brutal-accent p-2 bg-transparent rounded-lg transition-all placeholder-gray-400 hover:bg-white hover:border-gray-200"
 			/>
 			<i
 				class="fa fa-pencil absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -131,7 +131,7 @@
 		<!-- Status indicators -->
 		{#if $isDirty && !isSaving}
 			<div
-				class="hidden sm:flex items-center px-3 py-1.5 bg-[#ffe066] border-[2px] border-gray-900 rounded-md shadow-[2px_2px_0_0_#1f2937] transform -rotate-1 hover:rotate-0 transition-all cursor-help"
+				class="hidden sm:flex items-center px-3 py-1.5 bg-[#ffe066] border-[2px] border-gray-900 rounded-md shadow-brutal-sm transform -rotate-1 hover:rotate-0 transition-all cursor-help"
 				title="Don't forget to save!"
 			>
 				<div class="relative flex h-2.5 w-2.5 mr-2">
@@ -148,7 +148,7 @@
 			</div>
 		{:else if showAutoSaved}
 			<div
-				class="hidden sm:flex items-center px-3 py-1.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-md shadow-[2px_2px_0_0_#1f2937] transform rotate-1 hover:rotate-0 transition-all cursor-default"
+				class="hidden sm:flex items-center px-3 py-1.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-md shadow-brutal-sm transform rotate-1 hover:rotate-0 transition-all cursor-default"
 			>
 				<i class="fa fa-sparkles text-[10px] text-gray-900 mr-1.5" />
 				<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest mt-[1px]">
@@ -159,7 +159,7 @@
 
 		<div class="hidden sm:flex items-center gap-2 mr-2">
 			<button
-				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
+				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
 				on:click={undo}
 				disabled={!$canUndo}
 				title="Undo (Cmd+Z)"
@@ -167,7 +167,7 @@
 				<i class="fa fa-undo text-xs" />
 			</button>
 			<button
-				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
+				class="w-9 h-9 flex items-center justify-center bg-white border-[3px] border-gray-900 rounded-lg text-gray-900 transition-all shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:bg-gray-100"
 				on:click={redo}
 				disabled={!$canRedo}
 				title="Redo (Cmd+Shift+Z)"
@@ -179,7 +179,7 @@
 		{#if $selectedComponent}
 			<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full" />
 			<button
-				class="w-9 h-9 flex items-center justify-center bg-brand-danger border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
+				class="w-9 h-9 flex items-center justify-center bg-brand-danger border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
 				on:click={deleteSelected}
 				title="Delete selected element"
 			>
@@ -192,7 +192,7 @@
 		<!-- Resize Button -->
 		<button
 			class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border-[3px] border-gray-900 bg-white text-gray-900
-				shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+				shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 			on:click={() => dispatch('resize')}
 			title="Resize for different platforms"
 		>
@@ -206,9 +206,9 @@
 		<button
 			class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
 			{guestMode
-				? 'bg-brand-danger text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
+				? 'bg-brand-danger text-white shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
 				: $isDirty
-				? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
+				? 'bg-[#4ade80] text-gray-900 shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
 				: 'bg-gray-100 text-gray-400 cursor-default'}"
 			on:click={save}
 			disabled={guestMode ? isSaving : isSaving || !$isDirty}

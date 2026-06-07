@@ -22,7 +22,7 @@
 			
 			<!-- Main Bento-style Card -->
 			<div
-				class="relative bg-[#E0F2FE] rounded-[2rem] border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] p-8 md:p-12 lg:p-16 overflow-hidden group hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 flex flex-col lg:flex-row items-center justify-between gap-12"
+				class="relative bg-[#E0F2FE] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-3xl p-8 md:p-12 lg:p-16 overflow-hidden group hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 flex flex-col lg:flex-row items-center justify-between gap-12"
 			>
 				<!-- Subtle texture -->
 				<div
@@ -38,7 +38,7 @@
 				<!-- Left Content -->
 				<div class="relative z-10 flex flex-col items-start w-full lg:w-1/2">
 					<div
-						class="inline-block mb-6 px-4 py-1.5 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full transform rotate-2"
+						class="inline-block mb-6 px-4 py-1.5 bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full transform rotate-2"
 					>
 						<span class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider"
 							>Start Building</span
@@ -62,7 +62,7 @@
 						.
 					</h2>
 					<p
-						class="text-lg md:text-xl lg:text-2xl text-gray-800 font-medium mb-10 max-w-xl bg-white px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1"
+						class="text-lg md:text-xl lg:text-2xl text-gray-800 font-medium mb-10 max-w-xl bg-white px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-1"
 					>
 						Sign up, create a template, call the endpoint. Your first rendered image in under 5
 						minutes.
@@ -72,7 +72,7 @@
 						<SignUpButton
 							text="Start Building Free"
 							location="mid_cta"
-							class="w-full sm:w-auto bg-brand-danger text-white text-lg md:text-xl px-8 py-5 rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all font-black uppercase tracking-wider flex-shrink-0 inline-flex items-center justify-center gap-3"
+							class="w-full sm:w-auto bg-brand-danger text-white text-lg md:text-xl px-8 py-5 rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider flex-shrink-0 inline-flex items-center justify-center gap-3"
 						/>
 					</div>
 				</div>
@@ -84,7 +84,7 @@
 						class="absolute top-4 left-4 z-20 animate-[bounce_3s_ease-in-out_infinite]"
 					>
 						<div
-							class="flex items-center gap-2 px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-wider text-xs border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-6"
+							class="flex items-center gap-2 px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-wider text-xs border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-6"
 						>
 							<svg class="w-4 h-4 text-brand-accent" fill="currentColor" viewBox="0 0 24 24">
 								<path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -96,7 +96,7 @@
 						class="absolute bottom-10 -right-4 z-20 animate-[bounce_4s_ease-in-out_infinite] delay-150"
 					>
 						<div
-							class="px-4 py-2 bg-[#4ade80] text-gray-900 font-black uppercase tracking-wider text-xs border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform rotate-3"
+							class="px-4 py-2 bg-[#4ade80] text-gray-900 font-black uppercase tracking-wider text-xs border-[3px] border-gray-900 shadow-brutal-lg transform rotate-3"
 						>
 							No Credit Card
 						</div>

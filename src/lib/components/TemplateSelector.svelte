@@ -262,7 +262,7 @@
 
 		const wrapper = document.createElement('div');
 		wrapper.className =
-			'bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden';
+			'bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden';
 		wrapper.style.fontFamily = 'inherit';
 
 		// Search bar
@@ -403,8 +403,8 @@
 		{disabled
 		? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
 		: open
-		? 'border-brand-accent shadow-[4px_4px_0_0_#ffc480]'
-		: 'border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] cursor-pointer'}"
+		? 'border-brand-accent shadow-brutal-accent'
+		: 'border-gray-900 hover:shadow-brutal-lg cursor-pointer'}"
 >
 	{#if displayTemplate}
 		{#if displayTemplate.thumbnail}

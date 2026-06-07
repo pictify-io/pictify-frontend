@@ -229,7 +229,7 @@
 		</div>
 	{:else if !$currentTeam}
 		<div
-			class="bg-yellow-50 border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-[8px_8px_0_0_#1f2937]"
+			class="bg-yellow-50 border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-brutal-2xl"
 		>
 			<svg
 				class="w-16 h-16 mx-auto text-yellow-500 mb-6"
@@ -255,14 +255,14 @@
 			<div class="lg:col-span-8 space-y-8">
 				<!-- Members List -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex justify-between items-center"
 					>
 						<div class="flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -300,7 +300,7 @@
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
-											class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+											class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 										>
 											<span class="text-sm font-black text-gray-900">
 												{member.user?.email?.charAt(0)?.toUpperCase() || '?'}
@@ -357,11 +357,11 @@
 				<!-- Pending Invitations -->
 				{#if $teamInvitations.length > 0}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-yellow-400 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 rounded-lg bg-yellow-400 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -445,11 +445,11 @@
 			<div class="lg:col-span-4 space-y-8 sticky top-8">
 				<!-- Team Name Settings -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 						<div
-							class="w-8 h-8 rounded-lg bg-blue-500 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-8 h-8 rounded-lg bg-blue-500 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 						>
 							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -524,7 +524,7 @@
 						{:else}
 							<div class="flex items-center">
 								<div
-									class="w-12 h-12 rounded-xl bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+									class="w-12 h-12 rounded-xl bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 								>
 									<span class="text-xl font-black text-gray-900">
 										{$currentTeam?.name?.charAt(0)?.toUpperCase() || 'T'}

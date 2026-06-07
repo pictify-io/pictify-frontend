@@ -54,7 +54,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -67,10 +67,10 @@
 			<!-- Animated Icon -->
 			<div class="relative mb-10 group">
 				<div
-					class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-brutal-lg"
 				/>
 				<div
-					class="relative w-24 h-24 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-300"
+					class="relative w-24 h-24 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-lg group-hover:-translate-y-2 transition-transform duration-300"
 				>
 					<svg
 						class="w-12 h-12 text-gray-900"
@@ -114,7 +114,7 @@
 				</a>
 				<a
 					href="https://docs.pictify.io"
-					class="px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 rounded-xl font-black uppercase tracking-wider hover:bg-gray-50 hover:-translate-y-1 transition-all shadow-[6px_6px_0_0_#1f2937]"
+					class="px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 rounded-xl font-black uppercase tracking-wider hover:bg-gray-50 hover:-translate-y-1 transition-all shadow-brutal-xl"
 				>
 					Read Docs
 				</a>
@@ -150,7 +150,7 @@
 								{@const icon = brandIcons[integration.icon] || brandIcons.default}
 								<a
 									href="/integrations/{integration.slug}"
-									class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
+									class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
 								>
 									<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
 										<div class="flex justify-between items-start mb-6">

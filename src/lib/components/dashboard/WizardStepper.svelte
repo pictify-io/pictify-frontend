@@ -25,9 +25,9 @@
 			on:click={() => handleClick(step, i)}
 			class="flex-1 flex flex-col items-start p-4 border-[3px] rounded-xl transition-all relative overflow-hidden group
 				{i < currentIndex
-				? 'cursor-pointer bg-[#4ade80] border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1'
+				? 'cursor-pointer bg-[#4ade80] border-gray-900 hover:shadow-brutal-lg hover:-translate-y-1'
 				: ''}
-				{i === currentIndex ? 'bg-brand-accent border-gray-900 shadow-[4px_4px_0_0_#1f2937]' : ''}
+				{i === currentIndex ? 'bg-brand-accent border-gray-900 shadow-brutal-lg' : ''}
 				{i > currentIndex ? 'cursor-default opacity-60 bg-white border-gray-300' : ''}"
 		>
 			<div class="flex items-center justify-between w-full relative z-10">

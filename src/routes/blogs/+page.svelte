@@ -52,7 +52,7 @@
 		>
 			<div class="mb-8">
 				<div
-					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-2"
+					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-2"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">Resources</span>
 				</div>
@@ -71,7 +71,7 @@
 			<div class="w-full max-w-lg mt-4">
 				<a
 					href="/signup?redirect=/blogs"
-					class="inline-flex items-center justify-center w-full sm:w-auto bg-gray-900 text-white border-[3px] border-gray-900 px-8 py-3.5 text-lg font-black uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:bg-black hover:shadow-[6px_6px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
+					class="inline-flex items-center justify-center w-full sm:w-auto bg-gray-900 text-white border-[3px] border-gray-900 px-8 py-3.5 text-lg font-black uppercase tracking-wide shadow-brutal-accent hover:bg-black hover:shadow-[6px_6px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
 				>
 					Get started free →
 				</a>
@@ -94,11 +94,11 @@
 				<a href="/blogs/{featured.slug}" class="relative block w-full max-w-xl group z-10">
 					<!-- Card -->
 					<div
-						class="relative bg-white border-[3px] border-gray-900 rounded-2xl p-4 shadow-[8px_8px_0_0_#1f2937] transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[12px_12px_0_0_#1f2937]"
+						class="relative bg-white border-[3px] border-gray-900 rounded-2xl p-4 shadow-brutal-2xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-brutal-3xl"
 					>
 						<!-- Featured Badge -->
 						<div
-							class="absolute -top-4 -right-4 bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-[4px_4px_0_0_#1f2937] z-20"
+							class="absolute -top-4 -right-4 bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-brutal-lg z-20"
 						>
 							<span class="font-black uppercase tracking-widest text-sm">Featured</span>
 						</div>

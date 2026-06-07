@@ -28,7 +28,7 @@
 			bgColor: 'bg-brand-accent',
 			borderColor: 'border-brand-accent',
 			textOnBg: 'text-gray-900',
-			shadowColor: 'shadow-[4px_4px_0_0_#ffc480]'
+			shadowColor: 'shadow-brutal-accent'
 		},
 		{
 			value: 'pdf',
@@ -104,7 +104,7 @@
 	on:click|self={handleClose}
 >
 	<div
-		class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+		class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
 	>
 		<!-- Header -->
 		<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-accent">
@@ -127,8 +127,8 @@
 								{isLocked
 								? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-75'
 								: selectedFormat === format.value
-								? `border-gray-900 ${format.bgColor}/10 shadow-[4px_4px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]`
-								: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
+								? `border-gray-900 ${format.bgColor}/10 shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]`
+								: 'border-gray-900 bg-white hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
 							on:click={() => !isLocked && (selectedFormat = format.value)}
 							disabled={isLocked}
 						>
@@ -149,14 +149,14 @@
 								</div>
 							{:else if selectedFormat === format.value}
 								<div
-									class="absolute top-3 right-3 w-6 h-6 border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] {format.bgColor} rounded-full flex items-center justify-center"
+									class="absolute top-3 right-3 w-6 h-6 border-2 border-gray-900 shadow-brutal-sm {format.bgColor} rounded-full flex items-center justify-center"
 								>
 									<i class="fa fa-check {format.textOnBg} text-xs font-bold" />
 								</div>
 							{/if}
 							<div class="flex items-start gap-4">
 								<div
-									class="w-12 h-12 rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center flex-shrink-0
+									class="w-12 h-12 rounded-lg border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center flex-shrink-0
 									{isLocked
 										? 'bg-gray-200 text-gray-400 border-gray-300 shadow-none'
 										: selectedFormat === format.value
@@ -189,8 +189,8 @@
 							<button
 								class="p-3 rounded-lg border-[3px] text-left transition-all
 									{selectedPreset === preset.value
-									? 'border-gray-900 bg-brand-danger/10 shadow-[4px_4px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
-									: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
+									? 'border-gray-900 bg-brand-danger/10 shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+									: 'border-gray-900 bg-white hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
 								on:click={() => (selectedPreset = preset.value)}
 							>
 								<div class="font-black text-xs uppercase text-gray-900 tracking-tight">
@@ -209,7 +209,7 @@
 
 					{#if selectedPreset === 'CUSTOM'}
 						<div
-							class="flex items-center gap-4 mt-4 p-5 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+							class="flex items-center gap-4 mt-4 p-5 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 						>
 							<div class="flex-1 space-y-1.5">
 								<label class="text-[10px] font-black uppercase tracking-widest text-gray-900"
@@ -218,7 +218,7 @@
 								<input
 									type="number"
 									bind:value={customWidth}
-									class="w-full px-4 py-2.5 border-[3px] border-gray-900 rounded-lg text-sm font-black focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:-translate-y-1 transition-all"
+									class="w-full px-4 py-2.5 border-[3px] border-gray-900 rounded-lg text-sm font-black focus:outline-none focus:shadow-brutal-accent focus:-translate-y-1 transition-all"
 									min="100"
 									max="5000"
 								/>
@@ -231,7 +231,7 @@
 								<input
 									type="number"
 									bind:value={customHeight}
-									class="w-full px-4 py-2.5 border-[3px] border-gray-900 rounded-lg text-sm font-black focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:-translate-y-1 transition-all"
+									class="w-full px-4 py-2.5 border-[3px] border-gray-900 rounded-lg text-sm font-black focus:outline-none focus:shadow-brutal-accent focus:-translate-y-1 transition-all"
 									min="100"
 									max="5000"
 								/>
@@ -248,13 +248,13 @@
 		>
 			<button
 				on:click={handleClose}
-				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 bg-white text-gray-900 font-black uppercase text-xs tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 bg-white text-gray-900 font-black uppercase text-xs tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Cancel
 			</button>
 			<button
 				on:click={handleContinue}
-				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 font-black uppercase text-xs tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2
+				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 font-black uppercase text-xs tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2
 					{selectedFormat === 'image'
 					? 'bg-brand-accent text-gray-900 hover:bg-[#ffb360]'
 					: 'bg-brand-danger text-white hover:bg-[#ff5252]'}"

@@ -99,7 +99,7 @@
 		on:click|self={close}
 	>
 		<div
-			class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-[8px_8px_0_0_#1f2937]"
+			class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-2xl"
 		>
 			<!-- Header strip -->
 			<div
@@ -107,7 +107,7 @@
 			>
 				<div class="flex items-center gap-3">
 					<div
-						class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]"
+						class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm"
 					>
 						<i class="fa fa-expand text-[12px] text-gray-900"></i>
 					</div>
@@ -124,7 +124,7 @@
 					type="button"
 					on:click={close}
 					aria-label="Close"
-					class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+					class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 				>
 					<i class="fa fa-xmark text-[12px]"></i>
 				</button>
@@ -143,8 +143,8 @@
 							on:click={() => pickPreset(preset)}
 							class="flex flex-col gap-1 rounded-xl border-[3px] p-3 text-left transition-all
 								{active
-									? 'border-gray-900 bg-brand-accent/30 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
-									: 'border-gray-900 bg-white hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]'}"
+									? 'border-gray-900 bg-brand-accent/30 shadow-brutal-md -translate-x-[1px] -translate-y-[1px]'
+									: 'border-gray-900 bg-white hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-md'}"
 						>
 							<div class="flex items-center gap-2">
 								<div
@@ -177,7 +177,7 @@
 							min="10"
 							max={MAX_DIM}
 							bind:value={customWidth}
-							class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#ffc480] focus:outline-none"
+							class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-brutal-accent focus:outline-none"
 						/>
 					</div>
 					<div>
@@ -188,7 +188,7 @@
 							min="10"
 							max={MAX_DIM}
 							bind:value={customHeight}
-							class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#ffc480] focus:outline-none"
+							class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-brutal-accent focus:outline-none"
 						/>
 					</div>
 					{#if dimensionError}
@@ -207,7 +207,7 @@
 				<button
 					type="button"
 					on:click={close}
-					class="rounded-xl border-[3px] border-gray-900 bg-white px-5 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+					class="rounded-xl border-[3px] border-gray-900 bg-white px-5 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
 				>
 					Cancel
 				</button>
@@ -215,7 +215,7 @@
 					type="button"
 					on:click={apply}
 					disabled={!!dimensionError}
-					class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-gray-900 px-5 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+					class="flex items-center gap-2 rounded-xl border-[3px] border-gray-900 bg-gray-900 px-5 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-brutal-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					<i class="fa fa-check text-[10px]"></i>
 					Apply

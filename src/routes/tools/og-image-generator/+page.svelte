@@ -782,7 +782,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -945,7 +945,7 @@
 									bind:value={url}
 									on:input={handleFirstInput}
 									type="text"
-									class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] py-4 px-5 transition-all bg-white"
+									class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-brutal-accent py-4 px-5 transition-all bg-white"
 									placeholder="https://yourwebsite.com"
 									on:keydown={(e) => e.key === 'Enter' && submitUrl(url)}
 								/>
@@ -1144,7 +1144,7 @@
 										<input
 											id="og-heading"
 											type="text"
-											class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black focus:shadow-[4px_4px_0_0_#ffc480] py-3 px-4 transition-all"
+											class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black focus:shadow-brutal-accent py-3 px-4 transition-all"
 											placeholder="Enter heading"
 											value={websiteInfo.heading}
 											on:input={updateHeading}
@@ -1158,7 +1158,7 @@
 										>
 										<textarea
 											id="og-description"
-											class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black focus:shadow-[4px_4px_0_0_#ffc480] py-3 px-4 transition-all resize-none"
+											class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black focus:shadow-brutal-accent py-3 px-4 transition-all resize-none"
 											rows="3"
 											value={websiteInfo.subHeading}
 											on:input={updateSubHeading}

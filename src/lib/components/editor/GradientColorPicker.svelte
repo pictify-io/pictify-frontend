@@ -416,7 +416,7 @@
 {#if showColorPicker}
 	<div
 		use:portal
-		class="fixed color-picker-modal border-[3px] border-gray-900 rounded-lg shadow-[8px_8px_0_0_#1f2937] bg-white"
+		class="fixed color-picker-modal border-[3px] border-gray-900 rounded-lg shadow-brutal-2xl bg-white"
 		style="top: {modalPosition.top}px; left: {modalPosition.left}px; width: 280px; max-height: calc(100vh - 20px); overflow-y: auto; z-index: 999999 !important;"
 	>
 		<div class="bg-white">
@@ -430,7 +430,7 @@
 					{#if supportsEyeDropper}
 						<button
 							type="button"
-							class="p-1.5 rounded border-[2px] border-transparent hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+							class="p-1.5 rounded border-[2px] border-transparent hover:border-gray-900 hover:shadow-brutal-sm transition-all"
 							on:click={handleEyedropper}
 							title="Pick color from screen"
 						>
@@ -486,7 +486,7 @@
 						{#each gradientPresets as preset}
 							<button
 								type="button"
-								class="h-8 rounded overflow-hidden border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#ffc480] transition-all hover:-translate-y-0.5"
+								class="h-8 rounded overflow-hidden border-[2px] border-gray-900 hover:shadow-brutal-accent-sm transition-all hover:-translate-y-0.5"
 								style="background: linear-gradient({preset.angle}deg, {preset.colors.join(', ')})"
 								on:click={() => applyPreset(preset)}
 								title={preset.name}
@@ -576,7 +576,7 @@
 				<div class="px-3 pb-2 bg-white border-b-[2px] border-gray-900 pt-2">
 					<button
 						type="button"
-						class="w-full text-xs font-black uppercase tracking-wider text-white bg-brand-danger px-2 py-1.5 rounded border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all flex items-center justify-center gap-1.5"
+						class="w-full text-xs font-black uppercase tracking-wider text-white bg-brand-danger px-2 py-1.5 rounded border-[2px] border-gray-900 hover:shadow-brutal-sm transition-all flex items-center justify-center gap-1.5"
 						on:click={() => handleStopDelete(activeStopId)}
 					>
 						<i class="fa fa-trash" />
@@ -608,7 +608,7 @@
 									{#each canvasColors.slice(0, 8) as color}
 										<button
 											type="button"
-											class="w-7 h-7 rounded border-[2px] border-gray-900 shadow-sm hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all cursor-pointer"
+											class="w-7 h-7 rounded border-[2px] border-gray-900 shadow-sm hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all cursor-pointer"
 											style="background-color: {color}"
 											on:click={() => applyPaletteColor(color)}
 											title="Apply {color}"
@@ -669,7 +669,7 @@
 									{#each generatedPalette as color}
 										<button
 											type="button"
-											class="relative w-8 h-8 rounded border-[2px] border-gray-900 shadow hover:shadow-[2px_2px_0_0_#ffc480] hover:-translate-y-0.5 transition-all cursor-pointer"
+											class="relative w-8 h-8 rounded border-[2px] border-gray-900 shadow hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all cursor-pointer"
 											style="background-color: {color}"
 											on:click={() => applyPaletteColor(color)}
 											title="Click to apply {color}"

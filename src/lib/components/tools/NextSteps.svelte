@@ -258,7 +258,7 @@
 							<button
 								type="submit"
 								disabled={isSubmittingEmail}
-								class="px-6 py-3 bg-black text-white border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 whitespace-nowrap"
+								class="px-6 py-3 bg-black text-white border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 whitespace-nowrap"
 							>
 								{isSubmittingEmail ? 'Sending...' : 'Get Free Access'}
 							</button>

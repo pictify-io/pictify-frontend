@@ -103,7 +103,7 @@
 
 		{#if loading}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-8"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-8"
 			>
 				<div class="flex items-center justify-center">
 					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
@@ -138,7 +138,7 @@
 			</div>
 		{:else if invitation}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-hidden"
 			>
 				<!-- Header -->
 				<div class="px-8 py-6 bg-brand-accent border-b-[3px] border-gray-900 text-center">

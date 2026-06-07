@@ -67,7 +67,7 @@
 	<div class="max-w-6xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-20">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] mb-6 transform -rotate-1"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 rounded-full border-[3px] border-gray-900 shadow-brutal-accent mb-6 transform -rotate-1"
 			>
 				<span class="text-sm font-bold text-white uppercase tracking-wider">Build vs. Buy</span>
 			</div>
@@ -145,7 +145,7 @@
 						<!-- Pictify Side (Solution) -->
 						<div class="md:col-span-5 relative">
 							<div
-								class="h-full bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] group-hover:shadow-[6px_6px_0_0_#1f2937] group-hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 relative overflow-hidden"
+								class="h-full bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg group-hover:shadow-brutal-xl group-hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 relative overflow-hidden"
 							>
 								<!-- Glow Effect -->
 								<div

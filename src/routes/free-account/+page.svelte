@@ -98,7 +98,7 @@
 		<section class="w-full py-16 md:py-24 px-6">
 			<div class="max-w-5xl mx-auto text-center">
 				<div
-					class="inline-block bg-[#4ade80] border-[3px] border-black shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1"
+					class="inline-block bg-[#4ade80] border-[3px] border-black shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">100% Free</span>
 				</div>
@@ -314,13 +314,13 @@
 				<div class="flex flex-col sm:flex-row gap-4 justify-center">
 					<a
 						href="/signup"
-						class="px-8 py-4 bg-black text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+						class="px-8 py-4 bg-black text-white border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 					>
 						Create Free Account
 					</a>
 					<a
 						href="/tools"
-						class="px-8 py-4 bg-white text-black border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+						class="px-8 py-4 bg-white text-black border-[4px] border-black font-black text-lg uppercase tracking-wide shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 					>
 						Try Tools First
 					</a>

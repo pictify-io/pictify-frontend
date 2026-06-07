@@ -624,7 +624,7 @@
 									on:click={() => (cdnTimeRange = range)}
 									class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
 										{cdnTimeRange === range
-										? 'bg-black text-white border-black shadow-[2px_2px_0_0_#ffc480]'
+										? 'bg-black text-white border-black shadow-brutal-accent-sm'
 										: 'bg-white text-black border-black hover:shadow-[2px_2px_0_0_black] hover:-translate-y-0.5'}"
 								>
 									{range}
@@ -673,7 +673,7 @@
 												class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-30 translate-y-2 group-hover:translate-y-0 hidden sm:block"
 											>
 												<div
-													class="bg-black text-white px-3 py-2 rounded-xl border-[2px] border-black font-black shadow-[4px_4px_0_0_#ffc480] whitespace-nowrap flex flex-col items-center"
+													class="bg-black text-white px-3 py-2 rounded-xl border-[2px] border-black font-black shadow-brutal-accent whitespace-nowrap flex flex-col items-center"
 												>
 													<span
 														class="text-[10px] text-gray-400 uppercase tracking-widest leading-none mb-1.5"

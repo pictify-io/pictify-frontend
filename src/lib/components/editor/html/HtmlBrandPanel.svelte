@@ -177,7 +177,7 @@
 	<div class="border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 		<div class="flex items-center justify-between gap-3">
 			<div class="flex items-center gap-2">
-				<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+				<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 					<i class="fa fa-palette text-[12px] text-gray-900"></i>
 				</div>
 				<div>
@@ -189,7 +189,7 @@
 				href="/dashboard/brand-assets"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="flex h-8 items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+				class="flex h-8 items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 			>
 				<i class="fa fa-arrow-up-right-from-square text-[10px]"></i>
 				Manage
@@ -205,7 +205,7 @@
 				on:click={() => (activeType = t.key)}
 				class="flex-shrink-0 flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest transition-all
 					{activeType === t.key
-						? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#1f2937]'
+						? 'bg-gray-900 text-white shadow-brutal-sm'
 						: 'bg-white text-gray-700 hover:shadow-[1px_1px_0_0_#1f2937]'}"
 			>
 				<i class="fa {t.icon} text-[9px]"></i>
@@ -221,7 +221,7 @@
 			type="text"
 			bind:value={searchQuery}
 			placeholder="SEARCH {activeType.toUpperCase()}..."
-			class="w-full rounded-md border-[2px] border-gray-900 bg-white py-1.5 pl-7 pr-2 text-[10px] font-black uppercase tracking-widest text-gray-900 placeholder-gray-400 focus:-translate-y-0.5 focus:shadow-[2px_2px_0_0_#ffc480] focus:outline-none"
+			class="w-full rounded-md border-[2px] border-gray-900 bg-white py-1.5 pl-7 pr-2 text-[10px] font-black uppercase tracking-widest text-gray-900 placeholder-gray-400 focus:-translate-y-0.5 focus:shadow-brutal-accent-sm focus:outline-none"
 		/>
 	</div>
 
@@ -236,7 +236,7 @@
 			</div>
 		{:else if !filteredList.length}
 			<div class="mx-auto mt-6 max-w-sm rounded-xl border-[3px] border-dashed border-gray-400 bg-white p-6 text-center">
-				<div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg border-[2px] border-gray-900 bg-[#ffe066] shadow-[2px_2px_0_0_#1f2937]">
+				<div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg border-[2px] border-gray-900 bg-[#ffe066] shadow-brutal-sm">
 					<i class="fa fa-box-open text-[14px] text-gray-900"></i>
 				</div>
 				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900">
@@ -266,7 +266,7 @@
 						type="button"
 						on:click={() => insertAsset(color)}
 						title="Insert hex {color.value}"
-						class="group overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+						class="group overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-md"
 					>
 						<div class="h-14 w-full" style="background-color: {color.value}"></div>
 						<div class="border-t-[2px] border-gray-900 bg-white px-2 py-1.5">
@@ -285,7 +285,7 @@
 						type="button"
 						on:click={() => insertAsset(font)}
 						title="Insert font stack for {font.metadata?.fontFamily || font.name}"
-						class="group flex w-full items-center gap-3 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white p-3 text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+						class="group flex w-full items-center gap-3 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white p-3 text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-md"
 					>
 						<span
 							class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#ffe066] text-[18px] text-gray-900"
@@ -315,7 +315,7 @@
 						type="button"
 						on:click={() => insertAsset(asset)}
 						title="Insert <img> for {asset.name}"
-						class="group overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+						class="group overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white text-left transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-md"
 					>
 						<div class="flex h-24 w-full items-center justify-center bg-[#f5f0e6] p-2">
 							{#if asset.url}

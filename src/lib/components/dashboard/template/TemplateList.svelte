@@ -249,7 +249,7 @@
 			<div
 				role="button"
 				tabindex="0"
-				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] sm:hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 overflow-hidden flex flex-col
+				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm sm:hover:shadow-brutal-md hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 overflow-hidden flex flex-col
 					{template.hasDynamicLink ? 'border-[#a855f7] ring-2 ring-[#a855f7]/30' : 'border-gray-900'}"
 				on:click={() => handleTemplateClick(template)}
 				on:keydown={(e) => {
@@ -368,7 +368,7 @@
 						class="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 pointer-events-none z-10"
 					>
 						<span
-							class="inline-flex items-center gap-1 px-2 py-1 bg-brand-accent text-gray-900 font-bold text-[10px] sm:text-xs uppercase tracking-wider rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+							class="inline-flex items-center gap-1 px-2 py-1 bg-brand-accent text-gray-900 font-bold text-[10px] sm:text-xs uppercase tracking-wider rounded-full border-[2px] border-gray-900 shadow-brutal-sm"
 						>
 							<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -589,7 +589,7 @@
 					disabled={!pagination.hasPrev}
 					class="group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
 						{pagination.hasPrev
-						? 'hover:bg-gray-900 hover:text-white shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
+						? 'hover:bg-gray-900 hover:text-white shadow-brutal-sm sm:shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
 						: 'opacity-50 cursor-not-allowed bg-gray-100'}"
 					title="Previous Page"
 					aria-label="Previous Page"
@@ -636,7 +636,7 @@
 					disabled={!pagination.hasNext}
 					class="group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
 						{pagination.hasNext
-						? 'hover:bg-gray-900 hover:text-white shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
+						? 'hover:bg-gray-900 hover:text-white shadow-brutal-sm sm:shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
 						: 'opacity-50 cursor-not-allowed bg-gray-100'}"
 					title="Next Page"
 					aria-label="Next Page"

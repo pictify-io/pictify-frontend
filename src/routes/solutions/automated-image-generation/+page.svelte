@@ -272,13 +272,13 @@
 		<div class="flex flex-col sm:flex-row gap-4 justify-center">
 			<a
 				href="/signup"
-				class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#ffc480] hover:shadow-[4px_4px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1 transition-all duration-200 text-center"
+				class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#ffc480] hover:shadow-brutal-accent hover:translate-x-1 hover:translate-y-1 transition-all duration-200 text-center"
 			>
 				Start Free
 			</a>
 			<a
 				href="#render"
-				class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all duration-200 inline-flex items-center justify-center gap-2 group"
+				class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1 transition-all duration-200 inline-flex items-center justify-center gap-2 group"
 			>
 				See the code
 				<svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -296,7 +296,7 @@
 	<section class="py-20 px-4 relative">
 		<div class="max-w-4xl mx-auto text-center">
 			<div
-				class="inline-block px-4 py-1.5 bg-brand-danger/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+				class="inline-block px-4 py-1.5 bg-brand-danger/20 border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Why we built this</span>
 			</div>
@@ -330,7 +330,7 @@
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Where this fits</span>
 				</div>
@@ -346,14 +346,14 @@
 				{#each useCases as u, i}
 					<a
 						href="/solutions/{u.slug}"
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden"
 						in:fly={{ y: 20, duration: 400, delay: i * 100 }}
 					>
 						<div
 							class="{u.color} p-6 border-b-[3px] border-gray-900 flex items-center justify-between"
 						>
 							<div
-								class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-12 transition-transform"
+								class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-12 transition-transform"
 							>
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={u.iconPath} />
@@ -459,7 +459,7 @@
 		<div class="max-w-6xl mx-auto">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
+					class="inline-block px-4 py-1.5 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2"
 				>
 					<span class="text-sm font-bold text-white uppercase tracking-wider">The Honest Breakdown</span>
 				</div>
@@ -479,7 +479,7 @@
 					>
 						{#if a.recommended}
 							<div
-								class="absolute -top-4 -right-4 bg-[#4ade80] border-[3px] border-gray-900 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-[3px_3px_0_0_#1f2937] z-20 transform rotate-6 inline-flex items-center gap-1.5 whitespace-nowrap"
+								class="absolute -top-4 -right-4 bg-[#4ade80] border-[3px] border-gray-900 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-brutal-md z-20 transform rotate-6 inline-flex items-center gap-1.5 whitespace-nowrap"
 							>
 								<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -487,7 +487,7 @@
 								This is us
 							</div>
 						{/if}
-						<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden flex-1">
+						<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden flex-1">
 						<div class="{a.tagColor} px-5 py-2 border-b-[3px] border-gray-900">
 							<span class="text-xs font-black uppercase tracking-widest text-gray-900">{a.tag}</span>
 						</div>
@@ -533,7 +533,7 @@
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-white uppercase tracking-wider">Six differentiators</span>
 				</div>
@@ -548,7 +548,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each differentiators as d, i}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
 						in:fly={{ y: 20, duration: 400, delay: i * 60 }}
 					>
 						<div class="{d.color} px-5 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
@@ -556,7 +556,7 @@
 							<div class="w-2.5 h-2.5 rounded-full bg-white border-2 border-gray-900"></div>
 						</div>
 						<div class="p-6">
-							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] mb-4 group-hover:rotate-6 transition-transform">
+							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-md mb-4 group-hover:rotate-6 transition-transform">
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={differentiatorIcons[d.badge]} />
 								</svg>
@@ -581,7 +581,7 @@
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-14">
 				<div
-					class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6"
+					class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6"
 				>
 					<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -601,7 +601,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr,auto,1fr] gap-4 md:gap-3 items-stretch mb-14">
 				<!-- Step 1: Design -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#ffc480]" in:fly={{ y: 20, duration: 400, delay: 0 }}>
-					<div class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-[3px_3px_0_0_#1f2937]">
+					<div class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
 						</svg>
@@ -620,7 +620,7 @@
 
 				<!-- Step 2: POST data -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#4ade80]" in:fly={{ y: 20, duration: 400, delay: 120 }}>
-					<div class="w-12 h-12 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-[3px_3px_0_0_#1f2937]">
+					<div class="w-12 h-12 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 19v-8m0 0l-4 4m4-4l4 4M3 7h18M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />
 						</svg>
@@ -639,7 +639,7 @@
 
 				<!-- Step 3: CDN URL -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#a78bfa]" in:fly={{ y: 20, duration: 400, delay: 240 }}>
-					<div class="w-12 h-12 bg-[#a78bfa] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-[3px_3px_0_0_#1f2937]">
+					<div class="w-12 h-12 bg-[#a78bfa] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
@@ -768,9 +768,9 @@
 			</div>
 
 			<!-- The punchline: logic lives on layers, not in your code -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 md:p-8 shadow-[6px_6px_0_0_#1f2937]">
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 md:p-8 shadow-brutal-xl">
 				<div class="flex flex-col md:flex-row items-start gap-5">
-					<div class="flex-shrink-0 w-14 h-14 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937]">
+					<div class="flex-shrink-0 w-14 h-14 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg">
 						<svg class="w-7 h-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
@@ -793,7 +793,7 @@
 		<div class="max-w-4xl mx-auto">
 			<div class="text-center mb-12">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Questions?</span>
 				</div>
@@ -805,7 +805,7 @@
 			<div class="space-y-4">
 				{#each faqs as faq, i}
 					<details
-						class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1 transition-all duration-200"
+						class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-lg overflow-hidden open:shadow-brutal-2xl open:-translate-y-1 transition-all duration-200"
 						in:fly={{ y: 10, duration: 300, delay: i * 40 }}
 					>
 						<summary
@@ -838,7 +838,7 @@
 			<div class="max-w-6xl mx-auto relative z-10">
 				<div class="text-center mb-14">
 					<div
-						class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
+						class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2"
 					>
 						<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Go deeper</span>
 					</div>
@@ -856,7 +856,7 @@
 						{@const rotations = ['-rotate-1', 'rotate-1', '-rotate-1', 'rotate-1', '-rotate-1', 'rotate-1']}
 						<a
 							href="/solutions/{r.slug}"
-							class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden {rotations[i % rotations.length]}"
+							class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden {rotations[i % rotations.length]}"
 							in:fly={{ y: 20, duration: 400, delay: i * 60 }}
 						>
 							<div class="{colors[i % colors.length]} h-2 border-b-[3px] border-gray-900"></div>

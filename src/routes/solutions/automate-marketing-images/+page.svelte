@@ -63,7 +63,7 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#fb923c]/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-[#fb923c]/20 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">Marketing Ops</span>
 		</div>
@@ -100,42 +100,42 @@
 			Every marketing channel, one automation layer
 		</h2>
 		<div class="grid md:grid-cols-2 gap-5">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Landing page heroes</h3>
 				<p class="text-gray-700">
 					Product-launch variants, campaign-specific heroes, personalized based on the referrer.
 					Render on first request, CDN-cache for the rest of the campaign.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Paid ad creatives</h3>
 				<p class="text-gray-700">
 					Bulk-render 50 headline variants for A/B testing. Push the URL list into Meta Ads Manager
 					or Google Ads via API. Creative fatigue-proof — generate new ones in minutes.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Email headers + inline images</h3>
 				<p class="text-gray-700">
 					Personalized email hero per recipient. Open rates climb when the hero says the reader's
 					name. Drop URLs into Klaviyo / Customer.io / any ESP merge tag.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Social media assets</h3>
 				<p class="text-gray-700">
 					Every new blog post, product update, or customer win becomes social assets across
 					LinkedIn, X, Instagram. One template, multiple dimensions, auto-published.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Webinar + event promos</h3>
 				<p class="text-gray-700">
 					Speaker cards, session-time graphics, registration-count countdowns. Each rendered from
 					the event record; updates automatically when times or speakers change.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Lifecycle + retention images</h3>
 				<p class="text-gray-700">
 					Onboarding milestones, monthly recaps, win-back campaigns. Personal data drives the image;
@@ -177,7 +177,7 @@
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

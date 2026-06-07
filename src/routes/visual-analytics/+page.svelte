@@ -159,7 +159,7 @@
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform rotate-1 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform rotate-1 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -200,7 +200,7 @@
 					href="/experiments"
 					on:click={() => trackCTA('See Experiments')}
 					class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+						shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center"
 				>
 					See Experiments
@@ -217,7 +217,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Capabilities</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -231,11 +231,11 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each features as feature, i}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden group"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 overflow-hidden group"
 						in:fly={{ y: 20, duration: 400, delay: i * 80 }}
 					>
 						<div class="{feature.color} p-5 border-b-[3px] border-gray-900 flex items-center justify-between">
-							<div class="w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_#1f2937] group-hover:rotate-12 transition-transform">
+							<div class="w-10 h-10 bg-white border-[3px] border-gray-900 rounded-lg flex items-center justify-center shadow-brutal-md group-hover:rotate-12 transition-transform">
 								<svg class="w-5 h-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={feature.iconPath} />
 								</svg>
@@ -272,7 +272,7 @@
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
 					>
-						<div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 {colors[i]} border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3">
+						<div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 {colors[i]} border-[3px] border-gray-900 shadow-brutal-accent flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3">
 							<span class="text-2xl md:text-3xl font-black text-gray-900">{step.number}</span>
 						</div>
 						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#ffc480] rounded-2xl">
@@ -293,7 +293,7 @@
 
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-brand-danger text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-danger text-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">The Flywheel</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -307,7 +307,7 @@
 			<div class="flex flex-wrap justify-center gap-4">
 				{#each flywheel as step, i}
 					<div class="flex items-center gap-3">
-						<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-xl p-4 w-40 text-center hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+						<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-xl p-4 w-40 text-center hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
 							in:fly={{ y: 15, duration: 300, delay: i * 100 }}>
 							<div class="w-10 h-10 bg-gray-100 border-2 border-gray-300 rounded-lg mx-auto mb-2 flex items-center justify-center">
 								<svg class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -327,7 +327,7 @@
 			</div>
 
 			<div class="text-center mt-8">
-				<div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] rounded-full">
+				<div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-900 shadow-brutal-md rounded-full">
 					<svg class="w-4 h-4 text-[#4ade80]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 					</svg>
@@ -342,10 +342,10 @@
 	<!-- Pricing CTA -->
 	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#4ade80] border-b-[3px] border-gray-900 relative overflow-hidden">
 		<div class="absolute inset-0 opacity-[0.15] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 24px 24px;" />
-		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce rounded-full" style="animation-duration: 3s;" />
+		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-brutal-lg animate-bounce rounded-full" style="animation-duration: 3s;" />
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-[12px_12px_0_0_#1f2937] hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow">
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6 leading-tight">
 					Start Measuring <span class="text-[#4ade80]">Today</span>
 				</h2>
@@ -369,7 +369,7 @@
 						href="/pricing"
 						on:click={() => trackCTA('View Pricing')}
 						class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-							shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+							shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 							transition-all duration-200 text-center"
 					>
 						View Pricing
@@ -387,7 +387,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900">
@@ -397,7 +397,7 @@
 
 			<div class="space-y-4">
 				{#each faqs as faq, i}
-					<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
+					<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
 						<button
 							on:click={() => (openFaq = openFaq === i ? -1 : i)}
 							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-[#4ade80]/10' : 'hover:bg-gray-50'}"

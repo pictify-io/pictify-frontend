@@ -213,7 +213,7 @@
 			class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center p-4"
 		>
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-6 max-w-sm w-full text-center relative overflow-hidden"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-6 max-w-sm w-full text-center relative overflow-hidden"
 			>
 				<!-- Decorative bg pattern -->
 				<div
@@ -222,7 +222,7 @@
 
 				<div class="relative z-10">
 					<div
-						class="w-16 h-16 mx-auto mb-4 bg-brand-accent rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center transform hover:scale-105 transition-transform duration-200"
+						class="w-16 h-16 mx-auto mb-4 bg-brand-accent rounded-xl border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center transform hover:scale-105 transition-transform duration-200"
 					>
 						<svg
 							class="w-8 h-8 text-gray-900"
@@ -266,7 +266,7 @@
 					{/if}
 
 					<button
-						class="w-full py-3 px-4 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="w-full py-3 px-4 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-lg border-2 border-gray-900 shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						on:click={handleUpgrade}
 					>
 						Upgrade to {upgradePrompt?.targetPlanName || 'Unlock'}
@@ -292,13 +292,13 @@
 			class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center p-4"
 		>
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-6 max-w-sm w-full text-center relative overflow-hidden"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-6 max-w-sm w-full text-center relative overflow-hidden"
 			>
 				<div class="absolute top-0 left-0 w-full h-1.5 bg-brand-danger border-b border-gray-900" />
 
 				<div class="relative z-10 mt-2">
 					<div
-						class="w-16 h-16 mx-auto mb-4 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center"
+						class="w-16 h-16 mx-auto mb-4 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center"
 					>
 						<svg
 							class="w-8 h-8 text-gray-900"
@@ -327,7 +327,7 @@
 
 					{#if upgradePrompt}
 						<button
-							class="w-full py-3 px-4 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="w-full py-3 px-4 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs rounded-lg border-2 border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							on:click={handleUpgrade}
 						>
 							Upgrade for {upgradePrompt.targetLimit === null

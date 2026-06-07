@@ -827,7 +827,7 @@
 		<!-- ============== STEP 1: SETUP ============== -->
 		{#if currentStep === 'setup'}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+				class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl"
 			>
 				<div
 					class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
@@ -856,7 +856,7 @@
 							bind:value={form.name}
 							on:input={handleNameInput}
 							placeholder="e.g. Homepage Hero Banner Test"
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-brutal-accent placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						/>
 					</div>
 
@@ -871,8 +871,8 @@
 								on:click={() => (form.testMode = 'same_template')}
 								class="text-left p-5 border-[3px] rounded-xl transition-all relative overflow-hidden group
 									{form.testMode === 'same_template'
-									? 'border-gray-900 bg-brand-accent/20 shadow-[6px_6px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
-									: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937]'}"
+									? 'border-gray-900 bg-brand-accent/20 shadow-brutal-xl translate-x-[-2px] translate-y-[-2px]'
+									: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-brutal-xl'}"
 							>
 								{#if form.testMode === 'same_template'}
 									<div
@@ -925,8 +925,8 @@
 								on:click={() => (form.testMode = 'different_templates')}
 								class="text-left p-5 border-[3px] rounded-xl transition-all relative overflow-hidden group
 									{form.testMode === 'different_templates'
-									? 'border-gray-900 bg-brand-accent/20 shadow-[6px_6px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
-									: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937]'}"
+									? 'border-gray-900 bg-brand-accent/20 shadow-brutal-xl translate-x-[-2px] translate-y-[-2px]'
+									: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-brutal-xl'}"
 							>
 								{#if form.testMode === 'different_templates'}
 									<div
@@ -992,7 +992,7 @@
 							bind:value={form.hypothesis}
 							placeholder="I believe changing the headline will increase click-through rate by 15%..."
 							rows="3"
-							class="w-full px-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] resize-none placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="w-full px-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-brutal-accent resize-none placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						/>
 					</div>
 				</div>
@@ -1015,7 +1015,7 @@
 						disabled={!canGoStep2}
 						class="px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all border-[2px] flex items-center gap-2
 							{canGoStep2
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'
+							? 'bg-gray-900 text-white border-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
 							: 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hidden'}"
 					>
 						Next Step
@@ -1035,7 +1035,7 @@
 		<!-- ============== STEP 2: VARIANTS ============== -->
 		{#if currentStep === 'variants'}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden"
 			>
 				<div
 					class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
@@ -1084,7 +1084,7 @@
 					<!-- Shared Template (same_template mode) -->
 					{#if form.testMode === 'same_template'}
 						<div
-							class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#1f2937]"
+							class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-brutal-lg"
 						>
 							<label
 								for="template-select"
@@ -1161,7 +1161,7 @@
 								<button
 									type="button"
 									on:click={qs.fn}
-									class="px-4 py-2 border-[2px] border-gray-900 rounded-lg text-xs font-black text-gray-900 uppercase tracking-wide bg-white shadow-[2px_2px_0_0_#1f2937] hover:bg-brand-accent hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_0_#1f2937] transition-all"
+									class="px-4 py-2 border-[2px] border-gray-900 rounded-lg text-xs font-black text-gray-900 uppercase tracking-wide bg-white shadow-brutal-sm hover:bg-brand-accent hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-brutal-md transition-all"
 								>
 									{qs.label}
 								</button>
@@ -1200,7 +1200,7 @@
 								class="border-[3px] rounded-xl overflow-hidden shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all relative
 								{variant.isDefault
 									? 'border-brand-accent shadow-[6px_6px_0_0_#ffc480]'
-									: 'border-gray-900 shadow-[8px_8px_0_0_#1f2937]'}"
+									: 'border-gray-900 shadow-brutal-2xl'}"
 							>
 								<!-- Background Grid Pattern -->
 								<div
@@ -1220,7 +1220,7 @@
 												? 'bg-brand-accent'
 												: index === 2
 												? 'bg-[#60a5fa]'
-												: 'bg-[#f472b6]'} border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+												: 'bg-[#f472b6]'} border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-brutal-sm"
 										>
 											{String.fromCharCode(65 + index)}
 										</div>
@@ -1232,7 +1232,7 @@
 										/>
 										{#if variant.isDefault}
 											<span
-												class="px-3 py-1 bg-brand-accent border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+												class="px-3 py-1 bg-brand-accent border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 											>
 												Default Variant
 											</span>
@@ -1240,7 +1240,7 @@
 									</div>
 									<div class="flex items-center gap-4">
 										<div
-											class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+											class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-[3px] border-gray-900 shadow-brutal-sm"
 										>
 											<span class="text-xs font-black uppercase tracking-widest text-gray-500"
 												>Weight</span
@@ -1267,7 +1267,7 @@
 												<button
 													type="button"
 													on:click={() => setDefault(index)}
-													class="p-2.5 bg-white border-[2px] border-gray-300 rounded-xl text-gray-500 hover:text-gray-900 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+													class="p-2.5 bg-white border-[2px] border-gray-300 rounded-xl text-gray-500 hover:text-gray-900 hover:border-gray-900 hover:shadow-brutal-sm transition-all"
 													title="Set as default"
 												>
 													<svg
@@ -1538,7 +1538,7 @@
 					<button
 						type="button"
 						on:click={addVariant}
-						class="w-full py-4 mt-3 border-[3px] border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-500 hover:border-gray-900 hover:text-gray-900 hover:bg-brand-accent/20 hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
+						class="w-full py-4 mt-3 border-[3px] border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-500 hover:border-gray-900 hover:text-gray-900 hover:bg-brand-accent/20 hover:shadow-brutal-md hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
 					>
 						<div
 							class="w-8 h-8 rounded-full bg-gray-200 group-hover:bg-gray-900 group-hover:text-brand-accent flex items-center justify-center transition-colors"
@@ -1581,7 +1581,7 @@
 						disabled={!canGoStep3}
 						class="px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all border-[2px] flex items-center gap-2
 							{canGoStep3
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#ffc480]'
+							? 'bg-gray-900 text-white border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm'
 							: 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hidden'}"
 					>
 						Next Step
@@ -1603,7 +1603,7 @@
 			<div class="space-y-6">
 				<!-- Goal Section -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl"
 				>
 					<div class="bg-gray-50 px-6 py-4 border-b-[3px] border-gray-900">
 						<h2 class="text-sm font-black uppercase tracking-widest text-gray-900">
@@ -1623,7 +1623,7 @@
 								on:click={() => (form.goalConfig.type = 'impressions_only')}
 								class="text-left p-4 border-[2px] rounded-lg transition-all relative
 									{form.goalConfig.type === 'impressions_only'
-									? 'border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] z-10 scale-[1.02]'
+									? 'border-gray-900 bg-white shadow-brutal-lg z-10 scale-[1.02]'
 									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
 							>
 								{#if form.goalConfig.type === 'impressions_only'}
@@ -1660,7 +1660,7 @@
 								on:click={() => (form.goalConfig.type = 'click_through')}
 								class="text-left p-4 border-[2px] rounded-lg transition-all relative
 									{form.goalConfig.type === 'click_through'
-									? 'border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] z-10 scale-[1.02]'
+									? 'border-gray-900 bg-white shadow-brutal-lg z-10 scale-[1.02]'
 									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
 							>
 								{#if form.goalConfig.type === 'click_through'}
@@ -1696,7 +1696,7 @@
 								on:click={() => (form.goalConfig.type = 'custom_event')}
 								class="text-left p-4 border-[2px] rounded-lg transition-all relative
 									{form.goalConfig.type === 'custom_event'
-									? 'border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937] z-10 scale-[1.02]'
+									? 'border-gray-900 bg-white shadow-brutal-lg z-10 scale-[1.02]'
 									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
 							>
 								{#if form.goalConfig.type === 'custom_event'}
@@ -1731,7 +1731,7 @@
 						<!-- Destination URL -->
 						{#if form.goalConfig.type === 'click_through'}
 							<div
-								class="bg-gray-50 border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+								class="bg-gray-50 border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-lg"
 							>
 								<label
 									for="destination-url"
@@ -1764,7 +1764,7 @@
 										type="url"
 										bind:value={form.goalConfig.destinationUrl}
 										placeholder="https://example.com/landing-page"
-										class="w-full pl-10 pr-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400"
+										class="w-full pl-10 pr-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-brutal-accent transition-all shadow-sm placeholder:text-gray-400"
 									/>
 								</div>
 								<p
@@ -1779,7 +1779,7 @@
 						<!-- Custom Event Name -->
 						{#if form.goalConfig.type === 'custom_event'}
 							<div
-								class="bg-gray-50 border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+								class="bg-gray-50 border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-lg"
 							>
 								<label
 									for="custom-event-name"
@@ -1812,7 +1812,7 @@
 										type="text"
 										bind:value={form.goalConfig.customEventName}
 										placeholder="signup"
-										class="w-full pl-10 pr-4 py-3 border-[3px] rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400
+										class="w-full pl-10 pr-4 py-3 border-[3px] rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-brutal-accent transition-all shadow-sm placeholder:text-gray-400
 											{form.goalConfig.customEventName && !/^[a-z][a-z0-9_]{0,49}$/.test(form.goalConfig.customEventName) ? 'border-red-400' : 'border-gray-300'}"
 									/>
 								</div>
@@ -1834,7 +1834,7 @@
 
 				<!-- Auto-Optimize Toggle -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl"
 				>
 					<div class="px-6 py-5 flex items-start gap-4 bg-brand-bg">
 						<label class="relative inline-flex items-center cursor-pointer mt-0.5 shrink-0">
@@ -1872,7 +1872,7 @@
 
 				<!-- Advanced Settings (collapsed by default) -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl"
 				>
 					<button
 						type="button"
@@ -1954,7 +1954,7 @@
 											? 'border-red-500 focus:border-red-500 focus:shadow-[4px_4px_0_0_#ef4444]'
 											: slugStatus === 'available'
 											? 'border-green-500 focus:border-green-500 focus:shadow-[4px_4px_0_0_#22c55e]'
-											: 'border-gray-400 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#1f2937]'}"
+											: 'border-gray-400 focus:border-gray-900 focus:shadow-brutal-lg'}"
 									/>
 									{#if !isEditMode}
 										<div
@@ -2081,7 +2081,7 @@
 												on:click={() => (form.outputConfig.format = fmt.value)}
 												class="flex-1 px-4 py-3 border-[3px] rounded-xl text-center text-sm font-black uppercase tracking-widest transition-all
 													{form.outputConfig.format === fmt.value
-													? 'border-gray-900 bg-brand-accent/20 shadow-[4px_4px_0_0_#1f2937] text-gray-900 -translate-y-[2px]'
+													? 'border-gray-900 bg-brand-accent/20 shadow-brutal-lg text-gray-900 -translate-y-[2px]'
 													: 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
 											>
 												{fmt.label}
@@ -2132,7 +2132,7 @@
 							Verification Receipt
 						</h3>
 						<div
-							class="bg-white border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937] pb-6 pt-4 px-1 relative
+							class="bg-white border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl pb-6 pt-4 px-1 relative
 							after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-4 after:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgdmlld0JveD0iMCAwIDEwIDEwIj4KICA8cG9seWdvbiBmaWxsPSIjZmZmIiBwb2ludHM9IjAsMTAgNSwwIDEwLDEwIi8+Cjwvc3ZnPg==')] after:bg-repeat-x after:-mb-1"
 						>
 							<div
@@ -2233,7 +2233,7 @@
 						</h3>
 
 						<div
-							class="flex-1 bg-gray-900 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937] flex flex-col"
+							class="flex-1 bg-gray-900 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl flex flex-col"
 						>
 							<!-- Terminal Header -->
 							<div
@@ -2358,12 +2358,12 @@
 
 				<!-- Launch Footer Component -->
 				<div
-					class="mt-8 bg-gray-50 border-[3px] border-gray-900 rounded-xl p-5 shadow-[6px_6px_0_0_#1f2937] flex flex-col md:flex-row items-center justify-between gap-4"
+					class="mt-8 bg-gray-50 border-[3px] border-gray-900 rounded-xl p-5 shadow-brutal-xl flex flex-col md:flex-row items-center justify-between gap-4"
 				>
 					<button
 						type="button"
 						on:click={prevStep}
-						class="w-full md:w-auto px-4 py-2.5 border-[2px] border-gray-300 bg-white rounded-lg text-xs font-black text-gray-500 hover:text-gray-900 hover:border-gray-900 uppercase tracking-wide transition-all shadow-sm hover:shadow-[3px_3px_0_0_#1f2937]"
+						class="w-full md:w-auto px-4 py-2.5 border-[2px] border-gray-300 bg-white rounded-lg text-xs font-black text-gray-500 hover:text-gray-900 hover:border-gray-900 uppercase tracking-wide transition-all shadow-sm hover:shadow-brutal-md"
 					>
 						&larr; Previous Step
 					</button>
@@ -2375,7 +2375,7 @@
 							disabled={!effectiveCanSubmit}
 							class="w-full sm:w-auto px-5 py-2.5 border-[2px] rounded-lg text-xs font-black uppercase tracking-wide transition-all
 								{effectiveCanSubmit
-								? 'border-gray-900 text-gray-900 bg-white shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'border-gray-900 text-gray-900 bg-white shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed hidden'}"
 						>
 							{#if isSubmitting}
@@ -2392,7 +2392,7 @@
 							disabled={!effectiveCanSubmit}
 							class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all
 								{effectiveCanSubmit
-								? 'bg-[#4ade80] text-gray-900 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-[#4ade80] text-gray-900 border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-200 text-gray-400 border-[2px] border-gray-300 cursor-not-allowed hidden'}"
 						>
 							{#if isSubmitting}

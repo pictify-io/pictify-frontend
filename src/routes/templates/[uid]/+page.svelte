@@ -173,7 +173,7 @@
 			<!-- Loading state -->
 			<div class="grid lg:grid-cols-2 gap-8">
 				<div
-					class="bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] aspect-video animate-pulse"
+					class="bg-white border-[3px] border-gray-900 shadow-brutal-xl aspect-video animate-pulse"
 				>
 					<div class="w-full h-full bg-gray-200" />
 				</div>
@@ -200,7 +200,7 @@
 				<p class="text-gray-600 font-medium mb-6">{error}</p>
 				<a
 					href="/templates"
-					class="inline-block px-6 py-3 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="inline-block px-6 py-3 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Browse all templates
 				</a>
@@ -211,7 +211,7 @@
 				<!-- Preview -->
 				<div>
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 					>
 						{#if template.thumbnail}
 							<img
@@ -311,7 +311,7 @@
 						<button
 							on:click={handleRemix}
 							disabled={forking}
-							class="w-full sm:w-auto px-8 py-4 bg-brand-danger text-white font-black text-lg uppercase tracking-wider border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+							class="w-full sm:w-auto px-8 py-4 bg-brand-danger text-white font-black text-lg uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{#if forking}
 								<span class="flex items-center justify-center gap-2">
@@ -381,7 +381,7 @@
 			</div>
 
 			<!-- API Example -->
-			<section class="mt-12 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]">
+			<section class="mt-12 bg-white border-[3px] border-gray-900 shadow-brutal-xl">
 				<div class="bg-gray-900 text-white px-6 py-3 flex items-center justify-between">
 					<span class="font-black uppercase tracking-wider text-sm">API Example</span>
 					<button
@@ -400,7 +400,7 @@
 			<section class="mt-12 grid md:grid-cols-3 gap-6">
 				<a
 					href="/templates"
-					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
+					class="block p-6 bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-2xl transition-all"
 				>
 					<h3 class="font-black text-lg mb-2">← Browse more</h3>
 					<p class="text-sm text-gray-600">Explore the full template gallery</p>
@@ -408,7 +408,7 @@
 
 				<a
 					href="/template-workspace/create"
-					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
+					class="block p-6 bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-2xl transition-all"
 				>
 					<h3 class="font-black text-lg mb-2 flex items-center gap-2">
 						<svg class="w-5 h-5 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -421,7 +421,7 @@
 
 				<a
 					href="/pricing"
-					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
+					class="block p-6 bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-2xl transition-all"
 				>
 					<h3 class="font-black text-lg mb-2 flex items-center gap-2">
 						<svg class="w-5 h-5 text-brand-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">

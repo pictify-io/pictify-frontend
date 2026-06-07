@@ -697,7 +697,7 @@
 								<i class="fa fa-ellipsis-v" />
 							</button>
 							<div
-								class="dropdown-menu border-[2px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-lg overflow-hidden"
+								class="dropdown-menu border-[2px] border-gray-900 shadow-brutal-lg rounded-lg overflow-hidden"
 							>
 								<button on:click={(e) => duplicateLayer(layer, e)} class="hover:bg-gray-50">
 									<i class="fa fa-clone mr-2 text-gray-400" />

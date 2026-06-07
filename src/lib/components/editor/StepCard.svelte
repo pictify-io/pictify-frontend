@@ -56,7 +56,7 @@
 </script>
 
 <div
-	class="step-card border-[3px] border-gray-900 rounded-lg p-4 mb-3 transition-all shadow-[4px_4px_0_0_#1f2937] {statusColor}"
+	class="step-card border-[3px] border-gray-900 rounded-lg p-4 mb-3 transition-all shadow-brutal-lg {statusColor}"
 	class:ring-2={isActive}
 	class:ring-brand-danger={isActive}
 	transition:fly={{ y: 20, duration: 300 }}
@@ -94,7 +94,7 @@
 			<img
 				src={step.thumbnail}
 				alt="Preview for step {stepIndex + 1}"
-				class="w-full rounded-lg border-2 border-gray-900 bg-white object-contain max-h-48 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-full rounded-lg border-2 border-gray-900 bg-white object-contain max-h-48 shadow-brutal-sm"
 			/>
 		</div>
 	{/if}
@@ -107,7 +107,7 @@
 			🛠️ Tool: <code class="bg-white border border-gray-900 px-1 py-0.5 rounded">{step.tool}</code>
 		</summary>
 		<pre
-			class="text-xs bg-white border-2 border-gray-900 p-2 rounded-lg mt-2 overflow-auto max-h-32 shadow-[2px_2px_0_0_#1f2937]">{JSON.stringify(
+			class="text-xs bg-white border-2 border-gray-900 p-2 rounded-lg mt-2 overflow-auto max-h-32 shadow-brutal-sm">{JSON.stringify(
 				step.args || {},
 				null,
 				2
@@ -116,7 +116,7 @@
 
 	{#if hasDiffSummary}
 		<div
-			class="diff-summary border-2 border-gray-900 rounded-lg p-3 mb-3 bg-white shadow-[2px_2px_0_0_#1f2937]"
+			class="diff-summary border-2 border-gray-900 rounded-lg p-3 mb-3 bg-white shadow-brutal-sm"
 		>
 			<p class="text-xs font-black text-gray-900 mb-2 uppercase">🔍 Canvas changes</p>
 			{#if step.diffSummary.backgroundChanged}
@@ -182,7 +182,7 @@
 					<img
 						src={step.validation.screenshot}
 						alt="Canvas after step {stepIndex + 1}"
-						class="w-full rounded-lg border-2 border-gray-900 max-h-40 object-contain bg-white shadow-[2px_2px_0_0_#1f2937]"
+						class="w-full rounded-lg border-2 border-gray-900 max-h-40 object-contain bg-white shadow-brutal-sm"
 					/>
 				</div>
 			{/if}
@@ -190,7 +190,7 @@
 			<!-- Issues -->
 			{#if step.validation.issues && step.validation.issues.length > 0}
 				<div
-					class="mt-2 bg-red-50 border-2 border-gray-900 p-2 rounded-lg shadow-[2px_2px_0_0_#1f2937]"
+					class="mt-2 bg-red-50 border-2 border-gray-900 p-2 rounded-lg shadow-brutal-sm"
 				>
 					<p class="text-xs font-black text-red-700 mb-1 uppercase">Issues:</p>
 					<ul class="text-xs text-red-700 list-disc list-inside font-medium">
@@ -204,7 +204,7 @@
 			<!-- Self-Corrections -->
 			{#if step.validation.suggestions && step.validation.suggestions.length > 0}
 				<div
-					class="mt-2 bg-purple-50 border-2 border-gray-900 p-2 rounded-lg shadow-[2px_2px_0_0_#1f2937]"
+					class="mt-2 bg-purple-50 border-2 border-gray-900 p-2 rounded-lg shadow-brutal-sm"
 				>
 					<p class="text-xs font-black text-purple-700 mb-1 uppercase">
 						🔧 Self-corrections applied:
@@ -242,7 +242,7 @@
 			<textarea
 				bind:value={feedbackText}
 				placeholder="Why did you reject this? (helps copilot improve)"
-				class="w-full text-xs border-2 border-gray-900 rounded-lg p-2 mb-2 min-h-[60px] focus:shadow-[4px_4px_0_0_#ffc480] font-medium"
+				class="w-full text-xs border-2 border-gray-900 rounded-lg p-2 mb-2 min-h-[60px] focus:shadow-brutal-accent font-medium"
 			/>
 			<button
 				on:click={() => onRegenerate(stepIndex, feedbackText)}

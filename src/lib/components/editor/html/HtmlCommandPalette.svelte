@@ -85,7 +85,7 @@
 	on:click|self={close}
 >
 	<div
-		class="w-full max-w-xl overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-[8px_8px_0_0_#1f2937]"
+		class="w-full max-w-xl overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-2xl"
 	>
 		<!-- Search -->
 		<div class="flex items-center gap-3 border-b-[2px] border-gray-900 bg-brand-bg px-4 py-3">

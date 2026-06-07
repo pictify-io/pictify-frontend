@@ -347,7 +347,7 @@
 					<!-- Mock Filters & Actions -->
 					<div class="flex flex-wrap gap-2 mb-6 sm:mb-8 pointer-events-none">
 						<button
-							class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]"
+							class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 bg-gray-900 text-white shadow-brutal-md"
 							>All</button
 						>
 						{#each ASSET_TYPES as type}
@@ -361,7 +361,7 @@
 						<div class="flex-grow" />
 
 						<button
-							class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] flex items-center gap-2"
+							class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md flex items-center gap-2"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -381,7 +381,7 @@
 					>
 						{#each MOCK_ASSETS as asset}
 							<div
-								class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] relative"
+								class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl relative"
 							>
 								<div
 									class="relative aspect-square bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] flex items-center justify-center overflow-hidden border-b-[3px] border-gray-900"
@@ -435,8 +435,8 @@
 						on:click={() => loadAssets(null)}
 						class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all
 				{selectedType === null
-							? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-							: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+							? 'bg-gray-900 text-white shadow-brutal-md'
+							: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 					>
 						All
 					</button>
@@ -445,8 +445,8 @@
 							on:click={() => loadAssets(type)}
 							class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 					{selectedType === type
-								? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-								: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+								? 'bg-gray-900 text-white shadow-brutal-md'
+								: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 						>
 							{ASSET_TYPE_LABELS[type]}s
 							<span
@@ -461,7 +461,7 @@
 
 					<button
 						on:click={() => openUploadModal('logo')}
-						class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+						class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -475,7 +475,7 @@
 					</button>
 					<button
 						on:click={openColorModal}
-						class="px-4 py-2.5 bg-[#4ade80] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+						class="px-4 py-2.5 bg-[#4ade80] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -489,7 +489,7 @@
 					</button>
 					<button
 						on:click={() => openUploadModal('font')}
-						class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+						class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -503,7 +503,7 @@
 					</button>
 					<button
 						on:click={() => openUploadModal('image')}
-						class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+						class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -520,7 +520,7 @@
 				<!-- Bulk Actions (Conditional) -->
 				{#if selectedAssets.size > 0}
 					<div
-						class="bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 p-4 mb-8 flex items-center justify-between shadow-[4px_4px_0_0_#1f2937] animate-fade-in"
+						class="bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 p-4 mb-8 flex items-center justify-between shadow-brutal-lg animate-fade-in"
 					>
 						<div class="flex items-center gap-3">
 							<button
@@ -548,7 +548,7 @@
 						</div>
 						<button
 							on:click={handleBulkDelete}
-							class="px-4 py-2 bg-white text-brand-danger rounded-lg border-[2px] border-gray-900 text-xs font-black uppercase tracking-wide hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 transition-all flex items-center gap-2"
+							class="px-4 py-2 bg-white text-brand-danger rounded-lg border-[2px] border-gray-900 text-xs font-black uppercase tracking-wide hover:shadow-brutal-sm hover:-translate-y-0.5 transition-all flex items-center gap-2"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -578,7 +578,7 @@
 							class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
 						>
 							<div
-								class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-[4px_4px_0_0_#1f2937]"
+								class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg"
 							>
 								<svg
 									class="w-10 h-10 text-gray-400"
@@ -612,7 +612,7 @@
 											? openColorModal()
 											: openUploadModal(selectedType)
 										: openUploadModal('logo')}
-								class="px-8 py-4 bg-gray-900 text-white text-sm font-black rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wider"
+								class="px-8 py-4 bg-gray-900 text-white text-sm font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wider"
 							>
 								Upload First Asset
 							</button>
@@ -621,7 +621,7 @@
 						<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 							{#each assets as asset (asset.uid)}
 								<div
-									class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200 relative"
+									class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1 transition-all duration-200 relative"
 								>
 									<!-- Selection Checkbox -->
 									<button
@@ -697,7 +697,7 @@
 											<button
 												on:click|stopPropagation={() =>
 													copyToClipboard(asset.type === 'color' ? asset.value : asset.url)}
-												class="w-8 h-8 bg-white rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center hover:bg-gray-50 hover:-translate-y-0.5 transition-all"
+												class="w-8 h-8 bg-white rounded-lg border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center hover:bg-gray-50 hover:-translate-y-0.5 transition-all"
 												title="Copy"
 											>
 												<svg
@@ -715,7 +715,7 @@
 											</button>
 											<button
 												on:click|stopPropagation={() => confirmDelete(asset)}
-												class="w-8 h-8 bg-brand-danger rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center hover:bg-[#ff5252] hover:-translate-y-0.5 transition-all"
+												class="w-8 h-8 bg-brand-danger rounded-lg border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center hover:bg-[#ff5252] hover:-translate-y-0.5 transition-all"
 												title="Delete"
 											>
 												<svg
@@ -882,7 +882,7 @@
 							type="text"
 							bind:value={uploadForm.name}
 							placeholder="e.g., Dark Logo Variant"
-							class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+							class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 						/>
 					</div>
 
@@ -898,7 +898,7 @@
 								type="text"
 								bind:value={uploadForm.tags}
 								placeholder="logo, dark, brand"
-								class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+								class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 							/>
 						</div>
 						<div class="flex items-end">
@@ -922,14 +922,14 @@
 				<div class="flex gap-3 pt-2">
 					<button
 						on:click={closeUploadModal}
-						class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						Cancel
 					</button>
 					<button
 						on:click={handleUpload}
 						disabled={!selectedFile || isUploading}
-						class="flex-[2] px-4 py-3 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="flex-[2] px-4 py-3 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{#if isUploading}
 							Uploading...
@@ -977,7 +977,7 @@
 				<!-- Color Picker -->
 				<div class="flex gap-4">
 					<div
-						class="w-24 h-24 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+						class="w-24 h-24 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 						style="background-color: {colorForm.value}"
 					/>
 					<div class="flex-1 space-y-4">
@@ -1026,14 +1026,14 @@
 				<div class="flex gap-3">
 					<button
 						on:click={closeColorModal}
-						class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						Cancel
 					</button>
 					<button
 						on:click={handleAddColor}
 						disabled={!colorForm.name || isUploading}
-						class="flex-[2] px-4 py-3 bg-[#4ade80] text-gray-900 rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="flex-[2] px-4 py-3 bg-[#4ade80] text-gray-900 rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 					>
 						Add Color
 					</button>

@@ -69,7 +69,7 @@
 		<div class="relative flex flex-col items-center justify-center text-center mb-16 pt-4 sm:pt-8">
 			<!-- Icon -->
 			<div
-				class="w-20 h-20 bg-brand-accent border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
+				class="w-20 h-20 bg-brand-accent border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-xl mb-8"
 			>
 				<svg class="w-10 h-10 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -101,7 +101,7 @@
 			{#each letters as letter}
 				<a
 					href="#letter-{letter}"
-					class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 hover:bg-brand-accent transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
+					class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 hover:bg-brand-accent transition-colors shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
 				>
 					{letter}
 				</a>
@@ -124,7 +124,7 @@
 						{#each groupedTerms[letter] as term}
 							<a
 								href="/glossary/{term.term}"
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
+								class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 							>
 								<h3
 									class="text-xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"

@@ -386,7 +386,7 @@
 		{:else if error}
 			<!-- Error state -->
 			<div
-				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl p-12 relative overflow-hidden"
+				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-3xl p-12 relative overflow-hidden"
 			>
 				<div class="absolute inset-0 bg-red-50/50 -z-10" />
 				<div
@@ -407,7 +407,7 @@
 				<p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
 				<a
 					href="/tools"
-					class="inline-block px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="inline-block px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 				>
 					Create your own
 				</a>
@@ -419,7 +419,7 @@
 				<div class="lg:col-span-8 flex flex-col gap-8">
 					<!-- "Window" Card -->
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-3xl overflow-hidden relative group"
 					>
 						<!-- Window Header -->
 						<div
@@ -486,7 +486,7 @@
 
 					<!-- A2: Embed Codes Panel -->
 					<div
-						class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-2xl overflow-hidden"
+						class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-2xl overflow-hidden"
 					>
 						<!-- Tab bar -->
 						<div class="flex border-b border-gray-700">
@@ -530,7 +530,7 @@
 				<div class="lg:col-span-4 flex flex-col gap-6">
 					<!-- Header Info -->
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-6"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl p-6"
 					>
 						<div class="flex items-center gap-3 mb-4">
 							<div
@@ -642,7 +642,7 @@
 					<div class="flex flex-col gap-4">
 						<button
 							on:click={copyShareUrl}
-							class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
+							class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
 						>
 							<svg
 								class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors"
@@ -665,7 +665,7 @@
 							<div class="relative download-dropdown">
 								<button
 									on:click={() => (downloadOpen = !downloadOpen)}
-									class="w-full py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
+									class="w-full py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -691,7 +691,7 @@
 								</button>
 								{#if downloadOpen}
 									<div
-										class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden z-30"
+										class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-hidden z-30"
 									>
 										{#each ['png', 'jpg', 'webp'] as fmt}
 											{@const isOriginal = (result.format || 'png').toLowerCase() === fmt}
@@ -753,7 +753,7 @@
 					<!-- A4: Remix This Template (enhanced) -->
 					{#if template && template.isPublic}
 						<div
-							class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-5 relative overflow-hidden group transition-all"
+							class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl p-5 relative overflow-hidden group transition-all"
 						>
 							<div class="absolute top-0 right-0 p-2 opacity-10">
 								<svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -781,7 +781,7 @@
 							<button
 								on:click={handleRemix}
 								disabled={forking}
-								class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
+								class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
 							>
 								{#if forking}
 									<span class="flex items-center justify-center gap-2">
@@ -812,7 +812,7 @@
 					<!-- A1: Analytics Card (visible to creator and team members) -->
 					{#if isLoggedIn && (analytics || analyticsLoading)}
 						<div
-							class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl overflow-hidden"
+							class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl overflow-hidden"
 						>
 							<div
 								class="bg-gray-50 border-b-[3px] border-gray-900 px-5 py-3 flex items-center gap-1.5"
@@ -1021,7 +1021,7 @@
 			{#if !isLoggedIn}
 				<div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
 					<div
-						class="bg-brand-danger rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden"
+						class="bg-brand-danger rounded-3xl border-[3px] border-gray-900 shadow-brutal-xl p-8 md:p-12 text-center relative overflow-hidden"
 					>
 						<div
 							class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"
@@ -1038,7 +1038,7 @@
 							<div class="flex flex-wrap justify-center gap-4">
 								<a
 									href="/signup"
-									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 								>
 									{result.source === 'api' ? 'Get API Key' : 'Start Free'}
 								</a>

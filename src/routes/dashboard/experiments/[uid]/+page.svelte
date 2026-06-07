@@ -426,7 +426,7 @@
 	{:else if !exp || !exp.uid}
 		<div class="flex flex-col items-center justify-center min-h-[60vh] text-center">
 			<div
-				class="w-20 h-20 bg-gray-100 border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-6 shadow-[6px_6px_0_0_#1f2937]"
+				class="w-20 h-20 bg-gray-100 border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-6 shadow-brutal-xl"
 			>
 				<svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -445,7 +445,7 @@
 			</p>
 			<a
 				href="/dashboard/experiments"
-				class="px-6 py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-6 py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Back to Experiments
 			</a>
@@ -491,7 +491,7 @@
 									<input
 										type="text"
 										bind:value={editName}
-										class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-lg font-black text-gray-900 focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480]"
+										class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-lg font-black text-gray-900 focus:outline-none focus:shadow-brutal-accent"
 									/>
 								</div>
 								<div>
@@ -503,19 +503,19 @@
 									<textarea
 										bind:value={editHypothesis}
 										rows="3"
-										class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] resize-none"
+										class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:shadow-brutal-accent resize-none"
 									/>
 								</div>
 								<div class="flex items-center gap-3">
 									<button
 										on:click={handleSaveEdit}
-										class="px-5 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-5 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Save Changes
 									</button>
 									<button
 										on:click={() => (showEditMode = false)}
-										class="px-5 py-2 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-5 py-2 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Cancel
 									</button>
@@ -578,7 +578,7 @@
 							{#if exp.status === 'draft' || exp.status === 'paused'}
 								<button
 									on:click={handleStart}
-									class="px-4 py-2.5 bg-[#4ade80] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									class="px-4 py-2.5 bg-[#4ade80] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -600,7 +600,7 @@
 							{#if exp.status === 'running'}
 								<button
 									on:click={handlePause}
-									class="px-4 py-2.5 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									class="px-4 py-2.5 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -619,7 +619,7 @@
 								{#if isSmartLink}
 									<button
 										on:click={handlePause}
-										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -640,7 +640,7 @@
 								{:else}
 									<button
 										on:click={() => (showDeclareWinner = true)}
-										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -666,7 +666,7 @@
 												? `/dashboard/experiments/create/scheduled?edit=${uid}`
 												: `/dashboard/experiments/create?edit=${uid}`
 										)}
-									class="px-4 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									class="px-4 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -683,7 +683,7 @@
 							<!-- Duplicate -->
 							<button
 								on:click={handleDuplicate}
-								class="px-4 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+								class="px-4 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 							>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
@@ -699,7 +699,7 @@
 							<!-- Delete -->
 							<button
 								on:click={() => (showDeleteConfirm = true)}
-								class="px-4 py-2.5 bg-brand-danger text-white font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+								class="px-4 py-2.5 bg-brand-danger text-white font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 							>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
@@ -720,7 +720,7 @@
 			<div class="grid grid-cols-2 {isCustomEventGoal ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-6">
 				<!-- Total Impressions -->
 				<div
-					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
+					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 				>
 					<div
 						class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#7c3aed]/10 flex items-center justify-between pointer-events-none relative"
@@ -764,7 +764,7 @@
 
 				<!-- Total Clicks -->
 				<div
-					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
+					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 				>
 					<div
 						class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#3b82f6]/10 flex items-center justify-between pointer-events-none relative"
@@ -802,7 +802,7 @@
 
 				<!-- Click Rate -->
 				<div
-					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
+					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 				>
 					<div
 						class="px-5 py-3 border-b-[3px] border-gray-900 bg-brand-success/10 flex items-center justify-between pointer-events-none relative"
@@ -841,7 +841,7 @@
 				<!-- Custom Events (only for custom_event goal) -->
 				{#if isCustomEventGoal}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 					>
 						<div
 							class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#a855f7]/10 flex items-center justify-between pointer-events-none relative"
@@ -880,7 +880,7 @@
 
 				<!-- Duration / Status -->
 				<div
-					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
+					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 				>
 					<div
 						class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#f59e0b]/10 flex items-center justify-between pointer-events-none relative"
@@ -934,7 +934,7 @@
 							Routing Rules
 						</h2>
 						<span
-							class="px-3 py-1 bg-[#c084fc] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase"
+							class="px-3 py-1 bg-[#c084fc] text-gray-900 border-[3px] border-gray-900 shadow-brutal-sm text-xs font-black rounded-lg uppercase"
 						>
 							{smartLinkRuleVariants.length}
 							{smartLinkRuleVariants.length === 1 ? 'Rule' : 'Rules'}
@@ -943,11 +943,11 @@
 
 					<!-- How it works callout -->
 					<div
-						class="bg-[#c084fc]/10 border-[3px] border-gray-900 rounded-xl p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]"
+						class="bg-[#c084fc]/10 border-[3px] border-gray-900 rounded-xl p-5 mb-6 shadow-brutal-lg"
 					>
 						<div class="flex items-start gap-3">
 							<div
-								class="w-8 h-8 bg-[#c084fc] border-[2px] border-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 bg-[#c084fc] border-[2px] border-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -978,7 +978,7 @@
 					<!-- Rule Variant Cards -->
 					{#if smartLinkRuleVariants.length === 0}
 						<div
-							class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] text-center"
+							class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-brutal-xl text-center"
 						>
 							<p class="text-gray-500 font-bold uppercase tracking-widest text-xs">
 								No routing rules configured yet.
@@ -988,7 +988,7 @@
 						<div class="space-y-5">
 							{#each smartLinkRuleVariants as variant, idx}
 								<div
-									class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-200"
+									class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1 transition-all duration-200"
 								>
 									<!-- Rule Header -->
 									<div
@@ -1158,7 +1158,7 @@
 								</h3>
 							</div>
 							<div
-								class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+								class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl"
 							>
 								<div
 									class="px-5 py-3 border-b-[3px] border-gray-900 bg-brand-accent/10 flex items-center justify-between"
@@ -1225,7 +1225,7 @@
 					<div class="flex items-center gap-3 mb-6">
 						<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Schedule</h2>
 						<span
-							class="px-3 py-1 bg-[#f59e0b] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase"
+							class="px-3 py-1 bg-[#f59e0b] text-gray-900 border-[3px] border-gray-900 shadow-brutal-sm text-xs font-black rounded-lg uppercase"
 						>
 							{variants.length} Variants
 						</span>
@@ -1234,11 +1234,11 @@
 					<!-- Expiration & Fallback Info -->
 					{#if exp.expiresAt || exp.fallbackImageUrl}
 						<div
-							class="bg-amber-50 border-[3px] border-gray-900 rounded-xl p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]"
+							class="bg-amber-50 border-[3px] border-gray-900 rounded-xl p-5 mb-6 shadow-brutal-lg"
 						>
 							<div class="flex items-start gap-3">
 								<div
-									class="w-8 h-8 bg-amber-200 border-[2px] border-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+									class="w-8 h-8 bg-amber-200 border-[2px] border-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-brutal-sm"
 								>
 									<svg
 										class="w-4 h-4 text-gray-900"
@@ -1282,7 +1282,7 @@
 								class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden {status ===
 								'active'
 									? 'shadow-[8px_8px_0_0_#f59e0b] -translate-y-1'
-									: 'shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1'} transition-all duration-200"
+									: 'shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1'} transition-all duration-200"
 							>
 								<!-- Variant Header -->
 								<div
@@ -1312,26 +1312,26 @@
 									<div class="flex items-center gap-2 shrink-0">
 										{#if status === 'active'}
 											<span
-												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#4ade80] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1.5"
+												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#4ade80] text-gray-900 border-gray-900 shadow-brutal-sm flex items-center gap-1.5"
 											>
 												<span class="w-2 h-2 bg-gray-900 rounded-full animate-pulse" />
 												Active Now
 											</span>
 										{:else if status === 'upcoming'}
 											<span
-												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm"
 											>
 												Upcoming
 											</span>
 										{:else if status === 'ended'}
 											<span
-												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-gray-200 text-gray-600 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-gray-200 text-gray-600 border-gray-900 shadow-brutal-sm"
 											>
 												Ended
 											</span>
 										{:else if status === 'default'}
 											<span
-												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-gray-100 text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-gray-100 text-gray-900 border-gray-900 shadow-brutal-sm"
 											>
 												Default
 											</span>
@@ -1452,7 +1452,7 @@
 					<div class="flex items-center gap-3 mb-6">
 						<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Variants</h2>
 						<span
-							class="px-3 py-1 bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase"
+							class="px-3 py-1 bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-sm text-xs font-black rounded-lg uppercase"
 						>
 							{variants.length}
 						</span>
@@ -1460,7 +1460,7 @@
 
 					{#if variants.length === 0}
 						<div
-							class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] text-center"
+							class="bg-white p-8 rounded-xl border-[3px] border-gray-900 shadow-brutal-xl text-center"
 						>
 							<p class="text-gray-500 font-bold uppercase tracking-widest text-xs">
 								No variants configured yet.
@@ -1472,7 +1472,7 @@
 								<div
 									class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden {variant.isWinner
 										? 'shadow-[8px_8px_0_0_#ffc480] -translate-y-1'
-										: 'shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1'} transition-all duration-200"
+										: 'shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1'} transition-all duration-200"
 								>
 									<!-- Variant Header -->
 									<div
@@ -1506,7 +1506,7 @@
 										<div class="flex items-center gap-2 shrink-0">
 											{#if variant.isWinner}
 												<span
-													class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1"
+													class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm flex items-center gap-1"
 												>
 													<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
 														<path
@@ -1518,7 +1518,7 @@
 											{/if}
 											{#if variant.isDefault}
 												<span
-													class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] border-gray-900 bg-gray-100 text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+													class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] border-gray-900 bg-gray-100 text-gray-900 shadow-brutal-sm"
 												>
 													Default
 												</span>
@@ -1549,7 +1549,7 @@
 													class="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
 												>
 													<button
-														class="px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-widest text-[10px] border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+														class="px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-widest text-[10px] border-[2px] border-gray-900 rounded-lg shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
 													>
 														Preview
 													</button>
@@ -1631,7 +1631,7 @@
 			<!-- ==================== SMART URL SECTION ==================== -->
 			{#if exp.slug}
 				<div
-					class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+					class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl"
 				>
 					<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-bg">
 						<h2
@@ -1664,7 +1664,7 @@
 								</div>
 								<button
 									on:click={() => copyToClipboard(`https://${publicUrl}`, 'URL copied!')}
-									class="px-5 py-3.5 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all shrink-0"
+									class="px-5 py-3.5 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all shrink-0"
 								>
 									Copy URL
 								</button>
@@ -1691,7 +1691,7 @@
 												`https://pictify.io/s/${exp.slug}/pixel.gif`,
 												'Pixel URL copied!'
 											)}
-										class="px-5 py-3.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all shrink-0"
+										class="px-5 py-3.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all shrink-0"
 									>
 										Copy Pixel
 									</button>
@@ -1773,7 +1773,7 @@ fetch("https://pictify.io/s/events", {
 			<!-- ==================== ANALYTICS SECTION ==================== -->
 			{#if exp.status === 'running' || exp.status === 'completed'}
 				<div
-					class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+					class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl"
 				>
 					<div
 						class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-bg flex items-center justify-between"
@@ -1966,7 +1966,7 @@ fetch("https://pictify.io/s/events", {
 								<div
 									class="flex items-center gap-4 p-5 rounded-xl border-[3px] {analytics.significance
 										.isSignificant
-										? 'border-gray-900 bg-[#4ade80]/10 shadow-[6px_6px_0_0_#1f2937]'
+										? 'border-gray-900 bg-[#4ade80]/10 shadow-brutal-xl'
 										: 'border-gray-900 bg-gray-50 shadow-[4px_4px_0_0_#e5e7eb]'} transition-all"
 								>
 									<div
@@ -2032,7 +2032,7 @@ fetch("https://pictify.io/s/events", {
 
 			<!-- ==================== SETTINGS SECTION (Collapsible) ==================== -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+				class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl"
 			>
 				<button
 					on:click={() => (showSettings = !showSettings)}
@@ -2058,7 +2058,7 @@ fetch("https://pictify.io/s/events", {
 						Experiment Settings
 					</h2>
 					<div
-						class="w-8 h-8 rounded-lg border-[2px] border-gray-900 bg-white flex items-center justify-center shadow-[2px_2px_0_0_#1f2937] group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all"
+						class="w-8 h-8 rounded-lg border-[2px] border-gray-900 bg-white flex items-center justify-center shadow-brutal-sm group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all"
 					>
 						<svg
 							class="w-5 h-5 text-gray-900 transition-transform duration-300 {showSettings
@@ -2417,8 +2417,8 @@ fetch("https://pictify.io/s/events", {
 						<div
 							class="p-4 rounded-xl border-[3px] cursor-pointer transition-all {selectedWinner ===
 							(variant.uid || variant.id || idx)
-								? 'border-gray-900 bg-brand-accent/20 shadow-[6px_6px_0_0_#1f2937]'
-								: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937]'}"
+								? 'border-gray-900 bg-brand-accent/20 shadow-brutal-xl'
+								: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-brutal-xl'}"
 							on:click={() => (selectedWinner = variant.uid || variant.id || idx)}
 						>
 							<div class="flex items-center justify-between">
@@ -2486,14 +2486,14 @@ fetch("https://pictify.io/s/events", {
 						showDeclareWinner = false;
 						selectedWinner = null;
 					}}
-					class="w-full sm:w-auto px-6 py-3.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="w-full sm:w-auto px-6 py-3.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Cancel
 				</button>
 				<button
 					on:click={handleComplete}
 					disabled={!selectedWinner}
-					class="w-full sm:w-auto px-6 py-3.5 bg-[#f59e0b] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0_0_#1f2937] disabled:hover:translate-x-0 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
+					class="w-full sm:w-auto px-6 py-3.5 bg-[#f59e0b] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-lg disabled:hover:translate-x-0 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
 				>
 					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 						<path
@@ -2578,13 +2578,13 @@ fetch("https://pictify.io/s/events", {
 			>
 				<button
 					on:click={() => (showDeleteConfirm = false)}
-					class="w-full sm:w-auto px-6 py-3.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="w-full sm:w-auto px-6 py-3.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Cancel
 				</button>
 				<button
 					on:click={handleDelete}
-					class="w-full sm:w-auto px-6 py-3.5 bg-[#ef4444] text-white font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2"
+					class="w-full sm:w-auto px-6 py-3.5 bg-[#ef4444] text-white font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path

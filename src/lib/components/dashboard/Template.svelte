@@ -255,7 +255,7 @@
 				<input
 					type="text"
 					placeholder="SEARCH TEMPLATES..."
-					class="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wide focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] sm:focus:shadow-[6px_6px_0_0_#ffc480] focus:-translate-y-0.5 sm:focus:-translate-y-1 transition-all placeholder-gray-400"
+					class="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wide focus:outline-none focus:shadow-brutal-accent sm:focus:shadow-[6px_6px_0_0_#ffc480] focus:-translate-y-0.5 sm:focus:-translate-y-1 transition-all placeholder-gray-400"
 					bind:value={searchQuery}
 					on:input={handleSearchInput}
 				/>
@@ -263,7 +263,7 @@
 
 			<!-- Create Button -->
 			<button
-				class="font-black py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] sm:hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[3px] sm:hover:translate-y-[3px] transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm
+				class="font-black py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm sm:hover:shadow-brutal-md hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[3px] sm:hover:translate-y-[3px] transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm
 				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-brand-accent hover:bg-[#ffb968] text-gray-900'}"
 				on:click={openTemplateCreator}
 			>
@@ -302,8 +302,8 @@
 					on:click={() => handleFilterChange('all')}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all
 						{formatFilter === 'all'
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					All
 				</button>
@@ -312,8 +312,8 @@
 					on:click={() => handleFilterChange('image')}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{formatFilter === 'image'
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -330,8 +330,8 @@
 					on:click={() => handleFilterChange('pdf')}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{formatFilter === 'pdf'
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -352,7 +352,7 @@
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{dynamicFilter
 						? 'bg-[#a855f7] text-white shadow-[3px_3px_0_0_#6b21a8] border-[#a855f7]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg
 						class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-[#a855f7]'}"

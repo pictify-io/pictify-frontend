@@ -620,10 +620,10 @@
 	{#if !hasCopilotAccess || featureLimitReached}
 		<div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-brand-bg">
 			<div
-				class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex flex-col items-center text-center"
+				class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-brutal-lg flex flex-col items-center text-center"
 			>
 				<div
-					class="w-10 h-10 rounded-lg bg-brand-accent border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center mb-3"
+					class="w-10 h-10 rounded-lg bg-brand-accent border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center mb-3"
 				>
 					<svg
 						width="20"
@@ -652,7 +652,7 @@
 				</p>
 				<button
 					on:click={() => openUpgradeModal('ai_copilot')}
-					class="w-full py-2 px-3 bg-[#b4f0a7] border-[2px] border-gray-900 text-gray-900 text-xs font-black rounded-lg shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all uppercase tracking-wide"
+					class="w-full py-2 px-3 bg-[#b4f0a7] border-[2px] border-gray-900 text-gray-900 text-xs font-black rounded-lg shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all uppercase tracking-wide"
 				>
 					Upgrade Now
 				</button>
@@ -696,7 +696,7 @@
 			{#if messages.length === 0}
 				<div class="flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
 					<div
-						class="w-12 h-12 rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] bg-white flex items-center justify-center"
+						class="w-12 h-12 rounded-lg border-[3px] border-gray-900 shadow-brutal-md bg-white flex items-center justify-center"
 					>
 						<svg
 							width="24"
@@ -719,7 +719,7 @@
 					<div class="flex flex-col gap-2 w-full px-1">
 						{#each QUICK_ACTIONS as action}
 							<button
-								class="text-[11px] text-left px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg hover:bg-brand-accent transition-all shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none font-bold text-gray-800"
+								class="text-[11px] text-left px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg hover:bg-brand-accent transition-all shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none font-bold text-gray-800"
 								on:click={() => handleGenerate(action)}
 							>
 								{action}
@@ -892,7 +892,7 @@
 					</div>
 					<button
 						on:click={cleanupStream}
-						class="px-3 py-2.5 bg-white text-gray-900 border-[2px] border-gray-900 rounded-lg text-xs font-bold shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all shrink-0"
+						class="px-3 py-2.5 bg-white text-gray-900 border-[2px] border-gray-900 rounded-lg text-xs font-bold shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all shrink-0"
 					>
 						Stop
 					</button>
@@ -905,13 +905,13 @@
 						on:keydown={handleKeydown}
 						on:input={resizeTextarea}
 						rows="2"
-						class="flex-1 px-3 py-2.5 border-[2px] border-gray-900 rounded-lg focus:ring-0 focus:border-gray-900 focus:shadow-[3px_3px_0_0_#ffc480] text-xs resize-none shadow-[3px_3px_0_0_#1f2937] transition-all min-h-[52px] max-h-[120px] font-medium bg-white overflow-hidden"
+						class="flex-1 px-3 py-2.5 border-[2px] border-gray-900 rounded-lg focus:ring-0 focus:border-gray-900 focus:shadow-[3px_3px_0_0_#ffc480] text-xs resize-none shadow-brutal-md transition-all min-h-[52px] max-h-[120px] font-medium bg-white overflow-hidden"
 						placeholder="Describe your design..."
 					/>
 					<button
 						on:click={() => handleGenerate()}
 						disabled={!prompt.trim()}
-						class="p-2.5 bg-gray-900 text-white rounded-lg disabled:bg-gray-300 disabled:text-gray-400 transition-all shadow-[2px_2px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#ffc480] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] shrink-0 mb-[3px]"
+						class="p-2.5 bg-gray-900 text-white rounded-lg disabled:bg-gray-300 disabled:text-gray-400 transition-all shadow-brutal-sm hover:shadow-[3px_3px_0_0_#ffc480] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] shrink-0 mb-[3px]"
 					>
 						<svg
 							width="16"

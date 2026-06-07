@@ -152,7 +152,7 @@
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-brand-accent border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-brand-accent border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<span class="w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-gray-900" />
 				<span class="text-sm font-black uppercase tracking-wider text-gray-900">Live Data · Auto-Refresh</span>
@@ -178,7 +178,7 @@
 					href="/signup"
 					on:click={() => trackCTA('Try Dynamic Links')}
 					class="px-8 py-4 bg-gray-900 text-white font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#ffc480] hover:shadow-[4px_4px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1
+						shadow-[8px_8px_0_0_#ffc480] hover:shadow-brutal-accent hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center flex items-center justify-center gap-2 group"
 				>
 					Try Dynamic Links Free
@@ -190,7 +190,7 @@
 					href="/templates"
 					on:click={() => trackCTA('Browse Templates')}
 					class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-						shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+						shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 						transition-all duration-200 text-center"
 				>
 					Browse Templates
@@ -208,7 +208,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#7dd3fc] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Capabilities</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -224,12 +224,12 @@
 					{@const colors = ['bg-brand-danger', 'bg-[#4ade80]', 'bg-brand-accent', 'bg-[#a78bfa]']}
 					{@const rotations = ['rotate-1', '-rotate-1', '-rotate-1', 'rotate-1']}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
 						in:fly={{ y: 20, duration: 400, delay: i * 100 }}
 					>
 						<!-- Colorful Header Block -->
 						<div class="{colors[i % colors.length]} p-6 border-b-[3px] border-gray-900 flex items-center justify-between">
-							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-12 transition-transform">
+							<div class="w-12 h-12 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-12 transition-transform">
 								<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={useCase.iconPath} />
 								</svg>
@@ -338,7 +338,7 @@
 
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#f43f5e] text-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Workflow</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -358,12 +358,12 @@
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
 					>
 						<!-- Number Badge -->
-						<div class="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 {colors[i]} border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3 z-10">
+						<div class="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 {colors[i]} border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center rounded-2xl transform transition-transform group-hover:scale-110 group-hover:-rotate-3 z-10">
 							<span class="text-2xl md:text-4xl font-black text-gray-900">{step.number}</span>
 						</div>
 
 						<!-- Content Card -->
-						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] group-hover:shadow-[12px_12px_0_0_#1f2937] rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
+						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
 							<h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-3">{step.title}</h3>
 							<p class="text-gray-700 text-lg md:text-xl font-medium leading-relaxed">{step.description}</p>
 						</div>
@@ -382,7 +382,7 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Integrations</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl border-[3px] border-transparent font-black text-gray-900 mb-6">
@@ -396,8 +396,8 @@
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each dataSources as source, i}
 					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-brand-danger', 'bg-[#4ade80]', 'bg-white']}
-					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 rounded-2xl transition-all group">
-						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform">
+					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 rounded-2xl transition-all group">
+						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d={source.iconPath} />
 							</svg>
@@ -429,7 +429,7 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Playground</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -443,7 +443,7 @@
 
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 				<!-- Data Source Input -->
-				<div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden flex flex-col group transition-shadow hover:shadow-[12px_12px_0_0_#1f2937]">
+				<div class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl overflow-hidden flex flex-col group transition-shadow hover:shadow-brutal-3xl">
 					<div class="px-5 py-3 bg-gray-100 border-b-[3px] border-gray-900 text-gray-900 font-black text-sm flex items-center gap-2">
 						<span class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
 						<span class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
@@ -458,7 +458,7 @@
 					<div class="p-5 border-t-[3px] border-gray-900 bg-gray-50 flex-none">
 						<button
 							on:click={runDemo}
-							class="w-full px-6 py-4 bg-[#7dd3fc] text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-lg shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-150 flex items-center justify-center gap-2"
+							class="w-full px-6 py-4 bg-[#7dd3fc] text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-lg shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-150 flex items-center justify-center gap-2"
 						>
 							Render Preview
 							<svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -469,7 +469,7 @@
 				</div>
 
 				<!-- Rendered Output -->
-				<div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden flex flex-col transition-shadow hover:shadow-[12px_12px_0_0_#1f2937]">
+				<div class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl overflow-hidden flex flex-col transition-shadow hover:shadow-brutal-3xl">
 					<div class="px-5 py-3 bg-gray-900 text-white font-black text-sm tracking-wide uppercase text-center border-b-[3px] border-gray-900 relative">
 						Output Preview
 					</div>
@@ -479,14 +479,14 @@
 								{#if demoData}
 									{@const parsed = (() => { try { return JSON.parse(demoData); } catch { return null; } })()}
 									{#if parsed}
-										<div class="bg-gradient-to-br from-brand-accent to-brand-danger p-8 md:p-10 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] text-left max-w-sm mx-auto rounded-xl transform rotate-1 hover:rotate-0 transition-transform">
+										<div class="bg-gradient-to-br from-brand-accent to-brand-danger p-8 md:p-10 border-[3px] border-gray-900 shadow-brutal-2xl text-left max-w-sm mx-auto rounded-xl transform rotate-1 hover:rotate-0 transition-transform">
 											<p class="text-3xl md:text-4xl font-black text-white mb-2 leading-none">{parsed.product_name || 'Product'}</p>
 											<p class="text-4xl md:text-5xl font-black text-gray-900 mb-4">{parsed.price || '$0'}</p>
 											{#if parsed.discount}
-												<span class="inline-block px-4 py-2 bg-white text-gray-900 font-black text-sm border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-2">{parsed.discount}</span>
+												<span class="inline-block px-4 py-2 bg-white text-gray-900 font-black text-sm border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-2">{parsed.discount}</span>
 											{/if}
 										</div>
-										<div class="mt-8 inline-block px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 text-xs font-black uppercase tracking-wider rounded shadow-[4px_4px_0_0_#ffc480] animate-bounce" style="animation-duration: 2s;">
+										<div class="mt-8 inline-block px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 text-xs font-black uppercase tracking-wider rounded shadow-brutal-accent animate-bounce" style="animation-duration: 2s;">
 											This image updates instantly!
 										</div>
 									{:else}
@@ -522,12 +522,12 @@
 		/>
 
 		<!-- Floating decorative elements -->
-		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
-		<div class="absolute bottom-10 left-10 w-24 h-24 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
+		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-brutal-lg animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
+		<div class="absolute bottom-10 left-10 w-24 h-24 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-[12px_12px_0_0_#1f2937] hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
 				<div class="inline-block px-4 py-1.5 bg-gray-900 text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#4ade80] rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold uppercase tracking-wider">Get Started</span>
@@ -564,7 +564,7 @@
 						href="/pricing"
 						on:click={() => trackCTA('View Pricing')}
 						class="px-8 py-4 bg-white text-gray-900 font-black text-lg border-[3px] border-gray-900 rounded-xl
-							shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1
+							shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-1 hover:translate-y-1
 							transition-all duration-200 text-center"
 					>
 						View Pricing
@@ -586,7 +586,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -596,7 +596,7 @@
 
 			<div class="space-y-4">
 				{#each faqs as faq, i}
-					<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
+					<div class="bg-white border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
 						<button
 							on:click={() => (openFaq = openFaq === i ? -1 : i)}
 							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-[#fdf2f8]' : 'hover:bg-gray-50'}"

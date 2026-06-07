@@ -156,7 +156,7 @@
 	<div class="max-w-7xl mx-auto px-6">
 		<div class="text-center mb-16">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-6 transform rotate-1"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Visual Editor</span>
 			</div>
@@ -182,7 +182,7 @@
 		<div class="relative mx-auto max-w-5xl perspective-1000">
 			<!-- Browser Frame -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] overflow-hidden relative z-10 transform transition-transform duration-500 hover:rotate-1"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-3xl overflow-hidden relative z-10 transform transition-transform duration-500 hover:rotate-1"
 				on:mouseenter={() => (isHovering = true)}
 				on:mouseleave={() => (isHovering = false)}
 			>
@@ -214,7 +214,7 @@
 						>
 							<button
 								on:click={() => goto('/canvas/try')}
-								class="group relative px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
+								class="group relative px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl transform hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-lg transition-all duration-200"
 							>
 								<div class="flex items-center gap-3">
 									<span>Try Canvas Editor</span>
@@ -453,7 +453,7 @@
 			<div class="md:hidden mt-6 flex justify-center">
 				<button
 					on:click={() => goto('/canvas/try')}
-					class="px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0_0_#1f2937] transition-all uppercase tracking-wider flex items-center gap-3"
+					class="px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-xl active:translate-x-1 active:translate-y-1 active:shadow-brutal-sm transition-all uppercase tracking-wider flex items-center gap-3"
 				>
 					<span>Try Canvas Editor</span>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -529,7 +529,7 @@
 
 							<!-- Arrow -->
 							<div class="flex flex-col items-center gap-2 relative">
-								<div class="bg-black text-white px-3 py-1.5 rounded text-[11px] font-black uppercase tracking-widest border-[3px] border-black transform rotate-3 z-10 shadow-[4px_4px_0_0_#ffc480]">1-Click</div>
+								<div class="bg-black text-white px-3 py-1.5 rounded text-[11px] font-black uppercase tracking-widest border-[3px] border-black transform rotate-3 z-10 shadow-brutal-accent">1-Click</div>
 							</div>
 
 							<!-- Pictify Template -->

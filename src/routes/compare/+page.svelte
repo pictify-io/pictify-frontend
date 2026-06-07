@@ -63,7 +63,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 			>
 				<div
-					class="px-6 py-2 bg-brand-danger border-[3px] border-gray-900 text-white font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
+					class="px-6 py-2 bg-brand-danger border-[3px] border-gray-900 text-white font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
 				>
 					Honest Comparisons
 				</div>
@@ -93,7 +93,7 @@
 
 					<a
 						href="/compare/{comparison.slug}"
-						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
+						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
 					>
 						<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
 							<!-- VS Header -->
@@ -125,7 +125,7 @@
 
 								<!-- Competitor Icon -->
 								<div
-									class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl shadow-[3px_3px_0_0_#1f2937] transition-transform group-hover:scale-110"
+									class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl shadow-brutal-md transition-transform group-hover:scale-110"
 									style="color: {icon.color || '#1f2937'}"
 								>
 									{#if icon.type === 'url'}

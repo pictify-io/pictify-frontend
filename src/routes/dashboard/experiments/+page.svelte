@@ -253,8 +253,8 @@
 					}}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[3px] border-gray-900 transition-all
 					{typeFilter === filter.value
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[3px_3px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-md'}"
 				>
 					{filter.label}
 				</button>
@@ -267,7 +267,7 @@
 				<select
 					bind:value={statusFilter}
 					on:change={handleFilterChange}
-					class="appearance-none pl-4 pr-10 py-2.5 bg-white border-[3px] border-gray-900 rounded-lg text-xs font-black uppercase tracking-wide text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] cursor-pointer shadow-[3px_3px_0_0_rgba(0,0,0,0.1)] hover:shadow-[3px_3px_0_0_#1f2937] transition-all"
+					class="appearance-none pl-4 pr-10 py-2.5 bg-white border-[3px] border-gray-900 rounded-lg text-xs font-black uppercase tracking-wide text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] cursor-pointer shadow-[3px_3px_0_0_rgba(0,0,0,0.1)] hover:shadow-brutal-md transition-all"
 				>
 					{#each statusFilters as sf}
 						<option value={sf.value}>{sf.label}</option>
@@ -291,7 +291,7 @@
 			<div class="relative">
 				<button
 					on:click={handleCreate}
-					class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+					class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -320,7 +320,7 @@
 					<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 					<div class="fixed inset-0 z-40" on:click={closeCreateDropdown} />
 					<div
-						class="absolute right-0 top-full mt-2 z-50 w-72 bg-white border-[3px] border-gray-900 rounded-xl shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+						class="absolute right-0 top-full mt-2 z-50 w-72 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden"
 					>
 						<div class="px-4 py-3 bg-gray-50 border-b-[2px] border-gray-200">
 							<span class="text-[10px] font-black uppercase tracking-widest text-gray-500"
@@ -333,7 +333,7 @@
 								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#4ade80]/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="w-8 h-8 bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
 								>
 									<span class="text-sm">&#9878;</span>
 								</div>
@@ -351,7 +351,7 @@
 								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#3b82f6]/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#3b82f6]/20 border-[2px] border-[#3b82f6] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="w-8 h-8 bg-[#3b82f6]/20 border-[2px] border-[#3b82f6] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
 								>
 									<svg
 										class="w-4 h-4 text-[#3b82f6]"
@@ -427,7 +427,7 @@
 						class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
 					>
 						<div
-							class="w-24 h-24 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-[6px_6px_0_0_#1f2937] -rotate-3 hover:rotate-0 transition-transform duration-300"
+							class="w-24 h-24 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-xl -rotate-3 hover:rotate-0 transition-transform duration-300"
 						>
 							<!-- Beaker Icon -->
 							<svg
@@ -453,7 +453,7 @@
 						</p>
 						<button
 							on:click={() => handleCreateType('ab_test')}
-							class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
+							class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
 						>
 							Create Your First Experiment
 							<svg
@@ -475,7 +475,7 @@
 					<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8">
 						{#each filteredExperiments as exp (exp.uid)}
 							<div
-								class="group bg-brand-bg border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
+								class="group bg-brand-bg border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
 								on:click={() => handleView(exp.uid)}
 								on:keydown={(e) => e.key === 'Enter' && handleView(exp.uid)}
 								role="button"
@@ -492,7 +492,7 @@
 									<div class="relative p-4 sm:p-5 border-b-[3px] border-gray-900 bg-white">
 										<!-- Image Container (Neo brutalist container) -->
 										<div
-											class="aspect-[16/9] w-full bg-[#f8fafc] border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#1f2937] relative"
+											class="aspect-[16/9] w-full bg-[#f8fafc] border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-lg relative"
 										>
 											{#if exp.template?.thumbnail || exp.variants?.[0]?.templateThumbnail || exp.variants?.[0]?.preRenderedUrl}
 												<img
@@ -549,7 +549,7 @@
 										<!-- Floating Badges Top Left -->
 										<div class="absolute top-6 left-6 flex flex-col items-start gap-2">
 											<span
-												class="inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-[3px_3px_0_0_#1f2937] {typeColors[
+												class="inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-brutal-md {typeColors[
 													exp.type
 												] || 'bg-white text-gray-900 border-gray-900'}"
 											>
@@ -584,7 +584,7 @@
 										>
 											<button
 												on:click|stopPropagation={() => confirmDelete(exp)}
-												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
+												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-brutal-md hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
 												title="Delete"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -696,7 +696,7 @@
 										>
 											<button
 												on:click|stopPropagation={() => handleView(exp.uid)}
-												class="flex-1 bg-white text-gray-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 hover:bg-gray-900 hover:text-white group/btn"
+												class="flex-1 bg-white text-gray-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 hover:bg-gray-900 hover:text-white group/btn"
 											>
 												<span>Open Editor</span>
 												<svg
@@ -716,7 +716,7 @@
 											{#if exp.status === 'draft' || exp.status === 'paused'}
 												<button
 													on:click|stopPropagation={() => handleStart(exp.uid)}
-													class="w-12 h-12 bg-[#4ade80] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													class="w-12 h-12 bg-[#4ade80] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Start"
 												>
 													<svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"
@@ -726,7 +726,7 @@
 											{:else if exp.status === 'running'}
 												<button
 													on:click|stopPropagation={() => handlePause(exp.uid)}
-													class="w-12 h-12 bg-brand-accent text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													class="w-12 h-12 bg-brand-accent text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Pause"
 												>
 													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
@@ -755,7 +755,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-md w-full overflow-hidden animate-fade-in-up"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-md w-full overflow-hidden animate-fade-in-up"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="delete-experiment-title"
@@ -825,13 +825,13 @@
 				<div class="flex gap-4">
 					<button
 						on:click={closeDeleteConfirm}
-						class="flex-1 px-4 py-3.5 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs"
+						class="flex-1 px-4 py-3.5 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs"
 					>
 						Cancel
 					</button>
 					<button
 						on:click={handleDelete}
-						class="flex-[1.5] px-4 py-3.5 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center justify-center gap-2"
+						class="flex-[1.5] px-4 py-3.5 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center justify-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

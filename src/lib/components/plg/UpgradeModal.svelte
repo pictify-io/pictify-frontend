@@ -131,7 +131,7 @@
 	>
 		<!-- Modal -->
 		<div
-			class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full overflow-hidden"
+			class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-lg w-full overflow-hidden"
 			transition:scale={{ duration: 300, easing: quintOut, start: 0.95 }}
 			on:click|stopPropagation
 			on:keydown|stopPropagation
@@ -145,7 +145,7 @@
 
 				<div class="relative z-10 flex gap-5 items-start">
 					<div
-						class="w-16 h-16 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center flex-shrink-0 text-gray-900 transform -rotate-2"
+						class="w-16 h-16 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center flex-shrink-0 text-gray-900 transform -rotate-2"
 					>
 						<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -212,7 +212,7 @@
 
 						<!-- Next plan -->
 						<div
-							class="p-4 bg-brand-accent/10 rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] relative text-center relative overflow-hidden"
+							class="p-4 bg-brand-accent/10 rounded-lg border-2 border-gray-900 shadow-brutal-md relative text-center relative overflow-hidden"
 						>
 							<!-- Highlight bg -->
 							<div class="absolute inset-0 bg-brand-accent opacity-5" />
@@ -254,7 +254,7 @@
 				<!-- Time saved stat -->
 				{#if timeSaved && timeSaved.value > 0}
 					<div
-						class="flex items-center gap-3 p-3 bg-brand-success rounded-lg mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+						class="flex items-center gap-3 p-3 bg-brand-success rounded-lg mb-6 border-2 border-gray-900 shadow-brutal-lg"
 					>
 						<div class="p-1.5 bg-black/10 rounded-md">
 							<svg
@@ -283,7 +283,7 @@
 				<!-- CTA Buttons -->
 				<div class="space-y-3">
 					<button
-						class="w-full py-3 px-6 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 group"
+						class="w-full py-3 px-6 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 group"
 						on:click={handleCTAClick}
 					>
 						{prompt.cta?.text || 'Upgrade Now'}

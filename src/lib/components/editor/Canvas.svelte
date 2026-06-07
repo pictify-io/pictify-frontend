@@ -958,7 +958,7 @@
 	{/if}
 
 	<div
-		class="shadow-[8px_8px_0_0_#1f2937] border-[3px] border-gray-900 bg-white transition-transform duration-200 ease-out origin-center relative"
+		class="shadow-brutal-2xl border-[3px] border-gray-900 bg-white transition-transform duration-200 ease-out origin-center relative"
 		style="transform: scale({scale});"
 	>
 		<div bind:this={canvasContainer}>

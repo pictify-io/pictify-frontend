@@ -46,7 +46,7 @@
 			<div class="flex items-center gap-2 sm:gap-3">
 				<!-- Logo Icon (Abstract Shapes) -->
 				<div
-					class="w-7 h-7 sm:w-8 sm:h-8 bg-gray-900 rounded-md flex items-center justify-center shadow-[2px_2px_0_0_#ffc480] sm:shadow-[3px_3px_0_0_#ffc480] group-hover:shadow-none group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-all border-2 border-transparent"
+					class="w-7 h-7 sm:w-8 sm:h-8 bg-gray-900 rounded-md flex items-center justify-center shadow-brutal-accent-sm sm:shadow-[3px_3px_0_0_#ffc480] group-hover:shadow-none group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-all border-2 border-transparent"
 				>
 					<svg
 						class="w-4 h-4 sm:w-5 sm:h-5 text-white"
@@ -95,7 +95,7 @@
 					type="button"
 					on:click={() => openUpgradeModal('trial_badge')}
 					aria-label={`Free trial: ${days} day${days === 1 ? '' : 's'} left. Upgrade your plan.`}
-					class="group flex items-stretch overflow-hidden rounded-lg border-2 border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937] transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-brand-accent motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
+					class="group flex items-stretch overflow-hidden rounded-lg border-2 border-gray-900 bg-white shadow-brutal-sm transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-brutal-md active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-brand-accent motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
 				>
 					<span class="flex items-center gap-1.5 py-1.5 pl-2.5 pr-2.5">
 						<svg

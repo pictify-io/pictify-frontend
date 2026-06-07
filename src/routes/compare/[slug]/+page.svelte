@@ -305,14 +305,14 @@
 
 					<!-- VS Badge -->
 					<div
-						class="w-12 h-12 sm:w-16 sm:h-16 bg-brand-danger border-[3px] border-gray-900 rounded-full flex items-center justify-center font-black text-white text-lg sm:text-2xl shadow-[4px_4px_0_0_#1f2937] z-10"
+						class="w-12 h-12 sm:w-16 sm:h-16 bg-brand-danger border-[3px] border-gray-900 rounded-full flex items-center justify-center font-black text-white text-lg sm:text-2xl shadow-brutal-lg z-10"
 					>
 						VS
 					</div>
 
 					<!-- Competitor Icon -->
 					<div
-						class="w-20 h-20 sm:w-28 sm:h-28 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] transform rotate-3 hover:rotate-0 transition-transform duration-300"
+						class="w-20 h-20 sm:w-28 sm:h-28 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
 						style="color: {icon.color || '#1f2937'}"
 					>
 						{#if icon.type === 'url'}
@@ -352,7 +352,7 @@
 			{#if comparison.tldr}
 				<section class="mb-12">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-[4px_4px_0_0_#ffc480]"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-brutal-accent"
 					>
 						<p class="text-gray-700 font-bold leading-relaxed">
 							<span class="text-brand-danger font-black uppercase tracking-wide">TL;DR:</span>
@@ -479,7 +479,7 @@
 					>
 						<h3 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-900 font-black text-sm shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-900 font-black text-sm shadow-brutal-sm"
 								>1</span
 							>
 							Choose Pictify if...
@@ -494,7 +494,7 @@
 					>
 						<h3 class="text-xl font-black text-gray-700 mb-4 flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-gray-100 border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-500 font-black text-sm shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 bg-gray-100 border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-500 font-black text-sm shadow-brutal-sm"
 								>2</span
 							>
 							Choose {comparison.competitor} if...
@@ -515,7 +515,7 @@
 						Feature Comparison
 					</h2>
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-xl"
 					>
 						<table class="w-full">
 							<thead class="bg-gray-900 text-white">
@@ -653,7 +653,7 @@
 								{#each comparison.migration.steps as step, i}
 									<li class="flex items-center gap-4">
 										<span
-											class="w-10 h-10 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-gray-900 text-lg font-black shadow-[2px_2px_0_0_#1f2937] flex-shrink-0"
+											class="w-10 h-10 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-gray-900 text-lg font-black shadow-brutal-sm flex-shrink-0"
 											>{i + 1}</span
 										>
 										<span class="text-gray-900 font-bold text-lg">{step}</span>
@@ -726,7 +726,7 @@
 				<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
 					<a
 						href="/solutions/automated-image-generation"
-						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1 text-sm">Automated Image Generation</h3>
 						<p class="text-xs text-gray-500">The complete guide — templates, APIs, expressions, and live data bindings.</p>
@@ -759,7 +759,7 @@
 						{@const compIcon = brandIcons[compSlug] || brandIcons.default}
 						<a
 							href="/compare/{comp.slug}"
-							class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
 						>
 							<div class="flex items-center gap-4">
 								<div
@@ -820,7 +820,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -829,7 +829,7 @@
 				</h1>
 				<a
 					href="/compare"
-					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					View All Comparisons
 				</a>

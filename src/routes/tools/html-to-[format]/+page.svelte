@@ -677,7 +677,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -901,7 +901,7 @@
 		{#if !isUserLoggedIn}
 			<div class="w-full max-w-5xl mx-auto mb-12">
 				<div
-					class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl p-6"
+					class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl p-6"
 				>
 					<div class="flex items-center gap-4">
 						<div class="flex-1">
@@ -928,7 +928,7 @@
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
 									on:click={() => trackSignupClick('generation_limit_banner')}
-									class="inline-block py-2 px-4 rounded-lg border-[3px] border-gray-900 font-bold bg-brand-danger text-white shadow-[4px_4px_0_0_#1f2937] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#1f2937] transition-all text-sm"
+									class="inline-block py-2 px-4 rounded-lg border-[3px] border-gray-900 font-bold bg-brand-danger text-white shadow-brutal-lg hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-brutal-sm transition-all text-sm"
 								>
 									Sign Up Free
 								</a>

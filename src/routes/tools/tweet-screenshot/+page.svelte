@@ -473,12 +473,12 @@ print(res.json()['image']['url'])`;
 					placeholder="https://twitter.com/jack/status/20"
 					bind:value={urlInput}
 					on:keydown={(e) => e.key === 'Enter' && handleFetchClick()}
-					class="flex-1 px-4 py-3 text-base bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-[3px_3px_0_0_#1f2937] transition-all"
+					class="flex-1 px-4 py-3 text-base bg-white border-[3px] border-gray-900 rounded-lg shadow-brutal-lg focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-brutal-md transition-all"
 				/>
 				<button
 					on:click={handleFetchClick}
 					disabled={status === 'fetching'}
-					class="px-6 py-3 bg-brand-accent text-gray-900 font-black border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#1f2937] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+					class="px-6 py-3 bg-brand-accent text-gray-900 font-black border-[3px] border-gray-900 rounded-lg shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-md active:translate-x-[2px] active:translate-y-[2px] active:shadow-brutal-sm disabled:opacity-60 disabled:cursor-not-allowed transition-all"
 				>
 					{status === 'fetching' ? 'Fetching…' : 'Fetch'}
 				</button>
@@ -512,7 +512,7 @@ print(res.json()['image']['url'])`;
 		<!-- Preview on top, fields below (stacked vertically; preview is full-width so tall cards don't clip) -->
 		<div class="flex flex-col-reverse gap-6 mb-10 max-w-3xl mx-auto">
 			<!-- Fields -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl p-6">
 				<h2 class="text-xl font-black mb-4 text-gray-900">Tweet fields</h2>
 				<div class="space-y-4">
 					<div>
@@ -619,7 +619,7 @@ print(res.json()['image']['url'])`;
 				<button
 					on:click={handleGenerate}
 					disabled={isGenerating}
-					class="w-full mt-6 px-6 py-3 bg-gray-900 text-white font-black rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_#ffc480] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+					class="w-full mt-6 px-6 py-3 bg-gray-900 text-white font-black rounded-lg border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_#ffc480] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
 				>
 					{isGenerating ? 'Generating…' : 'Download PNG'}
 				</button>
@@ -629,7 +629,7 @@ print(res.json()['image']['url'])`;
 			</div>
 
 			<!-- Live preview -->
-			<div class="bg-gradient-to-br from-gray-50 to-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#1f2937] p-6">
+			<div class="bg-gradient-to-br from-gray-50 to-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl p-6">
 				<h2 class="text-xl font-black mb-4 text-gray-900">Live preview</h2>
 				<div class="flex items-start justify-center">
 					<div class="rounded-xl overflow-hidden border-2 border-gray-300 shadow-md bg-white max-w-full">
@@ -662,7 +662,7 @@ print(res.json()['image']['url'])`;
 		<section id="api" class="mt-20 scroll-mt-20">
 			<div class="text-center mb-12">
 				<div
-					class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform rotate-1 rounded-lg"
+					class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 				</div>
@@ -692,7 +692,7 @@ print(res.json()['image']['url'])`;
 			</div>
 
 			<!-- Code Snippet -->
-			<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+			<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 				<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
@@ -713,7 +713,7 @@ print(res.json()['image']['url'])`;
 				<div class="flex flex-wrap justify-center gap-4">
 					<a
 						href="/signup"
-						class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						Get API Key
 					</a>
@@ -721,7 +721,7 @@ print(res.json()['image']['url'])`;
 						href="https://docs.pictify.io"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						Read API Docs
 					</a>
@@ -804,28 +804,28 @@ print(res.json()['image']['url'])`;
 
 				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">Why this beats screenshots of your screen</h3>
 				<div class="grid md:grid-cols-2 gap-5 mb-8">
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 						<h4 class="font-black text-gray-900 mb-2">Pixel-perfect, every time</h4>
 						<p class="text-gray-700">
 							Rendered server-side with consistent typography and spacing. No viewport
 							differences, no device pixel ratio weirdness, no status-bar notch cropping.
 						</p>
 					</div>
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 						<h4 class="font-black text-gray-900 mb-2">Works when the embed doesn't</h4>
 						<p class="text-gray-700">
 							Tweet got deleted or the account went private? Paste what you remember, fill the
 							fields manually, and produce a usable screenshot without relying on the live tweet.
 						</p>
 					</div>
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 						<h4 class="font-black text-gray-900 mb-2">No Twitter API key</h4>
 						<p class="text-gray-700">
 							Other tools require you to spin up a Twitter developer account and manage
 							tokens. We use the public syndication endpoint — zero setup, zero monthly cost.
 						</p>
 					</div>
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 						<h4 class="font-black text-gray-900 mb-2">Scales to a million</h4>
 						<p class="text-gray-700">
 							Need tweet images for every author, every post, every campaign? The same tool

@@ -70,7 +70,7 @@
 		<div class="mx-auto max-w-2xl space-y-6">
 			<!-- OUTPUT FORMAT card -->
 			<section
-				class="rounded-xl border-[3px] border-gray-900 bg-white p-5 shadow-[4px_4px_0_0_#1f2937]"
+				class="rounded-xl border-[3px] border-gray-900 bg-white p-5 shadow-brutal-lg"
 			>
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-900"
 					>Output format</label>
@@ -80,8 +80,8 @@
 							type="button"
 							class="flex flex-col items-center justify-center gap-1 rounded-lg border-[3px] border-gray-900 px-3 py-3 text-[11px] font-black uppercase tracking-widest transition-all
 								{format === fmt.key
-									? 'bg-brand-accent text-gray-900 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
-									: 'bg-white text-gray-900 hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
+									? 'bg-brand-accent text-gray-900 shadow-brutal-md -translate-x-[1px] -translate-y-[1px]'
+									: 'bg-white text-gray-900 hover:shadow-brutal-md hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 							on:click={() => {
 								format = fmt.key;
 								patch({ format });
@@ -103,7 +103,7 @@
 								pdfPreset = e.target.value;
 								patch({ pdfPreset });
 							}}
-							class="w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black uppercase tracking-wider text-gray-900 transition-all focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#ffc480] focus:outline-none"
+							class="w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black uppercase tracking-wider text-gray-900 transition-all focus:-translate-y-1 focus:shadow-brutal-accent focus:outline-none"
 						>
 							{#each PDF_PRESETS as p}
 								<option value={p.value}>{p.label} — {p.note}</option>
@@ -121,7 +121,7 @@
 								max={MAX_DIM}
 								value={width}
 								on:input={onWidth}
-								class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#ffc480] focus:outline-none"
+								class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-brutal-accent focus:outline-none"
 							/>
 						</div>
 						<div>
@@ -133,7 +133,7 @@
 								max={MAX_DIM}
 								value={height}
 								on:input={onHeight}
-								class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#ffc480] focus:outline-none"
+								class="mt-2 w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black text-gray-900 transition-all focus:-translate-y-1 focus:shadow-brutal-accent focus:outline-none"
 							/>
 						</div>
 						{#if dimensionError}
@@ -148,7 +148,7 @@
 
 			<!-- STRICT VARIABLES toggle card -->
 			<section
-				class="rounded-xl border-[3px] border-gray-900 bg-white p-5 shadow-[4px_4px_0_0_#1f2937]"
+				class="rounded-xl border-[3px] border-gray-900 bg-white p-5 shadow-brutal-lg"
 			>
 				<label class="flex cursor-pointer items-start gap-4">
 					<input
@@ -176,7 +176,7 @@
 
 			<!-- JS ENABLED toggle card — danger-red treatment when ON -->
 			<section
-				class="rounded-xl border-[3px] p-5 shadow-[4px_4px_0_0_#1f2937] transition-colors
+				class="rounded-xl border-[3px] p-5 shadow-brutal-lg transition-colors
 					{jsEnabled ? 'border-gray-900 bg-brand-danger/10' : 'border-gray-900 bg-white'}"
 			>
 				<label class="flex cursor-pointer items-start gap-4">
@@ -202,7 +202,7 @@
 
 				{#if jsEnabled}
 					<div
-						class="mt-4 flex items-start gap-3 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-4 py-3 text-white shadow-[2px_2px_0_0_#1f2937]"
+						class="mt-4 flex items-start gap-3 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-4 py-3 text-white shadow-brutal-sm"
 					>
 						<i class="fa fa-triangle-exclamation text-xs mt-0.5"></i>
 						<div>

@@ -279,7 +279,7 @@
 			class="mb-8 max-w-2xl p-4 bg-brand-success/10 border-[3px] border-brand-success rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
 		>
 			<div
-				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -334,7 +334,7 @@
 			<section>
 				{#if $billingState.loading && !$billingState.loaded}
 					<div
-						class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+						class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 					>
 						<Loader size="10" show={true} />
 						<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">
@@ -343,7 +343,7 @@
 					</div>
 				{:else if $billingState.error}
 					<div
-						class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+						class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 					>
 						<div
 							class="w-12 h-12 bg-brand-danger/20 rounded-xl border-[3px] border-brand-danger flex items-center justify-center mb-4"
@@ -368,7 +368,7 @@
 						<p class="text-gray-600 font-medium text-sm mb-6">{$billingState.error}</p>
 						<button
 							on:click={() => initBilling()}
-							class="px-6 py-2.5 text-sm font-black text-gray-900 bg-brand-accent uppercase tracking-widest rounded-xl border-[3px] border-gray-900 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0_0_#1f2937] transition-all"
+							class="px-6 py-2.5 text-sm font-black text-gray-900 bg-brand-accent uppercase tracking-widest rounded-xl border-[3px] border-gray-900 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-brutal-lg transition-all"
 						>
 							Retry
 						</button>

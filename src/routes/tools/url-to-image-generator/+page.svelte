@@ -720,7 +720,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -1098,7 +1098,7 @@
 					</h3>
 
 					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
+						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
 						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
 							<img
@@ -1113,7 +1113,7 @@
 						<a
 							href={imageUrl}
 							download="pictify-screenshot.{fileFormat}"
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -1127,7 +1127,7 @@
 						</a>
 						<button
 							on:click={() => copyToClipboard(imageUrl)}
-							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -1158,7 +1158,7 @@
 							<a
 								href="/signup?redirect=/tools/url-to-image-generator"
 								on:click={() => trackSignupClick('post_generation_value_prop')}
-								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Get Your API Key — Free
 							</a>
@@ -1170,7 +1170,7 @@
 
 		<!-- Live API Request Builder -->
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-16 mb-8">
-			<div class="border-[3px] border-black shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+			<div class="border-[3px] border-black shadow-brutal-2xl overflow-hidden">
 				<div class="bg-black px-4 py-3 flex items-center justify-between">
 					<div class="flex items-center gap-3">
 						<span class="text-xs font-black uppercase tracking-widest text-brand-accent"
@@ -1214,7 +1214,7 @@
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
 			<h2 class="text-3xl font-black mb-8 text-black uppercase text-center">What You Can Build</h2>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
+				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
 					<h3 class="font-black text-lg mb-2">Link Preview Images</h3>
 					<p class="text-gray-600 font-medium text-sm">
 						Auto-generate thumbnail images from any URL for link previews, bookmarks, and content
@@ -1234,13 +1234,13 @@
 						embed in emails.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#1f2937]">
+				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-lg">
 					<h3 class="font-black text-lg mb-2">OG Image Fallbacks</h3>
 					<p class="text-gray-600 font-medium text-sm">
 						Generate Open Graph images on-the-fly for pages that don't have custom social previews.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ffc480]">
+				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
 					<h3 class="font-black text-lg mb-2">Web Archiving</h3>
 					<p class="text-gray-600 font-medium text-sm">
 						Capture and store visual snapshots of competitor pages, legal evidence, or content for

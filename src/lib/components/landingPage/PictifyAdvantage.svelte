@@ -139,7 +139,7 @@
 			<!-- Card 1: Cold Starts -->
 			<div
 				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
-					? 'shadow-[8px_8px_0_0_#1f2937]'
+					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
 				<div class="flex justify-between items-start mb-4">
@@ -187,7 +187,7 @@
 			<!-- Card 2: Designer Flow -->
 			<div
 				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
-					? 'shadow-[8px_8px_0_0_#1f2937]'
+					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
 				<div class="flex justify-between items-start mb-4">
@@ -222,10 +222,10 @@
 					{#if isPictify}
 						<div class="flex gap-2">
 							<div
-								class="w-8 h-8 rounded bg-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] transform -rotate-3"
+								class="w-8 h-8 rounded bg-white border-2 border-gray-900 shadow-brutal-sm transform -rotate-3"
 							/>
 							<div
-								class="w-8 h-8 rounded bg-brand-danger border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] transform rotate-3 flex items-center justify-center text-white font-bold text-xs"
+								class="w-8 h-8 rounded bg-brand-danger border-2 border-gray-900 shadow-brutal-sm transform rotate-3 flex items-center justify-center text-white font-bold text-xs"
 							>
 								P
 							</div>
@@ -254,7 +254,7 @@
 			<!-- Card 3: Maintenance -->
 			<div
 				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
-					? 'shadow-[8px_8px_0_0_#1f2937]'
+					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
 				<div class="flex justify-between items-start mb-4">

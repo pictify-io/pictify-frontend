@@ -100,7 +100,7 @@
 			<!-- Header -->
 			<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-5 py-4">
 				<div class="flex items-center gap-2">
-					<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+					<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 						<i class="fa fa-book-open text-[12px] text-gray-900"></i>
 					</div>
 					<div>
@@ -116,7 +116,7 @@
 					type="button"
 					on:click={close}
 					aria-label="Close"
-					class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+					class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 				>
 					<i class="fa fa-xmark text-[12px]"></i>
 				</button>
@@ -130,7 +130,7 @@
 						on:click={() => (activeSection = sec.key)}
 						class="flex flex-1 items-center justify-center gap-1.5 rounded-md border-[2px] border-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all
 							{activeSection === sec.key
-								? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#1f2937]'
+								? 'bg-gray-900 text-white shadow-brutal-sm'
 								: 'bg-white text-gray-700 hover:shadow-[1px_1px_0_0_#1f2937]'}"
 					>
 						<i class="fa {sec.icon} text-[10px]"></i>
@@ -261,7 +261,7 @@
 						<section>
 							<div class="rounded-lg border-[3px] border-gray-900 bg-brand-danger/10 p-4">
 								<div class="flex items-center gap-2">
-									<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-brand-danger shadow-[2px_2px_0_0_#1f2937]">
+									<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-brand-danger shadow-brutal-sm">
 										<i class="fa fa-triangle-exclamation text-[11px] text-white"></i>
 									</div>
 									<h3 class="text-[11px] font-black uppercase tracking-widest text-gray-900">

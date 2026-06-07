@@ -810,7 +810,7 @@
 					{isEditMode ? 'Edit Smart Link' : 'Create Smart Link'}
 				</h1>
 				<span
-					class="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] bg-[#3b82f6]/20"
+					class="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm bg-[#3b82f6]/20"
 				>
 					Smart Link
 				</span>
@@ -828,7 +828,7 @@
 		<!-- ============== STEP 1: BASICS ============== -->
 		{#if currentStep === 'basics'}
 			<div
-				class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+				class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl"
 			>
 				<div class="bg-gray-50 border-b-[3px] border-gray-900 px-6 py-4">
 					<h2 class="text-sm font-black uppercase tracking-widest text-gray-900">
@@ -853,7 +853,7 @@
 							bind:value={form.name}
 							on:input={handleNameInput}
 							placeholder="e.g. Mobile vs Desktop Banner"
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-brutal-accent placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						/>
 					</div>
 
@@ -886,7 +886,7 @@
 									? 'border-red-500 focus:border-red-500 focus:shadow-[4px_4px_0_0_#ef4444]'
 									: slugStatus === 'available'
 									? 'border-green-500 focus:border-green-500 focus:shadow-[4px_4px_0_0_#22c55e]'
-									: 'border-gray-400 focus:border-gray-900 focus:shadow-[4px_4px_0_0_#1f2937]'}"
+									: 'border-gray-400 focus:border-gray-900 focus:shadow-brutal-lg'}"
 							/>
 							{#if !isEditMode}
 								<div class="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-1">
@@ -998,7 +998,7 @@
 											on:click={() => (form.outputConfig.format = fmt.value)}
 											class="flex-1 px-4 py-3 border-[3px] rounded-xl text-center text-sm font-black uppercase tracking-widest transition-all
 												{form.outputConfig.format === fmt.value
-												? 'border-gray-900 bg-brand-accent/20 shadow-[4px_4px_0_0_#1f2937] text-gray-900 -translate-y-[2px]'
+												? 'border-gray-900 bg-brand-accent/20 shadow-brutal-lg text-gray-900 -translate-y-[2px]'
 												: 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
 										>
 											{fmt.label}
@@ -1049,7 +1049,7 @@
 						disabled={!canGoStep2}
 						class="px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all border-[2px] flex items-center gap-2
 							{canGoStep2
-							? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'
+							? 'bg-gray-900 text-white border-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
 							: 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hidden'}"
 					>
 						Next: Rules & Launch
@@ -1106,7 +1106,7 @@
 						>
 							<div class="flex items-center gap-4">
 								<div
-									class="w-9 h-9 bg-[#4ade80] border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+									class="w-9 h-9 bg-[#4ade80] border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-brutal-sm"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1127,7 +1127,7 @@
 									placeholder="Fallback Name"
 								/>
 								<span
-									class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+									class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 								>
 									Fallback
 								</span>
@@ -1349,7 +1349,7 @@
 				<!-- ===== RULE VARIANT CARDS ===== -->
 				{#each ruleVariantIndices as { variant, index }, ruleNum (variant.id)}
 					<div
-						class="border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] transition-all relative"
+						class="border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl transition-all relative"
 					>
 						<div
 							class="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none"
@@ -1361,7 +1361,7 @@
 						>
 							<div class="flex items-center gap-4">
 								<div
-									class="w-9 h-9 bg-[#3b82f6] border-[2px] border-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+									class="w-9 h-9 bg-[#3b82f6] border-[2px] border-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-brutal-sm"
 								>
 									#{ruleNum + 1}
 								</div>
@@ -1381,7 +1381,7 @@
 									type="button"
 									on:click={() => moveVariant(index, -1)}
 									disabled={index <= 1}
-									class="p-2 bg-white border-[2px] border-gray-300 rounded-lg text-gray-500 hover:text-gray-900 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+									class="p-2 bg-white border-[2px] border-gray-300 rounded-lg text-gray-500 hover:text-gray-900 hover:border-gray-900 hover:shadow-brutal-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
 									title="Move Up"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1398,7 +1398,7 @@
 									type="button"
 									on:click={() => moveVariant(index, 1)}
 									disabled={index >= form.variants.length - 1}
-									class="p-2 bg-white border-[2px] border-gray-300 rounded-lg text-gray-500 hover:text-gray-900 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+									class="p-2 bg-white border-[2px] border-gray-300 rounded-lg text-gray-500 hover:text-gray-900 hover:border-gray-900 hover:shadow-brutal-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
 									title="Move Down"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1774,12 +1774,12 @@
 
 				<!-- Action Bar -->
 				<div
-					class="bg-gray-50 border-[3px] border-gray-900 rounded-xl p-5 shadow-[6px_6px_0_0_#1f2937] flex flex-col md:flex-row items-center justify-between gap-4"
+					class="bg-gray-50 border-[3px] border-gray-900 rounded-xl p-5 shadow-brutal-xl flex flex-col md:flex-row items-center justify-between gap-4"
 				>
 					<button
 						type="button"
 						on:click={prevStep}
-						class="w-full md:w-auto px-4 py-2.5 border-[2px] border-gray-300 bg-white rounded-lg text-xs font-black text-gray-500 hover:text-gray-900 hover:border-gray-900 uppercase tracking-wide transition-all shadow-sm hover:shadow-[3px_3px_0_0_#1f2937]"
+						class="w-full md:w-auto px-4 py-2.5 border-[2px] border-gray-300 bg-white rounded-lg text-xs font-black text-gray-500 hover:text-gray-900 hover:border-gray-900 uppercase tracking-wide transition-all shadow-sm hover:shadow-brutal-md"
 					>
 						&larr; Back to Basics
 					</button>
@@ -1791,7 +1791,7 @@
 							disabled={!effectiveCanSubmit}
 							class="w-full sm:w-auto px-5 py-2.5 border-[2px] rounded-lg text-xs font-black uppercase tracking-wide transition-all
 								{effectiveCanSubmit
-								? 'border-gray-900 text-gray-900 bg-white shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'border-gray-900 text-gray-900 bg-white shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed hidden'}"
 						>
 							{#if isSubmitting}
@@ -1808,7 +1808,7 @@
 							disabled={!effectiveCanSubmit}
 							class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all
 								{effectiveCanSubmit
-								? 'bg-[#4ade80] text-gray-900 border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-[#4ade80] text-gray-900 border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-200 text-gray-400 border-[2px] border-gray-300 cursor-not-allowed hidden'}"
 						>
 							{#if isSubmitting}

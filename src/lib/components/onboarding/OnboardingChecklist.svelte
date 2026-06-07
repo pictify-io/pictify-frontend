@@ -57,7 +57,7 @@
 
 {#if $showOnboarding}
 	<div
-		class="fixed bottom-6 right-6 z-50 w-[340px] bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-300 font-sans"
+		class="fixed bottom-6 right-6 z-50 w-[340px] bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-300 font-sans"
 		class:translate-y-[calc(100%-60px)]={$onboardingStore.isCollapsed}
 	>
 		<!-- Header -->
@@ -106,7 +106,7 @@
 			<div class="flex items-center gap-2">
 				<!-- Collapse/Expand icon -->
 				<div
-					class="w-8 h-8 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+					class="w-8 h-8 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 				>
 					<svg
 						class="w-5 h-5 text-gray-900 transition-transform duration-300"
@@ -135,7 +135,7 @@
 						{step.completed
 						? 'border-gray-200 bg-gray-50 opacity-60'
 						: step.href
-						? 'border-gray-900 bg-white hover:bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-[2px] cursor-pointer'
+						? 'border-gray-900 bg-white hover:bg-white hover:shadow-brutal-lg hover:-translate-y-[2px] cursor-pointer'
 						: 'border-gray-300 bg-gray-50'}"
 					on:click={() => handleStepClick(step)}
 					disabled={step.completed || !step.href}
@@ -145,7 +145,7 @@
 						class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center border-[2px]
 							{step.completed
 							? 'bg-green-100 text-green-600 border-transparent'
-							: 'bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'}"
+							: 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'}"
 					>
 						{#if step.completed}
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

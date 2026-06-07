@@ -89,13 +89,13 @@
 </script>
 
 <div
-	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 >
 	<!-- Header -->
 	<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4">
 		<div class="flex items-center gap-3">
 			<div
-				class="w-8 h-8 rounded-lg bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-8 h-8 rounded-lg bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -152,7 +152,7 @@
 								disabled={loading}
 								class="px-3 py-1.5 border-2 border-gray-900 font-medium text-sm transition-colors disabled:opacity-50
                      {selectedPreset === amount
-									? 'bg-blue-500 text-white shadow-[2px_2px_0_0_#1f2937]'
+									? 'bg-blue-500 text-white shadow-brutal-sm'
 									: 'bg-white text-gray-900 hover:bg-gray-100'}"
 							>
 								${amount}

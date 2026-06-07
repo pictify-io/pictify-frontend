@@ -215,7 +215,7 @@
 				class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
 			>
 				<div
-					class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-[4px_4px_0_0_#1f2937]"
+					class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg"
 				>
 					{#if mediaType === 'images'}
 						<svg
@@ -296,7 +296,7 @@
 					<div
 						role="button"
 						tabindex="0"
-						class="media-card group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1"
+						class="media-card group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1"
 						on:click={() => openLightbox(media)}
 						on:keydown={(e) => e.key === 'Enter' && openLightbox(media)}
 					>
@@ -377,7 +377,7 @@
 							>
 								<button
 									on:click={(e) => copyToClipboard(media.url, e)}
-									class="bg-white rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-white rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Copy URL"
 								>
 									<svg
@@ -396,7 +396,7 @@
 								</button>
 								<button
 									on:click={(e) => downloadMedia(media.url, e)}
-									class="bg-brand-danger rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-brand-danger rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Download"
 								>
 									<svg
@@ -458,7 +458,7 @@
 							disabled={!hasPrev || isLoadingMore}
 							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
 							{hasPrev
-								? 'bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-white text-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -482,7 +482,7 @@
 										disabled={isLoadingMore}
 										class="w-8 h-8 text-xs font-black rounded-md border-[2px] transition-all duration-200 flex items-center justify-center
 										{pageNum === currentPage
-											? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#ffc480]'
+											? 'bg-gray-900 border-gray-900 text-white shadow-brutal-accent-sm'
 											: 'bg-white border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-900'}"
 									>
 										{pageNum}
@@ -497,7 +497,7 @@
 							disabled={!hasNext || isLoadingMore}
 							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
 							{hasNext
-								? 'bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-white text-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -529,7 +529,7 @@
 	>
 		<!-- Close button -->
 		<button
-			class="absolute top-6 right-6 w-12 h-12 bg-white rounded-xl border-[3px] border-gray-900 flex items-center justify-center transition-all shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] z-50"
+			class="absolute top-6 right-6 w-12 h-12 bg-white rounded-xl border-[3px] border-gray-900 flex items-center justify-center transition-all shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] z-50"
 			on:click={closeLightbox}
 			aria-label="Close lightbox"
 		>
@@ -651,7 +651,7 @@
 
 				<div class="flex gap-3 w-full sm:w-auto">
 					<button
-						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => copyToClipboard(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -665,7 +665,7 @@
 						Copy Link
 					</button>
 					<button
-						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => downloadMedia(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

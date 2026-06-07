@@ -87,7 +87,7 @@
 			<div class="lg:col-span-1 space-y-4 sm:space-y-6 lg:space-y-8">
 				<!-- Usage Monitor -->
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden relative group"
+					class="bg-white rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden relative group"
 				>
 					<!-- Monitor Header -->
 					<div
@@ -173,7 +173,7 @@
 
 				<!-- Efficiency Ticket -->
 				<div
-					class="bg-brand-accent rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
+					class="bg-brand-accent rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl relative overflow-hidden"
 				>
 					<!-- Ticket Perforations -->
 					<div
@@ -206,7 +206,7 @@
 			<!-- Right Column: Tokens (The "Key Rack") -->
 			<div class="lg:col-span-2">
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] sm:shadow-[12px_12px_0_0_#1f2937] h-full flex flex-col relative overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl border-[3px] border-gray-900 shadow-brutal-xl sm:shadow-brutal-3xl h-full flex flex-col relative overflow-hidden"
 				>
 					<!-- Header -->
 					<div
@@ -228,7 +228,7 @@
 						</div>
 						<button
 							on:click={createAPITokenAction}
-							class="group relative px-4 sm:px-6 py-2 sm:py-3 bg-[#4ade80] text-gray-900 font-black text-xs sm:text-sm uppercase tracking-wide rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[4px_4px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] sm:hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all w-full sm:w-auto"
+							class="group relative px-4 sm:px-6 py-2 sm:py-3 bg-[#4ade80] text-gray-900 font-black text-xs sm:text-sm uppercase tracking-wide rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-lg hover:shadow-[1px_1px_0_0_#1f2937] sm:hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all w-full sm:w-auto"
 						>
 							<span class="flex items-center justify-center gap-2">
 								<svg
@@ -264,7 +264,7 @@
 											<!-- Left: Status Indicator -->
 											<div class="flex items-center gap-2 sm:gap-3 md:gap-4">
 												<div
-													class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-900 flex items-center justify-center border-2 border-gray-900 shadow-[2px_2px_0_0_#ffc480]"
+													class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-900 flex items-center justify-center border-2 border-gray-900 shadow-brutal-accent-sm"
 												>
 													<svg
 														class="w-5 h-5 sm:w-6 sm:h-6 text-brand-accent"
@@ -376,7 +376,7 @@
 			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
 		>
 			<div
-				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full relative overflow-hidden"
+				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-md w-full relative overflow-hidden"
 			>
 				<!-- Header Strip -->
 				<div
@@ -387,7 +387,7 @@
 					<!-- Warning Icon -->
 					<div class="flex justify-center mb-4">
 						<div
-							class="w-14 h-14 rounded-xl bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center"
+							class="w-14 h-14 rounded-xl bg-brand-danger border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -425,7 +425,7 @@
 						</button>
 						<button
 							on:click={executeRevoke}
-							class="flex-1 px-4 py-3 text-xs font-black text-white bg-brand-danger rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+							class="flex-1 px-4 py-3 text-xs font-black text-white bg-brand-danger rounded-lg border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 						>
 							Revoke Key
 						</button>

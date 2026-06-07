@@ -114,7 +114,7 @@
 	     breathing room against the neobrutalist border so wide
 	     templates don't visually touch the frame corners. -->
 	<div
-		class="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border-[3px] border-gray-900 bg-[#f5f0e6] p-4 shadow-[6px_6px_0_0_#1f2937]"
+		class="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border-[3px] border-gray-900 bg-[#f5f0e6] p-4 shadow-brutal-xl"
 		aria-live="off"
 	>
 		{#if dataUrl}
@@ -131,19 +131,19 @@
 			<img
 				src={dataUrl}
 				alt="Live template preview"
-				class="block h-auto w-auto max-h-full max-w-full rounded-md border-[2px] border-gray-900 bg-white object-contain shadow-[3px_3px_0_0_#1f2937]"
+				class="block h-auto w-auto max-h-full max-w-full rounded-md border-[2px] border-gray-900 bg-white object-contain shadow-brutal-md"
 				style="aspect-ratio: {width} / {height};"
 			/>
 		{:else if loading}
 			<div class="flex flex-col items-center gap-3 text-gray-500">
-				<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-[3px_3px_0_0_#1f2937]">
+				<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-brutal-md">
 					<i class="fa fa-hourglass-half text-gray-900"></i>
 				</div>
 				<span class="text-[11px] font-black uppercase tracking-widest">Rendering…</span>
 			</div>
 		{:else if !html}
 			<div class="flex max-w-xs flex-col items-center gap-3 text-center">
-				<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-[3px_3px_0_0_#1f2937]">
+				<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-brutal-md">
 					<i class="fa fa-eye text-lg text-gray-900"></i>
 				</div>
 				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900">
@@ -160,7 +160,7 @@
 
 		{#if loading && dataUrl}
 			<div
-				class="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-brand-accent px-2 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+				class="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-brand-accent px-2 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 			>
 				<i class="fa fa-rotate-right fa-spin text-[9px]"></i>
 				Rendering
@@ -171,19 +171,19 @@
 	<!-- Status footer — pill chips matching the dashboard's filter chips -->
 	<div class="flex flex-wrap items-center gap-2" role="status" aria-live="polite">
 		<span
-			class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+			class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 		>
 			<i class="fa fa-expand text-[10px]"></i>
 			{width} × {height}
 		</span>
 		<span
-			class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+			class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 		>
 			{format}
 		</span>
 		{#if totalMs > 0}
 			<span
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 			>
 				<i class="fa fa-clock text-[10px]"></i>
 				{(totalMs / 1000).toFixed(2)}s
@@ -200,7 +200,7 @@
 
 		{#if status === 'error'}
 			<span
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-brand-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937]"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-brand-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-brutal-sm"
 			>
 				<i class="fa fa-triangle-exclamation text-[10px]"></i>
 				{error}
@@ -208,13 +208,13 @@
 			<button
 				type="button"
 				on:click={retry}
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 			>
 				Retry
 			</button>
 		{:else if status === 'ok'}
 			<span
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-[#4ade80] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-[#4ade80] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 			>
 				<span class="relative flex h-2 w-2">
 					<span class="relative inline-flex h-2 w-2 rounded-full border-[1.5px] border-gray-900 bg-[#22c55e]"></span>

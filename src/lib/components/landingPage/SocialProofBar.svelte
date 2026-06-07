@@ -13,7 +13,7 @@
 		<div class="flex flex-wrap justify-center gap-4 mb-6">
 			{#each stats as stat}
 				<div
-					class="flex items-center gap-3 px-5 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 transition-transform"
+					class="flex items-center gap-3 px-5 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:-translate-y-0.5 transition-transform"
 				>
 					<span class="font-black text-2xl text-gray-900">{stat.value}</span>
 					<span class="text-sm font-bold text-gray-500 uppercase">{stat.label}</span>

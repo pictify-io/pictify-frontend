@@ -58,7 +58,7 @@
 		<div class="grid lg:grid-cols-3 gap-8">
 			<!-- Card 1: Marketing ROI -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-[12px_12px_0_0_#1f2937] transition-all"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-brutal-3xl transition-all"
 			>
 				<div
 					class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
@@ -126,7 +126,7 @@
 
 			<!-- Card 2: Performance/Speed -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-[12px_12px_0_0_#1f2937] transition-all"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-brutal-3xl transition-all"
 			>
 				<div
 					class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
@@ -181,7 +181,7 @@
 
 			<!-- Card 3: Dev Efficiency -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-[12px_12px_0_0_#1f2937] transition-all"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-brutal-3xl transition-all"
 			>
 				<div
 					class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"

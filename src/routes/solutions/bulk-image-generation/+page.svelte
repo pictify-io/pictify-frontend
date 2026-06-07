@@ -63,7 +63,7 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#4ade80]/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-[#4ade80]/20 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 		</div>
@@ -97,25 +97,25 @@
 			When bulk rendering is the right tool
 		</h2>
 		<div class="grid md:grid-cols-2 gap-5">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Campaign launches</h3>
 				<p class="text-gray-700">
 					New feature ships; every user gets a personalized announcement graphic. 40,000 users, 40,000 images. Render the batch, email the URLs.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Catalog backfills</h3>
 				<p class="text-gray-700">
 					Existing e-commerce catalog that never had OG images per product. One batch POST, every product has a rendered card. Store the URLs on the product records.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Certificate runs</h3>
 				<p class="text-gray-700">
 					Course cohort completes; every graduate gets a certificate. The batch lists all 500 graduates with their names and dates. Output is 500 PDF + 500 PNG ready to email.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Monthly reports</h3>
 				<p class="text-gray-700">
 					End of month; render a dashboard summary image per customer from their usage data. Batch of N customers, one webhook, newsletter pipeline picks up the URLs.
@@ -128,7 +128,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			Batch render example
 		</h2>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-6">
+		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden mb-6">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
@@ -199,7 +199,7 @@ const { jobId } = await response.json();
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

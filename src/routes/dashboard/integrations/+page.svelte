@@ -119,9 +119,9 @@
 				<button
 					disabled={item.comingSoon}
 					on:click={() => handleCardClick(item)}
-					class="group text-left h-full relative bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[6px_6px_0_0_#1f2937] transition-all duration-200 flex flex-col {item.comingSoon
+					class="group text-left h-full relative bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-brutal-xl transition-all duration-200 flex flex-col {item.comingSoon
 						? 'opacity-75 cursor-not-allowed'
-						: 'hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px]'}"
+						: 'hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px]'}"
 				>
 					<!-- Icon Badge -->
 					<div class="mb-6 flex justify-between items-start w-full">

@@ -235,7 +235,7 @@
 	     tabs rather than a foreign surface. -->
 	<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 		<div class="flex items-center gap-2">
-			<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+			<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 				<i class="fa fa-wand-magic-sparkles text-[12px] text-gray-900"></i>
 			</div>
 			<div>
@@ -249,7 +249,7 @@
 				on:click={resetConversation}
 				title="Clear conversation"
 				aria-label="Clear conversation"
-				class="flex h-8 items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+				class="flex h-8 items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 			>
 				<i class="fa fa-arrows-rotate text-[10px]"></i>
 				Reset
@@ -262,7 +262,7 @@
 	<div bind:this={scrollArea} class="flex-1 overflow-y-auto px-6 py-4">
 		{#if turns.length === 0}
 			<div class="flex h-full flex-col items-center justify-center gap-4 py-10 text-center">
-				<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-[3px_3px_0_0_#1f2937]">
+				<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffe066] shadow-brutal-md">
 					<i class="fa fa-wand-magic-sparkles text-lg text-gray-900"></i>
 				</div>
 				<p class="text-[12px] font-black uppercase tracking-widest text-gray-900">
@@ -276,7 +276,7 @@
 						<button
 							type="button"
 							on:click={() => seedPrompt(qp)}
-							class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-left text-[11px] font-bold text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#ffe066] hover:shadow-none"
+							class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-left text-[11px] font-bold text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#ffe066] hover:shadow-none"
 						>
 							{qp}
 						</button>
@@ -294,7 +294,7 @@
 						</div>
 					{:else}
 						<div class="flex justify-start">
-							<div class="max-w-[90%] rounded-xl rounded-tl-sm border-[2px] border-gray-900 bg-white px-4 py-3 text-[12px] leading-relaxed text-gray-900 shadow-[3px_3px_0_0_#1f2937]">
+							<div class="max-w-[90%] rounded-xl rounded-tl-sm border-[2px] border-gray-900 bg-white px-4 py-3 text-[12px] leading-relaxed text-gray-900 shadow-brutal-md">
 								<div class="mb-1 flex items-center gap-2">
 									<span class="text-[9px] font-black uppercase tracking-widest text-gray-500">Copilot</span>
 									{#if turn.pending}
@@ -354,7 +354,7 @@
 				<button
 					type="button"
 					on:click={applyPending}
-					class="flex-1 rounded-md border-[2px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-white text-gray-900' : 'bg-[#4ade80] text-gray-900'} px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="flex-1 rounded-md border-[2px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-white text-gray-900' : 'bg-[#4ade80] text-gray-900'} px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-brutal-md transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					<i class="fa fa-check mr-1 text-[10px]"></i>
 					{pendingWarnings.length > 0 ? 'Apply anyway' : 'Apply to editor'}
@@ -362,7 +362,7 @@
 				<button
 					type="button"
 					on:click={() => { pendingApplyHtml = null; pendingWarnings = []; }}
-					class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					Skip
 				</button>
@@ -390,7 +390,7 @@
 				<button
 					type="button"
 					on:click={stop}
-					class="flex items-center gap-2 rounded-md border-[2px] border-gray-900 bg-brand-danger px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="flex items-center gap-2 rounded-md border-[2px] border-gray-900 bg-brand-danger px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-brutal-md transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					<i class="fa fa-stop text-[10px]"></i>
 					Stop

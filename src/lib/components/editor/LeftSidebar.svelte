@@ -31,8 +31,8 @@
 		<button
 			class="w-10 h-10 flex flex-col items-center justify-center mb-4 rounded-lg transition-all duration-200 group relative border-[2px]
 			{$activeSidebarTab === tab.id
-				? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#ffc480] translate-x-[1px] translate-y-[1px]'
-				: 'bg-white text-gray-900 border-gray-900 hover:bg-brand-accent shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}"
+				? 'bg-gray-900 text-white border-gray-900 shadow-brutal-accent-sm translate-x-[1px] translate-y-[1px]'
+				: 'bg-white text-gray-900 border-gray-900 hover:bg-brand-accent shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}"
 			on:click={() => setActive(tab.id)}
 			title={tab.label}
 		>
@@ -45,7 +45,7 @@
 
 	<!-- Figma Import - Prominent standalone button -->
 	<button
-		class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group relative border-[2px] bg-[#a259ff] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] hover:brightness-110"
+		class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group relative border-[2px] bg-[#a259ff] border-gray-900 shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] hover:brightness-110"
 		on:click={openFigmaImport}
 		title="Import from Figma"
 	>

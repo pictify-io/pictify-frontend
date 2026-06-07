@@ -35,7 +35,7 @@
 <!-- Programmatic Usage Section -->
 <section class="mt-20">
 	<div class="text-center mb-12">
-		<div class="inline-block bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform rotate-1 rounded-lg">
+		<div class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg">
 			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 		</div>
 		<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
@@ -65,7 +65,7 @@
 		</div>
 
 		<!-- Code Snippet -->
-		<div class="bg-[#1e1e1e] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#1e1e1e] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
@@ -88,7 +88,7 @@
 			<a
 				href="/signup"
 				on:click={handleSignupClick}
-				class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Get API Key
 			</a>
@@ -96,7 +96,7 @@
 				href="https://docs.pictify.io"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Read API Docs
 			</a>

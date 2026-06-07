@@ -478,7 +478,7 @@
 						{isSending
 							? 'bg-gray-200 text-gray-600'
 							: canSend
-								? 'bg-brand-accent text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
+								? 'bg-brand-accent text-gray-900 shadow-brutal-md hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed'}"
 				>
 					{#if isSending}
@@ -744,7 +744,7 @@
 		<!-- Response card — dominant, tabbed -->
 		<section class="px-5 pb-6 pt-4">
 			<div
-				class="overflow-hidden rounded-lg border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#1f2937]"
+				class="overflow-hidden rounded-lg border-[3px] border-gray-900 bg-white shadow-brutal-lg"
 			>
 				<!-- Tab bar + status -->
 				<div
@@ -875,7 +875,7 @@
 										<button
 											type="button"
 											on:click={retryImgManually}
-											class="inline-flex items-center gap-1 rounded-md border-[2px] border-gray-900 bg-brand-accent px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+											class="inline-flex items-center gap-1 rounded-md border-[2px] border-gray-900 bg-brand-accent px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-md"
 										>
 											<i class="fa fa-rotate-right text-[9px]"></i>
 											Retry
