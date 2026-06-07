@@ -84,13 +84,26 @@
 				class="relative"
 				on:mouseenter={() => (showSolutionsDropdown = true)}
 				on:mouseleave={() => (showSolutionsDropdown = false)}
+				on:focusout={(e) => {
+					if (!e.currentTarget.contains(e.relatedTarget)) showSolutionsDropdown = false;
+				}}
 			>
 				<button
 					class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide flex items-center gap-1"
 					on:click={() => (showSolutionsDropdown = !showSolutionsDropdown)}
+					on:keydown={(e) => e.key === 'Escape' && (showSolutionsDropdown = false)}
+					aria-expanded={showSolutionsDropdown}
+					aria-haspopup="true"
 				>
 					Solutions
-					<svg class="w-3 h-3 transition-transform" class:rotate-180={showSolutionsDropdown} fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+					<svg
+						class="w-3 h-3 transition-transform"
+						class:rotate-180={showSolutionsDropdown}
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2.5"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
 					</svg>
 				</button>
@@ -103,67 +116,138 @@
 						<a
 							href="/dynamic-images"
 							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
-							on:click={() => { showSolutionsDropdown = false; trackNav('Dynamic Images', '/dynamic-images', 'header'); }}
+							on:click={() => {
+								showSolutionsDropdown = false;
+								trackNav('Dynamic Images', '/dynamic-images', 'header');
+							}}
 						>
-							<div class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-								<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+							<div
+								class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+							>
+								<svg
+									class="w-4 h-4 text-gray-900"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+									/>
 								</svg>
 							</div>
 							<div>
 								<span class="block text-sm font-black text-gray-900">Dynamic Images</span>
-								<span class="block text-xs text-gray-500 mt-0.5">Auto-updating images from live data</span>
+								<span class="block text-xs text-gray-500 mt-0.5"
+									>Auto-updating images from live data</span
+								>
 							</div>
 						</a>
 						<a
 							href="/email-personalization"
 							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
-							on:click={() => { showSolutionsDropdown = false; trackNav('Email Personalization', '/email-personalization', 'header'); }}
+							on:click={() => {
+								showSolutionsDropdown = false;
+								trackNav('Email Personalization', '/email-personalization', 'header');
+							}}
 						>
-							<div class="w-8 h-8 bg-[#ff6b6b]/15 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-								<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+							<div
+								class="w-8 h-8 bg-[#ff6b6b]/15 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+							>
+								<svg
+									class="w-4 h-4 text-gray-900"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+									/>
 								</svg>
 							</div>
 							<div>
 								<span class="block text-sm font-black text-gray-900">Email Personalization</span>
-								<span class="block text-xs text-gray-500 mt-0.5">Personalized images in every email</span>
+								<span class="block text-xs text-gray-500 mt-0.5"
+									>Personalized images in every email</span
+								>
 							</div>
 						</a>
 						<a
 							href="/experiments"
 							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
-							on:click={() => { showSolutionsDropdown = false; trackNav('Experiments', '/experiments', 'header'); }}
+							on:click={() => {
+								showSolutionsDropdown = false;
+								trackNav('Experiments', '/experiments', 'header');
+							}}
 						>
-							<div class="w-8 h-8 bg-[#4ade80]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-								<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+							<div
+								class="w-8 h-8 bg-[#4ade80]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+							>
+								<svg
+									class="w-4 h-4 text-gray-900"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/>
 								</svg>
 							</div>
 							<div>
 								<span class="block text-sm font-black text-gray-900">Experiments</span>
-								<span class="block text-xs text-gray-500 mt-0.5">A/B test, smart links & auto-optimize</span>
+								<span class="block text-xs text-gray-500 mt-0.5"
+									>A/B test, smart links & auto-optimize</span
+								>
 							</div>
 						</a>
 						<a
 							href="/visual-analytics"
 							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
-							on:click={() => { showSolutionsDropdown = false; trackNav('Visual Analytics', '/visual-analytics', 'header'); }}
+							on:click={() => {
+								showSolutionsDropdown = false;
+								trackNav('Visual Analytics', '/visual-analytics', 'header');
+							}}
 						>
-							<div class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-								<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+							<div
+								class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+							>
+								<svg
+									class="w-4 h-4 text-gray-900"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+									/>
 								</svg>
 							</div>
 							<div>
 								<span class="block text-sm font-black text-gray-900">Visual Analytics</span>
-								<span class="block text-xs text-gray-500 mt-0.5">Track, measure & optimize performance</span>
+								<span class="block text-xs text-gray-500 mt-0.5"
+									>Track, measure & optimize performance</span
+								>
 							</div>
 						</a>
 						<a
 							href="/solutions"
 							class="block px-5 py-3 bg-gray-50 text-center text-xs font-black uppercase tracking-widest text-gray-700 hover:text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
-							on:click={() => { showSolutionsDropdown = false; trackNav('View all solutions', '/solutions', 'header'); }}
+							on:click={() => {
+								showSolutionsDropdown = false;
+								trackNav('View all solutions', '/solutions', 'header');
+							}}
 						>
 							View all solutions →
 						</a>
@@ -279,25 +363,50 @@
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackNav('Pricing', '/pricing', 'mobile_menu')}>Pricing</a
 			>
-			<div class="border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl overflow-hidden">
-				<p class="px-4 pt-3 pb-1 text-xs font-black text-gray-400 uppercase tracking-widest">Solutions</p>
+			<div
+				class="border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl overflow-hidden"
+			>
+				<p class="px-4 pt-3 pb-1 text-xs font-black text-gray-400 uppercase tracking-widest">
+					Solutions
+				</p>
 				<a
 					href="/dynamic-images"
 					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
 					on:click={() => trackNav('Dynamic Images', '/dynamic-images', 'mobile_menu')}
 				>
-					<svg class="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+					<svg
+						class="w-5 h-5 text-gray-700 flex-shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+						/>
 					</svg>
 					Dynamic Images
 				</a>
 				<a
 					href="/email-personalization"
 					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
-					on:click={() => trackNav('Email Personalization', '/email-personalization', 'mobile_menu')}
+					on:click={() =>
+						trackNav('Email Personalization', '/email-personalization', 'mobile_menu')}
 				>
-					<svg class="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+					<svg
+						class="w-5 h-5 text-gray-700 flex-shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+						/>
 					</svg>
 					Email Personalization
 				</a>
@@ -306,8 +415,18 @@
 					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
 					on:click={() => trackNav('Experiments', '/experiments', 'mobile_menu')}
 				>
-					<svg class="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+					<svg
+						class="w-5 h-5 text-gray-700 flex-shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+						/>
 					</svg>
 					Experiments
 				</a>
@@ -316,8 +435,18 @@
 					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
 					on:click={() => trackNav('Visual Analytics', '/visual-analytics', 'mobile_menu')}
 				>
-					<svg class="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+					<svg
+						class="w-5 h-5 text-gray-700 flex-shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+						/>
 					</svg>
 					Visual Analytics
 				</a>

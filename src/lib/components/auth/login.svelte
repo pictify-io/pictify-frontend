@@ -260,7 +260,8 @@
 
 			{#if errorMessage}
 				<div
-					class="bg-[#ff6b6b]/10 border-2 border-[#ff6b6b] text-[#ff6b6b] p-3 rounded-xl font-bold flex items-center gap-2"
+					class="bg-[#ff6b6b]/10 border-2 border-[#ff6b6b] text-red-700 p-3 rounded-xl font-bold flex items-center gap-2"
+					role="alert"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

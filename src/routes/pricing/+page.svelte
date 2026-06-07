@@ -110,9 +110,7 @@
 			question: 'What happens if I exceed the monthly limit?',
 			answer: `All paid plans can enable <strong>overage billing</strong> to keep rendering beyond their limit. Basic: ${formatOverageRate(
 				PLANS.BASIC
-			)}/render, Pro: ${formatOverageRate(
-				PLANS.STANDARD
-			)}/render, Business: ${formatOverageRate(
+			)}/render, Pro: ${formatOverageRate(PLANS.STANDARD)}/render, Business: ${formatOverageRate(
 				PLANS.BUSINESS
 			)}/render. Set a monthly spending cap to control costs. Free tier users need to upgrade to continue.`,
 			isOpened: false
@@ -909,11 +907,18 @@
 
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						{#each FAQs as faq}
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
 							<div
 								class="group flex flex-col bg-white rounded-xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f2937] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937]"
+								role="button"
+								tabindex="0"
+								aria-expanded={faq.isOpened}
 								on:click={() => (faq.isOpened = !faq.isOpened)}
+								on:keydown={(e) => {
+									if (e.key === 'Enter' || e.key === ' ') {
+										e.preventDefault();
+										faq.isOpened = !faq.isOpened;
+									}
+								}}
 							>
 								<div class="flex items-start justify-between gap-4 p-6">
 									<h3 class="text-lg font-black text-gray-900 leading-tight pr-4">

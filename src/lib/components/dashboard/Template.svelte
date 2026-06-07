@@ -267,7 +267,7 @@
 			<!-- Create Button -->
 			<button
 				class="font-black py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] sm:hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[3px] sm:hover:translate-y-[3px] transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm
-				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-[#ff6b6b] hover:bg-[#ff5252] text-white'}"
+				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-[#ffc480] hover:bg-[#ffb968] text-gray-900'}"
 				on:click={openTemplateCreator}
 			>
 				{#if isAtTemplateLimit}
@@ -444,11 +444,7 @@
 	</div>
 
 	{#if showEnginePicker}
-		<EnginePicker
-			mode="modal"
-			on:select={handleEngineSelect}
-			on:close={handleCloseEnginePicker}
-		/>
+		<EnginePicker mode="modal" on:select={handleEngineSelect} on:close={handleCloseEnginePicker} />
 	{/if}
 
 	{#if showTemplateTypeSelector}
