@@ -1466,7 +1466,7 @@
 										</label>
 										<select
 											bind:value={createTemplateParams.outputFormat}
-											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none"
+											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-brutal-accent"
 										>
 											<option value="image">image</option>
 											<option value="pdf">pdf</option>

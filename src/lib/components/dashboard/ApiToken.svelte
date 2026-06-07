@@ -317,6 +317,7 @@
 													class="p-1.5 sm:p-2 hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"
 													on:click={() => copyToClipboard(token.token)}
 													title="Copy to clipboard"
+													aria-label="Copy API key to clipboard"
 												>
 													<img loading="lazy"
 														src={CopyIcon}

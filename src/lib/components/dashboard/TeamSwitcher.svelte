@@ -309,7 +309,7 @@
 						type="text"
 						bind:value={newTeamName}
 						placeholder="Acme Corp"
-						class="w-full px-3 py-2 text-sm font-bold border-[3px] border-gray-300 rounded-lg focus:border-gray-900 focus:outline-none mb-2"
+						class="w-full px-3 py-2 text-sm font-bold border-[3px] border-gray-300 rounded-lg focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent mb-2"
 						on:keydown={(e) => e.key === 'Enter' && handleCreateTeam()}
 					/>
 					{#if error}

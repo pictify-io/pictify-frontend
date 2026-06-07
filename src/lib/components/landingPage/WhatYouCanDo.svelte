@@ -80,12 +80,6 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10 box-border">
 		<!-- Header -->
 		<div class="text-center mb-20 max-w-3xl mx-auto">
-			<div
-				class="inline-block mb-4 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2"
-			>
-				<span class="font-bold text-sm text-black uppercase tracking-wider">The Engine</span>
-			</div>
-
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				What Makes It <br />
 				<span class="relative inline-block text-brand-danger">

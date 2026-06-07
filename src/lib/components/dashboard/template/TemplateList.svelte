@@ -474,6 +474,7 @@
 						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
 						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
 						title="Render with variables"
+						aria-label="Render with variables"
 					>
 						<svg
 							class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
@@ -496,6 +497,7 @@
 						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
 						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/bulk-render`)}
 						title="Batch render from CSV"
+						aria-label="Batch render from CSV"
 					>
 						<svg
 							class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
@@ -517,6 +519,7 @@
 							class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-[#a855f7] bg-[#a855f7]/10 hover:bg-[#a855f7]/20 transition-all duration-150"
 							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
 							title="View live link"
+							aria-label="View live link"
 						>
 							<svg
 								class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
@@ -540,6 +543,7 @@
 							class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-all duration-150"
 							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
 							title="Deploy as live link"
+							aria-label="Deploy as live link"
 						>
 							<svg
 								class="w-4 h-4 sm:w-[18px] sm:h-[18px]"

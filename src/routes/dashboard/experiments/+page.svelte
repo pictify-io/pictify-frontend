@@ -586,6 +586,7 @@
 												on:click|stopPropagation={() => confirmDelete(exp)}
 												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-brutal-md hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
 												title="Delete"
+												aria-label="Delete experiment"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 													><path
@@ -718,6 +719,7 @@
 													on:click|stopPropagation={() => handleStart(exp.uid)}
 													class="w-12 h-12 bg-[#4ade80] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Start"
+													aria-label="Start experiment"
 												>
 													<svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"
 														><path d="M8 5v14l11-7z" /></svg
@@ -728,6 +730,7 @@
 													on:click|stopPropagation={() => handlePause(exp.uid)}
 													class="w-12 h-12 bg-brand-accent text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Pause"
+													aria-label="Pause experiment"
 												>
 													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
 														><path d="M6 4h4v16H6zm8 0h4v16h-4z" /></svg
@@ -777,6 +780,7 @@
 				<button
 					class="text-gray-400 hover:text-white transition-colors"
 					on:click={closeDeleteConfirm}
+					aria-label="Close dialog"
 				>
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path

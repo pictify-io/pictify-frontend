@@ -488,7 +488,7 @@
 									id="teamName"
 									type="text"
 									bind:value={teamName}
-									class="w-full px-4 py-3 text-sm font-bold bg-white border-[3px] border-gray-300 rounded-xl focus:border-gray-900 focus:outline-none transition-colors placeholder-gray-300"
+									class="w-full px-4 py-3 text-sm font-bold bg-white border-[3px] border-gray-300 rounded-xl focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors placeholder-gray-300"
 									placeholder="Enter team name"
 								/>
 							</div>
@@ -601,7 +601,7 @@
 											type="email"
 											bind:value={inviteEmail}
 											placeholder="colleague@company.com"
-											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none transition-colors text-sm font-medium"
+											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors text-sm font-medium"
 											on:keydown={(e) => e.key === 'Enter' && handleInvite()}
 										/>
 									</div>

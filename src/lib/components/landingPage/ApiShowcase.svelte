@@ -64,7 +64,7 @@ const image = await pictify.render({
 		},
 		simple: {
 			title: 'Raw HTML',
-			description: 'Or just render HTML directly — no template needed',
+			description: 'Or just render HTML directly, no template needed',
 			icon: '🌐',
 			color: '#ff6b6b',
 			code: `curl -X POST https://api.pictify.io/image \\

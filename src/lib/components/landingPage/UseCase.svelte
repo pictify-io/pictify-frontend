@@ -80,7 +80,7 @@
 				<div class="text-center">
 					<h3 class="text-xl md:text-2xl font-bold text-gray-900">How It Works</h3>
 					<p class="mt-2 text-base md:text-lg text-gray-700">
-						Transform your HTML designs into production-ready images in 3 simple steps
+						Convert your HTML designs into production-ready images in 3 simple steps
 					</p>
 				</div>
 

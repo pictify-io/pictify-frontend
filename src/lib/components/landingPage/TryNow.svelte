@@ -115,7 +115,7 @@
 							>
 								<h4 class="font-black text-gray-900 text-base mb-2">What about my data?</h4>
 								<p class="text-sm text-gray-600 font-medium">
-									Your data is never stored. We render and return — that's it.
+									Your data is never stored. We render and return. That's it.
 								</p>
 							</div>
 							<div

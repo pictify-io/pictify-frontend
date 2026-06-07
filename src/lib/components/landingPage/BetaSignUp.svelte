@@ -19,7 +19,7 @@
 				/>
 				<input
 					type="text"
-					class="border-[3px] w-full relative z-20 border-gray-900 placeholder-gray-600 text-lg font-medium focus:outline-none py-3.5 px-6 rounded"
+					class="border-[3px] w-full relative z-20 border-gray-900 placeholder-gray-600 text-lg font-medium focus:outline-none focus:shadow-brutal-accent py-3.5 px-6 rounded"
 					placeholder="Email Address"
 				/>
 			</div>

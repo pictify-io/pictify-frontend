@@ -76,12 +76,6 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Main Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
-			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-xl rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
-			>
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Infrastructure</span>
-			</div>
-
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Plugs Into Your Stack.<br />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">

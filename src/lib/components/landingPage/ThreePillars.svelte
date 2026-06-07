@@ -30,7 +30,7 @@
 			id: 'scale',
 			icon: 'bolt',
 			title: 'Speed at Scale',
-			subtitle: 'Enterprise-grade infrastructure',
+			subtitle: 'Serverless rendering infrastructure',
 			color: 'bg-green-400',
 			features: [
 				{ title: 'Sub-500ms', desc: 'Average generation time' },

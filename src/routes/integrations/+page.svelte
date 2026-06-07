@@ -92,8 +92,8 @@
 			<h1
 				class="text-5xl sm:text-7xl font-black text-gray-900 tracking-tighter mb-8 max-w-4xl mx-auto leading-[0.9]"
 			>
-				Supercharge Your <br />
-				<span class="text-brand-danger decoration-clone">Workflow</span>
+				Connect Pictify to <br />
+				<span class="text-brand-danger decoration-clone">Your Stack</span>
 			</h1>
 
 			<!-- Description -->

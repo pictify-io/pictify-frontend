@@ -1250,7 +1250,7 @@
 												min="0"
 												max="10000"
 												bind:value={variant.weight}
-												class="w-16 bg-transparent text-sm font-black text-gray-900 text-right focus:outline-none"
+												class="w-16 bg-transparent text-sm font-black text-gray-900 text-right focus:outline-none focus:shadow-brutal-accent rounded"
 											/>
 											<span class="text-xs font-bold text-gray-400"> / 10000 </span>
 										</div>

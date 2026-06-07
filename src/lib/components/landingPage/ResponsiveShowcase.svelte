@@ -22,14 +22,6 @@
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-16 max-w-3xl mx-auto relative">
-			<div
-				class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform -rotate-1 hover:rotate-2 transition-transform cursor-default"
-			>
-				<span class="text-sm font-black text-gray-900 uppercase tracking-wider"
-					>Responsive Engine</span
-				>
-			</div>
-			
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template.<br />
 				<span class="relative inline-block text-[#3b82f6]">
@@ -44,7 +36,7 @@
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 font-medium">
-				Design once, generate images for Instagram, Twitter, LinkedIn, YouTube, and OG tags — all from a
+				Design once, generate images for Instagram, Twitter, LinkedIn, YouTube, and OG tags. All from a
 				single template with shared variables.
 			</p>
 		</div>

@@ -127,7 +127,7 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Just send raw data — the template's logic handles the rest. <span
+						Just send raw data. The template's logic handles the rest. <span
 							class="bg-red-100 px-1 border-b-2 border-red-300">200ms later</span
 						>, your visual is ready.
 						{#if activeStep === 1 && !isPaused}

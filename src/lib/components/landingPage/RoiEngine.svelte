@@ -39,11 +39,6 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Header -->
 		<div class="text-center mb-20">
-			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-[#1f2937] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] mb-6 transform -rotate-1"
-			>
-				<span class="text-sm font-bold text-white uppercase tracking-wider">Why Pictify?</span>
-			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				The ROI <br />
 				<span class="text-brand-danger">Engine.</span>

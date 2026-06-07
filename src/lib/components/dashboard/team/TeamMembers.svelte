@@ -430,7 +430,7 @@
 											type="email"
 											bind:value={inviteEmail}
 											placeholder="colleague@company.com"
-											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none transition-colors"
+											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors"
 											on:keydown={(e) => e.key === 'Enter' && handleInvite()}
 										/>
 									</div>

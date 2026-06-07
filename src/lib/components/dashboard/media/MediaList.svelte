@@ -379,6 +379,7 @@
 									on:click={(e) => copyToClipboard(media.url, e)}
 									class="bg-white rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Copy URL"
+									aria-label="Copy URL"
 								>
 									<svg
 										class="w-4 h-4 text-gray-900"
@@ -398,6 +399,7 @@
 									on:click={(e) => downloadMedia(media.url, e)}
 									class="bg-brand-danger rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Download"
+									aria-label="Download"
 								>
 									<svg
 										class="w-4 h-4 text-white"

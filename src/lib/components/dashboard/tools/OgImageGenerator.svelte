@@ -862,13 +862,14 @@
 												<div class="relative">
 													<input
 														type={showApiKey ? 'text' : 'password'}
-														class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg text-sm font-mono bg-white focus:border-gray-900 focus:outline-none transition-colors"
+														class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg text-sm font-mono bg-white focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors"
 														value={apiKey}
 														readonly
 													/>
 													<button
 														class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
 														on:click={() => (showApiKey = !showApiKey)}
+														aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
 													>
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
@@ -978,7 +979,7 @@
 
 															{#if param.name === 'template'}
 																<select
-																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none transition-colors bg-white cursor-pointer"
+																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors bg-white cursor-pointer"
 																	bind:value={settings[param.name]}
 																>
 																	<option value="">Select a template</option>
@@ -991,7 +992,7 @@
 															{:else}
 																<input
 																	type="text"
-																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none transition-colors"
+																	class="w-full px-4 py-2.5 border-[3px] border-gray-200 rounded-lg text-sm font-medium focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors"
 																	placeholder={param.description}
 																	bind:value={settings[param.name]}
 																/>

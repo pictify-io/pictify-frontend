@@ -387,6 +387,7 @@
 								on:click={() => handleDelete(connector.uid)}
 								class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
 								title="Delete"
+								aria-label="Delete connector"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
@@ -437,6 +438,7 @@
 					<button
 						on:click={closeModal}
 						class="p-1.5 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						aria-label="Close dialog"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -581,14 +583,14 @@
 												type="password"
 												bind:value={newConnector.credentials[key]}
 												required
-												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent"
 											/>
 										{:else}
 											<input
 												type="text"
 												bind:value={newConnector.credentials[key]}
 												required
-												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent"
 											/>
 										{/if}
 									</div>
@@ -610,7 +612,7 @@
 											type="text"
 											bind:value={newConnector.config[key]}
 											required={opts.required}
-											class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+											class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent"
 										/>
 									</div>
 								{/each}

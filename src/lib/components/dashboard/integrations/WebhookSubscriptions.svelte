@@ -364,6 +364,7 @@
 										on:click={() => handlePause(sub.uid)}
 										class="p-2 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors border-2 border-transparent hover:border-yellow-900"
 										title="Pause"
+										aria-label="Pause webhook"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -379,6 +380,7 @@
 										on:click={() => handleResume(sub.uid)}
 										class="p-2 text-green-700 hover:bg-green-100 rounded-lg transition-colors border-2 border-transparent hover:border-green-900"
 										title="Resume"
+										aria-label="Resume webhook"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -400,6 +402,7 @@
 									on:click={() => handleDelete(sub.uid)}
 									class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors border-2 border-transparent hover:border-red-900"
 									title="Delete"
+									aria-label="Delete webhook"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -451,6 +454,7 @@
 					<button
 						on:click={closeModal}
 						class="p-1.5 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						aria-label="Close dialog"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -504,6 +508,7 @@
 								<button
 									on:click={() => navigator.clipboard.writeText(createdSecret)}
 									class="p-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 border-2 border-gray-900 shadow-[3px_3px_0_0_#ffc480] hover:shadow-[1px_1px_0_0_#ffc480] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+									aria-label="Copy webhook secret"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
