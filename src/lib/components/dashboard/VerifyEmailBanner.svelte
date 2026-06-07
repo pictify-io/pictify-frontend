@@ -62,7 +62,7 @@
 	}
 </script>
 
-<div class="bg-[#ffc480] border-t-[3px] border-b-[3px] border-gray-900">
+<div class="bg-brand-accent border-t-[3px] border-b-[3px] border-gray-900">
 	<button
 		type="button"
 		class="w-full text-left px-5 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between focus:outline-none focus-visible:ring-4 focus-visible:ring-gray-900 disabled:opacity-80 group"
@@ -93,7 +93,7 @@
 			</p>
 		</div>
 		<div
-			class="flex items-center gap-2 text-sm font-black text-gray-900 bg-white px-5 py-2.5 rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] group-hover:shadow-[2px_2px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all uppercase tracking-wide"
+			class="flex items-center gap-2 text-sm font-black text-gray-900 bg-white px-5 py-2.5 rounded-lg border-[3px] border-gray-900 shadow-brutal-lg group-hover:shadow-brutal-sm group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all uppercase tracking-wide"
 		>
 			{#if isLoading()}
 				<span class="inline-flex items-center gap-2">

@@ -5,7 +5,7 @@
 			icon: 'code',
 			title: 'Fully Programmable',
 			subtitle: 'API-first workflow for teams',
-			color: 'bg-[#ffc480]',
+			color: 'bg-brand-accent',
 			features: [
 				{ title: 'RESTful API', desc: 'Simple HTTP calls to generate any image' },
 				{ title: 'Template Variables', desc: 'Inject dynamic data into your designs' },
@@ -18,7 +18,7 @@
 			icon: 'image',
 			title: 'Visual Power',
 			subtitle: 'Pixel-perfect rendering every time',
-			color: 'bg-[#ff6b6b]',
+			color: 'bg-brand-danger',
 			features: [
 				{ title: 'Full CSS Support', desc: 'Flexbox, Grid, animations, custom fonts' },
 				{ title: 'Retina Ready', desc: '4K resolution with custom DPI' },
@@ -30,7 +30,7 @@
 			id: 'scale',
 			icon: 'bolt',
 			title: 'Speed at Scale',
-			subtitle: 'Enterprise-grade infrastructure',
+			subtitle: 'Serverless rendering infrastructure',
 			color: 'bg-green-400',
 			features: [
 				{ title: 'Sub-500ms', desc: 'Average generation time' },
@@ -86,7 +86,7 @@
 		<!-- Section Header -->
 		<div class="text-center mb-16">
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				What Makes Pictify <span class="text-[#ff6b6b]">Different</span>
+				What Makes Pictify <span class="text-brand-danger">Different</span>
 			</h2>
 			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
 				Designers design. Devs integrate. Everyone ships.
@@ -97,15 +97,15 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(250px,auto)]">
 			<!-- Cell 1: Programmable (Large, spans 2 cols) -->
 			<div
-				class="md:col-span-2 bg-[#FFFDF8] rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-0 transform {visible
+				class="md:col-span-2 bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-0 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>
-				<div class="absolute inset-0 bg-[#ffc480]/10" />
+				<div class="absolute inset-0 bg-brand-accent/10" />
 				<div class="p-8 h-full flex flex-col md:flex-row gap-8 items-center">
 					<div class="flex-1 z-10">
 						<div
-							class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] rounded-full border-2 border-gray-900 text-xs font-bold mb-4"
+							class="inline-flex items-center gap-2 px-3 py-1 bg-brand-accent rounded-full border-2 border-gray-900 text-xs font-bold mb-4"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -161,15 +161,15 @@
 
 			<!-- Cell 2: Visual Power (Tall) -->
 			<div
-				class="md:row-span-2 bg-[#FFFDF8] rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-150 transform {visible
+				class="md:row-span-2 bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-150 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>
-				<div class="absolute inset-0 bg-[#ff6b6b]/10" />
+				<div class="absolute inset-0 bg-brand-danger/10" />
 				<div class="p-8 h-full flex flex-col">
 					<div class="z-10">
 						<div
-							class="inline-flex items-center gap-2 px-3 py-1 bg-[#ff6b6b] rounded-full border-2 border-gray-900 text-xs font-bold mb-4"
+							class="inline-flex items-center gap-2 px-3 py-1 bg-brand-danger rounded-full border-2 border-gray-900 text-xs font-bold mb-4"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -197,12 +197,12 @@
 							<span class="font-bold text-gray-300 text-4xl">BG</span>
 						</div>
 						<div
-							class="w-40 h-48 bg-white/80 border-2 border-gray-900 rounded-lg shadow-sm absolute top-4 left-1/2 -translate-x-1/2 transform translate-z-10 group-hover:translate-y-0 transition-transform duration-500 z-20 flex items-center justify-center backdrop-blur-sm"
+							class="w-40 h-48 bg-white/80 border-2 border-gray-900 rounded-lg shadow-sm absolute top-4 left-1/2 -translate-x-1/2 transform translate-z-10 group-hover:translate-y-0 transition-transform duration-500 z-20 flex items-center justify-center"
 						>
 							<span class="font-bold text-gray-400 text-4xl">IMG</span>
 						</div>
 						<div
-							class="w-40 h-48 bg-white/60 border-2 border-gray-900 rounded-lg shadow-sm absolute top-8 left-1/2 -translate-x-1/2 transform translate-z-20 group-hover:-translate-y-4 transition-transform duration-500 z-30 flex items-center justify-center backdrop-blur-sm"
+							class="w-40 h-48 bg-white/60 border-2 border-gray-900 rounded-lg shadow-sm absolute top-8 left-1/2 -translate-x-1/2 transform translate-z-20 group-hover:-translate-y-4 transition-transform duration-500 z-30 flex items-center justify-center"
 						>
 							<span class="font-bold text-gray-900 text-4xl">TXT</span>
 						</div>
@@ -212,7 +212,7 @@
 
 			<!-- Cell 3: Speed (Medium) -->
 			<div
-				class="bg-[#FFFDF8] rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-300 transform {visible
+				class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-300 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>
@@ -244,7 +244,7 @@
 
 			<!-- Cell 4: Scale (Medium) -->
 			<div
-				class="bg-[#FFFDF8] rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-450 transform {visible
+				class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-450 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>

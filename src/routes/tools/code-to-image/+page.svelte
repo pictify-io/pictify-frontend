@@ -922,7 +922,7 @@
 	})}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -930,10 +930,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -942,7 +942,7 @@
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -963,7 +963,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					★ Free Tool
 				</div>
@@ -977,7 +977,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h1>
@@ -988,7 +988,7 @@
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
 					Create beautiful, <span
-						class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black"
+						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>syntax-highlighted</span
 					>
 					code screenshots.
@@ -1008,7 +1008,7 @@
 		<div class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 lg:gap-8 items-start">
 			<!-- Left Column: Controls -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] lg:shadow-[8px_8px_0_0_#000] lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1"
+				class="bg-white border-[3px] border-black shadow-brutal-xl lg:shadow-brutal-2xl lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1"
 			>
 				<!-- Terminal Header -->
 				<div
@@ -1018,9 +1018,9 @@
 						<span class="animate-pulse">_</span> CONFIG
 					</h2>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-[#ff6b6b] border border-black" />
-						<div class="w-3 h-3 bg-[#ffc480] border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-brand-danger border border-black" />
+						<div class="w-3 h-3 bg-brand-accent border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 				<div
@@ -1038,7 +1038,7 @@
 								<div class="relative">
 									<select
 										id="language"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
 										bind:value={language}
 										on:change={() => {
 											/* update filename via reactive */
@@ -1072,7 +1072,7 @@
 								<div class="relative">
 									<select
 										id="theme"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
 										bind:value={themeId}
 									>
 										{#each themeOptions as opt}
@@ -1103,7 +1103,7 @@
 								<div class="relative">
 									<select
 										id="font"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
 										bind:value={fontId}
 									>
 										{#each fontOptions as opt}
@@ -1139,7 +1139,7 @@
 								<div class="relative">
 									<select
 										id="backdrop"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
 										bind:value={backdrop}
 									>
 										{#each backdropOptions as option}
@@ -1171,13 +1171,13 @@
 									<div class="flex items-center gap-2">
 										<input
 											id="solidBg"
-											class="h-10 w-full border-[3px] border-black cursor-pointer shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
+											class="h-10 w-full border-[3px] border-black cursor-pointer shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
 											type="color"
 											bind:value={solidBackground}
 										/>
 										<input
 											type="text"
-											class="w-24 border-[3px] border-black p-2 text-sm font-mono shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+											class="w-24 border-[3px] border-black p-2 text-sm font-mono shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 											bind:value={solidBackground}
 										/>
 									</div>
@@ -1193,7 +1193,7 @@
 										>
 										<input
 											id="gradientStart"
-											class="h-8 w-full border-[3px] border-black cursor-pointer shadow-[2px_2px_0_0_#000]"
+											class="h-8 w-full border-[3px] border-black cursor-pointer shadow-brutal-sm"
 											type="color"
 											bind:value={customGradientStart}
 										/>
@@ -1206,7 +1206,7 @@
 										>
 										<input
 											id="gradientEnd"
-											class="h-8 w-full border-[3px] border-black cursor-pointer shadow-[2px_2px_0_0_#000]"
+											class="h-8 w-full border-[3px] border-black cursor-pointer shadow-brutal-sm"
 											type="color"
 											bind:value={customGradientEnd}
 										/>
@@ -1247,7 +1247,7 @@
 										name="chrome"
 										id="chrome"
 										bind:checked={showWindowChrome}
-										class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-[#ff6b6b]"
+										class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-danger"
 									/>
 									<label
 										for="chrome"
@@ -1269,7 +1269,7 @@
 										name="lineNumbers"
 										id="lineNumbers"
 										bind:checked={showLineNumbers}
-										class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-[#ff6b6b]"
+										class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-danger"
 									/>
 									<label
 										for="lineNumbers"
@@ -1287,7 +1287,7 @@
 								class="text-xs font-black text-black uppercase tracking-widest flex items-center gap-2 pb-2 border-b-[2px] border-black"
 							>
 								<span
-									class="w-5 h-5 bg-[#ffc480] border-[2px] border-black flex items-center justify-center text-xs"
+									class="w-5 h-5 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
 									>⚙</span
 								>
 								Advanced Styling
@@ -1417,7 +1417,7 @@
 			<div class="space-y-4 sm:space-y-6 order-1 lg:order-2">
 				<!-- Editor Area -->
 				<div
-					class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] overflow-hidden"
+					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden"
 				>
 					<!-- Terminal Header -->
 					<div
@@ -1425,16 +1425,16 @@
 					>
 						<div class="flex items-center gap-2">
 							<div class="flex gap-1.5 sm:gap-2 mr-2 sm:mr-4">
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#ff6b6b] border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#ffc480] border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#4ade80] border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-danger border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-accent border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-data-green border border-black" />
 							</div>
 							<span class="font-mono text-[10px] sm:text-xs tracking-widest uppercase"
 								>~ code_editor</span
 							>
 						</div>
 						<button
-							class="px-2 sm:px-3 py-1 bg-[#ff6b6b] hover:bg-[#ff5252] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="px-2 sm:px-3 py-1 bg-brand-danger hover:bg-data-red text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							on:click={() => {
 								code = sampleCode[language] || '';
 								isUsingSample = true;
@@ -1471,7 +1471,7 @@
 								<span class="text-[10px] font-bold text-black uppercase tracking-wider">SIZE:</span>
 								<input
 									type="number"
-									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-[#ff6b6b]"
+									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-brand-danger"
 									bind:value={previewWidth}
 									min="400"
 									max="1600"
@@ -1484,7 +1484,7 @@
 								<span class="font-bold text-xs">×</span>
 								<input
 									type="number"
-									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-[#ff6b6b]"
+									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-brand-danger"
 									bind:value={previewHeight}
 									min="300"
 									max="1200"
@@ -1501,7 +1501,7 @@
 					<button
 						on:click={generateImage}
 						disabled={isGenerating}
-						class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-4 sm:px-8 py-2.5 sm:py-3 border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
+						class="bg-brand-danger hover:bg-data-red text-white px-4 sm:px-8 py-2.5 sm:py-3 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
 					>
 						{#if isGenerating}
 							<svg
@@ -1584,10 +1584,10 @@
 							</div>
 						{:else if generatedImage}
 							<div class="flex items-center justify-center w-full h-full p-4 sm:p-8">
-								<img
+								<img loading="lazy"
 									src={generatedImage.url}
 									alt="Generated output"
-									class="max-w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000]"
+									class="max-w-full h-auto border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl"
 								/>
 							</div>
 						{/if}
@@ -1596,7 +1596,7 @@
 					<!-- Action bar below preview (only when image is generated) -->
 					{#if generatedImage}
 						<div
-							class="bg-[#4ade80] border-t-[3px] border-black px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
+							class="bg-data-green border-t-[3px] border-black px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
 						>
 							<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black"
 								>✓ Image generated</span
@@ -1605,7 +1605,7 @@
 								<a
 									href={generatedImage.url}
 									target="_blank"
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>Open in Tab</a
 								>
 								<button
@@ -1662,9 +1662,9 @@
 		<div class="max-w-5xl mx-auto px-0 mt-12 sm:mt-16 lg:mt-20">
 			<!-- Separator -->
 			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-[#FFFDF8] px-4 sm:px-6">
+				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
 					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
 					>
 						<span class="font-black text-sm sm:text-lg">?</span>
 					</div>
@@ -1678,7 +1678,7 @@
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-2 sm:px-4">CODE TO IMAGE</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h2>
@@ -1692,7 +1692,7 @@
 			/>
 
 			<!-- Code to Image — Comparison -->
-			<section class="mb-8 sm:mb-12 bg-[#fffdf8] border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 transition-all duration-300">
+			<section class="mb-8 sm:mb-12 bg-brand-bg border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 transition-all duration-300">
 				<h3 class="text-xl sm:text-2xl font-black mb-6 text-black tracking-tight">Code Screenshot Tools Compared</h3>
 				<div class="overflow-x-auto">
 					<table class="w-full text-left border-collapse text-sm">
@@ -1748,10 +1748,10 @@
 
 			<!-- What is a Code to Image Generator Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1782,10 +1782,10 @@
 
 			<!-- Benefits Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ff6b6b] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1804,9 +1804,9 @@
 				</h3>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#ff6b6b] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-brand-danger p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1823,9 +1823,9 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#ffc480] p-2 border-[2px] border-black text-black flex-shrink-0">
+						<div class="bg-brand-accent p-2 border-[2px] border-black text-black flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1841,9 +1841,9 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#4ade80] p-2 border-[2px] border-black text-black flex-shrink-0">
+						<div class="bg-data-green p-2 border-[2px] border-black text-black flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1859,9 +1859,9 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#60a5fa] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-data-sky p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1877,9 +1877,9 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#a78bfa] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-data-violet p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1895,9 +1895,9 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#f472b6] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-data-pink p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1918,7 +1918,7 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="bg-[#facc15] p-2 border-[2px] border-black text-black flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1936,7 +1936,7 @@
 					</div>
 
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex items-start gap-4 hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="bg-[#22c55e] p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1957,10 +1957,10 @@
 
 			<!-- How to Use Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1985,7 +1985,7 @@
 				<div class="space-y-5">
 					<div class="flex items-start gap-4">
 						<span
-							class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]"
+							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
 							>1</span
 						>
 						<div>
@@ -1998,7 +1998,7 @@
 					</div>
 					<div class="flex items-start gap-4">
 						<span
-							class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]"
+							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
 							>2</span
 						>
 						<div>
@@ -2011,7 +2011,7 @@
 					</div>
 					<div class="flex items-start gap-4">
 						<span
-							class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]"
+							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
 							>3</span
 						>
 						<div>
@@ -2024,7 +2024,7 @@
 					</div>
 					<div class="flex items-start gap-4">
 						<span
-							class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]"
+							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
 							>4</span
 						>
 						<div>
@@ -2037,7 +2037,7 @@
 					</div>
 					<div class="flex items-start gap-4">
 						<span
-							class="bg-[#ff6b6b] text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[3px_3px_0_0_#000]"
+							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
 							>5</span
 						>
 						<div>
@@ -2053,10 +2053,10 @@
 
 			<!-- Real-World Use Cases Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -2075,11 +2075,11 @@
 				</h3>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#ff6b6b] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-brand-danger border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -2102,11 +2102,11 @@
 						</p>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#ffc480] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-brand-accent border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-black"
@@ -2129,11 +2129,11 @@
 						</p>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-data-green border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-black"
@@ -2156,11 +2156,11 @@
 						</p>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#60a5fa] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-data-sky border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -2182,11 +2182,11 @@
 						</p>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#a78bfa] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-data-violet border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -2209,7 +2209,7 @@
 						</p>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
@@ -2239,10 +2239,10 @@
 
 			<!-- Best Practices Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ff6b6b] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -2267,17 +2267,17 @@
 					<div class="space-y-4">
 						<h4 class="font-black text-lg text-black flex items-center gap-2">
 							<span
-								class="w-8 h-8 bg-[#ff6b6b] text-white border-[2px] border-black flex items-center justify-center text-sm shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-brand-danger text-white border-[2px] border-black flex items-center justify-center text-sm shadow-brutal-sm"
 								>&lt;/&gt;</span
 							>
 							Code Quality
 						</h4>
 						<div class="space-y-2">
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#ff6b6b] flex-shrink-0"
+									class="w-5 h-5 text-brand-danger flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2294,10 +2294,10 @@
 								>
 							</div>
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#ff6b6b] flex-shrink-0"
+									class="w-5 h-5 text-brand-danger flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2314,10 +2314,10 @@
 								>
 							</div>
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#ff6b6b] flex-shrink-0"
+									class="w-5 h-5 text-brand-danger flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2334,10 +2334,10 @@
 								>
 							</div>
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#ff6b6b] flex-shrink-0"
+									class="w-5 h-5 text-brand-danger flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2359,17 +2359,17 @@
 					<div class="space-y-4">
 						<h4 class="font-black text-lg text-black flex items-center gap-2">
 							<span
-								class="w-8 h-8 bg-[#4ade80] text-black border-[2px] border-black flex items-center justify-center text-sm shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-data-green text-black border-[2px] border-black flex items-center justify-center text-sm shadow-brutal-sm"
 								>🎨</span
 							>
 							Visual Design
 						</h4>
 						<div class="space-y-2">
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2385,10 +2385,10 @@
 								>
 							</div>
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2405,10 +2405,10 @@
 								>
 							</div>
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2425,10 +2425,10 @@
 								>
 							</div>
 							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-start gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2446,7 +2446,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="mt-8 p-5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_#000]">
+				<div class="mt-8 p-5 bg-brand-accent border-[3px] border-black shadow-brutal-lg">
 					<h4 class="font-black text-lg text-black mb-4 flex items-center gap-2">
 						<span
 							class="w-7 h-7 bg-black text-white border-[2px] border-black flex items-center justify-center text-sm"
@@ -2483,10 +2483,10 @@
 
 			<!-- FAQ Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -2505,7 +2505,7 @@
 				</h3>
 				<div class="space-y-3">
 					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<summary
 							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
@@ -2532,7 +2532,7 @@
 					</details>
 
 					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<summary
 							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
@@ -2558,7 +2558,7 @@
 					</details>
 
 					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<summary
 							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
@@ -2584,7 +2584,7 @@
 					</details>
 
 					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<summary
 							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
@@ -2610,7 +2610,7 @@
 					</details>
 
 					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<summary
 							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
@@ -2639,10 +2639,10 @@
 
 			<!-- Supported Languages Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -2665,109 +2665,109 @@
 				</p>
 				<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">⚡</div>
 						<span class="font-bold text-black text-xs">JavaScript</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🔷</div>
 						<span class="font-bold text-black text-xs">TypeScript</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🐍</div>
 						<span class="font-bold text-black text-xs">Python</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">☕</div>
 						<span class="font-bold text-black text-xs">Java</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">⚙️</div>
 						<span class="font-bold text-black text-xs">C++</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🔷</div>
 						<span class="font-bold text-black text-xs">C#</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🐘</div>
 						<span class="font-bold text-black text-xs">PHP</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">💎</div>
 						<span class="font-bold text-black text-xs">Ruby</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🐹</div>
 						<span class="font-bold text-black text-xs">Go</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🦀</div>
 						<span class="font-bold text-black text-xs">Rust</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🍎</div>
 						<span class="font-bold text-black text-xs">Swift</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🌐</div>
 						<span class="font-bold text-black text-xs">HTML</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🎨</div>
 						<span class="font-bold text-black text-xs">CSS</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">🗃️</div>
 						<span class="font-bold text-black text-xs">SQL</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">📄</div>
 						<span class="font-bold text-black text-xs">JSON</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">📝</div>
 						<span class="font-bold text-black text-xs">YAML</span>
 					</div>
 					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">📋</div>
 						<span class="font-bold text-black text-xs">Markdown</span>
 					</div>
 					<div
-						class="bg-[#ff6b6b] border-[3px] border-black p-3 text-center shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-brand-danger border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<div class="text-xl mb-1">+</div>
 						<span class="font-bold text-white text-xs">More!</span>
@@ -2781,17 +2781,17 @@
 		{#if showFirstGenerationPrompt}
 			<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
 				<div
-					class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]"
+					class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl"
 				>
 					<!-- Modal Header -->
 					<div
-						class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+						class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
 					>
 						<h3 class="text-lg font-black text-black uppercase tracking-wider">
 							🎉 Great First Image!
 						</h3>
 						<button
-							class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-[#ff6b6b] hover:text-white transition-colors"
+							class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors"
 							on:click={() => (showFirstGenerationPrompt = false)}
 						>
 							<span class="font-black">×</span>
@@ -2803,15 +2803,15 @@
 
 						<ul class="space-y-2 mb-6">
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#4ade80]">✓</span>
+								<span class="font-black text-data-green">✓</span>
 								<span class="font-bold text-black text-sm">Unlimited image generations</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#4ade80]">✓</span>
+								<span class="font-black text-data-green">✓</span>
 								<span class="font-bold text-black text-sm">No watermarks</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#4ade80]">✓</span>
+								<span class="font-black text-data-green">✓</span>
 								<span class="font-bold text-black text-sm">API Access</span>
 							</li>
 						</ul>
@@ -2820,13 +2820,13 @@
 							<a
 								href="/signup?redirect=/tools/code-to-image"
 								on:click={() => analytics.track('tool_signup_click', { tool_name: 'code_to_image', cta_location: 'free_tier_card' })}
-								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Create Free Account
 							</a>
 
 							<button
-								class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide"
+								class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
 								on:click={() => (showFirstGenerationPrompt = false)}
 							>
 								Continue as Guest
@@ -2844,11 +2844,11 @@
 				style="margin-top: 0px;"
 			>
 				<div
-					class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]"
+					class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl"
 				>
 					<!-- Modal Header -->
 					<div
-						class="bg-[#ff6b6b] px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+						class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
 					>
 						<h3 class="text-lg font-black text-white uppercase tracking-wider">
 							🎨 Ready to Create More?
@@ -2868,19 +2868,19 @@
 
 						<ul class="space-y-2 mb-6">
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#ff6b6b]">✓</span>
+								<span class="font-black text-brand-danger">✓</span>
 								<span class="font-bold text-black text-sm">Unlimited image generations</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#ff6b6b]">✓</span>
+								<span class="font-black text-brand-danger">✓</span>
 								<span class="font-bold text-black text-sm">No watermarks</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#ff6b6b]">✓</span>
+								<span class="font-black text-brand-danger">✓</span>
 								<span class="font-bold text-black text-sm">API Access</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#ff6b6b]">✓</span>
+								<span class="font-black text-brand-danger">✓</span>
 								<span class="font-bold text-black text-sm">Priority support</span>
 							</li>
 						</ul>
@@ -2889,13 +2889,13 @@
 							<a
 								href="/signup?redirect=/tools/code-to-image"
 								on:click={() => analytics.track('tool_signup_click', { tool_name: 'code_to_image', cta_location: 'limit_reached_modal' })}
-								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Sign Up Free
 							</a>
 
 							<button
-								class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide"
+								class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
 								on:click={() => (showUpgradePrompt = false)}
 							>
 								Maybe Later
@@ -2912,11 +2912,11 @@
 		<section class="mb-12 max-w-5xl mx-auto px-4">
 			<h3 class="text-xl font-black mb-4 text-black uppercase text-center">Related Tools</h3>
 			<div class="flex flex-wrap gap-3 justify-center">
-				<a href="/tools/html-to-png" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">HTML to PNG</a>
-				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">URL to Image</a>
-				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">OG Image Generator</a>
-				<a href="/tools/markdown" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">Markdown to Image</a>
-				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-[#ffc480] hover:shadow-[4px_4px_0_0_#000] transition-all">Compare Tools</a>
+				<a href="/tools/html-to-png" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">HTML to PNG</a>
+				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">URL to Image</a>
+				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">OG Image Generator</a>
+				<a href="/tools/markdown" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Markdown to Image</a>
+				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Compare Tools</a>
 			</div>
 		</section>
 

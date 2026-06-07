@@ -11,7 +11,7 @@
 </script>
 
 <div
-	class="bg-gray-900 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937] flex flex-col"
+	class="bg-gray-900 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-brutal-xl flex flex-col"
 >
 	<!-- Terminal Header -->
 	<div class="h-10 border-b-[3px] border-gray-700 flex items-center px-4 bg-gray-800 shrink-0">
@@ -31,14 +31,14 @@
 		<div class="space-y-6">
 			<!-- Image URL -->
 			<div class="space-y-2">
-				<div class="text-[10px] uppercase font-black tracking-widest text-[#4ade80]">
+				<div class="text-[10px] uppercase font-black tracking-widest text-data-green">
 					> Image Endpoint
 				</div>
 				<p class="text-xs text-gray-400 font-sans font-bold">
 					Serve this URL inside an {@html '<code>&lt;img&gt;</code>'} or CSS background.
 				</p>
 				<div
-					class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-[#ffc480]"
+					class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-brand-accent"
 				>
 					{previewUrl}
 				</div>
@@ -47,14 +47,14 @@
 			{#if goalType === 'click_through'}
 				<!-- Click Tracking Link -->
 				<div class="space-y-2">
-					<div class="text-[10px] uppercase font-black tracking-widest text-[#60a5fa]">
+					<div class="text-[10px] uppercase font-black tracking-widest text-data-sky">
 						> CTA Link Endpoint
 					</div>
 					<p class="text-xs text-gray-400 font-sans font-bold">
 						Use this URL for your button's href attribute.
 					</p>
 					<div
-						class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-[#60a5fa]"
+						class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-data-sky"
 					>
 						{clickTrackUrl}
 					</div>
@@ -62,7 +62,7 @@
 
 				<!-- HTML Snippet -->
 				<div class="space-y-2">
-					<div class="text-[10px] uppercase font-black tracking-widest text-[#f472b6]">
+					<div class="text-[10px] uppercase font-black tracking-widest text-data-pink">
 						> Example Implementation
 					</div>
 					<div
@@ -84,7 +84,7 @@
 			{:else}
 				<!-- HTML Snippet (impressions only) -->
 				<div class="space-y-2">
-					<div class="text-[10px] uppercase font-black tracking-widest text-[#f472b6]">
+					<div class="text-[10px] uppercase font-black tracking-widest text-data-pink">
 						> Example Implementation
 					</div>
 					<div

@@ -69,7 +69,7 @@
 		analytics.track('checkout_page_loaded', {
 			source: source || 'dashboard_upgrade',
 			current_plan: currentPlan,
-			discount_code: discountCode || null,
+			discount_code: discountCode || null
 		});
 
 		try {
@@ -139,9 +139,7 @@
 			if (discountCode) {
 				customParams.push(`checkout[discount_code]=${encodeURIComponent(discountCode)}`);
 				// Also pass through custom_data so the webhook can attribute the code on subscription_created
-				customParams.push(
-					`checkout[custom][discount_code]=${encodeURIComponent(discountCode)}`
-				);
+				customParams.push(`checkout[custom][discount_code]=${encodeURIComponent(discountCode)}`);
 				// Fire-and-forget: record on plgEngagement.discountCodesUsed.
 				// Best-effort attribution at intent-to-checkout time — the webhook can confirm later.
 				// Guard against double-recording on rapid multi-card clicks before navigation.
@@ -175,10 +173,10 @@
 	<!-- Discount Banner -->
 	{#if discountCode}
 		<div
-			class="mb-8 p-4 bg-[#10b981]/10 border-[3px] border-[#10b981] rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
+			class="mb-8 p-4 bg-brand-success/10 border-[3px] border-brand-success rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
 		>
 			<div
-				class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -191,7 +189,7 @@
 			</div>
 			<div>
 				<p class="font-black text-gray-900 text-lg uppercase tracking-tight">
-					Code Applied: <span class="text-[#10b981]">{discountCode}</span>
+					Code Applied: <span class="text-brand-success">{discountCode}</span>
 				</p>
 				<p class="text-sm font-bold text-gray-600">
 					Your discount will be applied at checkout automatically.
@@ -206,14 +204,11 @@
 			<div
 				class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 			>
-				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse" />
+				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full" />
 				Pricing Plans
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-2">
-				Upgrade Your <span
-					class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-					>Plan</span
-				>
+				Upgrade Your <span class="text-gray-900">Plan</span>
 			</h1>
 			<p class="text-gray-600 font-bold text-sm sm:text-base">
 				Unlock more renders, AI generations, and features
@@ -223,12 +218,12 @@
 		<!-- Monthly/Annual Toggle -->
 		<div class="flex flex-col items-start md:items-end gap-2 shrink-0">
 			<div
-				class="flex items-center p-1 bg-gray-100 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="flex items-center p-1 bg-gray-100 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<button
 					class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all {showAnnual
 						? 'text-gray-500 hover:text-gray-700'
-						: 'bg-white text-gray-900 shadow-[2px_2px_0_0_#1f2937] border-2 border-gray-900'}"
+						: 'bg-white text-gray-900 shadow-brutal-sm border-2 border-gray-900'}"
 					on:click={() => (showAnnual = false)}
 				>
 					Monthly
@@ -236,7 +231,7 @@
 				<div class="relative">
 					<button
 						class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all {showAnnual
-							? 'bg-[#ffc480] text-gray-900 shadow-[2px_2px_0_0_#1f2937] border-2 border-gray-900'
+							? 'bg-brand-accent text-gray-900 shadow-brutal-sm border-2 border-gray-900'
 							: 'text-gray-500 hover:text-gray-700'}"
 						on:click={() => (showAnnual = true)}
 					>
@@ -244,7 +239,7 @@
 					</button>
 					{#if !showAnnual}
 						<span
-							class="absolute -top-3 -right-3 px-1.5 py-0.5 bg-[#10b981] text-white text-[10px] font-black uppercase tracking-widest rounded border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] rotate-12"
+							class="absolute -top-3 -right-3 px-1.5 py-0.5 bg-brand-success text-white text-[10px] font-black uppercase tracking-widest rounded border-2 border-gray-900 shadow-brutal-sm rotate-12"
 						>
 							-20%
 						</span>
@@ -253,7 +248,7 @@
 			</div>
 			{#if showAnnual}
 				<p
-					class="text-[10px] font-black text-[#10b981] uppercase tracking-widest bg-[#10b981]/10 px-2 py-0.5 rounded border-2 border-[#10b981]"
+					class="text-[10px] font-black text-brand-success uppercase tracking-widest bg-brand-success/10 px-2 py-0.5 rounded border-2 border-brand-success"
 				>
 					Save 20% with annual billing
 				</p>
@@ -264,7 +259,7 @@
 	<div class="flex-1 flex flex-col">
 		{#if isLoading}
 			<div
-				class="flex flex-col items-center justify-center py-16 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+				class="flex flex-col items-center justify-center py-16 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 			>
 				<Loader size="10" show={true} />
 				<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">
@@ -273,12 +268,12 @@
 			</div>
 		{:else if error}
 			<div
-				class="flex flex-col items-center justify-center py-12 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]"
+				class="flex flex-col items-center justify-center py-12 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
 			>
 				<div
-					class="w-12 h-12 bg-[#ff6b6b]/20 rounded-xl border-[3px] border-[#ff6b6b] flex items-center justify-center mb-4"
+					class="w-12 h-12 bg-brand-danger/20 rounded-xl border-[3px] border-brand-danger flex items-center justify-center mb-4"
 				>
-					<svg class="w-6 h-6 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-6 h-6 text-brand-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -305,12 +300,12 @@
 
 					<div
 						class="flex flex-col relative bg-white rounded-2xl border-[3px] {isPopular
-							? 'border-[#ff6b6b] shadow-[8px_8px_0_0_#ff6b6b]'
-							: 'border-gray-900 shadow-[8px_8px_0_0_#1f2937]'} {isCurrent ? 'opacity-70' : ''}"
+							? 'border-brand-danger shadow-[8px_8px_0_0_#ff6b6b]'
+							: 'border-gray-900 shadow-brutal-2xl'} {isCurrent ? 'opacity-70' : ''}"
 					>
 						{#if isPopular}
 							<div
-								class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#ff6b6b] text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+								class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-brand-danger text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 							>
 								Most Popular
 							</div>
@@ -333,7 +328,7 @@
 									{/if}
 								</div>
 								{#if showAnnual && monthlySavings > 0}
-									<p class="text-sm text-[#10b981] font-black uppercase tracking-widest">
+									<p class="text-sm text-brand-success font-black uppercase tracking-widest">
 										Save ${monthlySavings * 12}/year
 									</p>
 								{:else}
@@ -355,8 +350,8 @@
 									on:click={() => handlePurchase(plan)}
 									class="w-full py-4 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all mb-8
 										{isPopular
-										? 'bg-[#ff6b6b] text-white hover:bg-[#ff5252] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
-										: 'bg-[#ffc480] text-gray-900 hover:bg-[#ffb360] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+										? 'bg-brand-danger text-white hover:bg-data-red shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
+										: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 								>
 									Upgrade to {plan.name === 'Standard' ? 'Pro' : plan.name}
 								</button>

@@ -73,7 +73,7 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -81,7 +81,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -101,10 +101,10 @@
 
 			<!-- Main Content Card -->
 			<article
-				class="bg-white border-[4px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-12"
+				class="bg-white border-[4px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden mb-12"
 			>
 				<!-- Header -->
-				<div class="bg-[#ffc480] border-b-[4px] border-gray-900 p-8">
+				<div class="bg-brand-accent border-b-[4px] border-gray-900 p-8">
 					<div
 						class="inline-block px-3 py-1 bg-white border-[2px] border-gray-900 rounded-full text-xs font-black uppercase tracking-wide mb-4"
 					>
@@ -143,10 +143,10 @@
 						{#each relatedTerms as related}
 							<a
 								href="/glossary/{related.term}"
-								class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
+								class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 							>
 								<h3
-									class="font-black text-gray-900 mb-1 group-hover:text-[#ff6b6b] transition-colors"
+									class="font-black text-gray-900 mb-1 group-hover:text-brand-danger transition-colors"
 								>
 									{related.title}
 								</h3>
@@ -161,7 +161,7 @@
 
 			<!-- CTA Section -->
 			<section
-				class="mb-12 bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center"
+				class="mb-12 bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center"
 			>
 				<h2 class="text-2xl font-black text-gray-900 mb-3">Put it into practice</h2>
 				<p class="text-gray-600 font-bold mb-6">
@@ -169,7 +169,7 @@
 				</p>
 				<a
 					href="/tools/og-image-generator"
-					class="inline-block px-6 py-3 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="inline-block px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 				>
 					Try OG Image Generator
 				</a>
@@ -184,7 +184,7 @@
 					{#each otherTerms as other}
 						<a
 							href="/glossary/{other.term}"
-							class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-gray-900 hover:bg-[#ffc480] transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
+							class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-gray-900 hover:bg-brand-accent transition-colors shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
 						>
 							{other.title}
 						</a>
@@ -203,7 +203,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -212,7 +212,7 @@
 				</h1>
 				<a
 					href="/glossary"
-					class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Browse Glossary
 				</a>

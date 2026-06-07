@@ -203,7 +203,7 @@
 			>
 				{#each MOCK_CONNECTORS as connector}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] p-4"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-md p-4"
 					>
 						<div class="flex items-start justify-between mb-3">
 							<div class="flex items-center gap-3">
@@ -261,7 +261,7 @@
 								class="flex-1 px-3 py-2 text-xs font-bold text-gray-400 bg-gray-50 rounded-lg border border-gray-200"
 								>Test Connection</button
 							>
-							<button class="p-2 text-gray-300 border border-transparent"
+							<button aria-label="Delete connector" class="p-2 text-gray-300 border border-transparent"
 								><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
 										stroke-linecap="round"
@@ -285,10 +285,10 @@
 			</div>
 		{:else if connectors.length === 0}
 			<div
-				class="text-center py-12 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="text-center py-12 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center"
+					class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-xl border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center"
 				>
 					<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -305,7 +305,7 @@
 				</p>
 				<button
 					on:click={() => (showCreateModal = true)}
-					class="px-5 py-2 text-xs font-bold text-gray-900 bg-[#ffc480] rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+					class="px-5 py-2 text-xs font-bold text-gray-900 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 				>
 					Add Connector
 				</button>
@@ -315,7 +315,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{#each connectors as connector}
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] p-4"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-md p-4"
 					>
 						<div class="flex items-start justify-between mb-3">
 							<div class="flex items-center gap-3">
@@ -385,8 +385,9 @@
 							</button>
 							<button
 								on:click={() => handleDelete(connector.uid)}
-								class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+								class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
 								title="Delete"
+								aria-label="Delete connector"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
@@ -408,18 +409,18 @@
 <!-- Create Modal -->
 {#if showCreateModal}
 	<div
-		class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+		class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="connector-modal-title"
 		on:keydown={(e) => e.key === 'Escape' && closeModal()}
 	>
 		<div
-			class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
+			class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
 		>
 			<!-- Header Strip -->
 			<div
-				class="absolute top-0 left-0 w-full h-1.5 bg-[#4ade80] border-b-[3px] border-gray-900 z-10"
+				class="absolute top-0 left-0 w-full h-1.5 bg-data-green border-b-[3px] border-gray-900 z-10"
 			/>
 			<!-- Decorative bg pattern -->
 			<div
@@ -436,7 +437,8 @@
 					</h3>
 					<button
 						on:click={closeModal}
-						class="p-1.5 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						aria-label="Close dialog"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -455,7 +457,7 @@
 						{#each STORAGE_PROVIDERS as provider}
 							<button
 								on:click={() => selectProvider(provider)}
-								class="p-4 border-[3px] border-gray-200 rounded-xl text-left hover:border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] transition-all bg-white"
+								class="p-4 border-[3px] border-gray-200 rounded-xl text-left hover:border-gray-900 hover:shadow-brutal-lg transition-all bg-white"
 							>
 								<span
 									class="w-8 h-8 mb-2 flex items-center justify-center bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700"
@@ -565,7 +567,7 @@
 								type="text"
 								bind:value={newConnector.name}
 								required
-								class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ffc480]"
+								class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent"
 							/>
 						</div>
 
@@ -581,14 +583,14 @@
 												type="password"
 												bind:value={newConnector.credentials[key]}
 												required
-												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent"
 											/>
 										{:else}
 											<input
 												type="text"
 												bind:value={newConnector.credentials[key]}
 												required
-												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+												class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent"
 											/>
 										{/if}
 									</div>
@@ -610,7 +612,7 @@
 											type="text"
 											bind:value={newConnector.config[key]}
 											required={opts.required}
-											class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+											class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 focus:shadow-brutal-accent"
 										/>
 									</div>
 								{/each}
@@ -631,7 +633,7 @@
 							<button
 								type="submit"
 								disabled={creating}
-								class="flex-1 px-4 py-3 text-sm font-bold text-white bg-[#ff6b6b] rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+								class="flex-1 px-4 py-3 text-sm font-bold text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{creating ? 'Saving...' : 'Save Connector'}
 							</button>

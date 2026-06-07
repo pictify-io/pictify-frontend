@@ -162,7 +162,7 @@
 		>
 			<!-- Main Modal -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 			>
 				<!-- Close Button -->
 				<button
@@ -181,7 +181,7 @@
 				</button>
 
 				<!-- Header -->
-				<div class="bg-[#FFFDF8] p-6 text-center border-b-[3px] border-gray-900">
+				<div class="bg-brand-bg p-6 text-center border-b-[3px] border-gray-900">
 					<h2 id="modal-title" class="text-2xl font-black text-gray-900 mb-2">
 						{activeTab === 'signup' ? 'Create Your Account' : 'Welcome Back'}
 					</h2>
@@ -203,7 +203,7 @@
 					>
 						Sign Up
 						{#if activeTab === 'signup'}
-							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffc480]" />
+							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-brand-accent" />
 						{/if}
 					</button>
 					<div class="w-[3px] bg-gray-900" />
@@ -216,7 +216,7 @@
 					>
 						Log In
 						{#if activeTab === 'login'}
-							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#ff6b6b]" />
+							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-brand-danger" />
 						{/if}
 					</button>
 				</div>
@@ -226,11 +226,11 @@
 					<!-- Google Auth -->
 					<button
 						type="button"
-						class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold text-sm"
+						class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold text-sm"
 						on:click={handleGoogleAuth}
 						disabled={isLoading}
 					>
-						<img
+						<img loading="lazy"
 							src="https://www.svgrepo.com/show/475656/google-color.svg"
 							alt="Google"
 							class="w-5 h-5"
@@ -256,7 +256,7 @@
 							id="email"
 							type="email"
 							bind:value={email}
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all text-sm font-medium"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-brutal-accent transition-all text-sm font-medium"
 							disabled={isLoading}
 							required
 						/>
@@ -274,7 +274,7 @@
 							id="password"
 							type="password"
 							bind:value={password}
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all text-sm font-medium"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:shadow-brutal-accent transition-all text-sm font-medium"
 							disabled={isLoading}
 							required
 						/>
@@ -341,7 +341,7 @@
 					<!-- Submit Button -->
 					<button
 						type="submit"
-						class="w-full py-3 px-6 bg-gray-900 text-white font-bold text-base uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="w-full py-3 px-6 bg-gray-900 text-white font-bold text-base uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 						disabled={isLoading ||
 							!email ||
 							!password ||
@@ -377,7 +377,7 @@
 							Already have an account?
 							<button
 								type="button"
-								class="font-bold text-gray-900 hover:text-[#ff6b6b] transition-colors"
+								class="font-bold text-gray-900 hover:text-brand-danger transition-colors"
 								on:click={() => switchTab('login')}
 							>
 								Log in
@@ -386,7 +386,7 @@
 							Don't have an account?
 							<button
 								type="button"
-								class="font-bold text-gray-900 hover:text-[#ffc480] transition-colors"
+								class="font-bold text-gray-900 hover:text-brand-accent transition-colors"
 								on:click={() => switchTab('signup')}
 							>
 								Sign up

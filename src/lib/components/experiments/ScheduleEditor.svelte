@@ -14,10 +14,10 @@
 
 	// Color palette for variant bars
 	const VARIANT_COLORS = [
-		{ bg: 'bg-[#ffc480]', border: 'border-[#e6a050]', text: 'text-gray-900' },
-		{ bg: 'bg-[#4ade80]', border: 'border-[#22c55e]', text: 'text-gray-900' },
-		{ bg: 'bg-[#a78bfa]', border: 'border-[#7c3aed]', text: 'text-white' },
-		{ bg: 'bg-[#f472b6]', border: 'border-[#ec4899]', text: 'text-white' },
+		{ bg: 'bg-brand-accent', border: 'border-[#e6a050]', text: 'text-gray-900' },
+		{ bg: 'bg-data-green', border: 'border-[#22c55e]', text: 'text-gray-900' },
+		{ bg: 'bg-data-violet', border: 'border-[#7c3aed]', text: 'text-white' },
+		{ bg: 'bg-data-pink', border: 'border-[#ec4899]', text: 'text-white' },
 		{ bg: 'bg-[#38bdf8]', border: 'border-[#0284c7]', text: 'text-gray-900' }
 	];
 
@@ -144,7 +144,7 @@
 <div class="space-y-6">
 	<!-- Timeline Visualization -->
 	{#if hasAnySchedule}
-		<div class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-5">
+		<div class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-5">
 			<h4
 				class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2"
 			>
@@ -191,7 +191,7 @@
 								</div>
 							{:else}
 								<div class="flex items-center justify-center h-full">
-									<span class="text-[10px] font-bold text-gray-300 italic"
+									<span class="text-[10px] font-bold text-gray-600 italic"
 										>No schedule — {variant.name}</span
 									>
 								</div>
@@ -201,7 +201,7 @@
 				</div>
 
 				<!-- Time axis -->
-				<div class="flex justify-between mt-2 text-[9px] font-bold text-gray-400">
+				<div class="flex justify-between mt-2 text-[9px] font-bold text-gray-600">
 					<span>{formatDate(new Date(bounds.min).toISOString())}</span>
 					<span>{formatDate(new Date(bounds.max).toISOString())}</span>
 				</div>
@@ -212,7 +212,7 @@
 	<!-- Overlap Warning -->
 	{#if overlaps.length > 0}
 		<div
-			class="bg-[#ffc480]/20 border-[3px] border-[#ffc480] rounded-xl p-4 flex items-start gap-3"
+			class="bg-brand-accent/20 border-[3px] border-brand-accent rounded-xl p-4 flex items-start gap-3"
 		>
 			<svg
 				class="w-5 h-5 text-[#e6a050] shrink-0 mt-0.5"
@@ -244,7 +244,7 @@
 	{#each variants as variant, i}
 		{@const color = getColor(i)}
 		<div
-			class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] overflow-hidden"
+			class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg overflow-hidden"
 		>
 			<!-- Variant header -->
 			<div class="flex items-center gap-3 px-5 py-3 border-b-[3px] border-gray-200 bg-gray-50">
@@ -272,7 +272,7 @@
 							value={utcToLocal(variant.schedule?.startAt)}
 							on:input={(e) => handleStartChange(i, e.target.value)}
 							{disabled}
-							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all"
+							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all"
 						/>
 					</div>
 					<div>
@@ -280,14 +280,14 @@
 							class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5"
 						>
 							End Date & Time
-							<span class="text-gray-300 normal-case tracking-normal">(optional)</span>
+							<span class="text-gray-600 normal-case tracking-normal">(optional)</span>
 						</label>
 						<input
 							type="datetime-local"
 							value={utcToLocal(variant.schedule?.endAt)}
 							on:input={(e) => handleEndChange(i, e.target.value)}
 							{disabled}
-							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all"
+							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all"
 						/>
 					</div>
 				</div>
@@ -315,16 +315,16 @@
 							{#if variant.schedule.endAt}
 								until <span class="text-gray-900">{formatDate(variant.schedule.endAt)}</span>
 							{:else}
-								<span class="text-gray-400">(no end date)</span>
+								<span class="text-gray-600">(no end date)</span>
 							{/if}
-							<span class="text-gray-300">({userTimezone})</span>
+							<span class="text-gray-600">({userTimezone})</span>
 						</span>
 					</div>
 				{:else}
 					<div
 						class="bg-gray-50 border-[2px] border-dashed border-gray-300 rounded-lg px-4 py-2.5 text-center"
 					>
-						<span class="text-[10px] font-bold text-gray-400">
+						<span class="text-[10px] font-bold text-gray-600">
 							{variant.isDefault
 								? 'Default variant — shown when no other variant is active'
 								: 'Set a start date to schedule this variant'}
@@ -337,7 +337,7 @@
 
 	<!-- Experiment Expiration & Fallback -->
 	<div
-		class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-5 space-y-4"
+		class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-5 space-y-4"
 	>
 		<h4 class="text-xs font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
 			<svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -355,23 +355,23 @@
 			<div>
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">
 					Hard Expiration Date
-					<span class="text-gray-300 normal-case tracking-normal">(optional)</span>
+					<span class="text-gray-600 normal-case tracking-normal">(optional)</span>
 				</label>
 				<input
 					type="datetime-local"
 					value={utcToLocal(expiresAt)}
 					on:input={(e) => handleExpiresAtChange(e.target.value)}
 					{disabled}
-					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all"
+					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all"
 				/>
-				<p class="text-[9px] text-gray-400 mt-1">
+				<p class="text-[9px] text-gray-600 mt-1">
 					After this date, the image link returns 410 Gone or shows fallback.
 				</p>
 			</div>
 			<div>
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">
 					Fallback Image URL
-					<span class="text-gray-300 normal-case tracking-normal">(optional)</span>
+					<span class="text-gray-600 normal-case tracking-normal">(optional)</span>
 				</label>
 				<input
 					type="url"
@@ -379,9 +379,9 @@
 					on:input={(e) => handleFallbackChange(e.target.value)}
 					{disabled}
 					placeholder="https://example.com/fallback.png"
-					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all placeholder:text-gray-300 placeholder:font-sans"
+					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all placeholder:text-gray-300 placeholder:font-sans"
 				/>
-				<p class="text-[9px] text-gray-400 mt-1">Shown after expiration instead of 410 Gone.</p>
+				<p class="text-[9px] text-gray-600 mt-1">Shown after expiration instead of 410 Gone.</p>
 			</div>
 		</div>
 	</div>

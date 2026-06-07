@@ -20,7 +20,7 @@
 	type="button"
 	class="px-8 py-4 font-bold text-lg rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
 		{variant === 'primary' && !className
-		? 'bg-[#ffc480] text-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px]'
+		? 'bg-brand-accent text-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px]'
 		: variant === 'secondary' && !className
 		? 'bg-white text-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px]'
 		: ''} {className}"

@@ -19,7 +19,10 @@
 	/>
 	<link rel="canonical" href="https://pictify.io/blogs" />
 	<meta property="og:title" content="Pictify Blog — Programmatic Media Automation" />
-	<meta property="og:description" content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows for developers." />
+	<meta
+		property="og:description"
+		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows for developers."
+	/>
 	<meta property="og:url" content="https://pictify.io/blogs" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify" />
@@ -29,12 +32,15 @@
 	<meta property="og:image:alt" content="Pictify Blog — deep technical image dev content" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Pictify Blog — Programmatic Media Automation" />
-	<meta name="twitter:description" content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows." />
+	<meta
+		name="twitter:description"
+		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows."
+	/>
 	<meta name="twitter:image" content="https://pictify.io/og/blogs/index.png" />
 </svelte:head>
 
 <div
-	class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black"
+	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
 >
 	<Nav />
 
@@ -42,11 +48,11 @@
 	<div class="w-full flex flex-col md:flex-row border-b-[3px] border-gray-900">
 		<!-- Left Content -->
 		<div
-			class="flex-1 px-6 md:px-12 py-12 md:py-20 flex flex-col justify-center md:border-r-[3px] border-gray-900 bg-[#FFFDF8]"
+			class="flex-1 px-6 md:px-12 py-12 md:py-20 flex flex-col justify-center md:border-r-[3px] border-gray-900 bg-brand-bg"
 		>
 			<div class="mb-8">
 				<div
-					class="inline-block bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-2"
+					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-2"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">Resources</span>
 				</div>
@@ -54,9 +60,7 @@
 					class="text-5xl md:text-6xl lg:text-7xl font-black leading-none tracking-tighter mb-6 uppercase"
 				>
 					Programmatic Media:<br />
-					<span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-700"
-						>Templates & Tutorials</span
-					>
+					<span class="text-gray-900">Templates & Tutorials</span>
 				</h1>
 				<p class="text-xl md:text-2xl font-bold text-gray-600 max-w-lg leading-relaxed">
 					Learn how teams design templates once and render variants via API — the infrastructure
@@ -67,7 +71,7 @@
 			<div class="w-full max-w-lg mt-4">
 				<a
 					href="/signup?redirect=/blogs"
-					class="inline-flex items-center justify-center w-full sm:w-auto bg-gray-900 text-white border-[3px] border-gray-900 px-8 py-3.5 text-lg font-black uppercase tracking-wide shadow-[4px_4px_0_0_#ffc480] hover:bg-black hover:shadow-[6px_6px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
+					class="inline-flex items-center justify-center w-full sm:w-auto bg-gray-900 text-white border-[3px] border-gray-900 px-8 py-3.5 text-lg font-black uppercase tracking-wide shadow-brutal-accent hover:bg-black hover:shadow-[6px_6px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
 				>
 					Get started free →
 				</a>
@@ -76,7 +80,7 @@
 
 		<!-- Right Content (Featured) -->
 		<div
-			class="flex-1 bg-[#ffc480] pattern-grid flex items-center justify-center p-8 md:p-16 relative overflow-hidden"
+			class="flex-1 bg-brand-accent pattern-grid flex items-center justify-center p-8 md:p-16 relative overflow-hidden"
 		>
 			<!-- Decorative Elements -->
 			<div
@@ -90,11 +94,11 @@
 				<a href="/blogs/{featured.slug}" class="relative block w-full max-w-xl group z-10">
 					<!-- Card -->
 					<div
-						class="relative bg-white border-[3px] border-gray-900 rounded-2xl p-4 shadow-[8px_8px_0_0_#1f2937] transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[12px_12px_0_0_#1f2937]"
+						class="relative bg-white border-[3px] border-gray-900 rounded-2xl p-4 shadow-brutal-2xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-brutal-3xl"
 					>
 						<!-- Featured Badge -->
 						<div
-							class="absolute -top-4 -right-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-[4px_4px_0_0_#1f2937] z-20"
+							class="absolute -top-4 -right-4 bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-brutal-lg z-20"
 						>
 							<span class="font-black uppercase tracking-widest text-sm">Featured</span>
 						</div>
@@ -102,7 +106,7 @@
 						<div
 							class="h-[280px] border-[3px] border-gray-900 rounded-xl overflow-hidden bg-gray-100 mb-6 relative"
 						>
-							<img
+							<img loading="lazy"
 								src={featured?.heroImage}
 								class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
 								alt={featured?.title}

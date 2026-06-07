@@ -236,14 +236,14 @@
 		role="dialog"
 		aria-modal="false"
 		aria-label="Edit variable"
-		class="w-[360px] rounded-xl border-[3px] border-gray-900 bg-white shadow-[6px_6px_0_0_#1f2937]"
+		class="w-[360px] rounded-xl border-[3px] border-gray-900 bg-white shadow-brutal-xl"
 	>
 		<!-- Header -->
 		<div
-			class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-4 py-3"
+			class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-4 py-3"
 		>
 			<div class="flex items-center gap-2">
-				<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+				<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 					<i class="fa fa-cube text-[11px] text-gray-900"></i>
 				</div>
 				<h3 class="text-[11px] font-black uppercase tracking-widest text-gray-900">
@@ -254,7 +254,7 @@
 				type="button"
 				on:click={close}
 				aria-label="Close"
-				class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
+				class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-gray-900 hover:text-white hover:shadow-none"
 			>
 				<i class="fa fa-xmark text-[11px]"></i>
 			</button>
@@ -275,7 +275,7 @@
 					class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-sm font-bold text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 				/>
 				{#if nameError}
-					<p class="text-[10px] font-black uppercase tracking-wider text-[#ff5252]">
+					<p class="text-[10px] font-black uppercase tracking-wider text-data-red">
 						<i class="fa fa-triangle-exclamation mr-1 text-[9px]"></i>
 						{nameError}
 					</p>
@@ -297,7 +297,7 @@
 							on:click={() => onTypeChange(t.value)}
 							class="rounded-md border-[2px] border-gray-900 px-1.5 py-1.5 text-[9px] font-black uppercase tracking-widest transition-all
 								{draft.type === t.value
-									? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#1f2937]'
+									? 'bg-gray-900 text-white shadow-brutal-sm'
 									: 'bg-white text-gray-700 hover:shadow-[1px_1px_0_0_#1f2937]'}"
 							title={t.label}
 						>
@@ -327,7 +327,7 @@
 						rows="6"
 						spellcheck="false"
 						placeholder={draft.type === 'array' ? '[\n  { "name": "…" }\n]' : '{\n  "field": "…"\n}'}
-						class="w-full resize-y rounded-lg border-[2px] {jsonError ? 'border-[#ff6b6b]' : 'border-gray-900'} bg-white px-3 py-2 font-mono text-[11px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+						class="w-full resize-y rounded-lg border-[2px] {jsonError ? 'border-brand-danger' : 'border-gray-900'} bg-white px-3 py-2 font-mono text-[11px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 					></textarea>
 					{#if jsonError}
 						<p class="pt-0.5 text-[10px] font-bold text-[#c62828]">{jsonError}</p>
@@ -365,7 +365,7 @@
 			<div class="space-y-2">
 				<!-- Required -->
 				<label
-					class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 transition-all hover:shadow-[2px_2px_0_0_#1f2937]"
+					class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 transition-all hover:shadow-brutal-sm"
 				>
 					<div class="flex items-center gap-2">
 						<i class="fa fa-asterisk text-[10px] text-gray-700"></i>
@@ -384,7 +384,7 @@
 								}
 							};
 						}}
-						class="h-4 w-4 accent-[#ffc480]"
+						class="h-4 w-4 accent-brand-accent"
 					/>
 				</label>
 
@@ -392,8 +392,8 @@
 				<label
 					class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-[2px] px-3 py-2 transition-all
 						{draft.allowRawHtml
-							? 'border-gray-900 bg-[#ff6b6b] text-white shadow-[2px_2px_0_0_#1f2937]'
-							: 'border-gray-900 bg-white text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+							? 'border-gray-900 bg-brand-danger text-white shadow-brutal-sm'
+							: 'border-gray-900 bg-white text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<div class="flex items-center gap-2">
 						<i
@@ -415,7 +415,7 @@
 
 				{#if draft.allowRawHtml}
 					<p
-						class="rounded-md border-[2px] border-gray-900 bg-[#ff6b6b]/10 px-3 py-2 text-[10px] font-bold text-gray-800"
+						class="rounded-md border-[2px] border-gray-900 bg-brand-danger/10 px-3 py-2 text-[10px] font-bold text-gray-800"
 					>
 						<i class="fa fa-info-circle mr-1"></i>
 						Use <code class="text-[#c88a3b]">{'{{{' + draft.name + '}}}'}</code> in the
@@ -432,7 +432,7 @@
 			<button
 				type="button"
 				on:click={remove}
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#ff6b6b] hover:text-white hover:shadow-none"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-brand-danger hover:text-white hover:shadow-none"
 			>
 				<i class="fa fa-trash text-[10px]"></i>
 				Delete
@@ -441,7 +441,7 @@
 				<button
 					type="button"
 					on:click={close}
-					class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					Cancel
 				</button>
@@ -449,7 +449,7 @@
 					type="button"
 					on:click={apply}
 					disabled={!!nameError || (isJsonType && !!jsonError)}
-					class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[2px_2px_0_0_#1f2937]"
+					class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-brutal-sm"
 				>
 					<i class="fa fa-check mr-1 text-[10px]"></i>
 					Apply

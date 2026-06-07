@@ -20,25 +20,25 @@
 
 <div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 	<div
-		class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
+		class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 	>
-		<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+		<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 		<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 			{heading}
 		</h3>
 
 		<div
-			class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-[8px_8px_0_0_#1f2937] rotate-1 mb-8"
+			class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 		>
-			<img src={imageUrl} alt={imageAlt} class="max-w-full h-auto max-h-[400px]" />
+			<img loading="lazy" src={imageUrl} alt={imageAlt} class="max-w-full h-auto max-h-[400px]" />
 		</div>
 
 		<div class="flex flex-wrap justify-center gap-4">
 			<a
 				href={imageUrl}
 				download={downloadFileName}
-				class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+				class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 					><path

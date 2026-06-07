@@ -566,27 +566,27 @@
 
 <!-- Responsive banner (visible < 1024px) -->
 <div
-	class="flex items-center justify-center gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-3 text-sm font-black uppercase tracking-wider text-gray-900 lg:hidden"
+	class="flex items-center justify-center gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-6 py-3 text-sm font-black uppercase tracking-wider text-gray-900 lg:hidden"
 >
 	<span>Desktop-only editor</span>
-	<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-0.5 font-mono text-[11px] text-[#ffc480]"
+	<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-0.5 font-mono text-[11px] text-brand-accent"
 		>npx pictify</code
 	>
 </div>
 
 <!-- Below 768px: hide editor entirely -->
 <div
-	class="relative flex h-screen w-full flex-col overflow-hidden bg-[#FFFDF8] md:block"
+	class="relative flex h-screen w-full flex-col overflow-hidden bg-brand-bg md:block"
 >
 	<div class="md:hidden flex h-full items-center justify-center p-8 text-center">
-		<div class="max-w-sm rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-[8px_8px_0_0_#1f2937]">
-			<div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937]">
+		<div class="max-w-sm rounded-2xl border-[3px] border-gray-900 bg-white p-8 shadow-brutal-2xl">
+			<div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-brutal-md">
 				<i class="fa fa-desktop text-xl text-gray-900"></i>
 			</div>
 			<p class="text-lg font-black uppercase tracking-wider text-gray-900">Wider screen needed</p>
 			<p class="mt-3 text-sm font-bold text-gray-600">
 				The HTML editor works best on desktop. Use
-				<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-0.5 font-mono text-[11px] text-[#ffc480]">npx pictify</code>
+				<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-0.5 font-mono text-[11px] text-brand-accent">npx pictify</code>
 				from your dev machine.
 			</p>
 		</div>
@@ -630,7 +630,7 @@
 				     shadow and brand-accent fill, identical to how the dashboard
 				     marks the selected format filter. -->
 				<nav
-					class="flex items-center gap-2 border-b-[3px] border-gray-900 bg-[#FFFDF8] px-4 py-3"
+					class="flex items-center gap-2 border-b-[3px] border-gray-900 bg-brand-bg px-4 py-3"
 					role="tablist"
 					aria-label="Editor panels"
 				>
@@ -649,8 +649,8 @@
 							data-tour-id={'tab-' + tab.k}
 							class="flex items-center gap-2 rounded-lg border-[2px] border-gray-900 px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all
 								{activeTab === tab.k
-									? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-									: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
+									? 'bg-gray-900 text-white shadow-brutal-md'
+									: 'bg-white text-gray-700 hover:shadow-brutal-sm hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 							on:click={() => (activeTab = tab.k)}
 						>
 							<i class="fa {tab.icon} text-[10px]"></i>
@@ -669,8 +669,8 @@
 						data-tour-id="snippets-button"
 						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest transition-all
 							{showSnippetLibrary
-								? 'bg-[#ffe066] text-gray-900 shadow-[3px_3px_0_0_#1f2937]'
-								: 'bg-white text-gray-700 hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
+								? 'bg-[#ffe066] text-gray-900 shadow-brutal-md'
+								: 'bg-white text-gray-700 hover:shadow-brutal-sm hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 					>
 						<i class="fa fa-wand-magic-sparkles text-[10px]"></i>
 						Snippets
@@ -681,7 +681,7 @@
 						type="button"
 						on:click={() => (showCommandPalette = true)}
 						title="Command palette (⌘K)"
-						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-700 transition-all hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-700 transition-all hover:shadow-brutal-sm hover:-translate-x-[1px] hover:-translate-y-[1px]"
 					>
 						<i class="fa fa-terminal text-[10px]"></i>
 						⌘K
@@ -834,14 +834,14 @@
 		on:click|self={cancelRemoval}
 	>
 		<div
-			class="w-full max-w-md overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937]"
+			class="w-full max-w-md overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-2xl"
 			role="alertdialog"
 			aria-modal="true"
 			aria-labelledby="remove-var-title"
 		>
 			<!-- Header strip — red accent because this is a destructive action. -->
-			<div class="flex items-center gap-3 border-b-[3px] border-gray-900 bg-[#ff6b6b] px-5 py-3">
-				<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
+			<div class="flex items-center gap-3 border-b-[3px] border-gray-900 bg-brand-danger px-5 py-3">
+				<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-brutal-sm">
 					<i class="fa fa-triangle-exclamation text-[12px] text-gray-900"></i>
 				</div>
 				<h2 id="remove-var-title" class="text-[12px] font-black uppercase tracking-widest text-white">
@@ -854,7 +854,7 @@
 			<div class="px-5 py-5">
 				<p class="text-[13px] font-semibold leading-relaxed text-gray-800">
 					{#if pendingRemoval.names.length === 1}
-						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[11px] text-[#ffc480]">{'{{' + pendingRemoval.names[0] + '}}'}</code>
+						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[11px] text-brand-accent">{'{{' + pendingRemoval.names[0] + '}}'}</code>
 						is still referenced
 						<strong class="font-black text-gray-900">{pendingRemoval.occurrences}
 							{pendingRemoval.occurrences === 1 ? 'time' : 'times'}</strong>
@@ -875,8 +875,8 @@
 					<p class="text-[11px] font-bold leading-relaxed text-gray-900">
 						<i class="fa fa-circle-info mr-1 text-[10px]"></i>
 						<span class="font-black uppercase tracking-widest">Block uses kept.</span>
-						Occurrences inside <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{#each}}'}</code> /
-						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{#if}}'}</code> stay — remove those by hand if needed.
+						Occurrences inside <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{#each}}'}</code> /
+						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{#if}}'}</code> stay — remove those by hand if needed.
 					</p>
 				</div>
 			</div>
@@ -885,17 +885,17 @@
 				<button
 					type="button"
 					on:click={cancelRemoval}
-					class="rounded-md border-[2px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="rounded-md border-[2px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>Cancel</button>
 				<button
 					type="button"
 					on:click={() => confirmRemoval(false)}
-					class="rounded-md border-[2px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="rounded-md border-[2px] border-gray-900 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>Keep tokens</button>
 				<button
 					type="button"
 					on:click={() => confirmRemoval(true)}
-					class="rounded-md border-[2px] border-gray-900 bg-[#ff6b6b] px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="rounded-md border-[2px] border-gray-900 bg-brand-danger px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-brutal-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>Delete + strip tokens</button>
 			</div>
 		</div>

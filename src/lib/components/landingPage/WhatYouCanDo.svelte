@@ -70,7 +70,7 @@
 	});
 </script>
 
-<section bind:this={sectionRef} class="w-full py-20 md:py-32 bg-[#fffdf8] relative overflow-hidden">
+<section bind:this={sectionRef} class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Background Pattern -->
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -80,15 +80,9 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10 box-border">
 		<!-- Header -->
 		<div class="text-center mb-20 max-w-3xl mx-auto">
-			<div
-				class="inline-block mb-4 px-4 py-1.5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2"
-			>
-				<span class="font-bold text-sm text-black uppercase tracking-wider">The Engine</span>
-			</div>
-
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				What Makes It <br />
-				<span class="relative inline-block text-[#ff6b6b]">
+				<span class="relative inline-block text-brand-danger">
 					Programmable
 					<svg
 						class="absolute w-full h-4 -bottom-1 left-0 text-black z-[-1] opacity-20"
@@ -109,7 +103,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 auto-rows-[minmax(340px,auto)]">
 			<!-- Card 1: Design Freedom (Visual Editor) -->
 			<div
-				class="md:col-span-12 lg:col-span-7 bg-[#E0F2FE] rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col md:flex-row"
+				class="md:col-span-12 lg:col-span-7 bg-[#E0F2FE] rounded-2xl border-[3px] border-black shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col md:flex-row"
 				on:mouseenter={() => (activeHover = 'design')}
 				on:mouseleave={() => (activeHover = null)}
 			>
@@ -117,7 +111,7 @@
 				<div class="p-8 md:p-10 flex-1 z-10 flex flex-col justify-between">
 					<div>
 						<div
-							class="w-12 h-12 bg-white border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0_0_black] group-hover:rotate-6 transition-transform"
+							class="w-12 h-12 bg-white border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-brutal-lg group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -168,7 +162,7 @@
 								<div
 									class="w-full h-24 bg-gray-100 rounded mb-3 overflow-hidden border border-gray-200 relative"
 								>
-									<img
+									<img loading="lazy"
 										src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=400&q=80"
 										class="w-full h-full object-cover"
 										alt="preview"
@@ -179,7 +173,7 @@
 
 								<!-- Hover Interaction Elements -->
 								<div
-									class="absolute top-10 right-2 w-8 h-8 bg-[#ff6b6b] rounded-full border-[2px] border-black cursor-move shadow-[2px_2px_0_0_black] transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20 flex items-center justify-center"
+									class="absolute top-10 right-2 w-8 h-8 bg-brand-danger rounded-full border-[2px] border-black cursor-move shadow-brutal-sm transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20 flex items-center justify-center"
 								>
 									<svg
 										class="w-4 h-4 text-white"
@@ -202,17 +196,17 @@
 
 			<!-- Card 2: Developer Experience (API) -->
 			<div
-				class="md:col-span-12 lg:col-span-5 bg-[#1F2937] rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col"
+				class="md:col-span-12 lg:col-span-5 bg-[#1F2937] rounded-2xl border-[3px] border-black shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col"
 				on:mouseenter={handleApiEnter}
 				on:mouseleave={() => (activeHover = null)}
 			>
 				<div class="p-8 md:p-10 flex-1 relative z-10">
 					<div class="flex justify-between items-start mb-6">
 						<div
-							class="w-12 h-12 bg-gray-800 border-[3px] border-gray-600 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_black]"
+							class="w-12 h-12 bg-gray-800 border-[3px] border-gray-600 rounded-xl flex items-center justify-center shadow-brutal-lg"
 						>
 							<svg
-								class="w-6 h-6 text-[#4ade80]"
+								class="w-6 h-6 text-data-green"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -225,7 +219,7 @@
 							>
 						</div>
 						<div
-							class="px-3 py-1 bg-[#4ade80] text-black text-xs font-bold uppercase rounded-full border border-black"
+							class="px-3 py-1 bg-data-green text-black text-xs font-bold uppercase rounded-full border border-black"
 						>
 							50+ Functions
 						</div>
@@ -247,7 +241,7 @@
 							<div class="w-2.5 h-2.5 rounded-full bg-green-500" />
 						</div>
 						<div class="text-gray-300 overflow-hidden break-words text-xs md:text-sm">
-							<span class="text-[#ff6b6b]">$</span>
+							<span class="text-brand-danger">$</span>
 							{displayedApiText}<span class="animate-pulse">_</span>
 						</div>
 
@@ -273,7 +267,7 @@
 
 			<!-- Card 3: Infinite Scale (Infrastructure) -->
 			<div
-				class="md:col-span-12 bg-[#FFF4C3] rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+				class="md:col-span-12 bg-[#FFF4C3] rounded-2xl border-[3px] border-black shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group cursor-pointer"
 				on:mouseenter={() => (activeHover = 'scale')}
 				on:mouseleave={() => (activeHover = null)}
 			>
@@ -283,8 +277,8 @@
 						<div
 							class="absolute top-8 right-8 md:right-auto md:left-8 md:top-auto md:bottom-8 inline-flex items-center gap-2 px-3 py-1.5 bg-black rounded-lg border border-gray-700 shadow-xl"
 						>
-							<div class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-							<div class="font-mono text-xs font-bold text-[#4ade80]">
+							<div class="w-2 h-2 rounded-full bg-data-green animate-pulse" />
+							<div class="font-mono text-xs font-bold text-data-green">
 								{#if visible}
 									<span class="tabular-nums"
 										>{((Math.floor(Date.now() / 100) % 1000) + 4000).toLocaleString()}</span
@@ -296,7 +290,7 @@
 						</div>
 
 						<div
-							class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0_0_black] group-hover:-translate-y-1 transition-transform"
+							class="w-12 h-12 bg-brand-danger border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-brutal-lg group-hover:-translate-y-1 transition-transform"
 						>
 							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -364,7 +358,7 @@
 											class="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[1px]"
 										>
 											<div class="w-full h-full bg-white rounded-full p-[1px]">
-												<img
+												<img loading="lazy"
 													src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
 													alt="avatar"
 													class="rounded-full"
@@ -405,7 +399,7 @@
 										</div>
 										<div class="font-bold text-sm truncate w-full">Midnight City</div>
 										<div class="h-1 w-full bg-gray-600 rounded-full mt-2 overflow-hidden">
-											<div class="h-full w-2/3 bg-[#4ade80]" />
+											<div class="h-full w-2/3 bg-data-green" />
 										</div>
 									</div>
 									<!-- Visualizer bars bg -->
@@ -420,7 +414,7 @@
 								<!-- 4. Review/Testimonial -->
 								<!-- 4. Review/Testimonial -->
 								<div
-									class="w-48 h-24 bg-[#ffc480] border-[2px] border-black rounded-xl p-3 shrink-0 flex flex-col justify-between relative overflow-hidden"
+									class="w-48 h-24 bg-brand-accent border-[2px] border-black rounded-xl p-3 shrink-0 flex flex-col justify-between relative overflow-hidden"
 								>
 									<div class="text-4xl absolute -top-2 -left-1 opacity-20 font-serif leading-none">
 										"
@@ -431,7 +425,7 @@
 									</p>
 									<div class="flex items-center gap-2 mt-auto pt-1">
 										<div class="w-6 h-6 rounded-full border border-black overflow-hidden shrink-0">
-											<img
+											<img loading="lazy"
 												src="/landing-page/profile_sarah.png"
 												class="w-full h-full object-cover"
 												alt="Sarah Jenkins"
@@ -446,7 +440,7 @@
 									class="w-48 h-24 bg-white border-[2px] border-black rounded-xl flex overflow-hidden shadow-[4px_4px_0_0_rgba(0,0,0,0.05)] relative shrink-0"
 								>
 									<div
-										class="w-12 h-full bg-[#ff6b6b] flex flex-col items-center justify-center border-r-[2px] border-dashed border-black relative"
+										class="w-12 h-full bg-brand-danger flex flex-col items-center justify-center border-r-[2px] border-dashed border-black relative"
 									>
 										<div
 											class="text-white -rotate-90 text-[10px] font-bold tracking-widest uppercase whitespace-nowrap"
@@ -476,7 +470,7 @@
 									<div
 										class="w-12 h-16 bg-gray-100 rounded border border-gray-200 shrink-0 relative flex items-center justify-center"
 									>
-										<img
+										<img loading="lazy"
 											src="/landing-page/product_shoe.png"
 											alt="p"
 											class="w-full h-full object-cover mix-blend-multiply opacity-80"
@@ -529,7 +523,7 @@
 										<div class="w-1/5 h-[40%] bg-gray-200 rounded-t-sm" />
 										<div class="w-1/5 h-[60%] bg-gray-300 rounded-t-sm" />
 										<div class="w-1/5 h-[30%] bg-gray-200 rounded-t-sm" />
-										<div class="w-1/5 h-[80%] bg-[#4ade80] rounded-t-sm border border-black/10" />
+										<div class="w-1/5 h-[80%] bg-data-green rounded-t-sm border border-black/10" />
 										<div class="w-1/5 h-[50%] bg-gray-200 rounded-t-sm" />
 									</div>
 								</div>
@@ -539,7 +533,7 @@
 									class="w-48 h-24 bg-white border-[2px] border-black rounded-xl overflow-hidden shrink-0 flex"
 								>
 									<div class="w-16 h-full bg-gray-200 shrink-0">
-										<img
+										<img loading="lazy"
 											src="/landing-page/news_tech.png"
 											alt="news"
 											class="w-full h-full object-cover grayscale"
@@ -547,7 +541,7 @@
 									</div>
 									<div class="p-2 flex flex-col justify-between">
 										<div>
-											<div class="text-[8px] font-bold text-[#ff6b6b] uppercase mb-1">Breaking</div>
+											<div class="text-[8px] font-bold text-brand-danger uppercase mb-1">Breaking</div>
 											<div class="text-[10px] font-bold leading-tight">
 												AI Optimizes Image Workflows
 											</div>
@@ -563,7 +557,7 @@
 								<div
 									class="w-40 h-24 bg-white border-[2px] border-black rounded-xl p-0 shrink-0 overflow-hidden relative group"
 								>
-									<img
+									<img loading="lazy"
 										src="/landing-page/real_estate.png"
 										alt="house"
 										class="absolute inset-0 w-full h-full object-cover"
@@ -578,7 +572,7 @@
 										</div>
 									</div>
 									<div
-										class="absolute top-2 right-2 bg-[#ff6b6b] text-white text-[8px] font-bold px-1.5 py-0.5 border border-black shadow-[2px_2px_0_0_black]"
+										class="absolute top-2 right-2 bg-brand-danger text-white text-[8px] font-bold px-1.5 py-0.5 border border-black shadow-brutal-sm"
 									>
 										NEW
 									</div>

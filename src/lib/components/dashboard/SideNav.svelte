@@ -43,7 +43,7 @@
 </script>
 
 <div
-	class="flex flex-col h-full bg-[#FFFDF8] w-full border-r-[3px] border-gray-900 relative overflow-hidden"
+	class="flex flex-col h-full bg-brand-bg w-full border-r-[3px] border-gray-900 relative overflow-hidden"
 >
 	<!-- Navigation -->
 	<div class="flex-1 overflow-y-auto py-6 px-3 relative z-10 scrollbar-hide">
@@ -61,7 +61,7 @@
 					: undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard'
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -83,7 +83,7 @@
 			</a>
 
 			<!-- ═══ CONTENT Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Content
 			</p>
 
@@ -93,7 +93,7 @@
 				aria-current={isActive(currentPath, '/dashboard/template') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/template')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -120,7 +120,7 @@
 				aria-current={isActive(currentPath, '/dashboard/brand-assets') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/brand-assets')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -148,7 +148,7 @@
 				on:click={() => analytics.trackExperimentFeatureDiscovered({ source: 'nav' })}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/experiments')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -170,7 +170,7 @@
 			</a>
 
 			<!-- ═══ MEDIA Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Media
 			</p>
 
@@ -179,7 +179,7 @@
 				aria-current={$page.url.pathname === '/dashboard/media/images' ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/media/images'
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -205,7 +205,7 @@
 				aria-current={$page.url.pathname === '/dashboard/media/gifs' ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/media/gifs'
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -231,7 +231,7 @@
 				aria-current={$page.url.pathname === '/dashboard/media/pdfs' ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/media/pdfs'
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -253,7 +253,7 @@
 			</a>
 
 			<!-- ═══ ANALYTICS Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Analytics
 			</p>
 
@@ -263,7 +263,7 @@
 				aria-current={isActive(currentPath, '/dashboard/analytics') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/analytics')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -290,7 +290,7 @@
 				aria-current={isActive(currentPath, '/dashboard/activity-logs') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/activity-logs')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -312,7 +312,7 @@
 			</a>
 
 			<!-- ═══ DEVELOPER Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Developer
 			</p>
 
@@ -322,7 +322,7 @@
 				aria-current={isActive(currentPath, '/dashboard/api-playground') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/api-playground')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -349,7 +349,7 @@
 				aria-current={isActive(currentPath, '/dashboard/api-token') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/api-token')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -376,7 +376,7 @@
 				aria-current={isActive(currentPath, '/dashboard/integrations') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/integrations')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -407,7 +407,7 @@
 					aria-current={isActive(currentPath, '/dashboard/team') ? 'page' : undefined}
 					class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 						{isActive(currentPath, '/dashboard/team')
-						? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+						? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 				>
 					<svg
@@ -428,7 +428,7 @@
 					<span>Team Settings</span>
 					{#if $isTeamOwner}
 						<span
-							class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-[#ffc480] text-gray-900 rounded-full border border-gray-900"
+							class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-brand-accent text-gray-900 rounded-full border border-gray-900"
 						>
 							Owner
 						</span>
@@ -442,7 +442,7 @@
 				aria-current={isActive(currentPath, '/dashboard/billing') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/billing')
-					? 'bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937]'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
@@ -463,7 +463,7 @@
 				<span>Billing</span>
 				{#if !isPaidPlan}
 					<span
-						class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-[#10b981] text-white rounded-full"
+						class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-brand-success text-white rounded-full"
 					>
 						Free
 					</span>
@@ -510,7 +510,7 @@
 	<div class="p-4 bg-white border-t-[3px] border-gray-900 relative z-20">
 		<!-- Keyboard shortcut hint -->
 		<div
-			class="flex items-center justify-center mb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+			class="flex items-center justify-center mb-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest"
 		>
 			<kbd
 				class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[10px] font-mono mr-1"
@@ -523,13 +523,10 @@
 		{#if !isPaidPlan}
 			<a
 				href="/dashboard/billing"
-				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-[#ff6b6b] uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all overflow-hidden"
+				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-brand-danger uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
-				<div
-					class="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%] animate-[shimmer_2s_infinite]"
-				/>
 				<svg
-					class="w-4 h-4 mr-2 relative z-10"
+					class="w-4 h-4 mr-2"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -541,7 +538,7 @@
 						d="M13 10V3L4 14h7v7l9-11h-7z"
 					/>
 				</svg>
-				<span class="relative z-10">Upgrade Plan</span>
+				<span>Upgrade Plan</span>
 			</a>
 		{/if}
 

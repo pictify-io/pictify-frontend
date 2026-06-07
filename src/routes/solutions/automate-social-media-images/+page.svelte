@@ -63,14 +63,14 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#ffc480]/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-brand-accent/20 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For Marketing</span>
 		</div>
 		<h1
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
-			Automate social media images<br /><span class="text-[#ff6b6b]">at any scale.</span>
+			Automate social media images<br /><span class="text-brand-danger">at any scale.</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			One template. Thousands of personalized variants. One API call per post. No more design-queue bottlenecks.
@@ -97,7 +97,7 @@
 			What automated social images unlock
 		</h2>
 		<div class="grid md:grid-cols-2 gap-5">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Blog-post-to-social automation</h3>
 				<p class="text-gray-700">
 					New blog post lands? Webhook renders LinkedIn, X, and Instagram cards with the headline,
@@ -105,7 +105,7 @@
 					ships — no human in between.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Customer testimonial cards</h3>
 				<p class="text-gray-700">
 					Every 5-star review in your CRM becomes a social-ready testimonial graphic. Avatar, quote,
@@ -113,14 +113,14 @@
 					already have.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Event and webinar promos</h3>
 				<p class="text-gray-700">
 					Speaker confirmed? Render their cover card. Session time updated? Re-render. Panel of five
 					speakers? Batch renders five cards in parallel, all using the same brand template.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 				<h3 class="font-black text-gray-900 mb-2">Year-in-review and milestone cards</h3>
 				<p class="text-gray-700">
 					One template × N customers = N shareable Year-in-Review graphics. Each user's data (hours
@@ -139,7 +139,7 @@
 			<p class="text-lg text-gray-700 leading-relaxed mb-5">
 				Social platforms each have their own canonical dimensions:
 			</p>
-			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-5 list-disc pl-6 marker:text-[#ff6b6b]">
+			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-5 list-disc pl-6 marker:text-brand-danger">
 				<li><strong>LinkedIn post:</strong> 1200 × 627</li>
 				<li><strong>X (Twitter):</strong> 1200 × 675</li>
 				<li><strong>Instagram feed:</strong> 1080 × 1080 (square) or 1080 × 1350 (portrait)</li>
@@ -161,7 +161,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			Example: render LinkedIn + X cards for every new blog post
 		</h2>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#282c34] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
@@ -216,7 +216,7 @@
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

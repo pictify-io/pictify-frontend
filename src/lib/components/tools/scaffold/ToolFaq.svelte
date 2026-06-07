@@ -19,7 +19,7 @@
 	<h2 class="text-3xl md:text-4xl font-black text-gray-900 text-center mb-8">{heading}</h2>
 	<div class="max-w-3xl mx-auto space-y-4">
 		{#each faqs as faq}
-			<details class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 group">
+			<details class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 group">
 				<summary class="font-black text-lg cursor-pointer flex justify-between items-center">
 					<span>{faq.q}</span>
 					<span class="text-2xl group-open:rotate-45 transition-transform">+</span>

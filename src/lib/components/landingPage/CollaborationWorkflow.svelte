@@ -39,16 +39,9 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Header -->
 		<div class="text-center mb-20">
-			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1"
-			>
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Unified Workflow</span
-				>
-			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Stop the <br />
-				<span class="relative inline-block text-[#ff6b6b]">
+				<span class="relative inline-block text-brand-danger">
 					Handover Hell
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -92,13 +85,13 @@
 				<!-- Left: Designer View -->
 				<div class="relative group">
 					<div
-						class="absolute -top-12 left-4 bg-[#ffc480] px-4 py-2 rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] transform -rotate-2 z-20"
+						class="absolute -top-12 left-4 bg-brand-accent px-4 py-2 rounded-lg border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-2 z-20"
 					>
 						<span class="font-bold text-sm">👩‍🎨 Designer</span>
 					</div>
 
 					<div
-						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-6 relative overflow-hidden"
+						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-6 relative overflow-hidden"
 					>
 						<!-- Editor Interface Mockup -->
 						<div class="flex justify-between items-center mb-4 border-b-2 border-gray-100 pb-2">
@@ -116,7 +109,7 @@
 							<div
 								class="px-6 py-3 bg-white border-[2px] border-gray-900 shadow-sm transform transition-all duration-500
 								{activeStep === 0 || activeStep === 1
-									? 'scale-110 rotate-2 border-[#ff6b6b]'
+									? 'scale-110 rotate-2 border-brand-danger'
 									: 'scale-100 rotate-0'}"
 							>
 								<span class="font-black text-lg">SALE 50%</span>
@@ -127,7 +120,7 @@
 										in:fly={{ y: 10, duration: 300 }}
 									>
 										<svg
-											class="w-6 h-6 text-gray-900 fill-[#ffc480] drop-shadow-md"
+											class="w-6 h-6 text-gray-900 fill-brand-accent drop-shadow-md"
 											viewBox="0 0 24 24"
 										>
 											<path
@@ -137,7 +130,7 @@
 											/>
 										</svg>
 										<div
-											class="bg-[#ffc480] px-2 py-0.5 rounded text-[10px] font-bold border border-gray-900 ml-4 mt-1"
+											class="bg-brand-accent px-2 py-0.5 rounded text-[10px] font-bold border border-gray-900 ml-4 mt-1"
 										>
 											Editing...
 										</div>
@@ -151,30 +144,30 @@
 				<!-- Right: Developer View -->
 				<div class="relative group">
 					<div
-						class="absolute -top-12 right-4 bg-[#4ade80] px-4 py-2 rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] transform rotate-2 z-20"
+						class="absolute -top-12 right-4 bg-data-green px-4 py-2 rounded-lg border-[3px] border-gray-900 shadow-brutal-lg transform rotate-2 z-20"
 					>
 						<span class="font-bold text-sm">👨‍💻 Developer</span>
 					</div>
 
 					<div
-						class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-6 relative overflow-hidden"
+						class="bg-[#1e1e1e] rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-6 relative overflow-hidden"
 					>
 						<!-- Terminal Header -->
 						<div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
-							<div class="w-3 h-3 rounded-full bg-[#ff6b6b]" />
-							<div class="w-3 h-3 rounded-full bg-[#ffc480]" />
-							<div class="w-3 h-3 rounded-full bg-[#4ade80]" />
+							<div class="w-3 h-3 rounded-full bg-brand-danger" />
+							<div class="w-3 h-3 rounded-full bg-brand-accent" />
+							<div class="w-3 h-3 rounded-full bg-data-green" />
 						</div>
 
 						<div class="font-mono text-sm space-y-2">
 							<div class="text-gray-500"># Trigger generation via API</div>
 							<div class="text-white">
-								<span class="text-[#ff6b6b]">const</span> response =
-								<span class="text-[#ff6b6b]">await</span>
+								<span class="text-brand-danger">const</span> response =
+								<span class="text-brand-danger">await</span>
 								pictify.generate({`{`}
 							</div>
 							<div class="pl-4 text-white">
-								template: <span class="text-[#4ade80]">'promo-banner-v2'</span>,
+								template: <span class="text-data-green">'promo-banner-v2'</span>,
 							</div>
 							<div class="pl-4 text-white">
 								data: {`{`} ... {`}`}
@@ -183,7 +176,7 @@
 
 							{#if activeStep === 2}
 								<div
-									class="mt-4 p-2 bg-[#4ade80]/20 border border-[#4ade80] rounded text-[#4ade80] text-xs"
+									class="mt-4 p-2 bg-data-green/20 border border-data-green rounded text-data-green text-xs"
 									in:fade
 								>
 									✓ Template updated automatically
@@ -198,10 +191,10 @@
 		<!-- Value Props -->
 		<div class="grid md:grid-cols-3 gap-6 mt-20">
 			<div
-				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-10 h-10 bg-[#ffc480] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
+					class="w-10 h-10 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
 				>
 					<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -218,10 +211,10 @@
 				</p>
 			</div>
 			<div
-				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-10 h-10 bg-[#ff6b6b] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
+					class="w-10 h-10 bg-brand-danger rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
 				>
 					<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -238,10 +231,10 @@
 				</p>
 			</div>
 			<div
-				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-10 h-10 bg-[#4ade80] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
+					class="w-10 h-10 bg-data-green rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
 				>
 					<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path

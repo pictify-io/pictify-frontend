@@ -49,14 +49,14 @@
 				<input
 					type="text"
 					placeholder="Search templates..."
-					class="w-full pl-12 pr-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-medium focus:outline-none focus:ring-0 focus:shadow-[4px_4px_0_0_#ffc480] transition-all duration-200"
+					class="w-full pl-12 pr-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-medium focus:outline-none focus:ring-0 focus:shadow-brutal-accent transition-all duration-200"
 					bind:value={searchQuery}
 					on:input={handleSearch}
 				/>
 			</div>
 		</div>
 		<button
-			class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-bold py-3 px-5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 flex items-center gap-2"
+			class="bg-brand-danger hover:bg-data-red text-white font-bold py-3 px-5 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 flex items-center gap-2"
 			on:click={openTemplateCreator}
 		>
 			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

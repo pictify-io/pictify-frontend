@@ -92,7 +92,7 @@
 	{#if variant === 'inline'}
 		<!-- Inline Banner -->
 		<div
-			class="p-4 bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center gap-4 relative overflow-hidden"
+			class="p-4 bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-lg flex items-center gap-4 relative overflow-hidden"
 			transition:fade={{ duration: 200 }}
 		>
 			<!-- Decorative pattern -->
@@ -101,7 +101,7 @@
 			/>
 
 			<div
-				class="relative z-10 w-10 h-10 flex items-center justify-center bg-[#ffc480] rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+				class="relative z-10 w-10 h-10 flex items-center justify-center bg-brand-accent rounded-lg border-2 border-gray-900 shadow-brutal-sm"
 			>
 				<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={iconPath} />
@@ -117,7 +117,7 @@
 				</p>
 			</div>
 			<button
-				class="relative z-10 px-4 py-2 bg-[#ffc480] text-gray-900 font-black text-xs uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all whitespace-nowrap"
+				class="relative z-10 px-4 py-2 bg-brand-accent text-gray-900 font-black text-xs uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all whitespace-nowrap"
 				on:click={handleUpgrade}
 			>
 				Upgrade to {PLAN_DISPLAY_NAMES[targetPlan]}
@@ -139,18 +139,18 @@
 	{:else if variant === 'card'}
 		<!-- Card Style -->
 		<div
-			class="p-6 bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] relative overflow-hidden"
+			class="p-6 bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-xl relative overflow-hidden"
 			transition:scale={{ duration: 200, easing: quintOut, start: 0.95 }}
 		>
 			<!-- Background decoration -->
 			<div
-				class="absolute -top-10 -right-10 w-32 h-32 bg-[#ffc480]/20 rounded-full border-2 border-gray-900 dashed"
+				class="absolute -top-10 -right-10 w-32 h-32 bg-brand-accent/20 rounded-full border-2 border-gray-900 dashed"
 			/>
 
 			<div class="relative">
 				<div class="flex items-start gap-4">
 					<div
-						class="w-12 h-12 bg-[#ffc480] rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center flex-shrink-0"
+						class="w-12 h-12 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-brutal-sm flex items-center justify-center flex-shrink-0"
 					>
 						<svg
 							class="w-6 h-6 text-gray-900"
@@ -178,7 +178,7 @@
 
 						{#if upgradeMessages.benefit}
 							<div
-								class="inline-block mt-3 px-2 py-1 bg-[#10b981]/10 border border-[#10b981]/30 rounded text-[10px] font-bold text-[#059669] uppercase flex items-center gap-1"
+								class="inline-block mt-3 px-2 py-1 bg-brand-success/10 border border-brand-success/30 rounded text-[10px] font-bold text-[#059669] uppercase flex items-center gap-1"
 							>
 								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
@@ -218,7 +218,7 @@
 								</svg>
 								<div class="flex items-center gap-2">
 									<span class="text-gray-500 font-bold text-xs uppercase">Upgrade:</span>
-									<span class="font-black text-[#10b981]">
+									<span class="font-black text-brand-success">
 										{targetLimit === null ? 'Unlimited' : formatLimit(targetLimit)}
 									</span>
 								</div>
@@ -229,7 +229,7 @@
 
 				<div class="flex gap-3 mt-6">
 					<button
-						class="flex-1 py-2.5 bg-[#ffc480] text-gray-900 font-black text-xs uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="flex-1 py-2.5 bg-brand-accent text-gray-900 font-black text-xs uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						on:click={handleUpgrade}
 					>
 						Upgrade Now
@@ -254,13 +254,13 @@
 			aria-modal="true"
 		>
 			<div
-				class="relative bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
+				class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-md w-full overflow-hidden"
 				transition:scale={{ duration: 300, easing: quintOut, start: 0.95 }}
 				on:click|stopPropagation
 				on:keydown|stopPropagation
 			>
 				<!-- Header -->
-				<div class="bg-[#ffc480] p-6 relative overflow-hidden border-b-[3px] border-gray-900">
+				<div class="bg-brand-accent p-6 relative overflow-hidden border-b-[3px] border-gray-900">
 					<!-- Decorative pattern -->
 					<div
 						class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px]"
@@ -268,7 +268,7 @@
 
 					<div class="relative z-10">
 						<div
-							class="w-16 h-16 bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mb-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300"
+							class="w-16 h-16 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mb-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300"
 						>
 							<svg
 								class="w-8 h-8 text-gray-900"
@@ -312,7 +312,7 @@
 				<div class="p-6">
 					{#if upgradeMessages.benefit}
 						<div
-							class="flex items-start gap-3 p-3 bg-[#10b981] rounded-lg mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+							class="flex items-start gap-3 p-3 bg-brand-success rounded-lg mb-6 border-2 border-gray-900 shadow-brutal-lg"
 						>
 							<div class="p-1 bg-black/10 rounded">
 								<svg
@@ -338,17 +338,17 @@
 						<div class="grid grid-cols-2 gap-4 mb-6">
 							<div class="p-4 bg-white rounded-lg border-2 border-gray-200 text-center">
 								<p class="text-xs text-gray-500 uppercase tracking-wide font-bold">Current</p>
-								<p class="text-2xl font-black text-gray-400 mt-1">
+								<p class="text-2xl font-black text-gray-600 mt-1">
 									{currentLimit === false ? 'None' : formatLimit(currentLimit)}
 								</p>
 							</div>
 							<div
-								class="p-4 bg-[#ffc480]/20 rounded-lg text-center border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+								class="p-4 bg-brand-accent/20 rounded-lg text-center border-2 border-gray-900 shadow-brutal-sm"
 							>
 								<p class="text-xs text-gray-500 uppercase tracking-wide font-bold">
 									With {PLAN_DISPLAY_NAMES[targetPlan]}
 								</p>
-								<p class="text-2xl font-black text-[#10b981] mt-1">
+								<p class="text-2xl font-black text-brand-success mt-1">
 									{targetLimit === null ? 'Unlimited' : formatLimit(targetLimit)}
 								</p>
 							</div>
@@ -357,7 +357,7 @@
 
 					<div class="space-y-3">
 						<button
-							class="w-full py-3 px-6 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="w-full py-3 px-6 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-sm rounded-lg border-2 border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							on:click={handleUpgrade}
 						>
 							Upgrade to {PLAN_DISPLAY_NAMES[targetPlan]}

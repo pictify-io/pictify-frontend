@@ -25,14 +25,14 @@
 
 	const TYPE_CONFIG = {
 		success: {
-			bg: 'bg-[#4ade80]',
-			border: 'border-[#4ade80]',
+			bg: 'bg-data-green',
+			border: 'border-data-green',
 			icon: 'M5 13l4 4L19 7',
 			title: 'Success'
 		},
 		error: {
-			bg: 'bg-[#ff6b6b]',
-			border: 'border-[#ff6b6b]',
+			bg: 'bg-brand-danger',
+			border: 'border-brand-danger',
 			icon: 'M6 18L18 6M6 6l12 12',
 			title: 'Error'
 		},
@@ -43,8 +43,8 @@
 			title: 'Warning'
 		},
 		default: {
-			bg: 'bg-[#ffc480]',
-			border: 'border-[#ffc480]',
+			bg: 'bg-brand-accent',
+			border: 'border-brand-accent',
 			icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
 			title: 'Note'
 		}
@@ -66,7 +66,7 @@
 		{#each $visibleToasts as t (t.id)}
 			<div
 				transition:fly={{ y: 50, duration: 300, easing: quadOut }}
-				class="flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] rounded-xl overflow-hidden"
+				class="flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-xl overflow-hidden"
 			>
 				<!-- Color Strip / Icon Area -->
 				<div
@@ -75,7 +75,7 @@
 							.bg} w-12 flex items-center justify-center border-r-[3px] border-gray-900 flex-shrink-0"
 				>
 					<div
-						class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+						class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-brutal-sm"
 					>
 						<svg
 							class="w-5 h-5 text-gray-900"

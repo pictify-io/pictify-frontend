@@ -35,7 +35,7 @@
 </script>
 
 <div
-	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+	class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 >
 	<!-- Header -->
 	<div class="px-5 py-4 border-b-2 border-gray-200 flex items-center justify-between">
@@ -74,9 +74,9 @@
 	{:else if error}
 		<div class="p-6 text-center">
 			<div
-				class="w-12 h-12 bg-[#ff6b6b]/10 rounded-xl border-2 border-[#ff6b6b] flex items-center justify-center mx-auto mb-3"
+				class="w-12 h-12 bg-brand-danger/10 rounded-xl border-2 border-brand-danger flex items-center justify-center mx-auto mb-3"
 			>
-				<svg class="w-6 h-6 text-[#ff6b6b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+				<svg class="w-6 h-6 text-brand-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 					><path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -89,7 +89,7 @@
 			<p class="text-xs text-gray-500 mb-3">Please try again later</p>
 			<button
 				on:click={() => dispatch('retry')}
-				class="text-xs font-bold text-[#ff6b6b] hover:underline uppercase tracking-wider"
+				class="text-xs font-bold text-brand-danger hover:underline uppercase tracking-wider"
 			>
 				Retry
 			</button>
@@ -166,7 +166,7 @@
 										href={invoice.invoiceUrl}
 										target="_blank"
 										rel="noopener noreferrer"
-										class="inline-flex items-center gap-1 text-sm font-bold text-[#ff6b6b] hover:underline"
+										class="inline-flex items-center gap-1 text-sm font-bold text-brand-danger hover:underline"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path

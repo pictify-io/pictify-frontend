@@ -13,7 +13,7 @@
 	import EmptyTemplate from '$lib/components/dashboard/template/EmptyTemplate.svelte';
 	import TemplateTypeSelector from '$lib/components/editor/TemplateTypeSelector.svelte';
 	import EnginePicker from '$lib/components/editor/html/EnginePicker.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { FeatureUpgradePrompt } from '$lib/components/plg';
 	import {
 		checkFeatureAccessSync,
@@ -198,14 +198,11 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full" />
 					Design Studio
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					Template <span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Library</span
-					>
+					Template <span class="text-gray-900">Library</span>
 				</h1>
 			</div>
 
@@ -217,11 +214,11 @@
 					</div>
 					<div
 						class="text-lg sm:text-xl font-black tabular-nums {isAtTemplateLimit
-							? 'text-[#ff6b6b]'
+							? 'text-brand-danger'
 							: 'text-gray-900'}"
 					>
 						{pagination.total || 0}{#if typeof templateLimit === 'number'}<span
-								class="text-gray-400">/{formatLimit(templateLimit)}</span
+								class="text-gray-600">/{formatLimit(templateLimit)}</span
 							>{/if}
 					</div>
 				</div>
@@ -258,7 +255,7 @@
 				<input
 					type="text"
 					placeholder="SEARCH TEMPLATES..."
-					class="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wide focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] sm:focus:shadow-[6px_6px_0_0_#ffc480] focus:-translate-y-0.5 sm:focus:-translate-y-1 transition-all placeholder-gray-400"
+					class="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wide focus:outline-none focus:shadow-brutal-accent sm:focus:shadow-[6px_6px_0_0_#ffc480] focus:-translate-y-0.5 sm:focus:-translate-y-1 transition-all placeholder-gray-400"
 					bind:value={searchQuery}
 					on:input={handleSearchInput}
 				/>
@@ -266,8 +263,8 @@
 
 			<!-- Create Button -->
 			<button
-				class="font-black py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] sm:hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[3px] sm:hover:translate-y-[3px] transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm
-				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-[#ff6b6b] hover:bg-[#ff5252] text-white'}"
+				class="font-black py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm sm:hover:shadow-brutal-md hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[3px] sm:hover:translate-y-[3px] transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm
+				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-brand-accent hover:bg-[#ffb968] text-gray-900'}"
 				on:click={openTemplateCreator}
 			>
 				{#if isAtTemplateLimit}
@@ -305,8 +302,8 @@
 					on:click={() => handleFilterChange('all')}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all
 						{formatFilter === 'all'
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					All
 				</button>
@@ -315,8 +312,8 @@
 					on:click={() => handleFilterChange('image')}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{formatFilter === 'image'
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -333,8 +330,8 @@
 					on:click={() => handleFilterChange('pdf')}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{formatFilter === 'pdf'
-						? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#1f2937]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-gray-900 text-white shadow-brutal-md'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -354,11 +351,11 @@
 					on:click={handleDynamicFilterChange}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{dynamicFilter
-						? 'bg-[#a855f7] text-white shadow-[3px_3px_0_0_#6b21a8] border-[#a855f7]'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
+						? 'bg-data-purple text-white shadow-[3px_3px_0_0_#6b21a8] border-data-purple'
+						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg
-						class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-[#a855f7]'}"
+						class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-data-purple'}"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -387,17 +384,41 @@
 				</button>
 			</div>
 			{#if isLoading}
+				<!-- Skeleton grid — 6 cards matching the real template card shape -->
 				<div
-					class="absolute inset-0 flex items-center justify-center z-20 bg-[#FFFDF8]/80 backdrop-blur-sm rounded-xl"
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8"
 				>
-					<Loader size="16" show={isLoading} />
+					{#each Array(6) as _}
+						<div
+							class="bg-white rounded-xl border-[3px] border-gray-200 shadow-brutal-lg overflow-hidden flex flex-col"
+						>
+							<!-- Card tab bar -->
+							<Skeleton class="h-8 rounded-none border-b-[3px] border-gray-200" />
+							<!-- Thumbnail -->
+							<Skeleton class="aspect-[4/3] rounded-none" />
+							<!-- Footer info -->
+							<div class="px-4 pt-4 pb-3 flex flex-col gap-3 border-t-[3px] border-gray-200">
+								<Skeleton class="h-5 w-3/4" />
+								<div class="flex gap-2">
+									<Skeleton class="h-4 w-16" />
+									<Skeleton class="h-4 w-20" />
+								</div>
+							</div>
+							<!-- Action bar -->
+							<div class="grid grid-cols-3 border-t-[3px] border-gray-200">
+								{#each Array(3) as _}
+									<Skeleton class="h-10 rounded-none" />
+								{/each}
+							</div>
+						</div>
+					{/each}
 				</div>
 			{/if}
 
 			{#if templateList.length === 0 && !isLoading}
 				{#if searchQuery}
 					<div
-						class="text-center py-12 sm:py-16 md:py-20 bg-white rounded-xl sm:rounded-2xl md:rounded-3xl border-[2px] sm:border-[3px] border-gray-900 border-dashed shadow-sm px-4"
+						class="text-center py-12 sm:py-16 md:py-20 bg-white rounded-xl sm:rounded-2xl md:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 border-dashed shadow-sm px-4"
 					>
 						<div
 							class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 bg-gray-50 rounded-full border-[2px] sm:border-[3px] border-gray-900 flex items-center justify-center"
@@ -425,7 +446,7 @@
 							We couldn't find any templates matching "{searchQuery}"
 						</p>
 						<button
-							class="mt-4 sm:mt-6 text-xs sm:text-sm font-bold text-[#ff6b6b] hover:text-[#ff5252] uppercase tracking-wide underline decoration-2 underline-offset-4"
+							class="mt-4 sm:mt-6 text-xs sm:text-sm font-bold text-brand-danger hover:text-data-red uppercase tracking-wide underline decoration-2 underline-offset-4"
 							on:click={() => {
 								searchQuery = '';
 								handleSearchInput({ target: { value: '' } });
@@ -444,11 +465,7 @@
 	</div>
 
 	{#if showEnginePicker}
-		<EnginePicker
-			mode="modal"
-			on:select={handleEngineSelect}
-			on:close={handleCloseEnginePicker}
-		/>
+		<EnginePicker mode="modal" on:select={handleEngineSelect} on:close={handleCloseEnginePicker} />
 	{/if}
 
 	{#if showTemplateTypeSelector}
@@ -466,4 +483,3 @@
 		/>
 	{/if}
 </section>
-```

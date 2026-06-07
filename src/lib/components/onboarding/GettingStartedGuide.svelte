@@ -101,13 +101,13 @@
 </script>
 
 <div
-	class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+	class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden"
 >
 	<!-- Header -->
-	<div class="flex items-center justify-between px-6 py-4 bg-[#ffc480] border-b-[3px] border-black">
+	<div class="flex items-center justify-between px-6 py-4 bg-brand-accent border-b-[3px] border-black">
 		<div class="flex items-center gap-3">
 			<div
-				class="w-10 h-10 bg-white border-[3px] border-black rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_black]"
+				class="w-10 h-10 bg-white border-[3px] border-black rounded-xl flex items-center justify-center shadow-brutal-md"
 			>
 				<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -139,7 +139,7 @@
 				class="relative rounded-2xl border-[3px] transition-all duration-200
 					{completed
 					? 'border-gray-200 bg-gray-50/50'
-					: 'border-black bg-white shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-0.5'}"
+					: 'border-black bg-white shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5'}"
 			>
 				<div class="p-5">
 					<div class="flex items-start gap-4">
@@ -147,8 +147,8 @@
 						<div
 							class="w-10 h-10 rounded-xl border-[3px] flex items-center justify-center flex-shrink-0 text-sm font-black
 								{completed
-								? 'border-[#4ade80] bg-[#4ade80]/10 text-[#4ade80]'
-								: 'border-black shadow-[2px_2px_0_0_black]'}"
+								? 'border-data-green bg-data-green/10 text-data-green'
+								: 'border-black shadow-brutal-sm'}"
 							style={!completed ? `background-color: ${step.color}` : ''}
 						>
 							{#if completed}
@@ -185,7 +185,7 @@
 								<div
 									class="mt-3 px-4 py-2.5 bg-[#1e1e1e] rounded-lg border-[2px] border-black font-mono text-xs text-gray-300 overflow-x-auto"
 								>
-									<span class="text-[#ffc480]">{step.code}</span>
+									<span class="text-brand-accent">{step.code}</span>
 								</div>
 							{/if}
 
@@ -196,7 +196,7 @@
 										<div
 											class="flex items-center gap-3 px-4 py-3 bg-[#1e1e1e] rounded-lg border-[2px] border-black font-mono text-sm text-gray-300 overflow-x-auto"
 										>
-											<span class="text-[#ffc480] flex-1 truncate">{apiKey}</span>
+											<span class="text-brand-accent flex-1 truncate">{apiKey}</span>
 											<button
 												on:click={() => copyCommand(apiKey, step.number)}
 												class="flex-shrink-0 px-2 py-1 rounded border border-gray-600 text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:border-gray-400 transition-colors"
@@ -246,7 +246,7 @@
 										class="flex items-center gap-3 px-4 py-3 bg-[#1e1e1e] rounded-lg border-[2px] border-black font-mono text-sm text-gray-300 overflow-x-auto"
 									>
 										<span class="text-gray-500 select-none">$</span>
-										<span class="text-[#4ade80] flex-1">{resolved}</span>
+										<span class="text-data-green flex-1">{resolved}</span>
 										<button
 											on:click={() => copyCommand(resolved, step.number)}
 											class="flex-shrink-0 px-2 py-1 rounded border border-gray-600 text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:border-gray-400 transition-colors"
@@ -275,7 +275,7 @@
 												}}
 												class="flex-1 px-4 py-2 text-xs font-black uppercase tracking-wider transition-colors border-r-[2px] border-black last:border-r-0
 													{(activeTabs[step.number] || tabs[0].id) === tab.id
-													? 'bg-[#ffc480] text-black'
+													? 'bg-brand-accent text-black'
 													: 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-black'}"
 											>
 												{tab.label}
@@ -306,7 +306,7 @@
 														</div>
 														{#if tabStep.code}
 															<div
-																class="mx-4 mb-3 ml-12 px-3 py-2 bg-[#1e1e1e] rounded-md font-mono text-[12px] text-[#4ade80] whitespace-pre-wrap leading-relaxed"
+																class="mx-4 mb-3 ml-12 px-3 py-2 bg-[#1e1e1e] rounded-md font-mono text-[12px] text-data-green whitespace-pre-wrap leading-relaxed"
 															>
 																{resolveTabStep(tabStep.code)}
 															</div>
@@ -335,7 +335,7 @@
 									on:click={() => trackChecklistCta(step)}
 									target={step.external ? '_blank' : undefined}
 									rel={step.external ? 'noopener noreferrer' : undefined}
-									class="inline-flex items-center gap-2 mt-3 px-5 py-2 rounded-lg border-[2px] border-black text-sm font-black uppercase tracking-wider shadow-[2px_2px_0_0_black] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="inline-flex items-center gap-2 mt-3 px-5 py-2 rounded-lg border-[2px] border-black text-sm font-black uppercase tracking-wider shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									style="background-color: {step.color}"
 								>
 									{step.cta}
@@ -376,20 +376,20 @@
 			<div class="flex items-center gap-4 flex-wrap">
 				<a
 					href="/dashboard/api-playground"
-					class="text-sm font-bold text-black hover:text-[#ff6b6b] underline underline-offset-2 transition-colors"
+					class="text-sm font-bold text-black hover:text-brand-danger underline underline-offset-2 transition-colors"
 				>
 					API Playground
 				</a>
 				<a
 					href="https://docs.pictify.io"
 					target="_blank"
-					class="text-sm font-bold text-black hover:text-[#ff6b6b] underline underline-offset-2 transition-colors"
+					class="text-sm font-bold text-black hover:text-brand-danger underline underline-offset-2 transition-colors"
 				>
 					Documentation
 				</a>
 				<a
 					href="/dashboard/template"
-					class="text-sm font-bold text-black hover:text-[#ff6b6b] underline underline-offset-2 transition-colors"
+					class="text-sm font-bold text-black hover:text-brand-danger underline underline-offset-2 transition-colors"
 				>
 					Browse Templates
 				</a>

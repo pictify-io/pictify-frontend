@@ -252,7 +252,7 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -260,7 +260,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -305,18 +305,18 @@
 
 					<!-- VS Badge -->
 					<div
-						class="w-12 h-12 sm:w-16 sm:h-16 bg-[#ff6b6b] border-[3px] border-gray-900 rounded-full flex items-center justify-center font-black text-white text-lg sm:text-2xl shadow-[4px_4px_0_0_#1f2937] z-10"
+						class="w-12 h-12 sm:w-16 sm:h-16 bg-brand-danger border-[3px] border-gray-900 rounded-full flex items-center justify-center font-black text-white text-lg sm:text-2xl shadow-brutal-lg z-10"
 					>
 						VS
 					</div>
 
 					<!-- Competitor Icon -->
 					<div
-						class="w-20 h-20 sm:w-28 sm:h-28 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] transform rotate-3 hover:rotate-0 transition-transform duration-300"
+						class="w-20 h-20 sm:w-28 sm:h-28 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
 						style="color: {icon.color || '#1f2937'}"
 					>
 						{#if icon.type === 'url'}
-							<img src={icon.url} alt={comparison.competitor} class="w-10 h-10 sm:w-14 sm:h-14" />
+							<img loading="lazy" src={icon.url} alt={comparison.competitor} class="w-10 h-10 sm:w-14 sm:h-14" />
 						{:else if icon.type === 'text'}
 							<span class="text-2xl sm:text-4xl font-black" style="color: {icon.color}"
 								>{icon.text}</span
@@ -352,10 +352,10 @@
 			{#if comparison.tldr}
 				<section class="mb-12">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-[4px_4px_0_0_#ffc480]"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-brutal-accent"
 					>
 						<p class="text-gray-700 font-bold leading-relaxed">
-							<span class="text-[#ff6b6b] font-black uppercase tracking-wide">TL;DR:</span>
+							<span class="text-brand-danger font-black uppercase tracking-wide">TL;DR:</span>
 							{comparison.tldr}
 						</p>
 					</div>
@@ -390,7 +390,7 @@
 						{#each comparison.advantages as advantage}
 							<li class="flex items-start gap-3">
 								<div
-									class="w-6 h-6 rounded-full bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
+									class="w-6 h-6 rounded-full bg-data-green border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
 								>
 									<svg
 										class="w-3 h-3 text-gray-900 font-bold"
@@ -420,7 +420,7 @@
 							style="color: {icon.color || '#1f2937'}"
 						>
 							{#if icon.type === 'url'}
-								<img src={icon.url} alt={comparison.competitor} class="w-8 h-8" />
+								<img loading="lazy" src={icon.url} alt={comparison.competitor} class="w-8 h-8" />
 							{:else if icon.type === 'text'}
 								<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
 							{:else if icon.type === 'svg'}
@@ -479,7 +479,7 @@
 					>
 						<h3 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-900 font-black text-sm shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 bg-data-green border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-900 font-black text-sm shadow-brutal-sm"
 								>1</span
 							>
 							Choose Pictify if...
@@ -494,7 +494,7 @@
 					>
 						<h3 class="text-xl font-black text-gray-700 mb-4 flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-gray-100 border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-500 font-black text-sm shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 bg-gray-100 border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-500 font-black text-sm shadow-brutal-sm"
 								>2</span
 							>
 							Choose {comparison.competitor} if...
@@ -515,7 +515,7 @@
 						Feature Comparison
 					</h2>
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-xl"
 					>
 						<table class="w-full">
 							<thead class="bg-gray-900 text-white">
@@ -545,7 +545,7 @@
 													<div
 														class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-[2px] border-gray-900 {star <
 														scores.pictify
-															? 'bg-[#4ade80]'
+															? 'bg-data-green'
 															: 'bg-transparent opacity-20'}"
 													/>
 												{/each}
@@ -602,7 +602,7 @@
 								{#each pricingTiers as tier, i}
 									<tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
 										<td class="px-6 py-4 font-black text-gray-900">{tier.name}</td>
-										<td class="px-6 py-4 font-bold text-[#4ade80] border-l-[3px] border-gray-100"
+										<td class="px-6 py-4 font-bold text-data-green border-l-[3px] border-gray-100"
 											>{tier.pictify}</td
 										>
 										<td class="px-6 py-4 font-medium text-gray-600 border-l-[3px] border-gray-100"
@@ -653,7 +653,7 @@
 								{#each comparison.migration.steps as step, i}
 									<li class="flex items-center gap-4">
 										<span
-											class="w-10 h-10 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-gray-900 text-lg font-black shadow-[2px_2px_0_0_#1f2937] flex-shrink-0"
+											class="w-10 h-10 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-gray-900 text-lg font-black shadow-brutal-sm flex-shrink-0"
 											>{i + 1}</span
 										>
 										<span class="text-gray-900 font-bold text-lg">{step}</span>
@@ -679,7 +679,7 @@
 								class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#e5e7eb] hover:shadow-[2px_2px_0_0_#e5e7eb] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<h3 class="text-lg font-black text-gray-900 mb-3 flex items-start gap-3">
-									<span class="text-[#ff6b6b]">Q.</span>
+									<span class="text-brand-danger">Q.</span>
 									{faq.q}
 								</h3>
 								<p
@@ -695,7 +695,7 @@
 
 			<!-- CTA Section -->
 			<section
-				class="mb-16 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
+				class="mb-16 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
 			>
 				<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Try Pictify Free</h2>
 				<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
@@ -705,7 +705,7 @@
 				<div class="flex flex-wrap justify-center gap-4">
 					<a
 						href="/signup"
-						class="px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+						class="px-8 py-4 bg-brand-danger text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 					>
 						Get Started Free
 					</a>
@@ -726,7 +726,7 @@
 				<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
 					<a
 						href="/solutions/automated-image-generation"
-						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1 text-sm">Automated Image Generation</h3>
 						<p class="text-xs text-gray-500">The complete guide — templates, APIs, expressions, and live data bindings.</p>
@@ -759,7 +759,7 @@
 						{@const compIcon = brandIcons[compSlug] || brandIcons.default}
 						<a
 							href="/compare/{comp.slug}"
-							class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffc480] transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
 						>
 							<div class="flex items-center gap-4">
 								<div
@@ -767,7 +767,7 @@
 									style="color: {compIcon.color || '#1f2937'}"
 								>
 									{#if compIcon.type === 'url'}
-										<img src={compIcon.url} alt={comp.competitor} class="w-6 h-6" />
+										<img loading="lazy" src={compIcon.url} alt={comp.competitor} class="w-6 h-6" />
 									{:else if compIcon.type === 'text'}
 										<span class="text-sm font-black" style="color: {compIcon.color}"
 											>{compIcon.text}</span
@@ -820,7 +820,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -829,7 +829,7 @@
 				</h1>
 				<a
 					href="/compare"
-					class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					View All Comparisons
 				</a>

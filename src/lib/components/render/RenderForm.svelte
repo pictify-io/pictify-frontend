@@ -80,14 +80,14 @@
 				<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">
 					{variable.name}
 					{#if variable.required}
-						<span class="text-[#ff6b6b]">*</span>
+						<span class="text-brand-danger">*</span>
 					{/if}
 				</label>
 				{#if variable.type === 'text' && (variable.name
 						.toLowerCase()
 						.includes('description') || variable.name.toLowerCase().includes('content'))}
 					<textarea
-						class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all resize-none placeholder-gray-400"
+						class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-brutal-accent focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all resize-none placeholder-gray-400"
 						rows="3"
 						placeholder={variable.placeholder || `ENTER ${variable.name.toUpperCase()}...`}
 						value={variableValues[variable.name] || ''}
@@ -109,7 +109,7 @@
 						</div>
 						<input
 							type="text"
-							class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all uppercase"
+							class="flex-1 px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold font-mono focus:outline-none focus:shadow-brutal-accent focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all uppercase"
 							value={variableValues[variable.name] || ''}
 							on:input={(e) => handleInputChange(variable.name, e.target.value)}
 							placeholder="#000000"
@@ -118,7 +118,7 @@
 				{:else}
 					<input
 						type={getInputType(variable)}
-						class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
+						class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-brutal-accent focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all placeholder-gray-400"
 						placeholder={variable.placeholder || `ENTER ${variable.name.toUpperCase()}...`}
 						value={variableValues[variable.name] || ''}
 						on:input={(e) => handleInputChange(variable.name, e.target.value)}
@@ -178,7 +178,7 @@
 					</div>
 				{/if}
 				<button
-					class="w-full py-2 bg-[#4ecdc4] text-white font-black uppercase tracking-wide border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all text-xs"
+					class="w-full py-2 bg-data-teal text-white font-black uppercase tracking-wide border-[3px] border-gray-900 rounded-lg shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all text-xs"
 					on:click={applyJsonInput}
 				>
 					Apply JSON Configuration

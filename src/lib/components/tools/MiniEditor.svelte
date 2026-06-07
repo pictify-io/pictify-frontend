@@ -167,7 +167,7 @@
 <div class="relative">
 	{#if loadError}
 		<div
-			class="absolute inset-0 z-20 flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]"
+			class="absolute inset-0 z-20 flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
 		>
 			<div class="flex flex-col items-center gap-2 text-center px-4">
 				<span class="text-lg font-bold text-gray-900">Failed to load editor</span>
@@ -176,7 +176,7 @@
 		</div>
 	{:else if loading}
 		<div
-			class="absolute inset-0 z-20 flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937]"
+			class="absolute inset-0 z-20 flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
 		>
 			<div class="flex items-center gap-3">
 				<div
@@ -195,13 +195,13 @@
 		</div>
 	{/if}
 
-	<div class="border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] bg-white overflow-hidden">
+	<div class="border-[3px] border-gray-900 shadow-brutal-xl bg-white overflow-hidden">
 		<canvas bind:this={canvasEl}>
 			<p>Interactive template preview — click text elements to edit</p>
 		</canvas>
 	</div>
 
 	{#if selectedText}
-		<div class="mt-2 text-xs text-[#4ade80] font-bold">Double-click text to type</div>
+		<div class="mt-2 text-xs text-data-green font-bold">Double-click text to type</div>
 	{/if}
 </div>

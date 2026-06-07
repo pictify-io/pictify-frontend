@@ -106,15 +106,15 @@
 
 <!-- Full-screen overlay -->
 <div
-	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
 >
 	<div
-		class="w-full max-w-2xl bg-[#FFFDF8] border-[3px] border-black rounded-3xl shadow-[8px_8px_0_0_black] overflow-hidden animate-wizard-in"
+		class="w-full max-w-2xl bg-brand-bg border-[3px] border-black rounded-2xl shadow-brutal-2xl overflow-hidden animate-wizard-in"
 	>
 		<!-- Header -->
 		<div class="px-8 pt-8 pb-4">
 			<div
-				class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] border-[2px] border-black rounded-full shadow-[3px_3px_0_0_black] mb-4"
+				class="inline-flex items-center gap-2 px-3 py-1 bg-brand-accent border-[2px] border-black rounded-full shadow-brutal-md mb-4"
 			>
 				<span class="text-[10px] font-black text-black uppercase tracking-widest">Quick Setup</span>
 			</div>
@@ -142,13 +142,13 @@
 						on:click={() => (selectedIntent = intent.id)}
 						class="text-left p-5 rounded-xl border-[3px] transition-all duration-200
 							{selectedIntent === intent.id
-							? 'border-black bg-[#ffc480]/30 shadow-[4px_4px_0_0_black] -translate-y-0.5'
-							: 'border-gray-200 bg-white hover:border-black hover:shadow-[2px_2px_0_0_black] hover:-translate-y-0.5'}"
+							? 'border-black bg-brand-accent/30 shadow-brutal-lg -translate-y-0.5'
+							: 'border-gray-200 bg-white hover:border-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
 					>
 						<div class="flex items-center gap-4">
 							<div
 								class="w-10 h-10 rounded-xl border-[2px] flex items-center justify-center flex-shrink-0
-								{selectedIntent === intent.id ? 'border-black bg-[#ffc480]' : 'border-gray-300 bg-gray-50'}"
+								{selectedIntent === intent.id ? 'border-black bg-brand-accent' : 'border-gray-300 bg-gray-50'}"
 							>
 								{#if intent.icon === 'robot'}
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -220,7 +220,7 @@
 				on:click={skip}
 				disabled={saving}
 				class="text-sm font-bold transition-colors underline underline-offset-2 {isValueSkip
-					? 'text-black hover:text-[#ff6b6b]'
+					? 'text-black hover:text-brand-danger'
 					: 'text-gray-500 hover:text-black'}"
 			>
 				{isValueSkip ? 'Just show me my API key →' : 'Skip for now'}
@@ -229,9 +229,9 @@
 			<button
 				on:click={finish}
 				disabled={!selectedIntent || saving}
-				class="px-6 py-2.5 text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] transition-all
+				class="px-6 py-2.5 text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-black shadow-brutal-lg transition-all
 					{selectedIntent && !saving
-					? 'bg-[#ffc480] text-black hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px]'
+					? 'bg-brand-accent text-black hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
 					: 'bg-gray-200 text-gray-400 cursor-not-allowed'}"
 			>
 				{saving ? 'Saving...' : 'Get Started'}

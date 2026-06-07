@@ -3,7 +3,7 @@
 		{
 			title: 'Automation',
 			description: 'Connect to your existing workflows',
-			color: 'bg-[#ff6b6b]',
+			color: 'bg-brand-danger',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
 			items: ['Zapier', 'Make', 'n8n', 'Pipedream'],
@@ -12,7 +12,7 @@
 		{
 			title: 'Storage & Delivery',
 			description: 'Deliver to your own CDN',
-			color: 'bg-[#4ade80]',
+			color: 'bg-data-green',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
 			items: ['AWS S3', 'Google Cloud', 'Cloudinary', 'ImageKit'],
@@ -21,7 +21,7 @@
 		{
 			title: 'Webhooks',
 			description: 'Real-time event notifications',
-			color: 'bg-[#ffc480]',
+			color: 'bg-brand-accent',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
 			items: ['render.completed', 'render.failed', 'experiment.winner'],
@@ -50,7 +50,7 @@
 			description:
 				'Scale with your organization. Advanced access control, custom domains, and audit logs.',
 			color: 'bg-white',
-			iconBg: 'bg-[#ffc480]',
+			iconBg: 'bg-brand-accent',
 			iconColor: 'text-black',
 			items: ['Multi-Workspace', 'Role-Based Access', 'SSO/SAML', 'Audit Logs'],
 			cols: 'xl:col-span-12'
@@ -59,7 +59,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -67,24 +67,18 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Main Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
-			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
-			>
-				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Infrastructure</span>
-			</div>
-
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Plugs Into Your Stack.<br />
-				<span class="relative inline-block text-[#ff6b6b] transform rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					No Glue Code
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
@@ -106,7 +100,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 xl:gap-8">
 			{#each categories as cat}
 				<div
-					class="{cat.cols} {cat.color} rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] transition-all duration-300 relative overflow-hidden group flex flex-col"
+					class="{cat.cols} {cat.color} rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 				>
 					<!-- Optional Gradient Overlay for non-white cards -->
 					{#if cat.color !== 'bg-white'}
@@ -120,7 +114,7 @@
 					<div class="p-8 md:p-10 flex-1 flex flex-col relative z-10">
 						<div class="flex items-center gap-4 mb-6">
 							<div
-								class="w-14 h-14 {cat.iconBg} border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform"
+								class="w-14 h-14 {cat.iconBg} border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:-rotate-6 transition-transform"
 							>
 								{#if cat.title === 'Automation'}
 									<svg
@@ -217,7 +211,7 @@
 						<div class="mt-auto flex flex-wrap gap-3">
 							{#each cat.items as item}
 								<span
-									class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-black text-black shadow-[2px_2px_0_0_#1f2937] group-hover:-translate-y-0.5 group-hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
+									class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-black text-black shadow-brutal-sm group-hover:-translate-y-0.5 group-hover:shadow-brutal-lg transition-all"
 								>
 									{#if cat.title === 'Webhooks'}
 										<code class="font-mono text-xs uppercase tracking-wider">{item}</code>
@@ -236,7 +230,7 @@
 		<div class="text-center mt-20">
 			<a
 				href="/integrations"
-				class="inline-flex items-center gap-3 px-8 py-4 bg-[#ffc480] text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all group"
+				class="inline-flex items-center gap-3 px-8 py-4 bg-brand-accent text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-1 hover:translate-y-1 transition-all group"
 			>
 				<span class="text-lg">View All Integrations</span>
 				<div

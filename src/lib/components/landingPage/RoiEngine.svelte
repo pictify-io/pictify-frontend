@@ -5,7 +5,7 @@
 	// Data for the "Before/After" comparison in Card 1
 	const marketingStats = {
 		generic: { ctr: '1.2%', color: 'text-gray-400', label: 'Generic Ad' },
-		dynamic: { ctr: '4.8%', color: 'text-[#4ade80]', label: 'Dynamic Ad' }
+		dynamic: { ctr: '4.8%', color: 'text-data-green', label: 'Dynamic Ad' }
 	};
 
 	// Data for the "Speed" visual in Card 2
@@ -30,7 +30,7 @@
 	});
 </script>
 
-<section class="w-full py-20 md:py-32 bg-[#FFFDF8] relative overflow-hidden">
+<section class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Background Grid -->
 	<div
 		class="absolute inset-0 bg-[linear-gradient(45deg,#f3f4f6_25%,transparent_25%,transparent_75%,#f3f4f6_75%,#f3f4f6),linear-gradient(45deg,#f3f4f6_25%,transparent_25%,transparent_75%,#f3f4f6_75%,#f3f4f6)] [background-size:20px_20px] [background-position:0_0,10px_10px] opacity-50"
@@ -39,14 +39,9 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Header -->
 		<div class="text-center mb-20">
-			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-[#1f2937] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] mb-6 transform -rotate-1"
-			>
-				<span class="text-sm font-bold text-white uppercase tracking-wider">Why Pictify?</span>
-			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				The ROI <br />
-				<span class="text-[#ff6b6b]">Engine.</span>
+				<span class="text-brand-danger">Engine.</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
 				Don't just generate images. Generate results. Infrastructure designed to impact your bottom
@@ -58,7 +53,7 @@
 		<div class="grid lg:grid-cols-3 gap-8">
 			<!-- Card 1: Marketing ROI -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-[12px_12px_0_0_#1f2937] transition-all"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-brutal-3xl transition-all"
 			>
 				<div
 					class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
@@ -75,7 +70,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-[#ff6b6b] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-brand-danger rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -97,7 +92,7 @@
 					<div class="space-y-4">
 						<div>
 							<div
-								class="flex justify-between text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider"
+								class="flex justify-between text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider"
 							>
 								Generic
 							</div>
@@ -109,12 +104,12 @@
 						</div>
 						<div>
 							<div
-								class="flex justify-between text-xs font-bold text-[#ff6b6b] mb-1 uppercase tracking-wider"
+								class="flex justify-between text-xs font-bold text-brand-danger mb-1 uppercase tracking-wider"
 							>
 								Pictify Dynamic
 							</div>
 							<div
-								class="h-8 bg-[#ff6b6b] rounded w-3/4 flex items-center px-2 text-xs font-bold text-white relative shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] animate-[grow_1s_ease-out]"
+								class="h-8 bg-brand-danger rounded w-3/4 flex items-center px-2 text-xs font-bold text-white relative shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] animate-[grow_1s_ease-out]"
 							>
 								4.8%
 								<span class="absolute right-2 bg-white/20 px-1.5 rounded text-[9px]">4x Lift</span>
@@ -126,7 +121,7 @@
 
 			<!-- Card 2: Performance/Speed -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-[12px_12px_0_0_#1f2937] transition-all"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-brutal-3xl transition-all"
 			>
 				<div
 					class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
@@ -143,7 +138,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-[#ffc480] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -165,7 +160,7 @@
 				>
 					<!-- Speedometer Visual -->
 					<div class="text-center relative z-10">
-						<div class="text-5xl font-black text-[#4ade80] tabular-nums tracking-tighter">
+						<div class="text-5xl font-black text-data-green tabular-nums tracking-tighter">
 							{generationTime}<span class="text-2xl text-gray-500">ms</span>
 						</div>
 						<div class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
@@ -174,14 +169,14 @@
 					</div>
 					<!-- Animated Line -->
 					<div class="absolute bottom-0 left-0 w-full h-1 bg-gray-800">
-						<div class="h-full bg-[#4ade80] w-full animate-[scan_2s_linear_infinite]" />
+						<div class="h-full bg-data-green w-full animate-[scan_2s_linear_infinite]" />
 					</div>
 				</div>
 			</div>
 
 			<!-- Card 3: Dev Efficiency -->
 			<div
-				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-[12px_12px_0_0_#1f2937] transition-all"
+				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 flex flex-col h-full relative overflow-hidden group hover:-translate-y-1 hover:shadow-brutal-3xl transition-all"
 			>
 				<div
 					class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
@@ -198,7 +193,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-[#4ade80] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-data-green rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -225,13 +220,13 @@
 								>AWS EC2 (Puppeteer)</span
 							>
 						</div>
-						<span class="text-xs font-bold text-gray-400">$400/mo</span>
+						<span class="text-xs font-bold text-gray-600">$400/mo</span>
 					</div>
 					<div
-						class="flex items-center justify-between p-3 bg-[#4ade80]/10 border-[2px] border-[#4ade80] rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.05)] transform scale-105"
+						class="flex items-center justify-between p-3 bg-data-green/10 border-[2px] border-data-green rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.05)] transform scale-105"
 					>
 						<div class="flex items-center gap-2">
-							<div class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+							<div class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 							<span class="text-xs font-bold text-gray-900">Pictify API</span>
 						</div>
 						<span class="text-xs font-bold text-gray-900">$39/mo</span>

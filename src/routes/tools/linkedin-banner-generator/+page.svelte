@@ -525,7 +525,7 @@
 	<link rel="canonical" href="https://pictify.io/tools/linkedin-banner-generator" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -533,17 +533,17 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative z-10">
 		<!-- Breadcrumb -->
 		<nav class="mb-12 flex justify-center">
 			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937]"
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
 			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
@@ -562,7 +562,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-8"
 			>
 				<div
-					class="px-6 py-2 bg-[#4ade80] border-[4px] border-black text-black font-black text-sm uppercase tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-2 bg-data-green border-[4px] border-black text-black font-black text-sm uppercase tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Free • No Signup Required
 				</div>
@@ -576,7 +576,7 @@
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[4px] border-black shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[4px] border-black shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h1>
@@ -586,7 +586,7 @@
 				<p
 					class="text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-6 shadow-[8px_8px_0_0_#e5e7eb]"
 				>
-					Choose from <span class="bg-[#ffc480] px-1 border-b-[3px] border-black"
+					Choose from <span class="bg-brand-accent px-1 border-b-[3px] border-black"
 						>{allTemplates.length}+ templates</span
 					>
 					designed for developers, marketers, designers, and professionals.
@@ -599,12 +599,12 @@
 			<!-- Stats -->
 			<div class="flex items-center justify-center gap-4 mt-8">
 				<div
-					class="px-4 py-2 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] font-black text-sm"
+					class="px-4 py-2 bg-white border-[3px] border-gray-900 shadow-brutal-lg font-black text-sm"
 				>
-					<span class="text-[#ff6b6b]">{totalBannersCreated.toLocaleString()}</span> banners created
+					<span class="text-brand-danger">{totalBannersCreated.toLocaleString()}</span> banners created
 				</div>
 				<div
-					class="px-4 py-2 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] font-black text-sm flex items-center gap-1"
+					class="px-4 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg font-black text-sm flex items-center gap-1"
 				>
 					<span class="text-yellow-700">★★★★★</span>
 					<span>4.9/5</span>
@@ -619,8 +619,8 @@
 					on:click={() => (selectedCategory = 'all')}
 					class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all {selectedCategory ===
 					'all'
-						? 'bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480] -translate-x-1 -translate-y-1'
-						: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+						? 'bg-gray-900 text-white shadow-brutal-accent -translate-x-1 -translate-y-1'
+						: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 				>
 					All Templates
 				</button>
@@ -629,8 +629,8 @@
 						on:click={() => (selectedCategory = category.id)}
 						class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all flex items-center gap-2 {selectedCategory ===
 						category.id
-							? 'bg-gray-900 text-white shadow-[4px_4px_0_0_#ffc480] -translate-x-1 -translate-y-1'
-							: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
+							? 'bg-gray-900 text-white shadow-brutal-accent -translate-x-1 -translate-y-1'
+							: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 					>
 						{@html categoryIcons[category.icon]}
 						{category.label}
@@ -645,14 +645,14 @@
 				{#each filteredTemplates as template}
 					<button
 						on:click={() => selectTemplate(template)}
-						class="group relative bg-white border-[3px] border-gray-900 p-1 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden {selectedTemplate?.id ===
+						class="group relative bg-white border-[3px] border-gray-900 p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden {selectedTemplate?.id ===
 						template.id
-							? 'ring-4 ring-[#ffc480] ring-offset-2'
+							? 'ring-4 ring-brand-accent ring-offset-2'
 							: ''}"
 					>
 						{#if template.popular}
 							<div
-								class="absolute top-3 left-3 z-10 bg-[#ffc480] text-black text-xs font-black uppercase tracking-wider px-3 py-1 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+								class="absolute top-3 left-3 z-10 bg-brand-accent text-black text-xs font-black uppercase tracking-wider px-3 py-1 border-[2px] border-gray-900 shadow-brutal-sm"
 							>
 								Popular
 							</div>
@@ -684,7 +684,7 @@
 						</div>
 						<div class="p-4 bg-white">
 							<p
-								class="text-base font-black text-gray-900 uppercase tracking-wide group-hover:text-[#ff6b6b] transition-colors"
+								class="text-base font-black text-gray-900 uppercase tracking-wide group-hover:text-brand-danger transition-colors"
 							>
 								{template.name}
 							</p>
@@ -713,21 +713,21 @@
 						>
 							<div class="flex items-center gap-3">
 								<div class="flex gap-2">
-									<div class="w-4 h-4 bg-[#ff6b6b] border-2 border-gray-700" />
-									<div class="w-4 h-4 bg-[#ffc480] border-2 border-gray-700" />
-									<div class="w-4 h-4 bg-[#4ade80] border-2 border-gray-700" />
+									<div class="w-4 h-4 bg-brand-danger border-2 border-gray-700" />
+									<div class="w-4 h-4 bg-brand-accent border-2 border-gray-700" />
+									<div class="w-4 h-4 bg-data-green border-2 border-gray-700" />
 								</div>
 								<span class="font-mono font-bold tracking-wider text-sm uppercase"
 									>PREVIEW: {LINKEDIN_BANNER_WIDTH} × {LINKEDIN_BANNER_HEIGHT}px</span
 								>
 							</div>
 							<label
-								class="flex items-center gap-2 text-sm font-bold cursor-pointer hover:text-[#ffc480] transition-colors"
+								class="flex items-center gap-2 text-sm font-bold cursor-pointer hover:text-brand-accent transition-colors"
 							>
 								<input
 									type="checkbox"
 									bind:checked={showSafeZone}
-									class="w-4 h-4 accent-[#ffc480]"
+									class="w-4 h-4 accent-brand-accent"
 								/>
 								Show Safe Zone
 							</label>
@@ -739,7 +739,7 @@
 							style="background-image: repeating-linear-gradient(45deg, #e5e5e5 25%, transparent 25%, transparent 75%, #e5e5e5 75%, #e5e5e5), repeating-linear-gradient(45deg, #e5e5e5 25%, #f0f0f0 25%, #f0f0f0 75%, #e5e5e5 75%, #e5e5e5); background-position: 0 0, 10px 10px; background-size: 20px 20px;"
 						>
 							<div
-								class="relative inline-block border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden"
+								class="relative inline-block border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden"
 							>
 								<OgImageTemplate
 									html={selectedTemplate.html}
@@ -763,7 +763,7 @@
                     "
 									>
 										<div
-											class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 bg-[#ff6b6b] text-white text-[10px] font-black uppercase tracking-wider border-[2px] border-black whitespace-nowrap"
+											class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 bg-brand-danger text-white text-[10px] font-black uppercase tracking-wider border-[2px] border-black whitespace-nowrap"
 										>
 											Safe Zone (568×264px)
 										</div>
@@ -773,7 +773,7 @@
 						</div>
 
 						<!-- Controls -->
-						<div class="p-6 md:p-8 bg-[#FFFDF8]">
+						<div class="p-6 md:p-8 bg-brand-bg">
 							<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 								<!-- Dynamic Text Inputs based on Template Variables -->
 								<div class="space-y-6">
@@ -787,7 +787,7 @@
 												type="text"
 												value={variable.value}
 												on:input={(e) => handleVariableChange(variableId, e)}
-												class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+												class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-brutal-accent transition-all bg-white"
 												placeholder={variable.label}
 											/>
 										</div>
@@ -801,7 +801,7 @@
 											type="file"
 											accept="image/*"
 											on:change={handleLogoUpload}
-											class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-[#ffc480] file:text-black file:font-black file:uppercase file:text-xs file:tracking-wider file:cursor-pointer"
+											class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-brutal-accent transition-all bg-white file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-brand-accent file:text-black file:font-black file:uppercase file:text-xs file:tracking-wider file:cursor-pointer"
 										/>
 									</div>
 								</div>
@@ -878,7 +878,7 @@
 								<button
 									on:click={generateBanner}
 									disabled={isImageGenerating}
-									class="px-12 py-5 bg-[#ff6b6b] text-white border-[4px] border-black font-black text-xl uppercase tracking-wider shadow-[8px_8px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+									class="px-12 py-5 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wider shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
 								>
 									{#if isImageGenerating}
 										<svg class="animate-spin h-6 w-6" viewBox="0 0 24 24">
@@ -916,7 +916,7 @@
 							{#if isImageGenerating}
 								<div class="mt-6 w-full max-w-md mx-auto">
 									<div class="h-3 bg-white border-[3px] border-gray-900">
-										<div class="h-full bg-[#4ade80] transition-all" style="width: {$progress}%" />
+										<div class="h-full bg-data-green transition-all" style="width: {$progress}%" />
 									</div>
 								</div>
 							{/if}
@@ -931,13 +931,13 @@
 			<div class="mb-16">
 				<div class="relative">
 					<div
-						class="absolute inset-0 bg-[#4ade80] translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
+						class="absolute inset-0 bg-data-green translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
 					/>
 
 					<div class="relative border-[4px] border-black bg-white">
 						<!-- Header -->
 						<div
-							class="bg-[#4ade80] text-black px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
+							class="bg-data-green text-black px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
 						>
 							<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -953,9 +953,9 @@
 						<div class="p-6 md:p-8">
 							<!-- Banner Preview -->
 							<div
-								class="aspect-[4/1] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden mb-6"
+								class="aspect-[4/1] border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden mb-6"
 							>
-								<img
+								<img loading="lazy"
 									src={imageUrl}
 									alt="Generated LinkedIn Banner"
 									class="w-full h-full object-cover"
@@ -965,7 +965,7 @@
 							<!-- Watermark Notice -->
 							{#if !isUserLoggedIn && generationCount > 2}
 								<div
-									class="bg-[#ffc480] border-[3px] border-gray-900 p-5 mb-6 shadow-[4px_4px_0_0_#1f2937]"
+									class="bg-brand-accent border-[3px] border-gray-900 p-5 mb-6 shadow-brutal-lg"
 								>
 									<p class="font-black text-gray-900 uppercase tracking-wide">
 										Free downloads include a small Pictify watermark
@@ -987,7 +987,7 @@
 							<div class="flex flex-wrap gap-4">
 								<button
 									on:click={downloadBanner}
-									class="flex-1 sm:flex-none px-8 py-4 bg-[#4ade80] text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-data-green text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1001,7 +1001,7 @@
 								</button>
 								<button
 									on:click={() => copyToClipboard(imageUrl)}
-									class="flex-1 sm:flex-none px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1021,7 +1021,7 @@
 		{/if}
 
 		<!-- How to Use Section -->
-		<div class="mb-16 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_0_#1f2937]">
+		<div class="mb-16 bg-white border-[4px] border-gray-900 shadow-brutal-2xl">
 			<div class="bg-gray-900 text-white px-6 py-4 border-b-[4px] border-gray-900">
 				<h2 class="text-2xl font-black uppercase tracking-tight">
 					How to Add Your Banner to LinkedIn
@@ -1032,7 +1032,7 @@
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							01
 						</div>
@@ -1045,7 +1045,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-[#ff6b6b] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-brand-danger text-white border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							02
 						</div>
@@ -1056,7 +1056,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							03
 						</div>
@@ -1073,11 +1073,11 @@
 		<div class="mb-16">
 			<div class="relative">
 				<div
-					class="absolute inset-0 bg-[#ffc480] translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
+					class="absolute inset-0 bg-brand-accent translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
 				/>
 
 				<div class="relative bg-white border-[4px] border-black">
-					<div class="bg-[#ffc480] text-black px-6 py-4 border-b-[4px] border-black">
+					<div class="bg-brand-accent text-black px-6 py-4 border-b-[4px] border-black">
 						<h2 class="text-2xl font-black uppercase tracking-tight">LinkedIn Banner Size Guide</h2>
 					</div>
 
@@ -1094,23 +1094,23 @@
 									Recommended Dimensions
 								</h3>
 								<ul class="space-y-3">
-									<li class="flex items-center gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
-										<span class="text-[#4ade80] font-black">✓</span>
+									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
+										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
-											>Personal Profile: <strong class="text-[#ff6b6b]">1584 x 396 pixels</strong
+											>Personal Profile: <strong class="text-brand-danger">1584 x 396 pixels</strong
 											></span
 										>
 									</li>
-									<li class="flex items-center gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
-										<span class="text-[#4ade80] font-black">✓</span>
+									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
+										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
-											>Company Page: <strong class="text-[#ff6b6b]">1128 x 191 pixels</strong></span
+											>Company Page: <strong class="text-brand-danger">1128 x 191 pixels</strong></span
 										>
 									</li>
-									<li class="flex items-center gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
-										<span class="text-[#4ade80] font-black">✓</span>
+									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
+										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
-											>Aspect Ratio: <strong class="text-[#ff6b6b]">4:1</strong></span
+											>Aspect Ratio: <strong class="text-brand-danger">4:1</strong></span
 										>
 									</li>
 								</ul>
@@ -1120,19 +1120,19 @@
 									class="font-black text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2"
 								>
 									<span
-										class="w-8 h-8 bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center text-sm font-bold"
+										class="w-8 h-8 bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center text-sm font-bold"
 										>!</span
 									>
 									Important Notes
 								</h3>
 								<ul class="space-y-3">
-									<li class="flex items-start gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
-										<span class="text-[#ffc480] font-black mt-0.5">⚠</span>
+									<li class="flex items-start gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
+										<span class="text-brand-accent font-black mt-0.5">⚠</span>
 										<span class="font-medium"
 											>Mobile App Profile Photo covers large left area (~600px)</span
 										>
 									</li>
-									<li class="flex items-start gap-3 p-3 bg-[#FFFDF8] border-[2px] border-gray-900">
+									<li class="flex items-start gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
 										<span class="text-blue-500 font-black mt-0.5">ℹ</span>
 										<span class="font-medium"
 											>All templates now keep important text on the right side</span

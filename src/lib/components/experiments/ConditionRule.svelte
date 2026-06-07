@@ -160,7 +160,7 @@
 </script>
 
 <div
-	class="flex flex-wrap items-center gap-3 px-5 py-4 bg-white border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-xl group transition-all"
+	class="flex flex-wrap items-center gap-3 px-5 py-4 bg-white border-[3px] border-black shadow-brutal-lg rounded-xl group transition-all"
 >
 	<!-- Property label (read-only, set by CategoryPicker) -->
 	{#if rule.property}
@@ -174,7 +174,7 @@
 			Referrer: 'bg-pink-500'
 		}}
 		<div
-			class="flex items-center gap-2 px-3 py-2 bg-[#FFFDF8] border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl shrink-0"
+			class="flex items-center gap-2 px-3 py-2 bg-brand-bg border-[3px] border-black shadow-brutal-sm rounded-xl shrink-0"
 		>
 			<span
 				class="w-2.5 h-2.5 rounded-full shrink-0 border-[2px] border-black {dotColors[
@@ -190,7 +190,7 @@
 			bind:value={rule.property}
 			on:change={handlePropertyChange}
 			{disabled}
-			class="px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all shrink-0 cursor-pointer"
+			class="px-3 py-2 border-[3px] border-black shadow-brutal-sm rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all shrink-0 cursor-pointer"
 		>
 			<option value="">Select property...</option>
 			{#each ['Device', 'Location', 'Time', 'Browser', 'URL', 'Referrer'] as category}
@@ -211,7 +211,7 @@
 			on:input={emitChange}
 			placeholder="Param name"
 			{disabled}
-			class="px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold font-mono bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all sm:w-32 shrink-0 text-black"
+			class="px-3 py-2 border-[3px] border-black shadow-brutal-sm rounded-xl text-xs font-bold font-mono bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all sm:w-32 shrink-0 text-black"
 		/>
 	{/if}
 
@@ -221,7 +221,7 @@
 			bind:value={rule.operator}
 			on:change={emitChange}
 			{disabled}
-			class="px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold bg-[#ffc480] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all shrink-0 cursor-pointer text-black"
+			class="px-3 py-2 border-[3px] border-black shadow-brutal-sm rounded-xl text-xs font-bold bg-brand-accent focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all shrink-0 cursor-pointer text-black"
 		>
 			{#each getOperators(rule.property) as op}
 				<option value={op.value}>{op.label}</option>
@@ -252,8 +252,8 @@
 							}}
 							class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border-[3px] border-black transition-all cursor-pointer
 								{selected
-								? 'bg-black text-white shadow-[2px_2px_0_0_black]'
-								: 'bg-white text-black shadow-[2px_2px_0_0_black] hover:bg-[#ffc480] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black]'}"
+								? 'bg-black text-white shadow-brutal-sm'
+								: 'bg-white text-black shadow-brutal-sm hover:bg-brand-accent hover:-translate-y-[1px] hover:shadow-brutal-lg'}"
 						>
 							{propDef.optionLabels?.[opt] ||
 								(propDef.value === 'geo.continent' ? CONTINENT_LABELS[opt] : null) ||
@@ -267,7 +267,7 @@
 					bind:value={rule.value}
 					on:change={emitChange}
 					{disabled}
-					class="flex-1 px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all cursor-pointer text-black"
+					class="flex-1 px-3 py-2 border-[3px] border-black shadow-brutal-sm rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all cursor-pointer text-black"
 				>
 					<option value="">Select...</option>
 					{#each propDef.options as opt}
@@ -289,7 +289,7 @@
 					<button
 						type="button"
 						on:click={() => (isCountryPickerOpen = true)}
-						class="w-full flex items-center justify-between px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold bg-white hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all cursor-pointer text-black"
+						class="w-full flex items-center justify-between px-3 py-2 border-[3px] border-black shadow-brutal-sm rounded-xl text-xs font-bold bg-white hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all cursor-pointer text-black"
 					>
 						<span class="truncate pr-2">
 							{#if rule.operator === 'eq' && rule.value}
@@ -320,7 +320,7 @@
 								{@const country = COUNTRIES.find((c) => c.code === code)}
 								{#if country}
 									<div
-										class="flex items-center gap-1.5 px-2.5 py-1 bg-[#4ade80] rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_black]"
+										class="flex items-center gap-1.5 px-2.5 py-1 bg-data-green rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black shadow-brutal-sm"
 									>
 										<span>{country.flag} {country.code}</span>
 										<button
@@ -369,7 +369,7 @@
 								on:input={(e) => {
 									countrySearchQuery = e.target.value;
 								}}
-								class="w-full pl-9 pr-3 py-2 text-xs font-bold border-[3px] border-black rounded-xl shadow-[2px_2px_0_0_black] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all"
+								class="w-full pl-9 pr-3 py-2 text-xs font-bold border-[3px] border-black rounded-xl shadow-brutal-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all"
 							/>
 						</div>
 						<button
@@ -378,7 +378,7 @@
 								isCountryPickerOpen = false;
 								countrySearchQuery = '';
 							}}
-							class="px-3 py-2 bg-[#ffc480] border-[3px] border-black rounded-xl text-xs font-black shadow-[2px_2px_0_0_black] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all cursor-pointer"
+							class="px-3 py-2 bg-brand-accent border-[3px] border-black rounded-xl text-xs font-black shadow-brutal-sm hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all cursor-pointer"
 						>
 							Done
 						</button>
@@ -418,8 +418,8 @@
 								}}
 								class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-xs font-bold transition-all border-[2px] border-transparent cursor-pointer
 									{selected
-									? 'bg-[#c4f0ff] border-black shadow-[2px_2px_0_0_black] text-black'
-									: 'bg-transparent text-gray-700 hover:bg-gray-100 hover:border-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
+									? 'bg-[#c4f0ff] border-black shadow-brutal-sm text-black'
+									: 'bg-transparent text-gray-700 hover:bg-gray-100 hover:border-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
 							>
 								<div class="flex items-center gap-2">
 									<span class="text-base">{country.flag}</span>
@@ -473,8 +473,8 @@
 							}}
 							class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 								{allSelected
-								? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black]'
-								: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-[#ffc480] hover:text-black'}"
+								? 'bg-data-green text-black shadow-brutal-sm'
+								: 'bg-white text-gray-500 shadow-[1px_1px_0_0_#1f2937] hover:bg-brand-accent hover:text-black'}"
 						>
 							{range.label}
 						</button>
@@ -497,7 +497,7 @@
 				<!-- Hour grid with AM/PM sections -->
 				<div class="flex flex-col gap-2">
 					<div class="flex items-center gap-2">
-						<span class="text-[9px] font-black text-gray-400 uppercase tracking-widest w-7 shrink-0"
+						<span class="text-[9px] font-black text-gray-600 uppercase tracking-widest w-7 shrink-0"
 							>AM</span
 						>
 						<div class="flex flex-wrap gap-1 flex-1">
@@ -516,10 +516,10 @@
 										}
 										emitChange();
 									}}
-									class="w-9 h-8 rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
+									class="min-w-[44px] min-h-[44px] rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
-										? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black] -translate-y-[1px]'
-										: 'bg-white text-gray-500 hover:bg-[#ffc480] hover:text-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
+										? 'bg-data-green text-black shadow-brutal-sm -translate-y-[1px]'
+										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
 								>
 									{displayHour}
 								</button>
@@ -527,7 +527,7 @@
 						</div>
 					</div>
 					<div class="flex items-center gap-2">
-						<span class="text-[9px] font-black text-gray-400 uppercase tracking-widest w-7 shrink-0"
+						<span class="text-[9px] font-black text-gray-600 uppercase tracking-widest w-7 shrink-0"
 							>PM</span
 						>
 						<div class="flex flex-wrap gap-1 flex-1">
@@ -546,10 +546,10 @@
 										}
 										emitChange();
 									}}
-									class="w-9 h-8 rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
+									class="min-w-[44px] min-h-[44px] rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
-										? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black] -translate-y-[1px]'
-										: 'bg-white text-gray-500 hover:bg-[#ffc480] hover:text-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
+										? 'bg-data-green text-black shadow-brutal-sm -translate-y-[1px]'
+										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
 								>
 									{displayHour}
 								</button>
@@ -585,8 +585,8 @@
 						}}
 						class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 							{Array.isArray(rule.value) && WEEKDAYS.every((d) => rule.value.includes(d))
-							? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black]'
-							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-[#ffc480] hover:text-black'}"
+							? 'bg-data-green text-black shadow-brutal-sm'
+							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_#1f2937] hover:bg-brand-accent hover:text-black'}"
 					>
 						Weekdays
 					</button>
@@ -605,8 +605,8 @@
 						}}
 						class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 							{Array.isArray(rule.value) && WEEKEND.every((d) => rule.value.includes(d))
-							? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black]'
-							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-[#ffc480] hover:text-black'}"
+							? 'bg-data-green text-black shadow-brutal-sm'
+							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_#1f2937] hover:bg-brand-accent hover:text-black'}"
 					>
 						Weekend
 					</button>
@@ -614,7 +614,7 @@
 
 				<!-- Segmented Control for Days -->
 				<div
-					class="flex w-full overflow-hidden rounded-lg border-[3px] border-black shadow-[2px_2px_0_0_black]"
+					class="flex w-full overflow-hidden rounded-lg border-[3px] border-black shadow-brutal-sm"
 				>
 					{#each DAYS as day, index}
 						{@const selected = Array.isArray(rule.value) && rule.value.includes(day.code)}
@@ -630,9 +630,9 @@
 								}
 								emitChange();
 							}}
-							class="flex-1 py-2 text-xs font-black transition-all cursor-pointer uppercase tracking-wider
+							class="flex-1 py-2 min-h-[44px] text-xs font-black transition-all cursor-pointer uppercase tracking-wider
 								{index !== 0 ? 'border-l-[3px] border-black' : ''}
-								{selected ? 'bg-[#4ade80] text-black' : 'bg-white text-gray-500 hover:bg-gray-100'}"
+								{selected ? 'bg-data-green text-black' : 'bg-white text-gray-500 hover:bg-gray-100'}"
 						>
 							{day.label}
 						</button>
@@ -646,7 +646,7 @@
 				on:input={emitChange}
 				{disabled}
 				placeholder={rule.property === 'referrer.domain' ? 'e.g. twitter.com' : 'Value'}
-				class="flex-1 px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold font-mono bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all text-black"
+				class="flex-1 px-3 py-2 border-[3px] border-black shadow-brutal-sm rounded-xl text-xs font-bold font-mono bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-brutal-lg transition-all text-black"
 			/>
 		{/if}
 	{/if}
@@ -656,7 +656,7 @@
 		type="button"
 		on:click={emitRemove}
 		{disabled}
-		class="p-2 border-[3px] border-transparent rounded-xl text-gray-400 hover:text-black hover:bg-[#ff6b6b] hover:border-black hover:shadow-[2px_2px_0_0_black] transition-all shrink-0 self-center"
+		class="min-w-[44px] min-h-[44px] flex items-center justify-center border-[3px] border-transparent rounded-xl text-gray-400 hover:text-black hover:bg-brand-danger hover:border-black hover:shadow-brutal-sm transition-all shrink-0 self-center"
 		title="Remove rule"
 	>
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

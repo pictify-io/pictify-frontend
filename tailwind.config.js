@@ -31,6 +31,20 @@ export default {
 					squiggle: '#c62828',
 					gutter: '#f5f0e6',
 					selection: 'rgba(255, 196, 128, 0.3)'
+				},
+				// Data-viz / category palette: experiment types & statuses, chart
+				// series, badges. Named (1:1, not consolidated) so these usages are
+				// intentional tokens instead of scattered hex literals.
+				data: {
+					green: '#4ade80',
+					blue: '#3b82f6',
+					sky: '#60a5fa',
+					violet: '#a78bfa',
+					purple: '#a855f7',
+					amber: '#f59e0b',
+					teal: '#4ecdc4',
+					pink: '#f472b6',
+					red: '#ff5252'
 				}
 			},
 			boxShadow: {

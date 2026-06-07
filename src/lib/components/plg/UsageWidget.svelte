@@ -61,10 +61,10 @@
 	}
 
 	function getUrgencyBg(urgency) {
-		if (urgency === 'critical') return 'bg-[#ff6b6b]/15';
-		if (urgency === 'urgent') return 'bg-[#ff6b6b]/10';
-		if (urgency === 'warning') return 'bg-[#f59e0b]/15';
-		if (urgency === 'soft_warning') return 'bg-[#ffc480]/20';
+		if (urgency === 'critical') return 'bg-brand-danger/15';
+		if (urgency === 'urgent') return 'bg-brand-danger/10';
+		if (urgency === 'warning') return 'bg-data-amber/15';
+		if (urgency === 'soft_warning') return 'bg-brand-accent/20';
 		return 'bg-white';
 	}
 
@@ -80,7 +80,7 @@
 		on:mouseleave={handleMouseLeave}
 	>
 		<button
-			class="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg border-2 border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+			class="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg border-2 border-gray-900 bg-white shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
 			on:click={() => goto('/dashboard/api-token')}
 		>
 			<!-- Progress ring -->
@@ -121,7 +121,7 @@
 		{#if isHovered}
 			<div class="absolute top-full right-0 pt-2 sm:pt-4 w-72 sm:w-80 z-50 animate-fade-in">
 				<div
-					class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 				>
 					<!-- Header -->
 					<div
@@ -131,7 +131,7 @@
 							>Monthly Usage</span
 						>
 						<span
-							class="text-[9px] sm:text-[10px] font-black px-2 py-1 rounded bg-[#ffc480] text-gray-900 border border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] uppercase tracking-wider"
+							class="text-[9px] sm:text-[10px] font-black px-2 py-1 rounded bg-brand-accent text-gray-900 border border-gray-900 shadow-brutal-sm uppercase tracking-wider"
 						>
 							{$usageWidget.plan}
 						</span>
@@ -169,7 +169,7 @@
 
 						<!-- Overage info -->
 						{#if showOverageInfo}
-							<div class="bg-[#ffc480]/20 border-2 border-[#ffc480] rounded-lg p-3">
+							<div class="bg-brand-accent/20 border-2 border-brand-accent rounded-lg p-3">
 								<div class="flex items-center gap-2 mb-1">
 									<span class="text-[10px] font-black text-gray-900 uppercase tracking-wider"
 										>Overages Active</span
@@ -187,7 +187,7 @@
 
 						{#if $usageWidget.showUpgrade}
 							<button
-								class="w-full py-2.5 px-3 bg-[#ffc480] text-gray-900 text-xs font-black rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+								class="w-full py-2.5 px-3 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-2 border-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all uppercase tracking-widest flex items-center justify-center gap-2"
 								on:click|stopPropagation={() => openUpgradeModal('usage_limit')}
 							>
 								<span>Upgrade Plan</span>
@@ -224,7 +224,7 @@
 {:else}
 	<!-- Full version for dashboard -->
 	<div
-		class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden relative shadow-[8px_8px_0_0_#1f2937]"
+		class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden relative shadow-brutal-2xl"
 	>
 		<!-- Header Strip -->
 		<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex justify-between items-center">
@@ -257,7 +257,7 @@
 					</div>
 				</div>
 				<div class="flex flex-col items-end">
-					<div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+					<div class="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">
 						Monthly Capacity
 					</div>
 					<div
@@ -284,7 +284,7 @@
 					{/each}
 				</div>
 				<div
-					class="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1"
+					class="flex justify-between text-[10px] font-bold text-gray-600 uppercase tracking-widest px-1"
 				>
 					<span>0%</span>
 					<span>50%</span>
@@ -294,13 +294,13 @@
 
 			<!-- Footer / Actions -->
 			{#if $usageWidget.showUpgrade}
-				<div class="bg-[#FFFDF8] rounded-xl border-2 border-dashed border-gray-300 p-4 text-center">
+				<div class="bg-brand-bg rounded-xl border-2 border-dashed border-gray-300 p-4 text-center">
 					<p
 						class="text-xs font-bold text-gray-600 mb-3 uppercase tracking-wide flex items-center justify-center gap-2"
 					>
 						{#if $usageWidget.percentage >= 80}
 							<svg
-								class="w-4 h-4 text-[#ff6b6b]"
+								class="w-4 h-4 text-brand-danger"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -315,7 +315,7 @@
 							Capacity Critical
 						{:else}
 							<svg
-								class="w-4 h-4 text-[#ffc480]"
+								class="w-4 h-4 text-brand-accent"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -331,7 +331,7 @@
 						{/if}
 					</p>
 					<button
-						class="w-full py-3 px-4 bg-gray-900 text-white text-xs font-black rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#ffc480] transition-all uppercase tracking-widest group flex items-center justify-center gap-2"
+						class="w-full py-3 px-4 bg-gray-900 text-white text-xs font-black rounded-lg border-2 border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm transition-all uppercase tracking-widest group flex items-center justify-center gap-2"
 						on:click={() => openUpgradeModal('usage_limit')}
 					>
 						Increase Limits

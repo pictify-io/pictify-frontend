@@ -129,14 +129,14 @@
   </script>`}
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col">
+<div class="bg-brand-bg min-h-screen flex flex-col">
 	<Nav />
 
 	<main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
 		<!-- Header -->
 		<div class="text-center mb-10 md:mb-14">
 			<div
-				class="inline-block bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-2"
+				class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-2"
 			>
 				<span class="font-black uppercase tracking-widest text-sm">Template Gallery</span>
 			</div>
@@ -147,7 +147,7 @@
 		</div>
 
 		<!-- Filters and Search -->
-		<div class="bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-4 md:p-6 mb-8">
+		<div class="bg-white border-[3px] border-gray-900 shadow-brutal-xl p-4 md:p-6 mb-8">
 			<div class="flex flex-col lg:flex-row gap-4">
 				<!-- Search -->
 				<div class="flex-1">
@@ -157,7 +157,7 @@
 							bind:value={searchQuery}
 							on:keydown={handleSearch}
 							placeholder="Search templates..."
-							class="w-full px-4 py-3 pr-12 border-[3px] border-gray-900 font-bold text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ff6b6b] focus:ring-offset-2"
+							class="w-full px-4 py-3 pr-12 border-[3px] border-gray-900 font-bold text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-danger focus:ring-offset-2"
 						/>
 						<button
 							on:click={() => fetchTemplates(1)}
@@ -186,7 +186,7 @@
 					<select
 						bind:value={selectedCategory}
 						on:change={handleFilterChange}
-						class="w-full px-4 py-3 border-[3px] border-gray-900 font-bold text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#ff6b6b]"
+						class="w-full px-4 py-3 border-[3px] border-gray-900 font-bold text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-danger"
 					>
 						<option value="">All Categories</option>
 						{#each filters.categories as cat}
@@ -200,7 +200,7 @@
 					<select
 						bind:value={selectedType}
 						on:change={handleFilterChange}
-						class="w-full px-4 py-3 border-[3px] border-gray-900 font-bold text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#ff6b6b]"
+						class="w-full px-4 py-3 border-[3px] border-gray-900 font-bold text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-danger"
 					>
 						<option value="">All Types</option>
 						{#each filters.types as type}
@@ -214,7 +214,7 @@
 					<select
 						bind:value={sortBy}
 						on:change={handleFilterChange}
-						class="w-full px-4 py-3 border-[3px] border-gray-900 font-bold text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#ff6b6b]"
+						class="w-full px-4 py-3 border-[3px] border-gray-900 font-bold text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-danger"
 					>
 						<option value="featured">Featured</option>
 						<option value="popular">Most Popular</option>
@@ -244,7 +244,7 @@
 							}}
 							class="px-3 py-1 text-sm font-bold border-2 border-gray-900 rounded-full transition-all {selectedTag ===
 							tag
-								? 'bg-[#ff6b6b] text-white'
+								? 'bg-brand-danger text-white'
 								: 'bg-white hover:bg-gray-100'}"
 						>
 							{tag}
@@ -299,7 +299,7 @@
 			<div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
 				{#each Array(8) as _}
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] animate-pulse"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-xl animate-pulse"
 					>
 						<div class="aspect-video bg-gray-200" />
 						<div class="p-4">
@@ -315,7 +315,7 @@
 				{#each templates as template}
 					<a
 						href={`/templates/${template.uid}`}
-						class="group block bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#1f2937] transition-all overflow-hidden"
+						class="group block bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#1f2937] transition-all overflow-hidden"
 					>
 						<!-- Thumbnail -->
 						<div class="aspect-video bg-gray-100 relative overflow-hidden">
@@ -328,7 +328,7 @@
 								/>
 							{:else}
 								<div
-									class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#ffc480] to-[#ff6b6b]"
+									class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-accent to-brand-danger"
 								>
 									<span class="text-white font-black text-2xl opacity-50"
 										>{template.name.charAt(0)}</span
@@ -339,7 +339,7 @@
 							<!-- Featured badge -->
 							{#if template.isFeatured}
 								<div
-									class="absolute top-2 right-2 bg-[#ffc480] border-2 border-gray-900 px-2 py-0.5"
+									class="absolute top-2 right-2 bg-brand-accent border-2 border-gray-900 px-2 py-0.5"
 								>
 									<span class="text-xs font-black uppercase">Featured</span>
 								</div>
@@ -350,7 +350,7 @@
 						<div class="p-4">
 							<div class="flex items-start justify-between gap-2 mb-2">
 								<h3
-									class="font-black text-gray-900 line-clamp-1 group-hover:text-[#ff6b6b] transition-colors"
+									class="font-black text-gray-900 line-clamp-1 group-hover:text-brand-danger transition-colors"
 								>
 									{template.name}
 								</h3>
@@ -396,7 +396,7 @@
 						<!-- Hover CTA -->
 						<div class="px-4 pb-4">
 							<div
-								class="w-full py-2 bg-[#ff6b6b] text-white text-center font-black text-sm uppercase tracking-wider border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all"
+								class="w-full py-2 bg-brand-danger text-white text-center font-black text-sm uppercase tracking-wider border-[2px] border-gray-900 shadow-brutal-md group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all"
 							>
 								View Template →
 							</div>
@@ -430,7 +430,7 @@
 								on:click={() => goToPage(pageNum)}
 								class="w-10 h-10 border-[3px] border-gray-900 font-black text-sm transition-all {pagination.page ===
 								pageNum
-									? 'bg-[#ff6b6b] text-white'
+									? 'bg-brand-danger text-white'
 									: 'bg-white hover:bg-gray-100'}"
 							>
 								{pageNum}
@@ -469,7 +469,7 @@
 				<p class="text-gray-600 font-medium mb-6">Try adjusting your filters or search query.</p>
 				<button
 					on:click={clearFilters}
-					class="px-6 py-3 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-3 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Clear all filters
 				</button>
@@ -478,7 +478,7 @@
 
 		<!-- CTA Section -->
 		<section
-			class="mt-16 bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 md:p-12 text-center"
+			class="mt-16 bg-white border-[3px] border-gray-900 shadow-brutal-2xl p-8 md:p-12 text-center"
 		>
 			<h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-4">
 				Don't see what you need?
@@ -490,13 +490,13 @@
 			<div class="flex flex-col sm:flex-row gap-4 justify-center">
 				<a
 					href="/template-workspace/create"
-					class="px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Create from scratch
 				</a>
 				<a
 					href="/tools"
-					class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Browse free tools
 				</a>

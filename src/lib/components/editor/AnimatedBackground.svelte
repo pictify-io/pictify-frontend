@@ -1,9 +1,9 @@
 <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-60 z-0">
 	<div
-		class="absolute top-0 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-[#ff6b6b]/20 to-transparent rounded-full blur-[100px] transform -translate-y-1/2 animate-float"
+		class="absolute top-0 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-brand-danger/20 to-transparent rounded-full blur-[100px] transform -translate-y-1/2 animate-float"
 	/>
 	<div
-		class="absolute bottom-0 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-[#ffc480]/20 to-transparent rounded-full blur-[100px] transform translate-y-1/2 animate-float-delayed"
+		class="absolute bottom-0 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-brand-accent/20 to-transparent rounded-full blur-[100px] transform translate-y-1/2 animate-float-delayed"
 	/>
 	<div
 		class="absolute top-1/2 left-1/2 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-br from-[#6b95ff]/10 to-transparent rounded-full blur-[80px] transform -translate-x-1/2 animate-pulse-slow"

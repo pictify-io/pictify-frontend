@@ -188,11 +188,11 @@
 
 		<!-- Modal -->
 		<div
-			class="relative bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+			class="relative bg-white border-[3px] border-gray-900 shadow-brutal-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
 			transition:fly={{ y: 20, duration: 200 }}
 		>
 			<!-- Header -->
-			<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-[#ffc480]/10 flex items-center justify-between">
+			<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-accent/10 flex items-center justify-between">
 				<div>
 					<h2 class="text-xl font-black text-gray-900">Resize with AI</h2>
 					<p class="text-sm text-gray-600 mt-1">
@@ -214,7 +214,7 @@
 						on:click={generateAllSizes}
 						disabled={isResizing}
 						class="w-full mb-4 py-3 px-4 font-bold text-sm border-[3px] border-gray-900
-							bg-[#ffc480] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937]
+							bg-brand-accent shadow-brutal-lg hover:shadow-brutal-sm
 							hover:translate-x-[2px] hover:translate-y-[2px] transition-all
 							disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 					>
@@ -235,7 +235,7 @@
 								on:click={() => togglePreset(preset.id)}
 								class="p-3 text-center border-2 transition-all duration-150
 									{selectedPresets.has(preset.id)
-										? 'border-gray-900 bg-[#ffc480]/20 shadow-[3px_3px_0_0_#1f2937]'
+										? 'border-gray-900 bg-brand-accent/20 shadow-brutal-md'
 										: 'border-gray-200 hover:border-gray-400'}"
 							>
 								<div class="w-8 h-8 bg-gray-100 border border-gray-300 rounded-lg mx-auto mb-1 flex items-center justify-center">
@@ -326,7 +326,7 @@
 							on:click={handleResize}
 							disabled={selectedPresets.size === 0 || isResizing}
 							class="px-6 py-3 bg-gray-900 text-white font-bold border-2 border-gray-900
-								shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px]
+								shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px]
 								transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 						>
 							{#if isResizing}

@@ -15,7 +15,7 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 </script>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -23,10 +23,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main

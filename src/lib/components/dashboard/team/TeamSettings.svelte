@@ -87,7 +87,10 @@
 	}
 
 	async function handleInvite() {
-		if (!inviteEmail.trim() || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())) {
+		if (
+			!inviteEmail.trim() ||
+			!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())
+		) {
 			inviteError = 'Please enter a valid email address';
 			return;
 		}
@@ -201,13 +204,11 @@
 			<div
 				class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 			>
-				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#4ade80] rounded-full animate-pulse" />
+				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-data-green rounded-full" />
 				Workspace
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				Team <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-					>Settings</span
-				>
+				Team <span class="text-gray-900">Settings</span>
 			</h1>
 		</div>
 		<div class="flex items-center gap-4">
@@ -228,7 +229,7 @@
 		</div>
 	{:else if !$currentTeam}
 		<div
-			class="bg-yellow-50 border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-[8px_8px_0_0_#1f2937]"
+			class="bg-yellow-50 border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-brutal-2xl"
 		>
 			<svg
 				class="w-16 h-16 mx-auto text-yellow-500 mb-6"
@@ -254,14 +255,14 @@
 			<div class="lg:col-span-8 space-y-8">
 				<!-- Members List -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex justify-between items-center"
 					>
 						<div class="flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -295,11 +296,11 @@
 
 					<div class="divide-y-[3px] divide-gray-100">
 						{#each $teamMembers as member}
-							<div class="p-6 hover:bg-[#FFFDF8] transition-colors group">
+							<div class="p-6 hover:bg-brand-bg transition-colors group">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
-											class="w-10 h-10 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+											class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 										>
 											<span class="text-sm font-black text-gray-900">
 												{member.user?.email?.charAt(0)?.toUpperCase() || '?'}
@@ -332,7 +333,7 @@
 										<button
 											on:click={() => handleRemoveMember(member)}
 											disabled={removingMemberId === member.uid}
-											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-[#ff6b6b] transition-all disabled:opacity-50"
+											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-brand-danger transition-all disabled:opacity-50"
 											title="Remove Member"
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,11 +357,11 @@
 				<!-- Pending Invitations -->
 				{#if $teamInvitations.length > 0}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-yellow-400 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-8 h-8 rounded-lg bg-yellow-400 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -388,11 +389,11 @@
 
 						<div class="divide-y-[3px] divide-gray-100">
 							{#each $teamInvitations as invitation}
-								<div class="p-6 hover:bg-[#FFFDF8] transition-colors">
+								<div class="p-6 hover:bg-brand-bg transition-colors">
 									<div class="flex items-center justify-between">
 										<div>
 											<p class="font-bold text-gray-900 text-sm">{invitation.email}</p>
-											<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">
+											<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider mt-1">
 												Expires {formatDate(invitation.expiresAt)}
 											</p>
 										</div>
@@ -426,7 +427,7 @@
 												<button
 													on:click={() => handleRevokeInvitation(invitation)}
 													disabled={revokingInvitationId === invitation.uid}
-													class="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-gray-500 hover:text-[#ff6b6b] hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+													class="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-gray-500 hover:text-brand-danger hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
 												>
 													{revokingInvitationId === invitation.uid ? 'Revoking...' : 'Revoke'}
 												</button>
@@ -444,11 +445,11 @@
 			<div class="lg:col-span-4 space-y-8 sticky top-8">
 				<!-- Team Name Settings -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 						<div
-							class="w-8 h-8 rounded-lg bg-blue-500 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-8 h-8 rounded-lg bg-blue-500 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 						>
 							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -487,17 +488,17 @@
 									id="teamName"
 									type="text"
 									bind:value={teamName}
-									class="w-full px-4 py-3 text-sm font-bold bg-white border-[3px] border-gray-300 rounded-xl focus:border-gray-900 focus:outline-none transition-colors placeholder-gray-300"
+									class="w-full px-4 py-3 text-sm font-bold bg-white border-[3px] border-gray-300 rounded-xl focus:border-gray-900 focus:outline-none focus:shadow-brutal-accent transition-colors placeholder-gray-300"
 									placeholder="Enter team name"
 								/>
 							</div>
 
 							{#if error}
 								<div
-									class="bg-red-50 border-2 border-[#ff6b6b] rounded-xl p-3 mb-4 flex items-start gap-2"
+									class="bg-red-50 border-2 border-brand-danger rounded-xl p-3 mb-4 flex items-start gap-2"
 								>
 									<svg
-										class="w-4 h-4 text-[#ff6b6b] flex-shrink-0 mt-0.5"
+										class="w-4 h-4 text-brand-danger flex-shrink-0 mt-0.5"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -509,7 +510,7 @@
 											d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
 										/>
 									</svg>
-									<p class="text-[#ff6b6b] text-xs font-bold">{error}</p>
+									<p class="text-brand-danger text-xs font-bold">{error}</p>
 								</div>
 							{/if}
 
@@ -523,7 +524,7 @@
 						{:else}
 							<div class="flex items-center">
 								<div
-									class="w-12 h-12 rounded-xl bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+									class="w-12 h-12 rounded-xl bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 								>
 									<span class="text-xl font-black text-gray-900">
 										{$currentTeam?.name?.charAt(0)?.toUpperCase() || 'T'}
@@ -549,7 +550,7 @@
 					>
 						<div class="bg-gray-800 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 rounded-lg bg-data-green border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -600,19 +601,19 @@
 											type="email"
 											bind:value={inviteEmail}
 											placeholder="colleague@company.com"
-											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none transition-colors text-sm font-medium"
+											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-data-green focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors text-sm font-medium"
 											on:keydown={(e) => e.key === 'Enter' && handleInvite()}
 										/>
 									</div>
 
 									{#if inviteError}
-										<p class="text-[#ff6b6b] text-xs font-bold">{inviteError}</p>
+										<p class="text-brand-danger text-xs font-bold">{inviteError}</p>
 									{/if}
 
 									<button
 										on:click={handleInvite}
 										disabled={inviting || !inviteEmail.trim()}
-										class="w-full px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-900 bg-[#4ade80] rounded-xl border-[3px] border-[#4ade80] hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-0.5 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+										class="w-full px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-900 bg-data-green rounded-xl border-[3px] border-data-green hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-0.5 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
 									>
 										{inviting ? 'Sending...' : 'Send Invite'}
 									</button>

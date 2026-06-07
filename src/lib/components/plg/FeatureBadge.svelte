@@ -67,8 +67,8 @@
 		<span
 			class="inline-flex items-center gap-1.5 rounded-md font-black border-2 {sizeClasses} {remaining <=
 			2
-				? 'bg-[#ff6b6b] text-white border-gray-900'
-				: 'bg-[#10b981] text-gray-900 border-gray-900'}"
+				? 'bg-brand-danger text-white border-gray-900'
+				: 'bg-brand-success text-gray-900 border-gray-900'}"
 		>
 			{remaining}/{formatLimit(limit)}
 		</span>
@@ -82,7 +82,7 @@
 {:else if limit === null && hasAccess}
 	<!-- Unlimited access -->
 	<span
-		class="inline-flex items-center gap-1.5 rounded-md bg-[#10b981] text-gray-900 font-black border-2 border-gray-900 {sizeClasses}"
+		class="inline-flex items-center gap-1.5 rounded-md bg-brand-success text-gray-900 font-black border-2 border-gray-900 {sizeClasses}"
 	>
 		<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />

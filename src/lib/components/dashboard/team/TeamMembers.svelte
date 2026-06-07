@@ -43,7 +43,10 @@
 	});
 
 	async function handleInvite() {
-		if (!inviteEmail.trim() || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())) {
+		if (
+			!inviteEmail.trim() ||
+			!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())
+		) {
 			error = 'Please enter a valid email address';
 			return;
 		}
@@ -164,9 +167,7 @@
 				Back to Settings
 			</a>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				Team <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-					>Members</span
-				>
+				Team <span class="text-gray-900">Members</span>
 			</h1>
 		</div>
 		<div class="flex items-center gap-4">
@@ -187,14 +188,14 @@
 		</div>
 	{:else if !$currentTeam}
 		<div
-			class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-[4px_4px_0_0_#1f2937]"
+			class="bg-brand-bg border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-brutal-lg"
 		>
 			<p class="text-xl font-black text-gray-900">No team selected</p>
 		</div>
 	{:else}
 		<!-- Seat Usage -->
 		<div
-			class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden mb-10 transition-transform hover:-translate-y-1"
+			class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden mb-10 transition-transform hover:-translate-y-1"
 		>
 			<div class="p-8">
 				<div
@@ -206,13 +207,13 @@
 						</p>
 						<div class="flex items-baseline gap-2">
 							<span class="text-4xl font-black text-gray-900">{seatUsage}</span>
-							<span class="text-2xl font-bold text-gray-400">/ {seatLimit} Seats Used</span>
+							<span class="text-2xl font-bold text-gray-600">/ {seatLimit} Seats Used</span>
 						</div>
 					</div>
 					{#if seatUsage >= seatLimit && $isTeamOwner}
 						<a
 							href="/dashboard/upgrade"
-							class="px-6 py-3 text-sm font-black uppercase tracking-wider text-white bg-[#ff6b6b] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+							class="px-6 py-3 text-sm font-black uppercase tracking-wider text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
 						>
 							Add More Seats
 						</a>
@@ -224,8 +225,8 @@
 					<div
 						class="h-full border-r-[3px] border-gray-900 transition-all duration-500 {seatUsage >=
 						seatLimit
-							? 'bg-[#ff6b6b]'
-							: 'bg-[#4ade80]'}"
+							? 'bg-brand-danger'
+							: 'bg-data-green'}"
 						style="width: {Math.max(Math.min((seatUsage / seatLimit) * 100, 100), 2)}%"
 					/>
 				</div>
@@ -236,7 +237,7 @@
 			<!-- Main Content: Member List -->
 			<div class="lg:col-span-2 space-y-8">
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="px-8 py-6 border-b-[3px] border-gray-900 bg-gray-50 flex justify-between items-center"
@@ -250,11 +251,11 @@
 
 					<div class="divide-y-[3px] divide-gray-100">
 						{#each $teamMembers as member}
-							<div class="p-6 hover:bg-[#FFFDF8] transition-colors group">
+							<div class="p-6 hover:bg-brand-bg transition-colors group">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
-											class="w-12 h-12 rounded-xl bg-[#ffc480] border-[3px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+											class="w-12 h-12 rounded-xl bg-brand-accent border-[3px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 										>
 											<span class="text-lg font-black text-gray-900">
 												{member.user?.email?.charAt(0)?.toUpperCase() || '?'}
@@ -289,7 +290,7 @@
 										<button
 											on:click={() => handleRemoveMember(member)}
 											disabled={removingMemberId === member.uid}
-											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-[#ff6b6b] transition-all disabled:opacity-50"
+											class="opacity-0 group-hover:opacity-100 focus:opacity-100 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-brand-danger transition-all disabled:opacity-50"
 											title="Remove Member"
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +314,7 @@
 				<!-- Pending Invitations -->
 				<!-- Debug: invitations count = {$teamInvitations.length}, isOwner = {$isTeamOwner} -->
 				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 				>
 					<div class="px-8 py-6 border-b-[3px] border-gray-900 bg-gray-50">
 						<h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">
@@ -322,7 +323,7 @@
 					</div>
 					<div class="divide-y-[3px] divide-gray-100">
 						{#each $teamInvitations as invitation}
-							<div class="p-6 hover:bg-[#FFFDF8] transition-colors">
+							<div class="p-6 hover:bg-brand-bg transition-colors">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
@@ -339,7 +340,7 @@
 										</div>
 										<div>
 											<p class="font-bold text-gray-900">{invitation.email}</p>
-											<p class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">
+											<p class="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">
 												Expires {formatDate(invitation.expiresAt)}
 											</p>
 										</div>
@@ -347,7 +348,7 @@
 									<div class="flex items-center gap-2">
 										<button
 											on:click={() => copyInviteLink(invitation)}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#4ade80] hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-data-green hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
 											title="Copy invite link"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,7 +364,7 @@
 										<button
 											on:click={() => handleResendInvitation(invitation)}
 											disabled={resendingInvitationId === invitation.uid}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#3b82f6] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-data-blue hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
 											title="Resend invitation email"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,7 +380,7 @@
 										<button
 											on:click={() => handleRevokeInvitation(invitation)}
 											disabled={revokingInvitationId === invitation.uid}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#ff6b6b] hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-brand-danger hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 flex items-center"
 										>
 											{revokingInvitationId === invitation.uid ? 'Revoking...' : 'Revoke'}
 										</button>
@@ -387,7 +388,7 @@
 								</div>
 							</div>
 						{:else}
-							<div class="p-8 text-center text-gray-400 font-bold italic">
+							<div class="p-8 text-center text-gray-600 font-bold italic">
 								No pending invitations
 							</div>
 						{/each}
@@ -429,19 +430,19 @@
 											type="email"
 											bind:value={inviteEmail}
 											placeholder="colleague@company.com"
-											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none transition-colors"
+											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-data-green focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors"
 											on:keydown={(e) => e.key === 'Enter' && handleInvite()}
 										/>
 									</div>
 									<button
 										on:click={handleInvite}
 										disabled={inviting || !inviteEmail.trim()}
-										class="w-full px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-900 bg-[#4ade80] rounded-xl border-[3px] border-[#4ade80] hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-1 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+										class="w-full px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-900 bg-data-green rounded-xl border-[3px] border-data-green hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-1 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
 									>
 										{inviting ? 'Sending...' : 'Send Invite'}
 									</button>
 									{#if error}
-										<p class="text-[#ff6b6b] text-sm font-bold mt-2">{error}</p>
+										<p class="text-brand-danger text-sm font-bold mt-2">{error}</p>
 									{/if}
 								</div>
 							{/if}

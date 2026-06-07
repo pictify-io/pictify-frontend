@@ -103,7 +103,7 @@
 		<label
 			class="text-sm font-black uppercase tracking-widest text-gray-900 flex items-center gap-2"
 		>
-			<svg class="w-5 h-5 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24"
+			<svg class="w-5 h-5 text-brand-accent" fill="currentColor" viewBox="0 0 24 24"
 				><path
 					d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
 				/></svg
@@ -112,7 +112,7 @@
 		</label>
 		{#if preview.loading}
 			<span
-				class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#ffc480] bg-gray-900 px-2 py-1 rounded"
+				class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-brand-accent bg-gray-900 px-2 py-1 rounded"
 			>
 				<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
 					<circle
@@ -167,7 +167,7 @@
 						/>
 					</div>
 				{:else if preview.url}
-					<img
+					<img loading="lazy"
 						src={preview.url}
 						alt="Preview {variantName}"
 						class="max-w-full max-h-[300px] lg:max-h-full object-contain pointer-events-none drop-shadow-[0_20px_25px_rgba(0,0,0,0.2)]"
@@ -193,7 +193,7 @@
 					</div>
 				{:else}
 					<div
-						class="bg-white/80 backdrop-blur px-6 py-4 rounded-xl border-[3px] border-dashed border-gray-400 text-center text-gray-500 font-bold text-sm"
+						class="bg-white/80 px-6 py-4 rounded-xl border-[3px] border-dashed border-gray-400 text-center text-gray-500 font-bold text-sm"
 					>
 						Awaiting template...
 					</div>

@@ -274,7 +274,7 @@
 		if (playgroundSelectedLayouts.size === playgroundAvailableLayouts.length) {
 			playgroundSelectedLayouts = new Set();
 		} else {
-			playgroundSelectedLayouts = new Set(playgroundAvailableLayouts.map(l => l.key));
+			playgroundSelectedLayouts = new Set(playgroundAvailableLayouts.map((l) => l.key));
 		}
 		renderTemplateParams.layouts = [...playgroundSelectedLayouts];
 		renderTemplateParams.layout = '';
@@ -361,47 +361,87 @@
 				// Auto-fetch variables when template is selected
 				fetchTemplateVariables(templateUid);
 				// Fetch template to get available layouts
-				getTemplateById(templateUid).then(res => {
-					const layouts = res?.template?.layouts || {};
-					const entries = Object.entries(layouts);
-					playgroundAvailableLayouts = [
-						{ key: 'default', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
-						...entries.map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
-					];
-					playgroundSelectedLayouts = new Set(['default']);
-					renderTemplateParams.layouts = [];
-					renderTemplateParams.layout = '';
-				}).catch(() => {
-					playgroundAvailableLayouts = [];
-				});
+				getTemplateById(templateUid)
+					.then((res) => {
+						const layouts = res?.template?.layouts || {};
+						const entries = Object.entries(layouts);
+						playgroundAvailableLayouts = [
+							{
+								key: 'default',
+								name: 'Default',
+								width: res?.template?.width || 1080,
+								height: res?.template?.height || 1080
+							},
+							...entries.map(([key, l]) => ({
+								key,
+								name: l.name || key,
+								width: l.width,
+								height: l.height
+							}))
+						];
+						playgroundSelectedLayouts = new Set(['default']);
+						renderTemplateParams.layouts = [];
+						renderTemplateParams.layout = '';
+					})
+					.catch(() => {
+						playgroundAvailableLayouts = [];
+					});
 				break;
 			case 'batch-render':
 				batchRenderParams.templateUid = templateUid;
 				// Auto-fetch variables for batch render
 				fetchTemplateVariables(templateUid, true);
 				// Fetch layouts
-				getTemplateById(templateUid).then(res => {
-					const layouts = res?.template?.layouts || {};
-					batchAvailableLayouts = [
-						{ key: '', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
-						...Object.entries(layouts).map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
-					];
-					batchRenderParams.layout = '';
-				}).catch(() => { batchAvailableLayouts = []; });
+				getTemplateById(templateUid)
+					.then((res) => {
+						const layouts = res?.template?.layouts || {};
+						batchAvailableLayouts = [
+							{
+								key: '',
+								name: 'Default',
+								width: res?.template?.width || 1080,
+								height: res?.template?.height || 1080
+							},
+							...Object.entries(layouts).map(([key, l]) => ({
+								key,
+								name: l.name || key,
+								width: l.width,
+								height: l.height
+							}))
+						];
+						batchRenderParams.layout = '';
+					})
+					.catch(() => {
+						batchAvailableLayouts = [];
+					});
 				break;
 			case 'batch-render-csv':
 				batchRenderCsvParams.templateUid = templateUid;
 				// Auto-fetch variables for CSV batch render mappings
 				fetchTemplateVariablesForCsv(templateUid);
 				// Fetch layouts
-				getTemplateById(templateUid).then(res => {
-					const layouts = res?.template?.layouts || {};
-					batchCsvAvailableLayouts = [
-						{ key: '', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
-						...Object.entries(layouts).map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
-					];
-					batchRenderCsvParams.layout = '';
-				}).catch(() => { batchCsvAvailableLayouts = []; });
+				getTemplateById(templateUid)
+					.then((res) => {
+						const layouts = res?.template?.layouts || {};
+						batchCsvAvailableLayouts = [
+							{
+								key: '',
+								name: 'Default',
+								width: res?.template?.width || 1080,
+								height: res?.template?.height || 1080
+							},
+							...Object.entries(layouts).map(([key, l]) => ({
+								key,
+								name: l.name || key,
+								width: l.width,
+								height: l.height
+							}))
+						];
+						batchRenderCsvParams.layout = '';
+					})
+					.catch(() => {
+						batchCsvAvailableLayouts = [];
+					});
 				break;
 			case 'get-variables':
 				getVariablesParams.uid = templateUid;
@@ -567,7 +607,10 @@
 						};
 						if (playgroundSelectedLayouts.size > 1) {
 							opts.layouts = [...playgroundSelectedLayouts];
-						} else if (playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default')) {
+						} else if (
+							playgroundSelectedLayouts.size === 1 &&
+							!playgroundSelectedLayouts.has('default')
+						) {
 							opts.layout = [...playgroundSelectedLayouts][0];
 						} else if (renderTemplateParams.layout) {
 							opts.layout = renderTemplateParams.layout;
@@ -591,7 +634,11 @@
 							format: batchRenderParams.format,
 							quality: batchRenderParams.quality,
 							concurrency: batchRenderParams.concurrency,
-							...(batchSelectedLayouts.size > 1 ? { layouts: [...batchSelectedLayouts] } : batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default') ? { layout: [...batchSelectedLayouts][0] } : {}),
+							...(batchSelectedLayouts.size > 1
+								? { layouts: [...batchSelectedLayouts] }
+								: batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default')
+								? { layout: [...batchSelectedLayouts][0] }
+								: {}),
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -612,7 +659,11 @@
 							format: batchRenderCsvParams.format,
 							quality: batchRenderCsvParams.quality,
 							concurrency: batchRenderCsvParams.concurrency,
-							...(batchCsvSelectedLayouts.size > 1 ? { layouts: [...batchCsvSelectedLayouts] } : batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default') ? { layout: [...batchCsvSelectedLayouts][0] } : {}),
+							...(batchCsvSelectedLayouts.size > 1
+								? { layouts: [...batchCsvSelectedLayouts] }
+								: batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default')
+								? { layout: [...batchCsvSelectedLayouts][0] }
+								: {}),
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -851,7 +902,9 @@
 				format: renderTemplateParams.format,
 				quality: renderTemplateParams.quality,
 				...(playgroundSelectedLayouts.size > 1 ? { layouts: [...playgroundSelectedLayouts] } : {}),
-				...(playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default') ? { layout: [...playgroundSelectedLayouts][0] } : {}),
+				...(playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default')
+					? { layout: [...playgroundSelectedLayouts][0] }
+					: {})
 			},
 			requiresAuth: true
 		},
@@ -864,7 +917,11 @@
 				format: batchRenderParams.format,
 				quality: batchRenderParams.quality,
 				concurrency: batchRenderParams.concurrency,
-				...(batchSelectedLayouts.size > 1 ? { layouts: [...batchSelectedLayouts] } : batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default') ? { layout: [...batchSelectedLayouts][0] } : {})
+				...(batchSelectedLayouts.size > 1
+					? { layouts: [...batchSelectedLayouts] }
+					: batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default')
+					? { layout: [...batchSelectedLayouts][0] }
+					: {})
 			},
 			requiresAuth: true
 		},
@@ -878,7 +935,11 @@
 				format: batchRenderCsvParams.format,
 				quality: batchRenderCsvParams.quality,
 				concurrency: batchRenderCsvParams.concurrency,
-				...(batchCsvSelectedLayouts.size > 1 ? { layouts: [...batchCsvSelectedLayouts] } : batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default') ? { layout: [...batchCsvSelectedLayouts][0] } : {})
+				...(batchCsvSelectedLayouts.size > 1
+					? { layouts: [...batchCsvSelectedLayouts] }
+					: batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default')
+					? { layout: [...batchCsvSelectedLayouts][0] }
+					: {})
 			},
 			requiresAuth: true
 		},
@@ -1018,22 +1079,19 @@
 				<div
 					class="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 				>
-					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full" />
 					Dev Tools
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					API <span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Playground</span
-					>
+					API <span class="text-gray-900">Playground</span>
 				</h1>
 			</div>
 
 			<!-- Status Badge -->
 			<div
-				class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[4px_4px_0_0_#1f2937]"
+				class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-lg"
 			>
-				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-[#4ade80] rounded-full animate-pulse" />
+				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-data-green rounded-full animate-pulse" />
 				<span class="text-[10px] sm:text-xs font-black text-gray-900 uppercase tracking-wider"
 					>System OK</span
 				>
@@ -1046,7 +1104,7 @@
 			<div class="col-span-12 lg:col-span-4 space-y-4 sm:space-y-6 md:space-y-8">
 				<!-- Auth Card -->
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2"
@@ -1079,7 +1137,7 @@
 								</div>
 								<input
 									type="password"
-									class="w-full pl-8 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-3 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-mono font-bold text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] sm:focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									class="w-full pl-8 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-3 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-mono font-bold text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] sm:focus:shadow-brutal-accent transition-all"
 									value={apiToken}
 									readonly
 								/>
@@ -1110,7 +1168,7 @@
 								</p>
 								<a
 									href="/dashboard/api-token"
-									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#ff6b6b] text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-danger text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									Get API Key
 								</a>
@@ -1121,7 +1179,7 @@
 
 				<!-- Endpoints Menu -->
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2"
@@ -1142,7 +1200,7 @@
 							API Endpoints
 						</h3>
 					</div>
-					<div class="p-1.5 sm:p-2 space-y-2 bg-[#FFFDF8] max-h-[600px] overflow-y-auto">
+					<div class="p-1.5 sm:p-2 space-y-2 bg-brand-bg max-h-[600px] overflow-y-auto">
 						{#each endpointCategories as category}
 							<div class="border rounded-lg border-gray-200 overflow-hidden">
 								<button
@@ -1197,7 +1255,7 @@
 														</div>
 													</div>
 													{#if selectedEndpoint === endpoint.id}
-														<div class="w-1.5 h-1.5 bg-[#ffc480] rounded-full animate-pulse" />
+														<div class="w-1.5 h-1.5 bg-brand-accent rounded-full animate-pulse" />
 													{/if}
 												</div>
 											</button>
@@ -1213,7 +1271,7 @@
 			<!-- Right Panel: Console -->
 			<div class="col-span-12 lg:col-span-8 space-y-4 sm:space-y-6 md:space-y-8">
 				<!-- Endpoint Description -->
-				<div class="bg-[#ffc480] rounded-xl border-[3px] border-gray-900 p-4">
+				<div class="bg-brand-accent rounded-xl border-[3px] border-gray-900 p-4">
 					<div class="flex items-center gap-3">
 						<svg
 							class="w-5 h-5 text-gray-900 flex-shrink-0"
@@ -1234,15 +1292,15 @@
 
 				<!-- Request Builder -->
 				<div
-					class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
+					class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 				>
 					<div
 						class="bg-gray-100 p-4 border-b-[3px] border-gray-900 flex items-center justify-between"
 					>
 						<div class="flex items-center gap-3">
-							<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-							<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
-							<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+							<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+							<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
+							<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 						</div>
 						<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
 							Request Configuration
@@ -1259,7 +1317,7 @@
 									>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={imageParams.html}
@@ -1305,7 +1363,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={imageParams.width}
 									/>
 								</div>
@@ -1315,7 +1373,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={imageParams.height}
 									/>
 								</div>
@@ -1324,12 +1382,14 @@
 							<div class="space-y-4">
 								<!-- Name -->
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+									<label
+										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>
 										Name
 									</label>
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={createTemplateParams.name}
 										placeholder="My template"
 									/>
@@ -1337,7 +1397,9 @@
 
 								<!-- HTML body -->
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+									<label
+										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>
 										HTML
 									</label>
 									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
@@ -1345,21 +1407,33 @@
 											bind:value={createTemplateParams.html}
 											lang={htmlLang()}
 											styles={{
-												'&': { height: '240px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+												'&': {
+													height: '240px',
+													fontSize: '13px',
+													fontFamily: 'ui-monospace, monospace'
+												},
 												'.cm-content': { padding: '12px' },
-												'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '40px'
+												}
 											}}
 										/>
 									</div>
 									<p class="mt-1 text-[10px] text-gray-500 font-medium">
-										Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared names auto-register on save.
+										Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared
+										names auto-register on save.
 									</p>
 								</div>
 
 								<!-- Dimensions + format -->
 								<div class="grid grid-cols-3 gap-3">
 									<div>
-										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+										<label
+											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
+										>
 											Width
 										</label>
 										<input
@@ -1371,7 +1445,9 @@
 										/>
 									</div>
 									<div>
-										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+										<label
+											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
+										>
 											Height
 										</label>
 										<input
@@ -1383,12 +1459,14 @@
 										/>
 									</div>
 									<div>
-										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+										<label
+											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
+										>
 											Format
 										</label>
 										<select
 											bind:value={createTemplateParams.outputFormat}
-											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none"
+											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-brutal-accent"
 										>
 											<option value="image">image</option>
 											<option value="pdf">pdf</option>
@@ -1398,34 +1476,64 @@
 
 								<!-- Variable definitions (optional) -->
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
-										Variable definitions <span class="text-gray-500 font-medium normal-case">(optional · JSON array)</span>
+									<label
+										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>
+										Variable definitions <span class="text-gray-500 font-medium normal-case"
+											>(optional · JSON array)</span
+										>
 									</label>
 									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
 										<CodeMirror
 											bind:value={createTemplateParams.variableDefinitions}
 											lang={json()}
 											styles={{
-												'&': { height: '120px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+												'&': {
+													height: '120px',
+													fontSize: '13px',
+													fontFamily: 'ui-monospace, monospace'
+												},
 												'.cm-content': { padding: '12px' },
-												'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '40px'
+												}
 											}}
 										/>
 									</div>
 									<p class="mt-1 text-[10px] text-gray-500 font-medium">
-										Leave as <code class="font-mono">[]</code> to auto-declare variables from the HTML body.
+										Leave as <code class="font-mono">[]</code> to auto-declare variables from the HTML
+										body.
 									</p>
 								</div>
 
 								<!-- Safety toggles -->
 								<div class="grid grid-cols-2 gap-3">
-									<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
-										<input type="checkbox" bind:checked={createTemplateParams.jsEnabled} class="h-4 w-4 accent-gray-900" />
-										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">jsEnabled</span>
+									<label
+										class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer"
+									>
+										<input
+											type="checkbox"
+											bind:checked={createTemplateParams.jsEnabled}
+											class="h-4 w-4 accent-gray-900"
+										/>
+										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900"
+											>jsEnabled</span
+										>
 									</label>
-									<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
-										<input type="checkbox" bind:checked={createTemplateParams.strictVariables} class="h-4 w-4 accent-gray-900" />
-										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">strictVariables</span>
+									<label
+										class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer"
+									>
+										<input
+											type="checkbox"
+											bind:checked={createTemplateParams.strictVariables}
+											class="h-4 w-4 accent-gray-900"
+										/>
+										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900"
+											>strictVariables</span
+										>
 									</label>
 								</div>
 							</div>
@@ -1455,7 +1563,7 @@
 								{#if manualTemplateInput['get-template']}
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={getTemplateParams.uid}
 										placeholder="Enter template UID manually"
 									/>
@@ -1500,7 +1608,7 @@
 								{#if manualTemplateInput['delete-template']}
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={deleteTemplateParams.uid}
 										placeholder="Enter template UID to delete"
 									/>
@@ -1552,7 +1660,7 @@
 									</div>
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={searchTemplatesParams.q}
 										placeholder="Search templates by name, type, or tags"
 									/>
@@ -1566,7 +1674,7 @@
 										<input
 											type="number"
 											min="1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={searchTemplatesParams.page}
 										/>
 									</div>
@@ -1579,7 +1687,7 @@
 											type="number"
 											min="1"
 											max="100"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={searchTemplatesParams.limit}
 										/>
 									</div>
@@ -1615,7 +1723,7 @@
 									{#if manualTemplateInput['render-template']}
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={renderTemplateParams.templateUid}
 											placeholder="Enter template UID manually"
 										/>
@@ -1665,7 +1773,7 @@
 									</div>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={renderTemplateParams.variables}
@@ -1712,7 +1820,7 @@
 											>Format</label
 										>
 										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
 											bind:value={renderTemplateParams.format}
 										>
 											<option value="png">PNG</option>
@@ -1730,7 +1838,7 @@
 											min="0.1"
 											max="1"
 											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={renderTemplateParams.quality}
 										/>
 									</div>
@@ -1746,35 +1854,57 @@
 												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider transition-colors"
 												on:click={toggleAllPlaygroundLayouts}
 											>
-												{playgroundSelectedLayouts.size === playgroundAvailableLayouts.length ? 'Deselect All' : 'Select All'}
+												{playgroundSelectedLayouts.size === playgroundAvailableLayouts.length
+													? 'Deselect All'
+													: 'Select All'}
 											</button>
 										</div>
 										<div class="grid grid-cols-2 gap-2">
 											{#each playgroundAvailableLayouts as layout}
 												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(layout.key)
-														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(
+														layout.key
+													)
+														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => togglePlaygroundLayout(layout.key)}
 												>
 													<div class="flex items-center gap-2">
-														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{playgroundSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+														<div
+															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{playgroundSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
+														>
 															{#if playgroundSelectedLayouts.has(layout.key)}
-																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																<svg
+																	class="w-3 h-3 text-white"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																	stroke="currentColor"
+																	stroke-width="3"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		d="M5 13l4 4L19 7"
+																	/>
 																</svg>
 															{/if}
 														</div>
 														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+															<span class="block text-xs font-black text-gray-900 leading-tight"
+																>{layout.name}</span
+															>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono"
+																>{layout.width}x{layout.height}</span
+															>
 														</div>
 													</div>
 												</button>
 											{/each}
 										</div>
-										<p class="text-[10px] text-gray-500 mt-1">{playgroundSelectedLayouts.size} of {playgroundAvailableLayouts.length} selected</p>
+										<p class="text-[10px] text-gray-500 mt-1">
+											{playgroundSelectedLayouts.size} of {playgroundAvailableLayouts.length} selected
+										</p>
 									</div>
 								{:else}
 									<div>
@@ -1784,7 +1914,7 @@
 										>
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={renderTemplateParams.layout}
 											placeholder="e.g. twitter-post, facebook-post"
 										/>
@@ -1820,7 +1950,7 @@
 									{#if manualTemplateInput['batch-render']}
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderParams.templateUid}
 											placeholder="Enter template UID"
 										/>
@@ -1870,7 +2000,7 @@
 									</div>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={batchRenderParams.variableSets}
@@ -1917,7 +2047,7 @@
 											>Format</label
 										>
 										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
 											bind:value={batchRenderParams.format}
 										>
 											<option value="png">PNG</option>
@@ -1935,7 +2065,7 @@
 											min="0.1"
 											max="1"
 											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderParams.quality}
 										/>
 									</div>
@@ -1948,7 +2078,7 @@
 											type="number"
 											min="1"
 											max="10"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderParams.concurrency}
 										/>
 									</div>
@@ -1956,41 +2086,68 @@
 								{#if batchAvailableLayouts.length > 1}
 									<div>
 										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Layouts</label>
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+												>Layouts</label
+											>
 											<button
 												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
 												on:click={() => {
-													if (batchSelectedLayouts.size === batchAvailableLayouts.length) batchSelectedLayouts = new Set(['default']);
-													else batchSelectedLayouts = new Set(batchAvailableLayouts.map(l => l.key));
+													if (batchSelectedLayouts.size === batchAvailableLayouts.length)
+														batchSelectedLayouts = new Set(['default']);
+													else
+														batchSelectedLayouts = new Set(batchAvailableLayouts.map((l) => l.key));
 												}}
-											>{batchSelectedLayouts.size === batchAvailableLayouts.length ? 'Deselect All' : 'Select All'}</button>
+												>{batchSelectedLayouts.size === batchAvailableLayouts.length
+													? 'Deselect All'
+													: 'Select All'}</button
+											>
 										</div>
 										<div class="grid grid-cols-2 gap-2">
 											{#each batchAvailableLayouts as layout}
 												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(layout.key)
-														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(
+														layout.key
+													)
+														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchLayout(layout.key)}
 												>
 													<div class="flex items-center gap-2">
-														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{batchSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+														<div
+															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{batchSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
+														>
 															{#if batchSelectedLayouts.has(layout.key)}
-																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																<svg
+																	class="w-3 h-3 text-white"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																	stroke="currentColor"
+																	stroke-width="3"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		d="M5 13l4 4L19 7"
+																	/>
 																</svg>
 															{/if}
 														</div>
 														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+															<span class="block text-xs font-black text-gray-900 leading-tight"
+																>{layout.name}</span
+															>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono"
+																>{layout.width}x{layout.height}</span
+															>
 														</div>
 													</div>
 												</button>
 											{/each}
 										</div>
-										<p class="text-[10px] text-gray-500 mt-1">{batchSelectedLayouts.size} selected</p>
+										<p class="text-[10px] text-gray-500 mt-1">
+											{batchSelectedLayouts.size} selected
+										</p>
 									</div>
 								{/if}
 							</div>
@@ -2024,7 +2181,7 @@
 									{#if manualTemplateInput['batch-render-csv']}
 										<input
 											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderCsvParams.templateUid}
 											placeholder="Enter template UID"
 										/>
@@ -2042,7 +2199,7 @@
 									>
 									<input
 										type="url"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={batchRenderCsvParams.csvUrl}
 										placeholder="https://example.com/data.csv"
 									/>
@@ -2085,7 +2242,7 @@
 									</div>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={batchRenderCsvParams.mappings}
@@ -2132,7 +2289,7 @@
 											>Format</label
 										>
 										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all appearance-none"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
 											bind:value={batchRenderCsvParams.format}
 										>
 											<option value="png">PNG</option>
@@ -2150,7 +2307,7 @@
 											min="0.1"
 											max="1"
 											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderCsvParams.quality}
 										/>
 									</div>
@@ -2163,7 +2320,7 @@
 											type="number"
 											min="1"
 											max="10"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 											bind:value={batchRenderCsvParams.concurrency}
 										/>
 									</div>
@@ -2171,41 +2328,70 @@
 								{#if batchCsvAvailableLayouts.length > 1}
 									<div>
 										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Layouts</label>
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+												>Layouts</label
+											>
 											<button
 												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
 												on:click={() => {
-													if (batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length) batchCsvSelectedLayouts = new Set(['default']);
-													else batchCsvSelectedLayouts = new Set(batchCsvAvailableLayouts.map(l => l.key));
+													if (batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length)
+														batchCsvSelectedLayouts = new Set(['default']);
+													else
+														batchCsvSelectedLayouts = new Set(
+															batchCsvAvailableLayouts.map((l) => l.key)
+														);
 												}}
-											>{batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length ? 'Deselect All' : 'Select All'}</button>
+												>{batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length
+													? 'Deselect All'
+													: 'Select All'}</button
+											>
 										</div>
 										<div class="grid grid-cols-2 gap-2">
 											{#each batchCsvAvailableLayouts as layout}
 												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(layout.key)
-														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(
+														layout.key
+													)
+														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchCsvLayout(layout.key)}
 												>
 													<div class="flex items-center gap-2">
-														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{batchCsvSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+														<div
+															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{batchCsvSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
+														>
 															{#if batchCsvSelectedLayouts.has(layout.key)}
-																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																<svg
+																	class="w-3 h-3 text-white"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																	stroke="currentColor"
+																	stroke-width="3"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		d="M5 13l4 4L19 7"
+																	/>
 																</svg>
 															{/if}
 														</div>
 														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+															<span class="block text-xs font-black text-gray-900 leading-tight"
+																>{layout.name}</span
+															>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono"
+																>{layout.width}x{layout.height}</span
+															>
 														</div>
 													</div>
 												</button>
 											{/each}
 										</div>
-										<p class="text-[10px] text-gray-500 mt-1">{batchCsvSelectedLayouts.size} selected</p>
+										<p class="text-[10px] text-gray-500 mt-1">
+											{batchCsvSelectedLayouts.size} selected
+										</p>
 									</div>
 								{/if}
 							</div>
@@ -2216,7 +2402,7 @@
 								>
 								<input
 									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 									bind:value={batchStatusParams.batchId}
 									placeholder="Enter batch ID (e.g., batch_ABC123)"
 								/>
@@ -2228,7 +2414,7 @@
 								>
 								<input
 									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 									bind:value={cancelBatchParams.batchId}
 									placeholder="Enter batch ID to cancel"
 								/>
@@ -2260,7 +2446,7 @@
 								{#if manualTemplateInput['get-variables']}
 									<input
 										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={getVariablesParams.uid}
 										placeholder="Enter template UID"
 									/>
@@ -2280,7 +2466,7 @@
 									>
 									<div class="relative">
 										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-all bg-white"
+											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
 										>
 											<CodeMirror
 												bind:value={gifParams.html}
@@ -2326,7 +2512,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={gifParams.width}
 									/>
 								</div>
@@ -2336,7 +2522,7 @@
 									>
 									<input
 										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={gifParams.height}
 									/>
 								</div>
@@ -2348,7 +2534,7 @@
 										type="number"
 										min="1"
 										max="30"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-[4px_4px_0_0_#ffc480] transition-all"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={gifParams.framesPerSecond}
 									/>
 								</div>
@@ -2363,7 +2549,7 @@
 								/>
 							{/if}
 							<button
-								class="w-full py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-[4px_4px_0_0_#1f2937]"
+								class="w-full py-4 bg-brand-danger text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-brutal-lg"
 								on:click={() => testEndpoint(selectedEndpoint)}
 								disabled={loading || requiresEmailVerification}
 							>
@@ -2398,7 +2584,7 @@
 				<div class="relative group">
 					<!-- Terminal Window -->
 					<div
-						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col min-h-[400px]"
+						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px]"
 					>
 						<!-- Terminal Header -->
 						<div
@@ -2406,9 +2592,9 @@
 						>
 							<div class="flex items-center gap-3">
 								<div class="flex gap-1.5 mr-4">
-									<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-									<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
-									<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+									<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+									<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
+									<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 								</div>
 								<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
 									Terminal Output
@@ -2417,7 +2603,7 @@
 
 							{#if curlExample && !response}
 								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-[#ffc480] text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center gap-2 px-3 py-1.5 bg-brand-accent text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={handleCopyCurl}
 								>
 									{#if copiedCurl}
@@ -2444,7 +2630,7 @@
 								</button>
 							{:else if response}
 								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-600 hover:text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-600 hover:text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={() => {
 										response = null;
 										responseJson = '';
@@ -2478,7 +2664,7 @@
 										<!-- Status Bar -->
 										<div class="flex items-center gap-3 pb-4 border-b-2 border-gray-300">
 											<div class="flex items-center gap-2">
-												<div class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+												<div class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 												<span class="font-black text-lg text-gray-900">200 OK</span>
 											</div>
 											<span class="text-gray-400">|</span>
@@ -2490,7 +2676,7 @@
 										<!-- Generated Asset Preview -->
 										{#if response.url || response.gif?.url}
 											<div
-												class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+												class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 											>
 												<!-- Header -->
 												<div
@@ -2576,7 +2762,7 @@
 															</div>
 														</div>
 													{/if}
-													<img
+													<img loading="lazy"
 														src={previewImgSrc}
 														alt="Result"
 														class="w-full rounded-lg border-2 border-gray-200"
@@ -2590,7 +2776,7 @@
 
 										<!-- JSON Response -->
 										<div
-											class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+											class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 										>
 											<div class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900">
 												<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
@@ -2606,12 +2792,12 @@
 								{:else if curlExample}
 									<!-- cURL View -->
 									<div
-										class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
+										class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
 									>
 										<div
 											class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900 flex items-center gap-2"
 										>
-											<span class="text-[#4ade80] font-black text-sm">$</span>
+											<span class="text-data-green font-black text-sm">$</span>
 											<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
 												>cURL Command</span
 											>
@@ -2621,16 +2807,16 @@
 												class="text-gray-900 whitespace-pre-wrap break-all text-xs font-mono leading-relaxed">{@html escapeHtml(
 													curlExample.display
 												)
-													.replace(/curl/g, '<span class="text-[#ff6b6b] font-bold">curl</span>')
-													.replace(/-X/g, '<span class="text-[#ffc480] font-bold">-X</span>')
-													.replace(/-H/g, '<span class="text-[#ffc480] font-bold">-H</span>')
+													.replace(/curl/g, '<span class="text-brand-danger font-bold">curl</span>')
+													.replace(/-X/g, '<span class="text-brand-accent font-bold">-X</span>')
+													.replace(/-H/g, '<span class="text-brand-accent font-bold">-H</span>')
 													.replace(
 														/--data-raw/g,
-														'<span class="text-[#ffc480] font-bold">--data-raw</span>'
+														'<span class="text-brand-accent font-bold">--data-raw</span>'
 													)
 													.replace(
 														/(GET|POST|PUT|DELETE)/g,
-														'<span class="text-[#4ade80] font-bold">$1</span>'
+														'<span class="text-data-green font-bold">$1</span>'
 													)
 													.replace(/Bearer/g, '<span class="text-gray-600">Bearer</span>')}</pre>
 										</div>
@@ -2639,7 +2825,7 @@
 									<div class="flex flex-col items-center justify-center h-[200px]">
 										<div class="mb-4">
 											<div
-												class="w-16 h-16 rounded-full border-[3px] border-gray-300 border-t-[#ffc480] animate-spin"
+												class="w-16 h-16 rounded-full border-[3px] border-gray-300 border-t-brand-accent animate-spin"
 											/>
 										</div>
 										<p class="text-xs font-black text-gray-600 uppercase tracking-wider">
@@ -2662,7 +2848,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeImageHtml = false)}
 	>
 		<div
@@ -2672,7 +2858,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -2705,7 +2891,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={imageParams.html}
@@ -2733,7 +2919,7 @@
 			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
 				<div class="text-[10px] text-gray-500">HTML with inline styles and CSS</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeImageHtml = false)}
 				>
 					Close
@@ -2748,7 +2934,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeGifHtml = false)}
 	>
 		<div
@@ -2758,7 +2944,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -2791,7 +2977,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={gifParams.html}
@@ -2819,7 +3005,7 @@
 			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
 				<div class="text-[10px] text-gray-500">HTML with CSS animations for GIF generation</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeGifHtml = false)}
 				>
 					Close
@@ -2834,7 +3020,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeRenderVars = false)}
 	>
 		<div
@@ -2844,7 +3030,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -2877,7 +3063,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={renderTemplateParams.variables}
@@ -2907,7 +3093,7 @@
 					Format: <code class="bg-gray-100 px-1 rounded">{'{'}"key": "value"{'}'}</code>
 				</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeRenderVars = false)}
 				>
 					Close
@@ -2922,7 +3108,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeBatchVars = false)}
 	>
 		<div
@@ -2932,7 +3118,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -2965,7 +3151,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={batchRenderParams.variableSets}
@@ -2996,7 +3182,7 @@
 					is one variation
 				</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeBatchVars = false)}
 				>
 					Close
@@ -3011,7 +3197,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeCsvMappings = false)}
 	>
 		<div
@@ -3021,7 +3207,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -3054,7 +3240,7 @@
 			<!-- Editor -->
 			<div class="flex-1 min-h-0 p-5">
 				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-[4px_4px_0_0_#ffc480] transition-shadow bg-white h-full"
+					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
 				>
 					<CodeMirror
 						bind:value={batchRenderCsvParams.mappings}
@@ -3085,7 +3271,7 @@
 					>
 				</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeCsvMappings = false)}
 				>
 					Close

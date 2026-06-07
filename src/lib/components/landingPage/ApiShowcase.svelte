@@ -64,7 +64,7 @@ const image = await pictify.render({
 		},
 		simple: {
 			title: 'Raw HTML',
-			description: 'Or just render HTML directly — no template needed',
+			description: 'Or just render HTML directly, no template needed',
 			icon: '🌐',
 			color: '#ff6b6b',
 			code: `curl -X POST https://api.pictify.io/image \\
@@ -106,14 +106,14 @@ const image = await pictify.render({
 	});
 </script>
 
-<section class="w-full py-20 md:py-32 bg-[#fffdf8] relative overflow-hidden">
+<section class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Decorative Background Elements -->
 	<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"></div>
 	<div
-		class="absolute top-20 -left-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-20 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] -z-10 pointer-events-none"
 	></div>
 	<div
-		class="absolute bottom-[-10%] -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute bottom-[-10%] -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] -z-10 pointer-events-none"
 	></div>
 
 	<div class="max-w-7xl mx-auto px-6">
@@ -122,7 +122,7 @@ const image = await pictify.render({
 			<!-- Left: Content (V1 Layout Restored) -->
 			<div class="relative z-10 w-full lg:max-w-xl">
 				<div
-					class="inline-block px-5 py-2 bg-[#ff6b6b] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2 mb-8"
+					class="inline-block px-5 py-2 bg-brand-danger border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-2 mb-8"
 				>
 					<span class="text-sm font-black text-white uppercase tracking-wider">Developer-First</span>
 				</div>
@@ -132,7 +132,7 @@ const image = await pictify.render({
 					<span class="relative inline-block mt-2">
 						5 Minutes to Integrate
 						<svg
-							class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-[#4ade80] -z-10"
+							class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-data-green -z-10"
 							viewBox="0 0 100 10"
 							preserveAspectRatio="none"
 						>
@@ -150,7 +150,7 @@ const image = await pictify.render({
 				<div class="space-y-6 mb-12">
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-[#ffc480] rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_black] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+							class="w-14 h-14 bg-brand-accent rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 						</div>
@@ -164,7 +164,7 @@ const image = await pictify.render({
 
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-[#4ade80] rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_black] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+							class="w-14 h-14 bg-data-green rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
 						</div>
@@ -178,7 +178,7 @@ const image = await pictify.render({
 
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-[#ff6b6b] rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_black] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+							class="w-14 h-14 bg-brand-danger rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
 						</div>
@@ -194,7 +194,7 @@ const image = await pictify.render({
 				<a
 					href="https://docs.pictify.io"
 					target="_blank"
-					class="inline-flex items-center gap-3 px-8 py-5 bg-black text-white text-lg font-black uppercase tracking-wider rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-1 hover:translate-y-1 transition-all"
+					class="inline-flex items-center gap-3 px-8 py-5 bg-black text-white text-lg font-black uppercase tracking-wider rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_#ffc480] hover:shadow-brutal-accent-sm hover:translate-x-1 hover:translate-y-1 transition-all"
 				>
 					<span>View API Docs</span>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,16 +211,16 @@ const image = await pictify.render({
 			<!-- Right: Code Terminal (V2 Styling Preserved) -->
 			<div class="relative w-full z-10 mx-auto group">
 				<!-- Decorative yellow offset shadow box -->
-				<div class="absolute inset-0 bg-[#ffc480] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
+				<div class="absolute inset-0 bg-brand-accent rounded-2xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 
-				<div class="relative bg-[#1e1e1e] rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
+				<div class="relative bg-[#1e1e1e] rounded-2xl border-[3px] border-black shadow-brutal-2xl flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
 
 					<!-- Mac Header -->
 					<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">
 						<div class="flex gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-black"></div>
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-black"></div>
-							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-black"></div>
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-black"></div>
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-black"></div>
+							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-black"></div>
 						</div>
 						<div class="flex items-center gap-2 bg-black/40 px-3 py-1 rounded-md border border-white/10">
 							<svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
@@ -304,7 +304,7 @@ const image = await pictify.render({
 								<!-- Fake Response Area (Anchored to Bottom) -->
 								<div class="mt-8 border-t-[2px] border-dashed border-gray-700 pt-4">
 									{#if terminalState === 'idle' || terminalState === 'typing'}
-										<div class="flex items-center gap-2 text-[#4ade80]">
+										<div class="flex items-center gap-2 text-data-green">
 											<span class="animate-spin text-xl leading-none">⁕</span>
 											<span class="animate-pulse">Awaiting request...</span>
 										</div>

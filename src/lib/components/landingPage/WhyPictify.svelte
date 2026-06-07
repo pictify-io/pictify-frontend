@@ -14,9 +14,9 @@
 				label: 'Serverless Scale',
 				desc: 'Auto-scaling API. No ops. 99.9% Uptime.',
 				icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-				color: 'text-[#4ade80]',
-				bg: 'bg-[#4ade80]/10',
-				border: 'border-[#4ade80]'
+				color: 'text-data-green',
+				bg: 'bg-data-green/10',
+				border: 'border-data-green'
 			}
 		},
 		{
@@ -31,9 +31,9 @@
 				label: 'Visual Editor',
 				desc: 'Designers update templates with drag-and-drop. No deploys needed.',
 				icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
-				color: 'text-[#ff6b6b]',
-				bg: 'bg-[#ff6b6b]/10',
-				border: 'border-[#ff6b6b]'
+				color: 'text-brand-danger',
+				bg: 'bg-brand-danger/10',
+				border: 'border-brand-danger'
 			}
 		},
 		{
@@ -48,26 +48,26 @@
 				label: 'Sub-500ms',
 				desc: 'Global CDN caching. Optimized rendering engine.',
 				icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-				color: 'text-[#ffc480]',
-				bg: 'bg-[#ffc480]/10',
-				border: 'border-[#ffc480]'
+				color: 'text-brand-accent',
+				bg: 'bg-brand-accent/10',
+				border: 'border-brand-accent'
 			}
 		}
 	];
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden">
+<section class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Background Elements -->
 	<div
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50"
 	/>
-	<div class="absolute top-1/3 right-0 w-96 h-96 bg-[#ff6b6b]/5 rounded-full blur-3xl -z-10" />
-	<div class="absolute bottom-0 left-0 w-96 h-96 bg-[#4ade80]/5 rounded-full blur-3xl -z-10" />
+	<div class="absolute top-1/3 right-0 w-96 h-96 bg-brand-danger/5 rounded-full blur-3xl -z-10" />
+	<div class="absolute bottom-0 left-0 w-96 h-96 bg-data-green/5 rounded-full blur-3xl -z-10" />
 
 	<div class="max-w-6xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-20">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ffc480] mb-6 transform -rotate-1"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 rounded-full border-[3px] border-gray-900 shadow-brutal-accent mb-6 transform -rotate-1"
 			>
 				<span class="text-sm font-bold text-white uppercase tracking-wider">Build vs. Buy</span>
 			</div>
@@ -89,7 +89,7 @@
 		<div class="space-y-6">
 			<!-- Header Row (Desktop) -->
 			<div
-				class="hidden md:grid grid-cols-12 gap-6 text-sm font-bold text-gray-400 uppercase tracking-widest px-6"
+				class="hidden md:grid grid-cols-12 gap-6 text-sm font-bold text-gray-600 uppercase tracking-widest px-6"
 			>
 				<div class="col-span-5 text-center">DIY / Headless</div>
 				<div class="col-span-2 text-center" />
@@ -124,7 +124,7 @@
 									>
 								</div>
 								<div>
-									<div class="text-xs font-bold text-gray-400 uppercase mb-1 md:hidden">
+									<div class="text-xs font-bold text-gray-600 uppercase mb-1 md:hidden">
 										The Hard Way
 									</div>
 									<h4 class="font-bold text-gray-700 text-lg">{point.headless.label}</h4>
@@ -145,7 +145,7 @@
 						<!-- Pictify Side (Solution) -->
 						<div class="md:col-span-5 relative">
 							<div
-								class="h-full bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] group-hover:shadow-[6px_6px_0_0_#1f2937] group-hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 relative overflow-hidden"
+								class="h-full bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg group-hover:shadow-brutal-xl group-hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 relative overflow-hidden"
 							>
 								<!-- Glow Effect -->
 								<div

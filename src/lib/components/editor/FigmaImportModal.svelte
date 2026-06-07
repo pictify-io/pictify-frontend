@@ -223,7 +223,7 @@
 	on:click|self={close}
 >
 	<div
-		class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
+		class="bg-brand-bg border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
 	>
 		<!-- Header -->
 		<div
@@ -231,7 +231,7 @@
 		>
 			<div class="flex items-center gap-3">
 				<div
-					class="w-8 h-8 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+					class="w-8 h-8 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 				>
 					<svg width="16" height="16" viewBox="0 0 38 57" fill="none">
 						<path
@@ -261,7 +261,7 @@
 				</h2>
 			</div>
 			<button
-				class="w-8 h-8 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center hover:bg-red-50 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+				class="w-8 h-8 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center hover:bg-red-50 hover:shadow-brutal-sm transition-all"
 				on:click={close}
 			>
 				<i class="fa fa-times text-sm text-gray-900" />
@@ -274,7 +274,7 @@
 				<!-- Importing state -->
 				<div class="flex flex-col items-center justify-center py-10">
 					<div
-						class="w-16 h-16 rounded-full bg-[#a259ff] border-[3px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#1f2937] animate-pulse"
+						class="w-16 h-16 rounded-full bg-[#a259ff] border-[3px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg animate-pulse"
 					>
 						<i class="fa fa-spinner fa-spin text-2xl text-white" />
 					</div>
@@ -292,7 +292,7 @@
 					<div class="grid grid-cols-3 gap-3">
 						<div class="text-center">
 							<div
-								class="w-10 h-10 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-2 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-10 h-10 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-2 shadow-brutal-sm"
 							>
 								<span class="text-sm font-black text-gray-900">1</span>
 							</div>
@@ -301,7 +301,7 @@
 						</div>
 						<div class="text-center">
 							<div
-								class="w-10 h-10 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-2 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-10 h-10 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-2 shadow-brutal-sm"
 							>
 								<span class="text-sm font-black text-gray-900">2</span>
 							</div>
@@ -310,7 +310,7 @@
 						</div>
 						<div class="text-center">
 							<div
-								class="w-10 h-10 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-2 shadow-[2px_2px_0_0_#1f2937]"
+								class="w-10 h-10 rounded-lg bg-white border-[2px] border-gray-900 flex items-center justify-center mx-auto mb-2 shadow-brutal-sm"
 							>
 								<span class="text-sm font-black text-gray-900">3</span>
 							</div>
@@ -324,7 +324,7 @@
 				<div class="p-4 bg-[#a259ff]/5 border-[2px] border-[#a259ff] rounded-xl mb-6">
 					<div class="flex items-start gap-3">
 						<div
-							class="w-10 h-10 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-10 h-10 rounded-lg bg-[#a259ff] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 						>
 							<svg width="18" height="18" viewBox="0 0 38 57" fill="none">
 								<path
@@ -358,7 +358,7 @@
 								href="https://www.figma.com/community/plugin/pictify-send-to-pictify"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="inline-flex items-center gap-2 px-4 py-2 bg-[#a259ff] text-white border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+								class="inline-flex items-center gap-2 px-4 py-2 bg-[#a259ff] text-white border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
 							>
 								<i class="fa fa-external-link" />
 								Get Plugin
@@ -394,7 +394,7 @@
 						>
 							<i class="fa fa-inbox text-2xl text-gray-300 mb-2" />
 							<p class="text-xs font-bold text-gray-500 mb-1">No pending imports</p>
-							<p class="text-[10px] font-medium text-gray-400">
+							<p class="text-[10px] font-medium text-gray-600">
 								Use the Figma plugin to send designs here
 							</p>
 						</div>
@@ -402,10 +402,10 @@
 						<div class="space-y-2">
 							{#each pendingImports as imp}
 								<div
-									class="flex items-center gap-3 p-3 bg-white border-[2px] border-gray-900 rounded-lg hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-0.5 transition-all"
+									class="flex items-center gap-3 p-3 bg-white border-[2px] border-gray-900 rounded-lg hover:shadow-brutal-md hover:-translate-y-0.5 transition-all"
 								>
 									{#if imp.previewPng}
-										<img
+										<img loading="lazy"
 											src={imp.previewPng}
 											alt={imp.metadata?.frameName || 'Preview'}
 											class="w-14 h-14 rounded border-[2px] border-gray-200 object-contain bg-gray-50 flex-shrink-0"
@@ -429,7 +429,7 @@
 										</p>
 									</div>
 									<button
-										class="px-3 py-1.5 bg-[#a259ff] text-white border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex-shrink-0"
+										class="px-3 py-1.5 bg-[#a259ff] text-white border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex-shrink-0"
 										on:click={() => importFromPending(imp.importId)}
 									>
 										Import

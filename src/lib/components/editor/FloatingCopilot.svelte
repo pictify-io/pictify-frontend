@@ -138,7 +138,7 @@
 		<div class="pointer-events-auto">
 			{#if !isOpen}
 				<button
-					class="group flex items-center justify-center w-10 h-10 bg-[#ffc480] rounded-full shadow-[4px_4px_0_0_#1f2937] border-[3px] border-gray-900 hover:scale-110 transition-all duration-300 hover:shadow-xl"
+					class="group flex items-center justify-center w-10 h-10 bg-brand-accent rounded-full shadow-brutal-lg border-[3px] border-gray-900 hover:scale-110 transition-all duration-300 hover:shadow-xl"
 					on:click={toggleOpen}
 					title="Edit with Copilot (Cmd+K)"
 					in:scaleAnim={{ duration: 300, start: 0.8, easing: cubicOut }}
@@ -176,16 +176,16 @@
 				</button>
 			{:else}
 				<div
-					class="w-[320px] bg-[#FFFDF8] rounded-xl shadow-[8px_8px_0_0_#1f2937] border-[3px] border-gray-900 overflow-hidden"
+					class="w-[320px] bg-brand-bg rounded-xl shadow-brutal-2xl border-[3px] border-gray-900 overflow-hidden"
 					transition:fly={{ y: 10, duration: 300, easing: cubicOut }}
 				>
 					<!-- Header -->
 					<div
-						class="px-4 py-3 bg-[#FFFDF8] border-b-[3px] border-gray-900 flex items-center justify-between"
+						class="px-4 py-3 bg-brand-bg border-b-[3px] border-gray-900 flex items-center justify-between"
 					>
 						<div class="flex items-center gap-2">
 							<div
-								class="w-6 h-6 rounded-full bg-gradient-to-br from-[#ff6b6b] to-[#ffc480] flex items-center justify-center shadow-sm ring-2 ring-white"
+								class="w-6 h-6 rounded-full bg-gradient-to-br from-brand-danger to-brand-accent flex items-center justify-center shadow-sm ring-2 ring-white"
 							>
 								<svg
 									width="12"
@@ -231,7 +231,7 @@
 							bind:value={prompt}
 							on:keydown={handleKeydown}
 							placeholder="Describe how you want to change this element..."
-							class="w-full text-sm border-2 border-gray-900 rounded-lg p-3 focus:shadow-[4px_4px_0_0_#ffc480] focus:border-gray-900 focus:ring-0 min-h-[100px] resize-none bg-white mb-3 placeholder-gray-500 transition-all shadow-[4px_4px_0_0_#1f2937] font-medium"
+							class="w-full text-sm border-2 border-gray-900 rounded-lg p-3 focus:shadow-brutal-accent focus:border-gray-900 focus:ring-0 min-h-[100px] resize-none bg-white mb-3 placeholder-gray-500 transition-all shadow-brutal-lg font-medium"
 							disabled={isLoading}
 							autofocus
 						/>
@@ -260,7 +260,7 @@
 						<div class="flex justify-between items-center">
 							<span class="text-[11px] text-gray-400 font-medium px-1 flex items-center gap-1">
 								{#if isLoading}
-									<span class="animate-pulse text-[#ff6b6b] font-semibold"
+									<span class="animate-pulse text-brand-danger font-semibold"
 										>Generating changes...</span
 									>
 								{:else}
@@ -271,7 +271,7 @@
 							</span>
 
 							<button
-								class="bg-gray-900 text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#ffc480] hover:-translate-y-0.5 active:scale-95"
+								class="bg-gray-900 text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 active:scale-95"
 								on:click={handleGenerate}
 								disabled={isLoading || !prompt.trim()}
 							>

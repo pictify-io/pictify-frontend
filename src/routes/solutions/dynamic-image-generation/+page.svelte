@@ -63,7 +63,7 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#67e8f9]/25 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-[#67e8f9]/25 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">Dynamic Images</span>
 		</div>
@@ -99,7 +99,7 @@
 			Three dynamic-image shapes
 		</h2>
 		<div class="space-y-5">
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">Per-user dynamic</h3>
 				<p class="text-gray-700 leading-relaxed">
 					The image reflects the current viewer. Example: a user's Year-in-Review card that includes
@@ -107,7 +107,7 @@
 					user's data at request time. Stays current even if the user's stats change between shares.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">Per-request dynamic</h3>
 				<p class="text-gray-700 leading-relaxed">
 					The image reflects current state of something stateful — inventory, leaderboard standing,
@@ -115,7 +115,7 @@
 					changes. Great for live dashboards embedded in emails or status pages.
 				</p>
 			</div>
-			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-6">
+			<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-6">
 				<h3 class="font-black text-xl mb-2">Per-context dynamic</h3>
 				<p class="text-gray-700 leading-relaxed">
 					The image reflects contextual factors — campaign cohort, A/B experiment variant, device
@@ -155,7 +155,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			Example: per-user dynamic OG image
 		</h2>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
+		<div class="bg-[#282c34] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
@@ -202,7 +202,7 @@ export function buildProfileOgUrl(userId: string) {
 				{#each related as r}
 					<a
 						href="/solutions/{r.slug}"
-						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+						class="block bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm transition-all"
 					>
 						<h3 class="font-black text-gray-900 mb-1">{r.label}</h3>
 						<p class="text-xs text-gray-500 line-clamp-3">{r.summary}</p>

@@ -7,13 +7,13 @@
 	];
 </script>
 
-<section class="w-full py-10 bg-[#FFFDF8] relative">
+<section class="w-full py-10 bg-brand-bg relative">
 	<div class="max-w-6xl mx-auto px-6">
 		<!-- Stat Pills Row -->
 		<div class="flex flex-wrap justify-center gap-4 mb-6">
 			{#each stats as stat}
 				<div
-					class="flex items-center gap-3 px-5 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-0.5 transition-transform"
+					class="flex items-center gap-3 px-5 py-3 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:-translate-y-0.5 transition-transform"
 				>
 					<span class="font-black text-2xl text-gray-900">{stat.value}</span>
 					<span class="text-sm font-bold text-gray-500 uppercase">{stat.label}</span>
@@ -24,7 +24,7 @@
 		<!-- Badges Row -->
 		<div class="flex flex-wrap justify-center gap-3">
 			<div class="flex items-center gap-2 px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg">
-				<svg class="w-4 h-4 text-[#4ade80]" fill="currentColor" viewBox="0 0 20 20"
+				<svg class="w-4 h-4 text-data-green" fill="currentColor" viewBox="0 0 20 20"
 					><path
 						fill-rule="evenodd"
 						d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"

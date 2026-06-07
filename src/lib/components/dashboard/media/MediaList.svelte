@@ -10,7 +10,7 @@
 	} from '../../../../store/media.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
-	import Loader from '$lib/components/Loader.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import {
 		copyToClipboard as sharedCopy,
 		formatRelativeDate,
@@ -172,14 +172,12 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full" />
 					Media Library
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
 					{mediaType === 'images' ? 'Image' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
-					<span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Gallery</span
-					>
+					<span class="text-gray-900">Gallery</span>
 				</h1>
 			</div>
 
@@ -206,18 +204,28 @@
 
 		<!-- Content -->
 		{#if isLoading}
-			<div class="flex flex-col items-center justify-center py-32">
-				<Loader size="16" show={isLoading} />
-				<p class="text-gray-400 text-xs font-black uppercase tracking-widest mt-6 animate-pulse">
-					Loading Media Assets...
-				</p>
+			<!-- Skeleton grid — mirrors the real media card shape (4-col on xl) -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+				{#each Array(8) as _}
+					<div
+						class="bg-white border-[3px] border-gray-200 rounded-xl overflow-hidden shadow-brutal-xl flex flex-col"
+					>
+						<!-- Thumbnail area -->
+						<Skeleton class="h-[220px] rounded-none border-b-[3px] border-gray-200" />
+						<!-- Info strip -->
+						<div class="p-4 flex items-center justify-between">
+							<Skeleton class="h-4 w-24" />
+							<Skeleton class="h-4 w-10" />
+						</div>
+					</div>
+				{/each}
 			</div>
 		{:else if mediaList.length === 0}
 			<div
-				class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
+				class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border-[3px] border-gray-900 border-dashed shadow-sm"
 			>
 				<div
-					class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-[4px_4px_0_0_#1f2937]"
+					class="w-24 h-24 bg-gray-100 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg -rotate-3"
 				>
 					{#if mediaType === 'images'}
 						<svg
@@ -264,28 +272,28 @@
 					{/if}
 				</div>
 				<h2 class="text-2xl font-black text-gray-900 uppercase tracking-wide mb-2">
-					No {mediaType} Generated
+					No {mediaType === 'images' ? 'Images' : mediaType === 'gifs' ? 'GIFs' : 'PDFs'} Yet
 				</h2>
-				<p class="text-gray-500 font-bold max-w-md text-center">
-					Start generating {mediaType === 'images'
-						? 'images'
+				<p class="text-gray-500 font-bold max-w-sm text-center text-sm mb-6">
+					{mediaType === 'images'
+						? 'Rendered images land here. Pick a template and render your first image to get started.'
 						: mediaType === 'gifs'
-						? 'GIFs'
-						: 'PDFs'} from your templates to see them appear here.
+						? 'Animated GIFs you render from templates will appear here.'
+						: 'PDFs you generate from templates will be stored here.'}
 				</p>
 				<a
 					href="/dashboard/template"
-					class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-[#ffc480] hover:text-gray-900 transition-colors border-2 border-gray-900"
+					class="inline-flex items-center gap-2 px-5 py-3 bg-brand-accent text-gray-900 font-black text-xs uppercase tracking-wider rounded-lg border-[3px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
-					Open Templates
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 7l5 5m0 0l-5 5m5-5H6"
+							stroke-width="2.5"
+							d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
 						/></svg
 					>
+					Render from a Template
 				</a>
 			</div>
 		{:else}
@@ -298,7 +306,7 @@
 					<div
 						role="button"
 						tabindex="0"
-						class="media-card group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[8px_8px_0_0_#1f2937] hover:-translate-y-1"
+						class="media-card group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1"
 						on:click={() => openLightbox(media)}
 						on:keydown={(e) => e.key === 'Enter' && openLightbox(media)}
 					>
@@ -333,7 +341,7 @@
 									<!-- PDF Badge -->
 									<div class="absolute top-3 left-3 z-20">
 										<span
-											class="text-[10px] font-black text-gray-900 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md border-[2px] border-gray-900 uppercase tracking-wide shadow-sm"
+											class="text-[10px] font-black text-gray-900 bg-white/95 px-2 py-1 rounded-md border-[2px] border-gray-900 uppercase tracking-wide shadow-sm"
 										>
 											PDF
 										</span>
@@ -379,8 +387,9 @@
 							>
 								<button
 									on:click={(e) => copyToClipboard(media.url, e)}
-									class="bg-white rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-white rounded-lg min-w-[44px] min-h-[44px] sm:w-9 sm:h-9 sm:min-w-0 sm:min-h-0 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Copy URL"
+									aria-label="Copy URL"
 								>
 									<svg
 										class="w-4 h-4 text-gray-900"
@@ -398,8 +407,9 @@
 								</button>
 								<button
 									on:click={(e) => downloadMedia(media.url, e)}
-									class="bg-[#ff6b6b] rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-brand-danger rounded-lg min-w-[44px] min-h-[44px] sm:w-9 sm:h-9 sm:min-w-0 sm:min-h-0 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Download"
+									aria-label="Download"
 								>
 									<svg
 										class="w-4 h-4 text-white"
@@ -428,7 +438,7 @@
 									>
 								</div>
 								<span
-									class="text-[9px] font-black text-gray-900 bg-[#ffc480]/30 px-2 py-0.5 rounded border border-[#ffc480] uppercase tracking-wider"
+									class="text-[9px] font-black text-gray-900 bg-brand-accent/30 px-2 py-0.5 rounded border border-brand-accent uppercase tracking-wider"
 								>
 									{mediaType === 'images' ? 'PNG' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
 								</span>
@@ -458,9 +468,9 @@
 						<button
 							on:click={() => loadPage(currentPage - 1)}
 							disabled={!hasPrev || isLoadingMore}
-							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
+							class="min-w-[44px] min-h-[44px] w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
 							{hasPrev
-								? 'bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-white text-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -482,9 +492,9 @@
 									<button
 										on:click={() => loadPage(pageNum)}
 										disabled={isLoadingMore}
-										class="w-8 h-8 text-xs font-black rounded-md border-[2px] transition-all duration-200 flex items-center justify-center
+										class="min-w-[44px] min-h-[44px] sm:w-8 sm:h-8 sm:min-w-0 sm:min-h-0 text-xs font-black rounded-md border-[2px] transition-all duration-200 flex items-center justify-center
 										{pageNum === currentPage
-											? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#ffc480]'
+											? 'bg-gray-900 border-gray-900 text-white shadow-brutal-accent-sm'
 											: 'bg-white border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-900'}"
 									>
 										{pageNum}
@@ -497,9 +507,9 @@
 						<button
 							on:click={() => loadPage(currentPage + 1)}
 							disabled={!hasNext || isLoadingMore}
-							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
+							class="min-w-[44px] min-h-[44px] w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
 							{hasNext
-								? 'bg-white text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-white text-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,7 +532,7 @@
 {#if showLightbox && selectedMedia}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 	<div
-		class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
 		on:click={closeLightbox}
 		role="dialog"
 		aria-modal="true"
@@ -531,7 +541,7 @@
 	>
 		<!-- Close button -->
 		<button
-			class="absolute top-6 right-6 w-12 h-12 bg-white rounded-xl border-[3px] border-gray-900 flex items-center justify-center transition-all shadow-[4px_4px_0_0_#ffc480] hover:shadow-[2px_2px_0_0_#ffc480] hover:translate-x-[2px] hover:translate-y-[2px] z-50"
+			class="absolute top-6 right-6 w-12 h-12 bg-white rounded-xl border-[3px] border-gray-900 flex items-center justify-center transition-all shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] z-50"
 			on:click={closeLightbox}
 			aria-label="Close lightbox"
 		>
@@ -551,7 +561,7 @@
 		<div class="max-w-6xl w-full max-h-[90vh] flex flex-col relative" on:click|stopPropagation>
 			<!-- Image Frame -->
 			<div
-				class="bg-white rounded-2xl border-[3px] border-gray-900 p-2 shadow-[12px_12px_0_0_#000] relative overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-2 shadow-brutal-3xl relative overflow-hidden"
 			>
 				<!-- Pattern Background -->
 				<div
@@ -574,7 +584,7 @@
 							/>
 						</div>
 					{:else}
-						<img
+						<img loading="lazy"
 							src={selectedMedia.url}
 							alt="Full size media"
 							class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"
@@ -591,7 +601,7 @@
 							class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20"
 						>
 							<svg
-								class="w-4 h-4 text-[#ffc480]"
+								class="w-4 h-4 text-brand-accent"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -612,7 +622,7 @@
 							class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20"
 						>
 							<svg
-								class="w-4 h-4 text-[#ffc480]"
+								class="w-4 h-4 text-brand-accent"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -633,7 +643,7 @@
 							class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20"
 						>
 							<svg
-								class="w-4 h-4 text-[#4ade80]"
+								class="w-4 h-4 text-data-green"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -653,7 +663,7 @@
 
 				<div class="flex gap-3 w-full sm:w-auto">
 					<button
-						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => copyToClipboard(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -667,7 +677,7 @@
 						Copy Link
 					</button>
 					<button
-						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#ff6b6b] text-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => downloadMedia(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

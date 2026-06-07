@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Respect prefers-reduced-motion globally. Users who request reduced motion get
+ * near-instant transitions/animations across the whole app (marketing + dashboard)
+ * instead of carousels, shimmers, bounces, and reveal choreography. Essential,
+ * state-conveying motion can opt back in per-component if ever needed. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	::before,
+	::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
 /* Neobrutalist focus ring — replaces Tailwind's default outline/ring for
  * interactive elements in the HTML editor. Single 3px accent-colored
  * outer shadow keyed to `focus-visible` so mouse users don't see the ring

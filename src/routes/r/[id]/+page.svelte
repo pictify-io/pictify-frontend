@@ -59,7 +59,7 @@
 	// Embed code snippets
 	$: embedSnippets = result
 		? {
-				img: `<img src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${
+				img: `<img loading="lazy" src="${result.assetUrl}" alt="${result.title || 'Pictify image'}" width="${
 					result.width
 				}" height="${result.height}" />`,
 				markdown: `![${result.title || 'Pictify image'}](${result.assetUrl})`,
@@ -288,10 +288,10 @@
 			.replace(/&/g, '&amp;')
 			.replace(/</g, '&lt;')
 			.replace(/>/g, '&gt;')
-			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-[#ffc480]">$1</span>=')
-			.replace(/"([^"]*)"/g, '"<span class="text-[#4ade80]">$1</span>"')
-			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-[#ff6b6b]">$2</span>')
-			.replace(/(\[\/?\w+\])/g, '<span class="text-[#ff6b6b]">$1</span>');
+			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-brand-accent">$1</span>=')
+			.replace(/"([^"]*)"/g, '"<span class="text-data-green">$1</span>"')
+			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-brand-danger">$2</span>')
+			.replace(/(\[\/?\w+\])/g, '<span class="text-brand-danger">$1</span>');
 	}
 
 	onMount(() => {
@@ -358,16 +358,16 @@
 	{/if}
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col relative overflow-hidden font-sans">
+<div class="bg-brand-bg min-h-screen flex flex-col relative overflow-hidden font-sans">
 	<!-- Background Elements -->
 	<div
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<Nav />
@@ -377,7 +377,7 @@
 			<!-- Loading state -->
 			<div class="flex flex-col items-center justify-center min-h-[400px]">
 				<div
-					class="w-16 h-16 border-[4px] border-gray-900 border-t-[#ff6b6b] rounded-full animate-spin"
+					class="w-16 h-16 border-[4px] border-gray-900 border-t-brand-danger rounded-full animate-spin"
 				/>
 				<p class="mt-6 text-xl font-black text-gray-900 uppercase tracking-widest animate-pulse">
 					Loading Asset...
@@ -386,11 +386,11 @@
 		{:else if error}
 			<!-- Error state -->
 			<div
-				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl p-12 relative overflow-hidden"
+				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl p-12 relative overflow-hidden"
 			>
 				<div class="absolute inset-0 bg-red-50/50 -z-10" />
 				<div
-					class="inline-flex items-center justify-center w-20 h-20 bg-[#ff6b6b]/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-[#ff6b6b]"
+					class="inline-flex items-center justify-center w-20 h-20 bg-brand-danger/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-brand-danger"
 				>
 					<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -407,7 +407,7 @@
 				<p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
 				<a
 					href="/tools"
-					class="inline-block px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="inline-block px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 				>
 					Create your own
 				</a>
@@ -419,16 +419,16 @@
 				<div class="lg:col-span-8 flex flex-col gap-8">
 					<!-- "Window" Card -->
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-3xl overflow-hidden relative group"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
 					>
 						<!-- Window Header -->
 						<div
 							class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
 						>
 							<div class="flex items-center gap-2">
-								<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 							</div>
 							<div
 								class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
@@ -456,13 +456,13 @@
 							/>
 
 							{#if result.contentType === 'gif'}
-								<img
+								<img loading="lazy"
 									src={result.assetUrl}
 									alt={result.title || 'Generated GIF'}
 									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
 								/>
 							{:else}
-								<img
+								<img loading="lazy"
 									src={result.assetUrl}
 									alt={result.title || 'Generated image'}
 									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
@@ -474,9 +474,9 @@
 								href="https://pictify.io"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
+								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
 							>
-								<svg class="w-3.5 h-3.5 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"
+								<svg class="w-3.5 h-3.5 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
 									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
 								>
 								Made with Pictify
@@ -486,7 +486,7 @@
 
 					<!-- A2: Embed Codes Panel -->
 					<div
-						class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-2xl overflow-hidden"
+						class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-2xl overflow-hidden"
 					>
 						<!-- Tab bar -->
 						<div class="flex border-b border-gray-700">
@@ -495,7 +495,7 @@
 									on:click={() => (activeEmbedTab = tab.key)}
 									class="flex-1 px-4 py-3 text-[11px] font-black uppercase tracking-wider transition-colors {activeEmbedTab ===
 									tab.key
-										? 'bg-gray-800 text-[#4ade80] border-b-2 border-[#4ade80]'
+										? 'bg-gray-800 text-data-green border-b-2 border-data-green'
 										: 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'}"
 								>
 									{tab.label}
@@ -530,11 +530,11 @@
 				<div class="lg:col-span-4 flex flex-col gap-6">
 					<!-- Header Info -->
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-6"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl p-6"
 					>
 						<div class="flex items-center gap-3 mb-4">
 							<div
-								class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-[2px_2px_0_0_#000]"
+								class="inline-flex items-center gap-1.5 px-3 py-1 bg-data-green border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-brutal-sm"
 							>
 								Shared Link
 							</div>
@@ -612,9 +612,9 @@
 								<span class="flex items-center gap-1.5">
 									<span class="relative flex h-2 w-2">
 										<span
-											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75"
+											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-data-green opacity-75"
 										/>
-										<span class="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
+										<span class="relative inline-flex rounded-full h-2 w-2 bg-data-green" />
 									</span>
 									<span class="text-gray-900 font-bold"
 										>{analytics?.totalHits
@@ -625,13 +625,13 @@
 							</div>
 							<!-- B5: Social Proof -->
 							<div class="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-gray-100">
-								<svg class="w-4 h-4 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"
+								<svg class="w-4 h-4 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
 									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
 								>
 								<span class="text-xs text-gray-400 font-medium"
 									>Powered by <a
 										href="https://pictify.io"
-										class="text-[#ff6b6b] font-bold hover:underline">Pictify</a
+										class="text-brand-danger font-bold hover:underline">Pictify</a
 									> &mdash; Join 10,000+ developers</span
 								>
 							</div>
@@ -642,7 +642,7 @@
 					<div class="flex flex-col gap-4">
 						<button
 							on:click={copyShareUrl}
-							class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
+							class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
 						>
 							<svg
 								class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors"
@@ -665,7 +665,7 @@
 							<div class="relative download-dropdown">
 								<button
 									on:click={() => (downloadOpen = !downloadOpen)}
-									class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
+									class="w-full py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -691,7 +691,7 @@
 								</button>
 								{#if downloadOpen}
 									<div
-										class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden z-30"
+										class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-hidden z-30"
 									>
 										{#each ['png', 'jpg', 'webp'] as fmt}
 											{@const isOriginal = (result.format || 'png').toLowerCase() === fmt}
@@ -705,7 +705,7 @@
 												<span>{fmt.toUpperCase()}</span>
 												{#if isOriginal}
 													<span
-														class="text-[10px] font-black text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded"
+														class="text-[10px] font-black text-data-green bg-data-green/10 px-2 py-0.5 rounded"
 														>(Original)</span
 													>
 												{/if}
@@ -726,7 +726,7 @@
 								class="absolute inset-0 bg-[radial-gradient(#fff_0.5px,transparent_0.5px)] [background-size:12px_12px] opacity-5"
 							/>
 							<div class="relative z-10">
-								<p class="text-[10px] font-black uppercase tracking-widest text-[#ffc480] mb-2">
+								<p class="text-[10px] font-black uppercase tracking-widest text-brand-accent mb-2">
 									{ctaConfig.sidebar.heading}
 								</p>
 								<p class="text-sm text-gray-400 font-medium mb-4">
@@ -742,7 +742,7 @@
 								</p>
 								<button
 									on:click={handleSidebarCta}
-									class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[2px] border-[#ff6b6b] hover:bg-[#ff5252] transition-all rounded-lg text-sm"
+									class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[2px] border-brand-danger hover:bg-data-red transition-all rounded-lg text-sm"
 								>
 									{ctaConfig.sidebar.button}
 								</button>
@@ -753,7 +753,7 @@
 					<!-- A4: Remix This Template (enhanced) -->
 					{#if template && template.isPublic}
 						<div
-							class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl p-5 relative overflow-hidden group transition-all"
+							class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl p-5 relative overflow-hidden group transition-all"
 						>
 							<div class="absolute top-0 right-0 p-2 opacity-10">
 								<svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -781,7 +781,7 @@
 							<button
 								on:click={handleRemix}
 								disabled={forking}
-								class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
+								class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
 							>
 								{#if forking}
 									<span class="flex items-center justify-center gap-2">
@@ -812,7 +812,7 @@
 					<!-- A1: Analytics Card (visible to creator and team members) -->
 					{#if isLoggedIn && (analytics || analyticsLoading)}
 						<div
-							class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-2xl overflow-hidden"
+							class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl overflow-hidden"
 						>
 							<div
 								class="bg-gray-50 border-b-[3px] border-gray-900 px-5 py-3 flex items-center gap-1.5"
@@ -1021,7 +1021,7 @@
 			{#if !isLoggedIn}
 				<div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
 					<div
-						class="bg-[#ff6b6b] rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden"
+						class="bg-brand-danger rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl p-8 md:p-12 text-center relative overflow-hidden"
 					>
 						<div
 							class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"
@@ -1038,7 +1038,7 @@
 							<div class="flex flex-wrap justify-center gap-4">
 								<a
 									href="/signup"
-									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 								>
 									{result.source === 'api' ? 'Get API Key' : 'Start Free'}
 								</a>

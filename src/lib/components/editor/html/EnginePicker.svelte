@@ -79,17 +79,17 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+		class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
 		role="dialog"
 		aria-modal="true"
 		aria-label="Pick a template engine"
 		on:click|self={close}
 	>
 		<div
-			class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937]"
+			class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-2xl"
 		>
 			<!-- Header strip (accent background, same as sibling modal) -->
-			<div class="border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4">
+			<div class="border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 				<h2 class="text-xl font-black uppercase tracking-wider text-gray-900">
 					Create New Template
 				</h2>
@@ -110,20 +110,20 @@
 						type="button"
 						class="relative rounded-xl border-[3px] p-5 text-left transition-all
 							{selected === 'fabric'
-								? 'border-gray-900 bg-[#ffc480]/20 shadow-[4px_4px_0_0_#1f2937] -translate-x-[2px] -translate-y-[2px]'
-								: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
+								? 'border-gray-900 bg-brand-accent/20 shadow-brutal-lg -translate-x-[2px] -translate-y-[2px]'
+								: 'border-gray-900 bg-white hover:shadow-brutal-lg hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
 						on:click={() => choose('fabric')}
 					>
 						{#if selected === 'fabric'}
 							<div
-								class="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-900 bg-[#ffc480] shadow-[2px_2px_0_0_#1f2937]"
+								class="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-900 bg-brand-accent shadow-brutal-sm"
 							>
 								<i class="fa fa-check text-[10px] font-bold text-gray-900"></i>
 							</div>
 						{/if}
 						<div class="flex items-start gap-4">
 							<div
-								class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-[#ffc480] text-xl shadow-[2px_2px_0_0_#1f2937]"
+								class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-brand-accent text-xl shadow-brutal-sm"
 							>
 								<i class="fa fa-object-group text-gray-900"></i>
 							</div>
@@ -147,20 +147,20 @@
 						type="button"
 						class="relative rounded-xl border-[3px] p-5 text-left transition-all
 							{selected === 'html'
-								? 'border-gray-900 bg-[#ff6b6b]/10 shadow-[4px_4px_0_0_#1f2937] -translate-x-[2px] -translate-y-[2px]'
-								: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
+								? 'border-gray-900 bg-brand-danger/10 shadow-brutal-lg -translate-x-[2px] -translate-y-[2px]'
+								: 'border-gray-900 bg-white hover:shadow-brutal-lg hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
 						on:click={() => choose('html')}
 					>
 						<!-- NEW badge -->
 						<div
-							class="absolute right-3 top-3 flex items-center gap-1 rounded-lg border-2 border-gray-900 bg-[#ff6b6b] px-2 py-0.5 text-white shadow-[2px_2px_0_0_#1f2937]"
+							class="absolute right-3 top-3 flex items-center gap-1 rounded-lg border-2 border-gray-900 bg-brand-danger px-2 py-0.5 text-white shadow-brutal-sm"
 						>
 							<span class="text-[10px] font-black uppercase tracking-widest">New</span>
 						</div>
 
 						<div class="flex items-start gap-4">
 							<div
-								class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-[#ff6b6b] text-white shadow-[2px_2px_0_0_#1f2937]"
+								class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border-[3px] border-gray-900 bg-brand-danger text-white shadow-brutal-sm"
 							>
 								<i class="fa fa-code text-xl"></i>
 							</div>
@@ -198,7 +198,7 @@
 				<button
 					type="button"
 					on:click={close}
-					class="rounded-xl border-[3px] border-gray-900 bg-white px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-900 shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]"
+					class="rounded-xl border-[3px] border-gray-900 bg-white px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-900 shadow-brutal-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm"
 				>
 					Cancel
 				</button>
@@ -213,11 +213,11 @@
 		surprise if a user arrives here via a shared link vs the modal path.
 	-->
 	<div
-		class="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center bg-[#FFFDF8] p-6"
+		class="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center bg-brand-bg p-6"
 	>
 		<div class="flex w-full max-w-5xl flex-col gap-10">
 			<header class="text-center">
-				<div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[4px_4px_0_0_#1f2937]">
+				<div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-brutal-lg">
 					<i class="fa fa-plus text-xl text-gray-900"></i>
 				</div>
 				<h1 class="text-3xl font-black uppercase tracking-widest text-gray-900 md:text-4xl">
@@ -234,19 +234,19 @@
 					type="button"
 					class="relative flex flex-col gap-4 rounded-xl border-[3px] p-6 text-left transition-all
 						{selected === 'fabric'
-							? 'border-gray-900 bg-[#ffc480]/20 shadow-[6px_6px_0_0_#1f2937] -translate-x-[2px] -translate-y-[2px]'
-							: 'border-gray-900 bg-white hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
+							? 'border-gray-900 bg-brand-accent/20 shadow-brutal-xl -translate-x-[2px] -translate-y-[2px]'
+							: 'border-gray-900 bg-white hover:shadow-brutal-xl hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
 					on:click={() => choose('fabric')}
 				>
 					{#if selected === 'fabric'}
 						<div
-							class="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-[2px] border-gray-900 bg-[#ffc480] shadow-[2px_2px_0_0_#1f2937]"
+							class="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-[2px] border-gray-900 bg-brand-accent shadow-brutal-sm"
 						>
 							<i class="fa fa-check text-[11px] font-bold text-gray-900"></i>
 						</div>
 					{/if}
 					<div class="flex items-center gap-3">
-						<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937]">
+						<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-brutal-md">
 							<i class="fa fa-object-group text-xl text-gray-900"></i>
 						</div>
 						<h2 class="text-xl font-black uppercase tracking-tight text-gray-900">
@@ -258,7 +258,7 @@
 						you'd want to design visually.
 					</p>
 					<pre
-						class="mt-1 w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"
+						class="mt-1 w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-brand-accent"
 					><code>{`{
   "fabricJSData": {
     "version": "5.0",
@@ -280,19 +280,19 @@
 					type="button"
 					class="relative flex flex-col gap-4 rounded-xl border-[3px] p-6 text-left transition-all
 						{selected === 'html'
-							? 'border-gray-900 bg-[#ff6b6b]/10 shadow-[6px_6px_0_0_#1f2937] -translate-x-[2px] -translate-y-[2px]'
-							: 'border-gray-900 bg-white hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
+							? 'border-gray-900 bg-brand-danger/10 shadow-brutal-xl -translate-x-[2px] -translate-y-[2px]'
+							: 'border-gray-900 bg-white hover:shadow-brutal-xl hover:-translate-x-[2px] hover:-translate-y-[2px]'}"
 					on:click={() => choose('html')}
 				>
 					<!-- NEW badge -->
 					<div
-						class="absolute right-3 top-3 rounded-lg border-[2px] border-gray-900 bg-[#ff6b6b] px-2 py-0.5 shadow-[2px_2px_0_0_#1f2937]"
+						class="absolute right-3 top-3 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-2 py-0.5 shadow-brutal-sm"
 					>
 						<span class="text-[10px] font-black uppercase tracking-widest text-white">New</span>
 					</div>
 
 					<div class="flex items-center gap-3">
-						<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ff6b6b] shadow-[3px_3px_0_0_#1f2937]">
+						<div class="flex h-14 w-14 items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-danger shadow-brutal-md">
 							<i class="fa fa-code text-xl text-white"></i>
 						</div>
 						<h2 class="text-xl font-black uppercase tracking-tight text-gray-900">HTML</h2>
@@ -302,7 +302,7 @@
 						Tailwind. Rendered via Puppeteer.
 					</p>
 					<pre
-						class="mt-1 w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"
+						class="mt-1 w-full overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-brand-accent"
 					><code>{`<div class="invoice">
   <h1>{{title}}</h1>
   <p>{{amount | currency}}</p>

@@ -28,8 +28,8 @@
 		<div
 			class={`
         flex flex-col sm:flex-row items-center justify-between gap-3 p-3 border-[3px] border-black
-        ${isExhausted ? 'bg-[#ff6b6b]/20' : isLow ? 'bg-[#ffc480]/30' : 'bg-white'}
-        ${isExhausted ? 'shadow-[4px_4px_0_0_#ff6b6b]' : 'shadow-[4px_4px_0_0_#000]'}
+        ${isExhausted ? 'bg-brand-danger/20' : isLow ? 'bg-brand-accent/30' : 'bg-white'}
+        ${isExhausted ? 'shadow-[4px_4px_0_0_#ff6b6b]' : 'shadow-brutal-lg'}
       `}
 		>
 			<div class="flex items-center gap-3">
@@ -38,7 +38,7 @@
 					{#each Array(GUEST_DAILY_LIMIT) as _, i}
 						<div
 							class={`w-3 h-3 border-[2px] border-black ${
-								i < GUEST_DAILY_LIMIT - remaining ? 'bg-gray-400' : 'bg-[#4ade80]'
+								i < GUEST_DAILY_LIMIT - remaining ? 'bg-gray-400' : 'bg-data-green'
 							}`}
 						/>
 					{/each}
@@ -46,10 +46,10 @@
 
 				<div class="text-sm font-bold">
 					{#if isExhausted}
-						<span class="text-[#ff6b6b]">Daily limit reached!</span>
+						<span class="text-brand-danger">Daily limit reached!</span>
 						<span class="text-gray-600"> Sign up for unlimited access</span>
 					{:else if isLow}
-						<span class="text-[#ff6b6b]">{remaining}</span>
+						<span class="text-brand-danger">{remaining}</span>
 						<span class="text-gray-700">
 							free {remaining === 1 ? 'generation' : 'generations'} left today</span
 						>
@@ -68,9 +68,9 @@
           px-4 py-2 border-[2px] border-black font-black text-xs uppercase tracking-wide transition-all
           ${
 						isExhausted
-							? 'bg-[#ff6b6b] text-white shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px]'
+							? 'bg-brand-danger text-white shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 							: isLow
-							? 'bg-[#ffc480] text-black shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px]'
+							? 'bg-brand-accent text-black shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 							: 'bg-white text-black hover:bg-gray-50'
 					}
         `}

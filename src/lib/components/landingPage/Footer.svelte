@@ -2,7 +2,7 @@
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
 </script>
 
-<footer class="w-full bg-[#FFFDF8] border-t-[3px] border-gray-900">
+<footer class="w-full bg-brand-bg border-t-[3px] border-gray-900">
 	<div class="max-w-6xl mx-auto px-6 py-16">
 		<!-- Main Grid -->
 		<div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
@@ -38,7 +38,7 @@
 				<a
 					href="https://status.pictify.io"
 					target="_blank"
-					class="inline-flex items-center gap-3 px-4 py-2 bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-y-0.5 hover:translate-x-0.5 transition-all w-fit group"
+					class="inline-flex items-center gap-3 px-4 py-2 bg-white border-[3px] border-gray-900 rounded-lg shadow-brutal-lg hover:shadow-brutal-sm hover:translate-y-0.5 hover:translate-x-0.5 transition-all w-fit group"
 				>
 					<span class="relative flex h-3 w-3">
 						<span
@@ -65,33 +65,33 @@
 						<li>
 							<a
 								href="/pricing"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Pricing</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Pricing</a
 							>
 						</li>
 						<li>
 							<a
 								href={PUBLIC_DOCS_URL}
 								target="_blank"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">API Docs</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">API Docs</a
 							>
 						</li>
 						<li>
 							<a
 								href="/tools"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Tools</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Tools</a
 							>
 						</li>
 						<li>
 							<a
 								href="/templates"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Templates</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Templates</a
 							>
 						</li>
 						<li>
 							<a
 								href="https://status.pictify.io"
 								target="_blank"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Status</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Status</a
 							>
 						</li>
 					</ul>
@@ -108,28 +108,28 @@
 						<li>
 							<a
 								href="/integrations"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors"
 								>Integrations</a
 							>
 						</li>
 						<li>
 							<a
 								href="/alternatives"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors"
 								>Alternatives</a
 							>
 						</li>
 						<li>
 							<a
 								href="/compare"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors"
 								>Comparisons</a
 							>
 						</li>
 						<li>
 							<a
 								href="/glossary"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors">Glossary</a
+								class="text-gray-600 font-bold hover:text-data-green transition-colors">Glossary</a
 							>
 						</li>
 					</ul>
@@ -146,25 +146,25 @@
 						<li>
 							<a
 								href="/blogs"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Blog</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Blog</a
 							>
 						</li>
 						<li>
 							<a
 								href="mailto:support@pictify.io"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Contact</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Contact</a
 							>
 						</li>
 						<li>
 							<a
 								href="/terms"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Terms</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Terms</a
 							>
 						</li>
 						<li>
 							<a
 								href="/privacy"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Privacy</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Privacy</a
 							>
 						</li>
 					</ul>
@@ -184,7 +184,7 @@
 							class="flex items-center gap-2 group"
 						>
 							<div
-								class="w-8 h-8 bg-white border-[2px] border-gray-900 flex items-center justify-center rounded-md shadow-[2px_2px_0_0_#000] group-hover:-translate-y-0.5 transition-transform"
+								class="w-8 h-8 bg-white border-[2px] border-gray-900 flex items-center justify-center rounded-md shadow-brutal-sm group-hover:-translate-y-0.5 transition-transform"
 							>
 								<svg class="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 24 24"
 									><path
