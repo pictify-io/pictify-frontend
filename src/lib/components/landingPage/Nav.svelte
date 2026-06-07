@@ -186,7 +186,7 @@
 							}}
 						>
 							<div
-								class="w-8 h-8 bg-[#4ade80]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+								class="w-8 h-8 bg-data-green/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -299,7 +299,7 @@
 			{:else}
 				<a
 					href="/dashboard"
-					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-[#4ade80] hover:text-gray-900 transition-all uppercase tracking-wide"
+					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-data-green hover:text-gray-900 transition-all uppercase tracking-wide"
 					on:click={() => trackNav('Dashboard', '/dashboard', 'header')}
 				>
 					Dashboard
@@ -492,7 +492,7 @@
 			{:else}
 				<a
 					href="/dashboard"
-					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-[#4ade80] shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-data-green shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 					on:click={() => trackNav('Dashboard', '/dashboard', 'mobile_menu')}
 				>
 					Dashboard

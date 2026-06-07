@@ -643,7 +643,7 @@
 							class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20"
 						>
 							<svg
-								class="w-4 h-4 text-[#4ade80]"
+								class="w-4 h-4 text-data-green"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"

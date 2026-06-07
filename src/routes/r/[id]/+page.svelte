@@ -289,7 +289,7 @@
 			.replace(/</g, '&lt;')
 			.replace(/>/g, '&gt;')
 			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-brand-accent">$1</span>=')
-			.replace(/"([^"]*)"/g, '"<span class="text-[#4ade80]">$1</span>"')
+			.replace(/"([^"]*)"/g, '"<span class="text-data-green">$1</span>"')
 			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-brand-danger">$2</span>')
 			.replace(/(\[\/?\w+\])/g, '<span class="text-brand-danger">$1</span>');
 	}
@@ -428,7 +428,7 @@
 							<div class="flex items-center gap-2">
 								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
 								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 							</div>
 							<div
 								class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
@@ -495,7 +495,7 @@
 									on:click={() => (activeEmbedTab = tab.key)}
 									class="flex-1 px-4 py-3 text-[11px] font-black uppercase tracking-wider transition-colors {activeEmbedTab ===
 									tab.key
-										? 'bg-gray-800 text-[#4ade80] border-b-2 border-[#4ade80]'
+										? 'bg-gray-800 text-data-green border-b-2 border-data-green'
 										: 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'}"
 								>
 									{tab.label}
@@ -534,7 +534,7 @@
 					>
 						<div class="flex items-center gap-3 mb-4">
 							<div
-								class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-brutal-sm"
+								class="inline-flex items-center gap-1.5 px-3 py-1 bg-data-green border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-brutal-sm"
 							>
 								Shared Link
 							</div>
@@ -612,9 +612,9 @@
 								<span class="flex items-center gap-1.5">
 									<span class="relative flex h-2 w-2">
 										<span
-											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75"
+											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-data-green opacity-75"
 										/>
-										<span class="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
+										<span class="relative inline-flex rounded-full h-2 w-2 bg-data-green" />
 									</span>
 									<span class="text-gray-900 font-bold"
 										>{analytics?.totalHits
@@ -705,7 +705,7 @@
 												<span>{fmt.toUpperCase()}</span>
 												{#if isOriginal}
 													<span
-														class="text-[10px] font-black text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded"
+														class="text-[10px] font-black text-data-green bg-data-green/10 px-2 py-0.5 rounded"
 														>(Original)</span
 													>
 												{/if}
@@ -742,7 +742,7 @@
 								</p>
 								<button
 									on:click={handleSidebarCta}
-									class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[2px] border-brand-danger hover:bg-[#ff5252] transition-all rounded-lg text-sm"
+									class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[2px] border-brand-danger hover:bg-data-red transition-all rounded-lg text-sm"
 								>
 									{ctaConfig.sidebar.button}
 								</button>

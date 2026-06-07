@@ -867,7 +867,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 bg-brand-danger border border-black" />
 						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 
@@ -885,7 +885,7 @@
 								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
                 ${
 									creationMode === 'website'
-										? 'bg-[#4ade80] shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+										? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
 										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
 								}`}
 							>
@@ -912,7 +912,7 @@
 								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
                 ${
 									creationMode === 'direct'
-										? 'bg-[#4ade80] shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+										? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
 										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
 								}`}
 							>
@@ -1001,7 +1001,7 @@
 						</div>
 					{:else}
 						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] p-6 text-center">
+							<div class="bg-data-green/10 border-[3px] border-data-green p-6 text-center">
 								<p class="text-black font-bold text-lg">
 									✓ Select a template below to start designing
 								</p>
@@ -1032,7 +1032,7 @@
 						<div class="flex gap-2">
 							<div class="w-3 h-3 bg-brand-danger border border-white/20" />
 							<div class="w-3 h-3 bg-brand-accent border border-white/20" />
-							<div class="w-3 h-3 bg-[#4ade80] border border-white/20" />
+							<div class="w-3 h-3 bg-data-green border border-white/20" />
 						</div>
 					</div>
 
@@ -1171,7 +1171,7 @@
 							<div class="space-y-4 lg:col-span-2">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#4ade80] flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
+										class="w-8 h-8 bg-data-green flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1242,7 +1242,7 @@
 							</div>
 							<!-- Action bar -->
 							<div
-								class="bg-[#4ade80] border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+								class="bg-data-green border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
 							>
 								<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2">
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1365,7 +1365,7 @@
 						<div class="p-2 bg-gray-100 border-b-[3px] border-black flex gap-1.5">
 							<div class="w-2.5 h-2.5 bg-brand-danger border border-black" />
 							<div class="w-2.5 h-2.5 bg-brand-accent border border-black" />
-							<div class="w-2.5 h-2.5 bg-[#4ade80] border border-black" />
+							<div class="w-2.5 h-2.5 bg-data-green border border-black" />
 						</div>
 						<div class="relative bg-white overflow-hidden" style="height: 180px;">
 							<OgImageTemplate

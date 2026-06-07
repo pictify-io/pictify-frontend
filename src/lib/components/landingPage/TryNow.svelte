@@ -26,7 +26,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
-						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 					</div>
 				</div>
 
@@ -41,7 +41,7 @@
 					<!-- Content -->
 					<div class="relative z-10 flex flex-col items-center">
 						<div
-							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-brutal-sm mb-8 transform -rotate-2"
+							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-data-green shadow-brutal-sm mb-8 transform -rotate-2"
 						>
 							<span class="text-gray-900 text-sm font-bold uppercase tracking-wider flex items-center gap-2"
 								><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
@@ -138,7 +138,7 @@
 						class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors"
 					>
 						<div
-							class="w-10 h-10 rounded-lg bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
+							class="w-10 h-10 rounded-lg bg-data-green border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg
 								class="w-5 h-5 text-gray-900"

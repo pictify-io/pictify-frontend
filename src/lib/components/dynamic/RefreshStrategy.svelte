@@ -40,7 +40,7 @@
 		<!-- TTL Configuration -->
 		<div class="space-y-6">
 			<div class="flex items-center gap-2 pb-2 border-b-[3px] border-gray-900">
-				<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black" />
+				<span class="w-3 h-3 bg-data-blue rounded-full border-2 border-black" />
 				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">
 					Cache Duration (TTL)
 				</h3>
@@ -198,7 +198,7 @@
 	<!-- Output Configuration -->
 	<div class="mt-8 pt-8 border-t-[3px] border-gray-200 border-dashed">
 		<div class="flex items-center gap-2 pb-4">
-			<span class="w-3 h-3 bg-[#3b82f6] rounded-full border-2 border-black" />
+			<span class="w-3 h-3 bg-data-blue rounded-full border-2 border-black" />
 			<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Output Format</h3>
 		</div>
 
@@ -241,7 +241,7 @@
 							>Quality</label
 						>
 						<span
-							class="text-xs font-black text-[#3b82f6] bg-blue-50 px-2 rounded border border-blue-100"
+							class="text-xs font-black text-data-blue bg-blue-50 px-2 rounded border border-blue-100"
 							>{outputConfig.quality}%</span
 						>
 					</div>
@@ -272,7 +272,7 @@
 			Back
 		</button>
 		<button
-			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
+			class="px-5 py-2.5 bg-data-blue hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all group flex items-center gap-2"
 			on:click={handleNext}
 		>
 			Next: Publish

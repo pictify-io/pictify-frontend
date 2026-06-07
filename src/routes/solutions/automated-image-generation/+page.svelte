@@ -26,7 +26,7 @@
 			title: 'Dynamic product images',
 			description: 'Catalog-scale product cards with live prices, stock-aware badges, and seasonal variants — rendered from your inventory data.',
 			iconPath: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
-			color: 'bg-[#4ade80]',
+			color: 'bg-data-green',
 			slug: 'automate-product-images',
 			mock: 'product'
 		},
@@ -42,7 +42,7 @@
 			title: 'Personalized email headers',
 			description: 'Every recipient sees their name, plan, and stats in the email hero. Open rates climb because the image is about them.',
 			iconPath: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-			color: 'bg-[#a78bfa]',
+			color: 'bg-data-violet',
 			slug: 'automate-email-headers',
 			mock: 'email'
 		}
@@ -80,7 +80,7 @@
 		},
 		{
 			tag: 'OPTION 3',
-			tagColor: 'bg-[#a78bfa]',
+			tagColor: 'bg-data-violet',
 			title: 'AI image generators',
 			sub: 'DALL-E / Gemini / SD',
 			verdict: 'Great for novelty. Catastrophic for brand consistency.',
@@ -90,7 +90,7 @@
 		},
 		{
 			tag: 'OPTION 4',
-			tagColor: 'bg-[#4ade80]',
+			tagColor: 'bg-data-green',
 			title: 'Template-based API',
 			sub: 'Pictify · Bannerbear · Placid · RenderForm',
 			verdict: 'Design once. POST data. Repeat forever.',
@@ -112,13 +112,13 @@
 			title: 'Live data bindings',
 			description: 'Templates fetch variables from HTTP, webhooks, or Sheets at render time. Images update when data does.',
 			badge: 'DATA',
-			color: 'bg-[#4ade80]'
+			color: 'bg-data-green'
 		},
 		{
 			title: 'A/B experiments',
 			description: 'Ship variants, track impressions, declare a winner — all from the same API that renders the image.',
 			badge: 'TEST',
-			color: 'bg-[#a78bfa]'
+			color: 'bg-data-violet'
 		},
 		{
 			title: 'One API, many outputs',
@@ -264,7 +264,7 @@
 		<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-10 leading-relaxed">
 			An image generation API with templates, expressions, live data bindings, and experiments. One endpoint. Any scale. <br class="hidden sm:block" />
 			<span
-				class="font-black text-gray-900 bg-[#4ade80] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
+				class="font-black text-gray-900 bg-data-green px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
 				>No Canva. No Puppeteer fleet. No stitched stack.</span
 			>
 		</p>
@@ -382,7 +382,7 @@
 										<div class="flex items-center gap-1.5 text-[9px] text-gray-500 font-bold">
 											<div class="w-4 h-4 rounded-full bg-gray-200 border border-gray-900"></div>
 											<span>@you</span>
-											<span class="ml-auto bg-[#4ade80] text-gray-900 px-1.5 py-0.5 rounded border border-gray-900 font-black">LIVE</span>
+											<span class="ml-auto bg-data-green text-gray-900 px-1.5 py-0.5 rounded border border-gray-900 font-black">LIVE</span>
 										</div>
 									</div>
 								</div>
@@ -399,7 +399,7 @@
 										<div class="h-2 w-3/4 bg-gray-300 rounded mb-1.5"></div>
 										<div class="flex items-center justify-between">
 											<div class="font-black text-gray-900 text-sm">$39.<span class="text-[10px]">20</span></div>
-											<div class="text-[9px] font-black text-[#4ade80] bg-gray-900 px-1.5 py-0.5 rounded">In stock</div>
+											<div class="text-[9px] font-black text-data-green bg-gray-900 px-1.5 py-0.5 rounded">In stock</div>
 										</div>
 									</div>
 								</div>
@@ -414,10 +414,10 @@
 									<div class="px-3 py-2 bg-gray-50 flex items-center gap-1.5">
 										<div class="flex gap-0.5">
 											<div class="w-2 h-2 rounded bg-brand-danger border border-gray-900"></div>
-											<div class="w-2 h-2 rounded bg-[#4ade80] border border-gray-900"></div>
+											<div class="w-2 h-2 rounded bg-data-green border border-gray-900"></div>
 										</div>
 										<div class="text-[9px] font-mono text-gray-500 ml-1 truncate">og:image</div>
-										<div class="text-[9px] font-black text-[#4ade80] ml-auto bg-white border border-gray-900 px-1.5 rounded">200</div>
+										<div class="text-[9px] font-black text-data-green ml-auto bg-white border border-gray-900 px-1.5 rounded">200</div>
 									</div>
 								</div>
 							{:else if u.mock === 'email'}
@@ -427,7 +427,7 @@
 										<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
 										<span>Inbox · you@team.com</span>
 									</div>
-									<div class="h-16 bg-gradient-to-br from-[#a78bfa] to-[#7dd3fc] border-b-[2px] border-gray-900 flex items-center px-3 gap-2 relative">
+									<div class="h-16 bg-gradient-to-br from-data-violet to-[#7dd3fc] border-b-[2px] border-gray-900 flex items-center px-3 gap-2 relative">
 										<div class="w-8 h-8 rounded-full bg-white border-[2px] border-gray-900 flex items-center justify-center text-xs font-black text-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">A</div>
 										<div class="flex-1">
 											<div class="font-black text-white text-xs leading-tight drop-shadow-sm">Welcome, Ada</div>
@@ -474,12 +474,12 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 pt-4">
 				{#each approaches as a, i}
 					<div
-						class="relative flex flex-col {a.recommended ? 'ring-4 ring-[#4ade80]/40 rounded-2xl' : ''}"
+						class="relative flex flex-col {a.recommended ? 'ring-4 ring-data-green/40 rounded-2xl' : ''}"
 						in:fly={{ y: 20, duration: 400, delay: i * 80 }}
 					>
 						{#if a.recommended}
 							<div
-								class="absolute -top-4 -right-4 bg-[#4ade80] border-[3px] border-gray-900 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-brutal-md z-20 transform rotate-6 inline-flex items-center gap-1.5 whitespace-nowrap"
+								class="absolute -top-4 -right-4 bg-data-green border-[3px] border-gray-900 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-brutal-md z-20 transform rotate-6 inline-flex items-center gap-1.5 whitespace-nowrap"
 							>
 								<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -499,7 +499,7 @@
 							<p class="text-lg font-bold text-gray-900 mb-5 leading-snug">"{a.verdict}"</p>
 							<div class="space-y-3">
 								<div class="flex items-start gap-3">
-									<span class="flex-shrink-0 w-6 h-6 rounded-lg bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">
+									<span class="flex-shrink-0 w-6 h-6 rounded-lg bg-data-green border-2 border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]">
 										<svg class="w-3.5 h-3.5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
@@ -533,7 +533,7 @@
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-white uppercase tracking-wider">Six differentiators</span>
 				</div>
@@ -620,7 +620,7 @@
 
 				<!-- Step 2: POST data -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#4ade80]" in:fly={{ y: 20, duration: 400, delay: 120 }}>
-					<div class="w-12 h-12 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
+					<div class="w-12 h-12 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 19v-8m0 0l-4 4m4-4l4 4M3 7h18M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />
 						</svg>
@@ -639,7 +639,7 @@
 
 				<!-- Step 3: CDN URL -->
 				<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-5 flex flex-col items-center text-center shadow-[6px_6px_0_0_#a78bfa]" in:fly={{ y: 20, duration: 400, delay: 240 }}>
-					<div class="w-12 h-12 bg-[#a78bfa] border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
+					<div class="w-12 h-12 bg-data-violet border-[3px] border-gray-900 rounded-xl flex items-center justify-center mb-3 shadow-brutal-md">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
@@ -691,7 +691,7 @@
 								</div>
 								<!-- Footer / avatar -->
 								<div class="border-t-2 border-gray-200 px-4 py-2.5 flex items-center gap-2">
-									<div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#a78bfa] to-[#7dd3fc] border border-gray-900 flex-shrink-0"></div>
+									<div class="w-7 h-7 rounded-full bg-gradient-to-br from-data-violet to-[#7dd3fc] border border-gray-900 flex-shrink-0"></div>
 									<div class="text-[10px] font-bold text-gray-700">by team</div>
 								</div>
 							</div>
@@ -714,7 +714,7 @@
 								</div>
 								<div class="bg-white border-2 border-gray-900 rounded p-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
 									<div class="flex items-center gap-1.5 mb-1">
-										<div class="w-2 h-2 rounded-sm bg-[#4ade80] border border-gray-900"></div>
+										<div class="w-2 h-2 rounded-sm bg-data-green border border-gray-900"></div>
 										<code class="font-mono font-black text-gray-900">price</code>
 										<span class="ml-auto text-[9px] text-gray-500 font-bold uppercase">number</span>
 									</div>
@@ -722,7 +722,7 @@
 								</div>
 								<div class="bg-white border-2 border-gray-900 rounded p-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
 									<div class="flex items-center gap-1.5 mb-1">
-										<div class="w-2 h-2 rounded-sm bg-[#a78bfa] border border-gray-900"></div>
+										<div class="w-2 h-2 rounded-sm bg-data-violet border border-gray-900"></div>
 										<code class="font-mono font-black text-gray-900">featured</code>
 										<span class="ml-auto text-[9px] text-gray-500 font-bold uppercase">bool</span>
 									</div>
@@ -747,7 +747,7 @@
 						<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] border border-black/40"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] border border-black/40"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f] border border-black/40"></div>
-						<span class="ml-3 text-xs text-[#4ade80] font-mono font-bold uppercase tracking-wider">render.sh</span>
+						<span class="ml-3 text-xs text-data-green font-mono font-bold uppercase tracking-wider">render.sh</span>
 						<span class="ml-auto text-[10px] text-gray-500 font-mono font-bold uppercase tracking-widest">Your backend</span>
 					</div>
 					<pre class="p-6 overflow-x-auto text-sm text-gray-300 leading-relaxed flex-1"><code>{`curl -X POST \\
@@ -770,7 +770,7 @@
 			<!-- The punchline: logic lives on layers, not in your code -->
 			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 md:p-8 shadow-brutal-xl">
 				<div class="flex flex-col md:flex-row items-start gap-5">
-					<div class="flex-shrink-0 w-14 h-14 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg">
+					<div class="flex-shrink-0 w-14 h-14 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg">
 						<svg class="w-7 h-7 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
@@ -778,7 +778,7 @@
 					<div class="flex-1">
 						<div class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">The payoff</div>
 						<p class="text-lg text-gray-700 font-medium leading-relaxed">
-							Each layer carries its own binding. The <code class="bg-gray-900 px-2 py-0.5 rounded text-[#4ade80] font-mono">price</code> text layer runs the <code class="bg-gray-900 px-2 py-0.5 rounded text-brand-accent font-mono">| currency</code> filter on render — <code class="bg-gray-900 px-2 py-0.5 rounded text-[#4ade80] font-mono">49</code> becomes <code class="bg-gray-900 px-2 py-0.5 rounded text-[#4ade80] font-mono">$49.00</code>. The "New" badge has a <code class="bg-gray-900 px-2 py-0.5 rounded text-[#a78bfa] font-mono">showWhen: featured</code> rule, so it appears only when the flag is true. In Pictify, logic lives with the design. In Bannerbear, Placid, and RenderForm, it lives scattered across your app code.
+							Each layer carries its own binding. The <code class="bg-gray-900 px-2 py-0.5 rounded text-data-green font-mono">price</code> text layer runs the <code class="bg-gray-900 px-2 py-0.5 rounded text-brand-accent font-mono">| currency</code> filter on render — <code class="bg-gray-900 px-2 py-0.5 rounded text-data-green font-mono">49</code> becomes <code class="bg-gray-900 px-2 py-0.5 rounded text-data-green font-mono">$49.00</code>. The "New" badge has a <code class="bg-gray-900 px-2 py-0.5 rounded text-data-violet font-mono">showWhen: featured</code> rule, so it appears only when the flag is true. In Pictify, logic lives with the design. In Bannerbear, Placid, and RenderForm, it lives scattered across your app code.
 						</p>
 					</div>
 				</div>
@@ -793,7 +793,7 @@
 		<div class="max-w-4xl mx-auto">
 			<div class="text-center mb-12">
 				<div
-					class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
+					class="inline-block px-4 py-1.5 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2"
 				>
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Questions?</span>
 				</div>
@@ -852,7 +852,7 @@
 
 				<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 					{#each related as r, i}
-						{@const colors = ['bg-brand-danger', 'bg-[#4ade80]', 'bg-brand-accent', 'bg-[#a78bfa]', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
+						{@const colors = ['bg-brand-danger', 'bg-data-green', 'bg-brand-accent', 'bg-data-violet', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
 						{@const rotations = ['-rotate-1', 'rotate-1', '-rotate-1', 'rotate-1', '-rotate-1', 'rotate-1']}
 						<a
 							href="/solutions/{r.slug}"

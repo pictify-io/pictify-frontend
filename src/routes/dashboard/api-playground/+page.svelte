@@ -1091,7 +1091,7 @@
 			<div
 				class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-lg"
 			>
-				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-[#4ade80] rounded-full animate-pulse" />
+				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-data-green rounded-full animate-pulse" />
 				<span class="text-[10px] sm:text-xs font-black text-gray-900 uppercase tracking-wider"
 					>System OK</span
 				>
@@ -1300,7 +1300,7 @@
 						<div class="flex items-center gap-3">
 							<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
 							<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
-							<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+							<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 						</div>
 						<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
 							Request Configuration
@@ -2594,7 +2594,7 @@
 								<div class="flex gap-1.5 mr-4">
 									<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
 									<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
-									<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+									<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 								</div>
 								<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
 									Terminal Output
@@ -2664,7 +2664,7 @@
 										<!-- Status Bar -->
 										<div class="flex items-center gap-3 pb-4 border-b-2 border-gray-300">
 											<div class="flex items-center gap-2">
-												<div class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+												<div class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 												<span class="font-black text-lg text-gray-900">200 OK</span>
 											</div>
 											<span class="text-gray-400">|</span>
@@ -2797,7 +2797,7 @@
 										<div
 											class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900 flex items-center gap-2"
 										>
-											<span class="text-[#4ade80] font-black text-sm">$</span>
+											<span class="text-data-green font-black text-sm">$</span>
 											<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
 												>cURL Command</span
 											>
@@ -2816,7 +2816,7 @@
 													)
 													.replace(
 														/(GET|POST|PUT|DELETE)/g,
-														'<span class="text-[#4ade80] font-bold">$1</span>'
+														'<span class="text-data-green font-bold">$1</span>'
 													)
 													.replace(/Bearer/g, '<span class="text-gray-600">Bearer</span>')}</pre>
 										</div>

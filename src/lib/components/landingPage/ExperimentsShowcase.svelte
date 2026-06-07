@@ -395,7 +395,7 @@
 
 			<!-- Block 2: Auto-Optimize (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-[#4ade80] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
+				class="xl:col-span-5 bg-data-green rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 			>
 				<div class="absolute inset-0 bg-white/10 pointer-events-none" />
 
@@ -549,7 +549,7 @@
 									/></svg
 								>
 								<span
-									class="px-2 py-1 bg-[#4ade80] text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-brutal-sm"
+									class="px-2 py-1 bg-data-green text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-brutal-sm"
 									>Render</span
 								>
 							</div>
@@ -564,7 +564,7 @@
 									<div class="px-4 flex gap-1.5 h-full items-center py-3">
 										<div class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
 										<div class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-data-green border-[2px] border-gray-900" />
 									</div>
 									<div
 										class="flex-1 border-l-[3px] border-gray-900 bg-white px-4 py-2.5 font-mono text-[10px] sm:text-xs text-black font-bold flex items-center gap-2 truncate"
@@ -661,7 +661,7 @@
 													'Earth'}</span
 											>
 											<span
-												class="px-2 py-0.5 bg-[#4ade80] text-black text-[9px] sm:text-[10px] font-bold rounded shadow-brutal-sm border-[2px] border-gray-900"
+												class="px-2 py-0.5 bg-data-green text-black text-[9px] sm:text-[10px] font-bold rounded shadow-brutal-sm border-[2px] border-gray-900"
 												>{getTimeOfDay(viewerContext.time?.hour ?? 12)}</span
 											>
 										{/if}
@@ -685,7 +685,7 @@
 									<div class="px-4 flex gap-1.5 h-full items-center py-3">
 										<div class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
 										<div class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-data-green border-[2px] border-gray-900" />
 									</div>
 									<div
 										class="flex-1 border-l-[3px] border-gray-900 bg-white px-4 py-2.5 font-mono text-[10px] sm:text-xs text-black font-bold flex items-center gap-2 truncate"
@@ -731,7 +731,7 @@
 											class="absolute inset-0 flex items-center justify-center bg-white/40 z-10 transition-opacity"
 										>
 											<div
-												class="px-4 py-2 bg-black text-[#4ade80] font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-[#4ade80] shadow-brutal-lg animate-pulse"
+												class="px-4 py-2 bg-black text-data-green font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-data-green shadow-brutal-lg animate-pulse"
 											>
 												Computing...
 											</div>
@@ -775,7 +775,7 @@
 								>
 							</div>
 							<button
-								class="w-full sm:w-auto px-8 py-3.5 bg-black text-[#4ade80] text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all text-center inline-flex justify-center"
+								class="w-full sm:w-auto px-8 py-3.5 bg-black text-data-green text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all text-center inline-flex justify-center"
 								on:click={switchDemoContext}
 								disabled={smartLinkLoading}
 							>

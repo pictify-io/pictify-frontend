@@ -49,16 +49,16 @@
 	// Type badge colors
 	const typeColors = {
 		ab_test: 'bg-brand-accent text-gray-900 border-gray-900',
-		smart_link: 'bg-[#4ade80] text-gray-900 border-gray-900',
-		scheduled: 'bg-[#a78bfa] text-gray-900 border-gray-900'
+		smart_link: 'bg-data-green text-gray-900 border-gray-900',
+		scheduled: 'bg-data-violet text-gray-900 border-gray-900'
 	};
 
 	// Status badge config
 	const statusConfig = {
 		draft: { bg: 'bg-white text-gray-900 border-gray-900', dot: 'bg-gray-400' },
-		running: { bg: 'bg-[#4ade80] text-gray-900 border-gray-900', dot: 'bg-white' },
+		running: { bg: 'bg-data-green text-gray-900 border-gray-900', dot: 'bg-white' },
 		paused: { bg: 'bg-brand-accent text-gray-900 border-gray-900', dot: 'bg-white' },
-		completed: { bg: 'bg-[#60a5fa] text-gray-900 border-gray-900', dot: 'bg-white' },
+		completed: { bg: 'bg-data-sky text-gray-900 border-gray-900', dot: 'bg-white' },
 		archived: { bg: 'bg-gray-200 text-gray-500 border-gray-900', dot: 'bg-gray-400' }
 	};
 
@@ -330,10 +330,10 @@
 						<div class="p-2">
 							<button
 								on:click={() => handleCreateType('ab_test')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#4ade80]/10 transition-colors flex items-start gap-3 group"
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-data-green/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
+									class="w-8 h-8 bg-data-green/20 border-[2px] border-data-green rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
 								>
 									<span class="text-sm">&#9878;</span>
 								</div>
@@ -348,13 +348,13 @@
 							</button>
 							<button
 								on:click={() => handleCreateType('smart_link')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#3b82f6]/10 transition-colors flex items-start gap-3 group"
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-data-blue/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#3b82f6]/20 border-[2px] border-[#3b82f6] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
+									class="w-8 h-8 bg-data-blue/20 border-[2px] border-data-blue rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-brutal-sm transition-all"
 								>
 									<svg
-										class="w-4 h-4 text-[#3b82f6]"
+										class="w-4 h-4 text-data-blue"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -377,13 +377,13 @@
 							</button>
 							<button
 								on:click={() => handleCreateType('scheduled')}
-								class="w-full text-left px-4 py-3 rounded-lg hover:bg-[#f59e0b]/10 transition-colors flex items-start gap-3 group"
+								class="w-full text-left px-4 py-3 rounded-lg hover:bg-data-amber/10 transition-colors flex items-start gap-3 group"
 							>
 								<div
-									class="w-8 h-8 bg-[#f59e0b]/20 border-[2px] border-[#f59e0b] rounded-lg flex items-center justify-center shrink-0"
+									class="w-8 h-8 bg-data-amber/20 border-[2px] border-data-amber rounded-lg flex items-center justify-center shrink-0"
 								>
 									<svg
-										class="w-4 h-4 text-[#f59e0b]"
+										class="w-4 h-4 text-data-amber"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -745,7 +745,7 @@
 											{#if exp.status === 'draft' || exp.status === 'paused'}
 												<button
 													on:click|stopPropagation={() => handleStart(exp.uid)}
-													class="w-12 h-12 bg-[#4ade80] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													class="w-12 h-12 bg-data-green text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Start"
 													aria-label="Start experiment"
 												>

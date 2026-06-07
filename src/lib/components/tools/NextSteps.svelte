@@ -179,7 +179,7 @@
 			<div class="flex gap-2">
 				<div class="w-3 h-3 bg-brand-danger border border-black" />
 				<div class="w-3 h-3 bg-brand-accent border border-black" />
-				<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+				<div class="w-3 h-3 bg-data-green border border-black" />
 			</div>
 		</div>
 
@@ -341,7 +341,7 @@
 					<div class="flex items-center justify-between gap-3">
 						<h4 class="text-sm font-black uppercase tracking-widest">Copy API request</h4>
 						<button
-							class="px-3 py-1.5 bg-[#4ade80] border-[2px] border-black font-black text-xs uppercase shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="px-3 py-1.5 bg-data-green border-[2px] border-black font-black text-xs uppercase shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							type="button"
 							on:click={() => copy(curlSnippet, 'API request copied')}
 							disabled={!curlSnippet}

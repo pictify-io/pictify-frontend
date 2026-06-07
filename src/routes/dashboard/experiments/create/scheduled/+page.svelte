@@ -886,7 +886,7 @@
 						type="button"
 						disabled={!effectiveCanSubmit}
 						on:click={() => handleSubmit(true)}
-						class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-[#4ade80] shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-data-green shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{#if isSubmitting}
 							<svg class="w-4 h-4 animate-spin inline mr-2" fill="none" viewBox="0 0 24 24">

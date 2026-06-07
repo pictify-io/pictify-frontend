@@ -1736,7 +1736,7 @@
 					<button
 						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-[2px] border-gray-900 {$isPreviewActive
 							? 'bg-gray-200 text-gray-900 shadow-[2px_2px_0_0_#d1d5db] hover:shadow-[4px_4px_0_0_#d1d5db] hover:-translate-y-0.5'
-							: 'bg-[#4ade80] text-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5'}"
+							: 'bg-data-green text-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5'}"
 						on:click={togglePreview}
 						aria-pressed={$isPreviewActive}
 						aria-label={$isPreviewActive ? 'Stop canvas preview' : 'Start canvas preview'}
@@ -2152,7 +2152,7 @@
 					class="w-full py-2.5 px-3 {guestMode && !$user?.email
 						? 'bg-brand-accent'
 						: guestMode
-						? 'bg-[#4ade80]'
+						? 'bg-data-green'
 						: 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email
 						? 'gray-900'
 						: 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-brutal-sm hover:shadow-[4px_4px_0_0_{guestMode &&

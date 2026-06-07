@@ -144,7 +144,7 @@
 				<!-- Right: Developer View -->
 				<div class="relative group">
 					<div
-						class="absolute -top-12 right-4 bg-[#4ade80] px-4 py-2 rounded-lg border-[3px] border-gray-900 shadow-brutal-lg transform rotate-2 z-20"
+						class="absolute -top-12 right-4 bg-data-green px-4 py-2 rounded-lg border-[3px] border-gray-900 shadow-brutal-lg transform rotate-2 z-20"
 					>
 						<span class="font-bold text-sm">👨‍💻 Developer</span>
 					</div>
@@ -156,7 +156,7 @@
 						<div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
 							<div class="w-3 h-3 rounded-full bg-brand-danger" />
 							<div class="w-3 h-3 rounded-full bg-brand-accent" />
-							<div class="w-3 h-3 rounded-full bg-[#4ade80]" />
+							<div class="w-3 h-3 rounded-full bg-data-green" />
 						</div>
 
 						<div class="font-mono text-sm space-y-2">
@@ -167,7 +167,7 @@
 								pictify.generate({`{`}
 							</div>
 							<div class="pl-4 text-white">
-								template: <span class="text-[#4ade80]">'promo-banner-v2'</span>,
+								template: <span class="text-data-green">'promo-banner-v2'</span>,
 							</div>
 							<div class="pl-4 text-white">
 								data: {`{`} ... {`}`}
@@ -176,7 +176,7 @@
 
 							{#if activeStep === 2}
 								<div
-									class="mt-4 p-2 bg-[#4ade80]/20 border border-[#4ade80] rounded text-[#4ade80] text-xs"
+									class="mt-4 p-2 bg-data-green/20 border border-data-green rounded text-data-green text-xs"
 									in:fade
 								>
 									✓ Template updated automatically
@@ -234,7 +234,7 @@
 				class="bg-white p-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
 			>
 				<div
-					class="w-10 h-10 bg-[#4ade80] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
+					class="w-10 h-10 bg-data-green rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4"
 				>
 					<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path

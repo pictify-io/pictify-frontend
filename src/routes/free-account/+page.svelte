@@ -98,7 +98,7 @@
 		<section class="w-full py-16 md:py-24 px-6">
 			<div class="max-w-5xl mx-auto text-center">
 				<div
-					class="inline-block bg-[#4ade80] border-[3px] border-black shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1"
+					class="inline-block bg-data-green border-[3px] border-black shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">100% Free</span>
 				</div>
@@ -259,7 +259,7 @@
 										>
 											{#if row.free === 'Yes'}
 												<span
-													class="inline-flex items-center justify-center w-6 h-6 bg-[#4ade80] border-[2px] border-black rounded-full"
+													class="inline-flex items-center justify-center w-6 h-6 bg-data-green border-[2px] border-black rounded-full"
 												>
 													<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
 														<path
@@ -278,7 +278,7 @@
 										<td class="p-4 text-center border-t-[2px] border-gray-200">
 											{#if row.paid === 'Yes'}
 												<span
-													class="inline-flex items-center justify-center w-6 h-6 bg-[#4ade80] border-[2px] border-black rounded-full"
+													class="inline-flex items-center justify-center w-6 h-6 bg-data-green border-[2px] border-black rounded-full"
 												>
 													<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
 														<path

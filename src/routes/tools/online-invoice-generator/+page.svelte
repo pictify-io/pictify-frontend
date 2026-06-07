@@ -413,7 +413,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 bg-brand-danger border border-black" />
 						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 
@@ -459,7 +459,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#60a5fa] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-data-sky border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>2</span
 							>
 							Client Info
@@ -486,7 +486,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#a78bfa] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-data-violet border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>3</span
 							>
 							Invoice Details
@@ -630,7 +630,7 @@
 				<button
 					on:click={generateInvoice}
 					disabled={isImageGenerating}
-					class="w-full bg-brand-danger hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+					class="w-full bg-brand-danger hover:bg-data-red text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
 				>
 					{#if isImageGenerating}
 						<svg
@@ -680,7 +680,7 @@
 				{#if imageUrl}
 					<div class="bg-white border-[3px] border-black shadow-brutal-xl overflow-hidden">
 						<div
-							class="bg-[#4ade80] px-4 py-3 border-b-[3px] border-black flex items-center justify-between"
+							class="bg-data-green px-4 py-3 border-b-[3px] border-black flex items-center justify-between"
 						>
 							<span class="font-black uppercase tracking-wider text-sm text-black"
 								>✓ Invoice Generated</span
@@ -822,7 +822,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -844,7 +844,7 @@
 						<div
 							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
-							<span class="font-black text-[#4ade80]">✓</span>
+							<span class="font-black text-data-green">✓</span>
 							<span class="font-bold text-black text-sm">{benefit}</span>
 						</div>
 					{/each}
@@ -856,7 +856,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#60a5fa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -882,7 +882,7 @@
 					{#each [{ num: '1', text: 'Enter your company and client details' }, { num: '2', text: 'Choose from our professional invoice templates' }, { num: '3', text: 'Add line items for products or services' }, { num: '4', text: 'Set tax rates and discounts if applicable' }, { num: '5', text: 'Preview your invoice in real-time' }, { num: '6', text: 'Generate and download your custom invoice' }] as step}
 						<div class="flex items-start gap-4">
 							<span
-								class="bg-[#60a5fa] text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
+								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
 								>{step.num}</span
 							>
 							<span class="font-bold text-black text-sm pt-1">{step.text}</span>

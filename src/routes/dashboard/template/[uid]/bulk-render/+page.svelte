@@ -858,7 +858,7 @@
 									class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 								>
 									<span
-										class="w-3 h-3 bg-[#4ecdc4] border-2 border-gray-900 rounded-full shadow-[1px_1px_0_0_#1f2937]"
+										class="w-3 h-3 bg-data-teal border-2 border-gray-900 rounded-full shadow-[1px_1px_0_0_#1f2937]"
 									/>
 									Required Columns
 								</h2>
@@ -919,7 +919,7 @@
 						<div
 							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-2xl overflow-hidden"
 						>
-							<div class="bg-[#60a5fa] border-b-[3px] border-gray-900 px-6 py-4">
+							<div class="bg-data-sky border-b-[3px] border-gray-900 px-6 py-4">
 								<h2
 									class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2 text-shadow-sm"
 								>
@@ -1256,7 +1256,7 @@
 									Cancel
 								</button>
 								<button
-									class="px-8 py-3 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 uppercase tracking-widest text-sm"
+									class="px-8 py-3 bg-data-purple hover:bg-[#9333ea] text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 uppercase tracking-widest text-sm"
 									on:click={startBatch}
 									disabled={!canStartBatch || isBatchSubmitting}
 								>
@@ -1288,7 +1288,7 @@
 
 					<div class="lg:col-span-4">
 						<div
-							class="bg-[#eff6ff] border-[3px] border-[#60a5fa] rounded-xl p-6 shadow-[8px_8px_0_0_#bfdbfe]"
+							class="bg-[#eff6ff] border-[3px] border-data-sky rounded-xl p-6 shadow-[8px_8px_0_0_#bfdbfe]"
 						>
 							<h3 class="font-black text-blue-900 uppercase tracking-widest text-sm mb-4">Tips</h3>
 							<ul class="space-y-3">
@@ -1404,7 +1404,7 @@
 							>
 								<div class="absolute inset-0 bg-stripes-gray opacity-20" />
 								<div
-									class="h-full bg-[#4ade80] border-r-[3px] border-gray-900 transition-all duration-300 relative overflow-hidden"
+									class="h-full bg-data-green border-r-[3px] border-gray-900 transition-all duration-300 relative overflow-hidden"
 									style="width: {Math.max(5, (progress.completed / (progress.total || 1)) * 100)}%"
 								>
 									<div class="absolute inset-0 bg-stripes-white opacity-30 animate-slide" />
@@ -1456,7 +1456,7 @@
 					>
 						<div class="flex items-center gap-4">
 							<div
-								class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 rounded-full flex items-center justify-center text-gray-900 shadow-[4px_4px_0_0_#166534]"
+								class="w-16 h-16 bg-data-green border-[3px] border-gray-900 rounded-full flex items-center justify-center text-gray-900 shadow-[4px_4px_0_0_#166534]"
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1488,7 +1488,7 @@
 								Start New Batch
 							</button>
 							<button
-								class="px-8 py-3 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
+								class="px-8 py-3 bg-data-green hover:bg-[#22c55e] text-gray-900 font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"
 								on:click={downloadAsZip}
 								disabled={isDownloading || totalRenderedImages === 0}
 							>

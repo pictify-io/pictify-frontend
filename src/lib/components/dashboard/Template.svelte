@@ -351,11 +351,11 @@
 					on:click={handleDynamicFilterChange}
 					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
 						{dynamicFilter
-						? 'bg-[#a855f7] text-white shadow-[3px_3px_0_0_#6b21a8] border-[#a855f7]'
+						? 'bg-data-purple text-white shadow-[3px_3px_0_0_#6b21a8] border-data-purple'
 						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
 				>
 					<svg
-						class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-[#a855f7]'}"
+						class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-data-purple'}"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -446,7 +446,7 @@
 							We couldn't find any templates matching "{searchQuery}"
 						</p>
 						<button
-							class="mt-4 sm:mt-6 text-xs sm:text-sm font-bold text-brand-danger hover:text-[#ff5252] uppercase tracking-wide underline decoration-2 underline-offset-4"
+							class="mt-4 sm:mt-6 text-xs sm:text-sm font-bold text-brand-danger hover:text-data-red uppercase tracking-wide underline decoration-2 underline-offset-4"
 							on:click={() => {
 								searchQuery = '';
 								handleSearchInput({ target: { value: '' } });

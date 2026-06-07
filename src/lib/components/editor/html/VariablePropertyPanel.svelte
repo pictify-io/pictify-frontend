@@ -275,7 +275,7 @@
 					class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-sm font-bold text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 				/>
 				{#if nameError}
-					<p class="text-[10px] font-black uppercase tracking-wider text-[#ff5252]">
+					<p class="text-[10px] font-black uppercase tracking-wider text-data-red">
 						<i class="fa fa-triangle-exclamation mr-1 text-[9px]"></i>
 						{nameError}
 					</p>

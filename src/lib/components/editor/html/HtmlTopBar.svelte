@@ -57,10 +57,10 @@
 
 	$: statusMeta =
 		saveStatus === 'saving'
-			? { label: 'Saving…', bg: 'bg-[#ffe066]', dotBg: 'bg-[#f59e0b]' }
+			? { label: 'Saving…', bg: 'bg-[#ffe066]', dotBg: 'bg-data-amber' }
 			: saveStatus === 'unsaved'
-				? { label: 'Unsaved', bg: 'bg-brand-danger', dotBg: 'bg-[#ff5252]', textWhite: true }
-				: { label: 'Saved', bg: 'bg-[#4ade80]', dotBg: 'bg-[#22c55e]' };
+				? { label: 'Unsaved', bg: 'bg-brand-danger', dotBg: 'bg-data-red', textWhite: true }
+				: { label: 'Saved', bg: 'bg-data-green', dotBg: 'bg-[#22c55e]' };
 
 	function toggleFormat() {
 		dispatch('toggleFormat');
@@ -207,7 +207,7 @@
 				{isSaving
 					? 'bg-[#ffe066] text-gray-900 shadow-brutal-lg'
 					: isDirty
-						? 'bg-[#4ade80] text-gray-900 shadow-brutal-lg hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none'
+						? 'bg-data-green text-gray-900 shadow-brutal-lg hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none'
 						: 'bg-gray-100 text-gray-400'}"
 		>
 			{#if isSaving}
@@ -228,7 +228,7 @@
 			on:click={() => dispatch('publish')}
 			disabled={!canPublish}
 			title="Publish template"
-			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-brutal-lg transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-gray-400 disabled:hover:shadow-brutal-lg lg:flex
+			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-brutal-lg transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-data-red hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-gray-400 disabled:hover:shadow-brutal-lg lg:flex
 				{canPublish ? 'bg-brand-danger' : 'bg-gray-400'}"
 		>
 			<i class="fa fa-rocket text-[11px]"></i>

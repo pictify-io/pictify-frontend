@@ -275,9 +275,9 @@
 
 	const SCHEDULE_COLORS = [
 		{ bg: 'bg-brand-accent', border: 'border-[#e6a050]', text: 'text-gray-900' },
-		{ bg: 'bg-[#4ade80]', border: 'border-[#22c55e]', text: 'text-gray-900' },
-		{ bg: 'bg-[#a78bfa]', border: 'border-[#7c3aed]', text: 'text-white' },
-		{ bg: 'bg-[#f472b6]', border: 'border-[#ec4899]', text: 'text-white' },
+		{ bg: 'bg-data-green', border: 'border-[#22c55e]', text: 'text-gray-900' },
+		{ bg: 'bg-data-violet', border: 'border-[#7c3aed]', text: 'text-white' },
+		{ bg: 'bg-data-pink', border: 'border-[#ec4899]', text: 'text-white' },
 		{ bg: 'bg-[#38bdf8]', border: 'border-[#0284c7]', text: 'text-gray-900' }
 	];
 
@@ -538,7 +538,7 @@
 								</span>
 								{#if exp.banditConfig?.enabled}
 									<span
-										class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-black uppercase border-[2px] bg-[#a855f7]/10 text-[#7c3aed] border-[#a855f7]"
+										class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-black uppercase border-[2px] bg-data-purple/10 text-[#7c3aed] border-data-purple"
 									>
 										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -578,7 +578,7 @@
 							{#if exp.status === 'draft' || exp.status === 'paused'}
 								<button
 									on:click={handleStart}
-									class="px-4 py-2.5 bg-[#4ade80] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									class="px-4 py-2.5 bg-data-green text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -619,7 +619,7 @@
 								{#if isSmartLink}
 									<button
 										on:click={handlePause}
-										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+										class="px-4 py-2.5 bg-data-sky text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -640,7 +640,7 @@
 								{:else}
 									<button
 										on:click={() => (showDeclareWinner = true)}
-										class="px-4 py-2.5 bg-[#60a5fa] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+										class="px-4 py-2.5 bg-data-sky text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path
@@ -767,7 +767,7 @@
 					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 				>
 					<div
-						class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#3b82f6]/10 flex items-center justify-between pointer-events-none relative"
+						class="px-5 py-3 border-b-[3px] border-gray-900 bg-data-blue/10 flex items-center justify-between pointer-events-none relative"
 					>
 						<div
 							class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMwMDAiLz48L3N2Zz4=')] mix-blend-overlay"
@@ -844,7 +844,7 @@
 						class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 					>
 						<div
-							class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#a855f7]/10 flex items-center justify-between pointer-events-none relative"
+							class="px-5 py-3 border-b-[3px] border-gray-900 bg-data-purple/10 flex items-center justify-between pointer-events-none relative"
 						>
 							<div
 								class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMwMDAiLz48L3N2Zz4=')] mix-blend-overlay"
@@ -883,7 +883,7 @@
 					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden flex flex-col"
 				>
 					<div
-						class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#f59e0b]/10 flex items-center justify-between pointer-events-none relative"
+						class="px-5 py-3 border-b-[3px] border-gray-900 bg-data-amber/10 flex items-center justify-between pointer-events-none relative"
 					>
 						<div
 							class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMwMDAiLz48L3N2Zz4=')] mix-blend-overlay"
@@ -1225,7 +1225,7 @@
 					<div class="flex items-center gap-3 mb-6">
 						<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Schedule</h2>
 						<span
-							class="px-3 py-1 bg-[#f59e0b] text-gray-900 border-[3px] border-gray-900 shadow-brutal-sm text-xs font-black rounded-lg uppercase"
+							class="px-3 py-1 bg-data-amber text-gray-900 border-[3px] border-gray-900 shadow-brutal-sm text-xs font-black rounded-lg uppercase"
 						>
 							{variants.length} Variants
 						</span>
@@ -1312,7 +1312,7 @@
 									<div class="flex items-center gap-2 shrink-0">
 										{#if status === 'active'}
 											<span
-												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#4ade80] text-gray-900 border-gray-900 shadow-brutal-sm flex items-center gap-1.5"
+												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-data-green text-gray-900 border-gray-900 shadow-brutal-sm flex items-center gap-1.5"
 											>
 												<span class="w-2 h-2 bg-gray-900 rounded-full animate-pulse" />
 												Active Now
@@ -1430,7 +1430,7 @@
 														class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900"
 													>
 														<div
-															class="h-full bg-[#4ade80] border-r-[2px] border-gray-900 transition-all duration-500"
+															class="h-full bg-data-green border-r-[2px] border-gray-900 transition-all duration-500"
 															style="width: {getBarWidth(
 																variant.clicks || 0,
 																Math.max(...variants.map((v) => v.clicks || 0), 1)
@@ -1708,7 +1708,7 @@
 							</label>
 							<div class="relative group">
 								<pre
-									class="px-5 py-4 bg-gray-900 text-[#4ade80] border-[3px] border-gray-900 rounded-xl font-mono text-sm overflow-x-auto shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.5)]">{embedCode}</pre>
+									class="px-5 py-4 bg-gray-900 text-data-green border-[3px] border-gray-900 rounded-xl font-mono text-sm overflow-x-auto shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.5)]">{embedCode}</pre>
 								<button
 									on:click={() => copyToClipboard(embedCode, 'Embed code copied!')}
 									class="absolute top-3 right-3 px-4 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
@@ -1759,7 +1759,7 @@ fetch("https://pictify.io/s/events", {
   })
 })`, 'Tracking code copied!'
 										)}
-										class="absolute top-3 right-3 px-4 py-2 bg-[#a855f7] text-white font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
+										class="absolute top-3 right-3 px-4 py-2 bg-data-purple text-white font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
 									>
 										Copy Code
 									</button>
@@ -1796,7 +1796,7 @@ fetch("https://pictify.io/s/events", {
 								class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg border-[2px] border-gray-200"
 							>
 								<span
-									class="w-2.5 h-2.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-full animate-pulse shadow-[1px_1px_0_0_#1f2937]"
+									class="w-2.5 h-2.5 bg-data-green border-[2px] border-gray-900 rounded-full animate-pulse shadow-[1px_1px_0_0_#1f2937]"
 								/>
 								Live - Auto-refreshing
 							</span>
@@ -1834,7 +1834,7 @@ fetch("https://pictify.io/s/events", {
 										<div class="w-24 shrink-0 flex items-center justify-end gap-2 text-right">
 											{#if variant.isWinner}
 												<svg
-													class="w-3.5 h-3.5 text-[#f59e0b]"
+													class="w-3.5 h-3.5 text-data-amber"
 													fill="currentColor"
 													viewBox="0 0 24 24"
 													><path
@@ -1853,7 +1853,7 @@ fetch("https://pictify.io/s/events", {
 												class="h-full transition-all duration-700 ease-out flex items-center {variant.isWinner
 													? 'bg-brand-accent'
 													: idx % 2 === 0
-													? 'bg-[#60a5fa]'
+													? 'bg-data-sky'
 													: 'bg-[#c084fc]'} border-r-[3px] border-gray-900"
 												style="width: {getBarWidth(variant.impressions || 0, maxImpressions)}%"
 											>
@@ -1905,7 +1905,7 @@ fetch("https://pictify.io/s/events", {
 											<div class="w-24 shrink-0 flex items-center justify-end gap-2 text-right">
 												{#if variant.isWinner}
 													<svg
-														class="w-3.5 h-3.5 text-[#f59e0b]"
+														class="w-3.5 h-3.5 text-data-amber"
 														fill="currentColor"
 														viewBox="0 0 24 24"
 														><path
@@ -1923,7 +1923,7 @@ fetch("https://pictify.io/s/events", {
 												<div
 													class="h-full transition-all duration-700 ease-out flex items-center {variant.isWinner
 														? 'bg-brand-accent'
-														: 'bg-[#4ade80]'} border-r-[3px] border-gray-900"
+														: 'bg-data-green'} border-r-[3px] border-gray-900"
 													style="width: {getBarWidth(variant.clicks || 0, maxClicks)}%"
 												>
 													{#if (variant.clicks || 0) > 0}
@@ -1966,13 +1966,13 @@ fetch("https://pictify.io/s/events", {
 								<div
 									class="flex items-center gap-4 p-5 rounded-xl border-[3px] {analytics.significance
 										.isSignificant
-										? 'border-gray-900 bg-[#4ade80]/10 shadow-brutal-xl'
+										? 'border-gray-900 bg-data-green/10 shadow-brutal-xl'
 										: 'border-gray-900 bg-gray-50 shadow-[4px_4px_0_0_#e5e7eb]'} transition-all"
 								>
 									<div
 										class="w-12 h-12 rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 {analytics
 											.significance.isSignificant
-											? 'bg-[#4ade80] shadow-brutal-sm'
+											? 'bg-data-green shadow-brutal-sm'
 											: 'bg-gray-200'}"
 									>
 										{#if analytics.significance.isSignificant}
@@ -2287,7 +2287,7 @@ fetch("https://pictify.io/s/events", {
 								</div>
 								{#if exp.startAt && exp.status !== 'draft'}
 									<div
-										class="p-4 bg-[#60a5fa]/10 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+										class="p-4 bg-data-sky/10 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 									>
 										<span
 											class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1"
@@ -2300,7 +2300,7 @@ fetch("https://pictify.io/s/events", {
 								{/if}
 								{#if exp.winnerDeclaredAt}
 									<div
-										class="p-4 bg-[#4ade80]/10 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+										class="p-4 bg-data-green/10 border-[3px] border-gray-900 rounded-xl shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 									>
 										<span
 											class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1"
@@ -2493,7 +2493,7 @@ fetch("https://pictify.io/s/events", {
 				<button
 					on:click={handleComplete}
 					disabled={!selectedWinner}
-					class="w-full sm:w-auto px-6 py-3.5 bg-[#f59e0b] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-lg disabled:hover:translate-x-0 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
+					class="w-full sm:w-auto px-6 py-3.5 bg-data-amber text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-lg disabled:hover:translate-x-0 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
 				>
 					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 						<path

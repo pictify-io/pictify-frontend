@@ -160,12 +160,12 @@
 	<!-- Result Info & Actions -->
 	{#if renderResult?.url}
 		<div
-			class="bg-[#f0fdf4] border-[3px] border-[#4ade80] rounded-xl p-5 shadow-[4px_4px_0_0_#166534]"
+			class="bg-[#f0fdf4] border-[3px] border-data-green rounded-xl p-5 shadow-[4px_4px_0_0_#166534]"
 		>
 			<div class="flex items-start justify-between gap-4">
 				<div class="flex-1 min-w-0">
 					<div class="flex items-center gap-2 mb-2">
-						<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+						<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 						<p class="text-xs font-black text-green-800 uppercase tracking-widest">
 							Success (200 OK)
 						</p>

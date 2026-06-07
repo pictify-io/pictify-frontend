@@ -63,14 +63,14 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#4ade80]/20 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-data-green/20 border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 		</div>
 		<h1
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
-			Bulk image generation,<br /><span class="text-[#4ade80] italic">done right.</span>
+			Bulk image generation,<br /><span class="text-data-green italic">done right.</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			Render thousands of images from a CSV, spreadsheet, or JSON batch. Async jobs, webhooks on completion, parallelized renders — all from one template.
@@ -169,7 +169,7 @@ const { jobId } = await response.json();
 			Performance expectations
 		</h2>
 		<div class="prose prose-lg prose-neutral max-w-none">
-			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-5 list-disc pl-6 marker:text-[#4ade80]">
+			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-5 list-disc pl-6 marker:text-data-green">
 				<li><strong>100 images</strong> — typically under 30 seconds</li>
 				<li><strong>1,000 images</strong> — typically 2–4 minutes</li>
 				<li><strong>10,000 images</strong> — typically 15–25 minutes</li>

@@ -206,7 +206,7 @@
 							class="w-12 h-12 bg-gray-800 border-[3px] border-gray-600 rounded-xl flex items-center justify-center shadow-brutal-lg"
 						>
 							<svg
-								class="w-6 h-6 text-[#4ade80]"
+								class="w-6 h-6 text-data-green"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -219,7 +219,7 @@
 							>
 						</div>
 						<div
-							class="px-3 py-1 bg-[#4ade80] text-black text-xs font-bold uppercase rounded-full border border-black"
+							class="px-3 py-1 bg-data-green text-black text-xs font-bold uppercase rounded-full border border-black"
 						>
 							50+ Functions
 						</div>
@@ -277,8 +277,8 @@
 						<div
 							class="absolute top-8 right-8 md:right-auto md:left-8 md:top-auto md:bottom-8 inline-flex items-center gap-2 px-3 py-1.5 bg-black rounded-lg border border-gray-700 shadow-xl"
 						>
-							<div class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-							<div class="font-mono text-xs font-bold text-[#4ade80]">
+							<div class="w-2 h-2 rounded-full bg-data-green animate-pulse" />
+							<div class="font-mono text-xs font-bold text-data-green">
 								{#if visible}
 									<span class="tabular-nums"
 										>{((Math.floor(Date.now() / 100) % 1000) + 4000).toLocaleString()}</span
@@ -399,7 +399,7 @@
 										</div>
 										<div class="font-bold text-sm truncate w-full">Midnight City</div>
 										<div class="h-1 w-full bg-gray-600 rounded-full mt-2 overflow-hidden">
-											<div class="h-full w-2/3 bg-[#4ade80]" />
+											<div class="h-full w-2/3 bg-data-green" />
 										</div>
 									</div>
 									<!-- Visualizer bars bg -->
@@ -523,7 +523,7 @@
 										<div class="w-1/5 h-[40%] bg-gray-200 rounded-t-sm" />
 										<div class="w-1/5 h-[60%] bg-gray-300 rounded-t-sm" />
 										<div class="w-1/5 h-[30%] bg-gray-200 rounded-t-sm" />
-										<div class="w-1/5 h-[80%] bg-[#4ade80] rounded-t-sm border border-black/10" />
+										<div class="w-1/5 h-[80%] bg-data-green rounded-t-sm border border-black/10" />
 										<div class="w-1/5 h-[50%] bg-gray-200 rounded-t-sm" />
 									</div>
 								</div>

@@ -64,7 +64,7 @@
 			class="absolute -top-10 -right-10 w-40 h-40 bg-brand-accent rounded-full blur-3xl opacity-20 pointer-events-none"
 		/>
 		<div
-			class="absolute -bottom-10 -left-10 w-40 h-40 bg-[#4ade80] rounded-full blur-3xl opacity-20 pointer-events-none"
+			class="absolute -bottom-10 -left-10 w-40 h-40 bg-data-green rounded-full blur-3xl opacity-20 pointer-events-none"
 		/>
 
 		<div class="relative z-10 flex flex-col items-center justify-center text-center">
@@ -109,7 +109,7 @@
 				<!-- Status Messages -->
 				{#if status === 'success'}
 					<div
-						class="border-[3px] border-gray-900 bg-[#4ade80] text-gray-900 rounded-xl p-5 shadow-brutal-lg flex items-start gap-4 transform rotate-1"
+						class="border-[3px] border-gray-900 bg-data-green text-gray-900 rounded-xl p-5 shadow-brutal-lg flex items-start gap-4 transform rotate-1"
 					>
 						<div class="bg-white rounded-full p-1 border-[2px] border-gray-900 flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

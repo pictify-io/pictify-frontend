@@ -204,7 +204,7 @@
 			<div
 				class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 			>
-				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#4ade80] rounded-full animate-pulse" />
+				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-data-green rounded-full animate-pulse" />
 				Workspace
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -550,7 +550,7 @@
 					>
 						<div class="bg-gray-800 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
+								class="w-8 h-8 rounded-lg bg-data-green border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -601,7 +601,7 @@
 											type="email"
 											bind:value={inviteEmail}
 											placeholder="colleague@company.com"
-											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors text-sm font-medium"
+											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-data-green focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors text-sm font-medium"
 											on:keydown={(e) => e.key === 'Enter' && handleInvite()}
 										/>
 									</div>
@@ -613,7 +613,7 @@
 									<button
 										on:click={handleInvite}
 										disabled={inviting || !inviteEmail.trim()}
-										class="w-full px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-900 bg-[#4ade80] rounded-xl border-[3px] border-[#4ade80] hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-0.5 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+										class="w-full px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-900 bg-data-green rounded-xl border-[3px] border-data-green hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-0.5 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
 									>
 										{inviting ? 'Sending...' : 'Send Invite'}
 									</button>

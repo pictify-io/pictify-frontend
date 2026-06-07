@@ -228,7 +228,7 @@
 							>
 								<div class="flex items-start gap-4">
 									<div
-										class="w-10 h-10 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
+										class="w-10 h-10 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
 									>
 										<svg
 											class="w-5 h-5 text-gray-900"
@@ -440,7 +440,7 @@
 							Fast Install
 						</h2>
 						<div
-							class="inline-flex items-center gap-4 bg-black border border-gray-700 rounded-xl p-6 font-mono text-lg text-[#4ade80] max-w-2xl mx-auto shadow-2xl"
+							class="inline-flex items-center gap-4 bg-black border border-gray-700 rounded-xl p-6 font-mono text-lg text-data-green max-w-2xl mx-auto shadow-2xl"
 						>
 							<span class="text-brand-danger">$</span>
 							{integration.installCommand}
@@ -471,7 +471,7 @@
 					class="absolute top-0 left-0 w-32 h-32 bg-brand-danger rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
 				/>
 				<div
-					class="absolute bottom-0 right-0 w-32 h-32 bg-[#4ade80] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+					class="absolute bottom-0 right-0 w-32 h-32 bg-data-green rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
 				/>
 
 				<div class="relative z-10">
@@ -494,7 +494,7 @@
 						{/if}
 						<a
 							href="/signup"
-							class="px-8 py-4 bg-brand-danger text-white border-[3px] border-brand-danger font-black uppercase tracking-wide hover:bg-[#ff5252] hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
+							class="px-8 py-4 bg-brand-danger text-white border-[3px] border-brand-danger font-black uppercase tracking-wide hover:bg-data-red hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
 						>
 							Start For Free
 						</a>

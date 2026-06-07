@@ -498,7 +498,7 @@
 							emitChange();
 						}}
 						{disabled}
-						class="px-4 py-2.5 border-[3px] border-black shadow-brutal-sm rounded-xl bg-[#4ade80] text-black
+						class="px-4 py-2.5 border-[3px] border-black shadow-brutal-sm rounded-xl bg-data-green text-black
 							hover:shadow-brutal-lg hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 							transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest cursor-pointer"
 					>
@@ -537,7 +537,7 @@
 		<!-- Natural language summary -->
 		{#if summary}
 			<div
-				class="bg-[#4ade80] border-[3px] border-black shadow-brutal-lg rounded-xl px-5 py-4 mt-6"
+				class="bg-data-green border-[3px] border-black shadow-brutal-lg rounded-xl px-5 py-4 mt-6"
 			>
 				<div class="flex items-start gap-2">
 					<svg class="w-5 h-5 text-black mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 24 24">

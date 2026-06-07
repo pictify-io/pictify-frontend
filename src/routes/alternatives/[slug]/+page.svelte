@@ -137,7 +137,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#4ade80]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-data-green/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -166,7 +166,7 @@
 					class="inline-flex transform -rotate-1 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 				>
 					<div
-						class="px-5 py-2 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
+						class="px-5 py-2 bg-data-green border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
 					>
 						{alt.competitor} Alternative · 2026
 					</div>
@@ -177,7 +177,7 @@
 					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-4"
 				>
 					The Best {alt.competitor} Alternative
-					<span class="block text-[#4ade80]">for Developers</span>
+					<span class="block text-data-green">for Developers</span>
 				</h1>
 
 				<!-- Supporting subhead: repeats the keyword + adds long-tail variants. -->
@@ -206,7 +206,7 @@
 							class="flex items-start gap-3 bg-white border-[2px] border-gray-200 rounded-xl p-4"
 						>
 							<div
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 text-sm flex-shrink-0"
+								class="w-8 h-8 bg-data-green border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 text-sm flex-shrink-0"
 							>
 								{i + 1}
 							</div>
@@ -244,7 +244,7 @@
 						{#each alt.comparison.advantages.slice(0, 4) as adv}
 							<li class="flex items-start gap-3">
 								<div
-									class="w-6 h-6 rounded-full bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
+									class="w-6 h-6 rounded-full bg-data-green border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
 								>
 									<svg
 										class="w-3 h-3 text-gray-900 font-bold"
@@ -341,7 +341,7 @@
 							<tbody class="divide-y divide-gray-200">
 								<tr>
 									<td class="px-6 py-4 font-bold text-gray-900">Free</td>
-									<td class="px-6 py-4 font-medium text-[#4ade80]"
+									<td class="px-6 py-4 font-medium text-data-green"
 										>{alt.comparison.pricing.pictify.free}</td
 									>
 									<td class="px-6 py-4 font-medium text-gray-600"
@@ -350,7 +350,7 @@
 								</tr>
 								<tr class="bg-gray-50">
 									<td class="px-6 py-4 font-bold text-gray-900">Starter</td>
-									<td class="px-6 py-4 font-medium text-[#4ade80]"
+									<td class="px-6 py-4 font-medium text-data-green"
 										>{alt.comparison.pricing.pictify.starter}</td
 									>
 									<td class="px-6 py-4 font-medium text-gray-600"
@@ -359,7 +359,7 @@
 								</tr>
 								<tr>
 									<td class="px-6 py-4 font-bold text-gray-900">Pro</td>
-									<td class="px-6 py-4 font-medium text-[#4ade80]"
+									<td class="px-6 py-4 font-medium text-data-green"
 										>{alt.comparison.pricing.pictify.pro}</td
 									>
 									<td class="px-6 py-4 font-medium text-gray-600"
@@ -385,7 +385,7 @@
 						<div class="flex flex-wrap gap-6 mb-6">
 							<div>
 								<span class="text-sm font-bold text-gray-500 uppercase">Difficulty</span>
-								<p class="text-xl font-black text-[#4ade80]">
+								<p class="text-xl font-black text-data-green">
 									{alt.comparison.migration.difficulty}
 								</p>
 							</div>
@@ -442,7 +442,7 @@
 				<div class="flex flex-wrap justify-center gap-4">
 					<a
 						href="/signup"
-						class="px-8 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+						class="px-8 py-4 bg-data-green text-gray-900 border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 					>
 						{alt.cta}
 					</a>
@@ -465,7 +465,7 @@
 						{@const otherIcon = brandIcons[other.slug] || brandIcons.default}
 						<a
 							href="/alternatives/{other.slug}"
-							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-data-green transition-all group"
 						>
 							<div class="flex items-center gap-3">
 								<div
@@ -498,7 +498,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#4ade80] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-gray-900 shadow-brutal-2xl"
+					class="w-24 h-24 bg-data-green rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-gray-900 shadow-brutal-2xl"
 				>
 					?
 				</div>
@@ -507,7 +507,7 @@
 				</h1>
 				<a
 					href="/alternatives"
-					class="px-8 py-4 bg-[#4ade80] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-data-green border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					View All Alternatives
 				</a>

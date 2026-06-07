@@ -13,17 +13,17 @@
 	$: totalDeviceImpressions = deviceBreakdown.reduce((s, d) => s + (d.impressions || 0), 0);
 
 	const channelColors = {
-		web: 'bg-[#60a5fa]',
+		web: 'bg-data-sky',
 		email: 'bg-brand-accent',
 		ad: 'bg-brand-danger',
-		social: 'bg-[#a78bfa]',
-		'in-app': 'bg-[#4ade80]',
+		social: 'bg-data-violet',
+		'in-app': 'bg-data-green',
 		other: 'bg-gray-400'
 	};
 
 	const deviceColors = {
-		desktop: 'bg-[#60a5fa]',
-		mobile: 'bg-[#4ade80]',
+		desktop: 'bg-data-sky',
+		mobile: 'bg-data-green',
 		tablet: 'bg-brand-accent'
 	};
 </script>

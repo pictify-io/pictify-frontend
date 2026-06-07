@@ -63,7 +63,7 @@
 	function getUrgencyBg(urgency) {
 		if (urgency === 'critical') return 'bg-brand-danger/15';
 		if (urgency === 'urgent') return 'bg-brand-danger/10';
-		if (urgency === 'warning') return 'bg-[#f59e0b]/15';
+		if (urgency === 'warning') return 'bg-data-amber/15';
 		if (urgency === 'soft_warning') return 'bg-brand-accent/20';
 		return 'bg-white';
 	}

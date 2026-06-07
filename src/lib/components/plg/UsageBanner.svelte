@@ -70,7 +70,7 @@
 
 	function getBannerStyle(percentage) {
 		if (percentage >= 95) return 'bg-brand-danger'; // Critical - red
-		if (percentage >= 85) return 'bg-[#f59e0b]'; // Urgent - orange
+		if (percentage >= 85) return 'bg-data-amber'; // Urgent - orange
 		return 'bg-brand-accent'; // Default - yellow
 	}
 

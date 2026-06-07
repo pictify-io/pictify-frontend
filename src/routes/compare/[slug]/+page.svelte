@@ -390,7 +390,7 @@
 						{#each comparison.advantages as advantage}
 							<li class="flex items-start gap-3">
 								<div
-									class="w-6 h-6 rounded-full bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
+									class="w-6 h-6 rounded-full bg-data-green border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
 								>
 									<svg
 										class="w-3 h-3 text-gray-900 font-bold"
@@ -479,7 +479,7 @@
 					>
 						<h3 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-900 font-black text-sm shadow-brutal-sm"
+								class="w-8 h-8 bg-data-green border-[2px] border-gray-900 rounded-lg flex items-center justify-center text-gray-900 font-black text-sm shadow-brutal-sm"
 								>1</span
 							>
 							Choose Pictify if...
@@ -545,7 +545,7 @@
 													<div
 														class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-[2px] border-gray-900 {star <
 														scores.pictify
-															? 'bg-[#4ade80]'
+															? 'bg-data-green'
 															: 'bg-transparent opacity-20'}"
 													/>
 												{/each}
@@ -602,7 +602,7 @@
 								{#each pricingTiers as tier, i}
 									<tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
 										<td class="px-6 py-4 font-black text-gray-900">{tier.name}</td>
-										<td class="px-6 py-4 font-bold text-[#4ade80] border-l-[3px] border-gray-100"
+										<td class="px-6 py-4 font-bold text-data-green border-l-[3px] border-gray-100"
 											>{tier.pictify}</td
 										>
 										<td class="px-6 py-4 font-medium text-gray-600 border-l-[3px] border-gray-100"
@@ -653,7 +653,7 @@
 								{#each comparison.migration.steps as step, i}
 									<li class="flex items-center gap-4">
 										<span
-											class="w-10 h-10 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-gray-900 text-lg font-black shadow-brutal-sm flex-shrink-0"
+											class="w-10 h-10 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-gray-900 text-lg font-black shadow-brutal-sm flex-shrink-0"
 											>{i + 1}</span
 										>
 										<span class="text-gray-900 font-bold text-lg">{step}</span>

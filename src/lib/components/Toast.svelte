@@ -25,8 +25,8 @@
 
 	const TYPE_CONFIG = {
 		success: {
-			bg: 'bg-[#4ade80]',
-			border: 'border-[#4ade80]',
+			bg: 'bg-data-green',
+			border: 'border-data-green',
 			icon: 'M5 13l4 4L19 7',
 			title: 'Success'
 		},

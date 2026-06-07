@@ -562,7 +562,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-8"
 			>
 				<div
-					class="px-6 py-2 bg-[#4ade80] border-[4px] border-black text-black font-black text-sm uppercase tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-6 py-2 bg-data-green border-[4px] border-black text-black font-black text-sm uppercase tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Free • No Signup Required
 				</div>
@@ -715,7 +715,7 @@
 								<div class="flex gap-2">
 									<div class="w-4 h-4 bg-brand-danger border-2 border-gray-700" />
 									<div class="w-4 h-4 bg-brand-accent border-2 border-gray-700" />
-									<div class="w-4 h-4 bg-[#4ade80] border-2 border-gray-700" />
+									<div class="w-4 h-4 bg-data-green border-2 border-gray-700" />
 								</div>
 								<span class="font-mono font-bold tracking-wider text-sm uppercase"
 									>PREVIEW: {LINKEDIN_BANNER_WIDTH} × {LINKEDIN_BANNER_HEIGHT}px</span
@@ -916,7 +916,7 @@
 							{#if isImageGenerating}
 								<div class="mt-6 w-full max-w-md mx-auto">
 									<div class="h-3 bg-white border-[3px] border-gray-900">
-										<div class="h-full bg-[#4ade80] transition-all" style="width: {$progress}%" />
+										<div class="h-full bg-data-green transition-all" style="width: {$progress}%" />
 									</div>
 								</div>
 							{/if}
@@ -931,13 +931,13 @@
 			<div class="mb-16">
 				<div class="relative">
 					<div
-						class="absolute inset-0 bg-[#4ade80] translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
+						class="absolute inset-0 bg-data-green translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
 					/>
 
 					<div class="relative border-[4px] border-black bg-white">
 						<!-- Header -->
 						<div
-							class="bg-[#4ade80] text-black px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
+							class="bg-data-green text-black px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
 						>
 							<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -987,7 +987,7 @@
 							<div class="flex flex-wrap gap-4">
 								<button
 									on:click={downloadBanner}
-									class="flex-1 sm:flex-none px-8 py-4 bg-[#4ade80] text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-data-green text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1056,7 +1056,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+							class="w-16 h-16 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
 						>
 							03
 						</div>
@@ -1095,20 +1095,20 @@
 								</h3>
 								<ul class="space-y-3">
 									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-[#4ade80] font-black">✓</span>
+										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
 											>Personal Profile: <strong class="text-brand-danger">1584 x 396 pixels</strong
 											></span
 										>
 									</li>
 									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-[#4ade80] font-black">✓</span>
+										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
 											>Company Page: <strong class="text-brand-danger">1128 x 191 pixels</strong></span
 										>
 									</li>
 									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-[#4ade80] font-black">✓</span>
+										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
 											>Aspect Ratio: <strong class="text-brand-danger">4:1</strong></span
 										>

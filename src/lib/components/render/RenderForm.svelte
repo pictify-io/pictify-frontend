@@ -178,7 +178,7 @@
 					</div>
 				{/if}
 				<button
-					class="w-full py-2 bg-[#4ecdc4] text-white font-black uppercase tracking-wide border-[3px] border-gray-900 rounded-lg shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all text-xs"
+					class="w-full py-2 bg-data-teal text-white font-black uppercase tracking-wide border-[3px] border-gray-900 rounded-lg shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all text-xs"
 					on:click={applyJsonInput}
 				>
 					Apply JSON Configuration

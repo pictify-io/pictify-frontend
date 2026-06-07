@@ -158,7 +158,7 @@
 	}
 
 	function getStatusDot(status) {
-		if (status === 'success') return 'bg-[#4ade80]';
+		if (status === 'success') return 'bg-data-green';
 		if (status === 'failure') return 'bg-brand-danger';
 		return 'bg-brand-accent';
 	}
@@ -350,7 +350,7 @@
 			<div
 				class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-1 mb-6"
 			>
-				<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-black" />
+				<span class="w-2 h-2 bg-data-green rounded-full animate-pulse border border-black" />
 				<span class="text-xs font-black text-black uppercase tracking-widest">Command Center</span>
 			</div>
 			{#if welcomeMsg && totalTemplates === 0}
@@ -586,7 +586,7 @@
 
 				<!-- Aggregated Metric: Assets -->
 				<div
-					class="bg-[#4ade80] rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-data-green rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -628,7 +628,7 @@
 								class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_#1f2937]"
 							/>
 							<div
-								class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_#1f2937]"
+								class="w-3 h-3 rounded-full bg-data-green border border-black shadow-[1px_1px_0_0_#1f2937]"
 							/>
 							<div class="ml-2">
 								<span class="text-sm font-black text-black uppercase tracking-widest"
@@ -713,7 +713,7 @@
 
 											<!-- The Bar -->
 											<div
-												class="w-full bg-[#c4b5fd] border-[2px] border-b-0 border-black rounded-t-sm transition-all duration-300 group-hover:bg-[#a78bfa] group-hover:-translate-y-1 relative overflow-hidden"
+												class="w-full bg-[#c4b5fd] border-[2px] border-b-0 border-black rounded-t-sm transition-all duration-300 group-hover:bg-data-violet group-hover:-translate-y-1 relative overflow-hidden"
 												style="height: {Math.max((stat.hits / chartMax) * 100, 1)}%"
 											>
 												<!-- Grid pattern overlay inside the bar for texture -->
@@ -813,7 +813,7 @@
 									<h4
 										class="text-[10px] font-black text-black uppercase tracking-widest mb-4 flex items-center gap-2"
 									>
-										<div class="w-2 h-2 bg-[#4ade80] border-[2px] border-black rounded-sm" />
+										<div class="w-2 h-2 bg-data-green border-[2px] border-black rounded-sm" />
 										Top Countries
 									</h4>
 									<div class="space-y-2">
@@ -843,7 +843,7 @@
 						<h2
 							class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
 						>
-							<span class="w-3 h-3 bg-[#a78bfa] rounded-sm border-[2px] border-black" />
+							<span class="w-3 h-3 bg-data-violet rounded-sm border-[2px] border-black" />
 							Quick Actions
 						</h2>
 					</div>
@@ -959,13 +959,13 @@
 						<h2
 							class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
 						>
-							<span class="w-3 h-3 bg-[#4ade80] rounded-sm border-[2px] border-black rotate-45" />
+							<span class="w-3 h-3 bg-data-green rounded-sm border-[2px] border-black rotate-45" />
 							Continue Working
 						</h2>
 						{#if recentTemplates.length > 0}
 							<a
 								href="/dashboard/template"
-								class="text-xs font-black text-brand-danger uppercase tracking-wider hover:text-[#ff5252] flex items-center gap-1 group"
+								class="text-xs font-black text-brand-danger uppercase tracking-wider hover:text-data-red flex items-center gap-1 group"
 							>
 								View all templates
 								<svg

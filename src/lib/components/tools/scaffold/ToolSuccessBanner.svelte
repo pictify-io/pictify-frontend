@@ -20,9 +20,9 @@
 
 <div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 	<div
-		class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden"
+		class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 	>
-		<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+		<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 		<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 			{heading}

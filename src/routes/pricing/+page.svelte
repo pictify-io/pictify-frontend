@@ -436,7 +436,7 @@
 						high-performance infrastructure, and
 						<span class="relative inline-block px-2 mx-1">
 							<span
-								class="absolute inset-0 bg-[#4ade80]/30 -skew-y-2 rounded-lg border-2 border-transparent"
+								class="absolute inset-0 bg-data-green/30 -skew-y-2 rounded-lg border-2 border-transparent"
 							/>
 							<span class="relative text-gray-900">scale as you grow.</span>
 						</span>

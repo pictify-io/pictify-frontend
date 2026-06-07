@@ -237,7 +237,7 @@
 				>
 					<!-- Code Background -->
 					<div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none select-none">
-						<pre class="text-[#4ade80] font-mono text-sm leading-relaxed">
+						<pre class="text-data-green font-mono text-sm leading-relaxed">
 const pictify = new Pictify(API_KEY);
 await pictify.render(&#123;
   template: 'marketing-v1',
@@ -250,14 +250,14 @@ await pictify.render(&#123;
 					<div class="relative z-10 grid md:grid-cols-2 gap-12 items-center">
 						<div>
 							<div
-								class="inline-flex items-center gap-2 px-3 py-1 bg-gray-800 text-[#4ade80] border border-gray-700 text-xs font-mono font-bold uppercase tracking-widest rounded mb-6"
+								class="inline-flex items-center gap-2 px-3 py-1 bg-gray-800 text-data-green border border-gray-700 text-xs font-mono font-bold uppercase tracking-widest rounded mb-6"
 							>
-								<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse" />
+								<span class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
 								Developers
 							</div>
 							<h2 class="text-4xl md:text-5xl font-black text-white tracking-tight mb-6">
 								Build Custom <br />
-								<span class="text-[#4ade80]">Integrations</span>
+								<span class="text-data-green">Integrations</span>
 							</h2>
 							<p class="text-gray-400 font-medium text-lg mb-8 max-w-md leading-relaxed">
 								Use our powerful REST API and SDKs to integrate Pictify generation into any
@@ -266,7 +266,7 @@ await pictify.render(&#123;
 							<div class="flex flex-wrap gap-4">
 								<a
 									href="https://docs.pictify.io"
-									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider hover:bg-[#4ade80] hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]"
+									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider hover:bg-data-green hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]"
 								>
 									Read Documentation
 								</a>
@@ -286,13 +286,13 @@ await pictify.render(&#123;
 							<div class="px-4 py-3 bg-[#1f2937] border-b border-gray-800 flex items-center gap-2">
 								<div class="w-3 h-3 rounded-full bg-brand-danger" />
 								<div class="w-3 h-3 rounded-full bg-brand-accent" />
-								<div class="w-3 h-3 rounded-full bg-[#4ade80]" />
+								<div class="w-3 h-3 rounded-full bg-data-green" />
 								<div class="ml-2 text-xs text-gray-500 font-bold">bash</div>
 							</div>
 							<div class="p-6 space-y-4">
 								<div class="flex gap-2">
 									<span class="text-brand-danger">➜</span>
-									<span class="text-[#4ade80]">~</span>
+									<span class="text-data-green">~</span>
 									<span class="text-gray-300 typing-effect"
 										>curl -X POST https://api.pictify.io/image \</span
 									>

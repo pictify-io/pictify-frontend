@@ -401,7 +401,7 @@ console.log(result.url); // CDN URL of rendered image
 					{/if}
 				</h1>
 				<div
-					class="px-2 py-1 bg-[#4ecdc4] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-brutal-sm"
+					class="px-2 py-1 bg-data-teal text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-brutal-sm"
 				>
 					Render Mode
 				</div>
@@ -457,7 +457,7 @@ console.log(result.url); // CDN URL of rendered image
 							<h3
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#a78bfa] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-data-violet border-2 border-gray-900 rounded-full" />
 								Output Options
 							</h3>
 						</div>
@@ -565,7 +565,7 @@ console.log(result.url); // CDN URL of rendered image
 							<h3
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#60a5fa] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-data-sky border-2 border-gray-900 rounded-full" />
 								Authentication
 							</h3>
 						</div>
@@ -640,7 +640,7 @@ console.log(result.url); // CDN URL of rendered image
 										<EmailVerificationRequired email={userEmail} feature="template rendering" />
 									{:else}
 										<button
-											class="w-full bg-brand-danger hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+											class="w-full bg-brand-danger hover:bg-data-red text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
 											on:click={handleRender}
 											disabled={isRendering || !selectedApiKey}
 										>
@@ -747,7 +747,7 @@ console.log(result.url); // CDN URL of rendered image
 							<h2
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#4ade80] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-data-green border-2 border-gray-900 rounded-full" />
 								Live Preview
 							</h2>
 							<div class="flex gap-1">

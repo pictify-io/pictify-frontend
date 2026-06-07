@@ -792,7 +792,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
 						<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
-						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white" />
+						<div class="w-3 h-3 rounded-full bg-data-green border border-white" />
 					</div>
 					<div class="font-mono font-bold tracking-widest text-sm uppercase">
 						SYSTEM_INPUT_TERMINAL
@@ -847,7 +847,7 @@
 						{:else if !isPreviewLoaded}
 							<p class="mt-3 text-sm font-bold text-gray-500">
 								Load the preview first — then the green
-								<span class="text-[#4ade80] font-black">Capture</span> button activates below.
+								<span class="text-data-green font-black">Capture</span> button activates below.
 							</p>
 						{/if}
 					{/if}
@@ -1038,7 +1038,7 @@
 						id="capture-button"
 						on:click={generateImage}
 						disabled={captureDisabled}
-						class="w-full md:w-auto px-8 py-3 bg-[#4ade80] text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
+						class="w-full md:w-auto px-8 py-3 bg-data-green text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
 					>
 						{#if isImageGenerating}
 							<svg
@@ -1089,9 +1089,9 @@
 		{#if imageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 mt-16">
 				<div
-					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden"
+					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 						Screenshot Captured!
@@ -1439,7 +1439,7 @@
 						<span class="font-bold text-lg">Use the selector to remove ads/navbars.</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-[#4ade80] text-xl">03.</span>
+						<span class="font-black text-data-green text-xl">03.</span>
 						<span class="font-bold text-lg">Check mobile viewports for responsive sites.</span>
 					</li>
 				</ul>

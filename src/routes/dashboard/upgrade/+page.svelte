@@ -350,7 +350,7 @@
 									on:click={() => handlePurchase(plan)}
 									class="w-full py-4 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all mb-8
 										{isPopular
-										? 'bg-brand-danger text-white hover:bg-[#ff5252] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
+										? 'bg-brand-danger text-white hover:bg-data-red shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
 										: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 								>
 									Upgrade to {plan.name === 'Standard' ? 'Pro' : plan.name}

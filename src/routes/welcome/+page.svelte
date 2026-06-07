@@ -172,7 +172,7 @@
 		class="absolute top-0 right-0 w-96 h-96 bg-brand-accent/30 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 left-0 w-96 h-96 bg-[#4ade80]/15 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute bottom-0 left-0 w-96 h-96 bg-data-green/15 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<div class="relative z-10 mx-auto max-w-5xl px-4 py-10 md:py-14">
@@ -191,7 +191,7 @@
 		</div>
 
 		<h1 class="text-4xl md:text-5xl font-black leading-tight mb-3">
-			You're in. Now render it <span class="bg-[#4ade80] px-2 border-[2px] border-black">from your terminal</span>.
+			You're in. Now render it <span class="bg-data-green px-2 border-[2px] border-black">from your terminal</span>.
 		</h1>
 		<p class="text-lg font-medium text-gray-700 max-w-3xl mb-8">
 			The image you just made is one cURL away from being automated. Run it now, then put the same call inside the app you're actually building.
@@ -265,7 +265,7 @@
 							on:click={copyKey}
 							class="flex-shrink-0 px-3 py-2 border-[2px] border-black font-black text-xs uppercase
 								{copied
-								? 'bg-[#4ade80] text-black'
+								? 'bg-data-green text-black'
 								: 'bg-black text-white shadow-[3px_3px_0_0_#4ade80] hover:shadow-[1px_1px_0_0_#4ade80] hover:translate-x-[2px] hover:translate-y-[2px] transition-all'}"
 						>
 							{copied ? 'Copied' : 'Copy'}
@@ -289,7 +289,7 @@
 
 		<!-- Run from browser button (server-fires api_render_completed) -->
 		<div
-			class="bg-[#4ade80]/15 border-[3px] border-black shadow-brutal-xl p-5 md:p-6 mb-6"
+			class="bg-data-green/15 border-[3px] border-black shadow-brutal-xl p-5 md:p-6 mb-6"
 		>
 			<div class="flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
 				<div>

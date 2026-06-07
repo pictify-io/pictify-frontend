@@ -144,7 +144,7 @@
 			class="space-y-6 p-6 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl"
 		>
 			<div class="flex items-center gap-3 pb-4 border-b-[3px] border-gray-900">
-				<span class="w-3 h-3 bg-[#3b82f6] border-2 border-gray-900 rounded-full" />
+				<span class="w-3 h-3 bg-data-blue border-2 border-gray-900 rounded-full" />
 				<h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">
 					New Connection Details
 				</h3>
@@ -389,7 +389,7 @@
 							</div>
 						</div>
 						<div class="bg-black rounded-lg p-4 max-h-48 overflow-auto border-2 border-gray-800">
-							<pre class="text-xs font-mono text-[#4ade80] whitespace-pre-wrap">{JSON.stringify(
+							<pre class="text-xs font-mono text-data-green whitespace-pre-wrap">{JSON.stringify(
 									testResult.data,
 									null,
 									2
@@ -434,7 +434,7 @@
 	<!-- Actions -->
 	<div class="flex justify-end gap-4 pt-6 mt-6 border-t-[3px] border-gray-900">
 		<button
-			class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
+			class="px-5 py-2.5 bg-data-blue hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
 			on:click={handleNext}
 			disabled={!canProceed}
 		>

@@ -469,7 +469,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 bg-brand-danger border border-black" />
 						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 
@@ -499,7 +499,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#60a5fa] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-data-sky border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>2</span
 							>
 							Organization Name
@@ -518,7 +518,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#a78bfa] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-data-violet border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>3</span
 							>
 							Date
@@ -554,7 +554,7 @@
 					<button
 						type="button"
 						on:click={openInCanvasEditor}
-						class="w-full py-3 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
+						class="w-full py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -581,12 +581,12 @@
 						<div class="flex items-center gap-2">
 							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
 							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 						</div>
 						<div
 							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
 						>
-							<span class="px-2 py-0.5 bg-[#4ade80]/20 border border-[#4ade80] rounded text-gray-700">Interactive Editor</span>
+							<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700">Interactive Editor</span>
 							{selectedTemplate.width} x {selectedTemplate.height}px
 						</div>
 					</div>
@@ -621,7 +621,7 @@
 				<button
 					on:click={handleGenerate}
 					disabled={isGenerating}
-					class="w-full bg-brand-danger hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
+					class="w-full bg-brand-danger hover:bg-data-red text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
 				>
 					{#if isGenerating}
 						<svg
@@ -664,9 +664,9 @@
 		{#if generatedImageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 				<div
-					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden"
+					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 						Your certificate is ready!
@@ -700,7 +700,7 @@
 						</a>
 						<button
 							on:click={openInCanvasEditor}
-							class="px-6 py-3 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -810,7 +810,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -832,7 +832,7 @@
 						<div
 							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
-							<span class="font-black text-[#4ade80]">&#10003;</span>
+							<span class="font-black text-data-green">&#10003;</span>
 							<span class="font-bold text-black text-sm">{benefit}</span>
 						</div>
 					{/each}
@@ -844,7 +844,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#60a5fa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -870,7 +870,7 @@
 					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive canvas editor' }, { num: '4', text: 'Click any text on the canvas to make direct edits' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate or open it in the full editor for further customization' }] as step}
 						<div class="flex items-start gap-4">
 							<span
-								class="bg-[#60a5fa] text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
+								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
 								>{step.num}</span
 							>
 							<span class="font-bold text-black text-sm pt-1">{step.text}</span>
@@ -936,7 +936,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#a78bfa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-violet border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -963,13 +963,13 @@
 							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong>Elegant</strong> template, with gold borders and serif typography, is our most popular certificate of achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-[#60a5fa] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-data-sky pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Completion Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Issue a certificate of completion for courses, training programs, workshops, and onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek, contemporary feel that reads well on-screen and in print.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-[#4ade80] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-data-green pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Participation Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Acknowledge attendance and engagement with a certificate of participation. The <strong>Corporate</strong> template's navy header and formal layout make it the right certificate of participation template for conferences, webinars, and corporate events.
@@ -995,7 +995,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path

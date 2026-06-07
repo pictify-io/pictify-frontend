@@ -257,7 +257,7 @@
 				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 font-black uppercase text-xs tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2
 					{selectedFormat === 'image'
 					? 'bg-brand-accent text-gray-900 hover:bg-[#ffb360]'
-					: 'bg-brand-danger text-white hover:bg-[#ff5252]'}"
+					: 'bg-brand-danger text-white hover:bg-data-red'}"
 			>
 				Continue to Editor
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"

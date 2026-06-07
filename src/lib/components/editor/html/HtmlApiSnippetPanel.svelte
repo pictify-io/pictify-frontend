@@ -436,7 +436,7 @@
 							class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-danger opacity-75"
 						></span>
 						<span
-							class="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#ff5252]"
+							class="relative inline-flex h-1.5 w-1.5 rounded-full bg-data-red"
 						></span>
 					</span>
 					Unsaved · renders last saved
@@ -460,7 +460,7 @@
 					class="flex flex-1 items-stretch overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white"
 				>
 					<span
-						class="flex items-center bg-gray-900 px-3 font-mono text-[10px] font-black uppercase tracking-widest text-[#4ade80]"
+						class="flex items-center bg-gray-900 px-3 font-mono text-[10px] font-black uppercase tracking-widest text-data-green"
 					>
 						POST
 					</span>
@@ -570,7 +570,7 @@
 					<button
 						type="button"
 						on:click={resetAll}
-						class="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-[#ff5252]"
+						class="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-data-red"
 					>
 						<i class="fa fa-rotate-left mr-1 text-[9px]"></i>Reset
 					</button>
@@ -695,12 +695,12 @@
 												rows="3"
 												class="w-full resize-y rounded border-[1.5px] bg-gray-900 px-2 py-1.5 font-mono text-[11px] text-gray-100 focus:outline-none
 													{jsonVarErrors[def.name]
-														? 'border-[#ff5252]'
+														? 'border-data-red'
 														: 'border-gray-900'}"
 											></textarea>
 											{#if jsonVarErrors[def.name]}
 												<p
-													class="mt-1 font-mono text-[10px] text-[#ff5252]"
+													class="mt-1 font-mono text-[10px] text-data-red"
 												>
 													<i class="fa fa-triangle-exclamation"></i> {jsonVarErrors[def.name]}
 												</p>
@@ -776,7 +776,7 @@
 							<span
 								class="inline-flex items-center rounded-md border-[1.5px] border-gray-900 px-1.5 py-0.5 font-mono text-[10px] font-black
 									{statusCode < 300
-										? 'bg-[#4ade80] text-gray-900'
+										? 'bg-data-green text-gray-900'
 										: statusCode < 500
 											? 'bg-[#fbbf24] text-gray-900'
 											: 'bg-brand-danger text-white'}"
@@ -811,10 +811,10 @@
 					</div>
 				{:else if responseError && responseTab !== 'curl' && responseTab !== 'js'}
 					<div
-						class="border-l-[4px] border-[#ff5252] bg-brand-danger/10 px-4 py-3"
+						class="border-l-[4px] border-data-red bg-brand-danger/10 px-4 py-3"
 					>
 						<div class="flex items-start gap-2">
-							<i class="fa fa-triangle-exclamation mt-0.5 text-[#ff5252]"></i>
+							<i class="fa fa-triangle-exclamation mt-0.5 text-data-red"></i>
 							<div class="flex-1">
 								<p class="text-[10px] font-black uppercase tracking-widest text-gray-900">
 									Request failed
@@ -947,7 +947,7 @@
 								class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border-[1.5px] border-gray-600 bg-gray-800 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-gray-200 hover:border-gray-400 hover:text-white"
 							>
 								<i
-									class="fa {copiedKey === 'body' ? 'fa-check text-[#4ade80]' : 'fa-copy'} text-[9px]"
+									class="fa {copiedKey === 'body' ? 'fa-check text-data-green' : 'fa-copy'} text-[9px]"
 								></i>
 								{copiedKey === 'body' ? 'Copied' : 'Copy'}
 							</button>
@@ -967,7 +967,7 @@
 							class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border-[1.5px] border-gray-600 bg-gray-800 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-gray-200 hover:border-gray-400 hover:text-white"
 						>
 							<i
-								class="fa {copiedKey === 'curl' ? 'fa-check text-[#4ade80]' : 'fa-copy'} text-[9px]"
+								class="fa {copiedKey === 'curl' ? 'fa-check text-data-green' : 'fa-copy'} text-[9px]"
 							></i>
 							{copiedKey === 'curl' ? 'Copied' : 'Copy'}
 						</button>
@@ -982,7 +982,7 @@
 							class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border-[1.5px] border-gray-600 bg-gray-800 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-gray-200 hover:border-gray-400 hover:text-white"
 						>
 							<i
-								class="fa {copiedKey === 'js' ? 'fa-check text-[#4ade80]' : 'fa-copy'} text-[9px]"
+								class="fa {copiedKey === 'js' ? 'fa-check text-data-green' : 'fa-copy'} text-[9px]"
 							></i>
 							{copiedKey === 'js' ? 'Copied' : 'Copy'}
 						</button>

@@ -592,7 +592,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
 					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 				</div>
 				<span class="font-mono text-xs font-bold text-gray-500 uppercase tracking-widest">
 					{inputMode === 'csv' ? 'CSV Data' : 'HTML Table'}
@@ -611,10 +611,10 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
 					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 				</div>
 				<div class="flex items-center gap-2">
-					<span class="px-2 py-0.5 bg-[#4ade80]/20 border border-[#4ade80] rounded text-[10px] font-bold text-gray-700 uppercase tracking-wider">Live Preview</span>
+					<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-[10px] font-bold text-gray-700 uppercase tracking-wider">Live Preview</span>
 					<span class="font-mono text-xs font-bold text-gray-500">{previewWidth}x{previewHeight}</span>
 				</div>
 			</div>
@@ -648,7 +648,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 				type="button"
 				on:click={handleGenerate}
 				disabled={isGenerating}
-				class="px-10 py-5 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-10 py-5 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{#if isGenerating}
 					<svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
@@ -675,8 +675,8 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	{#if generatedImageUrl}
 		<div class="mt-12">
 			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-2xl text-center relative overflow-hidden">
-				<div class="absolute top-0 right-0 w-40 h-40 bg-[#4ade80]/10 rounded-full -mr-10 -mt-10" />
-				<span class="inline-block px-4 py-1.5 bg-[#4ade80] text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6">Success</span>
+				<div class="absolute top-0 right-0 w-40 h-40 bg-data-green/10 rounded-full -mr-10 -mt-10" />
+				<span class="inline-block px-4 py-1.5 bg-data-green text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6">Success</span>
 				<h3 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight mb-8">Your image is ready</h3>
 				<div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-10">
 					<img loading="lazy" src={generatedImageUrl} alt="Generated table" class="max-w-full h-auto max-h-[500px]" />
@@ -988,7 +988,7 @@ Bob,Designer,Active"""</span>
 	{#if showFirstGenerationPrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
 			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
-				<div class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
+				<div class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-black uppercase tracking-wider">Great First Image!</h3>
 					<button class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors" on:click={() => (showFirstGenerationPrompt = false)}>
 						<span class="font-black">x</span>
@@ -997,9 +997,9 @@ Bob,Designer,Active"""</span>
 				<div class="p-6">
 					<p class="text-black font-bold mb-4">Create a free account to unlock:</p>
 					<ul class="space-y-2 mb-6">
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">Unlimited image generations</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">No watermarks</span></li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-data-green">✓</span><span class="font-bold text-black text-sm">Unlimited image generations</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-data-green">✓</span><span class="font-bold text-black text-sm">No watermarks</span></li>
+						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-data-green">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
 					</ul>
 					<div class="space-y-3">
 						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Create Free Account</a>

@@ -38,7 +38,7 @@
 			class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]"
 		/>
 		<div
-			class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-brand-danger/5 via-[#4ade80]/5 to-brand-accent/5 rounded-full blur-3xl"
+			class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-brand-danger/5 via-data-green/5 to-brand-accent/5 rounded-full blur-3xl"
 		/>
 	</div>
 
@@ -70,7 +70,7 @@
 					<!-- Sliding Brick -->
 					<div
 						class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] border-[3px] border-gray-900 rounded-lg shadow-sm transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10 flex items-center justify-center font-black uppercase text-sm tracking-widest pointer-events-none {isPictify
-							? 'bg-[#4ade80] shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'
+							? 'bg-data-green shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'
 							: 'bg-brand-danger shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]'}"
 						style="transform: translateX({isPictify ? '100%' : '0%'})"
 					>
@@ -151,7 +151,7 @@
 						Cold Starts
 					</div>
 					<div
-						class="w-3 h-3 rounded-full animate-pulse {isPictify ? 'bg-[#4ade80]' : 'bg-red-500'}"
+						class="w-3 h-3 rounded-full animate-pulse {isPictify ? 'bg-data-green' : 'bg-red-500'}"
 					/>
 				</div>
 				<div
@@ -168,7 +168,7 @@
 				>
 					<div
 						class="h-full transition-all duration-300 {isPictify
-							? 'bg-[#4ade80] w-[15%]'
+							? 'bg-data-green w-[15%]'
 							: 'bg-red-500 w-[95%]'}"
 					/>
 				</div>
@@ -267,7 +267,7 @@
 					</div>
 					<div
 						class="text-xs font-bold px-2 py-0.5 rounded border {isPictify
-							? 'bg-[#4ade80]/20 text-[#166534] border-[#166534]'
+							? 'bg-data-green/20 text-[#166534] border-[#166534]'
 							: 'bg-red-900/20 text-red-500 border-red-500'}"
 					>
 						{isPictify ? 'ZERO' : 'HIGH'}

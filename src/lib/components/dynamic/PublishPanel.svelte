@@ -188,7 +188,7 @@
 					{isEditing ? 'Cancel' : 'Back'}
 				</button>
 				<button
-					class="px-5 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-2 group"
+					class="px-5 py-2.5 bg-data-blue hover:bg-[#2563eb] text-white font-black text-xs uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-2 group"
 					on:click={handlePublish}
 					disabled={isEditing ? isUpdating : isPublishing}
 				>

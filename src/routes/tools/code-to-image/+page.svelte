@@ -1020,7 +1020,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 bg-brand-danger border border-black" />
 						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
+						<div class="w-3 h-3 bg-data-green border border-black" />
 					</div>
 				</div>
 				<div
@@ -1427,14 +1427,14 @@
 							<div class="flex gap-1.5 sm:gap-2 mr-2 sm:mr-4">
 								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-danger border border-black" />
 								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-accent border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#4ade80] border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-data-green border border-black" />
 							</div>
 							<span class="font-mono text-[10px] sm:text-xs tracking-widest uppercase"
 								>~ code_editor</span
 							>
 						</div>
 						<button
-							class="px-2 sm:px-3 py-1 bg-brand-danger hover:bg-[#ff5252] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="px-2 sm:px-3 py-1 bg-brand-danger hover:bg-data-red text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							on:click={() => {
 								code = sampleCode[language] || '';
 								isUsingSample = true;
@@ -1501,7 +1501,7 @@
 					<button
 						on:click={generateImage}
 						disabled={isGenerating}
-						class="bg-brand-danger hover:bg-[#ff5252] text-white px-4 sm:px-8 py-2.5 sm:py-3 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
+						class="bg-brand-danger hover:bg-data-red text-white px-4 sm:px-8 py-2.5 sm:py-3 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
 					>
 						{#if isGenerating}
 							<svg
@@ -1596,7 +1596,7 @@
 					<!-- Action bar below preview (only when image is generated) -->
 					{#if generatedImage}
 						<div
-							class="bg-[#4ade80] border-t-[3px] border-black px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
+							class="bg-data-green border-t-[3px] border-black px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
 						>
 							<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black"
 								>✓ Image generated</span
@@ -1843,7 +1843,7 @@
 					<div
 						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#4ade80] p-2 border-[2px] border-black text-black flex-shrink-0">
+						<div class="bg-data-green p-2 border-[2px] border-black text-black flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1861,7 +1861,7 @@
 					<div
 						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#60a5fa] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-data-sky p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1879,7 +1879,7 @@
 					<div
 						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#a78bfa] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-data-violet p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1897,7 +1897,7 @@
 					<div
 						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					>
-						<div class="bg-[#f472b6] p-2 border-[2px] border-black text-white flex-shrink-0">
+						<div class="bg-data-pink p-2 border-[2px] border-black text-white flex-shrink-0">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
@@ -1960,7 +1960,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -2133,7 +2133,7 @@
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-data-green border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-black"
@@ -2160,7 +2160,7 @@
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#60a5fa] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-data-sky border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -2186,7 +2186,7 @@
 					>
 						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
 							<span
-								class="w-8 h-8 bg-[#a78bfa] border-[2px] border-black flex items-center justify-center flex-shrink-0"
+								class="w-8 h-8 bg-data-violet border-[2px] border-black flex items-center justify-center flex-shrink-0"
 							>
 								<svg
 									class="w-4 h-4 text-white"
@@ -2359,7 +2359,7 @@
 					<div class="space-y-4">
 						<h4 class="font-black text-lg text-black flex items-center gap-2">
 							<span
-								class="w-8 h-8 bg-[#4ade80] text-black border-[2px] border-black flex items-center justify-center text-sm shadow-brutal-sm"
+								class="w-8 h-8 bg-data-green text-black border-[2px] border-black flex items-center justify-center text-sm shadow-brutal-sm"
 								>🎨</span
 							>
 							Visual Design
@@ -2369,7 +2369,7 @@
 								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2388,7 +2388,7 @@
 								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2408,7 +2408,7 @@
 								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2428,7 +2428,7 @@
 								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
-									class="w-5 h-5 text-[#4ade80] flex-shrink-0"
+									class="w-5 h-5 text-data-green flex-shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -2486,7 +2486,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -2785,7 +2785,7 @@
 				>
 					<!-- Modal Header -->
 					<div
-						class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+						class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
 					>
 						<h3 class="text-lg font-black text-black uppercase tracking-wider">
 							🎉 Great First Image!
@@ -2803,15 +2803,15 @@
 
 						<ul class="space-y-2 mb-6">
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#4ade80]">✓</span>
+								<span class="font-black text-data-green">✓</span>
 								<span class="font-bold text-black text-sm">Unlimited image generations</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#4ade80]">✓</span>
+								<span class="font-black text-data-green">✓</span>
 								<span class="font-bold text-black text-sm">No watermarks</span>
 							</li>
 							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-[#4ade80]">✓</span>
+								<span class="font-black text-data-green">✓</span>
 								<span class="font-bold text-black text-sm">API Access</span>
 							</li>
 						</ul>

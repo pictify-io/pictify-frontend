@@ -108,28 +108,28 @@
 						<li>
 							<a
 								href="/integrations"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors"
 								>Integrations</a
 							>
 						</li>
 						<li>
 							<a
 								href="/alternatives"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors"
 								>Alternatives</a
 							>
 						</li>
 						<li>
 							<a
 								href="/compare"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors"
 								>Comparisons</a
 							>
 						</li>
 						<li>
 							<a
 								href="/glossary"
-								class="text-gray-600 font-bold hover:text-[#4ade80] transition-colors">Glossary</a
+								class="text-gray-600 font-bold hover:text-data-green transition-colors">Glossary</a
 							>
 						</li>
 					</ul>

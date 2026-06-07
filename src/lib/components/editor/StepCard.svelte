@@ -224,7 +224,7 @@
 		<div class="flex gap-2 mt-3 pt-3 border-t-2 border-gray-900">
 			<button
 				on:click={() => onApprove(stepIndex)}
-				class="flex-1 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-0.5 transition-all"
+				class="flex-1 bg-data-green hover:bg-[#22c55e] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-0.5 transition-all"
 			>
 				✓ Approve
 			</button>

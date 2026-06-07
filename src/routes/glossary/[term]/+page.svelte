@@ -161,7 +161,7 @@
 
 			<!-- CTA Section -->
 			<section
-				class="mb-12 bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center"
+				class="mb-12 bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center"
 			>
 				<h2 class="text-2xl font-black text-gray-900 mb-3">Put it into practice</h2>
 				<p class="text-gray-600 font-bold mb-6">
@@ -169,7 +169,7 @@
 				</p>
 				<a
 					href="/tools/og-image-generator"
-					class="inline-block px-6 py-3 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="inline-block px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 				>
 					Try OG Image Generator
 				</a>

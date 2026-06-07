@@ -226,7 +226,7 @@
 						class="h-full border-r-[3px] border-gray-900 transition-all duration-500 {seatUsage >=
 						seatLimit
 							? 'bg-brand-danger'
-							: 'bg-[#4ade80]'}"
+							: 'bg-data-green'}"
 						style="width: {Math.max(Math.min((seatUsage / seatLimit) * 100, 100), 2)}%"
 					/>
 				</div>
@@ -348,7 +348,7 @@
 									<div class="flex items-center gap-2">
 										<button
 											on:click={() => copyInviteLink(invitation)}
-											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#4ade80] hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-data-green hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
 											title="Copy invite link"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,7 +364,7 @@
 										<button
 											on:click={() => handleResendInvitation(invitation)}
 											disabled={resendingInvitationId === invitation.uid}
-											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#3b82f6] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-data-blue hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
 											title="Resend invitation email"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -430,14 +430,14 @@
 											type="email"
 											bind:value={inviteEmail}
 											placeholder="colleague@company.com"
-											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#4ade80] focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors"
+											class="w-full px-4 py-3 bg-gray-800 border-[3px] border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-data-green focus:outline-none focus:shadow-[3px_3px_0_0_#4ade80] transition-colors"
 											on:keydown={(e) => e.key === 'Enter' && handleInvite()}
 										/>
 									</div>
 									<button
 										on:click={handleInvite}
 										disabled={inviting || !inviteEmail.trim()}
-										class="w-full px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-900 bg-[#4ade80] rounded-xl border-[3px] border-[#4ade80] hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-1 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+										class="w-full px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-900 bg-data-green rounded-xl border-[3px] border-data-green hover:bg-[#22c55e] hover:border-[#22c55e] hover:-translate-y-1 transition-all shadow-[4px_4px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
 									>
 										{inviting ? 'Sending...' : 'Send Invite'}
 									</button>

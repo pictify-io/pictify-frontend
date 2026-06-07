@@ -109,7 +109,7 @@
 	};
 
 	const statusConfig = {
-		success: { color: 'bg-[#4ade80]/20 text-[#15803d] border-[#15803d]', dot: 'bg-[#15803d]' },
+		success: { color: 'bg-data-green/20 text-[#15803d] border-[#15803d]', dot: 'bg-[#15803d]' },
 		failure: { color: 'bg-brand-danger/20 text-[#b91c1c] border-[#b91c1c]', dot: 'bg-[#b91c1c]' },
 		pending: { color: 'bg-brand-accent/20 text-[#b45309] border-[#b45309]', dot: 'bg-[#b45309]' }
 	};
@@ -231,7 +231,7 @@
 						<span class="text-xs font-black text-gray-500 uppercase tracking-widest"
 							>Success Rate</span
 						>
-						<div class="w-2 h-2 bg-[#4ade80] rounded-full" />
+						<div class="w-2 h-2 bg-data-green rounded-full" />
 					</div>
 					<div class="text-3xl font-black text-gray-900">
 						{Math.round(((summary.byStatus?.success || 0) / summary.totalLogs) * 100)}%
@@ -240,7 +240,7 @@
 						class="w-full bg-gray-200 h-2 mt-2 rounded-full overflow-hidden border border-gray-900"
 					>
 						<div
-							class="h-full bg-[#4ade80]"
+							class="h-full bg-data-green"
 							style="width: {Math.round(
 								((summary.byStatus?.success || 0) / summary.totalLogs) * 100
 							)}%"
@@ -743,7 +743,7 @@
 				{#if selectedLog.metadata && Object.keys(selectedLog.metadata).length > 0}
 					<div class="bg-gray-900 rounded-xl border-[2px] border-gray-900 p-4 overflow-hidden">
 						<div class="flex items-center justify-between mb-2">
-							<h4 class="text-xs font-black text-[#4ade80] uppercase tracking-widest">
+							<h4 class="text-xs font-black text-data-green uppercase tracking-widest">
 								Metadata Payload
 							</h4>
 							<span class="text-[10px] text-gray-500 font-mono">JSON</span>

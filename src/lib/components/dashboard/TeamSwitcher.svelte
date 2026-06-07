@@ -149,7 +149,7 @@
 		const percentage = usage.limit > 0 ? (usage.count / usage.limit) * 100 : 0;
 		if (percentage >= 90) return 'bg-brand-danger';
 		if (percentage >= 75) return 'bg-brand-accent';
-		return 'bg-[#4ade80]';
+		return 'bg-data-green';
 	}
 
 	function getUsagePercentage(usage) {
@@ -289,7 +289,7 @@
 						</div>
 						{#if teamItem.team?.uid === $currentTeam?.uid}
 							<div
-								class="w-2 h-2 rounded-full bg-[#4ade80] border border-gray-900 shadow-[1px_1px_0_0_#1f2937]"
+								class="w-2 h-2 rounded-full bg-data-green border border-gray-900 shadow-[1px_1px_0_0_#1f2937]"
 							/>
 						{/if}
 					</button>
@@ -356,7 +356,7 @@
 								on:click={() => {
 									isOpen = false;
 								}}
-								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-brand-danger rounded-lg border-2 border-gray-900 hover:bg-[#ff5252] shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
+								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-brand-danger rounded-lg border-2 border-gray-900 hover:bg-data-red shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
 							>
 								Upgrade
 							</a>

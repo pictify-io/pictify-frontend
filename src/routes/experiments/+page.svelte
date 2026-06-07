@@ -34,14 +34,14 @@
 			title: 'Scheduled Variants',
 			description: 'Swap image variants on a schedule. Run a morning banner until noon, then switch to an afternoon offer automatically.',
 			iconPath: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-			color: 'bg-[#a78bfa]',
+			color: 'bg-data-violet',
 			tag: 'AUTOMATION'
 		},
 		{
 			title: 'Auto-Optimize',
 			description: 'Thompson Sampling algorithm automatically shifts traffic to the winning variant. No manual intervention needed.',
 			iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
-			color: 'bg-[#4ade80]',
+			color: 'bg-data-green',
 			tag: 'AI-POWERED'
 		}
 	];
@@ -194,7 +194,7 @@
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Badge -->
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-data-green border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<svg
 					class="w-4 h-4 text-gray-900"
@@ -342,7 +342,7 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0"></div>
 
 				{#each howItWorks as step, i}
-					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#4ade80]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet', 'bg-data-green']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -390,7 +390,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
 				{#each useCases as uc, i}
-					{@const colors = ['bg-brand-accent', 'bg-brand-danger', 'bg-[#a78bfa]', 'bg-[#4ade80]', 'bg-[#7dd3fc]', 'bg-[#f43f5e]']}
+					{@const colors = ['bg-brand-accent', 'bg-brand-danger', 'bg-data-violet', 'bg-data-green', 'bg-[#7dd3fc]', 'bg-[#f43f5e]']}
 					{@const rotations = ['rotate-1', '-rotate-1', 'rotate-2', '-rotate-2', 'rotate-1', '-rotate-1']}
 					<div
 						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
@@ -416,7 +416,7 @@
 									<div class="bg-gray-100 border-b-[2px] border-gray-900 px-2 py-1 flex items-center gap-1.5">
 										<div class="w-1.5 h-1.5 rounded-full bg-brand-danger border border-gray-900"></div>
 										<div class="w-1.5 h-1.5 rounded-full bg-brand-accent border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-data-green border border-gray-900"></div>
 									</div>
 									<div class="h-16 bg-brand-accent border-b-[2px] border-gray-900 flex items-center justify-center overflow-hidden relative">
 										<!-- AB Test Split Visual inside Email -->
@@ -424,7 +424,7 @@
 											<div class="w-1/2 h-full bg-brand-accent flex items-center justify-center border-r-[2px] border-gray-900">
 												<span class="font-black text-xs">V1</span>
 											</div>
-											<div class="w-1/2 h-full bg-[#a78bfa] flex items-center justify-center">
+											<div class="w-1/2 h-full bg-data-violet flex items-center justify-center">
 												<span class="font-black text-xs text-white">V2</span>
 											</div>
 										</div>
@@ -470,7 +470,7 @@
 							{:else if i === 3}
 								<!-- Geo-Targeted Promotions -->
 								<div class="w-full max-w-[200px] h-24 bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
-									<div class="w-1/2 h-full bg-[#4ade80]/20 flex flex-col justify-center items-center border-r-[3px] border-gray-900 border-dashed relative">
+									<div class="w-1/2 h-full bg-data-green/20 flex flex-col justify-center items-center border-r-[3px] border-gray-900 border-dashed relative">
 										<span class="text-xl mb-1">🇺🇸</span>
 										<div class="bg-black text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-gray-900">$129</div>
 										<!-- Routing arrow -->
@@ -513,21 +513,21 @@
 										<div class="w-8 h-2 bg-gray-300 rounded-full ml-auto"></div>
 									</div>
 									<div class="p-3 grid grid-cols-2 gap-2">
-										<div class="col-span-2 bg-[#a78bfa]/20 border-[2px] border-[#a78bfa] rounded p-2 flex items-center justify-between">
+										<div class="col-span-2 bg-data-violet/20 border-[2px] border-data-violet rounded p-2 flex items-center justify-between">
 											<div class="w-1/2 space-y-1">
-												<div class="w-8 h-1 bg-[#a78bfa] rounded"></div>
+												<div class="w-8 h-1 bg-data-violet rounded"></div>
 												<div class="w-12 h-2.5 bg-gray-900 rounded"></div>
 											</div>
-											<div class="w-6 h-6 rounded-full border-2 border-[#a78bfa] flex items-center justify-center">
-												<div class="w-2 h-2 bg-[#a78bfa] rounded-full"></div>
+											<div class="w-6 h-6 rounded-full border-2 border-data-violet flex items-center justify-center">
+												<div class="w-2 h-2 bg-data-violet rounded-full"></div>
 											</div>
 										</div>
-										<div class="bg-[#4ade80]/20 border-[2px] border-[#4ade80] rounded p-1.5">
+										<div class="bg-data-green/20 border-[2px] border-data-green rounded p-1.5">
 											<div class="w-full h-8 flex items-end gap-[1px]">
-												<div class="w-1/5 h-[30%] bg-[#4ade80]"></div>
-												<div class="w-1/5 h-[50%] bg-[#4ade80]"></div>
-												<div class="w-1/5 h-[40%] bg-[#4ade80]"></div>
-												<div class="w-1/5 h-[80%] bg-[#4ade80]"></div>
+												<div class="w-1/5 h-[30%] bg-data-green"></div>
+												<div class="w-1/5 h-[50%] bg-data-green"></div>
+												<div class="w-1/5 h-[40%] bg-data-green"></div>
+												<div class="w-1/5 h-[80%] bg-data-green"></div>
 												<div class="w-1/5 h-[100%] bg-gray-900"></div>
 											</div>
 										</div>
@@ -577,7 +577,7 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each analyticsFeatures as feature, i}
-					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-brand-danger', 'bg-[#4ade80]', 'bg-white']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet', 'bg-brand-danger', 'bg-data-green', 'bg-white']}
 					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] rounded-2xl transition-all group">
 						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -594,7 +594,7 @@
 	<SectionSeparator icon="arrow" />
 
 	<!-- Pricing CTA -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#4ade80] border-b-[3px] border-gray-900 overflow-hidden relative">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-data-green border-b-[3px] border-gray-900 overflow-hidden relative">
 		<!-- Dynamic Background Pattern -->
 		<div
 			class="absolute inset-0 opacity-[0.15] pointer-events-none"
@@ -615,7 +615,7 @@
 
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 					Start Experimenting <br class="hidden sm:block" />
-					<span class="text-[#4ade80] drop-shadow-[2px_2px_0_#1f2937] relative inline-block">
+					<span class="text-data-green drop-shadow-[2px_2px_0_#1f2937] relative inline-block">
 						Today
 						<svg class="absolute w-full h-4 -bottom-2 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 							<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -666,7 +666,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">

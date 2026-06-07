@@ -14,9 +14,9 @@
 				label: 'Serverless Scale',
 				desc: 'Auto-scaling API. No ops. 99.9% Uptime.',
 				icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-				color: 'text-[#4ade80]',
-				bg: 'bg-[#4ade80]/10',
-				border: 'border-[#4ade80]'
+				color: 'text-data-green',
+				bg: 'bg-data-green/10',
+				border: 'border-data-green'
 			}
 		},
 		{
@@ -62,7 +62,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50"
 	/>
 	<div class="absolute top-1/3 right-0 w-96 h-96 bg-brand-danger/5 rounded-full blur-3xl -z-10" />
-	<div class="absolute bottom-0 left-0 w-96 h-96 bg-[#4ade80]/5 rounded-full blur-3xl -z-10" />
+	<div class="absolute bottom-0 left-0 w-96 h-96 bg-data-green/5 rounded-full blur-3xl -z-10" />
 
 	<div class="max-w-6xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-20">

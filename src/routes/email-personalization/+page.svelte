@@ -37,7 +37,7 @@
 			title: 'Personalized Greetings',
 			description: '"Hey {{name}}, check out deals in {{city}}" — each recipient sees their own name and city.',
 			iconPath: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-			color: 'bg-[#4ade80]'
+			color: 'bg-data-green'
 		},
 		{
 			title: 'Countdown Timers',
@@ -55,7 +55,7 @@
 			title: 'Weather-Based',
 			description: 'Show weather-appropriate products or messaging based on the recipient\'s location.',
 			iconPath: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z',
-			color: 'bg-[#a78bfa]'
+			color: 'bg-data-violet'
 		}
 	];
 
@@ -176,7 +176,7 @@
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#4ade80] border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-data-green border-[3px] border-gray-900 rounded-full shadow-brutal-lg transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default"
 			>
 				<svg class="w-5 h-5 text-gray-900 drop-shadow-[1px_1px_0_rgba(255,255,255,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -186,7 +186,7 @@
 
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Personalized Images<br />
-				<span class="relative inline-block text-[#a78bfa] mt-2">
+				<span class="relative inline-block text-data-violet mt-2">
 					In Every Email
 					<svg class="absolute w-full h-4 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -252,7 +252,7 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0 border-l-[3px] border-dashed border-gray-900"></div>
 
 				{#each steps as step, i}
-					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -282,7 +282,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Features</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -295,7 +295,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
 				{#each useCases as useCase, i}
-					{@const colors = ['bg-[#4ade80]', 'bg-brand-danger', 'bg-brand-accent', 'bg-[#7dd3fc]']}
+					{@const colors = ['bg-data-green', 'bg-brand-danger', 'bg-brand-accent', 'bg-[#7dd3fc]']}
 					{@const rotations = ['rotate-1', '-rotate-1', '-rotate-1', 'rotate-1']}
 					<div
 						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
@@ -319,7 +319,7 @@
 								<!-- Personalized Greeting Visual -->
 								<div class="w-full max-w-[280px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden p-6 text-center">
 									<p class="font-black text-2xl text-gray-900 leading-tight">
-										Hey <span class="text-[#4ade80] inline-block px-1 border-b-[3px] border-gray-900 drop-shadow-[1px_1px_0_#fff] relative group-hover:scale-110 transition-transform">Alex</span>,<br />
+										Hey <span class="text-data-green inline-block px-1 border-b-[3px] border-gray-900 drop-shadow-[1px_1px_0_#fff] relative group-hover:scale-110 transition-transform">Alex</span>,<br />
 										Check out deals in <span class="bg-brand-accent px-2 py-0.5 rounded border-2 border-gray-900 shadow-sm inline-block transform rotate-2 relative group-hover:-rotate-2 transition-transform">Seattle</span>
 									</p>
 								</div>
@@ -378,7 +378,7 @@
 	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-brand-accent/10 border-y-[3px] border-gray-900 relative overflow-hidden">
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Integrations</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -424,7 +424,7 @@
 						<!-- Merge Tags Table -->
 						<div class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#e5e7eb] transform -rotate-1">
 							<h4 class="font-black text-xl text-gray-900 mb-4 flex items-center gap-2">
-								<svg class="w-5 h-5 text-[#a78bfa]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+								<svg class="w-5 h-5 text-data-violet" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
 								Merge Tags
 							</h4>
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -442,11 +442,11 @@
 						<!-- Example URL -->
 						<div class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#e5e7eb] transform rotate-1">
 							<h4 class="font-black text-xl text-gray-900 mb-4 flex items-center gap-2">
-								<svg class="w-5 h-5 text-[#4ade80]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+								<svg class="w-5 h-5 text-data-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
 								Example Image URL
 							</h4>
 							<div class="bg-gray-900 p-5 rounded-lg border-2 border-gray-900 shadow-[inset_2px_2px_0_rgba(0,0,0,0.5)] overflow-x-auto">
-								<code class="text-sm font-mono text-[#4ade80] font-bold whitespace-pre-wrap break-all leading-relaxed">{currentEsp.example}</code>
+								<code class="text-sm font-mono text-data-green font-bold whitespace-pre-wrap break-all leading-relaxed">{currentEsp.example}</code>
 							</div>
 						</div>
 
@@ -536,7 +536,7 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
 				<!-- Box 1 -->
-				<div class="p-8 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform rotate-1">
+				<div class="p-8 bg-data-green border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform rotate-1">
 					<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-900 shadow-sm">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
 					</div>
@@ -558,7 +558,7 @@
 				</div>
 
 				<!-- Box 3 -->
-				<div class="p-8 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform rotate-1">
+				<div class="p-8 bg-data-violet border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform rotate-1">
 					<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-900 shadow-sm">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 					</div>
@@ -585,7 +585,7 @@
 	<SectionSeparator icon="star" />
 
 	<!-- Pricing CTA -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#a78bfa] border-b-[3px] border-gray-900 overflow-hidden relative">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-data-violet border-b-[3px] border-gray-900 overflow-hidden relative">
 		<!-- Dynamic Background Pattern -->
 		<div
 			class="absolute inset-0 opacity-[0.15] pointer-events-none"
@@ -600,13 +600,13 @@
 			<!-- Neo-Brutalist Container -->
 			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
-				<div class="inline-block px-4 py-1.5 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-green text-gray-900 border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Start Now</span>
 				</div>
 
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 					Start Personalizing <br class="hidden sm:block" />
-					<span class="text-[#a78bfa] drop-shadow-[2px_2px_0_#1f2937] relative inline-block">
+					<span class="text-data-violet drop-shadow-[2px_2px_0_#1f2937] relative inline-block">
 						Email Images
 						<svg class="absolute w-full h-4 -bottom-2 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 							<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -674,7 +674,7 @@
 						>
 							<span>{faq.q}</span>
 							<div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center bg-white flex-shrink-0 ml-4 {openFaq === i ? 'shadow-[inset_2px_2px_0_0_#a78bfa]' : ''}">
-								<svg class="w-5 h-5 transition-transform {openFaq === i ? 'rotate-180 text-[#a78bfa]' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<svg class="w-5 h-5 transition-transform {openFaq === i ? 'rotate-180 text-data-violet' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
 								</svg>
 							</div>

@@ -260,7 +260,7 @@
 			<div class="flex gap-2">
 				<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
 				<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
-				<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white" />
+				<div class="w-3 h-3 rounded-full bg-data-green border border-white" />
 			</div>
 			<div class="font-mono font-bold tracking-widest text-xs uppercase">BARCODE_GENERATOR</div>
 			<div class="w-16" />
@@ -395,7 +395,7 @@
 			<button
 				on:click={generateImage}
 				disabled={!!barcodeError || isGenerating || !barcodeValue}
-				class="px-8 py-3 bg-[#4ade80] text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center gap-2"
+				class="px-8 py-3 bg-data-green text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center gap-2"
 			>
 				{#if isGenerating}
 					<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
@@ -418,8 +418,8 @@
 	<!-- Result -->
 	{#if imageUrl}
 		<div class="mt-12">
-			<div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden">
-				<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+			<div class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden">
+				<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 				<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">Barcode Generated!</h3>
 
 				<div class="inline-block bg-white border-[3px] border-gray-900 p-4 shadow-brutal-2xl rotate-1 mb-8">
@@ -541,7 +541,7 @@
 					<h3 class="font-black text-lg mb-2">Enter Your Data</h3>
 					<p class="text-sm font-medium text-gray-600">Type the text or numbers you want to encode. Choose a barcode format that matches your use case — Code 128 for general purpose, EAN-13 for retail products, UPC-A for US retail.</p>
 				</div>
-				<div class="border-[3px] border-black p-5 bg-[#4ade80]/10">
+				<div class="border-[3px] border-black p-5 bg-data-green/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">2</div>
 					<h3 class="font-black text-lg mb-2">Customize Appearance</h3>
 					<p class="text-sm font-medium text-gray-600">Adjust bar width, height, colors, and choose whether to display the encoded text below the bars. Enable transparent background for overlay use.</p>
@@ -559,7 +559,7 @@
 	<section class="mb-12">
 		<div class="border-[3px] border-black bg-[#0b0b1f] text-white shadow-brutal-2xl p-6 md:p-10">
 			<div class="flex items-start gap-4 mb-4">
-				<span class="px-3 py-1 bg-[#4ade80] text-black text-xs font-black uppercase tracking-wider border-[2px] border-[#4ade80] rounded">API</span>
+				<span class="px-3 py-1 bg-data-green text-black text-xs font-black uppercase tracking-wider border-[2px] border-data-green rounded">API</span>
 			</div>
 			<h2 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-3">
 				Bulk Barcode Generation
@@ -568,7 +568,7 @@
 				Need thousands of barcodes? Use the Pictify batch API to generate unique barcode images for every product, bin, or shipment in your system. Feed a CSV of SKUs and get back CDN-hosted barcode images in seconds.
 			</p>
 			<div class="flex flex-wrap gap-4">
-				<a href="/signup" class="px-6 py-3 bg-[#4ade80] text-black font-black border-[3px] border-[#4ade80] rounded-xl uppercase tracking-wide hover:bg-[#22c55e] transition-colors">
+				<a href="/signup" class="px-6 py-3 bg-data-green text-black font-black border-[3px] border-data-green rounded-xl uppercase tracking-wide hover:bg-[#22c55e] transition-colors">
 					Get API Key
 				</a>
 				<a href="https://docs.pictify.io" target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-transparent text-white font-black border-[3px] border-white rounded-xl uppercase tracking-wide hover:bg-white/10 transition-colors">

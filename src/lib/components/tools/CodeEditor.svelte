@@ -230,8 +230,8 @@
 			<!-- Preview Header -->
 			<div class="flex bg-[#1a1a2e] px-4 py-3 justify-between items-center">
 				<div class="flex items-center gap-3">
-					<span class="text-[#4ade80] text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-						<span class="w-2 h-2 rounded-full bg-[#4ade80] inline-block"></span>
+					<span class="text-data-green text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+						<span class="w-2 h-2 rounded-full bg-data-green inline-block"></span>
 						Live Preview
 					</span>
 					{#if isGifEnabled}

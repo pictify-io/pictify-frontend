@@ -810,7 +810,7 @@
 					{isEditMode ? 'Edit Smart Link' : 'Create Smart Link'}
 				</h1>
 				<span
-					class="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm bg-[#3b82f6]/20"
+					class="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm bg-data-blue/20"
 				>
 					Smart Link
 				</span>
@@ -1094,7 +1094,7 @@
 				<!-- ===== FALLBACK VARIANT (pinned at top) ===== -->
 				{#if fallbackVariant}
 					<div
-						class="border-[3px] border-[#4ade80] rounded-xl overflow-hidden shadow-[6px_6px_0_0_#4ade80] transition-all relative"
+						class="border-[3px] border-data-green rounded-xl overflow-hidden shadow-[6px_6px_0_0_#4ade80] transition-all relative"
 					>
 						<div
 							class="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none"
@@ -1102,11 +1102,11 @@
 
 						<!-- Header -->
 						<div
-							class="px-6 py-4 border-b-[3px] border-[#4ade80] bg-[#4ade80]/20 flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10"
+							class="px-6 py-4 border-b-[3px] border-data-green bg-data-green/20 flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10"
 						>
 							<div class="flex items-center gap-4">
 								<div
-									class="w-9 h-9 bg-[#4ade80] border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-brutal-sm"
+									class="w-9 h-9 bg-data-green border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center shrink-0 shadow-brutal-sm"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1127,13 +1127,13 @@
 									placeholder="Fallback Name"
 								/>
 								<span
-									class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
+									class="px-3 py-1 bg-data-green border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 								>
 									Fallback
 								</span>
 							</div>
 							<span
-								class="text-[10px] font-black uppercase tracking-widest text-green-800 bg-[#4ade80]/30 px-3 py-1.5 rounded-lg border-[2px] border-green-300"
+								class="text-[10px] font-black uppercase tracking-widest text-green-800 bg-data-green/30 px-3 py-1.5 rounded-lg border-[2px] border-green-300"
 							>
 								Always shown if no rules match
 							</span>
@@ -1361,7 +1361,7 @@
 						>
 							<div class="flex items-center gap-4">
 								<div
-									class="w-9 h-9 bg-[#3b82f6] border-[2px] border-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-brutal-sm"
+									class="w-9 h-9 bg-data-blue border-[2px] border-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-brutal-sm"
 								>
 									#{ruleNum + 1}
 								</div>
@@ -1741,10 +1741,10 @@
 				<button
 					type="button"
 					on:click={addRuleVariant}
-					class="w-full py-4 border-[3px] border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-500 hover:border-[#3b82f6] hover:text-[#3b82f6] hover:bg-blue-50 hover:shadow-[3px_3px_0_0_#3b82f6] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
+					class="w-full py-4 border-[3px] border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-500 hover:border-data-blue hover:text-data-blue hover:bg-blue-50 hover:shadow-[3px_3px_0_0_#3b82f6] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
 				>
 					<div
-						class="w-8 h-8 rounded-full bg-gray-200 group-hover:bg-[#3b82f6] group-hover:text-white flex items-center justify-center transition-colors"
+						class="w-8 h-8 rounded-full bg-gray-200 group-hover:bg-data-blue group-hover:text-white flex items-center justify-center transition-colors"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -1808,7 +1808,7 @@
 							disabled={!effectiveCanSubmit}
 							class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all
 								{effectiveCanSubmit
-								? 'bg-[#4ade80] text-gray-900 border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-data-green text-gray-900 border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-200 text-gray-400 border-[2px] border-gray-300 cursor-not-allowed hidden'}"
 						>
 							{#if isSubmitting}

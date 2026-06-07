@@ -365,12 +365,12 @@
 						<div class="flex items-center gap-2">
 							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
 							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
 						</div>
 						<div
 							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
 						>
-							<span class="px-2 py-0.5 bg-[#4ade80]/20 border border-[#4ade80] rounded text-gray-700">Interactive Editor</span>
+							<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700">Interactive Editor</span>
 							{templateWidth} x {templateHeight}px
 						</div>
 					</div>
@@ -404,7 +404,7 @@
 								<button
 									type="button"
 									on:click={openInCanvasEditor}
-									class="flex-1 py-4 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
+									class="flex-1 py-4 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -460,9 +460,9 @@
 			{#if generatedImageUrl}
 				<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 					<div
-						class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden"
+						class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 					>
-						<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
+						<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
 
 						<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
 							Success! Here is your image
@@ -611,7 +611,7 @@
 						{#if config.useCaseScenarios && config.useCaseScenarios.length}
 							<div class={config.longDescription ? 'lg:col-span-5' : 'lg:col-span-12'}>
 								<div
-									class="bg-[#4ade80] border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-3xl h-full relative overflow-hidden"
+									class="bg-data-green border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-3xl h-full relative overflow-hidden"
 								>
 									<!-- Decorative Circle -->
 									<div
@@ -694,7 +694,7 @@
 			<section class="py-20">
 				<div class="text-center mb-16 px-4">
 					<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-						Step-by-step <span class="text-[#4ade80]">workflow</span>
+						Step-by-step <span class="text-data-green">workflow</span>
 					</h2>
 				</div>
 
@@ -707,7 +707,7 @@
 								<div
 									class="bg-gray-900 text-white px-8 py-6 flex items-center justify-center border-b-[3px] md:border-b-0 md:border-r-[3px] border-gray-900 min-w-[100px]"
 								>
-									<span class="font-black text-4xl text-[#4ade80]">{i + 1}</span>
+									<span class="font-black text-4xl text-data-green">{i + 1}</span>
 								</div>
 								<div class="p-8 flex-1 group-hover:bg-gray-50 transition-colors">
 									<h3 class="font-black text-2xl text-gray-900 uppercase tracking-wide mb-3">
@@ -863,7 +863,7 @@
 						{#each config.related as relatedId}
 							<a
 								href={`/tools/${relatedId}`}
-								class="px-6 py-3 bg-brand-bg border-[3px] border-gray-900 font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all rounded-xl"
+								class="px-6 py-3 bg-brand-bg border-[3px] border-gray-900 font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-data-green transition-all rounded-xl"
 							>
 								{useCaseDetails[relatedId]?.label || relatedId}
 							</a>

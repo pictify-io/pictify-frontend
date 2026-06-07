@@ -17,17 +17,17 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#3b82f6]/10 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-data-blue/10 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-16 max-w-3xl mx-auto relative">
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template.<br />
-				<span class="relative inline-block text-[#3b82f6]">
+				<span class="relative inline-block text-data-blue">
 					Every Platform.
 					<svg
-						class="absolute w-full h-3 -bottom-1 left-0 text-[#3b82f6] opacity-30 z-[-1]"
+						class="absolute w-full h-3 -bottom-1 left-0 text-data-blue opacity-30 z-[-1]"
 						viewBox="0 0 100 10"
 						preserveAspectRatio="none"
 					>
@@ -44,7 +44,7 @@
 		<!-- Main Split Pane Showcase -->
 		<div class="max-w-5xl mx-auto group relative mt-12 block">
 			<!-- Decorative offset background -->
-			<div class="absolute inset-0 bg-[#3b82f6] rounded-2xl border-[3px] border-gray-900 transform translate-x-3 translate-y-3 z-0 pointer-events-none transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300"></div>
+			<div class="absolute inset-0 bg-data-blue rounded-2xl border-[3px] border-gray-900 transform translate-x-3 translate-y-3 z-0 pointer-events-none transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300"></div>
 			
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div 
@@ -58,7 +58,7 @@
 					<div class="flex gap-2">
 						<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-[2px] border-gray-900"></div>
-						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-[2px] border-gray-900"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-data-green border-[2px] border-gray-900"></div>
 					</div>
 					<div class="flex items-center gap-2 bg-white/60 px-3 py-1 rounded-md border-[2px] border-gray-900 shadow-brutal-sm">
 						<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
@@ -127,7 +127,7 @@
 					<!-- Right: Code Info -->
 					<div class="w-full lg:w-[45%] flex flex-col relative bg-white p-8 lg:p-10 justify-center group/rightpane">
 						<div class="mb-6">
-							<div class="inline-block px-3 py-1 bg-[#3b82f6] text-white font-black text-[10px] uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm rounded mb-4 transform -rotate-2">
+							<div class="inline-block px-3 py-1 bg-data-blue text-white font-black text-[10px] uppercase tracking-widest border-[2px] border-gray-900 shadow-brutal-sm rounded mb-4 transform -rotate-2">
 								Multi-Format Output
 							</div>
 							<h3 class="text-3xl font-black text-gray-900 mb-3 leading-tight">Generate All Sizes At Once</h3>
@@ -144,12 +144,12 @@
 							</div>
 							
 							<!-- The Code Block -->
-							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-[#4ade80] relative">
+							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-data-green relative">
 								<!-- Top Mac Dots inside code editor -->
 								<div class="flex gap-1.5 mb-3 border-b border-gray-700 pb-3">
 									<div class="w-2.5 h-2.5 rounded-full bg-brand-danger"></div>
 									<div class="w-2.5 h-2.5 rounded-full bg-brand-accent"></div>
-									<div class="w-2.5 h-2.5 rounded-full bg-[#4ade80]"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-data-green"></div>
 								</div>
 								<div class="space-y-1.5 overflow-x-auto whitespace-nowrap pb-2">
 									<div class="text-gray-500">// Request multiple sizes!</div>

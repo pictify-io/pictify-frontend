@@ -319,7 +319,7 @@
 					</div>
 					<div class="rounded-lg border-[2px] border-gray-900 bg-brand-bg p-3">
 						<div class="mb-2 flex items-center gap-2">
-							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#4ade80] text-[9px] font-black text-gray-900">2</span>
+							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-data-green text-[9px] font-black text-gray-900">2</span>
 							<span class="text-[10px] font-black uppercase tracking-widest text-gray-900">Right here</span>
 						</div>
 						<p class="text-[11px] font-semibold leading-snug text-gray-700">

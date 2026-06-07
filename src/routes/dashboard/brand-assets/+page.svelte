@@ -475,7 +475,7 @@
 					</button>
 					<button
 						on:click={openColorModal}
-						class="px-4 py-2.5 bg-[#4ade80] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+						class="px-4 py-2.5 bg-data-green text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -715,7 +715,7 @@
 											</button>
 											<button
 												on:click|stopPropagation={() => confirmDelete(asset)}
-												class="w-8 h-8 bg-brand-danger rounded-lg border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center hover:bg-[#ff5252] hover:-translate-y-0.5 transition-all"
+												class="w-8 h-8 bg-brand-danger rounded-lg border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center hover:bg-data-red hover:-translate-y-0.5 transition-all"
 												title="Delete"
 											>
 												<svg
@@ -812,13 +812,13 @@
 					<div
 						class="w-full py-10 border-[3px] border-dashed rounded-xl transition-all relative overflow-hidden
 							{selectedFile
-							? 'border-[#4ade80] bg-[#4ade80]/10'
+							? 'border-data-green bg-data-green/10'
 							: 'border-gray-300 group-hover:border-gray-900 group-hover:bg-gray-50'}"
 					>
 						<div class="text-center relative z-10">
 							{#if selectedFile}
 								<div
-									class="w-12 h-12 bg-[#4ade80] rounded-full border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-sm"
+									class="w-12 h-12 bg-data-green rounded-full border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-sm"
 								>
 									<svg
 										class="w-6 h-6 text-gray-900"
@@ -959,7 +959,7 @@
 		>
 			<div class="bg-gray-900 p-4 flex items-center justify-between">
 				<h2 class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
-					<span class="text-[#4ade80]">New</span> Color
+					<span class="text-data-green">New</span> Color
 				</h2>
 				<button on:click={closeColorModal} class="text-gray-400 hover:text-white">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1033,7 +1033,7 @@
 					<button
 						on:click={handleAddColor}
 						disabled={!colorForm.name || isUploading}
-						class="flex-[2] px-4 py-3 bg-[#4ade80] text-gray-900 rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="flex-[2] px-4 py-3 bg-data-green text-gray-900 rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 					>
 						Add Color
 					</button>

@@ -1215,12 +1215,12 @@
 									<div class="flex items-center gap-4">
 										<div
 											class="w-9 h-9 {index === 0
-												? 'bg-[#4ade80]'
+												? 'bg-data-green'
 												: index === 1
 												? 'bg-brand-accent'
 												: index === 2
-												? 'bg-[#60a5fa]'
-												: 'bg-[#f472b6]'} border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-brutal-sm"
+												? 'bg-data-sky'
+												: 'bg-data-pink'} border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-brutal-sm"
 										>
 											{String.fromCharCode(65 + index)}
 										</div>
@@ -1840,7 +1840,7 @@
 						<label class="relative inline-flex items-center cursor-pointer mt-0.5 shrink-0">
 							<input type="checkbox" bind:checked={form.autoOptimize} class="sr-only peer" />
 							<div
-								class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-[2px] border-gray-900 peer-checked:bg-[#a855f7]"
+								class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-[2px] border-gray-900 peer-checked:bg-data-purple"
 							/>
 						</label>
 						<div class="flex-1">
@@ -1849,7 +1849,7 @@
 									>Auto-Optimize</span
 								>
 								<span
-									class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-[2px] bg-[#a855f7]/10 text-[#7c3aed] border-[#a855f7]"
+									class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-[2px] bg-data-purple/10 text-[#7c3aed] border-data-purple"
 								>
 									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -2255,7 +2255,7 @@
 								<div class="space-y-6">
 									<!-- Image URL -->
 									<div class="space-y-2">
-										<div class="text-[10px] uppercase font-black tracking-widest text-[#4ade80]">
+										<div class="text-[10px] uppercase font-black tracking-widest text-data-green">
 											> Image Endpoint
 										</div>
 										<p class="text-xs text-gray-400 font-sans font-bold">
@@ -2271,14 +2271,14 @@
 									{#if form.goalConfig.type === 'click_through'}
 										<!-- Click Tracking Link -->
 										<div class="space-y-2">
-											<div class="text-[10px] uppercase font-black tracking-widest text-[#60a5fa]">
+											<div class="text-[10px] uppercase font-black tracking-widest text-data-sky">
 												> CTA Link Endpoint
 											</div>
 											<p class="text-xs text-gray-400 font-sans font-bold">
 												Use this URL for your button's href attribute.
 											</p>
 											<div
-												class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-[#60a5fa]"
+												class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-data-sky"
 											>
 												{clickTrackUrl}
 											</div>
@@ -2286,7 +2286,7 @@
 
 										<!-- HTML Snippet -->
 										<div class="space-y-2">
-											<div class="text-[10px] uppercase font-black tracking-widest text-[#f472b6]">
+											<div class="text-[10px] uppercase font-black tracking-widest text-data-pink">
 												> Example Implementation
 											</div>
 											<div
@@ -2310,7 +2310,7 @@
 									{:else if form.goalConfig.type === 'custom_event'}
 										<!-- Custom Event Snippet -->
 										<div class="space-y-2">
-											<div class="text-[10px] uppercase font-black tracking-widest text-[#f472b6]">
+											<div class="text-[10px] uppercase font-black tracking-widest text-data-pink">
 												> Example Implementation
 											</div>
 											<pre
@@ -2334,7 +2334,7 @@
 									{:else}
 										<!-- HTML Snippet -->
 										<div class="space-y-2">
-											<div class="text-[10px] uppercase font-black tracking-widest text-[#f472b6]">
+											<div class="text-[10px] uppercase font-black tracking-widest text-data-pink">
 												> Example Implementation
 											</div>
 											<div
@@ -2392,7 +2392,7 @@
 							disabled={!effectiveCanSubmit}
 							class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all
 								{effectiveCanSubmit
-								? 'bg-[#4ade80] text-gray-900 border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
+								? 'bg-data-green text-gray-900 border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-200 text-gray-400 border-[2px] border-gray-300 cursor-not-allowed hidden'}"
 						>
 							{#if isSubmitting}

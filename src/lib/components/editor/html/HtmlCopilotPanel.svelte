@@ -354,7 +354,7 @@
 				<button
 					type="button"
 					on:click={applyPending}
-					class="flex-1 rounded-md border-[2px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-white text-gray-900' : 'bg-[#4ade80] text-gray-900'} px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-brutal-md transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="flex-1 rounded-md border-[2px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-white text-gray-900' : 'bg-data-green text-gray-900'} px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-brutal-md transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					<i class="fa fa-check mr-1 text-[10px]"></i>
 					{pendingWarnings.length > 0 ? 'Apply anyway' : 'Apply to editor'}

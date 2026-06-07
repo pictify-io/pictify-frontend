@@ -59,7 +59,7 @@
 
 {#if show}
 	<div class="w-full max-w-5xl mx-auto mb-6">
-		<div class="border-[3px] border-black bg-[#4ade80]/10 shadow-brutal-xl relative overflow-hidden">
+		<div class="border-[3px] border-black bg-data-green/10 shadow-brutal-xl relative overflow-hidden">
 			<button
 				on:click={dismiss}
 				class="absolute top-3 right-3 p-1 text-gray-400 hover:text-gray-900 transition-colors z-10"
@@ -72,7 +72,7 @@
 
 			<div class="p-6 md:p-8">
 				<div class="flex items-center gap-3 mb-4">
-					<div class="w-10 h-10 bg-[#4ade80] border-[2px] border-black flex items-center justify-center flex-shrink-0">
+					<div class="w-10 h-10 bg-data-green border-[2px] border-black flex items-center justify-center flex-shrink-0">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
 						</svg>
@@ -98,7 +98,7 @@
 							on:click={copyKey}
 							class="flex-shrink-0 px-5 py-3 border-[2px] border-black font-black text-sm uppercase tracking-wide transition-all
 								{copied
-									? 'bg-[#4ade80] text-black'
+									? 'bg-data-green text-black'
 									: 'bg-black text-white shadow-[3px_3px_0_0_#4ade80] hover:shadow-[1px_1px_0_0_#4ade80] hover:translate-x-[2px] hover:translate-y-[2px]'}"
 						>
 							{copied ? 'Copied!' : 'Copy Key'}

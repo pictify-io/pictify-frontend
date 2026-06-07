@@ -214,7 +214,7 @@
 			</button>
 		{:else if status === 'ok'}
 			<span
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-[#4ade80] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-data-green px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
 			>
 				<span class="relative flex h-2 w-2">
 					<span class="relative inline-flex h-2 w-2 rounded-full border-[1.5px] border-gray-900 bg-[#22c55e]"></span>

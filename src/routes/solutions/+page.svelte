@@ -78,7 +78,7 @@
 		</h2>
 		<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 			{#each others as s, i}
-				{@const colors = ['bg-brand-danger', 'bg-[#4ade80]', 'bg-brand-accent', 'bg-[#a78bfa]', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
+				{@const colors = ['bg-brand-danger', 'bg-data-green', 'bg-brand-accent', 'bg-data-violet', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
 				<a
 					href="/solutions/{s.slug}"
 					class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden"

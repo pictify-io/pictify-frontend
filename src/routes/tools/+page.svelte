@@ -290,7 +290,7 @@
 							</div>
 							<div class="flex flex-col items-end gap-2 flex-shrink-0">
 								<span
-									class="px-4 py-2 bg-[#4ade80] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-md group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all text-xs flex items-center gap-2"
+									class="px-4 py-2 bg-data-green text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-md group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all text-xs flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path

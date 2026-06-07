@@ -25,7 +25,7 @@
 			title: 'Dashboards',
 			description: 'KPI snapshots for Slack, email, or embeds. Share live metric images that always show current data.',
 			iconPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-			color: 'bg-[#4ade80]'
+			color: 'bg-data-green'
 		},
 		{
 			title: 'Email',
@@ -37,7 +37,7 @@
 			title: 'Social Media',
 			description: 'Auto-updating social cards with live stats, follower counts, or real-time event data.',
 			iconPath: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
-			color: 'bg-[#a78bfa]'
+			color: 'bg-data-violet'
 		}
 	];
 
@@ -170,7 +170,7 @@
 
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
 				Connect your data. Your images stay fresh. Dynamic Links pull live data from any API, database, or spreadsheet — and render a new image on every request. <br class="hidden sm:block" />
-				<span class="font-black text-gray-900 bg-[#4ade80] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">No cron jobs. No stale content.</span>
+				<span class="font-black text-gray-900 bg-data-green px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">No cron jobs. No stale content.</span>
 			</p>
 
 			<div class="flex flex-col sm:flex-row gap-6 justify-center">
@@ -221,7 +221,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
 				{#each useCases as useCase, i}
-					{@const colors = ['bg-brand-danger', 'bg-[#4ade80]', 'bg-brand-accent', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-danger', 'bg-data-green', 'bg-brand-accent', 'bg-data-violet']}
 					{@const rotations = ['rotate-1', '-rotate-1', '-rotate-1', 'rotate-1']}
 					<div
 						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
@@ -260,8 +260,8 @@
 								<!-- Dashboards Visual -->
 								<div class="w-full max-w-[240px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
 									<div class="bg-gray-900 px-3 py-2 flex items-center justify-between">
-										<div class="text-[10px] font-black tracking-widest text-[#4ade80] uppercase">MRR Growth</div>
-										<div class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse"></div>
+										<div class="text-[10px] font-black tracking-widest text-data-green uppercase">MRR Growth</div>
+										<div class="w-2 h-2 rounded-full bg-data-green animate-pulse"></div>
 									</div>
 									<div class="p-4 bg-gray-50 flex flex-col items-center">
 										<div class="font-black text-3xl text-gray-900 mb-2">$84.2K</div>
@@ -269,8 +269,8 @@
 											<div class="flex-1 bg-gray-300 h-1/4 rounded-t"></div>
 											<div class="flex-1 bg-gray-300 h-2/4 rounded-t"></div>
 											<div class="flex-1 bg-gray-300 h-1/3 rounded-t"></div>
-											<div class="flex-1 bg-[#4ade80] h-3/4 rounded-t border-t-[2px] border-x-[2px] border-gray-900"></div>
-											<div class="flex-1 bg-[#4ade80] h-full rounded-t border-t-[2px] border-x-[2px] border-gray-900 relative">
+											<div class="flex-1 bg-data-green h-3/4 rounded-t border-t-[2px] border-x-[2px] border-gray-900"></div>
+											<div class="flex-1 bg-data-green h-full rounded-t border-t-[2px] border-x-[2px] border-gray-900 relative">
 												<div class="absolute -top-4 w-full text-center text-[8px] font-bold text-gray-900">Today</div>
 											</div>
 										</div>
@@ -282,7 +282,7 @@
 									<div class="bg-gray-100 border-b-[2px] border-gray-900 px-2 py-1 flex items-center gap-1.5">
 										<div class="w-1.5 h-1.5 rounded-full bg-brand-danger border border-gray-900"></div>
 										<div class="w-1.5 h-1.5 rounded-full bg-brand-accent border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-data-green border border-gray-900"></div>
 									</div>
 									<div class="p-3 bg-white space-y-2">
 										<div class="w-1/2 h-2 bg-gray-200 rounded"></div>
@@ -302,7 +302,7 @@
 							{:else if i === 3}
 								<!-- Social Visual -->
 								<div class="w-full max-w-[220px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
-									<div class="h-24 bg-gradient-to-r from-[#a78bfa] to-[#ffb6ff] border-b-[3px] border-gray-900 flex items-center justify-center flex-col relative pt-2">
+									<div class="h-24 bg-gradient-to-r from-data-violet to-[#ffb6ff] border-b-[3px] border-gray-900 flex items-center justify-center flex-col relative pt-2">
 										<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:10px_10px]"></div>
 										<div class="font-black text-3xl text-gray-900 drop-shadow-[2px_2px_0_#fff] relative z-10 mix-blend-hard-light">+1,200</div>
 										<div class="text-[10px] font-bold text-gray-900 uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded border border-gray-900 mt-1 shadow-sm relative z-10">New Followers</div>
@@ -352,7 +352,7 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0 border-l-[3px] border-dashed border-gray-900"></div>
 
 				{#each steps as step, i}
-					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -382,7 +382,7 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Integrations</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl border-[3px] border-transparent font-black text-gray-900 mb-6">
@@ -395,7 +395,7 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each dataSources as source, i}
-					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-brand-danger', 'bg-[#4ade80]', 'bg-white']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-data-violet', 'bg-brand-danger', 'bg-data-green', 'bg-white']}
 					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 rounded-2xl transition-all group">
 						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -447,7 +447,7 @@
 					<div class="px-5 py-3 bg-gray-100 border-b-[3px] border-gray-900 text-gray-900 font-black text-sm flex items-center gap-2">
 						<span class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
 						<span class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
-						<span class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
+						<span class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
 						<span class="ml-3 tracking-wide uppercase text-xs">api-response.json</span>
 					</div>
 					<textarea
@@ -586,7 +586,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#a78bfa] border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-data-violet border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">

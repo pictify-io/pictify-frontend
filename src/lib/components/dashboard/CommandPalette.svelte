@@ -317,10 +317,10 @@
 						>
 							{#if item.type === 'action'}
 								<div
-									class="w-8 h-8 rounded-lg bg-[#4ecdc4]/10 border-2 border-[#4ecdc4]/30 flex items-center justify-center flex-shrink-0"
+									class="w-8 h-8 rounded-lg bg-data-teal/10 border-2 border-data-teal/30 flex items-center justify-center flex-shrink-0"
 								>
 									<svg
-										class="w-4 h-4 text-[#4ecdc4]"
+										class="w-4 h-4 text-data-teal"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -360,7 +360,7 @@
 
 							{#if item.type === 'action'}
 								<span
-									class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#4ecdc4]/10 text-[#0d9488] rounded-full border border-[#4ecdc4]/30"
+									class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-data-teal/10 text-[#0d9488] rounded-full border border-data-teal/30"
 									>Action</span
 								>
 							{/if}

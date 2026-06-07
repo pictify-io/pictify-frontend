@@ -213,7 +213,7 @@
 				<ul class="space-y-2 mb-6">
 					<li class="flex items-center gap-3 font-bold">
 						<span
-							class="w-6 h-6 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-white text-sm"
+							class="w-6 h-6 bg-data-green border-[2px] border-black flex items-center justify-center text-white text-sm"
 						>
 							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
 								><path
@@ -227,7 +227,7 @@
 					</li>
 					<li class="flex items-center gap-3 font-bold">
 						<span
-							class="w-6 h-6 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-white text-sm"
+							class="w-6 h-6 bg-data-green border-[2px] border-black flex items-center justify-center text-white text-sm"
 						>
 							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
 								><path
@@ -241,7 +241,7 @@
 					</li>
 					<li class="flex items-center gap-3 font-bold">
 						<span
-							class="w-6 h-6 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-white text-sm"
+							class="w-6 h-6 bg-data-green border-[2px] border-black flex items-center justify-center text-white text-sm"
 						>
 							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
 								><path

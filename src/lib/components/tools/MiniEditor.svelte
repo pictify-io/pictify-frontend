@@ -202,6 +202,6 @@
 	</div>
 
 	{#if selectedText}
-		<div class="mt-2 text-xs text-[#4ade80] font-bold">Double-click text to type</div>
+		<div class="mt-2 text-xs text-data-green font-bold">Double-click text to type</div>
 	{/if}
 </div>

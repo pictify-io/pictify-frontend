@@ -52,7 +52,7 @@
 			<div class="flex items-center gap-3 min-w-0">
 				<div class="hidden sm:block flex-shrink-0">
 					<div
-						class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center"
+						class="w-8 h-8 bg-data-green border-[2px] border-black flex items-center justify-center"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path

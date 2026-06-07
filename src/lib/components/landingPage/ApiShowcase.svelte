@@ -113,7 +113,7 @@ const image = await pictify.render({
 		class="absolute top-20 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] -z-10 pointer-events-none"
 	></div>
 	<div
-		class="absolute bottom-[-10%] -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute bottom-[-10%] -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] -z-10 pointer-events-none"
 	></div>
 
 	<div class="max-w-7xl mx-auto px-6">
@@ -132,7 +132,7 @@ const image = await pictify.render({
 					<span class="relative inline-block mt-2">
 						5 Minutes to Integrate
 						<svg
-							class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-[#4ade80] -z-10"
+							class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-data-green -z-10"
 							viewBox="0 0 100 10"
 							preserveAspectRatio="none"
 						>
@@ -164,7 +164,7 @@ const image = await pictify.render({
 
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-[#4ade80] rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
+							class="w-14 h-14 bg-data-green rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
 						</div>
@@ -220,7 +220,7 @@ const image = await pictify.render({
 						<div class="flex gap-2">
 							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-black"></div>
 							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-black"></div>
-							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-black"></div>
+							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-black"></div>
 						</div>
 						<div class="flex items-center gap-2 bg-black/40 px-3 py-1 rounded-md border border-white/10">
 							<svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
@@ -304,7 +304,7 @@ const image = await pictify.render({
 								<!-- Fake Response Area (Anchored to Bottom) -->
 								<div class="mt-8 border-t-[2px] border-dashed border-gray-700 pt-4">
 									{#if terminalState === 'idle' || terminalState === 'typing'}
-										<div class="flex items-center gap-2 text-[#4ade80]">
+										<div class="flex items-center gap-2 text-data-green">
 											<span class="animate-spin text-xl leading-none">⁕</span>
 											<span class="animate-pulse">Awaiting request...</span>
 										</div>

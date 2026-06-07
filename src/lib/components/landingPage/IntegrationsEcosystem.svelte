@@ -12,7 +12,7 @@
 		{
 			title: 'Storage & Delivery',
 			description: 'Deliver to your own CDN',
-			color: 'bg-[#4ade80]',
+			color: 'bg-data-green',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
 			items: ['AWS S3', 'Google Cloud', 'Cloudinary', 'ImageKit'],
@@ -67,7 +67,7 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
 		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"

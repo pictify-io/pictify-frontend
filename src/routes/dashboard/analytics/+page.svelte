@@ -137,7 +137,7 @@
 			<div
 				class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#c4b5fd] border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-1 mb-6"
 			>
-				<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-black" />
+				<span class="w-2 h-2 bg-data-green rounded-full animate-pulse border border-black" />
 				<span class="text-xs font-black text-black uppercase tracking-widest">Analytics</span>
 			</div>
 			<h1
@@ -220,7 +220,7 @@
 
 			<!-- Unique Visitors -->
 			<div
-				class="bg-[#4ade80] rounded-2xl border-[3px] border-black shadow-brutal-xl p-5 md:p-6 relative overflow-hidden group"
+				class="bg-data-green rounded-2xl border-[3px] border-black shadow-brutal-xl p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/30 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"
@@ -269,7 +269,7 @@
 						class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_#1f2937]"
 					/>
 					<div
-						class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_#1f2937]"
+						class="w-3 h-3 rounded-full bg-data-green border border-black shadow-[1px_1px_0_0_#1f2937]"
 					/>
 					<div class="ml-2">
 						<span class="text-sm font-black text-black uppercase tracking-widest"
@@ -364,8 +364,8 @@
 										<div
 											class="w-full border-[2px] border-b-0 border-black rounded-t-sm transition-all duration-300 group-hover:-translate-y-1 relative overflow-hidden
 											{chartMode === 'views'
-												? 'bg-[#c4b5fd] group-hover:bg-[#a78bfa]'
-												: 'bg-brand-accent group-hover:bg-[#f59e0b]'}"
+												? 'bg-[#c4b5fd] group-hover:bg-data-violet'
+												: 'bg-brand-accent group-hover:bg-data-amber'}"
 											style="height: {Math.max(
 												((chartMode === 'views' ? stat.hits : stat.bytes) / currentMax) * 100,
 												1
@@ -507,7 +507,7 @@
 				<div class="flex items-center justify-between p-5 border-b-[3px] border-black bg-gray-50">
 					<div class="flex items-center gap-3">
 						<div
-							class="w-7 h-7 rounded-lg bg-[#4ade80] border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
+							class="w-7 h-7 rounded-lg bg-data-green border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-black"
@@ -554,7 +554,7 @@
 									</div>
 									<div class="w-full bg-gray-200 rounded-full h-1.5 border border-gray-300">
 										<div
-											class="bg-[#4ade80] h-full rounded-full border-r border-black/20 transition-all duration-500"
+											class="bg-data-green h-full rounded-full border-r border-black/20 transition-all duration-500"
 											style="width: {getPercentage(country.hits, topCountries[0]?.hits)}%"
 										/>
 									</div>
@@ -603,7 +603,7 @@
 						>
 							{#if statusCodes._200 > 0}
 								<div
-									class="bg-[#4ade80] flex items-center justify-center transition-all duration-500"
+									class="bg-data-green flex items-center justify-center transition-all duration-500"
 									style="width: {getPercentage(statusCodes._200, totalStatusHits)}%"
 								>
 									{#if getPercentage(statusCodes._200, totalStatusHits) > 15}
@@ -637,7 +637,7 @@
 						<div class="space-y-3">
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="w-4 h-4 bg-[#4ade80] rounded border-[2px] border-black" />
+									<div class="w-4 h-4 bg-data-green rounded border-[2px] border-black" />
 									<span class="text-xs font-black text-black uppercase tracking-wider">200 OK</span>
 								</div>
 								<div class="flex items-center gap-2">
@@ -690,7 +690,7 @@
 								statusCodes._200 + statusCodes._304,
 								totalStatusHits
 							)}
-							<div class="mt-6 p-4 bg-[#4ade80]/10 rounded-xl border-[2px] border-[#4ade80]">
+							<div class="mt-6 p-4 bg-data-green/10 rounded-xl border-[2px] border-data-green">
 								<div class="text-[10px] font-black text-black/60 uppercase tracking-widest mb-1">
 									Success Rate
 								</div>

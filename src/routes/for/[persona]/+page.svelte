@@ -165,7 +165,7 @@
 						>
 							<div class="flex items-start gap-4">
 								<div
-									class="w-10 h-10 bg-[#4ade80] border-[3px] border-gray-900 rounded-xl flex items-center justify-center font-black text-gray-900 shadow-brutal-md flex-shrink-0"
+									class="w-10 h-10 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center font-black text-gray-900 shadow-brutal-md flex-shrink-0"
 								>
 									{i + 1}
 								</div>

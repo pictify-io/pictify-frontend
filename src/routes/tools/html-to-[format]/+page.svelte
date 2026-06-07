@@ -771,7 +771,7 @@
 							class="w-3 h-3 bg-brand-accent border border-black hover:bg-yellow-400 transition-colors"
 						/>
 						<div
-							class="w-3 h-3 bg-[#4ade80] border border-black hover:bg-green-400 transition-colors"
+							class="w-3 h-3 bg-data-green border border-black hover:bg-green-400 transition-colors"
 						/>
 					</div>
 				</div>
@@ -803,7 +803,7 @@
 										class={`px-4 py-4 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
 										${
 											f === format
-												? 'bg-[#4ade80] shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+												? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
 												: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg hover:translate-x-[-1px] hover:translate-y-[-1px]'
 										}`}
 									>
@@ -852,10 +852,10 @@
 						<!-- Dimension Context Info -->
 						{#if dimensionContext}
 							<div class="border-t-[3px] border-dashed border-gray-300 my-8" />
-							<div class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-xl p-6">
+							<div class="bg-data-green/10 border-[3px] border-data-green rounded-xl p-6">
 								<div class="flex flex-wrap items-center gap-3 mb-4">
 									<span
-										class="px-3 py-1 bg-[#4ade80] text-black font-black text-sm uppercase rounded-full border-2 border-black"
+										class="px-3 py-1 bg-data-green text-black font-black text-sm uppercase rounded-full border-2 border-black"
 									>
 										{dimensionContext.label}
 									</span>
@@ -1036,7 +1036,7 @@
 				>
 					<!-- Success Header -->
 					<div
-						class="bg-[#4ade80] border-b-[3px] md:border-b-[4px] border-black p-3 md:p-4 flex justify-between items-center"
+						class="bg-data-green border-b-[3px] md:border-b-[4px] border-black p-3 md:p-4 flex justify-between items-center"
 					>
 						<h3
 							class="font-black text-black tracking-widest uppercase text-xs md:text-sm flex items-center gap-2"
@@ -1055,7 +1055,7 @@
 							>
 							SUCCESS: IMAGE_GENERATED
 						</h3>
-						<div class="font-mono text-xs font-bold bg-black text-[#4ade80] px-2 py-1">200 OK</div>
+						<div class="font-mono text-xs font-bold bg-black text-data-green px-2 py-1">200 OK</div>
 					</div>
 
 					<!-- Image Preview -->
@@ -1163,7 +1163,7 @@
 				<div class="w-full mt-8 space-y-5">
 					<!-- Automate via API -->
 					<div class="border-[3px] border-black bg-white shadow-brutal-xl">
-						<div class="bg-[#4ade80] px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
+						<div class="bg-data-green px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
 							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">01</span>
 							<h4 class="font-black uppercase tracking-widest text-sm">Automate via API</h4>
 						</div>
@@ -1175,7 +1175,7 @@
 								<a
 									href="https://docs.pictify.io/api-reference/overview"
 									target="_blank"
-									class="inline-block py-2.5 px-5 bg-[#4ade80] text-black border-[2px] border-black font-black uppercase text-xs shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="inline-block py-2.5 px-5 bg-data-green text-black border-[2px] border-black font-black uppercase text-xs shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									View API docs
 								</a>
@@ -1273,7 +1273,7 @@
 				>
 					<!-- Geometric decoration -->
 					<div class="absolute -top-3 -left-3 w-6 h-6 bg-brand-danger border-[3px] border-black" />
-					<div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#4ade80] border-[3px] border-black" />
+					<div class="absolute -bottom-3 -right-3 w-6 h-6 bg-data-green border-[3px] border-black" />
 
 					<div class="flex justify-between items-center mb-6 border-b-[3px] border-black pb-4">
 						<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">
@@ -1335,7 +1335,7 @@
 						</li>
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
+								class="w-8 h-8 bg-data-green border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1381,7 +1381,7 @@
 				>
 					<!-- Geometric decoration -->
 					<div class="absolute -top-3 -right-3 w-6 h-6 bg-brand-danger border-[3px] border-black" />
-					<div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#4ade80] border-[3px] border-black" />
+					<div class="absolute -bottom-3 -left-3 w-6 h-6 bg-data-green border-[3px] border-black" />
 
 					<div class="flex justify-between items-center mb-6 border-b-[3px] border-black pb-4">
 						<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">
@@ -1445,7 +1445,7 @@
 						</li>
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
+								class="w-8 h-8 bg-data-green border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path

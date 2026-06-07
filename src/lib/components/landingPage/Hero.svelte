@@ -141,7 +141,7 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
 		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
@@ -152,7 +152,7 @@
 		<div class="text-center mb-20 relative max-w-4xl mx-auto">
 			<!-- Rotated Eyebrow Pill -->
 			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-xl rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default relative"
+				class="inline-block mb-6 px-6 py-2 bg-data-green border-[3px] border-gray-900 shadow-brutal-xl rounded-full transform -rotate-2 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all cursor-default relative"
 			>
 				<!-- Sparkle SVG -->
 				<svg
@@ -226,7 +226,7 @@
 				</div>
 
 				<div class="flex items-center gap-3 text-sm text-gray-600 font-bold justify-center mt-2">
-					<svg class="w-5 h-5 text-[#4ade80]" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+					<svg class="w-5 h-5 text-data-green" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 						><path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -348,7 +348,7 @@
 							<div class="px-5 flex gap-2 h-full items-center py-4">
 								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900" />
 								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-[2px] border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-[2px] border-gray-900" />
 							</div>
 							<div
 								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate cursor-pointer hover:bg-gray-50 transition-colors"
@@ -389,7 +389,7 @@
 									class="absolute -top-6 -right-6 bg-white border-[3px] border-gray-900 rounded-xl px-3 py-1.5 shadow-[4px_4px_0_0_#4ade80] flex items-center gap-2 z-0 transform rotate-12 opacity-50 group-hover/canvas:opacity-100 group-hover/canvas:-translate-y-4 group-hover/canvas:translate-x-4 transition-all duration-500"
 								>
 									<span
-										class="w-2 h-2 rounded-full bg-[#4ade80] border border-gray-900 animate-pulse"
+										class="w-2 h-2 rounded-full bg-data-green border border-gray-900 animate-pulse"
 									/>
 									<span class="text-[9px] font-black uppercase text-gray-900 tracking-widest"
 										>Rendering</span
@@ -431,7 +431,7 @@
 										<div
 											class="px-5 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs rounded border-[3px] border-gray-900 shadow-[4px_4px_0_0_#4ade80] animate-pulse flex items-center gap-2"
 										>
-											<svg class="w-4 h-4 animate-spin text-[#4ade80]" fill="none" viewBox="0 24 24"
+											<svg class="w-4 h-4 animate-spin text-data-green" fill="none" viewBox="0 24 24"
 												><circle
 													class="opacity-25"
 													cx="12"

@@ -193,7 +193,7 @@
 					<div class="flex gap-2">
 						<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
-						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
 					</div>
 					<div class="flex-1 flex justify-center">
 						<div
@@ -233,7 +233,7 @@
 									</svg>
 								</div>
 								<div
-									class="absolute -top-2 -right-2 px-2 py-1 bg-[#4ade80] text-[10px] font-bold text-gray-900 border-[2px] border-gray-900 rounded animate-pulse"
+									class="absolute -top-2 -right-2 px-2 py-1 bg-data-green text-[10px] font-bold text-gray-900 border-[2px] border-gray-900 rounded animate-pulse"
 								>
 									NEW
 								</div>
@@ -329,31 +329,31 @@
 												/></svg
 											>
 											{#if selectedId === item.id}
-												<div class="absolute inset-0 bg-[#4ade80] opacity-10" />
+												<div class="absolute inset-0 bg-data-green opacity-10" />
 											{/if}
 										</div>
 									{/if}
 
 									<!-- Selection Box (Active Element Overlay) -->
 									{#if selectedId === item.id}
-										<div class="absolute inset-0 border-[3px] border-[#4ade80] pointer-events-none">
+										<div class="absolute inset-0 border-[3px] border-data-green pointer-events-none">
 											<!-- Resize Handles -->
 											<div
-												class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 											<div
-												class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 											<div
-												class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 											<div
-												class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-[#4ade80]"
+												class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-[2px] border-data-green"
 											/>
 
 											<!-- Label -->
 											<span
-												class="bg-[#4ade80] text-[10px] font-bold px-2 py-0.5 border-[2px] border-gray-900 absolute -top-6 left-0 shadow-brutal-sm uppercase tracking-wider whitespace-nowrap"
+												class="bg-data-green text-[10px] font-bold px-2 py-0.5 border-[2px] border-gray-900 absolute -top-6 left-0 shadow-brutal-sm uppercase tracking-wider whitespace-nowrap"
 											>
 												{item.type} Layer
 											</span>
@@ -491,7 +491,7 @@
 					<div class="flex gap-2">
 						<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-black"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-2 border-black"></div>
-						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-black"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-black"></div>
 					</div>
 					<div class="flex items-center gap-2 bg-white/40 px-3 py-1 rounded-md border-[2px] border-black">
 						<svg width="10" height="10" viewBox="0 0 38 57" fill="none"><path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="black"/><path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="black"/><path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="black"/><path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="black"/><path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="black"/></svg>
@@ -517,7 +517,7 @@
 										<svg class="w-10 h-10 md:w-12 md:h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
 									</div>
 									<div class="flex gap-2">
-										<div class="flex-1 h-3 bg-[#4ade80] rounded-sm border-2 border-black"></div>
+										<div class="flex-1 h-3 bg-data-green rounded-sm border-2 border-black"></div>
 										<div class="w-8 h-3 bg-brand-danger rounded-sm border-2 border-black"></div>
 									</div>
 								</div>
@@ -541,7 +541,7 @@
 										<!-- Graphic lines -->
 										<div class="absolute -left-4 -top-4 w-12 h-12 border-4 border-black rounded-full text-transparent"></div>
 										<!-- Template variable indicators -->
-										<div class="px-2 py-1 bg-[#4ade80] border-[2px] border-black shadow-brutal-sm rounded text-[9px] font-black text-black transform -rotate-2 relative z-10">{'{{name}}'}</div>
+										<div class="px-2 py-1 bg-data-green border-[2px] border-black shadow-brutal-sm rounded text-[9px] font-black text-black transform -rotate-2 relative z-10">{'{{name}}'}</div>
 									</div>
 									<div class="flex gap-2">
 										<div class="flex-1 h-3 bg-gray-300 rounded-sm border-2 border-black"></div>
@@ -549,7 +549,7 @@
 									</div>
 								</div>
 								<!-- Pictify logo badge -->
-								<div class="absolute -bottom-4 -right-4 w-10 h-10 bg-[#4ade80] rounded-lg border-[3px] border-black shadow-brutal-lg flex items-center justify-center z-20 group-hover/template:scale-110 transition-transform">
+								<div class="absolute -bottom-4 -right-4 w-10 h-10 bg-data-green rounded-lg border-[3px] border-black shadow-brutal-lg flex items-center justify-center z-20 group-hover/template:scale-110 transition-transform">
 									<span class="text-lg font-black text-black">P</span>
 								</div>
 							</div>
@@ -595,7 +595,7 @@
 								<span class="text-base font-bold text-black">Select frames</span>
 							</div>
 							<div class="flex items-center gap-4 group/step">
-								<div class="w-8 h-8 bg-[#4ade80] border-[3px] border-black flex items-center justify-center shrink-0 shadow-brutal-sm group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-brutal-lg transition-all">
+								<div class="w-8 h-8 bg-data-green border-[3px] border-black flex items-center justify-center shrink-0 shadow-brutal-sm group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-brutal-lg transition-all">
 									<span class="text-sm font-black text-black">3</span>
 								</div>
 								<span class="text-base font-bold text-black">Send to Pictify</span>

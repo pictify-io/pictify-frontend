@@ -819,7 +819,7 @@
 									>
 										<div
 											class={`h-3 w-3 rounded-full shadow-sm ${
-												isApiOperational ? 'bg-[#4ade80]' : 'bg-brand-danger'
+												isApiOperational ? 'bg-data-green' : 'bg-brand-danger'
 											}`}
 										/>
 										<span class="text-sm font-bold text-gray-700"
@@ -1110,7 +1110,7 @@
 														<span
 															class={`px-3 py-1 text-xs font-bold rounded-full border-2 border-gray-900 ${
 																testResponse.status >= 200 && testResponse.status < 300
-																	? 'bg-[#4ade80] text-gray-900'
+																	? 'bg-data-green text-gray-900'
 																	: 'bg-brand-danger text-white'
 															}`}
 														>
@@ -1197,7 +1197,7 @@
 			<div class="space-y-3 mb-8">
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
 					<div
-						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+						class="w-6 h-6 rounded-full bg-data-green border-2 border-gray-900 flex items-center justify-center text-xs"
 					>
 						✓
 					</div>
@@ -1205,7 +1205,7 @@
 				</div>
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
 					<div
-						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+						class="w-6 h-6 rounded-full bg-data-green border-2 border-gray-900 flex items-center justify-center text-xs"
 					>
 						✓
 					</div>
@@ -1213,7 +1213,7 @@
 				</div>
 				<div class="flex items-center gap-3 text-gray-700 font-bold">
 					<div
-						class="w-6 h-6 rounded-full bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center text-xs"
+						class="w-6 h-6 rounded-full bg-data-green border-2 border-gray-900 flex items-center justify-center text-xs"
 					>
 						✓
 					</div>

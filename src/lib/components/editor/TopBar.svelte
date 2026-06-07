@@ -139,7 +139,7 @@
 						class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-danger opacity-75"
 					/>
 					<span
-						class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff5252] border-[1.5px] border-gray-900"
+						class="relative inline-flex rounded-full h-2.5 w-2.5 bg-data-red border-[1.5px] border-gray-900"
 					/>
 				</div>
 				<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest mt-[1px]">
@@ -148,7 +148,7 @@
 			</div>
 		{:else if showAutoSaved}
 			<div
-				class="hidden sm:flex items-center px-3 py-1.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-md shadow-brutal-sm transform rotate-1 hover:rotate-0 transition-all cursor-default"
+				class="hidden sm:flex items-center px-3 py-1.5 bg-data-green border-[2px] border-gray-900 rounded-md shadow-brutal-sm transform rotate-1 hover:rotate-0 transition-all cursor-default"
 			>
 				<i class="fa fa-sparkles text-[10px] text-gray-900 mr-1.5" />
 				<span class="text-[10px] font-black text-gray-900 uppercase tracking-widest mt-[1px]">
@@ -179,7 +179,7 @@
 		{#if $selectedComponent}
 			<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full" />
 			<button
-				class="w-9 h-9 flex items-center justify-center bg-brand-danger border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
+				class="w-9 h-9 flex items-center justify-center bg-brand-danger border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-data-red"
 				on:click={deleteSelected}
 				title="Delete selected element"
 			>
@@ -206,9 +206,9 @@
 		<button
 			class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
 			{guestMode
-				? 'bg-brand-danger text-white shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
+				? 'bg-brand-danger text-white shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-data-red'
 				: $isDirty
-				? 'bg-[#4ade80] text-gray-900 shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
+				? 'bg-data-green text-gray-900 shadow-brutal-lg hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
 				: 'bg-gray-100 text-gray-400 cursor-default'}"
 			on:click={save}
 			disabled={guestMode ? isSaving : isSaving || !$isDirty}

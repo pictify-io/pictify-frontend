@@ -246,7 +246,7 @@
 				{#if isPaused && subscription.resumesAt}
 					<div class="flex items-center gap-3 mt-3 pt-3 border-t-2 border-dashed border-gray-200">
 						<div
-							class="w-8 h-8 rounded-lg bg-[#f59e0b] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
+							class="w-8 h-8 rounded-lg bg-data-amber border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 						>
 							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path

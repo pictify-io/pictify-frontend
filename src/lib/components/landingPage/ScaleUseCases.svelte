@@ -91,7 +91,7 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-data-green/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
 		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
@@ -378,7 +378,7 @@
 
 			<!-- Block 3: Email Personalization (Spans 12 cols, Split) -->
 			<div
-				class="xl:col-span-12 bg-[#4ade80] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group"
+				class="xl:col-span-12 bg-data-green rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Interactive Selector (Right via order, Left in DOM, 5 columns) -->
@@ -429,7 +429,7 @@
 									<div class="w-4 h-4 rounded-full {tier.color} border-[2px] border-gray-900" />
 									<div class="flex-1 text-sm uppercase tracking-wider font-black">{tier.label}</div>
 									{#if activeEmailTier === i}
-										<div class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
+										<div class="w-2 h-2 rounded-full bg-data-green animate-pulse" />
 									{/if}
 								</button>
 							{/each}
@@ -452,7 +452,7 @@
 								class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
 							>
 								<div
-									class="w-2 h-2 bg-[#4ade80] rounded-full border border-gray-900 animate-pulse"
+									class="w-2 h-2 bg-data-green rounded-full border border-gray-900 animate-pulse"
 								/>
 								Incoming payload
 							</div>
@@ -484,7 +484,7 @@
 										class="w-2.5 h-2.5 rounded-full bg-brand-accent border-[1.5px] border-gray-900"
 									/>
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-[#4ade80] border-[1.5px] border-gray-900"
+										class="w-2.5 h-2.5 rounded-full bg-data-green border-[1.5px] border-gray-900"
 									/>
 								</div>
 								<div
@@ -495,7 +495,7 @@
 							</div>
 
 							<div
-								class="w-full bg-[#4ade80] relative flex flex-col items-center justify-center text-center p-8 overflow-hidden aspect-[4/3]"
+								class="w-full bg-data-green relative flex flex-col items-center justify-center text-center p-8 overflow-hidden aspect-[4/3]"
 							>
 								<div
 									class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/30 to-transparent"
@@ -529,7 +529,7 @@
 												>
 													Points
 												</div>
-												<div class="text-xl md:text-2xl font-black text-[#4ade80] leading-none">
+												<div class="text-xl md:text-2xl font-black text-data-green leading-none">
 													{emailTiers[activeEmailTier].points}
 												</div>
 											</div>

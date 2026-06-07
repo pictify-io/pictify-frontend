@@ -192,7 +192,7 @@
 						/>
 					</div>
 					{#if dimensionError}
-						<p class="col-span-2 text-[11px] font-black uppercase tracking-wider text-[#ff5252]">
+						<p class="col-span-2 text-[11px] font-black uppercase tracking-wider text-data-red">
 							<i class="fa fa-triangle-exclamation mr-1 text-[10px]"></i>
 							{dimensionError}
 						</p>

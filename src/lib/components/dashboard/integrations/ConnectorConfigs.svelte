@@ -420,7 +420,7 @@
 		>
 			<!-- Header Strip -->
 			<div
-				class="absolute top-0 left-0 w-full h-1.5 bg-[#4ade80] border-b-[3px] border-gray-900 z-10"
+				class="absolute top-0 left-0 w-full h-1.5 bg-data-green border-b-[3px] border-gray-900 z-10"
 			/>
 			<!-- Decorative bg pattern -->
 			<div

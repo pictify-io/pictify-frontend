@@ -224,7 +224,7 @@
 					<!-- Generate Button -->
 					<div class="flex justify-center">
 						<button
-							class="bg-brand-danger text-white px-8 py-3 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+							class="bg-brand-danger text-white px-8 py-3 rounded-lg hover:bg-data-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 							on:click={generateScreenshot}
 							disabled={isGenerating ||
 								!prompt.trim() ||
@@ -344,7 +344,7 @@
 												href={finalResult.metadata.url}
 												target="_blank"
 												rel="noopener noreferrer"
-												class="text-brand-danger hover:text-[#ff5252]"
+												class="text-brand-danger hover:text-data-red"
 											>
 												{finalResult.metadata.url}
 											</a>
@@ -370,7 +370,7 @@
 										href={finalResult.url}
 										target="_blank"
 										rel="noopener noreferrer"
-										class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
+										class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-data-red transition-colors"
 									>
 										View Full Size
 									</a>
@@ -409,7 +409,7 @@
 			<div class="flex gap-3">
 				<a
 					href="/login"
-					class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
+					class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-data-red transition-colors"
 				>
 					Login
 				</a>

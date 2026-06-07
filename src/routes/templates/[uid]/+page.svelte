@@ -280,7 +280,7 @@
 							</span>
 							{#if template.isFeatured}
 								<span
-									class="px-3 py-1 bg-[#4ade80] border-2 border-gray-900 text-xs font-black uppercase"
+									class="px-3 py-1 bg-data-green border-2 border-gray-900 text-xs font-black uppercase"
 								>
 									Featured
 								</span>

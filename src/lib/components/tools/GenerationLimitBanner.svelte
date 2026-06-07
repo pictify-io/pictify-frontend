@@ -38,7 +38,7 @@
 					{#each Array(GUEST_DAILY_LIMIT) as _, i}
 						<div
 							class={`w-3 h-3 border-[2px] border-black ${
-								i < GUEST_DAILY_LIMIT - remaining ? 'bg-gray-400' : 'bg-[#4ade80]'
+								i < GUEST_DAILY_LIMIT - remaining ? 'bg-gray-400' : 'bg-data-green'
 							}`}
 						/>
 					{/each}

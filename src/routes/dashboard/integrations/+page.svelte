@@ -21,7 +21,7 @@
 				'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
 			category: 'Core',
 			href: '/dashboard/integrations/storage',
-			bgColor: 'bg-[#4ade80]'
+			bgColor: 'bg-data-green'
 		},
 		{
 			id: 'zapier',
@@ -44,7 +44,7 @@
 			url: 'https://make.com/en/integrations/pictify',
 			external: true,
 			comingSoon: true,
-			bgColor: 'bg-[#a78bfa]'
+			bgColor: 'bg-data-violet'
 		},
 		{
 			id: 'n8n',
@@ -67,7 +67,7 @@
 			url: 'https://pipedream.com/apps/pictify',
 			external: true,
 			comingSoon: true,
-			bgColor: 'bg-[#60a5fa]'
+			bgColor: 'bg-data-sky'
 		}
 	];
 

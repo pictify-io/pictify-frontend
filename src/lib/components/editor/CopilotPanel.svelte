@@ -938,7 +938,7 @@
 					/>
 					<span class="text-[9px] text-gray-400 group-hover:text-gray-600 transition-colors flex items-center gap-1">
 						{#if usePerformanceInsights}
-							<span class="inline-block w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
+							<span class="inline-block w-1.5 h-1.5 rounded-full bg-data-green" />
 						{/if}
 						Performance insights
 					</span>

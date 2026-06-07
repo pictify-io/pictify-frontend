@@ -147,7 +147,7 @@
 						<div
 							class="w-10 h-10 rounded-xl border-[3px] flex items-center justify-center flex-shrink-0 text-sm font-black
 								{completed
-								? 'border-[#4ade80] bg-[#4ade80]/10 text-[#4ade80]'
+								? 'border-data-green bg-data-green/10 text-data-green'
 								: 'border-black shadow-brutal-sm'}"
 							style={!completed ? `background-color: ${step.color}` : ''}
 						>
@@ -246,7 +246,7 @@
 										class="flex items-center gap-3 px-4 py-3 bg-[#1e1e1e] rounded-lg border-[2px] border-black font-mono text-sm text-gray-300 overflow-x-auto"
 									>
 										<span class="text-gray-500 select-none">$</span>
-										<span class="text-[#4ade80] flex-1">{resolved}</span>
+										<span class="text-data-green flex-1">{resolved}</span>
 										<button
 											on:click={() => copyCommand(resolved, step.number)}
 											class="flex-shrink-0 px-2 py-1 rounded border border-gray-600 text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:border-gray-400 transition-colors"
@@ -306,7 +306,7 @@
 														</div>
 														{#if tabStep.code}
 															<div
-																class="mx-4 mb-3 ml-12 px-3 py-2 bg-[#1e1e1e] rounded-md font-mono text-[12px] text-[#4ade80] whitespace-pre-wrap leading-relaxed"
+																class="mx-4 mb-3 ml-12 px-3 py-2 bg-[#1e1e1e] rounded-md font-mono text-[12px] text-data-green whitespace-pre-wrap leading-relaxed"
 															>
 																{resolveTabStep(tabStep.code)}
 															</div>

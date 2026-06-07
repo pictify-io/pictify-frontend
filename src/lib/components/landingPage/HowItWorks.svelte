@@ -150,7 +150,7 @@
 				>
 					<div class="flex items-center gap-6 mb-4">
 						<div
-							class="w-16 h-16 bg-[#4ade80] border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
+							class="w-16 h-16 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
 							2
 								? 'scale-110'
 								: 'scale-100'}"
@@ -228,7 +228,7 @@
 													class="w-8 h-8 rounded-full border-[2px] border-gray-900 bg-gray-100"
 												/>
 												<div
-													class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-xs font-bold"
+													class="px-3 py-1 bg-data-green border-[2px] border-gray-900 text-xs font-bold"
 												>
 													BUTTON
 												</div>
@@ -274,8 +274,8 @@
 										<div class="pl-4"><span class="text-brand-accent">"template"</span>: "promo",</div>
 										<div class="pl-4"><span class="text-brand-accent">"variables"</span>: {`{`}</div>
 										<div class="pl-8">"product": "Nike Air",</div>
-										<div class="pl-8">"price": <span class="text-[#4ade80]">129</span>,</div>
-										<div class="pl-8">"inStock": <span class="text-[#4ade80]">true</span></div>
+										<div class="pl-8">"price": <span class="text-data-green">129</span>,</div>
+										<div class="pl-8">"inStock": <span class="text-data-green">true</span></div>
 										<div class="pl-4">{`}`}</div>
 										{`}`}
 									</div>
@@ -290,7 +290,7 @@
 								? 'translate-y-0 opacity-100'
 								: activeStep > 2
 								? '-translate-y-full opacity-0'
-								: 'translate-y-full opacity-0'} flex items-center justify-center bg-[#4ade80] p-8"
+								: 'translate-y-full opacity-0'} flex items-center justify-center bg-data-green p-8"
 						>
 							<div class="relative group">
 								<div class="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl" />
@@ -305,7 +305,7 @@
 									<div class="p-4 flex items-center justify-between bg-white">
 										<div class="font-bold text-gray-900">generated_image.png</div>
 										<div
-											class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-xs font-bold shadow-brutal-sm"
+											class="px-3 py-1 bg-data-green border-[2px] border-gray-900 text-xs font-bold shadow-brutal-sm"
 										>
 											SUCCESS
 										</div>

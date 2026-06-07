@@ -320,7 +320,7 @@
 								{@const country = COUNTRIES.find((c) => c.code === code)}
 								{#if country}
 									<div
-										class="flex items-center gap-1.5 px-2.5 py-1 bg-[#4ade80] rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black shadow-brutal-sm"
+										class="flex items-center gap-1.5 px-2.5 py-1 bg-data-green rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black shadow-brutal-sm"
 									>
 										<span>{country.flag} {country.code}</span>
 										<button
@@ -473,7 +473,7 @@
 							}}
 							class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 								{allSelected
-								? 'bg-[#4ade80] text-black shadow-brutal-sm'
+								? 'bg-data-green text-black shadow-brutal-sm'
 								: 'bg-white text-gray-500 shadow-[1px_1px_0_0_#1f2937] hover:bg-brand-accent hover:text-black'}"
 						>
 							{range.label}
@@ -518,7 +518,7 @@
 									}}
 									class="min-w-[44px] min-h-[44px] rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
-										? 'bg-[#4ade80] text-black shadow-brutal-sm -translate-y-[1px]'
+										? 'bg-data-green text-black shadow-brutal-sm -translate-y-[1px]'
 										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
 								>
 									{displayHour}
@@ -548,7 +548,7 @@
 									}}
 									class="min-w-[44px] min-h-[44px] rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
-										? 'bg-[#4ade80] text-black shadow-brutal-sm -translate-y-[1px]'
+										? 'bg-data-green text-black shadow-brutal-sm -translate-y-[1px]'
 										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
 								>
 									{displayHour}
@@ -585,7 +585,7 @@
 						}}
 						class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 							{Array.isArray(rule.value) && WEEKDAYS.every((d) => rule.value.includes(d))
-							? 'bg-[#4ade80] text-black shadow-brutal-sm'
+							? 'bg-data-green text-black shadow-brutal-sm'
 							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_#1f2937] hover:bg-brand-accent hover:text-black'}"
 					>
 						Weekdays
@@ -605,7 +605,7 @@
 						}}
 						class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 							{Array.isArray(rule.value) && WEEKEND.every((d) => rule.value.includes(d))
-							? 'bg-[#4ade80] text-black shadow-brutal-sm'
+							? 'bg-data-green text-black shadow-brutal-sm'
 							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_#1f2937] hover:bg-brand-accent hover:text-black'}"
 					>
 						Weekend
@@ -632,7 +632,7 @@
 							}}
 							class="flex-1 py-2 min-h-[44px] text-xs font-black transition-all cursor-pointer uppercase tracking-wider
 								{index !== 0 ? 'border-l-[3px] border-black' : ''}
-								{selected ? 'bg-[#4ade80] text-black' : 'bg-white text-gray-500 hover:bg-gray-100'}"
+								{selected ? 'bg-data-green text-black' : 'bg-white text-gray-500 hover:bg-gray-100'}"
 						>
 							{day.label}
 						</button>
