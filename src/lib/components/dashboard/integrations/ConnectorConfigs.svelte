@@ -385,7 +385,7 @@
 							</button>
 							<button
 								on:click={() => handleDelete(connector.uid)}
-								class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+								class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
 								title="Delete"
 								aria-label="Delete connector"
 							>
@@ -437,7 +437,7 @@
 					</h3>
 					<button
 						on:click={closeModal}
-						class="p-1.5 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
 						aria-label="Close dialog"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

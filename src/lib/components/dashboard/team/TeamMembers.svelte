@@ -290,7 +290,7 @@
 										<button
 											on:click={() => handleRemoveMember(member)}
 											disabled={removingMemberId === member.uid}
-											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-brand-danger transition-all disabled:opacity-50"
+											class="opacity-0 group-hover:opacity-100 focus:opacity-100 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-brand-danger transition-all disabled:opacity-50"
 											title="Remove Member"
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -348,7 +348,7 @@
 									<div class="flex items-center gap-2">
 										<button
 											on:click={() => copyInviteLink(invitation)}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#4ade80] hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#4ade80] hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
 											title="Copy invite link"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,7 +364,7 @@
 										<button
 											on:click={() => handleResendInvitation(invitation)}
 											disabled={resendingInvitationId === invitation.uid}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#3b82f6] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#3b82f6] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
 											title="Resend invitation email"
 										>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,7 +380,7 @@
 										<button
 											on:click={() => handleRevokeInvitation(invitation)}
 											disabled={revokingInvitationId === invitation.uid}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-brand-danger hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+											class="px-3 min-h-[44px] text-xs font-black uppercase tracking-wider text-gray-500 hover:text-brand-danger hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 flex items-center"
 										>
 											{revokingInvitationId === invitation.uid ? 'Revoking...' : 'Revoke'}
 										</button>

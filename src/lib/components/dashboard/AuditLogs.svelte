@@ -539,7 +539,7 @@
 									</td>
 									<td class="px-4 py-4 text-right">
 										<button
-											class="text-gray-500 hover:text-brand-danger p-1"
+											class="text-gray-500 hover:text-brand-danger min-w-[44px] min-h-[44px] flex items-center justify-center"
 											on:click={() => openLogDetail(log)}
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -675,7 +675,7 @@
 				class="sticky top-0 bg-brand-accent border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
 			>
 				<h2 id="modal-title" class="text-lg font-bold text-gray-900">Activity Details</h2>
-				<button class="text-gray-900 hover:text-brand-danger p-1" on:click={closeLogDetail}>
+				<button class="text-gray-900 hover:text-brand-danger min-w-[44px] min-h-[44px] flex items-center justify-center" on:click={closeLogDetail}>
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"

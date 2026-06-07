@@ -362,7 +362,7 @@
 								{#if sub.status === 'active'}
 									<button
 										on:click={() => handlePause(sub.uid)}
-										class="p-2 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors border-2 border-transparent hover:border-yellow-900"
+										class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors border-2 border-transparent hover:border-yellow-900"
 										title="Pause"
 										aria-label="Pause webhook"
 									>
@@ -378,7 +378,7 @@
 								{:else}
 									<button
 										on:click={() => handleResume(sub.uid)}
-										class="p-2 text-green-700 hover:bg-green-100 rounded-lg transition-colors border-2 border-transparent hover:border-green-900"
+										class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-green-700 hover:bg-green-100 rounded-lg transition-colors border-2 border-transparent hover:border-green-900"
 										title="Resume"
 										aria-label="Resume webhook"
 									>
@@ -400,7 +400,7 @@
 								{/if}
 								<button
 									on:click={() => handleDelete(sub.uid)}
-									class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors border-2 border-transparent hover:border-red-900"
+									class="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors border-2 border-transparent hover:border-red-900"
 									title="Delete"
 									aria-label="Delete webhook"
 								>
@@ -453,7 +453,7 @@
 					</h3>
 					<button
 						on:click={closeModal}
-						class="p-1.5 hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
+						class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-black/10 rounded-lg text-gray-900 transition-colors"
 						aria-label="Close dialog"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

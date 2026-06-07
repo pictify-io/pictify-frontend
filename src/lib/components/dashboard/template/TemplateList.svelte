@@ -470,7 +470,7 @@
 				{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
 				>
 					<button
-						class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#4ecdc4] hover:bg-[#4ecdc4]/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
+						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-[#4ecdc4] hover:bg-[#4ecdc4]/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
 						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
 						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
 						title="Render with variables"
@@ -493,7 +493,7 @@
 						>
 					</button>
 					<button
-						class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-brand-danger hover:bg-brand-danger/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
+						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-brand-danger hover:bg-brand-danger/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
 						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
 						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/bulk-render`)}
 						title="Batch render from CSV"
@@ -516,7 +516,7 @@
 					</button>
 					{#if template.hasDynamicLink}
 						<button
-							class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-[#a855f7] bg-[#a855f7]/10 hover:bg-[#a855f7]/20 transition-all duration-150"
+							class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-[#a855f7] bg-[#a855f7]/10 hover:bg-[#a855f7]/20 transition-all duration-150"
 							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
 							title="View live link"
 							aria-label="View live link"
@@ -540,7 +540,7 @@
 						</button>
 					{:else}
 						<button
-							class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-all duration-150"
+							class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-[#3b82f6] hover:bg-[#3b82f6]/10 transition-all duration-150"
 							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
 							title="Deploy as live link"
 							aria-label="Deploy as live link"
@@ -591,7 +591,7 @@
 				<button
 					on:click={prevPage}
 					disabled={!pagination.hasPrev}
-					class="group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
+					class="group flex items-center justify-center min-w-[44px] min-h-[44px] sm:w-10 sm:h-10 sm:min-w-0 sm:min-h-0 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
 						{pagination.hasPrev
 						? 'hover:bg-gray-900 hover:text-white shadow-brutal-sm sm:shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
 						: 'opacity-50 cursor-not-allowed bg-gray-100'}"
@@ -621,7 +621,7 @@
 						{:else}
 							<button
 								on:click={() => goToPage(pageNum)}
-								class="w-6 h-6 sm:w-8 sm:h-8 text-[10px] sm:text-xs font-black rounded-md transition-all duration-200 flex items-center justify-center
+								class="min-w-[44px] min-h-[44px] sm:w-8 sm:h-8 sm:min-w-0 sm:min-h-0 text-[10px] sm:text-xs font-black rounded-md transition-all duration-200 flex items-center justify-center
 									{pageNum === pagination.page
 									? 'bg-gray-900 text-white shadow-md scale-105'
 									: 'text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm'}"
@@ -638,7 +638,7 @@
 				<button
 					on:click={nextPage}
 					disabled={!pagination.hasNext}
-					class="group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
+					class="group flex items-center justify-center min-w-[44px] min-h-[44px] sm:w-10 sm:h-10 sm:min-w-0 sm:min-h-0 rounded-lg border-[2px] border-gray-900 bg-white transition-all duration-200
 						{pagination.hasNext
 						? 'hover:bg-gray-900 hover:text-white shadow-brutal-sm sm:shadow-brutal-md hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
 						: 'opacity-50 cursor-not-allowed bg-gray-100'}"

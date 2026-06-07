@@ -33,21 +33,21 @@
 	{#each modes as mode}
 		{#if mode.disabled}
 			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-400 cursor-not-allowed border-[2px] border-transparent"
+				class="px-5 py-2.5 min-h-[44px] text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-400 cursor-not-allowed border-[2px] border-transparent"
 				disabled
 			>
 				{mode.label}
 			</button>
 		{:else if activeMode === mode.id}
 			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-white border-[2px] border-gray-900 shadow-brutal-sm"
+				class="px-5 py-2.5 min-h-[44px] text-xs font-black uppercase tracking-widest rounded-lg transition-all text-white border-[2px] border-gray-900 shadow-brutal-sm"
 				style="background-color: {mode.color}"
 			>
 				{mode.label}
 			</button>
 		{:else}
 			<button
-				class="px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
+				class="px-5 py-2.5 min-h-[44px] text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-600 hover:text-gray-900 hover:bg-white/50 border-[2px] border-transparent"
 				on:click={() => goto(mode.href(uid))}
 			>
 				{mode.label}

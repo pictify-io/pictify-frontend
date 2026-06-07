@@ -377,7 +377,7 @@
 							>
 								<button
 									on:click={(e) => copyToClipboard(media.url, e)}
-									class="bg-white rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-white rounded-lg min-w-[44px] min-h-[44px] sm:w-9 sm:h-9 sm:min-w-0 sm:min-h-0 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Copy URL"
 									aria-label="Copy URL"
 								>
@@ -397,7 +397,7 @@
 								</button>
 								<button
 									on:click={(e) => downloadMedia(media.url, e)}
-									class="bg-brand-danger rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-brand-danger rounded-lg min-w-[44px] min-h-[44px] sm:w-9 sm:h-9 sm:min-w-0 sm:min-h-0 border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Download"
 									aria-label="Download"
 								>
@@ -458,7 +458,7 @@
 						<button
 							on:click={() => loadPage(currentPage - 1)}
 							disabled={!hasPrev || isLoadingMore}
-							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
+							class="min-w-[44px] min-h-[44px] w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
 							{hasPrev
 								? 'bg-white text-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"
@@ -482,7 +482,7 @@
 									<button
 										on:click={() => loadPage(pageNum)}
 										disabled={isLoadingMore}
-										class="w-8 h-8 text-xs font-black rounded-md border-[2px] transition-all duration-200 flex items-center justify-center
+										class="min-w-[44px] min-h-[44px] sm:w-8 sm:h-8 sm:min-w-0 sm:min-h-0 text-xs font-black rounded-md border-[2px] transition-all duration-200 flex items-center justify-center
 										{pageNum === currentPage
 											? 'bg-gray-900 border-gray-900 text-white shadow-brutal-accent-sm'
 											: 'bg-white border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-900'}"
@@ -497,7 +497,7 @@
 						<button
 							on:click={() => loadPage(currentPage + 1)}
 							disabled={!hasNext || isLoadingMore}
-							class="w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
+							class="min-w-[44px] min-h-[44px] w-10 h-10 flex items-center justify-center rounded-lg border-[2px] border-gray-900 transition-all duration-200
 							{hasNext
 								? 'bg-white text-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300'}"

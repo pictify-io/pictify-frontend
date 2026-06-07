@@ -516,7 +516,7 @@
 										}
 										emitChange();
 									}}
-									class="w-9 h-8 rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
+									class="min-w-[44px] min-h-[44px] rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
 										? 'bg-[#4ade80] text-black shadow-brutal-sm -translate-y-[1px]'
 										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
@@ -546,7 +546,7 @@
 										}
 										emitChange();
 									}}
-									class="w-9 h-8 rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
+									class="min-w-[44px] min-h-[44px] rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
 										? 'bg-[#4ade80] text-black shadow-brutal-sm -translate-y-[1px]'
 										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-brutal-sm'}"
@@ -630,7 +630,7 @@
 								}
 								emitChange();
 							}}
-							class="flex-1 py-2 text-xs font-black transition-all cursor-pointer uppercase tracking-wider
+							class="flex-1 py-2 min-h-[44px] text-xs font-black transition-all cursor-pointer uppercase tracking-wider
 								{index !== 0 ? 'border-l-[3px] border-black' : ''}
 								{selected ? 'bg-[#4ade80] text-black' : 'bg-white text-gray-500 hover:bg-gray-100'}"
 						>
@@ -656,7 +656,7 @@
 		type="button"
 		on:click={emitRemove}
 		{disabled}
-		class="p-2 border-[3px] border-transparent rounded-xl text-gray-400 hover:text-black hover:bg-brand-danger hover:border-black hover:shadow-brutal-sm transition-all shrink-0 self-center"
+		class="min-w-[44px] min-h-[44px] flex items-center justify-center border-[3px] border-transparent rounded-xl text-gray-400 hover:text-black hover:bg-brand-danger hover:border-black hover:shadow-brutal-sm transition-all shrink-0 self-center"
 		title="Remove rule"
 	>
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

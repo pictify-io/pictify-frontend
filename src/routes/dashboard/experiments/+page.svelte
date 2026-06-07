@@ -584,7 +584,7 @@
 										>
 											<button
 												on:click|stopPropagation={() => confirmDelete(exp)}
-												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-brutal-md hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
+												class="min-w-[44px] min-h-[44px] sm:w-8 sm:h-8 sm:min-w-0 sm:min-h-0 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-brutal-md hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
 												title="Delete"
 												aria-label="Delete experiment"
 											>

@@ -314,7 +314,7 @@
 													{token.token.slice(0, 12)}...{token.token.slice(-4)}
 												</code>
 												<button
-													class="p-1.5 sm:p-2 hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"
+													class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"
 													on:click={() => copyToClipboard(token.token)}
 													title="Copy to clipboard"
 													aria-label="Copy API key to clipboard"
@@ -329,7 +329,7 @@
 
 											<!-- Right: Actions -->
 											<button
-												class="text-[10px] sm:text-xs font-bold text-gray-400 hover:text-red-600 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide border-2 border-transparent hover:border-red-100 w-full md:w-auto"
+												class="text-[10px] sm:text-xs font-bold text-gray-400 hover:text-red-600 px-2 sm:px-3 md:px-4 min-h-[44px] sm:py-2 rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide border-2 border-transparent hover:border-red-100 w-full md:w-auto flex items-center justify-center md:inline-flex"
 												on:click={() => confirmRevoke(token)}
 											>
 												Revoke
