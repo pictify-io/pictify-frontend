@@ -14,7 +14,7 @@
 	 * Insertion contract per type:
 	 *   color → '<hex>' (just the value, so it fits inside any
 	 *                   style="..." slot or CSS custom property)
-	 *   logo  → <img src="<url>" alt="<name>" style="max-width:100%" />
+	 *   logo  → <img loading="lazy" src="<url>" alt="<name>" style="max-width:100%" />
 	 *   image → same as logo
 	 *   icon  → same as logo (small inline default)
 	 *   font  → Two-step: if no <link> for this font exists, inject
@@ -106,7 +106,7 @@
 		// inside whatever container the user drops it into. Height
 		// auto preserves aspect ratio. The `$0` marker would place
 		// the caret — omitted here so the insertion feels atomic.
-		const body = `<img src="${url}" alt="${alt}" style="max-width:100%;height:auto;" />`;
+		const body = `<img loading="lazy" src="${url}" alt="${alt}" style="max-width:100%;height:auto;" />`;
 		dispatch('insert', { body });
 	}
 

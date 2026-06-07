@@ -118,7 +118,7 @@
 						</p>
 					</div>
 				{/if}
-				<img
+				<img loading="lazy"
 					src={imgSrc}
 					alt="Rendered output"
 					class="max-w-full max-h-[500px] object-contain shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] border-[2px] border-gray-200"
@@ -129,7 +129,7 @@
 			</div>
 		{:else if templateThumbnail}
 			<div class="text-center py-8 relative z-10 opacity-60 hover:opacity-100 transition-opacity">
-				<img
+				<img loading="lazy"
 					src={templateThumbnail}
 					alt="Template thumbnail"
 					class="max-w-[80%] max-h-[300px] object-contain mx-auto mb-6 border-[2px] border-gray-300 shadow-sm"

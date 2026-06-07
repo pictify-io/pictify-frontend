@@ -61,7 +61,7 @@
 							<p class="text-base md:text-lg text-gray-700">{useCase.description}</p>
 						</div>
 						<div class="relative rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-							<img
+							<img loading="lazy"
 								src={useCase.image}
 								alt={useCase.title}
 								class="w-full h-auto transform transition-transform duration-300 group-hover:scale-[1.02]"

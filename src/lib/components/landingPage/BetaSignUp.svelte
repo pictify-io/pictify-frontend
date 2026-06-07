@@ -3,7 +3,7 @@
 	<div
 		class="rounded-xl relative z-20 pl-8 sm:pl-10 pr-8 sm:pr-16 py-8 border-[3px] border-gray-900 bg-[#fff4da]"
 	>
-		<img
+		<img loading="lazy"
 			src="https://cdn.devdojo.com/images/january2023/shape-1.png"
 			class="absolute md:block hidden left-0 h-[4.5rem] w-[4.5rem] bottom-0 -translate-x-full ml-3"
 			alt="pictify-ui-element1"
@@ -32,7 +32,7 @@
 					class="py-3.5 rounded px-6 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-brand-accent tracking-wide text-lg flex-shrink-0 text-gray-900"
 					>Get Notified</button
 				>
-				<img
+				<img loading="lazy"
 					src="https://cdn.devdojo.com/images/january2023/shape-2.png"
 					class="absolute sm:translate-y-0 translate-y-full sm:mt-0 mt-16 w-16 right-0 translate-x-full top-0 h-16 mr-2"
 					alt="pictify-ui-element2"

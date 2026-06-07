@@ -31,7 +31,7 @@
 		<div
 			class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 		>
-			<img src={imageUrl} alt={imageAlt} class="max-w-full h-auto max-h-[400px]" />
+			<img loading="lazy" src={imageUrl} alt={imageAlt} class="max-w-full h-auto max-h-[400px]" />
 		</div>
 
 		<div class="flex flex-wrap justify-center gap-4">

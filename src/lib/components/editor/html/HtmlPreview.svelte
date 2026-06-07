@@ -128,7 +128,7 @@
 			  but kept as a belt-and-suspenders for browsers that
 			  render the img element at intrinsic size first.
 			-->
-			<img
+			<img loading="lazy"
 				src={dataUrl}
 				alt="Live template preview"
 				class="block h-auto w-auto max-h-full max-w-full rounded-md border-[2px] border-gray-900 bg-white object-contain shadow-brutal-md"

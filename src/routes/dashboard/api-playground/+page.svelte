@@ -2762,7 +2762,7 @@
 															</div>
 														</div>
 													{/if}
-													<img
+													<img loading="lazy"
 														src={previewImgSrc}
 														alt="Result"
 														class="w-full rounded-lg border-2 border-gray-200"

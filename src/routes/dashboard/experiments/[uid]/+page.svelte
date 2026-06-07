@@ -241,7 +241,7 @@
 	$: publicUrl = exp?.slug ? `pictify.io/s/${exp.slug}.${exp?.outputConfig?.format || 'png'}` : '';
 
 	$: embedCode = publicUrl
-		? `<img src="https://${publicUrl}" alt="${exp?.name || 'Experiment'}" />`
+		? `<img loading="lazy" src="https://${publicUrl}" alt="${exp?.name || 'Experiment'}" />`
 		: '';
 
 	$: runningDuration = getRunningDuration(exp);
@@ -1127,7 +1127,7 @@
 												<div
 													class="w-full h-32 lg:h-full bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] relative"
 												>
-													<img
+													<img loading="lazy"
 														src={variant.preRenderedUrl || variant.templateThumbnail}
 														alt="{variant.name || 'Variant'} preview"
 														class="w-full h-full object-contain p-2"
@@ -1186,7 +1186,7 @@
 										<div
 											class="w-40 h-28 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0 relative"
 										>
-											<img
+											<img loading="lazy"
 												src={smartLinkFallback.preRenderedUrl || smartLinkFallback.templateThumbnail}
 												alt="Fallback preview"
 												class="w-full h-full object-contain p-2"
@@ -1385,7 +1385,7 @@
 											<div
 												class="w-full lg:w-48 h-32 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] shrink-0 relative"
 											>
-												<img
+												<img loading="lazy"
 													src={variant.preRenderedUrl || variant.templateThumbnail}
 													alt="{variant.name} preview"
 													class="w-full h-full object-contain p-2"
@@ -1533,7 +1533,7 @@
 											<div
 												class="w-full h-40 bg-gray-100 border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] relative group"
 											>
-												<img
+												<img loading="lazy"
 													src={variant.preRenderedUrl || variant.templateThumbnail}
 													alt="{variant.name || 'Variant'} preview"
 													class="w-full h-full object-contain p-2"
@@ -1742,7 +1742,7 @@
 									<button
 										on:click={() => copyToClipboard(
 `// 1. Show the A/B tested image
-// <img src="https://${publicUrl}" />
+// <img loading="lazy" src="https://${publicUrl}" />
 
 // 2. Get the assigned variant for this viewer
 const res = await fetch("https://pictify.io/s/${exp.slug}/resolve")
@@ -2464,7 +2464,7 @@ fetch("https://pictify.io/s/events", {
 									<div
 										class="w-16 h-16 bg-gray-100 border-[3px] border-gray-900 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] rounded-xl overflow-hidden shrink-0"
 									>
-										<img
+										<img loading="lazy"
 											src={variant.preRenderedUrl || variant.templateThumbnail}
 											alt=""
 											class="w-full h-full object-contain p-1"

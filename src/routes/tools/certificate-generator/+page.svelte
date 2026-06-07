@@ -675,7 +675,7 @@
 					<div
 						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
-						<img
+						<img loading="lazy"
 							src={generatedImageUrl}
 							alt="Generated {selectedTemplate.name} certificate for {formValues.recipientName}"
 							class="max-w-full h-auto max-h-[400px]"

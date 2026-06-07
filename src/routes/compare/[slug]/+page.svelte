@@ -316,7 +316,7 @@
 						style="color: {icon.color || '#1f2937'}"
 					>
 						{#if icon.type === 'url'}
-							<img src={icon.url} alt={comparison.competitor} class="w-10 h-10 sm:w-14 sm:h-14" />
+							<img loading="lazy" src={icon.url} alt={comparison.competitor} class="w-10 h-10 sm:w-14 sm:h-14" />
 						{:else if icon.type === 'text'}
 							<span class="text-2xl sm:text-4xl font-black" style="color: {icon.color}"
 								>{icon.text}</span
@@ -420,7 +420,7 @@
 							style="color: {icon.color || '#1f2937'}"
 						>
 							{#if icon.type === 'url'}
-								<img src={icon.url} alt={comparison.competitor} class="w-8 h-8" />
+								<img loading="lazy" src={icon.url} alt={comparison.competitor} class="w-8 h-8" />
 							{:else if icon.type === 'text'}
 								<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
 							{:else if icon.type === 'svg'}
@@ -767,7 +767,7 @@
 									style="color: {compIcon.color || '#1f2937'}"
 								>
 									{#if compIcon.type === 'url'}
-										<img src={compIcon.url} alt={comp.competitor} class="w-6 h-6" />
+										<img loading="lazy" src={compIcon.url} alt={comp.competitor} class="w-6 h-6" />
 									{:else if compIcon.type === 'text'}
 										<span class="text-sm font-black" style="color: {compIcon.color}"
 											>{compIcon.text}</span

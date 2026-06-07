@@ -1135,7 +1135,7 @@
 															class="bg-white rounded-xl border-[3px] border-gray-900 p-4 shadow-brutal-lg space-y-4"
 														>
 															<h4 class="font-bold text-gray-900">Generated Asset</h4>
-															<img
+															<img loading="lazy"
 																src={imageUrl}
 																alt="Generated Result"
 																class="w-full rounded-lg border-2 border-gray-200"

@@ -297,7 +297,7 @@
 								<div
 									class="relative w-[400px] bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transform transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1"
 								>
-									<img
+									<img loading="lazy"
 										src="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
 										alt="Example of a generated image output from Pictify API"
 										class="w-full h-auto object-cover border-b-[3px] border-gray-900"

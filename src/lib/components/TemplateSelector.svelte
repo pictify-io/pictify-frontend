@@ -345,7 +345,7 @@
 			}`;
 
 			const thumbHtml = tpl.thumbnail
-				? `<img src="${escapeHtml(
+				? `<img loading="lazy" src="${escapeHtml(
 						tpl.thumbnail
 				  )}" alt="" class="w-12 h-9 object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100" />`
 				: `<div class="w-12 h-9 rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
@@ -408,7 +408,7 @@
 >
 	{#if displayTemplate}
 		{#if displayTemplate.thumbnail}
-			<img
+			<img loading="lazy"
 				src={displayTemplate.thumbnail}
 				alt=""
 				class="w-10 h-[30px] object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100"

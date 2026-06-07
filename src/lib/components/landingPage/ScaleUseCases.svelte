@@ -275,7 +275,7 @@
 									class="absolute w-full h-full left-0 top-0 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden flex flex-col justify-end p-2.5 md:p-3 bg-black transition-all duration-300 hover:scale-[1.05] group-hover:shadow-brutal-2xl {rotate} {zIndex} {translateX} hover:!z-20 origin-bottom"
 								>
 									<div class="absolute inset-0 pointer-events-none">
-										<img
+										<img loading="lazy"
 											src={variant.bgImg}
 											alt="abstract"
 											class="w-full h-full object-cover filter grayscale contrast-125 opacity-70"
@@ -297,7 +297,7 @@
 											{variant.title}
 										</h2>
 										<div class="flex items-center gap-1.5">
-											<img
+											<img loading="lazy"
 												src={variant.author.img}
 												alt="author"
 												class="w-4 h-4 md:w-5 md:h-5 bg-white border border-white shadow-[1px_1px_0_0_rgba(255,255,255,0.5)] rounded-none"
@@ -372,7 +372,7 @@
 							<div
 								class="w-[100px] md:w-[130px] relative z-10 h-full flex flex-col justify-center items-center"
 							>
-								<img
+								<img loading="lazy"
 									src={variant.image}
 									alt="product"
 									class="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500"

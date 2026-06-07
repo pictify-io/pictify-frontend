@@ -78,7 +78,7 @@
     <div class="main">
       <div class="container">
         <div>
-          <img src="https://res.cloudinary.com/diroilukd/image/upload/v1702766105/shape-1_wld59w.png" class="side-element-1">
+          <img loading="lazy" src="https://res.cloudinary.com/diroilukd/image/upload/v1702766105/shape-1_wld59w.png" class="side-element-1">
         </div>
         <div class="text">
           <h1>Pictify</h1>
@@ -87,7 +87,7 @@
         <div class="bottom-img-container">
           <div></div>
           <div>
-            <img src="https://res.cloudinary.com/diroilukd/image/upload/v1702766150/shape-2_phblyh.png" class="side-element-2">
+            <img loading="lazy" src="https://res.cloudinary.com/diroilukd/image/upload/v1702766150/shape-2_phblyh.png" class="side-element-2">
           </div>
         </div>
       </div>

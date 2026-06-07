@@ -572,7 +572,7 @@
 							/>
 						</div>
 					{:else}
-						<img
+						<img loading="lazy"
 							src={selectedMedia.url}
 							alt="Full size media"
 							class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"

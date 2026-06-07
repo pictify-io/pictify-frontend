@@ -126,7 +126,7 @@
 							style="color: {icon.color || '#1f2937'}"
 						>
 							{#if icon.type === 'url'}
-								<img src={icon.url} alt={integration.name} class="w-10 h-10" />
+								<img loading="lazy" src={icon.url} alt={integration.name} class="w-10 h-10" />
 							{:else if icon.type === 'text'}
 								<span class="text-2xl font-black" style="color: {icon.color}">{icon.text}</span>
 							{:else if icon.type === 'svg'}
@@ -524,7 +524,7 @@
 										style="color: {relatedIcon.color || '#1f2937'}"
 									>
 										{#if relatedIcon.type === 'url'}
-											<img src={relatedIcon.url} alt={related.name} class="w-6 h-6" />
+											<img loading="lazy" src={relatedIcon.url} alt={related.name} class="w-6 h-6" />
 										{:else if relatedIcon.type === 'text'}
 											<span class="text-sm font-black" style="color: {relatedIcon.color}"
 												>{relatedIcon.text}</span

@@ -974,7 +974,7 @@
 										class="aspect-video bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:12px_12px] border-b-[3px] border-black relative overflow-hidden flex-shrink-0"
 									>
 										{#if template.thumbnail}
-											<img
+											<img loading="lazy"
 												src={template.thumbnail}
 												alt={template.name}
 												class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -1139,7 +1139,7 @@
 										class="w-12 h-12 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:8px_8px] rounded-xl border-[2px] border-black flex-shrink-0 overflow-hidden shadow-[2px_2px_0_0_black] group-hover:shadow-[4px_4px_0_0_black] group-hover:-translate-y-0.5 transition-all"
 									>
 										{#if tpl.thumbnail}
-											<img src={tpl.thumbnail} alt={tpl.name} class="w-full h-full object-cover" />
+											<img loading="lazy" src={tpl.thumbnail} alt={tpl.name} class="w-full h-full object-cover" />
 										{:else if tpl.engine === 'html' && tpl.html}
 											<SnippetThumbnail
 												body={tpl.html}

@@ -398,7 +398,7 @@
 
 								<!-- The Rendered Image -->
 								{#if imageSrc}
-									<img
+									<img loading="lazy"
 										src={imageSrc}
 										alt="Live Pictify Demo"
 										class="w-full h-full object-contain rounded border-[3px] border-gray-900 shadow-brutal-2xl transition-opacity duration-300 relative z-10 bg-white"

@@ -842,7 +842,7 @@
 								<!-- Image is hidden until it successfully loads, to
 								     suppress the broken-image glyph while S3 is
 								     still propagating. -->
-								<img
+								<img loading="lazy"
 									src={previewSrc}
 									alt="Rendered template"
 									on:load={handleImgLoad}

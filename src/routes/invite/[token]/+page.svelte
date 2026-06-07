@@ -97,7 +97,7 @@
 		<!-- Logo -->
 		<div class="text-center mb-8">
 			<a href="/" class="inline-block">
-				<img src="/logo.svg" alt="Pictify" class="h-10 mx-auto" />
+				<img loading="lazy" src="/logo.svg" alt="Pictify" class="h-10 mx-auto" />
 			</a>
 		</div>
 
@@ -153,7 +153,7 @@
 							class="w-16 h-16 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center"
 						>
 							{#if invitation.team?.avatar}
-								<img
+								<img loading="lazy"
 									src={invitation.team.avatar}
 									alt={invitation.team.name}
 									class="w-full h-full rounded-xl object-cover"

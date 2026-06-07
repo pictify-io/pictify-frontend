@@ -168,7 +168,7 @@
 								<div
 									class="w-full h-24 bg-gray-100 rounded mb-3 overflow-hidden border border-gray-200 relative"
 								>
-									<img
+									<img loading="lazy"
 										src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=400&q=80"
 										class="w-full h-full object-cover"
 										alt="preview"
@@ -364,7 +364,7 @@
 											class="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[1px]"
 										>
 											<div class="w-full h-full bg-white rounded-full p-[1px]">
-												<img
+												<img loading="lazy"
 													src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
 													alt="avatar"
 													class="rounded-full"
@@ -431,7 +431,7 @@
 									</p>
 									<div class="flex items-center gap-2 mt-auto pt-1">
 										<div class="w-6 h-6 rounded-full border border-black overflow-hidden shrink-0">
-											<img
+											<img loading="lazy"
 												src="/landing-page/profile_sarah.png"
 												class="w-full h-full object-cover"
 												alt="Sarah Jenkins"
@@ -476,7 +476,7 @@
 									<div
 										class="w-12 h-16 bg-gray-100 rounded border border-gray-200 shrink-0 relative flex items-center justify-center"
 									>
-										<img
+										<img loading="lazy"
 											src="/landing-page/product_shoe.png"
 											alt="p"
 											class="w-full h-full object-cover mix-blend-multiply opacity-80"
@@ -539,7 +539,7 @@
 									class="w-48 h-24 bg-white border-[2px] border-black rounded-xl overflow-hidden shrink-0 flex"
 								>
 									<div class="w-16 h-full bg-gray-200 shrink-0">
-										<img
+										<img loading="lazy"
 											src="/landing-page/news_tech.png"
 											alt="news"
 											class="w-full h-full object-cover grayscale"
@@ -563,7 +563,7 @@
 								<div
 									class="w-40 h-24 bg-white border-[2px] border-black rounded-xl p-0 shrink-0 overflow-hidden relative group"
 								>
-									<img
+									<img loading="lazy"
 										src="/landing-page/real_estate.png"
 										alt="house"
 										class="absolute inset-0 w-full h-full object-cover"

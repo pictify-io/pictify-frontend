@@ -71,25 +71,25 @@
 				<div class="w-full">
 					<div class="flex mt-2 text-left w-full items-center">
 						{#if !isPasswordLengthValid}
-							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
 						{:else}
-							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
 						{/if}
 						<div class="text-gray-900 text-xs">Password must be at least 8 characters</div>
 					</div>
 					<div class="flex mt-2 text-left w-full items-center">
 						{#if !isPasswordContainsNumber}
-							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
 						{:else}
-							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
 						{/if}
 						<div class="text-gray-900 text-xs">Password must contain at least 1 number</div>
 					</div>
 					<div class="flex mt-2 text-left w-full items-center">
 						{#if !isPasswordContainsUpperCase}
-							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
 						{:else}
-							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
 						{/if}
 						<div class="text-gray-900 text-xs">
 							Password must contain at least 1 uppercase letter
@@ -97,9 +97,9 @@
 					</div>
 					<div class="flex mt-2 text-left w-full items-center">
 						{#if !isPasswordMatch}
-							<img src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={CheckboxEmpty} alt="Checkbox empty" class="w-5 h-5 mr-2" />
 						{:else}
-							<img src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
+							<img loading="lazy" src={Checkbox} alt="Checkbox" class="w-5 h-5 mr-2" />
 						{/if}
 						<div class="text-gray-900 text-xs">Passwords must match</div>
 					</div>

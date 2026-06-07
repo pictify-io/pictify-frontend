@@ -1584,7 +1584,7 @@
 							</div>
 						{:else if generatedImage}
 							<div class="flex items-center justify-center w-full h-full p-4 sm:p-8">
-								<img
+								<img loading="lazy"
 									src={generatedImage.url}
 									alt="Generated output"
 									class="max-w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000]"

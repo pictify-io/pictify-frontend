@@ -159,7 +159,7 @@
 												style="color: {icon.color || '#1f2937'}"
 											>
 												{#if icon.type === 'url'}
-													<img src={icon.url} alt={integration.name} class="w-8 h-8" />
+													<img loading="lazy" src={icon.url} alt={integration.name} class="w-8 h-8" />
 												{:else if icon.type === 'text'}
 													<span class="text-lg font-black" style="color: {icon.color}"
 														>{icon.text}</span

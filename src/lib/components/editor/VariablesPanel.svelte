@@ -2206,7 +2206,7 @@
 									</div>
 								</div>
 							{/if}
-							<img
+							<img loading="lazy"
 								src={imgSrc}
 								alt="Rendered template"
 								class="w-full rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#e5e5e5]"
@@ -2305,7 +2305,7 @@
 											<span class="text-[10px] font-bold text-gray-500 uppercase">Loading...</span>
 										</div>
 									{/if}
-									<img
+									<img loading="lazy"
 										src={imgState.src}
 										alt="{layoutResult.name} render"
 										class="w-full rounded border border-gray-300 bg-white"

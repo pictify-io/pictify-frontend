@@ -27,7 +27,7 @@
 						: 'border-gray-200 hover:border-gray-400 opacity-70 hover:opacity-100'}"
 				>
 					{#if tmpl.thumbnail}
-						<img src={tmpl.thumbnail} alt={tmpl.name} class="w-28 h-20 object-cover" />
+						<img loading="lazy" src={tmpl.thumbnail} alt={tmpl.name} class="w-28 h-20 object-cover" />
 					{:else}
 						<div
 							class="w-28 h-20 flex flex-col items-center justify-center gap-1 px-2"

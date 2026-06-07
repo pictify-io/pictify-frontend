@@ -106,7 +106,7 @@
 						<div
 							class="h-[280px] border-[3px] border-gray-900 rounded-xl overflow-hidden bg-gray-100 mb-6 relative"
 						>
-							<img
+							<img loading="lazy"
 								src={featured?.heroImage}
 								class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
 								alt={featured?.title}

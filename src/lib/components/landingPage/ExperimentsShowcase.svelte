@@ -336,7 +336,7 @@
 								</div>
 								<div class="aspect-[1200/630] flex items-center justify-center p-2">
 									{#if abVariantAImage}
-										<img
+										<img loading="lazy"
 											src={abVariantAImage}
 											alt="A/B Variant A"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/10"
@@ -373,7 +373,7 @@
 								</div>
 								<div class="aspect-[1200/630] flex items-center justify-center p-2">
 									{#if abVariantBImage}
-										<img
+										<img loading="lazy"
 											src={abVariantBImage}
 											alt="A/B Variant B"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/10"
@@ -597,7 +597,7 @@
 									class="relative bg-gray-50 aspect-[1200/630] flex items-center justify-center p-2"
 								>
 									{#if liveUrlImageSrc}
-										<img
+										<img loading="lazy"
 											src={liveUrlImageSrc}
 											alt="Live URL Preview"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/5 transition-opacity duration-300"
@@ -718,7 +718,7 @@
 									class="relative bg-gray-50 aspect-[1200/630] flex items-center justify-center p-2"
 								>
 									{#if smartLinkImageSrc}
-										<img
+										<img loading="lazy"
 											src={smartLinkImageSrc}
 											alt="Smart Link Preview"
 											class="w-full h-full object-contain rounded border-2 border-gray-900/5 transition-opacity"
