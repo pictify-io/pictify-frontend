@@ -461,7 +461,7 @@
 				<!-- Divider -->
 				<div class="flex items-center gap-3 justify-center">
 					<div class="h-[1px] flex-1 bg-gray-200" />
-					<span class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2"
+					<span class="text-[10px] font-black uppercase tracking-widest text-gray-600 px-2"
 						>or build your own</span
 					>
 					<div class="h-[1px] flex-1 bg-gray-200" />

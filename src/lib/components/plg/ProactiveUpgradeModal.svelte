@@ -302,7 +302,7 @@
 
 				<!-- Trust signals -->
 				<div
-					class="mt-6 pt-0 flex items-center justify-center gap-6 text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+					class="mt-6 pt-0 flex items-center justify-center gap-6 text-[10px] text-gray-600 font-bold uppercase tracking-wider"
 				>
 					<span class="flex items-center gap-1.5">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

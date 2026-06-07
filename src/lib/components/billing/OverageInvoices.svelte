@@ -161,11 +161,11 @@
 										Pay now
 									</a>
 								{:else if invoice.status === 'paid'}
-									<span class="text-xs text-gray-400 font-medium">
+									<span class="text-xs text-gray-600 font-medium">
 										{invoice.paidAt ? formatDate(invoice.paidAt) : 'Settled'}
 									</span>
 								{:else}
-									<span class="text-sm text-gray-400">-</span>
+									<span class="text-sm text-gray-600">-</span>
 								{/if}
 							</td>
 						</tr>

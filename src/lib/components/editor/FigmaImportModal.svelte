@@ -394,7 +394,7 @@
 						>
 							<i class="fa fa-inbox text-2xl text-gray-300 mb-2" />
 							<p class="text-xs font-bold text-gray-500 mb-1">No pending imports</p>
-							<p class="text-[10px] font-medium text-gray-400">
+							<p class="text-[10px] font-medium text-gray-600">
 								Use the Figma plugin to send designs here
 							</p>
 						</div>

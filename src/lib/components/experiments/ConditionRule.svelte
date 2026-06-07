@@ -497,7 +497,7 @@
 				<!-- Hour grid with AM/PM sections -->
 				<div class="flex flex-col gap-2">
 					<div class="flex items-center gap-2">
-						<span class="text-[9px] font-black text-gray-400 uppercase tracking-widest w-7 shrink-0"
+						<span class="text-[9px] font-black text-gray-600 uppercase tracking-widest w-7 shrink-0"
 							>AM</span
 						>
 						<div class="flex flex-wrap gap-1 flex-1">
@@ -527,7 +527,7 @@
 						</div>
 					</div>
 					<div class="flex items-center gap-2">
-						<span class="text-[9px] font-black text-gray-400 uppercase tracking-widest w-7 shrink-0"
+						<span class="text-[9px] font-black text-gray-600 uppercase tracking-widest w-7 shrink-0"
 							>PM</span
 						>
 						<div class="flex flex-wrap gap-1 flex-1">

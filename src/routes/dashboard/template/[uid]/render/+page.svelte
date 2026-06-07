@@ -872,7 +872,7 @@ console.log(result.url); // CDN URL of rendered image
 											/>
 										</div>
 									{/if}
-									<p class="text-sm font-bold text-gray-400 uppercase tracking-wide">
+									<p class="text-sm font-bold text-gray-600 uppercase tracking-wide">
 										{template?.engine === 'html' && template?.html
 											? 'Live preview · click Render for the real image'
 											: 'Fill in variables and click Render'}

@@ -257,7 +257,7 @@
 					</div>
 				</div>
 				<div class="flex flex-col items-end">
-					<div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+					<div class="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">
 						Monthly Capacity
 					</div>
 					<div
@@ -284,7 +284,7 @@
 					{/each}
 				</div>
 				<div
-					class="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1"
+					class="flex justify-between text-[10px] font-bold text-gray-600 uppercase tracking-widest px-1"
 				>
 					<span>0%</span>
 					<span>50%</span>

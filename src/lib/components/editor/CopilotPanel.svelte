@@ -818,7 +818,7 @@
 								class="bg-white border-[2px] border-gray-900 rounded-lg p-2 text-[11px] shadow-[1px_1px_0_0_#1f2937]"
 							>
 								<div class="flex items-start gap-1.5">
-									<span class="font-black text-gray-400 text-[10px] shrink-0"
+									<span class="font-black text-gray-600 text-[10px] shrink-0"
 										>#{step.stepNumber || index + 1}</span
 									>
 									<div class="flex-1 min-w-0">

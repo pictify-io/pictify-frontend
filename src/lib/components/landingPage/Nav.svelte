@@ -366,7 +366,7 @@
 			<div
 				class="border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl overflow-hidden"
 			>
-				<p class="px-4 pt-3 pb-1 text-xs font-black text-gray-400 uppercase tracking-widest">
+				<p class="px-4 pt-3 pb-1 text-xs font-black text-gray-600 uppercase tracking-widest">
 					Solutions
 				</p>
 				<a

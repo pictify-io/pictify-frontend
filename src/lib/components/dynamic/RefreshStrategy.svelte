@@ -254,7 +254,7 @@
 						value={outputConfig.quality}
 						on:input={(e) => handleOutputChange({ quality: parseInt(e.target.value) })}
 					/>
-					<div class="flex justify-between mt-2 text-[10px] font-black uppercase text-gray-400">
+					<div class="flex justify-between mt-2 text-[10px] font-black uppercase text-gray-600">
 						<span>Small File</span>
 						<span>High Quality</span>
 					</div>

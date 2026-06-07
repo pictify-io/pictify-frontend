@@ -1654,7 +1654,7 @@
 														{/each}
 													</div>
 												{:else}
-													<p class="text-xs font-bold text-gray-400 text-center py-4">
+													<p class="text-xs font-bold text-gray-600 text-center py-4">
 														{getResolvedTemplateUid(index)
 															? 'No variables defined.'
 															: 'Select template first.'}
@@ -1723,7 +1723,7 @@
 															{variantPreviews[index].error}
 														</p>
 													{:else}
-														<p class="text-[10px] font-bold text-gray-400 text-center">
+														<p class="text-[10px] font-bold text-gray-600 text-center">
 															Awaiting template...
 														</p>
 													{/if}

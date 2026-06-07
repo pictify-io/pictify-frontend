@@ -96,7 +96,7 @@
 				>
 					{group.operator || 'AND'}
 				</button>
-				<span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Group</span>
+				<span class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Group</span>
 			{/if}
 		</div>
 		<div class="flex items-center gap-2">

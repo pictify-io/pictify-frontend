@@ -218,7 +218,7 @@
 							: 'text-gray-900'}"
 					>
 						{pagination.total || 0}{#if typeof templateLimit === 'number'}<span
-								class="text-gray-400">/{formatLimit(templateLimit)}</span
+								class="text-gray-600">/{formatLimit(templateLimit)}</span
 							>{/if}
 					</div>
 				</div>

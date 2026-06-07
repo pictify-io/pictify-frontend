@@ -57,7 +57,7 @@
 										style="width: {pct}%"
 									/>
 								</div>
-								<div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
+								<div class="flex justify-between text-[10px] text-gray-600 mt-0.5">
 									<span>{(ch.impressions || 0).toLocaleString()} imp</span>
 									<span>{(ch.clicks || 0).toLocaleString()} clicks</span>
 								</div>
@@ -85,7 +85,7 @@
 										style="width: {pct}%"
 									/>
 								</div>
-								<div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
+								<div class="flex justify-between text-[10px] text-gray-600 mt-0.5">
 									<span>{(dv.impressions || 0).toLocaleString()} imp</span>
 									<span>{(dv.clicks || 0).toLocaleString()} clicks</span>
 								</div>

@@ -36,7 +36,7 @@
 							<span class="text-[10px] font-black text-gray-700 text-center leading-tight">
 								{tmpl.name}
 							</span>
-							<span class="text-[8px] text-gray-400">{tmpl.width}x{tmpl.height}</span>
+							<span class="text-[8px] text-gray-600">{tmpl.width}x{tmpl.height}</span>
 						</div>
 					{/if}
 				</button>

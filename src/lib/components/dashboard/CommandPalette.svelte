@@ -301,7 +301,7 @@
 			<div class="max-h-[50vh] overflow-y-auto py-2" role="listbox">
 				{#if filteredItems.length === 0}
 					<div class="px-5 py-8 text-center">
-						<p class="text-sm font-bold text-gray-400">No results for "{query}"</p>
+						<p class="text-sm font-bold text-gray-600">No results for "{query}"</p>
 					</div>
 				{:else}
 					{#each filteredItems as item, i}
@@ -380,7 +380,7 @@
 			<div
 				class="flex items-center justify-between px-5 py-2.5 border-t border-gray-100 bg-gray-50/50"
 			>
-				<div class="flex gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+				<div class="flex gap-3 text-[10px] font-bold text-gray-600 uppercase tracking-wide">
 					<span class="flex items-center gap-1">
 						<kbd class="px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[9px] font-mono"
 							>&#8593;&#8595;</kbd

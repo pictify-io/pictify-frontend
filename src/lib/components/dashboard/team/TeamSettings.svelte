@@ -393,7 +393,7 @@
 									<div class="flex items-center justify-between">
 										<div>
 											<p class="font-bold text-gray-900 text-sm">{invitation.email}</p>
-											<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">
+											<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider mt-1">
 												Expires {formatDate(invitation.expiresAt)}
 											</p>
 										</div>

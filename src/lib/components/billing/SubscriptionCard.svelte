@@ -180,7 +180,7 @@
 						<p class="text-2xl font-black text-gray-900 tracking-tight">
 							{formatCurrency(subscription.price)}
 						</p>
-						<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+						<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 							/ {subscription.interval || 'month'}
 						</p>
 					</div>
@@ -297,7 +297,7 @@
 										Card ending in {subscription.cardLastFour}
 									</p>
 								</div>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									{subscription.cardBrand}
 								</p>
 							</div>
@@ -309,7 +309,7 @@
 							</div>
 							<div>
 								<p class="text-xs font-black text-gray-900 uppercase">PayPal</p>
-								<p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									Connected
 								</p>
 							</div>
@@ -514,7 +514,7 @@
 			</div>
 
 			{#if isPayPal && !canPause}
-				<p class="text-[10px] font-bold text-gray-400 italic text-center">
+				<p class="text-[10px] font-bold text-gray-600 italic text-center">
 					* Pausing is not available for PayPal subscriptions.
 				</p>
 			{/if}

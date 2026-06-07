@@ -83,7 +83,7 @@
 			</a>
 
 			<!-- ═══ CONTENT Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Content
 			</p>
 
@@ -170,7 +170,7 @@
 			</a>
 
 			<!-- ═══ MEDIA Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Media
 			</p>
 
@@ -253,7 +253,7 @@
 			</a>
 
 			<!-- ═══ ANALYTICS Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Analytics
 			</p>
 
@@ -312,7 +312,7 @@
 			</a>
 
 			<!-- ═══ DEVELOPER Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Developer
 			</p>
 
@@ -510,7 +510,7 @@
 	<div class="p-4 bg-white border-t-[3px] border-gray-900 relative z-20">
 		<!-- Keyboard shortcut hint -->
 		<div
-			class="flex items-center justify-center mb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+			class="flex items-center justify-center mb-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest"
 		>
 			<kbd
 				class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[10px] font-mono mr-1"

@@ -89,7 +89,7 @@
 		<div class="space-y-6">
 			<!-- Header Row (Desktop) -->
 			<div
-				class="hidden md:grid grid-cols-12 gap-6 text-sm font-bold text-gray-400 uppercase tracking-widest px-6"
+				class="hidden md:grid grid-cols-12 gap-6 text-sm font-bold text-gray-600 uppercase tracking-widest px-6"
 			>
 				<div class="col-span-5 text-center">DIY / Headless</div>
 				<div class="col-span-2 text-center" />
@@ -124,7 +124,7 @@
 									>
 								</div>
 								<div>
-									<div class="text-xs font-bold text-gray-400 uppercase mb-1 md:hidden">
+									<div class="text-xs font-bold text-gray-600 uppercase mb-1 md:hidden">
 										The Hard Way
 									</div>
 									<h4 class="font-bold text-gray-700 text-lg">{point.headless.label}</h4>

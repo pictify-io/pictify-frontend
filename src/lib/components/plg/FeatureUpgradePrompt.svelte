@@ -338,7 +338,7 @@
 						<div class="grid grid-cols-2 gap-4 mb-6">
 							<div class="p-4 bg-white rounded-lg border-2 border-gray-200 text-center">
 								<p class="text-xs text-gray-500 uppercase tracking-wide font-bold">Current</p>
-								<p class="text-2xl font-black text-gray-400 mt-1">
+								<p class="text-2xl font-black text-gray-600 mt-1">
 									{currentLimit === false ? 'None' : formatLimit(currentLimit)}
 								</p>
 							</div>

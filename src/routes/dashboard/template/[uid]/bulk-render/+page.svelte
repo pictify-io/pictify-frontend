@@ -715,10 +715,10 @@
 						>
 							Upgrade to {PLAN_DISPLAY_NAMES[targetPlan]}
 						</button>
-						<p class="text-xs text-gray-400 mt-4">
+						<p class="text-xs text-gray-600 mt-4">
 							Need single renders? <a
 								href="/dashboard/template/{uid}/render"
-								class="text-gray-600 underline hover:text-gray-900">Use the render page instead</a
+								class="text-gray-700 underline hover:text-gray-900">Use the render page instead</a
 							>
 						</p>
 					</div>
@@ -1551,7 +1551,7 @@
 								class="font-black text-gray-900 uppercase tracking-widest text-sm mb-4 flex items-center justify-between"
 							>
 								<span>Generated Images ({totalRenderedImages})</span>
-								<span class="text-gray-400 text-xs">Showing first 50 rows</span>
+								<span class="text-gray-600 text-xs">Showing first 50 rows</span>
 							</h3>
 
 							{#if hasMultipleLayouts}
@@ -1561,7 +1561,7 @@
 										<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[4px_4px_0_0_#ccc]">
 											<div class="px-4 py-2 bg-gray-50 border-b-[2px] border-gray-200 flex items-center justify-between">
 												<span class="text-xs font-black text-gray-900 uppercase">Row #{(item.index ?? i) + 1}</span>
-												<span class="text-[10px] text-gray-400">{item.results.length} layout{item.results.length > 1 ? 's' : ''}</span>
+												<span class="text-[10px] text-gray-600">{item.results.length} layout{item.results.length > 1 ? 's' : ''}</span>
 											</div>
 											<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3">
 												{#each item.results as lr}

@@ -238,7 +238,7 @@
 		{/if}
 
 		<!-- Footer -->
-		<p class="text-center text-gray-400 text-sm mt-6">
+		<p class="text-center text-gray-600 text-sm mt-6">
 			By accepting, you agree to Pictify's <a href="/terms" class="underline hover:text-gray-600"
 				>Terms of Service</a
 			>

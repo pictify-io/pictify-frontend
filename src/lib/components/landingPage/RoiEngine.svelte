@@ -92,7 +92,7 @@
 					<div class="space-y-4">
 						<div>
 							<div
-								class="flex justify-between text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider"
+								class="flex justify-between text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider"
 							>
 								Generic
 							</div>
@@ -220,7 +220,7 @@
 								>AWS EC2 (Puppeteer)</span
 							>
 						</div>
-						<span class="text-xs font-bold text-gray-400">$400/mo</span>
+						<span class="text-xs font-bold text-gray-600">$400/mo</span>
 					</div>
 					<div
 						class="flex items-center justify-between p-3 bg-[#4ade80]/10 border-[2px] border-[#4ade80] rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.05)] transform scale-105"

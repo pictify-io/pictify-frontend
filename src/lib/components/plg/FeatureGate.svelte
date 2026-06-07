@@ -272,7 +272,7 @@
 						Upgrade to {upgradePrompt?.targetPlanName || 'Unlock'}
 					</button>
 
-					<p class="text-[10px] font-bold text-gray-400 mt-3 uppercase tracking-wider">
+					<p class="text-[10px] font-bold text-gray-600 mt-3 uppercase tracking-wider">
 						Available on {PLAN_DISPLAY_NAMES[upgradePrompt?.targetPlan] || 'higher'} plan
 					</p>
 				</div>

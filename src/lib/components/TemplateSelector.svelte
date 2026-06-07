@@ -300,7 +300,7 @@
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 			</svg>
-			<span class="ml-2 text-[10px] font-bold text-gray-400">Loading more...</span>
+			<span class="ml-2 text-[10px] font-bold text-gray-600">Loading more...</span>
 		</div>`;
 
 	function renderLoadMoreIndicator() {
@@ -322,7 +322,7 @@
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 					</svg>
-					<span class="ml-2 text-xs font-bold text-gray-400">Loading templates...</span>
+					<span class="ml-2 text-xs font-bold text-gray-600">Loading templates...</span>
 				</div>`;
 			return;
 		}
@@ -330,8 +330,8 @@
 		if (templates.length === 0) {
 			listEl.innerHTML = `
 				<div class="py-8 text-center">
-					<p class="text-sm font-bold text-gray-400">No templates found</p>
-					${query ? '<p class="text-xs text-gray-300 mt-1">Try a different search term</p>' : ''}
+					<p class="text-sm font-bold text-gray-600">No templates found</p>
+					${query ? '<p class="text-xs text-gray-600 mt-1">Try a different search term</p>' : ''}
 				</div>`;
 			return;
 		}

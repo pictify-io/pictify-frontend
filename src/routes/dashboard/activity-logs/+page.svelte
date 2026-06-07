@@ -577,7 +577,7 @@
 												{log.resourceId.substring(0, 8)}...
 											</span>
 										{:else}
-											<span class="text-gray-300">-</span>
+											<span class="text-gray-600">-</span>
 										{/if}
 									</td>
 									<td class="px-4 py-3 text-gray-600 text-xs">
@@ -679,7 +679,7 @@
 					<div
 						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 					>
-						<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+						<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 							>Event ID</span
 						>
 						<code
@@ -690,7 +690,7 @@
 					<div
 						class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 					>
-						<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+						<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 							>Timestamp</span
 						>
 						<span class="text-xs font-mono font-bold text-gray-900 block"
@@ -701,7 +701,7 @@
 						<div
 							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 						>
-							<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+							<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 								>Resource ID</span
 							>
 							<code class="text-xs font-mono font-bold text-gray-900 block truncate"
@@ -713,7 +713,7 @@
 						<div
 							class="p-3 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-lg"
 						>
-							<span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"
+							<span class="block text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1"
 								>Duration</span
 							>
 							<span class="text-xs font-mono font-bold text-gray-900 block"

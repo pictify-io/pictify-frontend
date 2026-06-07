@@ -384,7 +384,7 @@
 
 			<div class="relative flex py-2 items-center">
 				<div class="flex-grow border-t-2 border-gray-200" />
-				<span class="flex-shrink-0 mx-4 text-gray-400 font-bold text-sm uppercase"
+				<span class="flex-shrink-0 mx-4 text-gray-600 font-bold text-sm uppercase"
 					>Or continue with</span
 				>
 				<div class="flex-grow border-t-2 border-gray-200" />
@@ -408,7 +408,7 @@
 						>Login</a
 					>
 				</p>
-				<div class="mt-6 text-xs text-gray-400 font-medium px-4">
+				<div class="mt-6 text-xs text-gray-600 font-medium px-4">
 					By signing up, you agree to our
 					<a href="/terms" class="text-gray-500 hover:text-black underline">Terms</a>
 					and

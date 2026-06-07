@@ -528,7 +528,7 @@
 										{:else if log.resourceId}
 											<span class="font-mono text-xs">{log.resourceId.substring(0, 12)}...</span>
 										{:else}
-											<span class="text-gray-400">-</span>
+											<span class="text-gray-600">-</span>
 										{/if}
 									</td>
 									<td class="px-4 py-4 text-sm text-gray-600 font-mono font-bold">

@@ -207,7 +207,7 @@
 						</p>
 						<div class="flex items-baseline gap-2">
 							<span class="text-4xl font-black text-gray-900">{seatUsage}</span>
-							<span class="text-2xl font-bold text-gray-400">/ {seatLimit} Seats Used</span>
+							<span class="text-2xl font-bold text-gray-600">/ {seatLimit} Seats Used</span>
 						</div>
 					</div>
 					{#if seatUsage >= seatLimit && $isTeamOwner}
@@ -340,7 +340,7 @@
 										</div>
 										<div>
 											<p class="font-bold text-gray-900">{invitation.email}</p>
-											<p class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">
+											<p class="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">
 												Expires {formatDate(invitation.expiresAt)}
 											</p>
 										</div>
@@ -388,7 +388,7 @@
 								</div>
 							</div>
 						{:else}
-							<div class="p-8 text-center text-gray-400 font-bold italic">
+							<div class="p-8 text-center text-gray-600 font-bold italic">
 								No pending invitations
 							</div>
 						{/each}

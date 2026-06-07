@@ -802,7 +802,7 @@
 										>
 									{/if}
 									<p
-										class="text-[10px] font-bold text-gray-400 truncate max-w-[200px] sm:max-w-[300px]"
+										class="text-[10px] font-bold text-gray-600 truncate max-w-[200px] sm:max-w-[300px]"
 									>
 										{getAssetFilename(asset.assetKey)}
 									</p>
@@ -812,7 +812,7 @@
 							<!-- Period Views -->
 							<div class="text-right flex-shrink-0 hidden sm:block">
 								<div class="text-sm font-black text-black">{formatNumber(asset.periodHits)}</div>
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									views
 								</div>
 							</div>
@@ -820,7 +820,7 @@
 							<!-- Period Bandwidth -->
 							<div class="text-right flex-shrink-0 hidden md:block">
 								<div class="text-sm font-black text-black">{formatBytes(asset.periodBytes)}</div>
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									bandwidth
 								</div>
 							</div>
@@ -828,14 +828,14 @@
 							<!-- All-time Views -->
 							<div class="text-right flex-shrink-0 hidden lg:block">
 								<div class="text-sm font-black text-gray-600">{formatNumber(asset.totalHits)}</div>
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									all time
 								</div>
 							</div>
 
 							<!-- Last Seen -->
 							<div class="text-right flex-shrink-0 hidden lg:block w-20">
-								<div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+								<div class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">
 									{timeAgo(asset.lastSeen)}
 								</div>
 							</div>
@@ -843,7 +843,7 @@
 							<!-- Mobile summary -->
 							<div class="text-right flex-shrink-0 sm:hidden">
 								<div class="text-sm font-black text-black">{formatNumber(asset.periodHits)}</div>
-								<div class="text-[10px] font-bold text-gray-400">
+								<div class="text-[10px] font-bold text-gray-600">
 									{formatBytes(asset.periodBytes)}
 								</div>
 							</div>

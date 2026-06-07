@@ -260,7 +260,7 @@
 							</div>
 						</div>
 					{:else}
-						<div class="text-center space-y-3 text-gray-400">
+						<div class="text-center space-y-3 text-gray-600">
 							<div class="text-4xl">⚡</div>
 							<div class="text-sm">Waiting for input...</div>
 						</div>

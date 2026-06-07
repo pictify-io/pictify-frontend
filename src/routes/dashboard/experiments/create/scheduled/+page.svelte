@@ -533,7 +533,7 @@
 							class="flex-1 px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 						/>
 						{#if slugStatus === 'checking'}
-							<span class="text-xs font-bold text-gray-400">Checking...</span>
+							<span class="text-xs font-bold text-gray-600">Checking...</span>
 						{:else if slugStatus === 'available'}
 							<span class="text-xs font-bold text-green-600 flex items-center gap-1">
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -550,8 +550,8 @@
 							<span class="text-xs font-bold text-red-600">Taken</span>
 						{/if}
 					</div>
-					<p class="text-[10px] font-bold text-gray-400 mt-1.5">
-						Public URL: <span class="font-mono text-gray-600">{previewUrl}</span>
+					<p class="text-[10px] font-bold text-gray-600 mt-1.5">
+						Public URL: <span class="font-mono text-gray-700">{previewUrl}</span>
 					</p>
 				</div>
 

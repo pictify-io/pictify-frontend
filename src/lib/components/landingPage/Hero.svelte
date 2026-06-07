@@ -274,7 +274,7 @@
 							<div class="flex flex-col gap-1.5">
 								<label
 									for="hero-header"
-									class="text-[10px] font-black uppercase text-gray-400 tracking-wider"
+									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
 									>Header Text</label
 								>
 								<input
@@ -287,7 +287,7 @@
 							<div class="flex flex-col gap-1.5">
 								<label
 									for="hero-header2"
-									class="text-[10px] font-black uppercase text-gray-400 tracking-wider"
+									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
 									>Highlight Text</label
 								>
 								<input
@@ -300,7 +300,7 @@
 							<div class="flex flex-col gap-1.5">
 								<label
 									for="hero-header3"
-									class="text-[10px] font-black uppercase text-gray-400 tracking-wider"
+									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
 									>Header 3</label
 								>
 								<input
@@ -313,7 +313,7 @@
 							<div class="flex flex-col gap-1.5">
 								<label
 									for="hero-subheading"
-									class="text-[10px] font-black uppercase text-gray-400 tracking-wider"
+									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
 									>Subheading (Ribbon)</label
 								>
 								<input

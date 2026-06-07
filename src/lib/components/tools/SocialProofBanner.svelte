@@ -135,7 +135,7 @@
 								>{recentActivity[currentActivityIndex].user}</span
 							>
 							{recentActivity[currentActivityIndex].action}
-							<span class="text-gray-400">· {recentActivity[currentActivityIndex].time}</span>
+							<span class="text-gray-600">· {recentActivity[currentActivityIndex].time}</span>
 						</span>
 					</div>
 				{/if}

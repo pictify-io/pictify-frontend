@@ -122,7 +122,7 @@
 							<div
 								class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 leading-none tracking-tighter"
 							>
-								{Math.round(usagePercent)}<span class="text-lg sm:text-xl md:text-2xl text-gray-400"
+								{Math.round(usagePercent)}<span class="text-lg sm:text-xl md:text-2xl text-gray-600"
 									>%</span
 								>
 							</div>

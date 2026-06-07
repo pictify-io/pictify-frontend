@@ -293,7 +293,7 @@
 							</button>
 						{/each}
 						{#if allVariables.length === 0}
-							<div class="px-3 py-3 text-center text-[11px] text-gray-400">
+							<div class="px-3 py-3 text-center text-[11px] text-gray-600">
 								No variables on canvas
 							</div>
 						{/if}

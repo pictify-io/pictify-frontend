@@ -292,7 +292,7 @@
 					</div>
 				{:else}
 					<div
-						class="text-[10px] items-center font-bold flex gap-2 text-gray-400 mb-6 uppercase tracking-wider"
+						class="text-[10px] items-center font-bold flex gap-2 text-gray-600 mb-6 uppercase tracking-wider"
 					>
 						<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
 						vs headless Chrome

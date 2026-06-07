@@ -134,7 +134,7 @@
 					alt="Template thumbnail"
 					class="max-w-[80%] max-h-[300px] object-contain mx-auto mb-6 border-[2px] border-gray-300 shadow-sm"
 				/>
-				<p class="text-xs font-black text-gray-400 uppercase tracking-widest">Template Preview</p>
+				<p class="text-xs font-black text-gray-600 uppercase tracking-widest">Template Preview</p>
 			</div>
 		{:else}
 			<div class="text-center py-12 relative z-10">
@@ -150,7 +150,7 @@
 						/>
 					</svg>
 				</div>
-				<p class="text-sm font-black text-gray-400 uppercase tracking-widest">
+				<p class="text-sm font-black text-gray-600 uppercase tracking-widest">
 					Waiting for input...
 				</p>
 			</div>

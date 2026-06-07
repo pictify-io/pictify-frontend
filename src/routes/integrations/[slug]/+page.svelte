@@ -506,7 +506,7 @@
 			{#if relatedIntegrations.length > 0}
 				<section>
 					<div class="flex items-center gap-4 mb-8">
-						<h2 class="text-xl font-black uppercase tracking-wide text-gray-400">
+						<h2 class="text-xl font-black uppercase tracking-wide text-gray-600">
 							Related Integrations
 						</h2>
 						<div class="flex-1 h-[2px] bg-gray-200" />

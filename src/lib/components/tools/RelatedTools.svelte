@@ -7,7 +7,7 @@
 {#if tools.length > 0}
 	<section class="py-16 px-4 border-t-[3px] border-gray-900 bg-brand-bg">
 		<div class="max-w-5xl mx-auto">
-			<h3 class="text-2xl font-black uppercase tracking-widest text-gray-400 mb-8">
+			<h3 class="text-2xl font-black uppercase tracking-widest text-gray-600 mb-8">
 				More Tools You'll Love
 			</h3>
 			<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
