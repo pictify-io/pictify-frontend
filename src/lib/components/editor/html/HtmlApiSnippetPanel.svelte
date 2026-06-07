@@ -57,7 +57,7 @@
 	// --- image-ready polling ---------------------------------------------
 	// The render API returns a CDN/S3 URL immediately, but the upload is
 	// async — for a beat the URL 404s. Same pattern as the API playground:
-	// start with previewSrc = url, <img> onerror → retry with a cachebust
+	// start with previewSrc = url, <img loading="lazy"> onerror → retry with a cachebust
 	// query after a delay, up to PREVIEW_MAX_RETRIES. Each retry doubles
 	// the delay up to a cap so we don't hammer S3 during propagation.
 	const PREVIEW_MAX_RETRIES = 12;
@@ -842,7 +842,7 @@
 								<!-- Image is hidden until it successfully loads, to
 								     suppress the broken-image glyph while S3 is
 								     still propagating. -->
-								<img
+								<img loading="lazy"
 									src={previewSrc}
 									alt="Rendered template"
 									on:load={handleImgLoad}

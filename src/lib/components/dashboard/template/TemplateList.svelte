@@ -317,7 +317,7 @@
 						class="absolute inset-0 flex items-center justify-center p-3 sm:p-4 md:p-6 transition-transform duration-300 group-hover:scale-105"
 					>
 						{#if template.thumbnail}
-							<img
+							<img loading="lazy"
 								src={getThumbnailUrl(template)}
 								alt={template.name}
 								class="w-full h-full object-contain drop-shadow-lg"

@@ -352,9 +352,9 @@ const response = await fetch('${backendUrl}/templates/${uid}/render', {
 const result = await response.json();
 console.log(result.url); // CDN URL of rendered image
 
-// === Option 2: URL Parameter Render (for <img> tags & emails) ===
+// === Option 2: URL Parameter Render (for <img loading="lazy"> tags & emails) ===
 // Returns binary image directly — use as an img src:
-// <img src="${urlParamUrl}" />`;
+// <img loading="lazy" src="${urlParamUrl}" />`;
 
 		navigator.clipboard.writeText(code);
 		toast.set({ message: 'API code copied to clipboard', type: 'success', duration: 2000 });
@@ -808,7 +808,7 @@ console.log(result.url); // CDN URL of rendered image
 														<span class="text-xs font-bold text-gray-500 uppercase">Loading image...</span>
 													</div>
 												{/if}
-												<img
+												<img loading="lazy"
 													src={imgState.src}
 													alt="{layoutResult.name} render"
 													class="max-w-full max-h-[300px] object-contain border border-gray-300 bg-white"
@@ -855,7 +855,7 @@ console.log(result.url); // CDN URL of rendered image
 								       3. plain "Fill in…" placeholder -->
 								<div class="flex flex-col items-center justify-center py-12 text-center">
 									{#if template?.thumbnail}
-										<img
+										<img loading="lazy"
 											src={template.thumbnail}
 											alt="Template preview"
 											class="max-w-full max-h-[200px] object-contain border-2 border-gray-200 rounded-lg mb-4 opacity-60"

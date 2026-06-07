@@ -38,7 +38,7 @@
 
 	const generateEmbedCode = () => {
 		if (!dynamicUrl) return '';
-		return `<img src="${dynamicUrl}" alt="${template?.name || 'Live Image'}" />`;
+		return `<img loading="lazy" src="${dynamicUrl}" alt="${template?.name || 'Live Image'}" />`;
 	};
 
 	const handlePublish = () => {
@@ -327,7 +327,7 @@
 					<div
 						class="bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] border-[3px] border-gray-900 rounded-xl p-6 flex items-center justify-center min-h-[300px] shadow-brutal-lg bg-white"
 					>
-						<img
+						<img loading="lazy"
 							src={dynamicUrl}
 							alt="Live asset preview"
 							class="max-w-full max-h-[300px] object-contain shadow-2xl rounded-lg border-2 border-gray-900"

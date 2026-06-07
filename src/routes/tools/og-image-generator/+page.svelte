@@ -1080,7 +1080,7 @@
 											{#if websiteInfo.logo.startsWith('<svg')}
 												<div style="width: 120px;">{@html websiteInfo.logo}</div>
 											{:else}
-												<img
+												<img loading="lazy"
 													src={websiteInfo.logo}
 													style="width: 120px;"
 													alt="Logo"
@@ -1237,7 +1237,7 @@
 							<!-- Image preview -->
 							<div class="p-4 md:p-6 bg-white">
 								<div class="border-[3px] border-black bg-white p-2">
-									<img src={imageUrl} alt="Generated OG" class="w-full" />
+									<img loading="lazy" src={imageUrl} alt="Generated OG" class="w-full" />
 								</div>
 							</div>
 							<!-- Action bar -->

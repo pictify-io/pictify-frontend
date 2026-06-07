@@ -47,11 +47,11 @@
 	const snippetFormats = [
 		{
 			id: 'html',
-			label: 'HTML <img>',
+			label: 'HTML <img loading="lazy">',
 			iconPath: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
 			generate: () => {
 				const url = sanitizeForHtml(getUrlRenderUrl());
-				return `<img src="${url}" alt="Generated image" />`;
+				return `<img loading="lazy" src="${url}" alt="Generated image" />`;
 			}
 		},
 		{

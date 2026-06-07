@@ -1566,7 +1566,7 @@
 											<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3">
 												{#each item.results as lr}
 													<div class="group relative bg-gray-100 rounded-lg border-2 border-gray-200 overflow-hidden">
-														<img
+														<img loading="lazy"
 															src={lr.url}
 															alt="Row {(item.index ?? i) + 1} - {lr.name}"
 															class="w-full aspect-video object-contain bg-white"
@@ -1617,7 +1617,7 @@
 										<div
 											class="group relative aspect-square bg-gray-100 rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[4px_4px_0_0_#ccc] hover:shadow-[6px_6px_0_0_#999] transition-all hover:-translate-y-1"
 										>
-											<img
+											<img loading="lazy"
 												src={lr.url}
 												alt="Result {i}"
 												class="w-full h-full object-cover"

@@ -129,7 +129,7 @@
 									style="color: {icon.color || '#1f2937'}"
 								>
 									{#if icon.type === 'url'}
-										<img src={icon.url} alt={comparison.competitor} class="w-7 h-7" />
+										<img loading="lazy" src={icon.url} alt={comparison.competitor} class="w-7 h-7" />
 									{:else if icon.type === 'text'}
 										<span class="text-base font-black" style="color: {icon.color}">{icon.text}</span
 										>

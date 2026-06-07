@@ -91,7 +91,7 @@
 	<!-- Preview -->
 	{#if step.thumbnail}
 		<div class="mb-3">
-			<img
+			<img loading="lazy"
 				src={step.thumbnail}
 				alt="Preview for step {stepIndex + 1}"
 				class="w-full rounded-lg border-2 border-gray-900 bg-white object-contain max-h-48 shadow-brutal-sm"
@@ -179,7 +179,7 @@
 			<!-- Screenshot -->
 			{#if step.validation.screenshot}
 				<div class="mt-2">
-					<img
+					<img loading="lazy"
 						src={step.validation.screenshot}
 						alt="Canvas after step {stepIndex + 1}"
 						class="w-full rounded-lg border-2 border-gray-900 max-h-40 object-contain bg-white shadow-brutal-sm"

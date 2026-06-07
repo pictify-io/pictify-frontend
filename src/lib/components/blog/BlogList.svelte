@@ -28,7 +28,7 @@
 						<div
 							class="absolute inset-0 opacity-10 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:8px_8px]"
 						/>
-						<img
+						<img loading="lazy"
 							src={blog.heroImage}
 							class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
 							alt={blog.title}

@@ -772,7 +772,7 @@
 									<div
 										class="w-10 h-10 rounded-lg border-[2px] border-black overflow-hidden flex-shrink-0 shadow-[2px_2px_0_0_black] group-hover:shadow-[3px_3px_0_0_black] transition-all"
 									>
-										<img src={asset.templateThumbnail} alt="" class="w-full h-full object-cover" />
+										<img loading="lazy" src={asset.templateThumbnail} alt="" class="w-full h-full object-cover" />
 									</div>
 								{:else}
 									<div

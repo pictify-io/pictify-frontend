@@ -274,7 +274,7 @@
 							style="color: {icon.color || '#1f2937'}"
 						>
 							{#if icon.type === 'url'}
-								<img src={icon.url} alt={alt.competitor} class="w-8 h-8" />
+								<img loading="lazy" src={icon.url} alt={alt.competitor} class="w-8 h-8" />
 							{:else if icon.type === 'text'}
 								<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
 							{:else if icon.type === 'svg'}
@@ -473,7 +473,7 @@
 									style="color: {otherIcon.color || '#1f2937'}"
 								>
 									{#if otherIcon.type === 'url'}
-										<img src={otherIcon.url} alt={other.competitor} class="w-4 h-4" />
+										<img loading="lazy" src={otherIcon.url} alt={other.competitor} class="w-4 h-4" />
 									{:else if otherIcon.type === 'text'}
 										<span class="text-xs font-black" style="color: {otherIcon.color}"
 											>{otherIcon.text}</span

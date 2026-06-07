@@ -167,7 +167,7 @@
 						/>
 					</div>
 				{:else if preview.url}
-					<img
+					<img loading="lazy"
 						src={preview.url}
 						alt="Preview {variantName}"
 						class="max-w-full max-h-[300px] lg:max-h-full object-contain pointer-events-none drop-shadow-[0_20px_25px_rgba(0,0,0,0.2)]"

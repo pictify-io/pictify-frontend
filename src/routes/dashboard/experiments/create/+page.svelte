@@ -1104,7 +1104,7 @@
 										class="mt-4 flex items-center gap-4 p-4 bg-gray-50 border-[3px] border-gray-200 rounded-xl"
 									>
 										{#if sel.thumbnail}
-											<img
+											<img loading="lazy"
 												src={sel.thumbnail}
 												alt={sel.name}
 												class="w-24 h-24 object-contain bg-white rounded-lg border-[2px] border-gray-300 shadow-sm"
@@ -1492,7 +1492,7 @@
 															{/key}
 														</div>
 													{:else if variantPreviews[index]?.url}
-														<img
+														<img loading="lazy"
 															src={variantPreviews[index].url}
 															alt="Preview {variant.name}"
 															class="max-w-full max-h-[300px] lg:max-h-full object-contain pointer-events-none drop-shadow-[0_20px_25px_rgba(0,0,0,0.2)]"

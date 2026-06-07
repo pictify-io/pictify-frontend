@@ -176,7 +176,7 @@
 				class="w-9 h-9 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 			>
 				{#if $currentTeam?.avatar}
-					<img
+					<img loading="lazy"
 						src={$currentTeam.avatar}
 						alt={$currentTeam.name}
 						class="w-full h-full rounded-lg object-cover"
@@ -266,7 +266,7 @@
 							class="w-8 h-8 rounded-lg bg-gray-100 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-accent transition-colors"
 						>
 							{#if teamItem.team?.avatar}
-								<img
+								<img loading="lazy"
 									src={teamItem.team.avatar}
 									alt={teamItem.team.name}
 									class="w-full h-full rounded-lg object-cover"

@@ -27,8 +27,8 @@
 		},
 		{
 			number: '03',
-			title: 'Paste as <img> in Your Email',
-			description: 'Drop the URL into an <img> tag. When the email opens, Pictify renders a personalized image for that recipient. No plugins needed.'
+			title: 'Paste as <img loading="lazy"> in Your Email',
+			description: 'Drop the URL into an <img loading="lazy"> tag. When the email opens, Pictify renders a personalized image for that recipient. No plugins needed.'
 		}
 	];
 
@@ -101,7 +101,7 @@
 	const faqs = [
 		{
 			q: 'Does this work in all email clients?',
-			a: 'Yes! Personalized images are standard <img> tags — they work in Gmail, Outlook, Apple Mail, Yahoo, and every other email client. No JavaScript needed.'
+			a: 'Yes! Personalized images are standard <img loading="lazy"> tags — they work in Gmail, Outlook, Apple Mail, Yahoo, and every other email client. No JavaScript needed.'
 		},
 		{
 			q: 'How fast is the rendering?',

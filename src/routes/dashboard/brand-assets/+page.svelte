@@ -668,7 +668,7 @@
 												>
 											</div>
 										{:else}
-											<img
+											<img loading="lazy"
 												src={asset.url}
 												alt={asset.name}
 												class="w-full h-full object-contain p-6 drop-shadow-sm group-hover:scale-105 transition-transform duration-300"

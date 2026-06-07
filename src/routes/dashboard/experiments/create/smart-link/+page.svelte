@@ -1325,7 +1325,7 @@
 												/>
 											{/key}
 										{:else if variantPreviews[fallbackIndex]?.url}
-											<img
+											<img loading="lazy"
 												src={variantPreviews[fallbackIndex].url}
 												alt="Preview {fallbackVariant.name}"
 												class="max-w-full max-h-[200px] object-contain pointer-events-none"
@@ -1474,7 +1474,7 @@
 										class="w-14 h-10 rounded border-[1.5px] border-gray-200 bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center"
 									>
 										{#if variantPreviews[index]?.url}
-											<img
+											<img loading="lazy"
 												src={variantPreviews[index].url}
 												alt="Thumb"
 												class="w-full h-full object-cover"
@@ -1713,7 +1713,7 @@
 															/>
 														{/key}
 													{:else if variantPreviews[index]?.url}
-														<img
+														<img loading="lazy"
 															src={variantPreviews[index].url}
 															alt="Preview {variant.name}"
 															class="max-w-full max-h-[200px] object-contain pointer-events-none"

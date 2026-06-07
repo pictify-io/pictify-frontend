@@ -214,7 +214,7 @@
 						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
 					>
 						{#if template.thumbnail}
-							<img
+							<img loading="lazy"
 								src={template.thumbnail}
 								alt={template.name}
 								class="w-full aspect-video object-cover"

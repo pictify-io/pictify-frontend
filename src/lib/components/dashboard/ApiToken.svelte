@@ -318,7 +318,7 @@
 													on:click={() => copyToClipboard(token.token)}
 													title="Copy to clipboard"
 												>
-													<img
+													<img loading="lazy"
 														src={CopyIcon}
 														alt="Copy"
 														class="w-3 h-3 sm:w-4 sm:h-4 opacity-60 hover:opacity-100"
