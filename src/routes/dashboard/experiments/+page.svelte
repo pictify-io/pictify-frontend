@@ -13,7 +13,7 @@
 	} from '../../../store/experiments.store';
 	import { toast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { formatRelativeDate } from '$lib/utils/format.js';
 	import { user } from '../../../store/user.store';
 	import {
@@ -414,10 +414,30 @@
 		<FeatureGate feature={FEATURES.AB_TESTING}>
 			<div class="relative min-h-[400px]">
 				{#if isLoading}
-					<div
-						class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80"
-					>
-						<Loader size="16" show={isLoading} />
+					<!-- Skeleton rows — mirrors the real 2-col experiment card grid -->
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+						{#each Array(4) as _}
+							<div
+								class="bg-white border-[3px] border-gray-200 rounded-2xl overflow-hidden shadow-brutal-xl flex flex-col"
+							>
+								<!-- Image / preview area -->
+								<div class="p-4 border-b-[3px] border-gray-200">
+									<Skeleton class="aspect-[16/9] w-full rounded-xl" />
+								</div>
+								<!-- Body -->
+								<div class="p-5 flex flex-col gap-3">
+									<Skeleton class="h-6 w-2/3" />
+									<div class="flex gap-2">
+										<Skeleton class="h-5 w-20" />
+										<Skeleton class="h-5 w-24" />
+									</div>
+									<div class="flex gap-3 pt-2 border-t-[2px] border-gray-100 mt-1">
+										<Skeleton class="h-10 flex-1 rounded-xl" />
+										<Skeleton class="h-10 w-12 rounded-xl" />
+									</div>
+								</div>
+							</div>
+						{/each}
 					</div>
 				{/if}
 
@@ -444,20 +464,28 @@
 								/>
 							</svg>
 						</div>
-						<h3 class="text-xl font-black text-gray-900 uppercase tracking-tight mb-3">
+						<h3 class="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">
 							No experiments yet
 						</h3>
-						<p class="text-gray-500 font-bold max-w-md text-center mb-10 text-sm">
-							Create A/B tests, smart links, and scheduled experiments to optimize your image
-							performance and find the best performing variants.
+						<p class="text-gray-500 font-bold max-w-sm text-center mb-8 text-sm">
+							A/B tests, smart links, and scheduled swaps live here. Run your first experiment to
+							find the variant that converts best.
 						</p>
 						<button
 							on:click={() => handleCreateType('ab_test')}
-							class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
+							class="px-5 py-3 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-[3px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
 						>
-							Create Your First Experiment
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M12 4v16m8-8H4"
+								/></svg
+							>
+							Start your first A/B test
 							<svg
-								class="w-5 h-5 group-hover:translate-x-1 transition-transform"
+								class="w-4 h-4 group-hover:translate-x-1 transition-transform"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"

@@ -10,7 +10,7 @@
 	} from '../../../../store/media.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
-	import Loader from '$lib/components/Loader.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import {
 		copyToClipboard as sharedCopy,
 		formatRelativeDate,
@@ -204,18 +204,28 @@
 
 		<!-- Content -->
 		{#if isLoading}
-			<div class="flex flex-col items-center justify-center py-32">
-				<Loader size="16" show={isLoading} />
-				<p class="text-gray-400 text-xs font-black uppercase tracking-widest mt-6 animate-pulse">
-					Loading Media Assets...
-				</p>
+			<!-- Skeleton grid — mirrors the real media card shape (4-col on xl) -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+				{#each Array(8) as _}
+					<div
+						class="bg-white border-[3px] border-gray-200 rounded-xl overflow-hidden shadow-brutal-xl flex flex-col"
+					>
+						<!-- Thumbnail area -->
+						<Skeleton class="h-[220px] rounded-none border-b-[3px] border-gray-200" />
+						<!-- Info strip -->
+						<div class="p-4 flex items-center justify-between">
+							<Skeleton class="h-4 w-24" />
+							<Skeleton class="h-4 w-10" />
+						</div>
+					</div>
+				{/each}
 			</div>
 		{:else if mediaList.length === 0}
 			<div
 				class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border-[3px] border-gray-900 border-dashed shadow-sm"
 			>
 				<div
-					class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg"
+					class="w-24 h-24 bg-gray-100 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg -rotate-3"
 				>
 					{#if mediaType === 'images'}
 						<svg
@@ -262,28 +272,28 @@
 					{/if}
 				</div>
 				<h2 class="text-2xl font-black text-gray-900 uppercase tracking-wide mb-2">
-					No {mediaType} Generated
+					No {mediaType === 'images' ? 'Images' : mediaType === 'gifs' ? 'GIFs' : 'PDFs'} Yet
 				</h2>
-				<p class="text-gray-500 font-bold max-w-md text-center">
-					Start generating {mediaType === 'images'
-						? 'images'
+				<p class="text-gray-500 font-bold max-w-sm text-center text-sm mb-6">
+					{mediaType === 'images'
+						? 'Rendered images land here. Pick a template and render your first image to get started.'
 						: mediaType === 'gifs'
-						? 'GIFs'
-						: 'PDFs'} from your templates to see them appear here.
+						? 'Animated GIFs you render from templates will appear here.'
+						: 'PDFs you generate from templates will be stored here.'}
 				</p>
 				<a
 					href="/dashboard/template"
-					class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-brand-accent hover:text-gray-900 transition-colors border-2 border-gray-900"
+					class="inline-flex items-center gap-2 px-5 py-3 bg-brand-accent text-gray-900 font-black text-xs uppercase tracking-wider rounded-lg border-[3px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
-					Open Templates
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 7l5 5m0 0l-5 5m5-5H6"
+							stroke-width="2.5"
+							d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
 						/></svg
 					>
+					Render from a Template
 				</a>
 			</div>
 		{:else}

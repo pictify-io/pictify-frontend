@@ -31,6 +31,7 @@
 	import NudgeBanner from '$lib/components/dashboard/NudgeBanner.svelte';
 	import GettingStartedGuide from '$lib/components/onboarding/GettingStartedGuide.svelte';
 	import WelcomeWizard from '$lib/components/onboarding/WelcomeWizard.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { browser } from '$app/environment';
 	import posthog from 'posthog-js';
 
@@ -419,13 +420,33 @@
 	{/if}
 
 	{#if isLoading}
-		<div class="flex flex-col items-center justify-center py-20">
-			<div
-				class="w-12 h-12 border-[3px] border-gray-900 border-t-brand-accent rounded-full animate-spin"
-			/>
-			<p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">
-				Loading dashboard...
-			</p>
+		<!-- Skeleton: 3 stat cards + chart placeholder + 4 template cards -->
+		<div class="mb-12">
+			<Skeleton class="h-4 w-40 mb-6" />
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				{#each Array(3) as _}
+					<Skeleton class="h-32 rounded-2xl border-[3px] border-gray-200" />
+				{/each}
+			</div>
+		</div>
+		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
+			<div class="lg:col-span-8">
+				<Skeleton class="h-[400px] rounded-2xl border-[3px] border-gray-200" />
+			</div>
+			<div class="lg:col-span-4">
+				<Skeleton class="h-[400px] rounded-2xl border-[3px] border-gray-200" />
+			</div>
+			<div class="lg:col-span-8">
+				<Skeleton class="h-4 w-40 mb-6" />
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					{#each Array(4) as _}
+						<Skeleton class="h-52 rounded-2xl border-[3px] border-gray-200" />
+					{/each}
+				</div>
+			</div>
+			<div class="lg:col-span-4">
+				<Skeleton class="h-52 rounded-2xl border-[3px] border-gray-200" />
+			</div>
 		</div>
 	{:else}
 		<!-- Recommended For You (new personalized users only) -->

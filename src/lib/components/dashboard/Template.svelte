@@ -13,7 +13,7 @@
 	import EmptyTemplate from '$lib/components/dashboard/template/EmptyTemplate.svelte';
 	import TemplateTypeSelector from '$lib/components/editor/TemplateTypeSelector.svelte';
 	import EnginePicker from '$lib/components/editor/html/EnginePicker.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { FeatureUpgradePrompt } from '$lib/components/plg';
 	import {
 		checkFeatureAccessSync,
@@ -384,10 +384,34 @@
 				</button>
 			</div>
 			{#if isLoading}
+				<!-- Skeleton grid — 6 cards matching the real template card shape -->
 				<div
-					class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 rounded-xl"
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full mt-6 sm:mt-8"
 				>
-					<Loader size="16" show={isLoading} />
+					{#each Array(6) as _}
+						<div
+							class="bg-white rounded-xl border-[3px] border-gray-200 shadow-brutal-lg overflow-hidden flex flex-col"
+						>
+							<!-- Card tab bar -->
+							<Skeleton class="h-8 rounded-none border-b-[3px] border-gray-200" />
+							<!-- Thumbnail -->
+							<Skeleton class="aspect-[4/3] rounded-none" />
+							<!-- Footer info -->
+							<div class="px-4 pt-4 pb-3 flex flex-col gap-3 border-t-[3px] border-gray-200">
+								<Skeleton class="h-5 w-3/4" />
+								<div class="flex gap-2">
+									<Skeleton class="h-4 w-16" />
+									<Skeleton class="h-4 w-20" />
+								</div>
+							</div>
+							<!-- Action bar -->
+							<div class="grid grid-cols-3 border-t-[3px] border-gray-200">
+								{#each Array(3) as _}
+									<Skeleton class="h-10 rounded-none" />
+								{/each}
+							</div>
+						</div>
+					{/each}
 				</div>
 			{/if}
 
@@ -459,4 +483,3 @@
 		/>
 	{/if}
 </section>
-```
