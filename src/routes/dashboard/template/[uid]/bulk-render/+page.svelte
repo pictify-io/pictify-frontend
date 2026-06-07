@@ -622,7 +622,7 @@
 					{/if}
 				</h1>
 				<div
-					class="px-2 py-1 bg-brand-danger text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+					class="px-2 py-1 bg-brand-danger text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-brutal-sm"
 				>
 					Bulk Render
 				</div>
@@ -858,7 +858,7 @@
 									class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 								>
 									<span
-										class="w-3 h-3 bg-[#4ecdc4] border-2 border-gray-900 rounded-full shadow-[1px_1px_0_0_#000]"
+										class="w-3 h-3 bg-[#4ecdc4] border-2 border-gray-900 rounded-full shadow-[1px_1px_0_0_#1f2937]"
 									/>
 									Required Columns
 								</h2>

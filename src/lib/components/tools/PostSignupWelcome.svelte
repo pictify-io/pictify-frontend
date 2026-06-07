@@ -59,7 +59,7 @@
 
 {#if show}
 	<div class="w-full max-w-5xl mx-auto mb-6">
-		<div class="border-[3px] border-black bg-[#4ade80]/10 shadow-[6px_6px_0_0_#000] relative overflow-hidden">
+		<div class="border-[3px] border-black bg-[#4ade80]/10 shadow-brutal-xl relative overflow-hidden">
 			<button
 				on:click={dismiss}
 				class="absolute top-3 right-3 p-1 text-gray-400 hover:text-gray-900 transition-colors z-10"

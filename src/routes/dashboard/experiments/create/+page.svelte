@@ -889,7 +889,7 @@
 									<div
 										class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border-[2px]
 										{form.testMode === 'same_template'
-											? 'bg-brand-accent border-gray-900 shadow-[2px_2px_0_0_#000] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
+											? 'bg-brand-accent border-gray-900 shadow-brutal-sm shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
 											: 'bg-gray-100 border-gray-300 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]'}"
 									>
 										<svg
@@ -943,7 +943,7 @@
 									<div
 										class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border-[2px]
 										{form.testMode === 'different_templates'
-											? 'bg-brand-accent border-gray-900 shadow-[2px_2px_0_0_#000] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
+											? 'bg-brand-accent border-gray-900 shadow-brutal-sm shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
 											: 'bg-gray-100 border-gray-300 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]'}"
 									>
 										<svg

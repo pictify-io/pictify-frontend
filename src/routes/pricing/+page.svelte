@@ -448,7 +448,7 @@
 					>
 						<div class="absolute -top-4 -right-4 z-20">
 							<span
-								class="px-3 py-1.5 bg-brand-danger text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
+								class="px-3 py-1.5 bg-brand-danger text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-brutal-sm rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
 							>
 								Save 20%
 							</span>

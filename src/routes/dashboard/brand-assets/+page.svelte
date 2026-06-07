@@ -776,7 +776,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#000] max-w-md w-full overflow-hidden"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-md w-full overflow-hidden"
 			on:click|stopPropagation
 		>
 			<div class="bg-gray-900 p-4 flex items-center justify-between">
@@ -954,7 +954,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#000] max-w-md w-full overflow-hidden"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-md w-full overflow-hidden"
 			on:click|stopPropagation
 		>
 			<div class="bg-gray-900 p-4 flex items-center justify-between">

@@ -576,7 +576,7 @@
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[4px] border-black shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[4px] border-black shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h1>
@@ -878,7 +878,7 @@
 								<button
 									on:click={generateBanner}
 									disabled={isImageGenerating}
-									class="px-12 py-5 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wider shadow-[8px_8px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+									class="px-12 py-5 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wider shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
 								>
 									{#if isImageGenerating}
 										<svg class="animate-spin h-6 w-6" viewBox="0 0 24 24">

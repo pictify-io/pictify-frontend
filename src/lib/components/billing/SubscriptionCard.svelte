@@ -352,7 +352,7 @@
 					<button
 						on:click={handlePause}
 						disabled={pausing}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if pausing}
 							<span class="inline-flex items-center gap-2">
@@ -383,7 +383,7 @@
 					<button
 						on:click={handleResume}
 						disabled={resuming}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if resuming}
 							<span class="inline-flex items-center gap-2">
@@ -414,7 +414,7 @@
 					<button
 						on:click={handleReactivate}
 						disabled={reactivating}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if reactivating}
 							<span class="inline-flex items-center gap-2">
@@ -445,7 +445,7 @@
 					<button
 						on:click={handleCancel}
 						disabled={cancelling}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-red-50 hover:text-red-900 hover:border-red-900 shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-red-50 hover:text-red-900 hover:border-red-900 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if cancelling}
 							<span class="inline-flex items-center gap-2">
@@ -581,7 +581,7 @@
 			<div class="flex flex-wrap gap-2 pt-2">
 				<a
 					href="/dashboard/upgrade"
-					class="w-full text-center px-4 py-3 text-xs font-black text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-widest"
+					class="w-full text-center px-4 py-3 text-xs font-black text-gray-900 bg-white rounded-lg border-2 border-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm transition-all uppercase tracking-widest"
 				>
 					View all plans
 				</a>

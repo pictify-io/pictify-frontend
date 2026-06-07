@@ -115,7 +115,7 @@
 
 				<a
 					href="/signup"
-					class="inline-block px-8 py-4 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wide shadow-[6px_6px_0_0_#000] hover:shadow-[3px_3px_0_0_#000] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+					class="inline-block px-8 py-4 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wide shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
 				>
 					Create Free Account
 				</a>
@@ -140,7 +140,7 @@
                 border-[3px] border-black p-6 rounded-xl
                 ${
 									feature.highlight
-										? 'bg-brand-accent shadow-[6px_6px_0_0_#000]'
+										? 'bg-brand-accent shadow-brutal-xl'
 										: 'bg-brand-bg shadow-[4px_4px_0_0_#ccc]'
 								}
               `}
@@ -226,7 +226,7 @@
 				</p>
 
 				<div
-					class="border-[3px] border-black bg-white shadow-[8px_8px_0_0_#000] overflow-hidden rounded-xl"
+					class="border-[3px] border-black bg-white shadow-brutal-2xl overflow-hidden rounded-xl"
 				>
 					<div class="overflow-x-auto">
 						<table class="w-full">

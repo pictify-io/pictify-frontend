@@ -560,7 +560,7 @@
 										<!-- Floating Status Top Right -->
 										<div class="absolute top-6 right-6">
 											<span
-												class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-[3px_3px_0_0_#000] {statusConfig[
+												class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-[3px] shadow-brutal-md {statusConfig[
 													exp.status
 												]?.bg || 'bg-white text-gray-900 border-gray-900'}"
 											>
@@ -768,7 +768,7 @@
 			<div class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-3 h-3 bg-brand-danger rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]"
+						class="w-3 h-3 bg-brand-danger rounded-full border-[2px] border-gray-900 shadow-brutal-sm"
 					/>
 					<h2
 						id="delete-experiment-title"

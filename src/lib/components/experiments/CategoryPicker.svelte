@@ -97,7 +97,7 @@
 
 	<!-- Modal container -->
 	<div
-		class="relative w-full max-w-2xl border-[3px] border-black rounded-2xl bg-brand-bg shadow-[12px_12px_0_0_black] overflow-hidden"
+		class="relative w-full max-w-2xl border-[3px] border-black rounded-2xl bg-brand-bg shadow-brutal-3xl overflow-hidden"
 	>
 		{#if step === 'category'}
 			<!-- Step 1: Category grid -->
@@ -111,7 +111,7 @@
 					type="button"
 					on:click={cancel}
 					{disabled}
-					class="p-1.5 border-[3px] border-transparent rounded-lg text-black hover:bg-white hover:border-black hover:shadow-[2px_2px_0_0_black] transition-all"
+					class="p-1.5 border-[3px] border-transparent rounded-lg text-black hover:bg-white hover:border-black hover:shadow-brutal-sm transition-all"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -130,12 +130,12 @@
 						on:click={() => selectCategory(cat)}
 						{disabled}
 						class="flex flex-col items-center gap-3 p-5 rounded-xl border-[3px] border-gray-200 bg-white
-						hover:border-black hover:bg-[#FFDE82] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px]
+						hover:border-black hover:bg-[#FFDE82] hover:shadow-brutal-lg hover:-translate-y-[2px]
 						active:translate-y-0 active:shadow-none
 						transition-all text-center group cursor-pointer"
 					>
 						<div
-							class="w-12 h-12 border-[3px] border-transparent rounded-xl bg-gray-100 group-hover:bg-white group-hover:border-black group-hover:shadow-[2px_2px_0_0_black] flex items-center justify-center transition-all"
+							class="w-12 h-12 border-[3px] border-transparent rounded-xl bg-gray-100 group-hover:bg-white group-hover:border-black group-hover:shadow-brutal-sm flex items-center justify-center transition-all"
 						>
 							<svg
 								class="w-6 h-6 text-gray-500 group-hover:text-black transition-colors"
@@ -168,7 +168,7 @@
 						type="button"
 						on:click={reset}
 						{disabled}
-						class="p-1.5 border-[3px] border-transparent rounded-lg text-black hover:bg-white hover:border-black hover:shadow-[2px_2px_0_0_black] transition-all"
+						class="p-1.5 border-[3px] border-transparent rounded-lg text-black hover:bg-white hover:border-black hover:shadow-brutal-sm transition-all"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -187,7 +187,7 @@
 					type="button"
 					on:click={cancel}
 					{disabled}
-					class="p-1.5 border-[3px] border-transparent rounded-lg text-black hover:bg-white hover:border-black hover:shadow-[2px_2px_0_0_black] transition-all"
+					class="p-1.5 border-[3px] border-transparent rounded-lg text-black hover:bg-white hover:border-black hover:shadow-brutal-sm transition-all"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -206,7 +206,7 @@
 						on:click={() => selectProperty(prop.value)}
 						{disabled}
 						class="px-5 py-3 rounded-xl border-[3px] border-gray-300 bg-white text-sm font-bold text-gray-700
-						hover:border-black hover:bg-[#c4f0ff] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] hover:text-black
+						hover:border-black hover:bg-[#c4f0ff] hover:shadow-brutal-lg hover:-translate-y-[2px] hover:text-black
 						active:translate-y-0 active:shadow-none
 						transition-all cursor-pointer"
 					>

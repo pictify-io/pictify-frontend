@@ -3562,8 +3562,8 @@
 												<button
 													class="px-2 py-0.5 text-xs rounded-md transition-all {selectedCategory ===
 													'all'
-														? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000]'
-														: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000] hover:shadow-[1px_1px_0_0_#ffc480]'}"
+														? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937]'
+														: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#ffc480]'}"
 													on:click={() => (selectedCategory = 'all')}
 												>
 													All
@@ -3572,8 +3572,8 @@
 													<button
 														class="px-2 py-0.5 text-xs rounded-md transition-all {selectedCategory ===
 														category
-															? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000]'
-															: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#000] hover:shadow-[1px_1px_0_0_#ffc480]'}"
+															? 'bg-black text-white border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937]'
+															: 'bg-white text-gray-600 border-[2px] border-gray-900 shadow-[1px_1px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#ffc480]'}"
 														on:click={() => (selectedCategory = category)}
 													>
 														{CATEGORY_LABELS[category] || category}
@@ -3888,7 +3888,7 @@
 										class="flex-1 py-1.5 text-sm border-[2px] border-gray-900 rounded-lg transition-all {styles.textAlign ===
 										align.value
 											? 'bg-gray-900 text-white shadow-brutal-accent-sm'
-											: 'bg-white text-gray-700 shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5'}"
+											: 'bg-white text-gray-700 shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5'}"
 										on:click={() => updateProperty('textAlign', align.value)}
 									>
 										<i class="fa {align.icon}" />
@@ -3920,49 +3920,49 @@
 								<label class={fieldLabelClass}>Presets</label>
 								<div class="grid grid-cols-4 gap-1.5">
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('none')}
 										title="None"
 									>
 										None
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('soft-shadow')}
 										title="Soft Shadow"
 									>
 										Soft
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('hard-shadow')}
 										title="Hard Shadow"
 									>
 										Hard
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('outline')}
 										title="Outline"
 									>
 										Outline
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('glow')}
 										title="Glow"
 									>
 										Glow
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyTextEffectPreset('neon')}
 										title="Neon"
 									>
 										Neon
 									</button>
 									<button
-										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium col-span-2"
+										class="px-2 py-1.5 text-[10px] bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium col-span-2"
 										on:click={() => applyTextEffectPreset('bold-outline')}
 										title="Bold Outline"
 									>
@@ -4683,49 +4683,49 @@
 								<label class={fieldLabelClass}>Quick Filters</label>
 								<div class="grid grid-cols-2 gap-2">
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('none')}
 									>
 										Original
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('grayscale')}
 									>
 										B&W
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('sepia')}
 									>
 										Sepia
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('vintage')}
 									>
 										Vintage
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('cool')}
 									>
 										Cool
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('warm')}
 									>
 										Warm
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('dramatic')}
 									>
 										Dramatic
 									</button>
 									<button
-										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#000] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
+										class="px-3 py-2 text-xs bg-white border-[2px] border-gray-900 rounded-lg shadow-[1px_1px_0_0_#1f2937] hover:shadow-brutal-accent-sm hover:-translate-y-0.5 transition-all font-medium"
 										on:click={() => applyPresetFilter('fade')}
 									>
 										Fade

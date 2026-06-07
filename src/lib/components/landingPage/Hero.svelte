@@ -194,13 +194,13 @@
 					<SignUpButton
 						text="Start Building Free"
 						location="hero"
-						class="w-full sm:w-auto bg-brand-danger text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all font-black uppercase tracking-wider text-center"
+						class="w-full sm:w-auto bg-brand-danger text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider text-center"
 					/>
 
 					<a
 						href="https://docs.pictify.io"
 						target="_blank"
-						class="w-full sm:w-auto group flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all font-bold"
+						class="w-full sm:w-auto group flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-bold"
 						on:click={() =>
 							analytics.trackOutboundLink({
 								url: 'https://docs.pictify.io',

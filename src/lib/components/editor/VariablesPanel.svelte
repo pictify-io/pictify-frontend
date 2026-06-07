@@ -1139,7 +1139,7 @@
 		<div class="flex items-center justify-between">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Variables</h3>
 			<button
-				class="text-xs px-2.5 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-brutal-accent hover:-translate-y-0.5 flex items-center gap-1.5 uppercase font-bold tracking-wide border-[2px] border-gray-900"
+				class="text-xs px-2.5 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-black transition-all shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 flex items-center gap-1.5 uppercase font-bold tracking-wide border-[2px] border-gray-900"
 				on:click={startCreate}
 			>
 				<i class="fa fa-plus text-[10px]" />
@@ -1296,7 +1296,7 @@
 				<!-- Actions -->
 				<div class="flex gap-2 pt-2">
 					<button
-						class="flex-1 py-2.5 px-4 bg-gray-900 text-white rounded-lg text-xs font-black uppercase tracking-wider border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-brutal-accent hover:-translate-y-0.5 transition-all"
+						class="flex-1 py-2.5 px-4 bg-gray-900 text-white rounded-lg text-xs font-black uppercase tracking-wider border-[2px] border-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 transition-all"
 						on:click={saveVariable}
 					>
 						{editingVariable ? 'Update' : 'Create'} Variable
@@ -1326,7 +1326,7 @@
 						Create variables to make your template dynamic.
 					</p>
 					<button
-						class="text-xs px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 rounded-lg hover:bg-black transition-all shadow-[2px_2px_0_0_#000] hover:shadow-brutal-accent hover:-translate-y-0.5 uppercase font-bold"
+						class="text-xs px-4 py-2 bg-gray-900 text-white border-[2px] border-gray-900 rounded-lg hover:bg-black transition-all shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 uppercase font-bold"
 						on:click={startCreate}
 					>
 						<i class="fa fa-plus mr-1.5" />
@@ -1736,7 +1736,7 @@
 					<button
 						class="w-full px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all border-[2px] border-gray-900 {$isPreviewActive
 							? 'bg-gray-200 text-gray-900 shadow-[2px_2px_0_0_#d1d5db] hover:shadow-[4px_4px_0_0_#d1d5db] hover:-translate-y-0.5'
-							: 'bg-[#4ade80] text-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-brutal-accent hover:-translate-y-0.5'}"
+							: 'bg-[#4ade80] text-gray-900 shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5'}"
 						on:click={togglePreview}
 						aria-pressed={$isPreviewActive}
 						aria-label={$isPreviewActive ? 'Stop canvas preview' : 'Start canvas preview'}
@@ -2155,7 +2155,7 @@
 						? 'bg-[#4ade80]'
 						: 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email
 						? 'gray-900'
-						: 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_{guestMode &&
+						: 'white'} rounded-lg transition-all text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-brutal-sm hover:shadow-[4px_4px_0_0_{guestMode &&
 					!$user?.email
 						? '#ff6b6b'
 						: '#ffc480'}] hover:-translate-y-0.5 font-black uppercase tracking-wider border-[2px] border-gray-900"
@@ -2219,14 +2219,14 @@
 									class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2"
 								>
 									<button
-										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
+										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-brutal-sm"
 										on:click={openImageInNewTab}
 										title="Open in new tab"
 									>
 										<i class="fa fa-external-link-alt text-gray-900" />
 									</button>
 									<button
-										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
+										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-brutal-sm"
 										on:click={downloadImage}
 										title="Download image"
 									>

@@ -70,7 +70,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-brand-danger rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-brand-danger rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -138,7 +138,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -193,7 +193,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-[#4ade80] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-[#4ade80] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-brutal-lg"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

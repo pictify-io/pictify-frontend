@@ -9,7 +9,7 @@
 </script>
 
 <div
-	class="bg-white rounded-2xl border-[3px] border-black shadow-[4px_4px_0_0_black] p-4 flex items-center gap-4 group hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+	class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg p-4 flex items-center gap-4 group hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 >
 	<!-- Lightbulb icon -->
 	<div
@@ -34,7 +34,7 @@
 	{#if cta && href}
 		<a
 			{href}
-			class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase tracking-wider bg-brand-accent text-black border-[2px] border-black rounded-lg shadow-[2px_2px_0_0_black] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+			class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase tracking-wider bg-brand-accent text-black border-[2px] border-black rounded-lg shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 		>
 			{cta}
 		</a>

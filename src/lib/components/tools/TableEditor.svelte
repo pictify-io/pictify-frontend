@@ -987,7 +987,7 @@ Bob,Designer,Active"""</span>
 	<!-- First Generation Prompt (Modal) -->
 	{#if showFirstGenerationPrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
+			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
 				<div class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-black uppercase tracking-wider">Great First Image!</h3>
 					<button class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors" on:click={() => (showFirstGenerationPrompt = false)}>
@@ -1002,7 +1002,7 @@ Bob,Designer,Active"""</span>
 						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-[#4ade80]">✓</span><span class="font-bold text-black text-sm">API Access</span></li>
 					</ul>
 					<div class="space-y-3">
-						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Create Free Account</a>
+						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Create Free Account</a>
 						<button class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide" on:click={() => (showFirstGenerationPrompt = false)}>Continue as Guest</button>
 					</div>
 				</div>
@@ -1013,7 +1013,7 @@ Bob,Designer,Active"""</span>
 	<!-- Upgrade Prompt (Modal) -->
 	{#if showUpgradePrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
+			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
 				<div class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-white uppercase tracking-wider">Ready to Create More?</h3>
 					<button class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors" on:click={() => (showUpgradePrompt = false)}>
@@ -1029,7 +1029,7 @@ Bob,Designer,Active"""</span>
 						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black"><span class="font-black text-brand-danger">✓</span><span class="font-bold text-black text-sm">Priority support</span></li>
 					</ul>
 					<div class="space-y-3">
-						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Sign Up Free</a>
+						<a href="/signup?redirect=/tools/table" on:click={handleSignupClick} class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Sign Up Free</a>
 						<button class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide" on:click={() => (showUpgradePrompt = false)}>Maybe Later</button>
 					</div>
 				</div>

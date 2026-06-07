@@ -523,7 +523,7 @@
 					{/if}
 				</h1>
 				<div
-					class="px-2 py-1 bg-[#3b82f6] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+					class="px-2 py-1 bg-[#3b82f6] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-brutal-sm"
 				>
 					Live Mode
 				</div>

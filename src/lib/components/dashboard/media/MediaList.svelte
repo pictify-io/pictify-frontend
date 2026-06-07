@@ -551,7 +551,7 @@
 		<div class="max-w-6xl w-full max-h-[90vh] flex flex-col relative" on:click|stopPropagation>
 			<!-- Image Frame -->
 			<div
-				class="bg-white rounded-2xl border-[3px] border-gray-900 p-2 shadow-[12px_12px_0_0_#000] relative overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-2 shadow-brutal-3xl relative overflow-hidden"
 			>
 				<!-- Pattern Background -->
 				<div

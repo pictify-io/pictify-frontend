@@ -355,16 +355,16 @@
 			<a
 				href={PUBLIC_DOCS_URL}
 				target="_blank"
-				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackOutbound(PUBLIC_DOCS_URL, 'Docs', 'mobile_menu')}>Docs</a
 			>
 			<a
 				href="/pricing"
-				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackNav('Pricing', '/pricing', 'mobile_menu')}>Pricing</a
 			>
 			<div
-				class="border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl overflow-hidden"
+				class="border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl overflow-hidden"
 			>
 				<p class="px-4 pt-3 pb-1 text-xs font-black text-gray-400 uppercase tracking-widest">
 					Solutions
@@ -453,22 +453,22 @@
 			</div>
 			<a
 				href="/tools"
-				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackNav('Tools', '/tools', 'mobile_menu')}>Tools</a
 			>
 			<a
 				href="/templates"
-				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackNav('Templates', '/templates', 'mobile_menu')}>Templates</a
 			>
 			<a
 				href="/integrations"
-				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackNav('Integrations', '/integrations', 'mobile_menu')}>Integrations</a
 			>
 			<a
 				href="/blogs"
-				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 				on:click={() => trackNav('Blog', '/blogs', 'mobile_menu')}>Blog</a
 			>
 
@@ -477,14 +477,14 @@
 			{#if !isLoggedIn}
 				<a
 					href="/login"
-					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-gray-100 rounded-xl uppercase active:translate-y-1 active:shadow-[2px_2px_0_0_#000] transition-all"
+					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-gray-100 rounded-xl uppercase active:translate-y-1 active:shadow-brutal-sm transition-all"
 					on:click={() => trackCTA('Sign In', 'mobile_menu')}
 				>
 					Sign In
 				</a>
 				<a
 					href="/login"
-					class="p-4 text-center text-lg font-black text-white border-[3px] border-gray-900 bg-brand-danger shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+					class="p-4 text-center text-lg font-black text-white border-[3px] border-gray-900 bg-brand-danger shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 					on:click={() => trackCTA('Start Building Free', 'mobile_menu')}
 				>
 					Start Building Free
@@ -492,7 +492,7 @@
 			{:else}
 				<a
 					href="/dashboard"
-					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-[#4ade80] shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+					class="p-4 text-center text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-[#4ade80] shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 					on:click={() => trackNav('Dashboard', '/dashboard', 'mobile_menu')}
 				>
 					Dashboard

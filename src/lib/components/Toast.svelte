@@ -66,7 +66,7 @@
 		{#each $visibleToasts as t (t.id)}
 			<div
 				transition:fly={{ y: 50, duration: 300, easing: quadOut }}
-				class="flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] rounded-xl overflow-hidden"
+				class="flex items-stretch min-w-[340px] max-w-md bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-xl overflow-hidden"
 			>
 				<!-- Color Strip / Icon Area -->
 				<div
@@ -75,7 +75,7 @@
 							.bg} w-12 flex items-center justify-center border-r-[3px] border-gray-900 flex-shrink-0"
 				>
 					<div
-						class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+						class="bg-white border-2 border-gray-900 rounded-lg w-8 h-8 flex items-center justify-center shadow-brutal-sm"
 					>
 						<svg
 							class="w-5 h-5 text-gray-900"

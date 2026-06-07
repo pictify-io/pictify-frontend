@@ -175,7 +175,7 @@
 	<!-- Popup -->
 	<div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
 		<div
-			class="bg-white border-[4px] border-black shadow-[12px_12px_0_0_#000] max-w-lg w-full pointer-events-auto animate-slideUp"
+			class="bg-white border-[4px] border-black shadow-brutal-3xl max-w-lg w-full pointer-events-auto animate-slideUp"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="exit-popup-title"
@@ -266,7 +266,7 @@
 					<button
 						type="submit"
 						disabled={isSubmitting}
-						class="w-full py-4 bg-brand-accent text-black border-[3px] border-black font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="w-full py-4 bg-brand-accent text-black border-[3px] border-black font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 					>
 						{isSubmitting ? 'Saving...' : 'Get Free Access'}
 					</button>

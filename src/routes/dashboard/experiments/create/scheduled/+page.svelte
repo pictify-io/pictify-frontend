@@ -501,7 +501,7 @@
 	{#if currentStep === 'basics'}
 		<div class="mt-8 space-y-6">
 			<div
-				class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6 space-y-5"
+				class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-6 space-y-5"
 			>
 				<h3 class="text-sm font-black uppercase tracking-widest text-gray-900">Basic Setup</h3>
 
@@ -515,7 +515,7 @@
 						value={form.name}
 						on:input={handleNameInput}
 						placeholder="e.g. Holiday Banner Schedule"
-						class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
+						class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 					/>
 				</div>
 
@@ -530,7 +530,7 @@
 							value={form.slug}
 							on:input={handleSlugInput}
 							placeholder="holiday-banner"
-							class="flex-1 px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
+							class="flex-1 px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 						/>
 						{#if slugStatus === 'checking'}
 							<span class="text-xs font-bold text-gray-400">Checking...</span>
@@ -568,7 +568,7 @@
 								class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 									{form.outputConfig.format === fmt.value
 									? 'border-brand-accent bg-brand-accent/10 shadow-brutal-accent'
-									: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
+									: 'border-black bg-white shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[1px]'}"
 							>
 								<span class="text-sm font-black">{fmt.label}</span>
 								<p class="text-[9px] font-bold text-gray-500 mt-0.5">{fmt.desc}</p>
@@ -584,7 +584,7 @@
 					type="button"
 					disabled={!canGoStep2}
 					on:click={() => (currentStep = 'variants')}
-					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-brand-accent shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-brand-accent shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					Next: Variants
 				</button>
@@ -597,7 +597,7 @@
 		<div class="mt-8 space-y-6">
 			{#each form.variants as variant, i}
 				<div
-					class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] overflow-hidden"
+					class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg overflow-hidden"
 				>
 					<!-- Variant header -->
 					<div
@@ -662,7 +662,7 @@
 							<input
 								type="text"
 								bind:value={variant.name}
-								class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
+								class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all"
 							/>
 						</div>
 
@@ -729,7 +729,7 @@
 				<button
 					type="button"
 					on:click={() => (currentStep = 'basics')}
-					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px] transition-all"
+					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[1px] transition-all"
 				>
 					Back
 				</button>
@@ -737,7 +737,7 @@
 					type="button"
 					disabled={!canGoStep3}
 					on:click={() => (currentStep = 'schedule')}
-					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-brand-accent shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-brand-accent shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					Next: Schedule
 				</button>
@@ -759,14 +759,14 @@
 				<button
 					type="button"
 					on:click={() => (currentStep = 'variants')}
-					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px] transition-all"
+					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[1px] transition-all"
 				>
 					Back
 				</button>
 				<button
 					type="button"
 					on:click={() => (currentStep = 'launch')}
-					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-brand-accent shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all"
+					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-brand-accent shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all"
 				>
 					Next: Launch
 				</button>
@@ -779,7 +779,7 @@
 		<div class="mt-8 space-y-6">
 			<!-- Goal Config -->
 			<div
-				class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6 space-y-5"
+				class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-6 space-y-5"
 			>
 				<h3 class="text-sm font-black uppercase tracking-widest text-gray-900">Goal & Tracking</h3>
 
@@ -794,7 +794,7 @@
 							class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 								{form.goalConfig.type === 'impressions_only'
 								? 'border-brand-accent bg-brand-accent/10 shadow-brutal-accent'
-								: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
+								: 'border-black bg-white shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[1px]'}"
 						>
 							<span class="text-sm font-black">Views Only</span>
 							<p class="text-[9px] font-bold text-gray-500 mt-0.5">Track impressions</p>
@@ -805,7 +805,7 @@
 							class="flex-1 p-3 border-[3px] rounded-xl text-center transition-all cursor-pointer
 								{form.goalConfig.type === 'click_through'
 								? 'border-brand-accent bg-brand-accent/10 shadow-brutal-accent'
-								: 'border-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px]'}"
+								: 'border-black bg-white shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[1px]'}"
 						>
 							<span class="text-sm font-black">Click-through</span>
 							<p class="text-[9px] font-bold text-gray-500 mt-0.5">Track clicks + views</p>
@@ -823,7 +823,7 @@
 							type="url"
 							bind:value={form.goalConfig.destinationUrl}
 							placeholder="https://yoursite.com/landing-page"
-							class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all placeholder:text-gray-300 placeholder:font-sans"
+							class="w-full px-4 py-3 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-accent focus:border-brand-accent transition-all placeholder:text-gray-300 placeholder:font-sans"
 						/>
 					</div>
 				{/if}
@@ -838,7 +838,7 @@
 			/>
 
 			<!-- Summary -->
-			<div class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-6">
+			<div class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-6">
 				<h3 class="text-sm font-black uppercase tracking-widest text-gray-900 mb-4">Summary</h3>
 				<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
 					<div class="p-3 bg-gray-50 rounded-xl border-[2px] border-gray-200">
@@ -869,7 +869,7 @@
 				<button
 					type="button"
 					on:click={() => (currentStep = 'schedule')}
-					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[1px] transition-all"
+					class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-[1px] transition-all"
 				>
 					Back
 				</button>
@@ -878,7 +878,7 @@
 						type="button"
 						disabled={!effectiveCanSubmit}
 						on:click={() => handleSubmit(false)}
-						class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-white shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{isEditMode ? 'Update Draft' : 'Save Draft'}
 					</button>
@@ -886,7 +886,7 @@
 						type="button"
 						disabled={!effectiveCanSubmit}
 						on:click={() => handleSubmit(true)}
-						class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-[#4ade80] shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="px-6 py-3 border-[3px] border-black rounded-xl text-sm font-black bg-[#4ade80] shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-[2px] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{#if isSubmitting}
 							<svg class="w-4 h-4 animate-spin inline mr-2" fill="none" viewBox="0 0 24 24">

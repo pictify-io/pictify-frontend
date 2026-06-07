@@ -550,7 +550,7 @@
 					>
 						<div class="bg-gray-800 border-b-[3px] border-gray-900 p-4 flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 rounded-lg bg-[#4ade80] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"

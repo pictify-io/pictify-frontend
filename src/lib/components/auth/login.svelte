@@ -198,12 +198,12 @@
 	/>
 
 	<div
-		class="bg-white border-[3px] border-black shadow-[8px_8px_0_0_black] rounded-2xl p-6 md:p-10 w-full max-w-md relative z-10 transition-all duration-300"
+		class="bg-white border-[3px] border-black shadow-brutal-2xl rounded-2xl p-6 md:p-10 w-full max-w-md relative z-10 transition-all duration-300"
 	>
 		<div class="flex flex-col items-center justify-center mb-8">
 			<!-- Logo/Brand -->
 			<div
-				class="mb-6 inline-block px-6 py-2 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2 hover:rotate-0 transition-transform cursor-default"
+				class="mb-6 inline-block px-6 py-2 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-2 hover:rotate-0 transition-transform cursor-default"
 			>
 				<span class="text-2xl font-black text-black tracking-tight">Pictify</span>
 			</div>
@@ -233,7 +233,7 @@
 					bind:value={email}
 					type="email"
 					placeholder="name@example.com"
-					class="w-full border-[3px] border-black p-3 rounded-xl focus:outline-none focus:shadow-[4px_4px_0_0_black] transition-shadow text-lg font-medium placeholder:text-gray-400"
+					class="w-full border-[3px] border-black p-3 rounded-xl focus:outline-none focus:shadow-brutal-lg transition-shadow text-lg font-medium placeholder:text-gray-400"
 				/>
 			</div>
 
@@ -254,7 +254,7 @@
 					bind:value={password}
 					type="password"
 					placeholder="••••••••"
-					class="w-full border-[3px] border-black p-3 rounded-xl focus:outline-none focus:shadow-[4px_4px_0_0_black] transition-shadow text-lg font-medium placeholder:text-gray-400"
+					class="w-full border-[3px] border-black p-3 rounded-xl focus:outline-none focus:shadow-brutal-lg transition-shadow text-lg font-medium placeholder:text-gray-400"
 				/>
 			</div>
 
@@ -373,7 +373,7 @@
 
 			<button
 				on:click={handleSubmit}
-				class="bg-brand-danger text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-black text-lg mt-2 uppercase tracking-wide"
+				class="bg-brand-danger text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-black text-lg mt-2 uppercase tracking-wide"
 			>
 				{#if isLogin}
 					Login
@@ -392,7 +392,7 @@
 
 			<button
 				on:click={handleGoogleLogin}
-				class="bg-white text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-bold text-lg flex items-center justify-center gap-3"
+				class="bg-white text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-bold text-lg flex items-center justify-center gap-3"
 			>
 				<img loading="lazy" src={GoogleIcon} alt="Google" class="w-6 h-6" />
 				<span>Google</span>

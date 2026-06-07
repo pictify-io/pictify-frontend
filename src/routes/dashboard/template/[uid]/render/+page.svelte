@@ -401,7 +401,7 @@ console.log(result.url); // CDN URL of rendered image
 					{/if}
 				</h1>
 				<div
-					class="px-2 py-1 bg-[#4ecdc4] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+					class="px-2 py-1 bg-[#4ecdc4] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-brutal-sm"
 				>
 					Render Mode
 				</div>
@@ -697,7 +697,7 @@ console.log(result.url); // CDN URL of rendered image
 									</p>
 									<button
 										type="button"
-										class="w-full bg-amber-400 hover:bg-amber-500 text-black font-black py-3 px-4 rounded-lg border-[3px] border-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-xs"
+										class="w-full bg-amber-400 hover:bg-amber-500 text-black font-black py-3 px-4 rounded-lg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-xs"
 										on:click={handleCreateToken}
 										disabled={isCreatingToken}
 									>

@@ -32,7 +32,7 @@
 			{tab.label}
 			{#if tab.badge}
 				<span
-					class="absolute -top-1 -right-1 w-2 h-2 bg-brand-danger rounded-full border-[1px] border-gray-900 shadow-[1px_1px_0_0_#000]"
+					class="absolute -top-1 -right-1 w-2 h-2 bg-brand-danger rounded-full border-[1px] border-gray-900 shadow-[1px_1px_0_0_#1f2937]"
 				/>
 			{/if}
 		</button>

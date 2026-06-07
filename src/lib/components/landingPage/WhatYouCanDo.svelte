@@ -103,7 +103,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 auto-rows-[minmax(340px,auto)]">
 			<!-- Card 1: Design Freedom (Visual Editor) -->
 			<div
-				class="md:col-span-12 lg:col-span-7 bg-[#E0F2FE] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col md:flex-row"
+				class="md:col-span-12 lg:col-span-7 bg-[#E0F2FE] rounded-2xl border-[3px] border-black shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col md:flex-row"
 				on:mouseenter={() => (activeHover = 'design')}
 				on:mouseleave={() => (activeHover = null)}
 			>
@@ -111,7 +111,7 @@
 				<div class="p-8 md:p-10 flex-1 z-10 flex flex-col justify-between">
 					<div>
 						<div
-							class="w-12 h-12 bg-white border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0_0_black] group-hover:rotate-6 transition-transform"
+							class="w-12 h-12 bg-white border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-brutal-lg group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -173,7 +173,7 @@
 
 								<!-- Hover Interaction Elements -->
 								<div
-									class="absolute top-10 right-2 w-8 h-8 bg-brand-danger rounded-full border-[2px] border-black cursor-move shadow-[2px_2px_0_0_black] transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20 flex items-center justify-center"
+									class="absolute top-10 right-2 w-8 h-8 bg-brand-danger rounded-full border-[2px] border-black cursor-move shadow-brutal-sm transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20 flex items-center justify-center"
 								>
 									<svg
 										class="w-4 h-4 text-white"
@@ -196,14 +196,14 @@
 
 			<!-- Card 2: Developer Experience (API) -->
 			<div
-				class="md:col-span-12 lg:col-span-5 bg-[#1F2937] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col"
+				class="md:col-span-12 lg:col-span-5 bg-[#1F2937] rounded-2xl border-[3px] border-black shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col"
 				on:mouseenter={handleApiEnter}
 				on:mouseleave={() => (activeHover = null)}
 			>
 				<div class="p-8 md:p-10 flex-1 relative z-10">
 					<div class="flex justify-between items-start mb-6">
 						<div
-							class="w-12 h-12 bg-gray-800 border-[3px] border-gray-600 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_black]"
+							class="w-12 h-12 bg-gray-800 border-[3px] border-gray-600 rounded-xl flex items-center justify-center shadow-brutal-lg"
 						>
 							<svg
 								class="w-6 h-6 text-[#4ade80]"
@@ -267,7 +267,7 @@
 
 			<!-- Card 3: Infinite Scale (Infrastructure) -->
 			<div
-				class="md:col-span-12 bg-[#FFF4C3] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+				class="md:col-span-12 bg-[#FFF4C3] rounded-2xl border-[3px] border-black shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group cursor-pointer"
 				on:mouseenter={() => (activeHover = 'scale')}
 				on:mouseleave={() => (activeHover = null)}
 			>
@@ -290,7 +290,7 @@
 						</div>
 
 						<div
-							class="w-12 h-12 bg-brand-danger border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0_0_black] group-hover:-translate-y-1 transition-transform"
+							class="w-12 h-12 bg-brand-danger border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-brutal-lg group-hover:-translate-y-1 transition-transform"
 						>
 							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -572,7 +572,7 @@
 										</div>
 									</div>
 									<div
-										class="absolute top-2 right-2 bg-brand-danger text-white text-[8px] font-bold px-1.5 py-0.5 border border-black shadow-[2px_2px_0_0_black]"
+										class="absolute top-2 right-2 bg-brand-danger text-white text-[8px] font-bold px-1.5 py-0.5 border border-black shadow-brutal-sm"
 									>
 										NEW
 									</div>

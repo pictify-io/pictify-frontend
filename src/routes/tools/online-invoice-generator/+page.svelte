@@ -373,7 +373,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h1>
@@ -401,7 +401,7 @@
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
 			<!-- Left Column: Form -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] overflow-hidden"
+				class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden"
 			>
 				<!-- Terminal Header -->
 				<div
@@ -432,21 +432,21 @@
 						<input
 							bind:value={invoiceData.companyName}
 							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 							placeholder="Company Name"
 							on:input={updateHTML(selectedTemplate)}
 						/>
 						<div class="relative">
 							<input
 								type="file"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] file:mr-4 file:py-1 file:px-3 file:border-[2px] file:border-black file:bg-brand-accent file:font-bold file:text-black file:text-xs file:uppercase cursor-pointer"
+								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md file:mr-4 file:py-1 file:px-3 file:border-[2px] file:border-black file:bg-brand-accent file:font-bold file:text-black file:text-xs file:uppercase cursor-pointer"
 								accept="image/*"
 								on:change={updateLogo}
 							/>
 						</div>
 						<textarea
 							bind:value={invoiceData.companyAddress}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
 							placeholder="Company Address"
 							rows="2"
 							on:input={updateHTML(selectedTemplate)}
@@ -467,13 +467,13 @@
 						<input
 							bind:value={invoiceData.clientName}
 							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 							placeholder="Client Name"
 							on:input={updateHTML(selectedTemplate)}
 						/>
 						<textarea
 							bind:value={invoiceData.clientAddress}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
+							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
 							placeholder="Client Address"
 							rows="2"
 							on:input={updateHTML(selectedTemplate)}
@@ -495,20 +495,20 @@
 							<input
 								bind:value={invoiceData.invoiceNumber}
 								type="text"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 								placeholder="Invoice #"
 								on:input={updateHTML(selectedTemplate)}
 							/>
 							<input
 								bind:value={invoiceData.invoiceDate}
 								type="date"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 								on:input={updateHTML(selectedTemplate)}
 							/>
 							<input
 								bind:value={invoiceData.dueDate}
 								type="date"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 								on:input={updateHTML(selectedTemplate)}
 							/>
 						</div>
@@ -530,27 +530,27 @@
 								<input
 									bind:value={item.description}
 									type="text"
-									class="flex-grow min-w-[120px] border-[3px] border-black p-2 font-bold text-sm shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+									class="flex-grow min-w-[120px] border-[3px] border-black p-2 font-bold text-sm shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 									placeholder="Description"
 									on:input={updateHTML(selectedTemplate)}
 								/>
 								<input
 									bind:value={item.quantity}
 									type="number"
-									class="w-16 border-[3px] border-black p-2 font-bold text-sm text-center shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+									class="w-16 border-[3px] border-black p-2 font-bold text-sm text-center shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 									placeholder="Qty"
 									on:input={updateHTML(selectedTemplate)}
 								/>
 								<input
 									bind:value={item.price}
 									type="number"
-									class="w-20 border-[3px] border-black p-2 font-bold text-sm text-center shadow-[2px_2px_0_0_#000] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+									class="w-20 border-[3px] border-black p-2 font-bold text-sm text-center shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 									placeholder="Price"
 									on:input={updateHTML(selectedTemplate)}
 								/>
 								<button
 									on:click={() => removeItem(index)}
-									class="w-10 h-10 bg-brand-danger border-[3px] border-black text-white font-black flex items-center justify-center shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="w-10 h-10 bg-brand-danger border-[3px] border-black text-white font-black flex items-center justify-center shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									×
 								</button>
@@ -573,7 +573,7 @@
 							<input
 								bind:value={invoiceData.taxRate}
 								type="number"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
 								placeholder="0"
 								on:input={updateHTML(selectedTemplate)}
 							/>
@@ -588,7 +588,7 @@
 
 					<textarea
 						bind:value={invoiceData.notes}
-						class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-[3px_3px_0_0_#000] focus:shadow-[1px_1px_0_0_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
+						class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
 						placeholder="Additional Notes..."
 						rows="2"
 						on:input={updateHTML(selectedTemplate)}
@@ -599,7 +599,7 @@
 			<!-- Right Column: Preview -->
 			<div class="space-y-4 sm:space-y-6">
 				<div
-					class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] overflow-hidden"
+					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden"
 				>
 					<!-- Preview Header -->
 					<div
@@ -630,7 +630,7 @@
 				<button
 					on:click={generateInvoice}
 					disabled={isImageGenerating}
-					class="w-full bg-brand-danger hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+					class="w-full bg-brand-danger hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
 				>
 					{#if isImageGenerating}
 						<svg
@@ -669,7 +669,7 @@
 
 				<!-- Generated Image Result -->
 				{#if isImageGenerating}
-					<div class="bg-white border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000]">
+					<div class="bg-white border-[3px] border-black p-4 shadow-brutal-lg">
 						<p class="text-center font-bold mb-3">Generating Image...</p>
 						<div class="w-full bg-gray-200 border-[2px] border-black h-4">
 							<div class="bg-black h-full loading-bar" />
@@ -678,7 +678,7 @@
 				{/if}
 
 				{#if imageUrl}
-					<div class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_#000] overflow-hidden">
+					<div class="bg-white border-[3px] border-black shadow-brutal-xl overflow-hidden">
 						<div
 							class="bg-[#4ade80] px-4 py-3 border-b-[3px] border-black flex items-center justify-between"
 						>
@@ -695,7 +695,7 @@
 								<a
 									href={imageUrl}
 									target="_blank"
-									class="px-3 py-1 bg-white text-black border-[2px] border-black font-bold text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="px-3 py-1 bg-white text-black border-[2px] border-black font-bold text-xs uppercase shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									Open in Tab
 								</a>
@@ -705,7 +705,7 @@
 							<img loading="lazy"
 								src={imageUrl}
 								alt="Invoice"
-								class="w-full h-auto border-[3px] border-black shadow-[4px_4px_0_0_#000]"
+								class="w-full h-auto border-[3px] border-black shadow-brutal-lg"
 							/>
 						</div>
 					</div>
@@ -726,7 +726,7 @@
 		<div class="mt-12 sm:mt-16">
 			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">
 				<span
-					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -745,7 +745,7 @@
 					<button
 						class="relative bg-white border-[3px] {selectedTemplate === template
 							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
-							: 'border-black shadow-[4px_4px_0_0_#000]'} p-3 overflow-hidden hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer"
+							: 'border-black shadow-brutal-lg'} p-3 overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer"
 						on:click={() => updateTemplate(template)}
 					>
 						{#if selectedTemplate === template}
@@ -769,7 +769,7 @@
 			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
 				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
 					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
 					>
 						<span class="font-black text-sm sm:text-lg">?</span>
 					</div>
@@ -783,17 +783,17 @@
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-2 sm:px-4">INVOICING</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 			</h2>
 
 			<!-- What is Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -819,10 +819,10 @@
 
 			<!-- Benefits Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#4ade80] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -842,7 +842,7 @@
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					{#each ['Create professional invoices in minutes', 'Customize templates to match your brand', 'Automate calculations for taxes and totals', 'Save time on billing and bookkeeping', 'Access your invoices from anywhere', 'Improve cash flow with accurate billing'] as benefit}
 						<div
-							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-[3px_3px_0_0_#000] flex items-center gap-3 hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							<span class="font-black text-[#4ade80]">✓</span>
 							<span class="font-bold text-black text-sm">{benefit}</span>
@@ -853,10 +853,10 @@
 
 			<!-- How to Use Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#60a5fa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#60a5fa] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -882,7 +882,7 @@
 					{#each [{ num: '1', text: 'Enter your company and client details' }, { num: '2', text: 'Choose from our professional invoice templates' }, { num: '3', text: 'Add line items for products or services' }, { num: '4', text: 'Set tax rates and discounts if applicable' }, { num: '5', text: 'Preview your invoice in real-time' }, { num: '6', text: 'Generate and download your custom invoice' }] as step}
 						<div class="flex items-start gap-4">
 							<span
-								class="bg-[#60a5fa] text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-[2px_2px_0_0_#000]"
+								class="bg-[#60a5fa] text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
 								>{step.num}</span
 							>
 							<span class="font-bold text-black text-sm pt-1">{step.text}</span>
@@ -893,10 +893,10 @@
 
 			<!-- FAQ Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -916,7 +916,7 @@
 				<div class="space-y-3">
 					{#each [{ q: 'How do I use this invoice generator?', a: 'Simply fill in your company and client details, add invoice items, select a template, and click "Generate Invoice". You can then download your professional invoice.' }, { q: 'Is this invoice generator free to use?', a: 'Yes, our online invoice generator is completely free to use. Create and download as many invoices as you need without any cost.' }, { q: 'Can I customize the invoice template?', a: 'You can choose from a variety of professional designs. Each template can be populated with your specific invoice details.' }, { q: 'Are the generated invoices legally compliant?', a: 'Our templates include standard elements required for most invoices. Please check your local regulations for specific requirements.' }] as faq}
 						<details
-							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							<summary
 								class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none text-sm"

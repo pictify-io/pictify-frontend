@@ -184,7 +184,7 @@
 							class="flex items-center gap-2 group"
 						>
 							<div
-								class="w-8 h-8 bg-white border-[2px] border-gray-900 flex items-center justify-center rounded-md shadow-[2px_2px_0_0_#000] group-hover:-translate-y-0.5 transition-transform"
+								class="w-8 h-8 bg-white border-[2px] border-gray-900 flex items-center justify-center rounded-md shadow-brutal-sm group-hover:-translate-y-0.5 transition-transform"
 							>
 								<svg class="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 24 24"
 									><path

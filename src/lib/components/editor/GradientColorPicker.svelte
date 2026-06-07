@@ -456,7 +456,7 @@
 							type="button"
 							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode ===
 							'solid'
-								? 'bg-brand-accent text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
+								? 'bg-brand-accent text-gray-900 border-[2px] border-gray-900 shadow-brutal-sm'
 								: 'text-white hover:text-brand-accent'}"
 							on:click={switchToSolid}
 						>
@@ -466,7 +466,7 @@
 							type="button"
 							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode ===
 							'gradient'
-								? 'bg-brand-accent text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
+								? 'bg-brand-accent text-gray-900 border-[2px] border-gray-900 shadow-brutal-sm'
 								: 'text-white hover:text-brand-accent'}"
 							on:click={switchToGradient}
 						>

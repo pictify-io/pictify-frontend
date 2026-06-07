@@ -69,7 +69,7 @@
 			>
 			<span class="text-2xl">{statusIcon}</span>
 			<span
-				class="text-xs font-bold uppercase px-2 py-1 rounded bg-white border-2 border-gray-900 shadow-[2px_2px_0_0_#000]"
+				class="text-xs font-bold uppercase px-2 py-1 rounded bg-white border-2 border-gray-900 shadow-brutal-sm"
 			>
 				{step.status}
 			</span>
@@ -224,13 +224,13 @@
 		<div class="flex gap-2 mt-3 pt-3 border-t-2 border-gray-900">
 			<button
 				on:click={() => onApprove(stepIndex)}
-				class="flex-1 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
+				class="flex-1 bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-0.5 transition-all"
 			>
 				✓ Approve
 			</button>
 			<button
 				on:click={() => onReject(stepIndex)}
-				class="flex-1 bg-[#f87171] hover:bg-[#ef4444] text-white text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
+				class="flex-1 bg-[#f87171] hover:bg-[#ef4444] text-white text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-0.5 transition-all"
 			>
 				✗ Reject
 			</button>
@@ -246,7 +246,7 @@
 			/>
 			<button
 				on:click={() => onRegenerate(stepIndex, feedbackText)}
-				class="w-full bg-brand-accent hover:bg-[#ffb040] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
+				class="w-full bg-brand-accent hover:bg-[#ffb040] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-brutal-sm hover:shadow-brutal-lg hover:-translate-y-0.5 transition-all"
 			>
 				↻ Regenerate with Feedback
 			</button>

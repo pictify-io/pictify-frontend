@@ -244,7 +244,7 @@
 					/>
 					<!-- Badge -->
 					<div
-						class="absolute -top-6 bg-white border-[2px] border-gray-900 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-[2px_2px_0_0_#000] rotate-6"
+						class="absolute -top-6 bg-white border-[2px] border-gray-900 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-brutal-sm rotate-6"
 					>
 						JSON
 					</div>

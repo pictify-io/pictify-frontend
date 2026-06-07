@@ -271,7 +271,7 @@
 							</span>
 
 							<button
-								class="bg-gray-900 text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-[2px_2px_0_0_#000] hover:shadow-brutal-accent hover:-translate-y-0.5 active:scale-95"
+								class="bg-gray-900 text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-brutal-sm hover:shadow-brutal-accent hover:-translate-y-0.5 active:scale-95"
 								on:click={handleGenerate}
 								disabled={isLoading || !prompt.trim()}
 							>

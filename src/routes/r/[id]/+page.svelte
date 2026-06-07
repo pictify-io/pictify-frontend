@@ -534,7 +534,7 @@
 					>
 						<div class="flex items-center gap-3 mb-4">
 							<div
-								class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-[2px_2px_0_0_#000]"
+								class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-brutal-sm"
 							>
 								Shared Link
 							</div>

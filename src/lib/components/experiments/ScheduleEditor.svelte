@@ -144,7 +144,7 @@
 <div class="space-y-6">
 	<!-- Timeline Visualization -->
 	{#if hasAnySchedule}
-		<div class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-5">
+		<div class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-5">
 			<h4
 				class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2"
 			>
@@ -244,7 +244,7 @@
 	{#each variants as variant, i}
 		{@const color = getColor(i)}
 		<div
-			class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] overflow-hidden"
+			class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg overflow-hidden"
 		>
 			<!-- Variant header -->
 			<div class="flex items-center gap-3 px-5 py-3 border-b-[3px] border-gray-200 bg-gray-50">
@@ -272,7 +272,7 @@
 							value={utcToLocal(variant.schedule?.startAt)}
 							on:input={(e) => handleStartChange(i, e.target.value)}
 							{disabled}
-							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all"
+							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all"
 						/>
 					</div>
 					<div>
@@ -287,7 +287,7 @@
 							value={utcToLocal(variant.schedule?.endAt)}
 							on:input={(e) => handleEndChange(i, e.target.value)}
 							{disabled}
-							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all"
+							class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all"
 						/>
 					</div>
 				</div>
@@ -337,7 +337,7 @@
 
 	<!-- Experiment Expiration & Fallback -->
 	<div
-		class="bg-white border-[3px] border-black rounded-xl shadow-[4px_4px_0_0_black] p-5 space-y-4"
+		class="bg-white border-[3px] border-black rounded-xl shadow-brutal-lg p-5 space-y-4"
 	>
 		<h4 class="text-xs font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
 			<svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -362,7 +362,7 @@
 					value={utcToLocal(expiresAt)}
 					on:input={(e) => handleExpiresAtChange(e.target.value)}
 					{disabled}
-					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all"
+					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all"
 				/>
 				<p class="text-[9px] text-gray-400 mt-1">
 					After this date, the image link returns 410 Gone or shows fallback.
@@ -379,7 +379,7 @@
 					on:input={(e) => handleFallbackChange(e.target.value)}
 					{disabled}
 					placeholder="https://example.com/fallback.png"
-					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-[2px_2px_0_0_black] focus:outline-none focus:shadow-[4px_4px_0_0_black] focus:-translate-y-[1px] transition-all placeholder:text-gray-300 placeholder:font-sans"
+					class="w-full px-3 py-2.5 border-[3px] border-black rounded-xl text-sm font-bold font-mono bg-white shadow-brutal-sm focus:outline-none focus:shadow-brutal-lg focus:-translate-y-[1px] transition-all placeholder:text-gray-300 placeholder:font-sans"
 				/>
 				<p class="text-[9px] text-gray-400 mt-1">Shown after expiration instead of 410 Gone.</p>
 			</div>

@@ -41,7 +41,7 @@
 					<!-- Content -->
 					<div class="relative z-10 flex flex-col items-center">
 						<div
-							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-[2px_2px_0_0_#000] mb-8 transform -rotate-2"
+							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80] shadow-brutal-sm mb-8 transform -rotate-2"
 						>
 							<span class="text-gray-900 text-sm font-bold uppercase tracking-wider flex items-center gap-2"
 								><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
@@ -63,7 +63,7 @@
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
 							<SignUpButton
-								class="w-full sm:w-auto px-8 py-4 bg-brand-accent text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
+								class="w-full sm:w-auto px-8 py-4 bg-brand-accent text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
 								text="Start Building Free"
 								location="cta_section"
 							/>
@@ -71,7 +71,7 @@
 							<a
 								href="https://docs.pictify.io"
 								target="_blank"
-								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all flex items-center justify-center gap-2 group"
+								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all flex items-center justify-center gap-2 group"
 								on:click={() =>
 									analytics.trackOutboundLink({
 										url: 'https://docs.pictify.io',
@@ -138,7 +138,7 @@
 						class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors"
 					>
 						<div
-							class="w-10 h-10 rounded-lg bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+							class="w-10 h-10 rounded-lg bg-[#4ade80] border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg
 								class="w-5 h-5 text-gray-900"
@@ -163,7 +163,7 @@
 						class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors"
 					>
 						<div
-							class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+							class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg
 								class="w-5 h-5 text-gray-900"
@@ -188,7 +188,7 @@
 						class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors"
 					>
 						<div
-							class="w-10 h-10 rounded-lg bg-brand-danger border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+							class="w-10 h-10 rounded-lg bg-brand-danger border-[2px] border-gray-900 flex items-center justify-center shadow-brutal-sm"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path

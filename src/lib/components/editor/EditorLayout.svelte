@@ -362,7 +362,7 @@
 						? 'flex-1 rounded border-[2px]'
 						: 'w-full border-b-[2px] border-gray-900 hover:bg-gray-100'}
 					{$activeRightSidebarTab === 'properties'
-						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#000]'
+						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'
 						: $activeRightSidebarTab
 						? 'text-gray-500 hover:text-gray-900 border-transparent hover:border-gray-300'
 						: 'text-gray-500'}"
@@ -382,7 +382,7 @@
 						? 'flex-1 rounded border-[2px]'
 						: 'w-full border-b-[2px] border-gray-900 hover:bg-gray-100'}
 					{$activeRightSidebarTab === 'layers'
-						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#000]'
+						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'
 						: $activeRightSidebarTab
 						? 'text-gray-500 hover:text-gray-900 border-transparent hover:border-gray-300'
 						: 'text-gray-500'}"
@@ -402,7 +402,7 @@
 						? 'flex-1 rounded border-[2px]'
 						: 'w-full border-b-[2px] border-gray-900 hover:bg-gray-100'}
 					{$activeRightSidebarTab === 'variables'
-						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#000]'
+						? 'bg-brand-accent text-gray-900 border-gray-900 shadow-brutal-sm'
 						: $activeRightSidebarTab
 						? 'text-gray-500 hover:text-gray-900 border-transparent hover:border-gray-300'
 						: 'text-gray-500'}"

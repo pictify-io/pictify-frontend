@@ -347,7 +347,7 @@
 	<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 sm:mb-12 pt-4">
 		<div>
 			<div
-				class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-1 mb-6"
+				class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-1 mb-6"
 			>
 				<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-black" />
 				<span class="text-xs font-black text-black uppercase tracking-widest">Command Center</span>
@@ -373,13 +373,13 @@
 		<div class="flex items-center gap-4">
 			<a
 				href={primaryCTA?.href || '/dashboard/template/create'}
-				class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-[6px_6px_0_0_black] rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-[2px_2px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
+				class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
 			>
 				<span class="text-white font-black text-lg uppercase tracking-wide"
 					>{primaryCTA?.label || 'Create Template'}</span
 				>
 				<div
-					class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[2px_2px_0_0_black]"
+					class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
 				>
 					<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						{#if integrationMode === 'api'}
@@ -444,7 +444,7 @@
 						{@const preview = starterPreviews[templateId]}
 						<a
 							href="/template-workspace/create?useCase={templateId}"
-							class="group bg-white rounded-2xl border-[3px] border-black shadow-[4px_4px_0_0_black] overflow-hidden hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="group bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							<!-- Template Preview -->
 							<div
@@ -521,7 +521,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<!-- Aggregated Metric: Views -->
 				<div
-					class="bg-brand-accent rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-brand-accent rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -543,7 +543,7 @@
 
 				<!-- Aggregated Metric: Templates -->
 				<div
-					class="bg-indigo-300 rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-indigo-300 rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -565,7 +565,7 @@
 
 				<!-- Aggregated Metric: Assets -->
 				<div
-					class="bg-[#4ade80] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-[#4ade80] rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -593,7 +593,7 @@
 			<div class="lg:col-span-8 flex flex-col h-full">
 				<!-- Image Delivery Chart -->
 				<div
-					class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden flex flex-col h-full"
+					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden flex flex-col h-full"
 				>
 					<!-- Chart Header -->
 					<div
@@ -601,13 +601,13 @@
 					>
 						<div class="flex items-center gap-3">
 							<div
-								class="w-3 h-3 rounded-full bg-brand-danger border border-black shadow-[1px_1px_0_0_black]"
+								class="w-3 h-3 rounded-full bg-brand-danger border border-black shadow-[1px_1px_0_0_#1f2937]"
 							/>
 							<div
-								class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_black]"
+								class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_#1f2937]"
 							/>
 							<div
-								class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_black]"
+								class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_#1f2937]"
 							/>
 							<div class="ml-2">
 								<span class="text-sm font-black text-black uppercase tracking-widest"
@@ -625,7 +625,7 @@
 									class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
 										{cdnTimeRange === range
 										? 'bg-black text-white border-black shadow-brutal-accent-sm'
-										: 'bg-white text-black border-black hover:shadow-[2px_2px_0_0_black] hover:-translate-y-0.5'}"
+										: 'bg-white text-black border-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
 								>
 									{range}
 								</button>
@@ -652,7 +652,7 @@
 											<!-- Tick Label -->
 											{#if tick !== 0}
 												<div
-													class="absolute -top-[10px] right-0 translate-x-4 sm:translate-x-6 bg-white px-2 py-0.5 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_black] rounded-md pointer-events-auto"
+													class="absolute -top-[10px] right-0 translate-x-4 sm:translate-x-6 bg-white px-2 py-0.5 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider border-[2px] border-black shadow-brutal-sm rounded-md pointer-events-auto"
 												>
 													{formatNumber(chartMax * tick)}
 												</div>
@@ -710,7 +710,7 @@
 							<!-- X-Axis Labels (Dates) -->
 							<div class="flex justify-between items-center mt-3 z-10 px-1 pr-12 sm:pr-16">
 								<div
-									class="bg-white rounded-md border-[2px] border-black shadow-[2px_2px_0_0_black] px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
+									class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
 								>
 									{new Date(filteredDailyStats[0].date).toLocaleDateString('en-US', {
 										month: 'short',
@@ -719,7 +719,7 @@
 									})}
 								</div>
 								<div
-									class="bg-white rounded-md border-[2px] border-black shadow-[2px_2px_0_0_black] px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
+									class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
 								>
 									{new Date(
 										filteredDailyStats[filteredDailyStats.length - 1].date
@@ -735,7 +735,7 @@
 								class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50"
 							>
 								<div
-									class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-[4px_4px_0_0_black] rotate-3"
+									class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-brutal-lg rotate-3"
 								>
 									<svg
 										class="w-8 h-8 text-black"
@@ -779,7 +779,7 @@
 													>{ref.referrer || 'Direct'}</span
 												>
 												<span
-													class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black] group-hover:-translate-y-0.5 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+													class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937] group-hover:-translate-y-0.5 group-hover:shadow-brutal-sm transition-all"
 													>{formatNumber(ref.hits)}</span
 												>
 											</div>
@@ -803,7 +803,7 @@
 													>{country.country}</span
 												>
 												<span
-													class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_black] group-hover:-translate-y-0.5 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+													class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937] group-hover:-translate-y-0.5 group-hover:shadow-brutal-sm transition-all"
 													>{formatNumber(country.hits)}</span
 												>
 											</div>
@@ -831,7 +831,7 @@
 						{#each quickActions as action}
 							<a
 								href={action.href}
-								class="group bg-white rounded-xl border-[3px] border-black shadow-[3px_3px_0_0_black] p-3 hover:shadow-[1px_1px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center"
+								class="group bg-white rounded-xl border-[3px] border-black shadow-brutal-md p-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center"
 							>
 								<div
 									class="w-9 h-9 rounded-lg border-[2px] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform"
@@ -968,7 +968,7 @@
 							{#each recentTemplates.slice(0, 4) as template}
 								<a
 									href="/dashboard/template/{template.uid}"
-									class="group bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden hover:shadow-[4px_4px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex flex-col h-full"
+									class="group bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex flex-col h-full"
 								>
 									<div
 										class="aspect-video bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:12px_12px] border-b-[3px] border-black relative overflow-hidden flex-shrink-0"
@@ -1091,14 +1091,14 @@
 			<div class="lg:col-span-4 flex flex-col h-full">
 				<!-- Top Performing Templates -->
 				<div
-					class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden flex flex-col h-full"
+					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden flex flex-col h-full"
 				>
 					<div
 						class="flex items-center justify-between p-5 md:p-6 border-b-[3px] border-black bg-gray-50 flex-shrink-0"
 					>
 						<div class="flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-xl bg-yellow-200 border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+								class="w-8 h-8 rounded-xl bg-yellow-200 border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-black"
@@ -1136,7 +1136,7 @@
 
 									<!-- Thumbnail -->
 									<div
-										class="w-12 h-12 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:8px_8px] rounded-xl border-[2px] border-black flex-shrink-0 overflow-hidden shadow-[2px_2px_0_0_black] group-hover:shadow-[4px_4px_0_0_black] group-hover:-translate-y-0.5 transition-all"
+										class="w-12 h-12 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:8px_8px] rounded-xl border-[2px] border-black flex-shrink-0 overflow-hidden shadow-brutal-sm group-hover:shadow-brutal-lg group-hover:-translate-y-0.5 transition-all"
 									>
 										{#if tpl.thumbnail}
 											<img loading="lazy" src={tpl.thumbnail} alt={tpl.name} class="w-full h-full object-cover" />

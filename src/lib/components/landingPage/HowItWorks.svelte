@@ -176,7 +176,7 @@
 			<div class="flex-1 hidden md:block relative">
 				<div class="sticky top-32 h-[500px] w-full">
 					<div
-						class="relative w-full h-full bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#000] rounded-2xl overflow-hidden"
+						class="relative w-full h-full bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden"
 					>
 						<!-- Visual 1: Template Editor (Neo-Brutalist) -->
 						<div
@@ -204,13 +204,13 @@
 										class="w-16 border-r-[3px] border-gray-900 flex flex-col items-center py-4 gap-4 bg-brand-accent/20"
 									>
 										<div
-											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#000]"
+											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-sm"
 										/>
 										<div
-											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#000]"
+											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-sm"
 										/>
 										<div
-											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#000]"
+											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-brutal-sm"
 										/>
 									</div>
 									<!-- Canvas -->
@@ -218,7 +218,7 @@
 										class="flex-1 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] p-6 flex items-center justify-center"
 									>
 										<div
-											class="w-64 aspect-video bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] flex flex-col relative"
+											class="w-64 aspect-video bg-white border-[3px] border-gray-900 shadow-brutal-xl flex flex-col relative"
 										>
 											<div class="h-2/3 bg-brand-danger border-b-[3px] border-gray-900 p-4">
 												<div class="w-1/2 h-4 bg-white border-[2px] border-gray-900 mb-2" />
@@ -254,7 +254,7 @@
 								: 'translate-y-full opacity-0'} flex items-center justify-center bg-brand-danger p-8"
 						>
 							<div
-								class="w-full max-w-md bg-black border-[3px] border-gray-900 shadow-[8px_8px_0_0_#000] rounded-xl overflow-hidden"
+								class="w-full max-w-md bg-black border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl overflow-hidden"
 							>
 								<div
 									class="bg-white border-b-[3px] border-gray-900 p-2 flex items-center justify-between px-4"
@@ -305,7 +305,7 @@
 									<div class="p-4 flex items-center justify-between bg-white">
 										<div class="font-bold text-gray-900">generated_image.png</div>
 										<div
-											class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-xs font-bold shadow-[2px_2px_0_0_#000]"
+											class="px-3 py-1 bg-[#4ade80] border-[2px] border-gray-900 text-xs font-bold shadow-brutal-sm"
 										>
 											SUCCESS
 										</div>
@@ -314,7 +314,7 @@
 
 								<!-- Decorative Elements -->
 								<div
-									class="absolute -top-6 -right-6 w-12 h-12 bg-brand-accent rounded-full border-[3px] border-gray-900 flex items-center justify-center font-bold shadow-[3px_3px_0_0_#000] animate-bounce"
+									class="absolute -top-6 -right-6 w-12 h-12 bg-brand-accent rounded-full border-[3px] border-gray-900 flex items-center justify-center font-bold shadow-brutal-md animate-bounce"
 								>
 									<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path

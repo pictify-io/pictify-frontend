@@ -122,7 +122,7 @@ const image = await pictify.render({
 			<!-- Left: Content (V1 Layout Restored) -->
 			<div class="relative z-10 w-full lg:max-w-xl">
 				<div
-					class="inline-block px-5 py-2 bg-brand-danger border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2 mb-8"
+					class="inline-block px-5 py-2 bg-brand-danger border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-2 mb-8"
 				>
 					<span class="text-sm font-black text-white uppercase tracking-wider">Developer-First</span>
 				</div>
@@ -150,7 +150,7 @@ const image = await pictify.render({
 				<div class="space-y-6 mb-12">
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-brand-accent rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_black] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+							class="w-14 h-14 bg-brand-accent rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 						</div>
@@ -164,7 +164,7 @@ const image = await pictify.render({
 
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-[#4ade80] rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_black] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+							class="w-14 h-14 bg-[#4ade80] rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
 						</div>
@@ -178,7 +178,7 @@ const image = await pictify.render({
 
 					<div class="flex items-start gap-5 group">
 						<div
-							class="w-14 h-14 bg-brand-danger rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_black] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0_0_black] transition-all"
+							class="w-14 h-14 bg-brand-danger rounded-xl border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-lg group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-brutal-sm transition-all"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
 						</div>
@@ -213,7 +213,7 @@ const image = await pictify.render({
 				<!-- Decorative yellow offset shadow box -->
 				<div class="absolute inset-0 bg-brand-accent rounded-2xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 
-				<div class="relative bg-[#1e1e1e] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
+				<div class="relative bg-[#1e1e1e] rounded-2xl border-[3px] border-black shadow-brutal-2xl flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
 
 					<!-- Mac Header -->
 					<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">

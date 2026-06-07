@@ -178,7 +178,7 @@
 	<div class="relative z-10 mx-auto max-w-5xl px-4 py-10 md:py-14">
 		<div class="mb-8 flex items-center justify-between">
 			<div
-				class="inline-block px-5 py-1.5 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full -rotate-1"
+				class="inline-block px-5 py-1.5 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full -rotate-1"
 			>
 				<span class="text-xl font-black tracking-tight">Pictify</span>
 			</div>
@@ -200,7 +200,7 @@
 		<div class="grid md:grid-cols-2 gap-6 mb-6">
 			<!-- Left: render preview -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 flex flex-col"
+				class="bg-white border-[3px] border-black shadow-brutal-xl p-5 flex flex-col"
 			>
 				<div class="flex items-center justify-between mb-3">
 					<h2 class="font-black uppercase tracking-tight text-sm">What you just rendered</h2>
@@ -243,7 +243,7 @@
 
 			<!-- Right: API key + cURL -->
 			<div
-				class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 flex flex-col"
+				class="bg-white border-[3px] border-black shadow-brutal-xl p-5 flex flex-col"
 			>
 				<h2 class="font-black uppercase tracking-tight text-sm mb-3">Your API key</h2>
 
@@ -289,7 +289,7 @@
 
 		<!-- Run from browser button (server-fires api_render_completed) -->
 		<div
-			class="bg-[#4ade80]/15 border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 mb-6"
+			class="bg-[#4ade80]/15 border-[3px] border-black shadow-brutal-xl p-5 md:p-6 mb-6"
 		>
 			<div class="flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
 				<div>
@@ -340,7 +340,7 @@
 		</div>
 
 		<!-- Pricing CTA -->
-		<div class="bg-white border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
+		<div class="bg-white border-[3px] border-black shadow-brutal-xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
 			<div>
 				<h3 class="font-black text-lg mb-1">Render in production →</h3>
 				<p class="text-sm font-medium text-gray-700 max-w-xl">
@@ -350,7 +350,7 @@
 			<a
 				href="/pricing"
 				on:click={ctaClicked}
-				class="flex-shrink-0 px-6 py-3 border-[3px] border-black font-black text-base uppercase tracking-wide bg-brand-danger text-black shadow-[4px_4px_0_0_black] hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="flex-shrink-0 px-6 py-3 border-[3px] border-black font-black text-base uppercase tracking-wide bg-brand-danger text-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				See pricing →
 			</a>

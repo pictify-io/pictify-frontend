@@ -715,13 +715,13 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">{currentFormat.fullName}</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 				{#if hasSize}
 					<span class="block mt-2 sm:mt-4">
 						<span
-							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]"
+							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-brutal-md sm:shadow-brutal-lg"
 						>
 							{sizeString}
 						</span>
@@ -803,8 +803,8 @@
 										class={`px-4 py-4 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
 										${
 											f === format
-												? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-												: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-1px] hover:translate-y-[-1px]'
+												? 'bg-[#4ade80] shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+												: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg hover:translate-x-[-1px] hover:translate-y-[-1px]'
 										}`}
 									>
 										<span class="font-black text-2xl uppercase tracking-tighter">{f}</span>
@@ -839,7 +839,7 @@
 											${
 												sizeString === sz
 													? 'bg-black text-white shadow-[3px_3px_0_0_#ff6b6b]'
-													: 'bg-white text-black hover:bg-gray-50 shadow-[3px_3px_0_0_#ccc] hover:shadow-[3px_3px_0_0_#000]'
+													: 'bg-white text-black hover:bg-gray-50 shadow-[3px_3px_0_0_#ccc] hover:shadow-brutal-md'
 											}`}
 										>
 											{sz}
@@ -942,7 +942,7 @@
 		<!-- Code Editor Workstation -->
 		<div class="w-full max-w-6xl mx-auto mb-20 relative px-2 md:px-0">
 			<div
-				class="border-[3px] md:border-[4px] border-black bg-white relative z-10 shadow-[8px_8px_0_0_#000] overflow-hidden"
+				class="border-[3px] md:border-[4px] border-black bg-white relative z-10 shadow-brutal-2xl overflow-hidden"
 			>
 				<!-- Editor Component -->
 				<CodeEditor
@@ -974,7 +974,7 @@
 					<button
 						on:click={generateImage}
 						disabled={isImageGenerating}
-						class="relative w-full max-w-md py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+						class="relative w-full max-w-md py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
 					>
 						<div class="flex items-center justify-center gap-3 md:gap-4 relative z-10">
 							{#if isImageGenerating}
@@ -1032,7 +1032,7 @@
 		{#if imageUrl}
 			<div class="w-full max-w-5xl mx-auto mb-20 px-2 md:px-0">
 				<div
-					class="border-[3px] md:border-[4px] border-black bg-white shadow-[8px_8px_0_0_#000] relative"
+					class="border-[3px] md:border-[4px] border-black bg-white shadow-brutal-2xl relative"
 				>
 					<!-- Success Header -->
 					<div
@@ -1130,7 +1130,7 @@
 								href={imageUrl}
 								download
 								target="_blank"
-								class="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg
 									class="w-4 h-4"
@@ -1150,7 +1150,7 @@
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
 									on:click={() => trackSignupClick('result_actions')}
-									class="flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-accent border-[2px] border-black font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-accent border-[2px] border-black font-black uppercase text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									Sign up free
 								</a>
@@ -1162,7 +1162,7 @@
 				<!-- Next steps — stacked vertically -->
 				<div class="w-full mt-8 space-y-5">
 					<!-- Automate via API -->
-					<div class="border-[3px] border-black bg-white shadow-[6px_6px_0_0_#000]">
+					<div class="border-[3px] border-black bg-white shadow-brutal-xl">
 						<div class="bg-[#4ade80] px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
 							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">01</span>
 							<h4 class="font-black uppercase tracking-widest text-sm">Automate via API</h4>
@@ -1175,7 +1175,7 @@
 								<a
 									href="https://docs.pictify.io/api-reference/overview"
 									target="_blank"
-									class="inline-block py-2.5 px-5 bg-[#4ade80] text-black border-[2px] border-black font-black uppercase text-xs shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="inline-block py-2.5 px-5 bg-[#4ade80] text-black border-[2px] border-black font-black uppercase text-xs shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									View API docs
 								</a>
@@ -1195,7 +1195,7 @@
 					</div>
 
 					<!-- Use with AI via MCP -->
-					<div class="border-[3px] border-black bg-white shadow-[6px_6px_0_0_#000]">
+					<div class="border-[3px] border-black bg-white shadow-brutal-xl">
 						<div class="bg-brand-accent px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
 							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">02</span>
 							<h4 class="font-black uppercase tracking-widest text-sm">Use with AI agents</h4>
@@ -1209,7 +1209,7 @@
 									<a
 										href="https://www.npmjs.com/package/@pictify/mcp-server"
 										target="_blank"
-										class="inline-flex items-center gap-2 py-2.5 px-5 bg-brand-accent text-black border-[2px] border-black font-black uppercase text-xs shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="inline-flex items-center gap-2 py-2.5 px-5 bg-brand-accent text-black border-[2px] border-black font-black uppercase text-xs shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										<svg class="w-4 h-4" viewBox="0 0 256 256" fill="currentColor"><path d="M0 256V0h256v256z" fill="#C12127"/><path d="M48 48h160v160H176V80H128v128H48z" fill="#fff"/></svg>
 										npm install
@@ -1217,7 +1217,7 @@
 									<a
 										href="https://docs.pictify.io"
 										target="_blank"
-										class="inline-block py-2.5 px-5 bg-white text-black border-[2px] border-black font-black uppercase text-xs shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="inline-block py-2.5 px-5 bg-white text-black border-[2px] border-black font-black uppercase text-xs shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Read docs
 									</a>
@@ -1238,7 +1238,7 @@
 
 					<!-- Sign up CTA -->
 					{#if !isUserLoggedIn}
-						<div class="border-[3px] border-black bg-brand-danger shadow-[6px_6px_0_0_#000]">
+						<div class="border-[3px] border-black bg-brand-danger shadow-brutal-xl">
 							<div class="p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
 								<div class="flex items-center gap-4">
 									<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs flex-shrink-0">03</span>
@@ -1252,7 +1252,7 @@
 								<a
 									href={`/signup?redirect=/tools/html-to-${format}`}
 									on:click={() => trackSignupClick('go_unlimited_banner')}
-									class="py-3 px-6 bg-white text-black border-[2px] border-black font-black uppercase text-sm shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap flex-shrink-0"
+									class="py-3 px-6 bg-white text-black border-[2px] border-black font-black uppercase text-sm shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap flex-shrink-0"
 								>
 									Sign up free
 								</a>
@@ -1269,7 +1269,7 @@
 				class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 			>
 				<div
-					class="bg-white max-w-md w-full mx-auto p-8 shadow-[12px_12px_0_0_#000] border-[4px] border-black relative"
+					class="bg-white max-w-md w-full mx-auto p-8 shadow-brutal-3xl border-[4px] border-black relative"
 				>
 					<!-- Geometric decoration -->
 					<div class="absolute -top-3 -left-3 w-6 h-6 bg-brand-danger border-[3px] border-black" />
@@ -1305,7 +1305,7 @@
 					<ul class="space-y-4 mb-8">
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-brand-danger border-[2px] border-black flex items-center justify-center text-white shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-brand-danger border-[2px] border-black flex items-center justify-center text-white shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1320,7 +1320,7 @@
 						</li>
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-brand-accent border-[2px] border-black flex items-center justify-center text-black shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-brand-accent border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1335,7 +1335,7 @@
 						</li>
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-black shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1377,7 +1377,7 @@
 				style="margin-top: 0px;"
 			>
 				<div
-					class="bg-white max-w-md w-full mx-auto p-8 shadow-[12px_12px_0_0_#000] border-[4px] border-black relative"
+					class="bg-white max-w-md w-full mx-auto p-8 shadow-brutal-3xl border-[4px] border-black relative"
 				>
 					<!-- Geometric decoration -->
 					<div class="absolute -top-3 -right-3 w-6 h-6 bg-brand-danger border-[3px] border-black" />
@@ -1415,7 +1415,7 @@
 					<ul class="space-y-4 mb-8">
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-brand-danger border-[2px] border-black flex items-center justify-center text-white shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-brand-danger border-[2px] border-black flex items-center justify-center text-white shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1430,7 +1430,7 @@
 						</li>
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-brand-accent border-[2px] border-black flex items-center justify-center text-black shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-brand-accent border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1445,7 +1445,7 @@
 						</li>
 						<li class="flex items-center gap-4 text-black font-bold">
 							<div
-								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-black shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 bg-[#4ade80] border-[2px] border-black flex items-center justify-center text-black shadow-brutal-sm"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -1465,7 +1465,7 @@
 							<a
 								href={`/signup?redirect=/tools/html-to-${format}`}
 								on:click={() => trackSignupClick('pro_tier_card')}
-								class="block w-full py-4 px-6 border-[3px] border-black font-black bg-brand-danger text-center text-white shadow-[4px_4px_0_0_#000] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wider relative z-10"
+								class="block w-full py-4 px-6 border-[3px] border-black font-black bg-brand-danger text-center text-white shadow-brutal-lg hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-brutal-sm transition-all uppercase tracking-wider relative z-10"
 							>
 								Sign Up Free
 							</a>
@@ -1492,7 +1492,7 @@
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 				{#each currentFormat.benefits as benefit, i}
 					<div
-						class="bg-[#f3f4f6] border-[3px] border-black p-6 shadow-[4px_4px_0_0_#000] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[6px_6px_0_0_#000] transition-all duration-200"
+						class="bg-[#f3f4f6] border-[3px] border-black p-6 shadow-brutal-lg hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-brutal-xl transition-all duration-200"
 					>
 						<div class="flex flex-col items-start gap-4">
 							<div
@@ -1570,7 +1570,7 @@
 				{#each otherFormats as otherFormat}
 					<a
 						href={`/tools/html-to-${otherFormat}`}
-						class="flex items-center gap-4 p-5 transition-all border-[3px] border-black bg-white hover:bg-brand-accent hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] group"
+						class="flex items-center gap-4 p-5 transition-all border-[3px] border-black bg-white hover:bg-brand-accent hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px] group"
 					>
 						<div
 							class="w-12 h-12 bg-black text-white flex items-center justify-center font-black uppercase text-sm border-[2px] border-white group-hover:border-black group-hover:bg-white group-hover:text-black"
@@ -1623,7 +1623,7 @@
 			<p class="font-bold text-gray-500 uppercase tracking-widest mb-4">Spread the word</p>
 			<div class="flex flex-col md:flex-row justify-center md:space-x-6">
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-black text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-black transition-all shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000] mb-4 md:mb-0"
+					class="flex items-center justify-center px-8 py-4 bg-black text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-black transition-all shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg mb-4 md:mb-0"
 					on:click={() => handleSocialShare('twitter')}
 				>
 					<svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
@@ -1634,7 +1634,7 @@
 					Share on X
 				</button>
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]"
+					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg"
 					on:click={() => handleSocialShare('linkedin')}
 				>
 					<svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
@@ -1763,7 +1763,7 @@
 				<div class="space-y-4">
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">How does it work?</span>
 							<span
@@ -1793,7 +1793,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">External resources?</span>
 							<span
@@ -1823,7 +1823,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">Max file size?</span>
 							<span
@@ -1852,7 +1852,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">Privacy?</span>
 							<span
@@ -2203,11 +2203,11 @@
 		<section class="mb-16 w-full max-w-5xl mx-auto px-4">
 			<h2 class="text-2xl font-black mb-6 text-black uppercase text-center">Related Tools</h2>
 			<div class="flex flex-wrap gap-3 justify-center">
-				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-[4px_4px_0_0_#000] transition-all">URL to Image</a>
-				<a href="/tools/code-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-[4px_4px_0_0_#000] transition-all">Code to Image</a>
-				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-[4px_4px_0_0_#000] transition-all">OG Image Generator</a>
-				<a href="/glossary/html-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-[4px_4px_0_0_#000] transition-all">What is HTML to Image?</a>
-				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-[4px_4px_0_0_#000] transition-all">Compare Alternatives</a>
+				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">URL to Image</a>
+				<a href="/tools/code-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Code to Image</a>
+				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">OG Image Generator</a>
+				<a href="/glossary/html-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">What is HTML to Image?</a>
+				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Compare Alternatives</a>
 			</div>
 		</section>
 

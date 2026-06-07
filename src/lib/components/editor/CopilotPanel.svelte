@@ -744,8 +744,8 @@
 						<div
 							class="max-w-[85%] rounded-lg border-[2px] border-gray-900 px-3 py-2 text-xs font-medium leading-relaxed
 							{msg.role === 'user'
-								? 'bg-brand-accent text-gray-900 shadow-[2px_2px_0_0_#000] rounded-tr-sm'
-								: 'bg-white text-gray-900 shadow-[2px_2px_0_0_#000] rounded-tl-sm'}"
+								? 'bg-brand-accent text-gray-900 shadow-brutal-sm rounded-tr-sm'
+								: 'bg-white text-gray-900 shadow-brutal-sm rounded-tl-sm'}"
 						>
 							{msg.content}
 						</div>
@@ -757,7 +757,7 @@
 			{#if isLoading}
 				<div class="flex justify-start" transition:fly={{ y: 8, duration: 150 }}>
 					<div
-						class="max-w-[85%] bg-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] rounded-lg rounded-tl-sm px-3 py-2.5"
+						class="max-w-[85%] bg-white border-[2px] border-gray-900 shadow-brutal-sm rounded-lg rounded-tl-sm px-3 py-2.5"
 					>
 						<div class="flex items-center gap-2">
 							<div class="flex items-center gap-1">

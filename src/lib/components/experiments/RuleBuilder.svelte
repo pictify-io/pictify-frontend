@@ -391,7 +391,7 @@
 					type="button"
 					on:click={toggleRootOperator}
 					{disabled}
-					class="flex items-center gap-1.5 px-3 py-1.5 border-[3px] border-black rounded-lg text-[10px] font-black uppercase tracking-widest bg-white hover:bg-gray-100 hover:-translate-y-[2px] shadow-[2px_2px_0_0_black] hover:shadow-[4px_4px_0_0_black] active:shadow-none active:translate-y-[2px] hover:text-black transition-all text-black"
+					class="flex items-center gap-1.5 px-3 py-1.5 border-[3px] border-black rounded-lg text-[10px] font-black uppercase tracking-widest bg-white hover:bg-gray-100 hover:-translate-y-[2px] shadow-brutal-sm hover:shadow-brutal-lg active:shadow-none active:translate-y-[2px] hover:text-black transition-all text-black"
 				>
 					Match
 					<span class="bg-gray-900 text-white px-1.5 py-0.5 rounded text-[9px]">
@@ -429,7 +429,7 @@
 			<div class="space-y-4">
 				<!-- Quick Start — prominent accent card -->
 				<div
-					class="bg-[#FFDE82] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-xl p-5"
+					class="bg-[#FFDE82] border-[3px] border-black shadow-brutal-lg rounded-xl p-5"
 				>
 					<div class="flex items-center gap-2 mb-3">
 						<svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
@@ -448,8 +448,8 @@
 								type="button"
 								on:click={() => applyPreset(preset)}
 								{disabled}
-								class="px-3.5 py-2 rounded-lg border-[3px] border-black bg-white text-xs font-black text-black shadow-[2px_2px_0_0_black]
-									hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
+								class="px-3.5 py-2 rounded-lg border-[3px] border-black bg-white text-xs font-black text-black shadow-brutal-sm
+									hover:shadow-brutal-lg hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 									transition-all cursor-pointer"
 							>
 								{preset.label}
@@ -473,8 +473,8 @@
 						type="button"
 						on:click={() => handleOpenCategoryPicker(conditions)}
 						{disabled}
-						class="px-4 py-2.5 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl bg-white text-black
-							hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
+						class="px-4 py-2.5 border-[3px] border-black shadow-brutal-sm rounded-xl bg-white text-black
+							hover:shadow-brutal-lg hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 							transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest cursor-pointer"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -498,8 +498,8 @@
 							emitChange();
 						}}
 						{disabled}
-						class="px-4 py-2.5 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl bg-[#4ade80] text-black
-							hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
+						class="px-4 py-2.5 border-[3px] border-black shadow-brutal-sm rounded-xl bg-[#4ade80] text-black
+							hover:shadow-brutal-lg hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 							transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest cursor-pointer"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -524,8 +524,8 @@
 						type="button"
 						on:click={() => applyPreset(preset)}
 						{disabled}
-						class="px-3 py-1.5 rounded-lg border-[3px] border-black bg-white text-[10px] font-black text-black shadow-[2px_2px_0_0_black]
-							hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:shadow-none active:translate-y-0
+						class="px-3 py-1.5 rounded-lg border-[3px] border-black bg-white text-[10px] font-black text-black shadow-brutal-sm
+							hover:shadow-brutal-lg hover:-translate-y-[2px] active:shadow-none active:translate-y-0
 							transition-all cursor-pointer"
 					>
 						+ {preset.label}
@@ -537,7 +537,7 @@
 		<!-- Natural language summary -->
 		{#if summary}
 			<div
-				class="bg-[#4ade80] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-xl px-5 py-4 mt-6"
+				class="bg-[#4ade80] border-[3px] border-black shadow-brutal-lg rounded-xl px-5 py-4 mt-6"
 			>
 				<div class="flex items-start gap-2">
 					<svg class="w-5 h-5 text-black mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 24 24">

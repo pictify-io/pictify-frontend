@@ -239,7 +239,7 @@
 							on:click={() => {
 								createGif();
 							}}
-							class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+							class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

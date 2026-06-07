@@ -109,12 +109,12 @@
 	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
 >
 	<div
-		class="w-full max-w-2xl bg-brand-bg border-[3px] border-black rounded-2xl shadow-[8px_8px_0_0_black] overflow-hidden animate-wizard-in"
+		class="w-full max-w-2xl bg-brand-bg border-[3px] border-black rounded-2xl shadow-brutal-2xl overflow-hidden animate-wizard-in"
 	>
 		<!-- Header -->
 		<div class="px-8 pt-8 pb-4">
 			<div
-				class="inline-flex items-center gap-2 px-3 py-1 bg-brand-accent border-[2px] border-black rounded-full shadow-[3px_3px_0_0_black] mb-4"
+				class="inline-flex items-center gap-2 px-3 py-1 bg-brand-accent border-[2px] border-black rounded-full shadow-brutal-md mb-4"
 			>
 				<span class="text-[10px] font-black text-black uppercase tracking-widest">Quick Setup</span>
 			</div>
@@ -142,8 +142,8 @@
 						on:click={() => (selectedIntent = intent.id)}
 						class="text-left p-5 rounded-xl border-[3px] transition-all duration-200
 							{selectedIntent === intent.id
-							? 'border-black bg-brand-accent/30 shadow-[4px_4px_0_0_black] -translate-y-0.5'
-							: 'border-gray-200 bg-white hover:border-black hover:shadow-[2px_2px_0_0_black] hover:-translate-y-0.5'}"
+							? 'border-black bg-brand-accent/30 shadow-brutal-lg -translate-y-0.5'
+							: 'border-gray-200 bg-white hover:border-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
 					>
 						<div class="flex items-center gap-4">
 							<div
@@ -229,9 +229,9 @@
 			<button
 				on:click={finish}
 				disabled={!selectedIntent || saving}
-				class="px-6 py-2.5 text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] transition-all
+				class="px-6 py-2.5 text-sm font-black uppercase tracking-wider rounded-xl border-[3px] border-black shadow-brutal-lg transition-all
 					{selectedIntent && !saving
-					? 'bg-brand-accent text-black hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px]'
+					? 'bg-brand-accent text-black hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
 					: 'bg-gray-200 text-gray-400 cursor-not-allowed'}"
 			>
 				{saving ? 'Saving...' : 'Get Started'}

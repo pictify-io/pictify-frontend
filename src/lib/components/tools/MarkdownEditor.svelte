@@ -1010,7 +1010,7 @@ function generateImage(markdown) {
 	<!-- First Generation Prompt (Modal) -->
 	{#if showFirstGenerationPrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
+			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
 				<div class="bg-[#4ade80] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-black uppercase tracking-wider">
 						Great First Image!
@@ -1042,7 +1042,7 @@ function generateImage(markdown) {
 						<a
 							href="/signup?redirect=/tools/markdown"
 							on:click={handleSignupClick}
-							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							Create Free Account
 						</a>
@@ -1061,7 +1061,7 @@ function generateImage(markdown) {
 	<!-- Upgrade Prompt (Modal) -->
 	{#if showUpgradePrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
+			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
 				<div class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-white uppercase tracking-wider">
 						Ready to Create More?
@@ -1099,7 +1099,7 @@ function generateImage(markdown) {
 						<a
 							href="/signup?redirect=/tools/markdown"
 							on:click={handleSignupClick}
-							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							Sign Up Free
 						</a>

@@ -817,13 +817,13 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
 					/>
 				</span>
 				{#if isPlatform}
 					<span class="block mt-2 sm:mt-4">
 						<span
-							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]"
+							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-brutal-md sm:shadow-brutal-lg"
 						>
 							for {platformLabel}
 						</span>
@@ -885,8 +885,8 @@
 								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
                 ${
 									creationMode === 'website'
-										? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]'
+										? 'bg-[#4ade80] shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
 								}`}
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -912,8 +912,8 @@
 								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
                 ${
 									creationMode === 'direct'
-										? 'bg-[#4ade80] shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-[4px_4px_0_0_#000]'
+										? 'bg-[#4ade80] shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
+										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
 								}`}
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -952,7 +952,7 @@
 								<button
 									on:click={() => submitUrl(url)}
 									disabled={isFetchingWebsiteInfo}
-									class="py-4 px-8 bg-brand-accent border-[3px] border-black font-black uppercase tracking-wide text-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+									class="py-4 px-8 bg-brand-accent border-[3px] border-black font-black uppercase tracking-wide text-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
 								>
 									{#if isFetchingWebsiteInfo}
 										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -1021,7 +1021,7 @@
 				class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0"
 				bind:this={ogImageTemplateWrapper}
 			>
-				<div class="border-[3px] md:border-[4px] border-black bg-white shadow-[8px_8px_0_0_#000]">
+				<div class="border-[3px] md:border-[4px] border-black bg-white shadow-brutal-2xl">
 					<!-- Editor Header -->
 					<div
 						class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] md:border-b-[4px] border-black"
@@ -1040,7 +1040,7 @@
 					<div class="p-6 md:p-8 bg-gray-100 border-b-[3px] border-black">
 						<div class="flex justify-center items-center">
 							<div
-								class="border-[3px] border-black shadow-[6px_6px_0_0_#000] overflow-hidden bg-white"
+								class="border-[3px] border-black shadow-brutal-xl overflow-hidden bg-white"
 							>
 								<OgImageTemplate
 									html={typeof selectedTemplate === 'string'
@@ -1061,7 +1061,7 @@
 							<div class="space-y-4">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-brand-accent flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-brand-accent flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1098,7 +1098,7 @@
 									/>
 									<label
 										for="logoInput"
-										class="block w-full px-4 py-3 bg-white border-[3px] border-black text-black font-bold cursor-pointer hover:bg-gray-50 hover:shadow-[4px_4px_0_0_#000] transition-all text-center uppercase tracking-wide"
+										class="block w-full px-4 py-3 bg-white border-[3px] border-black text-black font-bold cursor-pointer hover:bg-gray-50 hover:shadow-brutal-lg transition-all text-center uppercase tracking-wide"
 									>
 										Upload Logo
 									</label>
@@ -1122,7 +1122,7 @@
 							<div class="space-y-4">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-brand-danger text-white flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-brand-danger text-white flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1171,7 +1171,7 @@
 							<div class="space-y-4 lg:col-span-2">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#4ade80] flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-[#4ade80] flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1253,7 +1253,7 @@
 								<div class="flex items-center gap-2">
 									<button
 										on:click={() => copyToClipboard(imageUrl)}
-										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white font-bold uppercase text-xs border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Copy URL
 									</button>
@@ -1261,7 +1261,7 @@
 										href={imageUrl}
 										download="og-image.png"
 										target="_blank"
-										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Download
 									</a>
@@ -1278,7 +1278,7 @@
 							<button
 								on:click={generateImage}
 								disabled={isImageGenerating}
-								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
 							>
 								<div class="flex items-center justify-center gap-3 md:gap-4">
 									{#if isImageGenerating}
@@ -1356,7 +1356,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2 md:px-0">
 				{#each templates.slice(0, 6) as template, i}
 					<div
-						class="group bg-white border-[3px] border-black overflow-hidden shadow-[4px_4px_0_0_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#000] transition-all duration-200 cursor-pointer"
+						class="group bg-white border-[3px] border-black overflow-hidden shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all duration-200 cursor-pointer"
 						on:click={() => selectTemplate(template)}
 						on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
 						role="button"
@@ -1413,7 +1413,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
 				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
 					<div
-						class="w-12 h-12 bg-brand-accent border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
+						class="w-12 h-12 bg-brand-accent border-[3px] border-black flex items-center justify-center mb-6 shadow-brutal-md"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1433,7 +1433,7 @@
 
 				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
 					<div
-						class="w-12 h-12 bg-brand-danger border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
+						class="w-12 h-12 bg-brand-danger border-[3px] border-black flex items-center justify-center mb-6 shadow-brutal-md"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1468,7 +1468,7 @@
 				<div class="space-y-4">
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase"
 								>How do I add an OG image?</span
@@ -1498,7 +1498,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">What size should it be?</span
 							>
@@ -1527,7 +1527,7 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
 						>
 							<span class="font-black text-lg text-gray-900 uppercase">Is there an API?</span>
 							<span

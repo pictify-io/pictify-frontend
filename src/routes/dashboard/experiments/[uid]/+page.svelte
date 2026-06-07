@@ -1711,7 +1711,7 @@
 									class="px-5 py-4 bg-gray-900 text-[#4ade80] border-[3px] border-gray-900 rounded-xl font-mono text-sm overflow-x-auto shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.5)]">{embedCode}</pre>
 								<button
 									on:click={() => copyToClipboard(embedCode, 'Embed code copied!')}
-									class="absolute top-3 right-3 px-4 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
+									class="absolute top-3 right-3 px-4 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
 								>
 									Copy HTML
 								</button>
@@ -1759,7 +1759,7 @@ fetch("https://pictify.io/s/events", {
   })
 })`, 'Tracking code copied!'
 										)}
-										class="absolute top-3 right-3 px-4 py-2 bg-[#a855f7] text-white font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
+										class="absolute top-3 right-3 px-4 py-2 bg-[#a855f7] text-white font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
 									>
 										Copy Code
 									</button>
@@ -1796,7 +1796,7 @@ fetch("https://pictify.io/s/events", {
 								class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg border-[2px] border-gray-200"
 							>
 								<span
-									class="w-2.5 h-2.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-full animate-pulse shadow-[1px_1px_0_0_#000]"
+									class="w-2.5 h-2.5 bg-[#4ade80] border-[2px] border-gray-900 rounded-full animate-pulse shadow-[1px_1px_0_0_#1f2937]"
 								/>
 								Live - Auto-refreshing
 							</span>
@@ -1859,7 +1859,7 @@ fetch("https://pictify.io/s/events", {
 											>
 												{#if (variant.impressions || 0) > 0}
 													<span
-														class="ml-3 text-[10px] font-black text-gray-900 whitespace-nowrap bg-white/50 px-2 py-0.5 rounded shadow-[1px_1px_0_0_#000]"
+														class="ml-3 text-[10px] font-black text-gray-900 whitespace-nowrap bg-white/50 px-2 py-0.5 rounded shadow-[1px_1px_0_0_#1f2937]"
 													>
 														{(variant.impressions || 0).toLocaleString()}
 													</span>
@@ -1928,7 +1928,7 @@ fetch("https://pictify.io/s/events", {
 												>
 													{#if (variant.clicks || 0) > 0}
 														<span
-															class="ml-3 text-[10px] font-black text-gray-900 whitespace-nowrap bg-white/50 px-2 py-0.5 rounded shadow-[1px_1px_0_0_#000]"
+															class="ml-3 text-[10px] font-black text-gray-900 whitespace-nowrap bg-white/50 px-2 py-0.5 rounded shadow-[1px_1px_0_0_#1f2937]"
 														>
 															{(variant.clicks || 0).toLocaleString()}
 														</span>
@@ -1972,7 +1972,7 @@ fetch("https://pictify.io/s/events", {
 									<div
 										class="w-12 h-12 rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 {analytics
 											.significance.isSignificant
-											? 'bg-[#4ade80] shadow-[2px_2px_0_0_#000]'
+											? 'bg-[#4ade80] shadow-brutal-sm'
 											: 'bg-gray-200'}"
 									>
 										{#if analytics.significance.isSignificant}
@@ -2367,7 +2367,7 @@ fetch("https://pictify.io/s/events", {
 			>
 				<div class="flex items-center gap-4">
 					<div
-						class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] rounded-xl flex items-center justify-center"
+						class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg rounded-xl flex items-center justify-center"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
 							<path
@@ -2385,7 +2385,7 @@ fetch("https://pictify.io/s/events", {
 					</div>
 				</div>
 				<button
-					class="w-10 h-10 bg-white border-[3px] border-gray-900 hover:bg-gray-100 rounded-xl shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-gray-900"
+					class="w-10 h-10 bg-white border-[3px] border-gray-900 hover:bg-gray-100 rounded-xl shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-gray-900"
 					on:click={() => {
 						showDeclareWinner = false;
 						selectedWinner = null;
@@ -2525,7 +2525,7 @@ fetch("https://pictify.io/s/events", {
 			>
 				<div class="flex items-center gap-4">
 					<div
-						class="w-12 h-12 bg-[#ef4444] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] rounded-xl flex items-center justify-center"
+						class="w-12 h-12 bg-[#ef4444] border-[3px] border-gray-900 shadow-brutal-lg rounded-xl flex items-center justify-center"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -2546,7 +2546,7 @@ fetch("https://pictify.io/s/events", {
 					</div>
 				</div>
 				<button
-					class="w-10 h-10 bg-white border-[3px] border-gray-900 hover:bg-gray-100 rounded-xl shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-gray-900"
+					class="w-10 h-10 bg-white border-[3px] border-gray-900 hover:bg-gray-100 rounded-xl shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-gray-900"
 					on:click={() => (showDeleteConfirm = false)}
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

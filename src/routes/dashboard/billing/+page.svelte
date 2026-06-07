@@ -427,7 +427,7 @@
 					<div class="bg-gray-800 border-b-[3px] border-gray-900 p-4">
 						<div class="flex items-center gap-3">
 							<div
-								class="w-8 h-8 rounded-lg bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#000]"
+								class="w-8 h-8 rounded-lg bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -463,7 +463,7 @@
 
 						<a
 							href="/dashboard/upgrade"
-							class="w-full py-3 px-4 rounded-lg font-black text-xs uppercase tracking-widest transition-all bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] text-center mt-auto"
+							class="w-full py-3 px-4 rounded-lg font-black text-xs uppercase tracking-widest transition-all bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-sm text-center mt-auto"
 						>
 							View Plans
 						</a>
