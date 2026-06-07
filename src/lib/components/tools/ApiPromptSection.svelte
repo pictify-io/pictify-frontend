@@ -54,14 +54,14 @@
 
 <section class="w-full max-w-7xl mx-auto px-6 md:px-0 mt-20">
 	<div
-		class="rounded-3xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937] overflow-hidden transform transition-transform hover:-translate-y-1"
+		class="rounded-3xl border-[3px] border-gray-900 bg-brand-bg shadow-[8px_8px_0_0_#1f2937] overflow-hidden transform transition-transform hover:-translate-y-1"
 	>
 		<div class="grid gap-12 lg:grid-cols-[1.1fr,1fr] p-8 md:p-12 items-center">
 			<!-- Left Column: Content -->
 			<div class="flex flex-col justify-between gap-8">
 				<div class="space-y-6">
 					<span
-						class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-900 bg-[#ffc480] px-4 py-1.5 rounded-full border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+						class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-accent px-4 py-1.5 rounded-full border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 					>
 						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -85,7 +85,7 @@
 						{#each points as point}
 							<li class="flex items-start gap-4 group">
 								<span
-									class="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#ff6b6b] text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] group-hover:translate-y-px group-hover:translate-x-px group-hover:shadow-none transition-all"
+									class="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-danger text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] group-hover:translate-y-px group-hover:translate-x-px group-hover:shadow-none transition-all"
 								>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +157,7 @@
 
 					{#if showSecondaryCta && secondaryCtaUrl}
 						<a
-							class="inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-gray-900 border-dashed px-6 py-3.5 text-base font-bold text-gray-700 bg-transparent hover:bg-[#ffc480]/10 transition-colors"
+							class="inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-gray-900 border-dashed px-6 py-3.5 text-base font-bold text-gray-700 bg-transparent hover:bg-brand-accent/10 transition-colors"
 							href={secondaryCtaUrl}
 							target={isExternalUrl(secondaryCtaUrl) ? '_blank' : undefined}
 							rel={isExternalUrl(secondaryCtaUrl) ? 'noreferrer' : undefined}
@@ -169,7 +169,7 @@
 
 				{#if note}
 					<p class="text-sm font-bold text-gray-500 flex items-center gap-2">
-						<span class="w-2 h-2 rounded-full bg-[#ff6b6b]" />
+						<span class="w-2 h-2 rounded-full bg-brand-danger" />
 						{note}
 					</p>
 				{/if}
@@ -179,10 +179,10 @@
 			<div class="relative">
 				<!-- Decorative dots -->
 				<div
-					class="absolute -top-4 -right-4 w-20 h-20 bg-[#ffc480] rounded-full blur-2xl opacity-20"
+					class="absolute -top-4 -right-4 w-20 h-20 bg-brand-accent rounded-full blur-2xl opacity-20"
 				/>
 				<div
-					class="absolute -bottom-4 -left-4 w-20 h-20 bg-[#ff6b6b] rounded-full blur-2xl opacity-20"
+					class="absolute -bottom-4 -left-4 w-20 h-20 bg-brand-danger rounded-full blur-2xl opacity-20"
 				/>
 
 				<div

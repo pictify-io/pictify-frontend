@@ -129,7 +129,7 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -191,7 +191,7 @@
 					class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-[4px_4px_0_0_#ffc480] max-w-3xl"
 				>
 					<p class="text-gray-700 font-bold leading-relaxed">
-						<span class="text-[#ff6b6b] font-black">TL;DR:</span>
+						<span class="text-brand-danger font-black">TL;DR:</span>
 						{alt.comparison.tldr}
 					</p>
 				</div>

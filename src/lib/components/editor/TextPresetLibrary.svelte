@@ -630,7 +630,7 @@
 
 				<!-- Preset Name & Category -->
 				<div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-					<span class="text-sm font-semibold text-gray-700 group-hover:text-[#ff6b6b]">
+					<span class="text-sm font-semibold text-gray-700 group-hover:text-brand-danger">
 						{preset.name}
 					</span>
 					<span

@@ -179,7 +179,7 @@
 </script>
 
 <section
-	class="min-h-screen w-full bg-[#FFFDF8] flex items-center justify-center p-4 relative overflow-hidden"
+	class="min-h-screen w-full bg-brand-bg flex items-center justify-center p-4 relative overflow-hidden"
 >
 	<!-- Background Pattern -->
 	<div
@@ -191,10 +191,10 @@
 
 	<!-- Decorative Blobs -->
 	<div
-		class="absolute top-0 right-0 w-96 h-96 bg-[#ffc480]/20 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 right-0 w-96 h-96 bg-brand-accent/20 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 left-0 w-96 h-96 bg-[#ff6b6b]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute bottom-0 left-0 w-96 h-96 bg-brand-danger/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<div
@@ -203,7 +203,7 @@
 		<div class="flex flex-col items-center justify-center mb-8">
 			<!-- Logo/Brand -->
 			<div
-				class="mb-6 inline-block px-6 py-2 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2 hover:rotate-0 transition-transform cursor-default"
+				class="mb-6 inline-block px-6 py-2 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2 hover:rotate-0 transition-transform cursor-default"
 			>
 				<span class="text-2xl font-black text-black tracking-tight">Pictify</span>
 			</div>
@@ -243,7 +243,7 @@
 					{#if isLogin}
 						<button
 							on:click={handleForgotPassword}
-							class="text-sm font-bold text-[#ff6b6b] hover:text-black hover:underline transition-colors"
+							class="text-sm font-bold text-brand-danger hover:text-black hover:underline transition-colors"
 						>
 							Forgot password?
 						</button>
@@ -260,7 +260,7 @@
 
 			{#if errorMessage}
 				<div
-					class="bg-[#ff6b6b]/10 border-2 border-[#ff6b6b] text-red-700 p-3 rounded-xl font-bold flex items-center gap-2"
+					class="bg-brand-danger/10 border-2 border-brand-danger text-red-700 p-3 rounded-xl font-bold flex items-center gap-2"
 					role="alert"
 				>
 					<svg
@@ -373,7 +373,7 @@
 
 			<button
 				on:click={handleSubmit}
-				class="bg-[#ff6b6b] text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-black text-lg mt-2 uppercase tracking-wide"
+				class="bg-brand-danger text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-[4px_4px_0_0_black] hover:shadow-[6px_6px_0_0_black] hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-black text-lg mt-2 uppercase tracking-wide"
 			>
 				{#if isLogin}
 					Login
@@ -404,7 +404,7 @@
 				<p class="text-gray-600 font-medium">
 					Already have an account? <a
 						href="/login?redirect={redirectUrl}"
-						class="font-black text-black hover:text-[#ff6b6b] hover:underline decoration-[3px] underline-offset-4 transition-all"
+						class="font-black text-black hover:text-brand-danger hover:underline decoration-[3px] underline-offset-4 transition-all"
 						>Login</a
 					>
 				</p>
@@ -418,7 +418,7 @@
 				<p class="text-gray-600 font-medium">
 					Don't have an account? <a
 						href="/signup?redirect={redirectUrl}"
-						class="font-black text-black hover:text-[#ff6b6b] hover:underline decoration-[3px] underline-offset-4 transition-all"
+						class="font-black text-black hover:text-brand-danger hover:underline decoration-[3px] underline-offset-4 transition-all"
 						>Sign Up</a
 					>
 				</p>

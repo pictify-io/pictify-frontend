@@ -59,7 +59,7 @@
 		saveStatus === 'saving'
 			? { label: 'Saving…', bg: 'bg-[#ffe066]', dotBg: 'bg-[#f59e0b]' }
 			: saveStatus === 'unsaved'
-				? { label: 'Unsaved', bg: 'bg-[#ff6b6b]', dotBg: 'bg-[#ff5252]', textWhite: true }
+				? { label: 'Unsaved', bg: 'bg-brand-danger', dotBg: 'bg-[#ff5252]', textWhite: true }
 				: { label: 'Saved', bg: 'bg-[#4ade80]', dotBg: 'bg-[#22c55e]' };
 
 	function toggleFormat() {
@@ -68,7 +68,7 @@
 </script>
 
 <header
-	class="relative z-20 flex h-16 flex-shrink-0 items-center justify-between border-b-[3px] border-gray-900 bg-[#FFFDF8] px-4 shadow-sm sm:px-6"
+	class="relative z-20 flex h-16 flex-shrink-0 items-center justify-between border-b-[3px] border-gray-900 bg-brand-bg px-4 shadow-sm sm:px-6"
 >
 	<!-- LEFT: back + name + status -->
 	<div class="flex min-w-0 items-center gap-3">
@@ -114,7 +114,7 @@
 		>
 			<span class="relative flex h-2.5 w-2.5">
 				{#if saveStatus === 'unsaved'}
-					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff6b6b] opacity-75"></span>
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-danger opacity-75"></span>
 				{/if}
 				<span class="relative inline-flex h-2.5 w-2.5 rounded-full border-[1.5px] border-gray-900 {statusMeta.dotBg}"></span>
 			</span>
@@ -169,7 +169,7 @@
 			on:click={toggleFormat}
 			title="Toggle output format"
 			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none sm:flex
-				{outputFormat === 'pdf' ? 'bg-[#ff6b6b] text-white' : 'bg-[#ffc480] text-gray-900'}"
+				{outputFormat === 'pdf' ? 'bg-brand-danger text-white' : 'bg-brand-accent text-gray-900'}"
 		>
 			<i class="fa {outputFormat === 'pdf' ? 'fa-file-pdf' : 'fa-image'} text-[11px]"></i>
 			{outputFormat === 'pdf' ? 'PDF' : 'Image'}
@@ -229,7 +229,7 @@
 			disabled={!canPublish}
 			title="Publish template"
 			class="hidden items-center gap-2 rounded-xl border-[3px] border-gray-900 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[4px_4px_0_0_#1f2937] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-gray-400 disabled:hover:shadow-[4px_4px_0_0_#1f2937] lg:flex
-				{canPublish ? 'bg-[#ff6b6b]' : 'bg-gray-400'}"
+				{canPublish ? 'bg-brand-danger' : 'bg-gray-400'}"
 		>
 			<i class="fa fa-rocket text-[11px]"></i>
 			Publish

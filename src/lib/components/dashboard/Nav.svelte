@@ -12,7 +12,7 @@
 </script>
 
 <header
-	class="w-full min-h-[64px] h-16 sm:min-h-[80px] sm:h-20 z-30 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex justify-between items-stretch sticky top-0 flex-shrink-0"
+	class="w-full min-h-[64px] h-16 sm:min-h-[80px] sm:h-20 z-30 border-b-[3px] border-gray-900 bg-brand-bg flex justify-between items-stretch sticky top-0 flex-shrink-0"
 >
 	<!-- Left Section: Brand -->
 	<div class="flex items-stretch flex-shrink-0">
@@ -41,7 +41,7 @@
 		<!-- Brand Logo Area - Match sidebar width exactly -->
 		<a
 			href="/"
-			class="hidden lg:flex w-64 min-w-[16rem] min-h-[64px] sm:min-h-[80px] flex-shrink-0 items-center justify-center px-4 sm:px-6 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-[#ffc480] transition-all group relative overflow-hidden"
+			class="hidden lg:flex w-64 min-w-[16rem] min-h-[64px] sm:min-h-[80px] flex-shrink-0 items-center justify-center px-4 sm:px-6 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-brand-accent transition-all group relative overflow-hidden"
 		>
 			<div class="flex items-center gap-2 sm:gap-3">
 				<!-- Logo Icon (Abstract Shapes) -->
@@ -88,14 +88,14 @@
 		{#if $trialInfo.isOnTrial}
 			{@const days = $trialInfo.daysRemaining ?? 0}
 			{@const iconColor =
-				days <= 3 ? 'text-[#ff6b6b]' : days <= 7 ? 'text-[#c88a3b]' : 'text-gray-900'}
+				days <= 3 ? 'text-brand-danger' : days <= 7 ? 'text-[#c88a3b]' : 'text-gray-900'}
 			<!-- Trial countdown -->
 			<div class="hidden items-center px-3 sm:flex md:px-4 border-r-[3px] border-gray-900">
 				<button
 					type="button"
 					on:click={() => openUpgradeModal('trial_badge')}
 					aria-label={`Free trial: ${days} day${days === 1 ? '' : 's'} left. Upgrade your plan.`}
-					class="group flex items-stretch overflow-hidden rounded-lg border-2 border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937] transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffc480] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
+					class="group flex items-stretch overflow-hidden rounded-lg border-2 border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937] transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#1f2937] focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-brand-accent motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
 				>
 					<span class="flex items-center gap-1.5 py-1.5 pl-2.5 pr-2.5">
 						<svg
@@ -117,7 +117,7 @@
 						</span>
 					</span>
 					<span
-						class="flex items-center border-l-2 border-gray-900 bg-[#ffc480] px-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-900 transition-colors group-hover:bg-[#ffb968]"
+						class="flex items-center border-l-2 border-gray-900 bg-brand-accent px-2.5 text-[11px] font-bold uppercase tracking-wide text-gray-900 transition-colors group-hover:bg-[#ffb968]"
 					>
 						Upgrade
 					</span>

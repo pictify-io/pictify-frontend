@@ -103,7 +103,7 @@
 </script>
 
 <div
-	class="h-16 bg-[#FFFDF8] border-b-[3px] border-gray-900 flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 relative flex-shrink-0"
+	class="h-16 bg-brand-bg border-b-[3px] border-gray-900 flex items-center justify-between px-4 sm:px-6 shadow-sm z-20 relative flex-shrink-0"
 >
 	<div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 mr-4">
 		<a
@@ -136,7 +136,7 @@
 			>
 				<div class="relative flex h-2.5 w-2.5 mr-2">
 					<span
-						class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b6b] opacity-75"
+						class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-danger opacity-75"
 					/>
 					<span
 						class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff5252] border-[1.5px] border-gray-900"
@@ -179,7 +179,7 @@
 		{#if $selectedComponent}
 			<div class="h-8 w-[3px] bg-gray-900 hidden sm:block rounded-full" />
 			<button
-				class="w-9 h-9 flex items-center justify-center bg-[#ff6b6b] border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
+				class="w-9 h-9 flex items-center justify-center bg-brand-danger border-[3px] border-gray-900 rounded-lg text-white transition-all shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ff5252]"
 				on:click={deleteSelected}
 				title="Delete selected element"
 			>
@@ -206,7 +206,7 @@
 		<button
 			class="px-4 sm:px-6 py-2 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all flex items-center gap-2
 			{guestMode
-				? 'bg-[#ff6b6b] text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
+				? 'bg-brand-danger text-white shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-[#ff5252]'
 				: $isDirty
 				? 'bg-[#4ade80] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]'
 				: 'bg-gray-100 text-gray-400 cursor-default'}"

@@ -389,7 +389,7 @@
 	<meta name="twitter:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
 </svelte:head>
 
-<section class="bg-[#FFFDF8] min-h-screen overflow-x-hidden">
+<section class="bg-brand-bg min-h-screen overflow-x-hidden">
 	<Nav />
 	<main class="relative z-10">
 		<div class="relative py-24 lg:py-32">
@@ -407,7 +407,7 @@
 					<div
 						class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-4 transform -rotate-1 hover:rotate-0 transition-transform"
 					>
-						<span class="w-2.5 h-2.5 bg-[#ff6b6b] rounded-full animate-pulse" />
+						<span class="w-2.5 h-2.5 bg-brand-danger rounded-full animate-pulse" />
 						<span class="text-xs font-black text-gray-900 uppercase tracking-widest"
 							>No Hidden Fees</span
 						>
@@ -417,7 +417,7 @@
 						class="text-5xl md:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
 					>
 						Simple, transparent <br />
-						<span class="relative inline-block text-[#ff6b6b] mt-1">
+						<span class="relative inline-block text-brand-danger mt-1">
 							Pricing
 							<svg
 								class="absolute w-[105%] h-6 -bottom-2 -left-[2.5%] text-gray-900 opacity-100"
@@ -448,7 +448,7 @@
 					>
 						<div class="absolute -top-4 -right-4 z-20">
 							<span
-								class="px-3 py-1.5 bg-[#ff6b6b] text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
+								class="px-3 py-1.5 bg-brand-danger text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
 							>
 								Save 20%
 							</span>
@@ -456,7 +456,7 @@
 
 						<button
 							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
-								? 'bg-[#ffc480] text-gray-900 shadow-sm border-2 border-gray-900'
+								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = false)}
 						>
@@ -464,7 +464,7 @@
 						</button>
 						<button
 							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
-								? 'bg-[#ffc480] text-gray-900 shadow-sm border-2 border-gray-900'
+								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = true)}
 						>
@@ -490,7 +490,7 @@
 					<p class="text-base font-bold text-gray-500">
 						Just exploring? Start with our <button
 							on:click={() => selectPlanHandler(PLANS.STARTER)}
-							class="text-[#ff6b6b] underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black"
+							class="text-brand-danger underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black"
 							>Free plan — 50 renders/mo</button
 						>. No credit card needed.
 					</p>
@@ -508,12 +508,12 @@
 						<div
 							class="relative flex flex-col p-6 h-full bg-white rounded-2xl border-[3px] border-gray-900 transition-all duration-300
 							{isPopular
-								? 'shadow-[12px_12px_0_0_#1f2937] lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-[#FFFDF8]'
+								? 'shadow-[12px_12px_0_0_#1f2937] lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-brand-bg'
 								: 'shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-1'}"
 						>
 							{#if isPopular}
 								<div
-									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] whitespace-nowrap z-30"
+									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] whitespace-nowrap z-30"
 								>
 									Most Popular
 								</div>
@@ -556,7 +556,7 @@
 									{@const annualCost = PLAN_PRICING[planId].annual}
 									{@const yearlySavings = (monthlyCost - annualCost) * 12}
 									<div
-										class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-[#10b981]/10 text-[#10b981] text-xs font-bold rounded-md border border-[#10b981]/30"
+										class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-brand-success/10 text-brand-success text-xs font-bold rounded-md border border-brand-success/30"
 									>
 										<svg
 											class="w-3.5 h-3.5"
@@ -626,7 +626,7 @@
 								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_BACKGROUND_REMOVER]}
 									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
 										<div
-											class="w-6 h-6 rounded bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+											class="w-6 h-6 rounded bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 										>
 											<svg
 												class="w-3.5 h-3.5 text-gray-900"
@@ -694,7 +694,7 @@
 								{#if PLAN_FEATURES[planId]?.[FEATURES.SSO_SAML]}
 									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
 										<div
-											class="w-6 h-6 rounded bg-[#ff6b6b]/20 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+											class="w-6 h-6 rounded bg-brand-danger/20 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
 										>
 											<svg
 												class="w-3.5 h-3.5 text-gray-900"
@@ -718,7 +718,7 @@
 							<button
 								class="w-full py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
 								{isPopular
-									? 'bg-[#ffc480] text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'
+									? 'bg-brand-accent text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'
 									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#1f2937]'}"
 								on:click={() => selectPlanHandler(planId)}
 							>
@@ -760,7 +760,7 @@
 											{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
 											<th
 												class="p-6 text-center border-b-[3px] border-r-[3px] last:border-r-0 border-gray-900 {isPopular
-													? 'bg-[#ffc480]/10'
+													? 'bg-brand-accent/10'
 													: 'bg-white'}"
 											>
 												<span class="font-black text-lg text-gray-900 block uppercase tracking-wide"
@@ -769,7 +769,7 @@
 												<span class="text-sm font-bold text-gray-500 mt-1 block">
 													{getPlanPrice(planId, showAnnual)}/mo
 													{#if showAnnual && PLAN_PRICING[planId]?.monthly > 0}
-														<span class="text-[#10b981] text-xs block">billed annually</span>
+														<span class="text-brand-success text-xs block">billed annually</span>
 													{/if}
 												</span>
 											</th>
@@ -807,7 +807,7 @@
 														: formatFeatureValue(planId, row.feature, row.unit || '')}
 													<td
 														class="p-5 text-center border-b border-r-[3px] last:border-r-0 last:border-b-0 border-gray-900 {isPopular
-															? 'bg-[#ffc480]/5'
+															? 'bg-brand-accent/5'
 															: ''}"
 													>
 														{#if value === true}
@@ -862,7 +862,7 @@
 
 				<!-- Enterprise CTA -->
 				<div
-					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] p-10 md:p-16 shadow-[8px_8px_0_0_#1f2937] text-center z-10"
+					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg p-10 md:p-16 shadow-[8px_8px_0_0_#1f2937] text-center z-10"
 				>
 					<!-- Geometric Decorations -->
 					<div
@@ -926,7 +926,7 @@
 									</h3>
 									<div
 										class="w-10 h-10 rounded-lg bg-gray-50 border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 transition-all duration-300 shadow-[2px_2px_0_0_#1f2937] {faq.isOpened
-											? 'rotate-180 bg-[#ffc480]'
+											? 'rotate-180 bg-brand-accent'
 											: 'group-hover:translate-x-[1px] group-hover:translate-y-[1px]'}"
 									>
 										<svg

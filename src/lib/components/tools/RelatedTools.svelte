@@ -5,7 +5,7 @@
 </script>
 
 {#if tools.length > 0}
-	<section class="py-16 px-4 border-t-[3px] border-gray-900 bg-[#FFFDF8]">
+	<section class="py-16 px-4 border-t-[3px] border-gray-900 bg-brand-bg">
 		<div class="max-w-5xl mx-auto">
 			<h3 class="text-2xl font-black uppercase tracking-widest text-gray-400 mb-8">
 				More Tools You'll Love

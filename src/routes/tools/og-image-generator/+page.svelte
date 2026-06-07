@@ -764,7 +764,7 @@
 	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -772,10 +772,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
@@ -803,7 +803,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					★ Free Tool
 				</div>
@@ -817,7 +817,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
 					/>
 				</span>
 				{#if isPlatform}
@@ -837,7 +837,7 @@
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
 					Create stunning <span
-						class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black"
+						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>Open Graph images</span
 					>
 					for your website.
@@ -865,8 +865,8 @@
 						<span class="animate-pulse">_</span> SELECT_MODE
 					</h3>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-[#ff6b6b] border border-black" />
-						<div class="w-3 h-3 bg-[#ffc480] border border-black" />
+						<div class="w-3 h-3 bg-brand-danger border border-black" />
+						<div class="w-3 h-3 bg-brand-accent border border-black" />
 						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
 					</div>
 				</div>
@@ -952,7 +952,7 @@
 								<button
 									on:click={() => submitUrl(url)}
 									disabled={isFetchingWebsiteInfo}
-									class="py-4 px-8 bg-[#ffc480] border-[3px] border-black font-black uppercase tracking-wide text-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+									class="py-4 px-8 bg-brand-accent border-[3px] border-black font-black uppercase tracking-wide text-black shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
 								>
 									{#if isFetchingWebsiteInfo}
 										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -985,7 +985,7 @@
 							</div>
 							{#if error}
 								<div
-									class="mt-4 p-4 bg-[#ff6b6b]/10 border-[3px] border-[#ff6b6b] text-[#ff6b6b] font-bold flex items-center gap-2"
+									class="mt-4 p-4 bg-brand-danger/10 border-[3px] border-brand-danger text-brand-danger font-bold flex items-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -1030,8 +1030,8 @@
 							/// CUSTOMIZE_IMAGE
 						</h3>
 						<div class="flex gap-2">
-							<div class="w-3 h-3 bg-[#ff6b6b] border border-white/20" />
-							<div class="w-3 h-3 bg-[#ffc480] border border-white/20" />
+							<div class="w-3 h-3 bg-brand-danger border border-white/20" />
+							<div class="w-3 h-3 bg-brand-accent border border-white/20" />
 							<div class="w-3 h-3 bg-[#4ade80] border border-white/20" />
 						</div>
 					</div>
@@ -1061,7 +1061,7 @@
 							<div class="space-y-4">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#ffc480] flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-brand-accent flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1110,7 +1110,7 @@
 											type="range"
 											min="50"
 											max="400"
-											class="w-full h-2 bg-gray-200 appearance-none cursor-pointer accent-[#ff6b6b]"
+											class="w-full h-2 bg-gray-200 appearance-none cursor-pointer accent-brand-danger"
 											value={logoWidth}
 											on:input={updateLogoWidth}
 										/>
@@ -1122,7 +1122,7 @@
 							<div class="space-y-4">
 								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
 									<span
-										class="w-8 h-8 bg-[#ff6b6b] text-white flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
+										class="w-8 h-8 bg-brand-danger text-white flex items-center justify-center border-[2px] border-black shadow-[2px_2px_0_0_#000]"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 											><path
@@ -1273,12 +1273,12 @@
 					<!-- Generate Button (hidden once image is generated) -->
 					{#if !imageUrl}
 						<div
-							class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-[#FFFDF8] to-[#fff5e6]"
+							class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-brand-bg to-[#fff5e6]"
 						>
 							<button
 								on:click={generateImage}
 								disabled={isImageGenerating}
-								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-[#ff6b6b] border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
 							>
 								<div class="flex items-center justify-center gap-3 md:gap-4">
 									{#if isImageGenerating}
@@ -1346,7 +1346,7 @@
 					<a
 						href="/signup"
 						on:click={() => analytics.track('tool_signup_click', { tool_name: 'og_image_generator', cta_location: 'view_all_templates' })}
-						class="font-bold text-black hover:text-[#ff6b6b] transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
+						class="font-bold text-black hover:text-brand-danger transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
 					>
 						View All Templates →
 					</a>
@@ -1363,8 +1363,8 @@
 						tabindex="0"
 					>
 						<div class="p-2 bg-gray-100 border-b-[3px] border-black flex gap-1.5">
-							<div class="w-2.5 h-2.5 bg-[#ff6b6b] border border-black" />
-							<div class="w-2.5 h-2.5 bg-[#ffc480] border border-black" />
+							<div class="w-2.5 h-2.5 bg-brand-danger border border-black" />
+							<div class="w-2.5 h-2.5 bg-brand-accent border border-black" />
 							<div class="w-2.5 h-2.5 bg-[#4ade80] border border-black" />
 						</div>
 						<div class="relative bg-white overflow-hidden" style="height: 180px;">
@@ -1413,7 +1413,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
 				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
 					<div
-						class="w-12 h-12 bg-[#ffc480] border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
+						class="w-12 h-12 bg-brand-accent border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1433,7 +1433,7 @@
 
 				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
 					<div
-						class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
+						class="w-12 h-12 bg-brand-danger border-[3px] border-black flex items-center justify-center mb-6 shadow-[3px_3px_0_0_#000]"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

@@ -108,7 +108,7 @@
 
 					<div class="hidden sm:flex items-center gap-3">
 						<div
-							class="w-10 h-10 bg-[#ffc480] border-[2px] border-black flex items-center justify-center"
+							class="w-10 h-10 bg-brand-accent border-[2px] border-black flex items-center justify-center"
 						>
 							<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path

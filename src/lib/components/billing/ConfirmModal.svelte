@@ -19,7 +19,7 @@
 		default: {
 			icon: 'text-gray-600',
 			iconBg: 'bg-gray-100',
-			button: 'bg-[#ffc480] text-gray-900 border-gray-900 hover:bg-[#ffb347]'
+			button: 'bg-brand-accent text-gray-900 border-gray-900 hover:bg-[#ffb347]'
 		},
 		danger: {
 			icon: 'text-red-600',

@@ -19,7 +19,7 @@
 			title: 'E-commerce',
 			description: 'Live product pricing, stock indicators, and personalized product recommendations that update automatically.',
 			iconPath: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			title: 'Dashboards',
@@ -31,7 +31,7 @@
 			title: 'Email',
 			description: 'Open-time personalization with live data — city, weather, countdown timers, and more.',
 			iconPath: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			title: 'Social Media',
@@ -145,14 +145,14 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 	<!-- Hero Section -->
 	<section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden" in:fly={{ y: 30, duration: 600 }}>
 		<div class="max-w-6xl mx-auto text-center relative z-10">
 			<div
-				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-[#ffc480] border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-brand-accent border-[3px] border-gray-900 rounded-full shadow-[4px_4px_0_0_#1f2937] transform -rotate-1 hover:rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
 			>
 				<span class="w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-gray-900" />
 				<span class="text-sm font-black uppercase tracking-wider text-gray-900">Live Data · Auto-Refresh</span>
@@ -160,7 +160,7 @@
 
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Images That<br />
-				<span class="relative inline-block text-[#ff6b6b] mt-2">
+				<span class="relative inline-block text-brand-danger mt-2">
 					Update Themselves
 					<svg class="absolute w-full h-4 -bottom-1 left-0 text-gray-900 opacity-20" viewBox="0 0 100 10" preserveAspectRatio="none">
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
@@ -221,7 +221,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
 				{#each useCases as useCase, i}
-					{@const colors = ['bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-[#ffc480]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-danger', 'bg-[#4ade80]', 'bg-brand-accent', 'bg-[#a78bfa]']}
 					{@const rotations = ['rotate-1', '-rotate-1', '-rotate-1', 'rotate-1']}
 					<div
 						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
@@ -246,7 +246,7 @@
 								<div class="w-full max-w-[220px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all">
 									<div class="h-24 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
 										<div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-200 transform -rotate-6 flex items-center justify-center">👟</div>
-										<div class="absolute top-2 right-2 bg-[#ff6b6b] text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-gray-900 shadow-sm animate-pulse">Low Stock</div>
+										<div class="absolute top-2 right-2 bg-brand-danger text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-gray-900 shadow-sm animate-pulse">Low Stock</div>
 									</div>
 									<div class="p-3 bg-white">
 										<div class="h-2 w-3/4 bg-gray-200 rounded mb-2"></div>
@@ -280,8 +280,8 @@
 								<!-- Email Visual -->
 								<div class="w-full max-w-[200px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden">
 									<div class="bg-gray-100 border-b-[2px] border-gray-900 px-2 py-1 flex items-center gap-1.5">
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-danger border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-accent border border-gray-900"></div>
 										<div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
 									</div>
 									<div class="p-3 bg-white space-y-2">
@@ -290,7 +290,7 @@
 										
 										<!-- Live Countdown Image -->
 										<div class="bg-gray-900 text-white rounded p-3 text-center border-2 border-gray-900 mt-2 shadow-sm">
-											<div class="text-[8px] font-bold text-[#ffc480] uppercase tracking-widest mb-1 shadow-[0_0_4px_rgba(255,196,128,0.5)]">Sale Ends In</div>
+											<div class="text-[8px] font-bold text-brand-accent uppercase tracking-widest mb-1 shadow-[0_0_4px_rgba(255,196,128,0.5)]">Sale Ends In</div>
 											<div class="flex justify-center gap-2 font-black font-mono text-lg leading-none">
 												<div class="flex flex-col"><span class="animate-pulse">04</span><span class="text-[6px] text-gray-400 tracking-wider">HRS</span></div>
 												<div class="text-gray-500">:</div>
@@ -352,7 +352,7 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0 border-l-[3px] border-dashed border-gray-900"></div>
 
 				{#each steps as step, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -395,7 +395,7 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each dataSources as source, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-white']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-brand-danger', 'bg-[#4ade80]', 'bg-white']}
 					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 rounded-2xl transition-all group">
 						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -406,7 +406,7 @@
 							<div class="flex items-center gap-2 mb-1">
 								<h3 class="font-black text-lg text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">{source.name}</h3>
 								{#if source.status === 'coming'}
-									<span class="text-[10px] px-2 py-0.5 bg-[#ffc480] border-[2px] border-gray-900 font-black tracking-wider uppercase rounded transform -rotate-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Soon</span>
+									<span class="text-[10px] px-2 py-0.5 bg-brand-accent border-[2px] border-gray-900 font-black tracking-wider uppercase rounded transform -rotate-2 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Soon</span>
 								{/if}
 							</div>
 							<p class="text-sm text-gray-700 font-medium leading-tight">{source.description}</p>
@@ -429,12 +429,12 @@
 
 		<div class="max-w-6xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Playground</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 					See It <br class="hidden sm:block" />
-					<span class="text-[#ff6b6b]">In Action</span>
+					<span class="text-brand-danger">In Action</span>
 				</h2>
 				<p class="text-xl text-gray-700 font-medium max-w-2xl mx-auto">
 					Edit the JSON data below and watch the image update in real-time.
@@ -445,14 +445,14 @@
 				<!-- Data Source Input -->
 				<div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] rounded-xl overflow-hidden flex flex-col group transition-shadow hover:shadow-[12px_12px_0_0_#1f2937]">
 					<div class="px-5 py-3 bg-gray-100 border-b-[3px] border-gray-900 text-gray-900 font-black text-sm flex items-center gap-2">
-						<span class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
-						<span class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
+						<span class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
+						<span class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
 						<span class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900 shadow-[1px_1px_0_0_rgba(0,0,0,0.2)]" />
 						<span class="ml-3 tracking-wide uppercase text-xs">api-response.json</span>
 					</div>
 					<textarea
 						bind:value={demoData}
-						class="w-full h-56 p-6 font-mono text-sm text-gray-900 bg-white border-none resize-none focus:outline-none focus:ring-4 focus:ring-[#ffc480]/30 transition-shadow transition-colors placeholder-gray-400"
+						class="w-full h-56 p-6 font-mono text-sm text-gray-900 bg-white border-none resize-none focus:outline-none focus:ring-4 focus:ring-brand-accent/30 transition-shadow transition-colors placeholder-gray-400"
 						spellcheck="false"
 					/>
 					<div class="p-5 border-t-[3px] border-gray-900 bg-gray-50 flex-none">
@@ -479,7 +479,7 @@
 								{#if demoData}
 									{@const parsed = (() => { try { return JSON.parse(demoData); } catch { return null; } })()}
 									{#if parsed}
-										<div class="bg-gradient-to-br from-[#ffc480] to-[#ff6b6b] p-8 md:p-10 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] text-left max-w-sm mx-auto rounded-xl transform rotate-1 hover:rotate-0 transition-transform">
+										<div class="bg-gradient-to-br from-brand-accent to-brand-danger p-8 md:p-10 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] text-left max-w-sm mx-auto rounded-xl transform rotate-1 hover:rotate-0 transition-transform">
 											<p class="text-3xl md:text-4xl font-black text-white mb-2 leading-none">{parsed.product_name || 'Product'}</p>
 											<p class="text-4xl md:text-5xl font-black text-gray-900 mb-4">{parsed.price || '$0'}</p>
 											{#if parsed.discount}
@@ -499,7 +499,7 @@
 							</div>
 						{:else}
 							<div class="text-center text-gray-400 max-w-[200px] mx-auto">
-								<svg class="w-20 h-20 mx-auto mb-6 opacity-40 hover:opacity-100 hover:text-[#ffc480] transition-colors cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" on:click={runDemo} on:keydown={(e) => e.key === 'Enter' && runDemo()} role="button" tabindex="0">
+								<svg class="w-20 h-20 mx-auto mb-6 opacity-40 hover:opacity-100 hover:text-brand-accent transition-colors cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" on:click={runDemo} on:keydown={(e) => e.key === 'Enter' && runDemo()} role="button" tabindex="0">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z" />
 								</svg>
 								<p class="font-bold text-gray-500 text-lg uppercase tracking-wider">Awaiting Render</p>
@@ -523,7 +523,7 @@
 
 		<!-- Floating decorative elements -->
 		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
-		<div class="absolute bottom-10 left-10 w-24 h-24 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
+		<div class="absolute bottom-10 left-10 w-24 h-24 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->

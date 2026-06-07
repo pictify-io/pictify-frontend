@@ -198,7 +198,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full animate-pulse" />
 					Design Studio
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -214,7 +214,7 @@
 					</div>
 					<div
 						class="text-lg sm:text-xl font-black tabular-nums {isAtTemplateLimit
-							? 'text-[#ff6b6b]'
+							? 'text-brand-danger'
 							: 'text-gray-900'}"
 					>
 						{pagination.total || 0}{#if typeof templateLimit === 'number'}<span
@@ -264,7 +264,7 @@
 			<!-- Create Button -->
 			<button
 				class="font-black py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] sm:hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[3px] sm:hover:translate-y-[3px] transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm
-				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-[#ffc480] hover:bg-[#ffb968] text-gray-900'}"
+				{isAtTemplateLimit ? 'bg-gray-400 text-white' : 'bg-brand-accent hover:bg-[#ffb968] text-gray-900'}"
 				on:click={openTemplateCreator}
 			>
 				{#if isAtTemplateLimit}
@@ -385,7 +385,7 @@
 			</div>
 			{#if isLoading}
 				<div
-					class="absolute inset-0 flex items-center justify-center z-20 bg-[#FFFDF8]/80 backdrop-blur-sm rounded-xl"
+					class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 backdrop-blur-sm rounded-xl"
 				>
 					<Loader size="16" show={isLoading} />
 				</div>
@@ -422,7 +422,7 @@
 							We couldn't find any templates matching "{searchQuery}"
 						</p>
 						<button
-							class="mt-4 sm:mt-6 text-xs sm:text-sm font-bold text-[#ff6b6b] hover:text-[#ff5252] uppercase tracking-wide underline decoration-2 underline-offset-4"
+							class="mt-4 sm:mt-6 text-xs sm:text-sm font-bold text-brand-danger hover:text-[#ff5252] uppercase tracking-wide underline decoration-2 underline-offset-4"
 							on:click={() => {
 								searchQuery = '';
 								handleSearchInput({ target: { value: '' } });

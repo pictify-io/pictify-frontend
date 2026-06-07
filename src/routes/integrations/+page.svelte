@@ -39,7 +39,7 @@
 	<meta name="twitter:image" content="https://media.pictify.io/fbap2-1775406920888.png" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -47,7 +47,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative z-10">
@@ -67,7 +67,7 @@
 			<!-- Animated Icon -->
 			<div class="relative mb-10 group">
 				<div
-					class="absolute inset-0 bg-[#ffc480] rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+					class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
 				/>
 				<div
 					class="relative w-24 h-24 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-translate-y-2 transition-transform duration-300"
@@ -93,7 +93,7 @@
 				class="text-5xl sm:text-7xl font-black text-gray-900 tracking-tighter mb-8 max-w-4xl mx-auto leading-[0.9]"
 			>
 				Supercharge Your <br />
-				<span class="text-[#ff6b6b] decoration-clone">Workflow</span>
+				<span class="text-brand-danger decoration-clone">Workflow</span>
 			</h1>
 
 			<!-- Description -->
@@ -132,7 +132,7 @@
 						>
 							<div>
 								<div
-									class="inline-flex items-center gap-2 px-3 py-1 bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 text-xs font-black uppercase tracking-widest rounded mb-3"
+									class="inline-flex items-center gap-2 px-3 py-1 bg-brand-accent text-gray-900 border-[2px] border-gray-900 text-xs font-black uppercase tracking-widest rounded mb-3"
 								>
 									{category.label}
 								</div>
@@ -195,7 +195,7 @@
 
 										<div class="mb-4">
 											<h3
-												class="text-2xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors"
+												class="text-2xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
 											>
 												{integration.name}
 											</h3>
@@ -217,7 +217,7 @@
 
 									<!-- Hover Effect Background -->
 									<div
-										class="absolute inset-0 bg-[#FFFDF8] opacity-0 group-hover:opacity-100 transition-opacity z-0"
+										class="absolute inset-0 bg-brand-bg opacity-0 group-hover:opacity-100 transition-opacity z-0"
 									/>
 								</a>
 							{/each}
@@ -284,24 +284,24 @@ await pictify.render(&#123;
 							class="bg-[#0f1117] rounded-xl border-2 border-gray-800 shadow-2xl overflow-hidden font-mono text-sm group transform transition-transform hover:scale-[1.02]"
 						>
 							<div class="px-4 py-3 bg-[#1f2937] border-b border-gray-800 flex items-center gap-2">
-								<div class="w-3 h-3 rounded-full bg-[#ff6b6b]" />
-								<div class="w-3 h-3 rounded-full bg-[#ffc480]" />
+								<div class="w-3 h-3 rounded-full bg-brand-danger" />
+								<div class="w-3 h-3 rounded-full bg-brand-accent" />
 								<div class="w-3 h-3 rounded-full bg-[#4ade80]" />
 								<div class="ml-2 text-xs text-gray-500 font-bold">bash</div>
 							</div>
 							<div class="p-6 space-y-4">
 								<div class="flex gap-2">
-									<span class="text-[#ff6b6b]">➜</span>
+									<span class="text-brand-danger">➜</span>
 									<span class="text-[#4ade80]">~</span>
 									<span class="text-gray-300 typing-effect"
 										>curl -X POST https://api.pictify.io/image \</span
 									>
 								</div>
 								<div class="pl-4 text-gray-400">
-									-H <span class="text-[#ffc480]">'Authorization: Bearer sk_live_...'</span> \
+									-H <span class="text-brand-accent">'Authorization: Bearer sk_live_...'</span> \
 								</div>
 								<div class="pl-4 text-gray-400">
-									-d <span class="text-[#ffc480]">'&#123;"template": "reciept-v2"&#125;'</span>
+									-d <span class="text-brand-accent">'&#123;"template": "reciept-v2"&#125;'</span>
 								</div>
 								<div class="flex gap-2 text-gray-500 pt-2">
 									<span>✓</span>

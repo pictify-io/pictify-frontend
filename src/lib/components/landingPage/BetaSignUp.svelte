@@ -29,7 +29,7 @@
 				/>
 				<button
 					type="submit"
-					class="py-3.5 rounded px-6 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-[#ffc480] tracking-wide text-lg flex-shrink-0 text-gray-900"
+					class="py-3.5 rounded px-6 group-hover:-translate-y-px group-hover:-translate-x-px ease-out duration-300 z-20 relative w-full border-[3px] border-gray-900 font-medium bg-brand-accent tracking-wide text-lg flex-shrink-0 text-gray-900"
 					>Get Notified</button
 				>
 				<img

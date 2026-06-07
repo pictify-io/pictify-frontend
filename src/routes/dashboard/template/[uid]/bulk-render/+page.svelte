@@ -622,7 +622,7 @@
 					{/if}
 				</h1>
 				<div
-					class="px-2 py-1 bg-[#ff6b6b] text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
+					class="px-2 py-1 bg-brand-danger text-white border-[2px] border-gray-900 rounded text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#000]"
 				>
 					Bulk Render
 				</div>
@@ -647,7 +647,7 @@
 				<div
 					class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
 				>
-					<div class="bg-[#ffc480] border-b-[3px] border-gray-900 p-6 text-center">
+					<div class="bg-brand-accent border-b-[3px] border-gray-900 p-6 text-center">
 						<div class="text-5xl mb-3">📦</div>
 						<h2 class="text-2xl font-black text-gray-900">Batch Rendering</h2>
 						<p class="text-gray-800 font-medium mt-1">Process multiple images at once</p>
@@ -664,7 +664,7 @@
 							<ul class="space-y-2 text-sm text-gray-700">
 								<li class="flex items-center gap-2">
 									<svg
-										class="w-5 h-5 text-[#10b981]"
+										class="w-5 h-5 text-brand-success"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -679,7 +679,7 @@
 								</li>
 								<li class="flex items-center gap-2">
 									<svg
-										class="w-5 h-5 text-[#10b981]"
+										class="w-5 h-5 text-brand-success"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -694,7 +694,7 @@
 								</li>
 								<li class="flex items-center gap-2">
 									<svg
-										class="w-5 h-5 text-[#10b981]"
+										class="w-5 h-5 text-brand-success"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -710,7 +710,7 @@
 							</ul>
 						</div>
 						<button
-							class="px-8 py-3 bg-[#ffc480] text-gray-900 font-black rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide"
+							class="px-8 py-3 bg-brand-accent text-gray-900 font-black rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide"
 							on:click={() => openUpgradeModal('batch_render')}
 						>
 							Upgrade to {PLAN_DISPLAY_NAMES[targetPlan]}
@@ -737,7 +737,7 @@
 							class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
 						>
 							<div
-								class="bg-[#ffc480] border-b-[3px] border-gray-900 px-6 py-4 flex justify-between items-center"
+								class="bg-brand-accent border-b-[3px] border-gray-900 px-6 py-4 flex justify-between items-center"
 							>
 								<h2
 									class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
@@ -790,7 +790,7 @@
 											>
 										</div>
 										<div
-											class="font-black text-xl text-gray-900 group-hover:underline decoration-4 decoration-[#ffc480]"
+											class="font-black text-xl text-gray-900 group-hover:underline decoration-4 decoration-brand-accent"
 										>
 											Click to upload
 										</div>
@@ -1200,7 +1200,7 @@
 									<div class="grid grid-cols-2 gap-2">
 										<button
 											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedBulkLayouts.has('default')
-												? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 												: 'bg-white border-gray-200 hover:border-gray-900'}"
 											on:click={() => toggleBulkLayout('default')}
 										>
@@ -1222,7 +1222,7 @@
 										{#each bulkTemplateLayouts as [key, layout]}
 											<button
 												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedBulkLayouts.has(key)
-													? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 													: 'bg-white border-gray-200 hover:border-gray-900'}"
 												on:click={() => toggleBulkLayout(key)}
 											>

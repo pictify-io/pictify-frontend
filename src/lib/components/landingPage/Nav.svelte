@@ -36,12 +36,12 @@
 
 <header
 	in:fly={{ y: -20, duration: 800, delay: 0 }}
-	class="w-full h-20 z-50 border-b-[3px] border-gray-900 bg-[#FFFDF8] sticky top-0 flex justify-between items-stretch"
+	class="w-full h-20 z-50 border-b-[3px] border-gray-900 bg-brand-bg sticky top-0 flex justify-between items-stretch"
 >
 	<!-- Brand Logo -->
 	<a
 		href="/"
-		class="flex flex-shrink-0 items-center justify-center px-6 sm:px-8 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-[#ffc480] transition-all group relative overflow-hidden"
+		class="flex flex-shrink-0 items-center justify-center px-6 sm:px-8 no-underline cursor-pointer border-r-[3px] border-gray-900 hover:bg-brand-accent transition-all group relative overflow-hidden"
 	>
 		<div class="flex items-center gap-2 sm:gap-3">
 			<!-- Logo Icon (Abstract Shapes) -->
@@ -115,14 +115,14 @@
 					>
 						<a
 							href="/dynamic-images"
-							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
+							class="flex items-start gap-3 px-5 py-4 hover:bg-brand-accent/15 transition-colors border-b-2 border-gray-100"
 							on:click={() => {
 								showSolutionsDropdown = false;
 								trackNav('Dynamic Images', '/dynamic-images', 'header');
 							}}
 						>
 							<div
-								class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+								class="w-8 h-8 bg-brand-accent/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -147,14 +147,14 @@
 						</a>
 						<a
 							href="/email-personalization"
-							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
+							class="flex items-start gap-3 px-5 py-4 hover:bg-brand-accent/15 transition-colors border-b-2 border-gray-100"
 							on:click={() => {
 								showSolutionsDropdown = false;
 								trackNav('Email Personalization', '/email-personalization', 'header');
 							}}
 						>
 							<div
-								class="w-8 h-8 bg-[#ff6b6b]/15 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+								class="w-8 h-8 bg-brand-danger/15 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -179,7 +179,7 @@
 						</a>
 						<a
 							href="/experiments"
-							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
+							class="flex items-start gap-3 px-5 py-4 hover:bg-brand-accent/15 transition-colors border-b-2 border-gray-100"
 							on:click={() => {
 								showSolutionsDropdown = false;
 								trackNav('Experiments', '/experiments', 'header');
@@ -211,14 +211,14 @@
 						</a>
 						<a
 							href="/visual-analytics"
-							class="flex items-start gap-3 px-5 py-4 hover:bg-[#ffc480]/15 transition-colors border-b-2 border-gray-100"
+							class="flex items-start gap-3 px-5 py-4 hover:bg-brand-accent/15 transition-colors border-b-2 border-gray-100"
 							on:click={() => {
 								showSolutionsDropdown = false;
 								trackNav('Visual Analytics', '/visual-analytics', 'header');
 							}}
 						>
 							<div
-								class="w-8 h-8 bg-[#ffc480]/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+								class="w-8 h-8 bg-brand-accent/20 border-2 border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
 							>
 								<svg
 									class="w-4 h-4 text-gray-900"
@@ -243,7 +243,7 @@
 						</a>
 						<a
 							href="/solutions"
-							class="block px-5 py-3 bg-gray-50 text-center text-xs font-black uppercase tracking-widest text-gray-700 hover:text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
+							class="block px-5 py-3 bg-gray-50 text-center text-xs font-black uppercase tracking-widest text-gray-700 hover:text-gray-900 hover:bg-brand-accent/15 transition-colors"
 							on:click={() => {
 								showSolutionsDropdown = false;
 								trackNav('View all solutions', '/solutions', 'header');
@@ -291,7 +291,7 @@
 				</a>
 				<a
 					href="/login"
-					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-[#ff6b6b] hover:text-gray-900 transition-all uppercase tracking-wide border-l-[3px] border-gray-900"
+					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-brand-danger hover:text-gray-900 transition-all uppercase tracking-wide border-l-[3px] border-gray-900"
 					on:click={() => trackCTA('Start Building Free', 'header')}
 				>
 					Start Building Free
@@ -350,7 +350,7 @@
 
 <!-- Mobile Menu Overlay -->
 {#if showMobileMenu}
-	<div class="fixed inset-0 z-40 bg-[#FFFDF8] pt-20 md:hidden overflow-y-auto">
+	<div class="fixed inset-0 z-40 bg-brand-bg pt-20 md:hidden overflow-y-auto">
 		<nav class="flex flex-col p-6 space-y-4">
 			<a
 				href={PUBLIC_DOCS_URL}
@@ -371,7 +371,7 @@
 				</p>
 				<a
 					href="/dynamic-images"
-					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
+					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-brand-accent/15 transition-colors"
 					on:click={() => trackNav('Dynamic Images', '/dynamic-images', 'mobile_menu')}
 				>
 					<svg
@@ -391,7 +391,7 @@
 				</a>
 				<a
 					href="/email-personalization"
-					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
+					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-brand-accent/15 transition-colors"
 					on:click={() =>
 						trackNav('Email Personalization', '/email-personalization', 'mobile_menu')}
 				>
@@ -412,7 +412,7 @@
 				</a>
 				<a
 					href="/experiments"
-					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
+					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-brand-accent/15 transition-colors"
 					on:click={() => trackNav('Experiments', '/experiments', 'mobile_menu')}
 				>
 					<svg
@@ -432,7 +432,7 @@
 				</a>
 				<a
 					href="/visual-analytics"
-					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-[#ffc480]/15 transition-colors"
+					class="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-900 hover:bg-brand-accent/15 transition-colors"
 					on:click={() => trackNav('Visual Analytics', '/visual-analytics', 'mobile_menu')}
 				>
 					<svg
@@ -484,7 +484,7 @@
 				</a>
 				<a
 					href="/login"
-					class="p-4 text-center text-lg font-black text-white border-[3px] border-gray-900 bg-[#ff6b6b] shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
+					class="p-4 text-center text-lg font-black text-white border-[3px] border-gray-900 bg-brand-danger shadow-[4px_4px_0_0_#000] rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
 					on:click={() => trackCTA('Start Building Free', 'mobile_menu')}
 				>
 					Start Building Free

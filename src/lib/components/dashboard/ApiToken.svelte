@@ -151,7 +151,7 @@
 
 						<div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 border-dashed border-gray-200">
 							<button
-								class="w-full py-2.5 sm:py-3 bg-gray-900 text-white font-bold uppercase tracking-wider text-xs sm:text-sm rounded-lg hover:bg-[#ffc480] hover:text-gray-900 transition-colors flex items-center justify-center gap-2 group/btn"
+								class="w-full py-2.5 sm:py-3 bg-gray-900 text-white font-bold uppercase tracking-wider text-xs sm:text-sm rounded-lg hover:bg-brand-accent hover:text-gray-900 transition-colors flex items-center justify-center gap-2 group/btn"
 							>
 								Increase Limits
 								<svg
@@ -173,14 +173,14 @@
 
 				<!-- Efficiency Ticket -->
 				<div
-					class="bg-[#ffc480] rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
+					class="bg-brand-accent rounded-xl sm:rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] sm:shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
 				>
 					<!-- Ticket Perforations -->
 					<div
-						class="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-[#FFFDF8] rounded-full border-[2px] sm:border-[3px] border-gray-900"
+						class="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-brand-bg rounded-full border-[2px] sm:border-[3px] border-gray-900"
 					/>
 					<div
-						class="absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-[#FFFDF8] rounded-full border-[2px] sm:border-[3px] border-gray-900"
+						class="absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-brand-bg rounded-full border-[2px] sm:border-[3px] border-gray-900"
 					/>
 
 					<div class="p-4 sm:p-6 text-center">
@@ -210,7 +210,7 @@
 				>
 					<!-- Header -->
 					<div
-						class="p-4 sm:p-6 md:p-8 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
+						class="p-4 sm:p-6 md:p-8 border-b-[3px] border-gray-900 bg-brand-bg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
 					>
 						<div>
 							<h2
@@ -267,7 +267,7 @@
 													class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-900 flex items-center justify-center border-2 border-gray-900 shadow-[2px_2px_0_0_#ffc480]"
 												>
 													<svg
-														class="w-5 h-5 sm:w-6 sm:h-6 text-[#ffc480]"
+														class="w-5 h-5 sm:w-6 sm:h-6 text-brand-accent"
 														fill="none"
 														stroke="currentColor"
 														viewBox="0 0 24 24"
@@ -376,18 +376,18 @@
 			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
 		>
 			<div
-				class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full relative overflow-hidden"
+				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full relative overflow-hidden"
 			>
 				<!-- Header Strip -->
 				<div
-					class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b-[3px] border-gray-900 z-10"
+					class="absolute top-0 left-0 w-full h-1.5 bg-brand-danger border-b-[3px] border-gray-900 z-10"
 				/>
 
 				<div class="p-6 pt-8">
 					<!-- Warning Icon -->
 					<div class="flex justify-center mb-4">
 						<div
-							class="w-14 h-14 rounded-xl bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center"
+							class="w-14 h-14 rounded-xl bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -425,7 +425,7 @@
 						</button>
 						<button
 							on:click={executeRevoke}
-							class="flex-1 px-4 py-3 text-xs font-black text-white bg-[#ff6b6b] rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+							class="flex-1 px-4 py-3 text-xs font-black text-white bg-brand-danger rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 						>
 							Revoke Key
 						</button>

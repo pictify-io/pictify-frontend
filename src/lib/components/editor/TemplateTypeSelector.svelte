@@ -25,8 +25,8 @@
 			icon: 'fa-image',
 			description: 'PNG/JPEG output for social media, OG images, banners',
 			color: '#ffc480',
-			bgColor: 'bg-[#ffc480]',
-			borderColor: 'border-[#ffc480]',
+			bgColor: 'bg-brand-accent',
+			borderColor: 'border-brand-accent',
 			textOnBg: 'text-gray-900',
 			shadowColor: 'shadow-[4px_4px_0_0_#ffc480]'
 		},
@@ -36,8 +36,8 @@
 			icon: 'fa-file-pdf',
 			description: 'Multi-page PDF with selectable text for invoices, reports',
 			color: '#ff6b6b',
-			bgColor: 'bg-[#ff6b6b]',
-			borderColor: 'border-[#ff6b6b]',
+			bgColor: 'bg-brand-danger',
+			borderColor: 'border-brand-danger',
 			textOnBg: 'text-white',
 			shadowColor: 'shadow-[4px_4px_0_0_#ff6b6b]'
 		}
@@ -104,10 +104,10 @@
 	on:click|self={handleClose}
 >
 	<div
-		class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+		class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
 	>
 		<!-- Header -->
-		<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-[#ffc480]">
+		<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-accent">
 			<h2 class="text-xl font-black uppercase tracking-wider text-gray-900">Create New Template</h2>
 			<p class="text-sm text-gray-700 mt-1">Choose the output format for your template</p>
 		</div>
@@ -189,7 +189,7 @@
 							<button
 								class="p-3 rounded-lg border-[3px] text-left transition-all
 									{selectedPreset === preset.value
-									? 'border-gray-900 bg-[#ff6b6b]/10 shadow-[4px_4px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
+									? 'border-gray-900 bg-brand-danger/10 shadow-[4px_4px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
 									: 'border-gray-900 bg-white hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[-2px] hover:translate-y-[-2px]'}"
 								on:click={() => (selectedPreset = preset.value)}
 							>
@@ -256,8 +256,8 @@
 				on:click={handleContinue}
 				class="px-6 py-3 rounded-xl border-[3px] border-gray-900 font-black uppercase text-xs tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2
 					{selectedFormat === 'image'
-					? 'bg-[#ffc480] text-gray-900 hover:bg-[#ffb360]'
-					: 'bg-[#ff6b6b] text-white hover:bg-[#ff5252]'}"
+					? 'bg-brand-accent text-gray-900 hover:bg-[#ffb360]'
+					: 'bg-brand-danger text-white hover:bg-[#ff5252]'}"
 			>
 				Continue to Editor
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"

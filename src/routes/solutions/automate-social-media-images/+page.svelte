@@ -63,14 +63,14 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#ffc480]/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-brand-accent/20 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For Marketing</span>
 		</div>
 		<h1
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
-			Automate social media images<br /><span class="text-[#ff6b6b]">at any scale.</span>
+			Automate social media images<br /><span class="text-brand-danger">at any scale.</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			One template. Thousands of personalized variants. One API call per post. No more design-queue bottlenecks.
@@ -139,7 +139,7 @@
 			<p class="text-lg text-gray-700 leading-relaxed mb-5">
 				Social platforms each have their own canonical dimensions:
 			</p>
-			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-5 list-disc pl-6 marker:text-[#ff6b6b]">
+			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-5 list-disc pl-6 marker:text-brand-danger">
 				<li><strong>LinkedIn post:</strong> 1200 × 627</li>
 				<li><strong>X (Twitter):</strong> 1200 × 675</li>
 				<li><strong>Instagram feed:</strong> 1080 × 1080 (square) or 1080 × 1350 (portrait)</li>

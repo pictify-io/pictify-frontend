@@ -229,11 +229,11 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+<div class="flex h-full w-full flex-col bg-brand-bg">
 	<!-- Panel header strip — mirrors the dialect of HtmlVariablesPanel
 	     header so the Copilot tab feels like a peer of the other
 	     tabs rather than a foreign surface. -->
-	<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4">
+	<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 		<div class="flex items-center gap-2">
 			<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
 				<i class="fa fa-wand-magic-sparkles text-[12px] text-gray-900"></i>
@@ -303,7 +303,7 @@
 											Writing
 										</span>
 									{:else if turn.errored}
-										<span class="inline-flex items-center gap-1 rounded-md border-[1.5px] border-gray-900 bg-[#ff6b6b] px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-white">
+										<span class="inline-flex items-center gap-1 rounded-md border-[1.5px] border-gray-900 bg-brand-danger px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-white">
 											Error
 										</span>
 									{/if}
@@ -319,7 +319,7 @@
 
 	<!-- Apply banner — only appears after a successful generation. Stays visible until the user applies or skips. -->
 	{#if pendingApplyHtml && !active}
-		<div class="border-t-[3px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-[#ff6b6b]' : 'bg-[#ffe066]'} px-6 py-3">
+		<div class="border-t-[3px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-brand-danger' : 'bg-[#ffe066]'} px-6 py-3">
 			<div class="mb-2 flex items-center justify-between gap-2">
 				<p class="text-[11px] font-black uppercase tracking-widest {pendingWarnings.length > 0 ? 'text-white' : 'text-gray-900'}">
 					{pendingWarnings.length > 0 ? 'Ready — with warnings' : 'Ready to apply'}
@@ -382,7 +382,7 @@
 			on:keydown={onKey}
 			rows="3"
 			placeholder={turns.length > 0 ? 'Follow up…' : 'Describe the template you want…'}
-			class="mt-1.5 w-full resize-none rounded-lg border-[2px] border-gray-900 bg-[#FFFDF8] px-3 py-2 text-[13px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+			class="mt-1.5 w-full resize-none rounded-lg border-[2px] border-gray-900 bg-brand-bg px-3 py-2 text-[13px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 		></textarea>
 		<div class="mt-2 flex items-center justify-between gap-2">
 			<span class="font-mono text-[10px] text-gray-500">⌘↵ to send</span>
@@ -390,7 +390,7 @@
 				<button
 					type="button"
 					on:click={stop}
-					class="flex items-center gap-2 rounded-md border-[2px] border-gray-900 bg-[#ff6b6b] px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+					class="flex items-center gap-2 rounded-md border-[2px] border-gray-900 bg-brand-danger px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
 				>
 					<i class="fa fa-stop text-[10px]"></i>
 					Stop

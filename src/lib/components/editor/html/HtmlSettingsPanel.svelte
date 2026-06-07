@@ -57,9 +57,9 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+<div class="flex h-full w-full flex-col bg-brand-bg">
 	<!-- Accent header strip -->
-	<div class="border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4">
+	<div class="border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 		<h2 class="text-lg font-black uppercase tracking-widest text-gray-900">Settings</h2>
 		<p class="mt-0.5 text-[11px] font-bold text-gray-800">
 			Output format, dimensions, and per-render toggles.
@@ -80,7 +80,7 @@
 							type="button"
 							class="flex flex-col items-center justify-center gap-1 rounded-lg border-[3px] border-gray-900 px-3 py-3 text-[11px] font-black uppercase tracking-widest transition-all
 								{format === fmt.key
-									? 'bg-[#ffc480] text-gray-900 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
+									? 'bg-brand-accent text-gray-900 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
 									: 'bg-white text-gray-900 hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 							on:click={() => {
 								format = fmt.key;
@@ -158,7 +158,7 @@
 							strictVariables = e.target.checked;
 							patch({ strictVariables });
 						}}
-						class="mt-1 h-5 w-5 accent-[#ffc480]"
+						class="mt-1 h-5 w-5 accent-brand-accent"
 					/>
 					<div class="flex-1">
 						<p class="text-sm font-black uppercase tracking-wider text-gray-900">
@@ -167,7 +167,7 @@
 						<p class="mt-1 text-xs font-bold text-gray-600">
 							When ON, missing root-level variables throw HTTP 422 at render time. Leave off if
 							you use conditionals like
-							<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-[#ffc480]"
+							<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-brand-accent"
 								>{'{{#if optional}}'}</code>.
 						</p>
 					</div>
@@ -177,7 +177,7 @@
 			<!-- JS ENABLED toggle card — danger-red treatment when ON -->
 			<section
 				class="rounded-xl border-[3px] p-5 shadow-[4px_4px_0_0_#1f2937] transition-colors
-					{jsEnabled ? 'border-gray-900 bg-[#ff6b6b]/10' : 'border-gray-900 bg-white'}"
+					{jsEnabled ? 'border-gray-900 bg-brand-danger/10' : 'border-gray-900 bg-white'}"
 			>
 				<label class="flex cursor-pointer items-start gap-4">
 					<input
@@ -187,7 +187,7 @@
 							jsEnabled = e.target.checked;
 							patch({ jsEnabled });
 						}}
-						class="mt-1 h-5 w-5 accent-[#ff6b6b]"
+						class="mt-1 h-5 w-5 accent-brand-danger"
 					/>
 					<div class="flex-1">
 						<p class="text-sm font-black uppercase tracking-wider text-gray-900">
@@ -202,7 +202,7 @@
 
 				{#if jsEnabled}
 					<div
-						class="mt-4 flex items-start gap-3 rounded-lg border-[2px] border-gray-900 bg-[#ff6b6b] px-4 py-3 text-white shadow-[2px_2px_0_0_#1f2937]"
+						class="mt-4 flex items-start gap-3 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-4 py-3 text-white shadow-[2px_2px_0_0_#1f2937]"
 					>
 						<i class="fa fa-triangle-exclamation text-xs mt-0.5"></i>
 						<div>

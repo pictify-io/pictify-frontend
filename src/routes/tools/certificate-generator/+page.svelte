@@ -322,7 +322,7 @@
 	{@html `<script type="application/ld+json">${templateListSchemaJson}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-x-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -330,10 +330,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -363,7 +363,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Free Tool
 				</div>
@@ -377,7 +377,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
 					/>
 				</span>
 			</h1>
@@ -387,7 +387,7 @@
 				<p
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
-					Create <span class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black"
+					Create <span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>professional certificates</span
 					>
 					in seconds.
@@ -405,7 +405,7 @@
 		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
 			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">
 				<span
-					class="w-8 h-8 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000]"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -423,7 +423,7 @@
 				{#each certificateTemplates as template}
 					<button
 						class="flex-shrink-0 w-44 bg-white border-[3px] {selectedTemplate.id === template.id
-							? 'border-[#ff6b6b] shadow-[6px_6px_0_0_#ff6b6b]'
+							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
 							: 'border-black shadow-[4px_4px_0_0_#000]'} p-3 overflow-hidden hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
 						on:click={() => selectTemplate(template)}
 						aria-label="{template.name} certificate template — {template.description}"
@@ -431,7 +431,7 @@
 					>
 						{#if selectedTemplate.id === template.id}
 							<div
-								class="absolute top-2 right-2 z-10 w-6 h-6 bg-[#ff6b6b] border-[2px] border-black flex items-center justify-center rounded-full"
+								class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center rounded-full"
 							>
 								<span class="text-white font-black text-sm">&#10003;</span>
 							</div>
@@ -467,8 +467,8 @@
 						<span class="animate-pulse">_</span> CERTIFICATE DETAILS
 					</h2>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-[#ff6b6b] border border-black" />
-						<div class="w-3 h-3 bg-[#ffc480] border border-black" />
+						<div class="w-3 h-3 bg-brand-danger border border-black" />
+						<div class="w-3 h-3 bg-brand-accent border border-black" />
 						<div class="w-3 h-3 bg-[#4ade80] border border-black" />
 					</div>
 				</div>
@@ -480,7 +480,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#ffc480] border-[2px] border-black flex items-center justify-center text-xs"
+								class="w-6 h-6 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
 								>1</span
 							>
 							Recipient Name
@@ -537,7 +537,7 @@
 							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
 						>
 							<span
-								class="w-6 h-6 bg-[#ff6b6b] border-[2px] border-black flex items-center justify-center text-xs text-white"
+								class="w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center text-xs text-white"
 								>4</span
 							>
 							Achievement
@@ -579,8 +579,8 @@
 						class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
 					>
 						<div class="flex items-center gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
 							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
 						</div>
 						<div
@@ -621,7 +621,7 @@
 				<button
 					on:click={handleGenerate}
 					disabled={isGenerating}
-					class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
+					class="w-full bg-brand-danger hover:bg-[#ff5252] text-white px-6 py-4 border-[3px] border-black shadow-[6px_6px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
 				>
 					{#if isGenerating}
 						<svg
@@ -754,9 +754,9 @@
 		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
 			<!-- Separator -->
 			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-[#FFFDF8] px-4 sm:px-6">
+				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
 					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
 					>
 						<span class="font-black text-sm sm:text-lg">?</span>
 					</div>
@@ -770,7 +770,7 @@
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-2 sm:px-4">CERTIFICATES</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
 					/>
 				</span>
 			</h2>
@@ -780,7 +780,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ffc480] border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -884,7 +884,7 @@
 				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[8px_8px_0_0_#000] p-4 sm:p-6 md:p-10 hover:shadow-[2px_2px_0_0_#000] sm:hover:shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#ff6b6b] border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-[2px_2px_0_0_#000] sm:shadow-[3px_3px_0_0_#000]"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -957,7 +957,7 @@
 					Every certificate template works for any certificate type — award, achievement, completion, participation, or appreciation. Pick a design that matches your brand and customize the title, recipient name, date, and achievement text. All templates are free and come with commercial-use rights.
 				</p>
 				<div class="space-y-5">
-					<div class="border-l-[4px] border-[#ffc480] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-brand-accent pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Achievement Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong>Elegant</strong> template, with gold borders and serif typography, is our most popular certificate of achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
@@ -975,7 +975,7 @@
 							Acknowledge attendance and engagement with a certificate of participation. The <strong>Corporate</strong> template's navy header and formal layout make it the right certificate of participation template for conferences, webinars, and corporate events.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-[#ff6b6b] pl-4 sm:pl-5">
+					<div class="border-l-[4px] border-brand-danger pl-4 sm:pl-5">
 						<h4 class="text-base sm:text-lg font-black text-black mb-1">Award Certificate Template</h4>
 						<p class="text-sm text-gray-700 font-medium">
 							Celebrate winners and honorees with a bold award certificate. The <strong>Creative</strong> template — coral accents and playful geometry — works well for employee-of-the-month awards, tournament winners, and community recognition.
@@ -1026,10 +1026,10 @@
 					class="bg-gray-900 border-[3px] border-black rounded-3xl p-8 sm:p-12 relative overflow-hidden"
 				>
 					<div
-						class="absolute top-0 right-0 w-40 h-40 bg-[#ffc480]/20 rounded-full blur-2xl pointer-events-none"
+						class="absolute top-0 right-0 w-40 h-40 bg-brand-accent/20 rounded-full blur-2xl pointer-events-none"
 					/>
 					<div
-						class="absolute bottom-0 left-0 w-32 h-32 bg-[#ff6b6b]/20 rounded-full blur-2xl pointer-events-none"
+						class="absolute bottom-0 left-0 w-32 h-32 bg-brand-danger/20 rounded-full blur-2xl pointer-events-none"
 					/>
 
 					<h3
@@ -1044,7 +1044,7 @@
 					<button
 						type="button"
 						on:click={openInCanvasEditor}
-						class="px-8 py-4 bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
+						class="px-8 py-4 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

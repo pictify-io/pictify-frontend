@@ -80,7 +80,7 @@
 				<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">
 					{variable.name}
 					{#if variable.required}
-						<span class="text-[#ff6b6b]">*</span>
+						<span class="text-brand-danger">*</span>
 					{/if}
 				</label>
 				{#if variable.type === 'text' && (variable.name

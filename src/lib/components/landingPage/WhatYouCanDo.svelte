@@ -70,7 +70,7 @@
 	});
 </script>
 
-<section bind:this={sectionRef} class="w-full py-20 md:py-32 bg-[#fffdf8] relative overflow-hidden">
+<section bind:this={sectionRef} class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Background Pattern -->
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -81,14 +81,14 @@
 		<!-- Header -->
 		<div class="text-center mb-20 max-w-3xl mx-auto">
 			<div
-				class="inline-block mb-4 px-4 py-1.5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2"
+				class="inline-block mb-4 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-2"
 			>
 				<span class="font-bold text-sm text-black uppercase tracking-wider">The Engine</span>
 			</div>
 
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				What Makes It <br />
-				<span class="relative inline-block text-[#ff6b6b]">
+				<span class="relative inline-block text-brand-danger">
 					Programmable
 					<svg
 						class="absolute w-full h-4 -bottom-1 left-0 text-black z-[-1] opacity-20"
@@ -179,7 +179,7 @@
 
 								<!-- Hover Interaction Elements -->
 								<div
-									class="absolute top-10 right-2 w-8 h-8 bg-[#ff6b6b] rounded-full border-[2px] border-black cursor-move shadow-[2px_2px_0_0_black] transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20 flex items-center justify-center"
+									class="absolute top-10 right-2 w-8 h-8 bg-brand-danger rounded-full border-[2px] border-black cursor-move shadow-[2px_2px_0_0_black] transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20 flex items-center justify-center"
 								>
 									<svg
 										class="w-4 h-4 text-white"
@@ -247,7 +247,7 @@
 							<div class="w-2.5 h-2.5 rounded-full bg-green-500" />
 						</div>
 						<div class="text-gray-300 overflow-hidden break-words text-xs md:text-sm">
-							<span class="text-[#ff6b6b]">$</span>
+							<span class="text-brand-danger">$</span>
 							{displayedApiText}<span class="animate-pulse">_</span>
 						</div>
 
@@ -296,7 +296,7 @@
 						</div>
 
 						<div
-							class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0_0_black] group-hover:-translate-y-1 transition-transform"
+							class="w-12 h-12 bg-brand-danger border-[3px] border-black rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0_0_black] group-hover:-translate-y-1 transition-transform"
 						>
 							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -420,7 +420,7 @@
 								<!-- 4. Review/Testimonial -->
 								<!-- 4. Review/Testimonial -->
 								<div
-									class="w-48 h-24 bg-[#ffc480] border-[2px] border-black rounded-xl p-3 shrink-0 flex flex-col justify-between relative overflow-hidden"
+									class="w-48 h-24 bg-brand-accent border-[2px] border-black rounded-xl p-3 shrink-0 flex flex-col justify-between relative overflow-hidden"
 								>
 									<div class="text-4xl absolute -top-2 -left-1 opacity-20 font-serif leading-none">
 										"
@@ -446,7 +446,7 @@
 									class="w-48 h-24 bg-white border-[2px] border-black rounded-xl flex overflow-hidden shadow-[4px_4px_0_0_rgba(0,0,0,0.05)] relative shrink-0"
 								>
 									<div
-										class="w-12 h-full bg-[#ff6b6b] flex flex-col items-center justify-center border-r-[2px] border-dashed border-black relative"
+										class="w-12 h-full bg-brand-danger flex flex-col items-center justify-center border-r-[2px] border-dashed border-black relative"
 									>
 										<div
 											class="text-white -rotate-90 text-[10px] font-bold tracking-widest uppercase whitespace-nowrap"
@@ -547,7 +547,7 @@
 									</div>
 									<div class="p-2 flex flex-col justify-between">
 										<div>
-											<div class="text-[8px] font-bold text-[#ff6b6b] uppercase mb-1">Breaking</div>
+											<div class="text-[8px] font-bold text-brand-danger uppercase mb-1">Breaking</div>
 											<div class="text-[10px] font-bold leading-tight">
 												AI Optimizes Image Workflows
 											</div>
@@ -578,7 +578,7 @@
 										</div>
 									</div>
 									<div
-										class="absolute top-2 right-2 bg-[#ff6b6b] text-white text-[8px] font-bold px-1.5 py-0.5 border border-black shadow-[2px_2px_0_0_black]"
+										class="absolute top-2 right-2 bg-brand-danger text-white text-[8px] font-bold px-1.5 py-0.5 border border-black shadow-[2px_2px_0_0_black]"
 									>
 										NEW
 									</div>

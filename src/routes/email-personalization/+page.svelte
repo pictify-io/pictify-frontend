@@ -43,13 +43,13 @@
 			title: 'Countdown Timers',
 			description: 'Live countdown to sale end, event start, or deadline — renders the current time at email open.',
 			iconPath: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			title: 'Live Pricing',
 			description: 'Show the actual product price and availability at the moment the email is opened.',
 			iconPath: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			title: 'Weather-Based',
@@ -169,7 +169,7 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 	<!-- Hero Section -->
@@ -197,7 +197,7 @@
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
 				Each recipient sees a different image — personalized at open time. Embed a single Pictify URL.
 				When the email opens, the image renders with the recipient's name, city, device, or live data.
-				<span class="font-black text-gray-900 bg-[#ffc480] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">No ESP plugins needed.</span>
+				<span class="font-black text-gray-900 bg-brand-accent px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">No ESP plugins needed.</span>
 			</p>
 
 			<div class="flex flex-col sm:flex-row gap-6 justify-center">
@@ -252,7 +252,7 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0 border-l-[3px] border-dashed border-gray-900"></div>
 
 				{#each steps as step, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -295,7 +295,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
 				{#each useCases as useCase, i}
-					{@const colors = ['bg-[#4ade80]', 'bg-[#ff6b6b]', 'bg-[#ffc480]', 'bg-[#7dd3fc]']}
+					{@const colors = ['bg-[#4ade80]', 'bg-brand-danger', 'bg-brand-accent', 'bg-[#7dd3fc]']}
 					{@const rotations = ['rotate-1', '-rotate-1', '-rotate-1', 'rotate-1']}
 					<div
 						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
@@ -320,13 +320,13 @@
 								<div class="w-full max-w-[280px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden p-6 text-center">
 									<p class="font-black text-2xl text-gray-900 leading-tight">
 										Hey <span class="text-[#4ade80] inline-block px-1 border-b-[3px] border-gray-900 drop-shadow-[1px_1px_0_#fff] relative group-hover:scale-110 transition-transform">Alex</span>,<br />
-										Check out deals in <span class="bg-[#ffc480] px-2 py-0.5 rounded border-2 border-gray-900 shadow-sm inline-block transform rotate-2 relative group-hover:-rotate-2 transition-transform">Seattle</span>
+										Check out deals in <span class="bg-brand-accent px-2 py-0.5 rounded border-2 border-gray-900 shadow-sm inline-block transform rotate-2 relative group-hover:-rotate-2 transition-transform">Seattle</span>
 									</p>
 								</div>
 							{:else if i === 1}
 								<!-- Countdown Timer Visual -->
 								<div class="w-full max-w-[240px] bg-gray-900 border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#ff6b6b] flex flex-col relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_#ff6b6b] transition-all overflow-hidden p-4 text-center">
-									<div class="text-[10px] font-black text-[#ff6b6b] uppercase tracking-widest mb-3 animate-pulse">Flash Sale Ends In</div>
+									<div class="text-[10px] font-black text-brand-danger uppercase tracking-widest mb-3 animate-pulse">Flash Sale Ends In</div>
 									<div class="flex justify-center gap-3 font-black font-mono text-3xl text-white leading-none">
 										<div class="flex flex-col bg-gray-800 p-2 rounded border-2 border-gray-700"><span>12</span><span class="text-[8px] text-gray-400 tracking-widest mt-1">HRS</span></div>
 										<div class="text-gray-500 self-center pb-3">:</div>
@@ -341,11 +341,11 @@
 											<!-- Placeholder image area -->
 											<svg class="w-full h-full text-gray-400 p-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
 										</div>
-										<div class="w-2/3 p-4 flex flex-col justify-center bg-[#ffc480]/20">
+										<div class="w-2/3 p-4 flex flex-col justify-center bg-brand-accent/20">
 											<div class="w-3/4 h-3 bg-gray-300 rounded mb-2"></div>
 											<div class="text-2xl font-black text-gray-900 relative inline-block self-start">
 												$89.99
-												<span class="absolute -top-3 -right-6 text-xs text-[#ff6b6b] line-through transform rotate-12 bg-white px-1 border border-gray-300 rounded">$120</span>
+												<span class="absolute -top-3 -right-6 text-xs text-brand-danger line-through transform rotate-12 bg-white px-1 border border-gray-300 rounded">$120</span>
 											</div>
 										</div>
 									</div>
@@ -375,7 +375,7 @@
 	</section>
 
 	<!-- ESP Integration Guides -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#ffc480]/10 border-y-[3px] border-gray-900 relative overflow-hidden">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-brand-accent/10 border-y-[3px] border-gray-900 relative overflow-hidden">
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
 				<div class="inline-block px-4 py-1.5 bg-[#4ade80] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-1">
@@ -396,7 +396,7 @@
 						on:click={() => (activeEsp = key)}
 						class="px-6 py-3 font-black text-lg border-[3px] border-gray-900 transition-all duration-200 rounded-xl
 							{activeEsp === key
-								? 'bg-gray-900 text-[#ffc480] shadow-[2px_2px_0_0_#1f2937] translate-y-1'
+								? 'bg-gray-900 text-brand-accent shadow-[2px_2px_0_0_#1f2937] translate-y-1'
 								: 'bg-white text-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-y-1 hover:bg-gray-50'}"
 					>
 						{esp.name}
@@ -456,15 +456,15 @@
 								<h4 class="font-black text-xl text-gray-900 mb-4">How to Use</h4>
 								<ol class="space-y-4 text-gray-800 font-medium">
 									<li class="flex items-start gap-3">
-										<div class="w-6 h-6 rounded bg-[#ffc480] text-gray-900 font-black flex items-center justify-center flex-shrink-0 border-2 border-gray-900">1</div>
+										<div class="w-6 h-6 rounded bg-brand-accent text-gray-900 font-black flex items-center justify-center flex-shrink-0 border-2 border-gray-900">1</div>
 										Copy the URL above
 									</li>
 									<li class="flex items-start gap-3">
-										<div class="w-6 h-6 rounded bg-[#ffc480] text-gray-900 font-black flex items-center justify-center flex-shrink-0 border-2 border-gray-900">2</div>
+										<div class="w-6 h-6 rounded bg-brand-accent text-gray-900 font-black flex items-center justify-center flex-shrink-0 border-2 border-gray-900">2</div>
 										In your {currentEsp.name} editor, add an Image block
 									</li>
 									<li class="flex items-start gap-3">
-										<div class="w-6 h-6 rounded bg-[#ffc480] text-gray-900 font-black flex items-center justify-center flex-shrink-0 border-2 border-gray-900">3</div>
+										<div class="w-6 h-6 rounded bg-brand-accent text-gray-900 font-black flex items-center justify-center flex-shrink-0 border-2 border-gray-900">3</div>
 										Paste the URL as the image <code class="bg-gray-200 px-1 border border-gray-400 rounded">src</code>
 									</li>
 								</ol>
@@ -473,7 +473,7 @@
 							<!-- Notes & Fallbacks -->
 							<div class="space-y-4 flex flex-col justify-between">
 								{#if currentEsp.note}
-									<div class="p-5 bg-[#ffc480]/20 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#ffc480]">
+									<div class="p-5 bg-brand-accent/20 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#ffc480]">
 										<p class="text-sm font-bold text-gray-900 flex items-start gap-2">
 											<svg class="w-5 h-5 text-[#f43f5e] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -510,7 +510,7 @@
 				</h4>
 				<ul class="space-y-3 text-lg text-gray-800 font-medium relative z-10">
 					<li class="flex gap-2"><span class="font-black text-[#5ce1e6] drop-shadow-[1px_1px_0_#1f2937]">Safe:</span> Personalized URLs are unique per recipient — Gmail caches each one separately.</li>
-					<li class="flex gap-2"><span class="font-black text-[#ffc480] drop-shadow-[1px_1px_0_#1f2937]">Notice:</span> Same recipient opening twice sees the cached version from first open (affects countdown timers).</li>
+					<li class="flex gap-2"><span class="font-black text-brand-accent drop-shadow-[1px_1px_0_#1f2937]">Notice:</span> Same recipient opening twice sees the cached version from first open (affects countdown timers).</li>
 					<li class="flex gap-2"><span class="font-black text-[#f43f5e] drop-shadow-[1px_1px_0_#1f2937]">Action:</span> IP-based geolocation does NOT work in Gmail. Always pass city via merge tags.</li>
 				</ul>
 			</div>
@@ -547,7 +547,7 @@
 				</div>
 
 				<!-- Box 2 -->
-				<div class="p-8 bg-[#ffc480] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform -rotate-1 mt-4 sm:mt-0">
+				<div class="p-8 bg-brand-accent border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform -rotate-1 mt-4 sm:mt-0">
 					<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-900 shadow-sm">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
 					</div>
@@ -569,7 +569,7 @@
 				</div>
 
 				<!-- Box 4 -->
-				<div class="p-8 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform -rotate-1 mt-4 sm:mt-0">
+				<div class="p-8 bg-brand-danger border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 rounded-xl flex flex-col items-start gap-4 transform -rotate-1 mt-4 sm:mt-0">
 					<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-900 shadow-sm">
 						<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
 					</div>
@@ -594,7 +594,7 @@
 
 		<!-- Floating decorative elements -->
 		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
-		<div class="absolute bottom-10 left-10 w-24 h-24 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
+		<div class="absolute bottom-10 left-10 w-24 h-24 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4.5s;"></div>
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
@@ -657,7 +657,7 @@
 
 		<div class="max-w-3xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-danger text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Support</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -670,7 +670,7 @@
 					<div class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-0.5 rounded-xl transition-all overflow-hidden {openFaq === i ? 'ring-2 ring-gray-900 ring-offset-2' : ''}">
 						<button
 							on:click={() => (openFaq = openFaq === i ? -1 : i)}
-							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-[#ffc480]/20' : 'hover:bg-gray-50'}"
+							class="w-full text-left px-6 py-5 flex items-center justify-between font-black text-lg text-gray-900 {openFaq === i ? 'bg-brand-accent/20' : 'hover:bg-gray-50'}"
 						>
 							<span>{faq.q}</span>
 							<div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center bg-white flex-shrink-0 ml-4 {openFaq === i ? 'shadow-[inset_2px_2px_0_0_#a78bfa]' : ''}">
@@ -680,7 +680,7 @@
 							</div>
 						</button>
 						{#if openFaq === i}
-							<div class="px-6 pb-6 pt-2 text-gray-700 font-medium leading-relaxed bg-[#ffc480]/20 border-t-[3px] border-gray-900" transition:fly={{ y: -10, duration: 200 }}>
+							<div class="px-6 pb-6 pt-2 text-gray-700 font-medium leading-relaxed bg-brand-accent/20 border-t-[3px] border-gray-900" transition:fly={{ y: -10, duration: 200 }}>
 								{faq.a}
 							</div>
 						{/if}

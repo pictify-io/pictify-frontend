@@ -147,8 +147,8 @@
 	function getUsageColor(usage) {
 		if (!usage) return 'bg-gray-300';
 		const percentage = usage.limit > 0 ? (usage.count / usage.limit) * 100 : 0;
-		if (percentage >= 90) return 'bg-[#ff6b6b]';
-		if (percentage >= 75) return 'bg-[#ffc480]';
+		if (percentage >= 90) return 'bg-brand-danger';
+		if (percentage >= 75) return 'bg-brand-accent';
 		return 'bg-[#4ade80]';
 	}
 
@@ -173,7 +173,7 @@
 		<div class="flex items-center min-w-0">
 			<!-- Team Avatar/Icon -->
 			<div
-				class="w-9 h-9 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-9 h-9 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
 			>
 				{#if $currentTeam?.avatar}
 					<img
@@ -258,12 +258,12 @@
 						on:click={() => handleSwitchTeam(teamItem.team?.uid)}
 						role="option"
 						aria-selected={teamItem.team?.uid === $currentTeam?.uid}
-						class="w-full flex items-center px-4 py-3 hover:bg-[#FFFDF8] transition-colors text-left group
-							{teamItem.team?.uid === $currentTeam?.uid ? 'bg-[#FFFDF8]' : ''}"
+						class="w-full flex items-center px-4 py-3 hover:bg-brand-bg transition-colors text-left group
+							{teamItem.team?.uid === $currentTeam?.uid ? 'bg-brand-bg' : ''}"
 						disabled={loading}
 					>
 						<div
-							class="w-8 h-8 rounded-lg bg-gray-100 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 group-hover:bg-[#ffc480] transition-colors"
+							class="w-8 h-8 rounded-lg bg-gray-100 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-accent transition-colors"
 						>
 							{#if teamItem.team?.avatar}
 								<img
@@ -279,7 +279,7 @@
 						</div>
 						<div class="ml-3 min-w-0 flex-1">
 							<p
-								class="text-sm font-black text-gray-900 truncate group-hover:text-[#ff6b6b] transition-colors"
+								class="text-sm font-black text-gray-900 truncate group-hover:text-brand-danger transition-colors"
 							>
 								{teamItem.team?.name}
 							</p>
@@ -313,11 +313,11 @@
 						on:keydown={(e) => e.key === 'Enter' && handleCreateTeam()}
 					/>
 					{#if error}
-						<p class="text-xs font-bold text-[#ff6b6b] mb-2">{error}</p>
+						<p class="text-xs font-bold text-brand-danger mb-2">{error}</p>
 						{#if errorWithUpgrade}
 							<a
 								href="/dashboard/upgrade"
-								class="inline-block mb-2 text-xs font-black text-[#ff6b6b] uppercase tracking-wide border-b-2 border-[#ff6b6b] hover:text-red-600"
+								class="inline-block mb-2 text-xs font-black text-brand-danger uppercase tracking-wide border-b-2 border-brand-danger hover:text-red-600"
 							>
 								Upgrade Plan →
 							</a>
@@ -356,7 +356,7 @@
 								on:click={() => {
 									isOpen = false;
 								}}
-								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-[#ff6b6b] rounded-lg border-2 border-gray-900 hover:bg-[#ff5252] shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
+								class="flex items-center justify-center w-full px-3 py-2 text-xs font-black text-white bg-brand-danger rounded-lg border-2 border-gray-900 hover:bg-[#ff5252] shadow-[2px_2px_0_0_#1f2937] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all uppercase tracking-wider"
 							>
 								Upgrade
 							</a>

@@ -18,7 +18,7 @@
 	$: statusColor =
 		{
 			pending: 'bg-yellow-50',
-			executing: 'bg-[#ff6b6b]/10',
+			executing: 'bg-brand-danger/10',
 			validated: 'bg-green-50',
 			approved: 'bg-green-100',
 			rejected: 'bg-red-50',
@@ -58,7 +58,7 @@
 <div
 	class="step-card border-[3px] border-gray-900 rounded-lg p-4 mb-3 transition-all shadow-[4px_4px_0_0_#1f2937] {statusColor}"
 	class:ring-2={isActive}
-	class:ring-[#ff6b6b]={isActive}
+	class:ring-brand-danger={isActive}
 	transition:fly={{ y: 20, duration: 300 }}
 >
 	<!-- Header -->
@@ -145,7 +145,7 @@
 				</ul>
 			{/if}
 			{#if step.diffSummary.updated?.length}
-				<p class="text-xs text-[#ff6b6b] font-bold uppercase mt-1">Updated</p>
+				<p class="text-xs text-brand-danger font-bold uppercase mt-1">Updated</p>
 				<ul class="text-xs text-gray-700 list-disc list-inside font-medium">
 					{#each step.diffSummary.updated.slice(0, 3) as updatedEl}
 						<li>
@@ -246,7 +246,7 @@
 			/>
 			<button
 				on:click={() => onRegenerate(stepIndex, feedbackText)}
-				class="w-full bg-[#ffc480] hover:bg-[#ffb040] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
+				class="w-full bg-brand-accent hover:bg-[#ffb040] text-gray-900 text-xs font-black uppercase tracking-wide py-2 px-3 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 transition-all"
 			>
 				↻ Regenerate with Feedback
 			</button>

@@ -92,13 +92,13 @@
 		on:click|self={close}
 	>
 		<aside
-			class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l-[3px] border-gray-900 bg-[#FFFDF8] shadow-[-8px_0_0_0_#1f2937]"
+			class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l-[3px] border-gray-900 bg-brand-bg shadow-[-8px_0_0_0_#1f2937]"
 			role="dialog"
 			aria-modal="true"
 			aria-label="Template syntax reference"
 		>
 			<!-- Header -->
-			<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-5 py-4">
+			<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-5 py-4">
 				<div class="flex items-center gap-2">
 					<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
 						<i class="fa fa-book-open text-[12px] text-gray-900"></i>
@@ -150,7 +150,7 @@
 							<p class="mt-1.5 text-[12px] font-semibold leading-relaxed text-gray-700">
 								Anywhere in your HTML, wrap a name in double braces to substitute a value at render time.
 							</p>
-							<pre class="mt-2 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"><code>{`<h1>{{title}}</h1>
+							<pre class="mt-2 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-brand-accent"><code>{`<h1>{{title}}</h1>
 <p>{{subtitle}}</p>`}</code></pre>
 							<p class="mt-2 text-[11px] font-bold text-gray-600">
 								Undeclared names auto-add as text variables when you save.
@@ -158,7 +158,7 @@
 							<div class="mt-3 rounded-lg border-[2px] border-gray-900 bg-[#ffe066] px-3 py-2">
 								<p class="text-[11px] font-bold leading-snug text-gray-900">
 									<i class="fa fa-hand-pointer mr-1 text-[10px]"></i>
-									<strong class="font-black">⌘-click</strong> a <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{token}}'}</code> to open the variable inspector. A plain click just places the caret for normal editing.
+									<strong class="font-black">⌘-click</strong> a <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{token}}'}</code> to open the variable inspector. A plain click just places the caret for normal editing.
 								</p>
 							</div>
 						</section>
@@ -170,13 +170,13 @@
 							<p class="mt-1.5 text-[12px] font-semibold leading-relaxed text-gray-700">
 								Show a block only when a value is truthy.
 							</p>
-							<pre class="mt-2 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"><code>{`{{#if isPremium}}
+							<pre class="mt-2 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-brand-accent"><code>{`{{#if isPremium}}
   <span>Pro member</span>
 {{else}}
   <span>Free</span>
 {{/if}}`}</code></pre>
 							<p class="mt-2 text-[11px] font-bold text-gray-600">
-								<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{#unless}}'}</code>
+								<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{#unless}}'}</code>
 								is the opposite — renders when falsy.
 							</p>
 						</section>
@@ -188,24 +188,24 @@
 							<p class="mt-1.5 text-[12px] font-semibold leading-relaxed text-gray-700">
 								Iterate over an array. Reference the current item with <code class="font-mono">this</code>.
 							</p>
-							<pre class="mt-2 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-[#ffc480]"><code>{`{{#each items}}
+							<pre class="mt-2 overflow-hidden rounded-lg border-[2px] border-gray-900 bg-gray-900 p-3 font-mono text-[11px] leading-relaxed text-brand-accent"><code>{`{{#each items}}
   <li>{{this.name}} — {{currency this.price "USD"}}</li>
 {{/each}}`}</code></pre>
 							<p class="mt-2 text-[11px] font-bold text-gray-600">
-								<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{@index}}'}</code>
+								<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{@index}}'}</code>
 								gives you the current position,
-								<code class="ml-1 rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{@first}}'}</code>
+								<code class="ml-1 rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{@first}}'}</code>
 								and
-								<code class="ml-1 rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{@last}}'}</code>
+								<code class="ml-1 rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{@last}}'}</code>
 								are handy for styling rows.
 							</p>
 							<div class="mt-3 rounded-lg border-[2px] border-gray-900 bg-[#ffe066] px-3 py-2">
 								<p class="text-[11px] font-bold leading-snug text-gray-900">
 									<i class="fa fa-cube mr-1 text-[10px]"></i>
-									Set <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">items</code> to type
+									Set <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">items</code> to type
 									<strong class="font-black">Array</strong> in the Variables panel so the API accepts JSON payloads. Use
 									<strong class="font-black">Object</strong> for nested
-									<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-[#ffc480]">{'{{user.name}}'}</code> access.
+									<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{user.name}}'}</code> access.
 								</p>
 							</div>
 						</section>
@@ -215,9 +215,9 @@
 					<div class="space-y-5">
 						<p class="text-[12px] font-semibold leading-relaxed text-gray-700">
 							Call a helper by writing its name before the value:
-							<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{helper input "arg"}}'}</code>.
+							<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{helper input "arg"}}'}</code>.
 							Nest helpers with parentheses:
-							<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{uppercase (trim name)}}'}</code>.
+							<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{uppercase (trim name)}}'}</code>.
 						</p>
 
 						{#each HELPER_EXAMPLES as group}
@@ -229,7 +229,7 @@
 									{#each group.rows as row}
 										<div class="rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2">
 											<div class="flex items-center gap-2">
-												<span class="rounded border-[1.5px] border-gray-900 bg-[#ffc480] px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-gray-900">
+												<span class="rounded border-[1.5px] border-gray-900 bg-brand-accent px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-gray-900">
 													{row.name}
 												</span>
 												<code class="flex-1 truncate font-mono text-[11px] text-gray-900">{row.example}</code>
@@ -251,7 +251,7 @@
 								Values are HTML-escaped by default
 							</h3>
 							<p class="mt-1.5 text-[12px] font-semibold leading-relaxed text-gray-700">
-								<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{name}}'}</code>
+								<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{name}}'}</code>
 								treats the value as text. If <code class="font-mono">name</code> is
 								<code class="font-mono">&lt;script&gt;alert(1)&lt;/script&gt;</code>
 								it renders as literal text — safe by default.
@@ -259,9 +259,9 @@
 						</section>
 
 						<section>
-							<div class="rounded-lg border-[3px] border-gray-900 bg-[#ff6b6b]/10 p-4">
+							<div class="rounded-lg border-[3px] border-gray-900 bg-brand-danger/10 p-4">
 								<div class="flex items-center gap-2">
-									<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#ff6b6b] shadow-[2px_2px_0_0_#1f2937]">
+									<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-brand-danger shadow-[2px_2px_0_0_#1f2937]">
 										<i class="fa fa-triangle-exclamation text-[11px] text-white"></i>
 									</div>
 									<h3 class="text-[11px] font-black uppercase tracking-widest text-gray-900">
@@ -269,9 +269,9 @@
 									</h3>
 								</div>
 								<p class="mt-2 text-[12px] font-semibold leading-relaxed text-gray-800">
-									<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{{raw}}}'}</code>
+									<code class="rounded-md border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{{raw}}}'}</code>
 									(triple brace) skips escaping and injects the value as HTML. Only enable a variable's
-									<span class="rounded border-[1.5px] border-gray-900 bg-[#ff6b6b] px-1 py-0 font-black uppercase tracking-widest text-white">Raw HTML</span>
+									<span class="rounded border-[1.5px] border-gray-900 bg-brand-danger px-1 py-0 font-black uppercase tracking-widest text-white">Raw HTML</span>
 									toggle when you fully trust the source. Never use raw with user input.
 								</p>
 							</div>

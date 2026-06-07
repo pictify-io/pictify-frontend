@@ -103,7 +103,7 @@
 		<label
 			class="text-sm font-black uppercase tracking-widest text-gray-900 flex items-center gap-2"
 		>
-			<svg class="w-5 h-5 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24"
+			<svg class="w-5 h-5 text-brand-accent" fill="currentColor" viewBox="0 0 24 24"
 				><path
 					d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
 				/></svg
@@ -112,7 +112,7 @@
 		</label>
 		{#if preview.loading}
 			<span
-				class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#ffc480] bg-gray-900 px-2 py-1 rounded"
+				class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-brand-accent bg-gray-900 px-2 py-1 rounded"
 			>
 				<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
 					<circle

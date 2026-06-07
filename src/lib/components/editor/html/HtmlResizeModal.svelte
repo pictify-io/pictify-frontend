@@ -99,11 +99,11 @@
 		on:click|self={close}
 	>
 		<div
-			class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937]"
+			class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-[8px_8px_0_0_#1f2937]"
 		>
 			<!-- Header strip -->
 			<div
-				class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4"
+				class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4"
 			>
 				<div class="flex items-center gap-3">
 					<div
@@ -143,7 +143,7 @@
 							on:click={() => pickPreset(preset)}
 							class="flex flex-col gap-1 rounded-xl border-[3px] p-3 text-left transition-all
 								{active
-									? 'border-gray-900 bg-[#ffc480]/30 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
+									? 'border-gray-900 bg-brand-accent/30 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
 									: 'border-gray-900 bg-white hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]'}"
 						>
 							<div class="flex items-center gap-2">

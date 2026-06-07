@@ -177,8 +177,8 @@
 		>
 			<div class="font-black uppercase tracking-widest text-xs">NEXT_STEPS</div>
 			<div class="flex gap-2">
-				<div class="w-3 h-3 bg-[#ff6b6b] border border-black" />
-				<div class="w-3 h-3 bg-[#ffc480] border border-black" />
+				<div class="w-3 h-3 bg-brand-danger border border-black" />
+				<div class="w-3 h-3 bg-brand-accent border border-black" />
 				<div class="w-3 h-3 bg-[#4ade80] border border-black" />
 			</div>
 		</div>
@@ -194,7 +194,7 @@
 			<!-- Email Capture Banner (shown for non-logged-in users) -->
 			{#if showEmailForm}
 				<div
-					class="mb-6 p-5 bg-gradient-to-r from-[#ffc480] to-[#ffb347] border-[3px] border-black shadow-[4px_4px_0_0_#000]"
+					class="mb-6 p-5 bg-gradient-to-r from-brand-accent to-[#ffb347] border-[3px] border-black shadow-[4px_4px_0_0_#000]"
 				>
 					<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 						<div class="flex-1">
@@ -303,7 +303,7 @@
 			{/if}
 
 			<!-- Save as template — full-width horizontal card -->
-			<div class="border-[3px] border-black bg-[#FFFDF8] shadow-[4px_4px_0_0_#000] p-5">
+			<div class="border-[3px] border-black bg-brand-bg shadow-[4px_4px_0_0_#000] p-5">
 				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 					<div class="flex-1">
 						<h4 class="text-sm font-black uppercase tracking-widest">Save as template</h4>
@@ -314,7 +314,7 @@
 					</div>
 					<div class="flex flex-col sm:flex-row gap-2 sm:flex-shrink-0">
 						<button
-							class="py-3 px-6 bg-[#ff6b6b] text-white border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap"
+							class="py-3 px-6 bg-brand-danger text-white border-[3px] border-black font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap"
 							type="button"
 							on:click={saveDraftAndOpenWorkspace}
 							disabled={!templateDraft}
@@ -337,7 +337,7 @@
 			<!-- API request + Batch example — two-column on wider screens -->
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
 				<!-- Copy API request -->
-				<div class="border-[3px] border-black bg-[#FFFDF8] shadow-[4px_4px_0_0_#000] p-5">
+				<div class="border-[3px] border-black bg-brand-bg shadow-[4px_4px_0_0_#000] p-5">
 					<div class="flex items-center justify-between gap-3">
 						<h4 class="text-sm font-black uppercase tracking-widest">Copy API request</h4>
 						<button
@@ -359,11 +359,11 @@
 				</div>
 
 				<!-- Batch example -->
-				<div class="border-[3px] border-black bg-[#FFFDF8] shadow-[4px_4px_0_0_#000] p-5">
+				<div class="border-[3px] border-black bg-brand-bg shadow-[4px_4px_0_0_#000] p-5">
 					<div class="flex items-center justify-between gap-3">
 						<h4 class="text-sm font-black uppercase tracking-widest">Batch 1,000 variants</h4>
 						<button
-							class="px-3 py-1.5 bg-[#ffc480] border-[2px] border-black font-black text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="px-3 py-1.5 bg-brand-accent border-[2px] border-black font-black text-xs uppercase shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							type="button"
 							on:click={() => copy(effectiveBatchSnippet, 'Batch example copied')}
 						>
@@ -391,7 +391,7 @@
 					<a
 						href="/signup"
 						on:click={() => analytics.track('tool_signup_click', { tool_name: toolName, cta_location: 'next_steps' })}
-						class="text-sm font-black uppercase tracking-wide text-[#ff6b6b] hover:underline underline-offset-4 flex items-center gap-1"
+						class="text-sm font-black uppercase tracking-wide text-brand-danger hover:underline underline-offset-4 flex items-center gap-1"
 					>
 						Join them free
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

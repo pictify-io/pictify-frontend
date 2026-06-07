@@ -241,7 +241,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -249,10 +249,10 @@
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ff6b6b]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-danger/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
@@ -268,7 +268,7 @@
 
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Optimize Every <br />
-				<span class="relative inline-block text-[#ff6b6b] transform rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					Visual
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
@@ -300,7 +300,7 @@
 				<div class="p-8 md:p-10 flex-1 flex flex-col">
 					<div class="flex items-center gap-4 mb-6">
 						<div
-							class="w-14 h-14 bg-[#ffc480] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform"
+							class="w-14 h-14 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform"
 						>
 							<span class="font-black text-2xl">A/B</span>
 						</div>
@@ -392,7 +392,7 @@
 						</div>
 
 						<button
-							class="w-full mt-4 py-3 bg-[#ffc480] text-black font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+							class="w-full mt-4 py-3 bg-brand-accent text-black font-black uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
 							on:click={switchVariant}
 						>
 							Force Switch Traffic
@@ -439,7 +439,7 @@
 						</div>
 
 						<div class="space-y-5">
-							{#each [{ label: 'Variant A', color: 'bg-blue-500', width: barWidths[0] }, { label: 'Variant B', color: 'bg-purple-500', width: barWidths[1] }, { label: 'Variant C', color: 'bg-[#ff6b6b]', width: barWidths[2] }] as bar}
+							{#each [{ label: 'Variant A', color: 'bg-blue-500', width: barWidths[0] }, { label: 'Variant B', color: 'bg-purple-500', width: barWidths[1] }, { label: 'Variant C', color: 'bg-brand-danger', width: barWidths[2] }] as bar}
 								<div>
 									<div class="flex justify-between text-xs font-black text-black mb-1.5 uppercase">
 										<span>{bar.label}</span>
@@ -541,7 +541,7 @@
 									/></svg
 								>
 								<span
-									class="px-2 py-1 bg-[#ffc480] text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-[2px_2px_0_0_#1f2937]"
+									class="px-2 py-1 bg-brand-accent text-black text-[10px] font-black rounded border-[2px] border-gray-900 uppercase shadow-[2px_2px_0_0_#1f2937]"
 									>Map</span
 								>
 								<svg
@@ -570,8 +570,8 @@
 									class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 								>
 									<div class="px-4 flex gap-1.5 h-full items-center py-3">
-										<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#ffc480] border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
 										<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
 									</div>
 									<div
@@ -663,7 +663,7 @@
 												{#if viewerContext.device?.type === 'mobile'} Mobile {:else} Desktop {/if}
 											</span>
 											<span
-												class="px-2 py-0.5 bg-[#ffc480] text-black text-[9px] sm:text-[10px] font-bold rounded shadow-[2px_2px_0_0_#1f2937] border-[2px] border-gray-900"
+												class="px-2 py-0.5 bg-brand-accent text-black text-[9px] sm:text-[10px] font-bold rounded shadow-[2px_2px_0_0_#1f2937] border-[2px] border-gray-900"
 												>{viewerContext.geo?.country ||
 													CONTINENT_NAMES[viewerContext.geo?.continent] ||
 													'Earth'}</span
@@ -691,8 +691,8 @@
 									class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 								>
 									<div class="px-4 flex gap-1.5 h-full items-center py-3">
-										<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900" />
-										<div class="w-3 h-3 rounded-full bg-[#ffc480] border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
+										<div class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
 										<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
 									</div>
 									<div

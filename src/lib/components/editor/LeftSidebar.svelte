@@ -25,14 +25,14 @@
 </script>
 
 <div
-	class="w-16 bg-[#FFFDF8] border-r-[3px] border-gray-900 flex flex-col items-center py-6 h-full z-10 flex-shrink-0"
+	class="w-16 bg-brand-bg border-r-[3px] border-gray-900 flex flex-col items-center py-6 h-full z-10 flex-shrink-0"
 >
 	{#each tabs as tab}
 		<button
 			class="w-10 h-10 flex flex-col items-center justify-center mb-4 rounded-lg transition-all duration-200 group relative border-[2px]
 			{$activeSidebarTab === tab.id
 				? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0_0_#ffc480] translate-x-[1px] translate-y-[1px]'
-				: 'bg-white text-gray-900 border-gray-900 hover:bg-[#ffc480] shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}"
+				: 'bg-white text-gray-900 border-gray-900 hover:bg-brand-accent shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}"
 			on:click={() => setActive(tab.id)}
 			title={tab.label}
 		>

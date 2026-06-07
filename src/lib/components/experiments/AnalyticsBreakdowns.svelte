@@ -14,8 +14,8 @@
 
 	const channelColors = {
 		web: 'bg-[#60a5fa]',
-		email: 'bg-[#ffc480]',
-		ad: 'bg-[#ff6b6b]',
+		email: 'bg-brand-accent',
+		ad: 'bg-brand-danger',
 		social: 'bg-[#a78bfa]',
 		'in-app': 'bg-[#4ade80]',
 		other: 'bg-gray-400'
@@ -24,7 +24,7 @@
 	const deviceColors = {
 		desktop: 'bg-[#60a5fa]',
 		mobile: 'bg-[#4ade80]',
-		tablet: 'bg-[#ffc480]'
+		tablet: 'bg-brand-accent'
 	};
 </script>
 

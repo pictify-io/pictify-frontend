@@ -838,7 +838,7 @@
 						Rule-Based Routing
 					</p>
 				</div>
-				<div class="p-6 space-y-6 bg-[#FFFDF8]">
+				<div class="p-6 space-y-6 bg-brand-bg">
 					<!-- Name -->
 					<div>
 						<label
@@ -853,7 +853,7 @@
 							bind:value={form.name}
 							on:input={handleNameInput}
 							placeholder="e.g. Mobile vs Desktop Banner"
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						/>
 					</div>
 
@@ -998,7 +998,7 @@
 											on:click={() => (form.outputConfig.format = fmt.value)}
 											class="flex-1 px-4 py-3 border-[3px] rounded-xl text-center text-sm font-black uppercase tracking-widest transition-all
 												{form.outputConfig.format === fmt.value
-												? 'border-gray-900 bg-[#ffc480]/20 shadow-[4px_4px_0_0_#1f2937] text-gray-900 -translate-y-[2px]'
+												? 'border-gray-900 bg-brand-accent/20 shadow-[4px_4px_0_0_#1f2937] text-gray-900 -translate-y-[2px]'
 												: 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
 										>
 											{fmt.label}
@@ -1190,7 +1190,7 @@
 																bind:value={row.value}
 																on:input={() => syncVarsFromEditor(fallbackIndex)}
 																placeholder="Override value or use dynamic tags →"
-																class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
+																class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-brand-bg transition-colors"
 															/>
 															{#if contextVariables.length > 0}
 																<button
@@ -1199,7 +1199,7 @@
 																	class="px-2 py-2 border-[2px] rounded-lg text-xs font-black transition-all shrink-0 {showContextVars[
 																		`${fallbackIndex}-${rowIndex}`
 																	]
-																		? 'border-[#ffc480] bg-[#ffc480]/20 text-gray-900'
+																		? 'border-brand-accent bg-brand-accent/20 text-gray-900'
 																		: 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
 																	title="Insert dynamic context variable"
 																>
@@ -1221,7 +1221,7 @@
 													</div>
 													{#if showContextVars[`${fallbackIndex}-${rowIndex}`]}
 														<div
-															class="ml-0 sm:ml-[calc(33.333%+0.5rem)] p-3 bg-gray-50 border-[2px] border-dashed border-[#ffc480] rounded-lg"
+															class="ml-0 sm:ml-[calc(33.333%+0.5rem)] p-3 bg-gray-50 border-[2px] border-dashed border-brand-accent rounded-lg"
 															transition:slide={{ duration: 150 }}
 														>
 															<p
@@ -1281,7 +1281,7 @@
 											class="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1.5"
 										>
 											<svg
-												class="w-3.5 h-3.5 text-[#ffc480]"
+												class="w-3.5 h-3.5 text-brand-accent"
 												fill="currentColor"
 												viewBox="0 0 24 24"
 												><path
@@ -1582,7 +1582,7 @@
 																			bind:value={row.value}
 																			on:input={() => syncVarsFromEditor(index)}
 																			placeholder="Override value or use dynamic tags →"
-																			class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
+																			class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-brand-bg transition-colors"
 																		/>
 																		{#if contextVariables.length > 0}
 																			<button
@@ -1591,7 +1591,7 @@
 																				class="px-2 py-2 border-[2px] rounded-lg text-xs font-black transition-all shrink-0 {showContextVars[
 																					`${index}-${rowIndex}`
 																				]
-																					? 'border-[#ffc480] bg-[#ffc480]/20 text-gray-900'
+																					? 'border-brand-accent bg-brand-accent/20 text-gray-900'
 																					: 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
 																				title="Insert dynamic context variable"
 																			>
@@ -1613,7 +1613,7 @@
 																</div>
 																{#if showContextVars[`${index}-${rowIndex}`]}
 																	<div
-																		class="ml-0 sm:ml-[calc(33.333%+0.5rem)] p-3 bg-gray-50 border-[2px] border-dashed border-[#ffc480] rounded-lg"
+																		class="ml-0 sm:ml-[calc(33.333%+0.5rem)] p-3 bg-gray-50 border-[2px] border-dashed border-brand-accent rounded-lg"
 																		transition:slide={{ duration: 150 }}
 																	>
 																		<p
@@ -1669,7 +1669,7 @@
 														class="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1.5"
 													>
 														<svg
-															class="w-3.5 h-3.5 text-[#ffc480]"
+															class="w-3.5 h-3.5 text-brand-accent"
 															fill="currentColor"
 															viewBox="0 0 24 24"
 															><path

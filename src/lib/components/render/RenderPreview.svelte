@@ -71,7 +71,7 @@
 				<div class="relative w-20 h-20 mx-auto mb-6">
 					<div class="absolute inset-0 border-[6px] border-gray-200 rounded-full" />
 					<div
-						class="absolute inset-0 border-[6px] border-[#ff6b6b] rounded-full border-t-transparent animate-spin"
+						class="absolute inset-0 border-[6px] border-brand-danger rounded-full border-t-transparent animate-spin"
 					/>
 				</div>
 				<p class="text-sm font-black text-gray-900 uppercase tracking-widest animate-pulse">
@@ -84,7 +84,7 @@
 					class="w-20 h-20 mx-auto mb-6 bg-red-100 border-[3px] border-red-200 rounded-full flex items-center justify-center"
 				>
 					<svg
-						class="w-10 h-10 text-[#ff6b6b]"
+						class="w-10 h-10 text-brand-danger"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -102,7 +102,7 @@
 			</div>
 		{:else if renderResult?.url}
 			<div
-				class="relative w-full h-full p-6 flex items-center justify-center bg-[#FFFDF8]"
+				class="relative w-full h-full p-6 flex items-center justify-center bg-brand-bg"
 				style="min-height: 400px;"
 			>
 				{#if !imgLoaded}
@@ -110,7 +110,7 @@
 						<div class="relative w-16 h-16 mx-auto mb-4">
 							<div class="absolute inset-0 border-[5px] border-gray-200 rounded-full" />
 							<div
-								class="absolute inset-0 border-[5px] border-[#ffc480] rounded-full border-t-transparent animate-spin"
+								class="absolute inset-0 border-[5px] border-brand-accent rounded-full border-t-transparent animate-spin"
 							/>
 						</div>
 						<p class="text-xs font-black text-gray-500 uppercase tracking-widest">

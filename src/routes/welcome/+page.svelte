@@ -163,13 +163,13 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<section class="min-h-screen w-full bg-[#FFFDF8] relative overflow-hidden">
+<section class="min-h-screen w-full bg-brand-bg relative overflow-hidden">
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
 	/>
 	<div
-		class="absolute top-0 right-0 w-96 h-96 bg-[#ffc480]/30 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 right-0 w-96 h-96 bg-brand-accent/30 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
 		class="absolute bottom-0 left-0 w-96 h-96 bg-[#4ade80]/15 rounded-full blur-[100px] -z-10 pointer-events-none"
@@ -178,7 +178,7 @@
 	<div class="relative z-10 mx-auto max-w-5xl px-4 py-10 md:py-14">
 		<div class="mb-8 flex items-center justify-between">
 			<div
-				class="inline-block px-5 py-1.5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full -rotate-1"
+				class="inline-block px-5 py-1.5 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full -rotate-1"
 			>
 				<span class="text-xl font-black tracking-tight">Pictify</span>
 			</div>
@@ -223,7 +223,7 @@
 								href={lastRender.url}
 								target="_blank"
 								rel="noopener"
-								class="text-sm font-mono break-all text-[#ff6b6b] hover:underline"
+								class="text-sm font-mono break-all text-brand-danger hover:underline"
 							>
 								{lastRender.url}
 							</a>
@@ -233,7 +233,7 @@
 							<p class="text-sm font-bold text-gray-500 mb-2">
 								No prior render found — we filled in a placeholder.
 							</p>
-							<a href="/tools" class="text-sm font-black text-[#ff6b6b] hover:underline"
+							<a href="/tools" class="text-sm font-black text-brand-danger hover:underline"
 								>Try a free tool first →</a
 							>
 						</div>
@@ -279,7 +279,7 @@
 						class="bg-[#1e1e1e] text-[#dcdcaa] text-xs font-mono p-4 overflow-auto border-[2px] border-black h-full max-h-[260px] whitespace-pre">{curlCommand}</pre>
 					<button
 						on:click={copyCurl}
-						class="absolute top-2 right-2 px-2 py-1 bg-white border-[2px] border-black font-black text-[10px] uppercase tracking-wide hover:bg-[#ffc480] transition-colors"
+						class="absolute top-2 right-2 px-2 py-1 bg-white border-[2px] border-black font-black text-[10px] uppercase tracking-wide hover:bg-brand-accent transition-colors"
 					>
 						Copy cURL
 					</button>
@@ -325,7 +325,7 @@
 							href={runResultUrl}
 							target="_blank"
 							rel="noopener"
-							class="text-sm font-mono truncate block text-[#ff6b6b] hover:underline"
+							class="text-sm font-mono truncate block text-brand-danger hover:underline"
 						>
 							{runResultUrl}
 						</a>
@@ -333,7 +333,7 @@
 				</div>
 			{/if}
 			{#if runState === 'error'}
-				<div class="mt-4 border-[2px] border-[#ff6b6b] bg-[#ff6b6b]/10 p-3 text-sm font-bold text-[#ff6b6b]">
+				<div class="mt-4 border-[2px] border-brand-danger bg-brand-danger/10 p-3 text-sm font-bold text-brand-danger">
 					{runError}
 				</div>
 			{/if}
@@ -350,14 +350,14 @@
 			<a
 				href="/pricing"
 				on:click={ctaClicked}
-				class="flex-shrink-0 px-6 py-3 border-[3px] border-black font-black text-base uppercase tracking-wide bg-[#ff6b6b] text-black shadow-[4px_4px_0_0_black] hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="flex-shrink-0 px-6 py-3 border-[3px] border-black font-black text-base uppercase tracking-wide bg-brand-danger text-black shadow-[4px_4px_0_0_black] hover:shadow-[2px_2px_0_0_black] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				See pricing →
 			</a>
 		</div>
 
 		<div class="mt-8 text-center text-sm font-medium text-gray-500">
-			Already comfortable? <a href="/dashboard" on:click={skipToDashboard} class="font-black text-black hover:text-[#ff6b6b] hover:underline"
+			Already comfortable? <a href="/dashboard" on:click={skipToDashboard} class="font-black text-black hover:text-brand-danger hover:underline"
 				>Jump to the dashboard</a
 			>
 		</div>

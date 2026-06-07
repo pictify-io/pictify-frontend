@@ -172,9 +172,9 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+<div class="flex h-full w-full flex-col bg-brand-bg">
 	<!-- Header strip -->
-	<div class="border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4">
+	<div class="border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 		<div class="flex items-center justify-between gap-3">
 			<div class="flex items-center gap-2">
 				<div class="flex h-8 w-8 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
@@ -345,14 +345,14 @@
 	<div class="border-t-[3px] border-gray-900 bg-white px-6 py-2">
 		<p class="text-[10px] font-bold leading-snug text-gray-600">
 			{#if activeType === 'colors'}
-				<i class="fa fa-lightbulb mr-1 text-[10px] text-[#ffc480]"></i>
+				<i class="fa fa-lightbulb mr-1 text-[10px] text-brand-accent"></i>
 				Inserts the hex value — paste inside a <code class="font-mono">style=</code> attribute.
 			{:else if activeType === 'fonts'}
-				<i class="fa fa-lightbulb mr-1 text-[10px] text-[#ffc480]"></i>
+				<i class="fa fa-lightbulb mr-1 text-[10px] text-brand-accent"></i>
 				Inserts a <code class="font-mono">@font-face</code> / Google Fonts link plus the
 				<code class="font-mono">font-family</code> rule.
 			{:else}
-				<i class="fa fa-lightbulb mr-1 text-[10px] text-[#ffc480]"></i>
+				<i class="fa fa-lightbulb mr-1 text-[10px] text-brand-accent"></i>
 				Inserts an <code class="font-mono">&lt;img&gt;</code> tag with a CDN URL and sensible defaults.
 			{/if}
 		</p>

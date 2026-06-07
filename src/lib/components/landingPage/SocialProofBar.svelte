@@ -7,7 +7,7 @@
 	];
 </script>
 
-<section class="w-full py-10 bg-[#FFFDF8] relative">
+<section class="w-full py-10 bg-brand-bg relative">
 	<div class="max-w-6xl mx-auto px-6">
 		<!-- Stat Pills Row -->
 		<div class="flex flex-wrap justify-center gap-4 mb-6">

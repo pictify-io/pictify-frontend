@@ -101,7 +101,7 @@
 					<a
 						href="/solutions/automated-image-generation"
 						on:click={() => trackClick('back_to_pillar')}
-						class="underline font-black text-gray-900 hover:text-[#ff6b6b] transition-colors"
+						class="underline font-black text-gray-900 hover:text-brand-danger transition-colors"
 					>Read the automated image generation guide →</a>
 				</p>
 			{/if}

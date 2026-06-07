@@ -143,15 +143,15 @@
 </script>
 
 <div
-	class="w-full bg-[#FFFDF8] h-full flex flex-col transition-all duration-300 z-0 overflow-hidden"
+	class="w-full bg-brand-bg h-full flex flex-col transition-all duration-300 z-0 overflow-hidden"
 >
 	{#if displayTab === 'copilot'}
 		<CopilotPanel />
 	{:else}
-		<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+		<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-brand-bg">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">{displayTab}</h3>
 		</div>
-		<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-[#FFFDF8]">
+		<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-brand-bg">
 			{#if displayTab === 'elements'}
 				<ShapesIconsLibrary />
 			{:else if displayTab === 'text'}
@@ -211,7 +211,7 @@
 							>
 								<div class="flex items-start gap-3">
 									<div
-										class="w-8 h-8 rounded bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
+										class="w-8 h-8 rounded bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
 									>
 										<i class="fa fa-align-left text-xs text-gray-900" />
 									</div>
@@ -235,7 +235,7 @@
 					<label class="block cursor-pointer">
 						<input type="file" accept="image/*" class="hidden" on:change={handleFileUpload} />
 						<div
-							class="w-full py-10 border-[3px] border-dashed border-gray-900 rounded-xl hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-3 group bg-[#FFFDF8]"
+							class="w-full py-10 border-[3px] border-dashed border-gray-900 rounded-xl hover:bg-gray-50 transition-all flex flex-col items-center justify-center gap-3 group bg-brand-bg"
 						>
 							<div
 								class="w-12 h-12 rounded-lg bg-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[4px_4px_0_0_#ffc480]"

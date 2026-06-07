@@ -263,10 +263,10 @@
 				>
 					<div class="flex items-center gap-1 sm:gap-1.5">
 						<div
-							class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ff6b6b] border border-gray-900"
+							class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-brand-danger border border-gray-900"
 						/>
 						<div
-							class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ffc480] border border-gray-900"
+							class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-brand-accent border border-gray-900"
 						/>
 						<div
 							class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#4ade80] border border-gray-900"
@@ -290,7 +290,7 @@
 						{/if}
 						{#if template.outputFormat === 'pdf'}
 							<span
-								class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-[#ff6b6b] text-white uppercase tracking-wider rounded border border-gray-900"
+								class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-brand-danger text-white uppercase tracking-wider rounded border border-gray-900"
 							>
 								PDF
 							</span>
@@ -368,7 +368,7 @@
 						class="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 pointer-events-none z-10"
 					>
 						<span
-							class="inline-flex items-center gap-1 px-2 py-1 bg-[#ffc480] text-gray-900 font-bold text-[10px] sm:text-xs uppercase tracking-wider rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+							class="inline-flex items-center gap-1 px-2 py-1 bg-brand-accent text-gray-900 font-bold text-[10px] sm:text-xs uppercase tracking-wider rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 						>
 							<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -492,7 +492,7 @@
 						>
 					</button>
 					<button
-						class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-[#ff6b6b] hover:bg-[#ff6b6b]/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
+						class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 text-gray-500 hover:text-brand-danger hover:bg-brand-danger/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
 						{template.hasDynamicLink ? 'border-[#a855f7]' : 'border-gray-900'}"
 						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/bulk-render`)}
 						title="Batch render from CSV"
@@ -572,7 +572,7 @@
 			<div
 				class="flex items-center gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-sm"
 			>
-				<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse" />
+				<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full animate-pulse" />
 				<div class="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wide">
 					<span class="hidden sm:inline">Showing </span><span class="text-gray-900"
 						>{Math.min(pagination.page * pagination.limit, pagination.total)}</span

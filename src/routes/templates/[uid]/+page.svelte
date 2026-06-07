@@ -156,7 +156,7 @@
 	{/if}
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col">
+<div class="bg-brand-bg min-h-screen flex flex-col">
 	<Nav />
 
 	<main class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
@@ -200,7 +200,7 @@
 				<p class="text-gray-600 font-medium mb-6">{error}</p>
 				<a
 					href="/templates"
-					class="inline-block px-6 py-3 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="inline-block px-6 py-3 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Browse all templates
 				</a>
@@ -221,7 +221,7 @@
 							/>
 						{:else}
 							<div
-								class="w-full aspect-video flex items-center justify-center bg-gradient-to-br from-[#ffc480] to-[#ff6b6b]"
+								class="w-full aspect-video flex items-center justify-center bg-gradient-to-br from-brand-accent to-brand-danger"
 							>
 								<span class="text-white font-black text-6xl opacity-50"
 									>{template.name.charAt(0)}</span
@@ -274,7 +274,7 @@
 					<div class="mb-6">
 						<div class="flex items-center gap-3 mb-3">
 							<span
-								class="px-3 py-1 bg-[#ffc480] border-2 border-gray-900 text-xs font-black uppercase"
+								class="px-3 py-1 bg-brand-accent border-2 border-gray-900 text-xs font-black uppercase"
 							>
 								{formatLabel(template.category)}
 							</span>
@@ -311,7 +311,7 @@
 						<button
 							on:click={handleRemix}
 							disabled={forking}
-							class="w-full sm:w-auto px-8 py-4 bg-[#ff6b6b] text-white font-black text-lg uppercase tracking-wider border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+							class="w-full sm:w-auto px-8 py-4 bg-brand-danger text-white font-black text-lg uppercase tracking-wider border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{#if forking}
 								<span class="flex items-center justify-center gap-2">
@@ -411,7 +411,7 @@
 					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
 				>
 					<h3 class="font-black text-lg mb-2 flex items-center gap-2">
-						<svg class="w-5 h-5 text-[#ffc480]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+						<svg class="w-5 h-5 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 						</svg>
 						Create from scratch
@@ -424,7 +424,7 @@
 					class="block p-6 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#1f2937] transition-all"
 				>
 					<h3 class="font-black text-lg mb-2 flex items-center gap-2">
-						<svg class="w-5 h-5 text-[#ff6b6b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+						<svg class="w-5 h-5 text-brand-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
 						</svg>
 						Get API access

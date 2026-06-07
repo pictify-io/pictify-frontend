@@ -59,13 +59,13 @@
 	<title>Pictify.io: Email preferences</title>
 </svelte:head>
 
-<section class="flex justify-center items-center w-screen h-screen px-4 bg-[#FFFDF8]">
+<section class="flex justify-center items-center w-screen h-screen px-4 bg-brand-bg">
 	<div
 		class="w-full max-w-lg bg-white border-[3px] border-gray-900 rounded-xl p-8 sm:p-10 shadow-[8px_8px_0_0_#1f2937] relative overflow-hidden"
 	>
 		<!-- Decorative blobs -->
 		<div
-			class="absolute -top-10 -right-10 w-40 h-40 bg-[#ffc480] rounded-full blur-3xl opacity-20 pointer-events-none"
+			class="absolute -top-10 -right-10 w-40 h-40 bg-brand-accent rounded-full blur-3xl opacity-20 pointer-events-none"
 		/>
 		<div
 			class="absolute -bottom-10 -left-10 w-40 h-40 bg-[#4ade80] rounded-full blur-3xl opacity-20 pointer-events-none"
@@ -147,7 +147,7 @@
 					</div>
 				{:else if status === 'error'}
 					<div
-						class="border-[3px] border-gray-900 bg-[#ff6b6b] text-white rounded-xl p-5 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transform -rotate-1"
+						class="border-[3px] border-gray-900 bg-brand-danger text-white rounded-xl p-5 shadow-[4px_4px_0_0_#1f2937] flex items-start gap-4 transform -rotate-1"
 					>
 						<div
 							class="bg-white text-gray-900 rounded-full p-1 border-[2px] border-gray-900 flex-shrink-0"

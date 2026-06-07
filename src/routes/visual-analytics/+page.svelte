@@ -25,13 +25,13 @@
 			title: 'Channel Attribution',
 			description: 'See how images perform across web, email, ads, and social. Identify which channel delivers the highest conversion rate.',
 			iconPath: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			title: 'Device Performance',
 			description: 'Compare mobile vs desktop vs tablet performance. Optimize designs for the devices your audience actually uses.',
 			iconPath: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			title: 'Geographic Insights',
@@ -152,7 +152,7 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 	<!-- Hero Section -->
@@ -180,7 +180,7 @@
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12 leading-relaxed">
 				Every image becomes a measurable performance asset. Track impressions, clicks, and conversions
 				across channels, devices, and geographies.
-				<span class="font-black text-gray-900 bg-[#ffc480] px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Stop guessing. Start measuring.</span>
+				<span class="font-black text-gray-900 bg-brand-accent px-2 border-b-[3px] border-gray-900 mt-2 inline-block shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">Stop guessing. Start measuring.</span>
 			</p>
 
 			<div class="flex flex-col sm:flex-row gap-6 justify-center">
@@ -217,7 +217,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-1">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-1">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Capabilities</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
@@ -267,7 +267,7 @@
 
 			<div class="space-y-6">
 				{#each steps as step, i}
-					{@const colors = ['bg-[#4ade80]', 'bg-[#ffc480]', 'bg-[#ff6b6b]']}
+					{@const colors = ['bg-[#4ade80]', 'bg-brand-accent', 'bg-brand-danger']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -288,12 +288,12 @@
 	<SectionSeparator icon="star" />
 
 	<!-- The Flywheel -->
-	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-[#ffc480]/10 border-y-[3px] border-gray-900 relative overflow-hidden">
+	<section class="py-24 px-4 sm:px-6 lg:px-8 bg-brand-accent/10 border-y-[3px] border-gray-900 relative overflow-hidden">
 		<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 32px 32px;" />
 
 		<div class="max-w-5xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-danger text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">The Flywheel</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6">

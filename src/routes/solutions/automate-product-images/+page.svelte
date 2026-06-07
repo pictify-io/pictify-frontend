@@ -63,14 +63,14 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-[#ff6b6b]/15 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-brand-danger/15 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For E-commerce</span>
 		</div>
 		<h1
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
-			Automate product images<br /><span class="text-[#ff6b6b]">from your data.</span>
+			Automate product images<br /><span class="text-brand-danger">from your data.</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			Render catalog-scale cards, seasonal variants, and stock-aware banners from one template. One API, any catalog.
@@ -135,7 +135,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			The integration, end to end
 		</h2>
-		<ol class="space-y-5 list-decimal pl-6 marker:text-[#ff6b6b] marker:font-black">
+		<ol class="space-y-5 list-decimal pl-6 marker:text-brand-danger marker:font-black">
 			<li class="text-lg text-gray-700 leading-relaxed">
 				<strong>Design the template.</strong> Drag-and-drop editor, or paste HTML/CSS. Declare
 				variables for every field that changes per product: name, price, image URL, discount, stock.

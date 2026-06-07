@@ -10,7 +10,7 @@
 	let isHovering = false;
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-b-[3px] border-gray-900">
+<section class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-b-[3px] border-gray-900">
 	<!-- Background Pattern from Integrations/Experiments -->
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -62,9 +62,9 @@
 			>
 				
 				<!-- Mac Header -->
-				<div class="bg-[#ffc480] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between z-20">
+				<div class="bg-brand-accent px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between z-20">
 					<div class="flex gap-2">
-						<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-[2px] border-gray-900"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-[2px] border-gray-900"></div>
 					</div>
@@ -74,7 +74,7 @@
 					</div>
 				</div>
 
-				<div class="flex flex-col lg:flex-row lg:items-stretch bg-[#FFFDF8]">
+				<div class="flex flex-col lg:flex-row lg:items-stretch bg-brand-bg">
 					<!-- Left: Visual Illustration -->
 					<div class="w-full lg:w-[55%] min-h-[350px] lg:min-h-[400px] flex items-center justify-center border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-gray-900 relative overflow-hidden">
 						
@@ -93,7 +93,7 @@
 						<!-- Center Data Node -->
 						<div class="absolute z-30 flex flex-col items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 							<div class="w-20 h-20 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[6px_6px_0_0_#ff6b6b] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[8px_8px_0_0_#ff6b6b] transition-all duration-300 relative">
-								<div class="absolute -top-3 -right-3 w-8 h-8 bg-[#ffc480] border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#1f2937] z-10">
+								<div class="absolute -top-3 -right-3 w-8 h-8 bg-brand-accent border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#1f2937] z-10">
 									<svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 								</div>
 								<span class="font-black text-3xl text-gray-900">{`{}`}</span>
@@ -140,7 +140,7 @@
 							</div>
 							<h3 class="text-3xl font-black text-gray-900 mb-3 leading-tight">Generate All Sizes At Once</h3>
 							<p class="text-sm font-medium text-gray-600 leading-relaxed max-w-sm">
-								Send a single API request with an array of <span class="text-gray-900 font-bold bg-[#ffc480] px-1 border border-gray-900 rounded">layouts</span> and receive optimized images formatted for every social channel instantly.
+								Send a single API request with an array of <span class="text-gray-900 font-bold bg-brand-accent px-1 border border-gray-900 rounded">layouts</span> and receive optimized images formatted for every social channel instantly.
 							</p>
 						</div>
 
@@ -155,8 +155,8 @@
 							<div class="bg-gray-900 border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-xl p-5 overflow-hidden font-mono text-xs md:text-sm text-[#4ade80] relative">
 								<!-- Top Mac Dots inside code editor -->
 								<div class="flex gap-1.5 mb-3 border-b border-gray-700 pb-3">
-									<div class="w-2.5 h-2.5 rounded-full bg-[#ff6b6b]"></div>
-									<div class="w-2.5 h-2.5 rounded-full bg-[#ffc480]"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-brand-danger"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-brand-accent"></div>
 									<div class="w-2.5 h-2.5 rounded-full bg-[#4ade80]"></div>
 								</div>
 								<div class="space-y-1.5 overflow-x-auto whitespace-nowrap pb-2">
@@ -164,7 +164,7 @@
 									<div><span class="text-white">POST</span> https://api.pictify.io/v1/render</div>
 									<div class="mt-2 text-white">{`{`}</div>
 									<div class="pl-4 text-[#93c5fd]">"template_id": "tp_12345",</div>
-									<div class="pl-4 pb-1"><span class="text-[#ffc480]">"layouts": ["ig", "x", "og"],</span></div>
+									<div class="pl-4 pb-1"><span class="text-brand-accent">"layouts": ["ig", "x", "og"],</span></div>
 									<div class="pl-4 text-[#93c5fd]">"data": {`{`}</div>
 									<div class="pl-8 text-white">"title": "Launch Day 🚀",</div>
 									<div class="pl-8 text-white">"author": "Suyash"</div>

@@ -2,7 +2,7 @@
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
 </script>
 
-<footer class="w-full bg-[#FFFDF8] border-t-[3px] border-gray-900">
+<footer class="w-full bg-brand-bg border-t-[3px] border-gray-900">
 	<div class="max-w-6xl mx-auto px-6 py-16">
 		<!-- Main Grid -->
 		<div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
@@ -65,33 +65,33 @@
 						<li>
 							<a
 								href="/pricing"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Pricing</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Pricing</a
 							>
 						</li>
 						<li>
 							<a
 								href={PUBLIC_DOCS_URL}
 								target="_blank"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">API Docs</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">API Docs</a
 							>
 						</li>
 						<li>
 							<a
 								href="/tools"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Tools</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Tools</a
 							>
 						</li>
 						<li>
 							<a
 								href="/templates"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Templates</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Templates</a
 							>
 						</li>
 						<li>
 							<a
 								href="https://status.pictify.io"
 								target="_blank"
-								class="text-gray-600 font-bold hover:text-[#ff6b6b] transition-colors">Status</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Status</a
 							>
 						</li>
 					</ul>
@@ -146,25 +146,25 @@
 						<li>
 							<a
 								href="/blogs"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Blog</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Blog</a
 							>
 						</li>
 						<li>
 							<a
 								href="mailto:support@pictify.io"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Contact</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Contact</a
 							>
 						</li>
 						<li>
 							<a
 								href="/terms"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Terms</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Terms</a
 							>
 						</li>
 						<li>
 							<a
 								href="/privacy"
-								class="text-gray-600 font-bold hover:text-[#ffc480] transition-colors">Privacy</a
+								class="text-gray-600 font-bold hover:text-brand-accent transition-colors">Privacy</a
 							>
 						</li>
 					</ul>

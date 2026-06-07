@@ -310,7 +310,7 @@
 							role="option"
 							aria-selected={i === selectedIndex}
 							class="flex items-center gap-3 px-5 py-3 cursor-pointer transition-colors
-								{i === selectedIndex ? 'bg-[#ffc480]/30' : 'hover:bg-gray-50'}"
+								{i === selectedIndex ? 'bg-brand-accent/30' : 'hover:bg-gray-50'}"
 							on:click={() => selectItem(item)}
 							on:mouseenter={() => (selectedIndex = i)}
 							on:keydown

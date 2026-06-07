@@ -65,7 +65,7 @@
 						on:input={handleInput}
 						placeholder="Override value"
 						{disabled}
-						class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
+						class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-brand-bg transition-colors"
 					/>
 					{#if !disabled}
 						<button

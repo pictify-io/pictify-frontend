@@ -274,7 +274,7 @@
 	// ============== Scheduled Display Helpers ==============
 
 	const SCHEDULE_COLORS = [
-		{ bg: 'bg-[#ffc480]', border: 'border-[#e6a050]', text: 'text-gray-900' },
+		{ bg: 'bg-brand-accent', border: 'border-[#e6a050]', text: 'text-gray-900' },
 		{ bg: 'bg-[#4ade80]', border: 'border-[#22c55e]', text: 'text-gray-900' },
 		{ bg: 'bg-[#a78bfa]', border: 'border-[#7c3aed]', text: 'text-white' },
 		{ bg: 'bg-[#f472b6]', border: 'border-[#ec4899]', text: 'text-white' },
@@ -445,7 +445,7 @@
 			</p>
 			<a
 				href="/dashboard/experiments"
-				class="px-6 py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-6 py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Back to Experiments
 			</a>
@@ -509,7 +509,7 @@
 								<div class="flex items-center gap-3">
 									<button
 										on:click={handleSaveEdit}
-										class="px-5 py-2 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="px-5 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[2px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Save Changes
 									</button>
@@ -600,7 +600,7 @@
 							{#if exp.status === 'running'}
 								<button
 									on:click={handlePause}
-									class="px-4 py-2.5 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+									class="px-4 py-2.5 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -699,7 +699,7 @@
 							<!-- Delete -->
 							<button
 								on:click={() => (showDeleteConfirm = true)}
-								class="px-4 py-2.5 bg-[#ff6b6b] text-white font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+								class="px-4 py-2.5 bg-brand-danger text-white font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 							>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
@@ -805,7 +805,7 @@
 					class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden flex flex-col"
 				>
 					<div
-						class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#10b981]/10 flex items-center justify-between pointer-events-none relative"
+						class="px-5 py-3 border-b-[3px] border-gray-900 bg-brand-success/10 flex items-center justify-between pointer-events-none relative"
 					>
 						<div
 							class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMwMDAiLz48L3N2Zz4=')] mix-blend-overlay"
@@ -992,7 +992,7 @@
 								>
 									<!-- Rule Header -->
 									<div
-										class="px-5 py-4 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex items-center justify-between"
+										class="px-5 py-4 border-b-[3px] border-gray-900 bg-brand-bg flex items-center justify-between"
 									>
 										<div class="flex items-center gap-4 min-w-0">
 											<!-- Priority badge -->
@@ -1113,7 +1113,7 @@
 															>CTR</span
 														>
 														<span
-															class="px-2 py-0.5 bg-[#10b981]/10 rounded border-[2px] border-gray-900 text-xs font-black text-gray-900 tabular-nums"
+															class="px-2 py-0.5 bg-brand-success/10 rounded border-[2px] border-gray-900 text-xs font-black text-gray-900 tabular-nums"
 															>{getVariantCtr(variant)}%</span
 														>
 													</div>
@@ -1148,7 +1148,7 @@
 					{#if smartLinkFallback}
 						<div class="mt-6">
 							<div class="flex items-center gap-2 mb-4">
-								<svg class="w-5 h-5 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24"
+								<svg class="w-5 h-5 text-brand-accent" fill="currentColor" viewBox="0 0 24 24"
 									><path
 										d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
 									/></svg
@@ -1161,7 +1161,7 @@
 								class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
 							>
 								<div
-									class="px-5 py-3 border-b-[3px] border-gray-900 bg-[#ffc480]/10 flex items-center justify-between"
+									class="px-5 py-3 border-b-[3px] border-gray-900 bg-brand-accent/10 flex items-center justify-between"
 								>
 									<div class="flex items-center gap-3">
 										<span class="text-sm font-black text-gray-900"
@@ -1288,7 +1288,7 @@
 								<div
 									class="px-5 py-4 border-b-[3px] border-gray-900 {status === 'active'
 										? 'bg-amber-50'
-										: 'bg-[#FFFDF8]'} flex items-center justify-between"
+										: 'bg-brand-bg'} flex items-center justify-between"
 								>
 									<div class="flex items-center gap-4 min-w-0">
 										<div
@@ -1319,7 +1319,7 @@
 											</span>
 										{:else if status === 'upcoming'}
 											<span
-												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+												class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 											>
 												Upcoming
 											</span>
@@ -1410,7 +1410,7 @@
 													class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900"
 												>
 													<div
-														class="h-full bg-[#ffc480] border-r-[2px] border-gray-900 transition-all duration-500"
+														class="h-full bg-brand-accent border-r-[2px] border-gray-900 transition-all duration-500"
 														style="width: {getBarWidth(variant.impressions || 0, maxImpressions)}%"
 													/>
 												</div>
@@ -1452,7 +1452,7 @@
 					<div class="flex items-center gap-3 mb-6">
 						<h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Variants</h2>
 						<span
-							class="px-3 py-1 bg-[#ffc480] text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase"
+							class="px-3 py-1 bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-black rounded-lg uppercase"
 						>
 							{variants.length}
 						</span>
@@ -1477,8 +1477,8 @@
 									<!-- Variant Header -->
 									<div
 										class="px-5 py-4 border-b-[3px] border-gray-900 {variant.isWinner
-											? 'bg-[#ffc480]/20'
-											: 'bg-[#FFFDF8]'} flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4"
+											? 'bg-brand-accent/20'
+											: 'bg-brand-bg'} flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4"
 									>
 										<div class="flex items-center gap-4 min-w-0 w-full sm:w-auto">
 											<!-- Variant Index Badge -->
@@ -1506,7 +1506,7 @@
 										<div class="flex items-center gap-2 shrink-0">
 											{#if variant.isWinner}
 												<span
-													class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1"
+													class="px-3 py-1.5 rounded-lg text-xs font-black uppercase border-[3px] bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-1"
 												>
 													<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
 														<path
@@ -1574,7 +1574,7 @@
 													class="w-full bg-gray-100 h-3 rounded overflow-hidden border-[2px] border-gray-900"
 												>
 													<div
-														class="h-full bg-[#ffc480] border-r-[2px] border-gray-900 transition-all duration-500"
+														class="h-full bg-brand-accent border-r-[2px] border-gray-900 transition-all duration-500"
 														style="width: {getBarWidth(variant.impressions || 0, maxImpressions)}%"
 													/>
 												</div>
@@ -1615,7 +1615,7 @@
 												>Conversion Rate</span
 											>
 											<div
-												class="px-3 py-1 bg-[#10b981]/10 rounded border-[2px] border-gray-900 text-gray-900 font-black tabular-nums"
+												class="px-3 py-1 bg-brand-success/10 rounded border-[2px] border-gray-900 text-gray-900 font-black tabular-nums"
 											>
 												{getVariantCtr(variant)}%
 											</div>
@@ -1633,7 +1633,7 @@
 				<div
 					class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
 				>
-					<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-[#FFFDF8]">
+					<div class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-bg">
 						<h2
 							class="text-xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3"
 						>
@@ -1664,7 +1664,7 @@
 								</div>
 								<button
 									on:click={() => copyToClipboard(`https://${publicUrl}`, 'URL copied!')}
-									class="px-5 py-3.5 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all shrink-0"
+									class="px-5 py-3.5 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all shrink-0"
 								>
 									Copy URL
 								</button>
@@ -1711,7 +1711,7 @@
 									class="px-5 py-4 bg-gray-900 text-[#4ade80] border-[3px] border-gray-900 rounded-xl font-mono text-sm overflow-x-auto shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.5)]">{embedCode}</pre>
 								<button
 									on:click={() => copyToClipboard(embedCode, 'Embed code copied!')}
-									class="absolute top-3 right-3 px-4 py-2 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
+									class="absolute top-3 right-3 px-4 py-2 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-[10px] border-[3px] border-gray-900 rounded-lg shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all opacity-0 group-hover:opacity-100"
 								>
 									Copy HTML
 								</button>
@@ -1776,7 +1776,7 @@ fetch("https://pictify.io/s/events", {
 					class="bg-white rounded-xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
 				>
 					<div
-						class="px-6 py-4 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex items-center justify-between"
+						class="px-6 py-4 border-b-[3px] border-gray-900 bg-brand-bg flex items-center justify-between"
 					>
 						<h2
 							class="text-xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3"
@@ -1851,7 +1851,7 @@ fetch("https://pictify.io/s/events", {
 										>
 											<div
 												class="h-full transition-all duration-700 ease-out flex items-center {variant.isWinner
-													? 'bg-[#ffc480]'
+													? 'bg-brand-accent'
 													: idx % 2 === 0
 													? 'bg-[#60a5fa]'
 													: 'bg-[#c084fc]'} border-r-[3px] border-gray-900"
@@ -1922,7 +1922,7 @@ fetch("https://pictify.io/s/events", {
 											>
 												<div
 													class="h-full transition-all duration-700 ease-out flex items-center {variant.isWinner
-														? 'bg-[#ffc480]'
+														? 'bg-brand-accent'
 														: 'bg-[#4ade80]'} border-r-[3px] border-gray-900"
 													style="width: {getBarWidth(variant.clicks || 0, maxClicks)}%"
 												>
@@ -2036,7 +2036,7 @@ fetch("https://pictify.io/s/events", {
 			>
 				<button
 					on:click={() => (showSettings = !showSettings)}
-					class="w-full px-6 py-4 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex items-center justify-between hover:bg-[#FFF8EA] transition-colors text-left group"
+					class="w-full px-6 py-4 border-b-[3px] border-gray-900 bg-brand-bg flex items-center justify-between hover:bg-[#FFF8EA] transition-colors text-left group"
 				>
 					<h2
 						class="text-xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3"
@@ -2367,7 +2367,7 @@ fetch("https://pictify.io/s/events", {
 			>
 				<div class="flex items-center gap-4">
 					<div
-						class="w-12 h-12 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] rounded-xl flex items-center justify-center"
+						class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] rounded-xl flex items-center justify-center"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
 							<path
@@ -2403,7 +2403,7 @@ fetch("https://pictify.io/s/events", {
 			</div>
 
 			<!-- Modal Body -->
-			<div class="p-6 overflow-y-auto space-y-6 bg-[#FFFDF8]">
+			<div class="p-6 overflow-y-auto space-y-6 bg-brand-bg">
 				<p
 					class="text-sm font-bold text-gray-700 bg-amber-50 border-[2px] border-amber-200 p-4 rounded-xl"
 				>
@@ -2417,7 +2417,7 @@ fetch("https://pictify.io/s/events", {
 						<div
 							class="p-4 rounded-xl border-[3px] cursor-pointer transition-all {selectedWinner ===
 							(variant.uid || variant.id || idx)
-								? 'border-gray-900 bg-[#ffc480]/20 shadow-[6px_6px_0_0_#1f2937]'
+								? 'border-gray-900 bg-brand-accent/20 shadow-[6px_6px_0_0_#1f2937]'
 								: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937]'}"
 							on:click={() => (selectedWinner = variant.uid || variant.id || idx)}
 						>
@@ -2427,7 +2427,7 @@ fetch("https://pictify.io/s/events", {
 									<div
 										class="w-8 h-8 rounded-full border-[3px] border-gray-900 flex items-center justify-center shrink-0 {selectedWinner ===
 										(variant.uid || variant.id || idx)
-											? 'bg-[#ffc480] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
+											? 'bg-brand-accent shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
 											: 'bg-gray-100 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]'}"
 									>
 										{#if selectedWinner === (variant.uid || variant.id || idx)}
@@ -2561,7 +2561,7 @@ fetch("https://pictify.io/s/events", {
 			</div>
 
 			<!-- Modal Body -->
-			<div class="p-6 bg-[#FFFDF8]">
+			<div class="p-6 bg-brand-bg">
 				<p class="text-base font-bold text-gray-800 leading-relaxed mb-4">
 					Are you absolutely sure you want to delete <strong
 						class="font-black text-red-600 bg-red-100 px-1 rounded">{exp?.name}</strong

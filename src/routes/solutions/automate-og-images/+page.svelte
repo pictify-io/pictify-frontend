@@ -63,14 +63,14 @@
 >
 	<header class="text-center mb-12">
 		<div
-			class="inline-block bg-gray-900 text-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
+			class="inline-block bg-gray-900 text-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] px-4 py-1 mb-6 transform -rotate-1 rounded-lg"
 		>
 			<span class="font-black uppercase tracking-widest text-sm">For Content Teams</span>
 		</div>
 		<h1
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
-			Automated OG images<br /><span class="text-[#ff6b6b]">for every page.</span>
+			Automated OG images<br /><span class="text-brand-danger">for every page.</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			Dynamic Open Graph images rendered per blog post, product, or user. One template, one API, one line in your <code class="bg-gray-100 px-1 rounded">&lt;head&gt;</code>.
@@ -100,7 +100,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			The pattern
 		</h2>
-		<ol class="space-y-4 list-decimal pl-6 marker:text-[#ff6b6b] marker:font-black text-lg text-gray-700">
+		<ol class="space-y-4 list-decimal pl-6 marker:text-brand-danger marker:font-black text-lg text-gray-700">
 			<li>Design one OG template (1200×630) with variable placeholders for title, author, hero image, category.</li>
 			<li>In each page's <code class="bg-gray-100 px-1 rounded">&lt;head&gt;</code>, output an <code class="bg-gray-100 px-1 rounded">og:image</code> meta tag whose URL encodes the variables as query parameters.</li>
 			<li>When a social platform fetches the URL, Pictify renders the image, CDN-caches it, and returns it in ~800ms. Every subsequent fetch hits the cache.</li>
@@ -156,7 +156,7 @@
 				— it renders OG images in your edge function. It works for simple designs, but hits limits
 				quickly:
 			</p>
-			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-4 list-disc pl-6 marker:text-[#ff6b6b]">
+			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-4 list-disc pl-6 marker:text-brand-danger">
 				<li><strong>Bundle size:</strong> @vercel/og pushes your edge bundle past 1MB; Pictify is an external API with zero bundle impact.</li>
 				<li><strong>CSS subset:</strong> @vercel/og uses satori, which supports a subset of CSS. Pictify renders real Chromium — full CSS grid, flexbox, web fonts, everything.</li>
 				<li><strong>Design workflow:</strong> changing an @vercel/og template means redeploying. Pictify templates live in a visual editor; copy changes don't require a deploy.</li>
@@ -165,7 +165,7 @@
 			<p class="text-lg text-gray-700 leading-relaxed">
 				For quick prototypes and Vercel-deployed side projects, @vercel/og is fine. For anything with
 				a designer in the loop or hosted outside Vercel, use Pictify. Try the
-				<a href="/tools/og-image-generator" class="text-[#ff6b6b] underline font-bold">OG image generator tool</a>
+				<a href="/tools/og-image-generator" class="text-brand-danger underline font-bold">OG image generator tool</a>
 				to prototype your template without writing code.
 			</p>
 		</div>

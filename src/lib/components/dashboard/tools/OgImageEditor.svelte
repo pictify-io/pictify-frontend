@@ -472,7 +472,7 @@
 				>
 					<span>UID: {template.uid}</span>
 					<button
-						class="hover:text-[#ff6b6b] transition-colors"
+						class="hover:text-brand-danger transition-colors"
 						on:click={() => {
 							navigator.clipboard.writeText(template.uid);
 							toast.set({ message: 'UID copied to clipboard', type: 'success', duration: 1500 });

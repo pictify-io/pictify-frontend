@@ -90,7 +90,7 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -98,10 +98,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -123,7 +123,7 @@
 			>
 				<!-- Icon -->
 				<div
-					class="w-20 h-20 bg-[#ff6b6b] border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
+					class="w-20 h-20 bg-brand-danger border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
 				>
 					<svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						{@html personaIcons[personaId] || personaIcons.developers}
@@ -145,7 +145,7 @@
 				<!-- CTA Button -->
 				<a
 					href={persona.ctaUrl}
-					class="px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-danger text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					{persona.cta}
 				</a>
@@ -183,12 +183,12 @@
 				>
 					What you can do
 				</h2>
-				<div class="bg-[#ffc480]/20 border-[3px] border-[#ffc480] rounded-2xl p-8">
+				<div class="bg-brand-accent/20 border-[3px] border-brand-accent rounded-2xl p-8">
 					<div class="grid md:grid-cols-2 gap-6">
 						{#each persona.useCases as useCase}
 							<div class="flex items-start gap-4">
 								<div
-									class="w-6 h-6 bg-[#ffc480] border-[2px] border-gray-900 rounded-lg flex items-center justify-center flex-shrink-0 mt-1"
+									class="w-6 h-6 bg-brand-accent border-[2px] border-gray-900 rounded-lg flex items-center justify-center flex-shrink-0 mt-1"
 								>
 									<svg
 										class="w-3 h-3 text-gray-900"
@@ -243,7 +243,7 @@
 				<div class="flex flex-wrap justify-center gap-4">
 					<a
 						href={persona.ctaUrl}
-						class="px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+						class="px-8 py-4 bg-brand-danger text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 					>
 						{persona.cta}
 					</a>
@@ -265,7 +265,7 @@
 					{#each otherPersonas as otherPersona}
 						<a
 							href="/for/{otherPersona.slug}"
-							class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#ffc480] transition-all group"
+							class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
 						>
 							<div class="flex items-center gap-3">
 								<div
@@ -294,7 +294,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
 				>
 					?
 				</div>
@@ -303,7 +303,7 @@
 				</h1>
 				<a
 					href="/"
-					class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Go Home
 				</a>

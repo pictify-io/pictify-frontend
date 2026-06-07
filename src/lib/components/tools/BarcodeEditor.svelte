@@ -258,8 +258,8 @@
 		<!-- Window Header -->
 		<div class="bg-black text-white px-4 py-2.5 flex justify-between items-center border-b-[3px] border-black">
 			<div class="flex gap-2">
-				<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-white" />
-				<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-white" />
+				<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
+				<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
 				<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white" />
 			</div>
 			<div class="font-mono font-bold tracking-widest text-xs uppercase">BARCODE_GENERATOR</div>
@@ -277,10 +277,10 @@
 						bind:value={barcodeValue}
 						type="text"
 						placeholder={activeFormat.placeholder}
-						class="w-full border-[3px] border-black px-3 py-2.5 font-mono font-bold text-sm focus:outline-none focus:border-[#ff6b6b] focus:shadow-[3px_3px_0_0_#ff6b6b] transition-all"
+						class="w-full border-[3px] border-black px-3 py-2.5 font-mono font-bold text-sm focus:outline-none focus:border-brand-danger focus:shadow-[3px_3px_0_0_#ff6b6b] transition-all"
 					/>
 					{#if barcodeError}
-						<p class="text-xs font-bold text-[#ff6b6b] mt-1">{barcodeError}</p>
+						<p class="text-xs font-bold text-brand-danger mt-1">{barcodeError}</p>
 					{/if}
 				</div>
 
@@ -451,7 +451,7 @@
 	<section class="mt-20 mb-12">
 		<div class="text-center mb-10">
 			<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">
-				Barcode Types <span class="text-[#ff6b6b]">Explained</span>
+				Barcode Types <span class="text-brand-danger">Explained</span>
 			</h2>
 			<p class="text-lg font-bold text-gray-600 mt-3 max-w-2xl mx-auto">
 				Choose the right barcode format for your use case. Each type has different data capacity, character support, and industry applications.
@@ -469,55 +469,55 @@
 					</tr>
 				</thead>
 				<tbody class="text-sm font-medium text-gray-700">
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Code 128</td>
 						<td class="p-3">Alphanumeric + symbols</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Shipping labels, logistics, general purpose</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">EAN-13</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">13 digits</td>
 						<td class="p-3">Retail products worldwide (international standard)</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">UPC-A</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">12 digits</td>
 						<td class="p-3">Retail products in North America</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Code 39</td>
 						<td class="p-3">Alphanumeric</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Manufacturing, military, healthcare IDs</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">ITF-14</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">14 digits</td>
 						<td class="p-3">Shipping containers, carton-level tracking</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Code 93</td>
 						<td class="p-3">Alphanumeric</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Postal services, electronic components</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Codabar</td>
 						<td class="p-3">Numeric + A-D delimiters</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Blood banks, libraries, FedEx airbills</td>
 					</tr>
-					<tr class="border-b border-gray-200 hover:bg-[#ffc480]/10">
+					<tr class="border-b border-gray-200 hover:bg-brand-accent/10">
 						<td class="p-3 font-black">MSI</td>
 						<td class="p-3">Numeric only</td>
 						<td class="p-3">Variable</td>
 						<td class="p-3">Warehouse shelves, inventory management</td>
 					</tr>
-					<tr class="hover:bg-[#ffc480]/10">
+					<tr class="hover:bg-brand-accent/10">
 						<td class="p-3 font-black">Pharmacode</td>
 						<td class="p-3">Numeric (3-131070)</td>
 						<td class="p-3">1-6 digits</td>
@@ -532,11 +532,11 @@
 	<section class="mb-12">
 		<div class="border-[3px] border-black bg-white shadow-[8px_8px_0_0_#1f2937] p-6 md:p-10">
 			<h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tighter mb-6">
-				How to Create a <span class="text-[#ff6b6b]">Barcode</span>
+				How to Create a <span class="text-brand-danger">Barcode</span>
 			</h2>
 
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="border-[3px] border-black p-5 bg-[#ffc480]/10">
+				<div class="border-[3px] border-black p-5 bg-brand-accent/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">1</div>
 					<h3 class="font-black text-lg mb-2">Enter Your Data</h3>
 					<p class="text-sm font-medium text-gray-600">Type the text or numbers you want to encode. Choose a barcode format that matches your use case — Code 128 for general purpose, EAN-13 for retail products, UPC-A for US retail.</p>
@@ -546,7 +546,7 @@
 					<h3 class="font-black text-lg mb-2">Customize Appearance</h3>
 					<p class="text-sm font-medium text-gray-600">Adjust bar width, height, colors, and choose whether to display the encoded text below the bars. Enable transparent background for overlay use.</p>
 				</div>
-				<div class="border-[3px] border-black p-5 bg-[#ff6b6b]/10">
+				<div class="border-[3px] border-black p-5 bg-brand-danger/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">3</div>
 					<h3 class="font-black text-lg mb-2">Download or Automate</h3>
 					<p class="text-sm font-medium text-gray-600">Download as PNG, JPG, WebP, or SVG. For bulk generation, use the Pictify API to create thousands of unique barcodes programmatically from your inventory or product data.</p>

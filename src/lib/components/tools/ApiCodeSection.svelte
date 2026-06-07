@@ -39,7 +39,7 @@
 			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 		</div>
 		<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-			{title} <span class="text-[#ff6b6b]">{titleHighlight}</span>
+			{title} <span class="text-brand-danger">{titleHighlight}</span>
 		</h2>
 		<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
 			{description}

@@ -31,9 +31,9 @@
 				label: 'Visual Editor',
 				desc: 'Designers update templates with drag-and-drop. No deploys needed.',
 				icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
-				color: 'text-[#ff6b6b]',
-				bg: 'bg-[#ff6b6b]/10',
-				border: 'border-[#ff6b6b]'
+				color: 'text-brand-danger',
+				bg: 'bg-brand-danger/10',
+				border: 'border-brand-danger'
 			}
 		},
 		{
@@ -48,20 +48,20 @@
 				label: 'Sub-500ms',
 				desc: 'Global CDN caching. Optimized rendering engine.',
 				icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-				color: 'text-[#ffc480]',
-				bg: 'bg-[#ffc480]/10',
-				border: 'border-[#ffc480]'
+				color: 'text-brand-accent',
+				bg: 'bg-brand-accent/10',
+				border: 'border-brand-accent'
 			}
 		}
 	];
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden">
+<section class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Background Elements -->
 	<div
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50"
 	/>
-	<div class="absolute top-1/3 right-0 w-96 h-96 bg-[#ff6b6b]/5 rounded-full blur-3xl -z-10" />
+	<div class="absolute top-1/3 right-0 w-96 h-96 bg-brand-danger/5 rounded-full blur-3xl -z-10" />
 	<div class="absolute bottom-0 left-0 w-96 h-96 bg-[#4ade80]/5 rounded-full blur-3xl -z-10" />
 
 	<div class="max-w-6xl mx-auto px-6 relative z-10">

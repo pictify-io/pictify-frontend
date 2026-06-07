@@ -368,9 +368,9 @@
 
 {#if isDefault}
 	<!-- Default variant: no rules needed, just show fallback notice -->
-	<div class="bg-[#ffc480]/10 border-[2px] border-[#ffc480] rounded-xl p-4">
+	<div class="bg-brand-accent/10 border-[2px] border-brand-accent rounded-xl p-4">
 		<div class="flex items-center gap-2">
-			<svg class="w-5 h-5 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24">
+			<svg class="w-5 h-5 text-brand-accent" fill="currentColor" viewBox="0 0 24 24">
 				<path
 					d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
 				/>

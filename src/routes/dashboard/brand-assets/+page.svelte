@@ -311,7 +311,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-danger rounded-full animate-pulse" />
 					Asset Vault
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -361,7 +361,7 @@
 						<div class="flex-grow" />
 
 						<button
-							class="px-4 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] flex items-center gap-2"
+							class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] flex items-center gap-2"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -461,7 +461,7 @@
 
 					<button
 						on:click={() => openUploadModal('logo')}
-						class="px-4 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
+						class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -520,7 +520,7 @@
 				<!-- Bulk Actions (Conditional) -->
 				{#if selectedAssets.size > 0}
 					<div
-						class="bg-[#ff6b6b] text-white rounded-xl border-[3px] border-gray-900 p-4 mb-8 flex items-center justify-between shadow-[4px_4px_0_0_#1f2937] animate-fade-in"
+						class="bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 p-4 mb-8 flex items-center justify-between shadow-[4px_4px_0_0_#1f2937] animate-fade-in"
 					>
 						<div class="flex items-center gap-3">
 							<button
@@ -548,7 +548,7 @@
 						</div>
 						<button
 							on:click={handleBulkDelete}
-							class="px-4 py-2 bg-white text-[#ff6b6b] rounded-lg border-[2px] border-gray-900 text-xs font-black uppercase tracking-wide hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 transition-all flex items-center gap-2"
+							class="px-4 py-2 bg-white text-brand-danger rounded-lg border-[2px] border-gray-900 text-xs font-black uppercase tracking-wide hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 transition-all flex items-center gap-2"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -567,7 +567,7 @@
 				<div class="relative min-h-[400px]">
 					{#if isLoading}
 						<div
-							class="absolute inset-0 flex items-center justify-center z-20 bg-[#FFFDF8]/80 backdrop-blur-sm"
+							class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 backdrop-blur-sm"
 						>
 							<Loader size="16" show={isLoading} />
 						</div>
@@ -715,7 +715,7 @@
 											</button>
 											<button
 												on:click|stopPropagation={() => confirmDelete(asset)}
-												class="w-8 h-8 bg-[#ff6b6b] rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center hover:bg-[#ff5252] hover:-translate-y-0.5 transition-all"
+												class="w-8 h-8 bg-brand-danger rounded-lg border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center hover:bg-[#ff5252] hover:-translate-y-0.5 transition-all"
 												title="Delete"
 											>
 												<svg
@@ -748,7 +748,7 @@
 											>
 											{#if asset.isPrimary}
 												<span
-													class="w-2 h-2 rounded-full bg-[#ff6b6b] border border-gray-900"
+													class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900"
 													title="Primary Asset"
 												/>
 											{/if}
@@ -776,7 +776,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#000] max-w-md w-full overflow-hidden"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#000] max-w-md w-full overflow-hidden"
 			on:click|stopPropagation
 		>
 			<div class="bg-gray-900 p-4 flex items-center justify-between">
@@ -784,7 +784,7 @@
 					id="upload-modal-title"
 					class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3"
 				>
-					<span class="text-[#ffc480]">Upload</span>
+					<span class="text-brand-accent">Upload</span>
 					{ASSET_TYPE_LABELS[uploadType]}
 				</h2>
 				<button on:click={closeUploadModal} class="text-gray-400 hover:text-white">
@@ -929,7 +929,7 @@
 					<button
 						on:click={handleUpload}
 						disabled={!selectedFile || isUploading}
-						class="flex-[2] px-4 py-3 bg-[#ff6b6b] text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						class="flex-[2] px-4 py-3 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{#if isUploading}
 							Uploading...
@@ -954,7 +954,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#000] max-w-md w-full overflow-hidden"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#000] max-w-md w-full overflow-hidden"
 			on:click|stopPropagation
 		>
 			<div class="bg-gray-900 p-4 flex items-center justify-between">

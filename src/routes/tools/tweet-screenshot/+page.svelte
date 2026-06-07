@@ -478,7 +478,7 @@ print(res.json()['image']['url'])`;
 				<button
 					on:click={handleFetchClick}
 					disabled={status === 'fetching'}
-					class="px-6 py-3 bg-[#ffc480] text-gray-900 font-black border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#1f2937] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+					class="px-6 py-3 bg-brand-accent text-gray-900 font-black border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#1f2937] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
 				>
 					{status === 'fetching' ? 'Fetching…' : 'Fetch'}
 				</button>
@@ -667,7 +667,7 @@ print(res.json()['image']['url'])`;
 					<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 				</div>
 				<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-					Automate with the <span class="text-[#ff6b6b]">API</span>
+					Automate with the <span class="text-brand-danger">API</span>
 				</h2>
 				<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
 					Generate tweet screenshots programmatically. Same HTML as the live preview, rendered at any scale via a single POST.
@@ -735,7 +735,7 @@ print(res.json()['image']['url'])`;
 		<section class="mt-20 max-w-4xl mx-auto px-2">
 			<div class="prose prose-lg prose-neutral max-w-none">
 				<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
-					The fastest way to <span class="text-[#ff6b6b]">screenshot a tweet</span>
+					The fastest way to <span class="text-brand-danger">screenshot a tweet</span>
 				</h2>
 				<p class="text-lg text-gray-700 leading-relaxed mb-5">
 					A clean tweet screenshot does a lot of work in content. Newsletters quote tweets. LinkedIn
@@ -754,7 +754,7 @@ print(res.json()['image']['url'])`;
 				</p>
 
 				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">Who uses a tweet screenshot generator?</h3>
-				<ul class="text-lg text-gray-700 leading-relaxed space-y-3 mb-8 list-disc pl-6 marker:text-[#ff6b6b]">
+				<ul class="text-lg text-gray-700 leading-relaxed space-y-3 mb-8 list-disc pl-6 marker:text-brand-danger">
 					<li>
 						<strong>Newsletter writers and creators</strong> who quote tweets in Substack,
 						Beehiiv, or ConvertKit and want a consistent look instead of iOS screenshots of
@@ -776,12 +776,12 @@ print(res.json()['image']['url'])`;
 					<li>
 						<strong>Developers and product teams</strong> generating tweet images programmatically
 						for content pipelines, CMS integrations, or automated lifecycle emails — see the
-						<a href="#api" class="text-[#ff6b6b] underline">API section</a> above.
+						<a href="#api" class="text-brand-danger underline">API section</a> above.
 					</li>
 				</ul>
 
 				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">How to screenshot a tweet in three steps</h3>
-				<ol class="text-lg text-gray-700 leading-relaxed space-y-3 mb-8 list-decimal pl-6 marker:text-[#ff6b6b] marker:font-black">
+				<ol class="text-lg text-gray-700 leading-relaxed space-y-3 mb-8 list-decimal pl-6 marker:text-brand-danger marker:font-black">
 					<li>
 						<strong>Paste the tweet URL.</strong> Copy the link from any tweet on
 						<code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">twitter.com</code>
@@ -838,7 +838,7 @@ print(res.json()['image']['url'])`;
 				<p class="text-lg text-gray-700 leading-relaxed mb-4">
 					The rendered image matches Twitter's native tweet card layout:
 				</p>
-				<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-8 list-disc pl-6 marker:text-[#ff6b6b]">
+				<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-8 list-disc pl-6 marker:text-brand-danger">
 					<li>Profile picture (auto-fetched from <code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">pbs.twimg.com</code>)</li>
 					<li>Display name + @handle with verified badge (blue checkmark or legacy gold)</li>
 					<li>Tweet body with clickable URLs, mentions, and hashtags styled in Twitter blue</li>
@@ -850,10 +850,10 @@ print(res.json()['image']['url'])`;
 
 				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">Tweet to image, programmatically</h3>
 				<p class="text-lg text-gray-700 leading-relaxed mb-4">
-					Everything this tool does, the <a href="https://docs.pictify.io" target="_blank" rel="noopener" class="text-[#ff6b6b] underline">Pictify API</a>
+					Everything this tool does, the <a href="https://docs.pictify.io" target="_blank" rel="noopener" class="text-brand-danger underline">Pictify API</a>
 					does via a single HTTP call. Generate tweet screenshots as part of a daily newsletter
 					build, a CMS publish hook, or a scheduled social campaign. The API snippet
-					<a href="#api" class="text-[#ff6b6b] underline">above</a> is the exact call we'd make
+					<a href="#api" class="text-brand-danger underline">above</a> is the exact call we'd make
 					ourselves — copy it, swap in your key, and you're shipping.
 				</p>
 				<p class="text-lg text-gray-700 leading-relaxed">

@@ -174,7 +174,7 @@
 			Referrer: 'bg-pink-500'
 		}}
 		<div
-			class="flex items-center gap-2 px-3 py-2 bg-[#FFFDF8] border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl shrink-0"
+			class="flex items-center gap-2 px-3 py-2 bg-brand-bg border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl shrink-0"
 		>
 			<span
 				class="w-2.5 h-2.5 rounded-full shrink-0 border-[2px] border-black {dotColors[
@@ -221,7 +221,7 @@
 			bind:value={rule.operator}
 			on:change={emitChange}
 			{disabled}
-			class="px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold bg-[#ffc480] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all shrink-0 cursor-pointer text-black"
+			class="px-3 py-2 border-[3px] border-black shadow-[2px_2px_0_0_black] rounded-xl text-xs font-bold bg-brand-accent focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all shrink-0 cursor-pointer text-black"
 		>
 			{#each getOperators(rule.property) as op}
 				<option value={op.value}>{op.label}</option>
@@ -253,7 +253,7 @@
 							class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border-[3px] border-black transition-all cursor-pointer
 								{selected
 								? 'bg-black text-white shadow-[2px_2px_0_0_black]'
-								: 'bg-white text-black shadow-[2px_2px_0_0_black] hover:bg-[#ffc480] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black]'}"
+								: 'bg-white text-black shadow-[2px_2px_0_0_black] hover:bg-brand-accent hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black]'}"
 						>
 							{propDef.optionLabels?.[opt] ||
 								(propDef.value === 'geo.continent' ? CONTINENT_LABELS[opt] : null) ||
@@ -378,7 +378,7 @@
 								isCountryPickerOpen = false;
 								countrySearchQuery = '';
 							}}
-							class="px-3 py-2 bg-[#ffc480] border-[3px] border-black rounded-xl text-xs font-black shadow-[2px_2px_0_0_black] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all cursor-pointer"
+							class="px-3 py-2 bg-brand-accent border-[3px] border-black rounded-xl text-xs font-black shadow-[2px_2px_0_0_black] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_black] transition-all cursor-pointer"
 						>
 							Done
 						</button>
@@ -474,7 +474,7 @@
 							class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 								{allSelected
 								? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black]'
-								: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-[#ffc480] hover:text-black'}"
+								: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-brand-accent hover:text-black'}"
 						>
 							{range.label}
 						</button>
@@ -519,7 +519,7 @@
 									class="w-9 h-8 rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
 										? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black] -translate-y-[1px]'
-										: 'bg-white text-gray-500 hover:bg-[#ffc480] hover:text-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
+										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
 								>
 									{displayHour}
 								</button>
@@ -549,7 +549,7 @@
 									class="w-9 h-8 rounded-md text-[11px] font-bold border-[2px] border-black transition-all flex items-center justify-center cursor-pointer
 										{selected
 										? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black] -translate-y-[1px]'
-										: 'bg-white text-gray-500 hover:bg-[#ffc480] hover:text-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
+										: 'bg-white text-gray-500 hover:bg-brand-accent hover:text-black hover:-translate-y-[1px] hover:shadow-[2px_2px_0_0_black]'}"
 								>
 									{displayHour}
 								</button>
@@ -586,7 +586,7 @@
 						class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 							{Array.isArray(rule.value) && WEEKDAYS.every((d) => rule.value.includes(d))
 							? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black]'
-							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-[#ffc480] hover:text-black'}"
+							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-brand-accent hover:text-black'}"
 					>
 						Weekdays
 					</button>
@@ -606,7 +606,7 @@
 						class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-[2px] border-black transition-all cursor-pointer
 							{Array.isArray(rule.value) && WEEKEND.every((d) => rule.value.includes(d))
 							? 'bg-[#4ade80] text-black shadow-[2px_2px_0_0_black]'
-							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-[#ffc480] hover:text-black'}"
+							: 'bg-white text-gray-500 shadow-[1px_1px_0_0_black] hover:bg-brand-accent hover:text-black'}"
 					>
 						Weekend
 					</button>
@@ -656,7 +656,7 @@
 		type="button"
 		on:click={emitRemove}
 		{disabled}
-		class="p-2 border-[3px] border-transparent rounded-xl text-gray-400 hover:text-black hover:bg-[#ff6b6b] hover:border-black hover:shadow-[2px_2px_0_0_black] transition-all shrink-0 self-center"
+		class="p-2 border-[3px] border-transparent rounded-xl text-gray-400 hover:text-black hover:bg-brand-danger hover:border-black hover:shadow-[2px_2px_0_0_black] transition-all shrink-0 self-center"
 		title="Remove rule"
 	>
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

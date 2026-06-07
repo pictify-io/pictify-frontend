@@ -48,7 +48,7 @@
 
 	// Type badge colors
 	const typeColors = {
-		ab_test: 'bg-[#ffc480] text-gray-900 border-gray-900',
+		ab_test: 'bg-brand-accent text-gray-900 border-gray-900',
 		smart_link: 'bg-[#4ade80] text-gray-900 border-gray-900',
 		scheduled: 'bg-[#a78bfa] text-gray-900 border-gray-900'
 	};
@@ -57,7 +57,7 @@
 	const statusConfig = {
 		draft: { bg: 'bg-white text-gray-900 border-gray-900', dot: 'bg-gray-400' },
 		running: { bg: 'bg-[#4ade80] text-gray-900 border-gray-900', dot: 'bg-white' },
-		paused: { bg: 'bg-[#ffc480] text-gray-900 border-gray-900', dot: 'bg-white' },
+		paused: { bg: 'bg-brand-accent text-gray-900 border-gray-900', dot: 'bg-white' },
 		completed: { bg: 'bg-[#60a5fa] text-gray-900 border-gray-900', dot: 'bg-white' },
 		archived: { bg: 'bg-gray-200 text-gray-500 border-gray-900', dot: 'bg-gray-400' }
 	};
@@ -201,7 +201,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full animate-pulse" />
 					Lab
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -291,7 +291,7 @@
 			<div class="relative">
 				<button
 					on:click={handleCreate}
-					class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
+					class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -415,7 +415,7 @@
 			<div class="relative min-h-[400px]">
 				{#if isLoading}
 					<div
-						class="absolute inset-0 flex items-center justify-center z-20 bg-[#FFFDF8]/80 backdrop-blur-sm"
+						class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 backdrop-blur-sm"
 					>
 						<Loader size="16" show={isLoading} />
 					</div>
@@ -453,7 +453,7 @@
 						</p>
 						<button
 							on:click={() => handleCreateType('ab_test')}
-							class="px-5 py-2.5 bg-[#ffc480] text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
+							class="px-5 py-2.5 bg-brand-accent text-gray-900 text-xs font-black rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wide flex items-center gap-2 group"
 						>
 							Create Your First Experiment
 							<svg
@@ -475,7 +475,7 @@
 					<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8">
 						{#each filteredExperiments as exp (exp.uid)}
 							<div
-								class="group bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
+								class="group bg-brand-bg border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-[6px_6px_0_0_#1f2937] hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 flex flex-col cursor-pointer relative"
 								on:click={() => handleView(exp.uid)}
 								on:keydown={(e) => e.key === 'Enter' && handleView(exp.uid)}
 								role="button"
@@ -577,14 +577,14 @@
 									</div>
 
 									<!-- Bottom Section: Details & Actions -->
-									<div class="p-4 sm:p-5 flex-grow flex flex-col bg-[#FFFDF8] relative">
+									<div class="p-4 sm:p-5 flex-grow flex flex-col bg-brand-bg relative">
 										<!-- Quick actions on the right (delete) positioned absolutely for clean layout -->
 										<div
 											class="absolute top-4 right-4 sm:top-5 sm:right-5 opacity-0 group-hover:opacity-100 transition-opacity z-20"
 										>
 											<button
 												on:click|stopPropagation={() => confirmDelete(exp)}
-												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-[#ff6b6b] hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
+												class="w-8 h-8 bg-white border-[2px] border-gray-200 text-gray-400 rounded-lg hover:border-gray-900 hover:text-brand-danger hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-[1px] hover:-translate-x-[1px] transition-all flex items-center justify-center z-20"
 												title="Delete"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -601,7 +601,7 @@
 										<!-- Name & Title -->
 										<div class="mb-4 pr-10">
 											<h3
-												class="text-xl sm:text-2xl font-black text-gray-900 leading-tight mb-3 line-clamp-2 decoration-[3px] decoration-[#ffc480]/50 group-hover:underline underline-offset-[6px]"
+												class="text-xl sm:text-2xl font-black text-gray-900 leading-tight mb-3 line-clamp-2 decoration-[3px] decoration-brand-accent/50 group-hover:underline underline-offset-[6px]"
 												title={exp.name}
 											>
 												{exp.name}
@@ -726,7 +726,7 @@
 											{:else if exp.status === 'running'}
 												<button
 													on:click|stopPropagation={() => handlePause(exp.uid)}
-													class="w-12 h-12 bg-[#ffc480] text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
+													class="w-12 h-12 bg-brand-accent text-gray-900 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center shrink-0 z-20"
 													title="Pause"
 												>
 													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
@@ -755,7 +755,7 @@
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 		<div
-			class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-md w-full overflow-hidden animate-fade-in-up"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-md w-full overflow-hidden animate-fade-in-up"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="delete-experiment-title"
@@ -765,11 +765,11 @@
 			<div class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-3 h-3 bg-[#ff6b6b] rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]"
+						class="w-3 h-3 bg-brand-danger rounded-full border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]"
 					/>
 					<h2
 						id="delete-experiment-title"
-						class="font-black text-sm uppercase tracking-widest text-[#ff6b6b]"
+						class="font-black text-sm uppercase tracking-widest text-brand-danger"
 					>
 						Delete Experiment?
 					</h2>
@@ -793,7 +793,7 @@
 			<div class="p-6">
 				<div class="flex items-start gap-4 mb-8">
 					<div
-						class="w-14 h-14 bg-[#ff6b6b] rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] -rotate-3"
+						class="w-14 h-14 bg-brand-danger rounded-xl border-[3px] border-gray-900 flex items-center justify-center shrink-0 shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] -rotate-3"
 					>
 						<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -831,7 +831,7 @@
 					</button>
 					<button
 						on:click={handleDelete}
-						class="flex-[1.5] px-4 py-3.5 bg-[#ff6b6b] text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center justify-center gap-2"
+						class="flex-[1.5] px-4 py-3.5 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center justify-center gap-2"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

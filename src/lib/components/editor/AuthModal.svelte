@@ -181,7 +181,7 @@
 				</button>
 
 				<!-- Header -->
-				<div class="bg-[#FFFDF8] p-6 text-center border-b-[3px] border-gray-900">
+				<div class="bg-brand-bg p-6 text-center border-b-[3px] border-gray-900">
 					<h2 id="modal-title" class="text-2xl font-black text-gray-900 mb-2">
 						{activeTab === 'signup' ? 'Create Your Account' : 'Welcome Back'}
 					</h2>
@@ -203,7 +203,7 @@
 					>
 						Sign Up
 						{#if activeTab === 'signup'}
-							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffc480]" />
+							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-brand-accent" />
 						{/if}
 					</button>
 					<div class="w-[3px] bg-gray-900" />
@@ -216,7 +216,7 @@
 					>
 						Log In
 						{#if activeTab === 'login'}
-							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#ff6b6b]" />
+							<div class="absolute bottom-0 left-0 w-full h-[3px] bg-brand-danger" />
 						{/if}
 					</button>
 				</div>
@@ -377,7 +377,7 @@
 							Already have an account?
 							<button
 								type="button"
-								class="font-bold text-gray-900 hover:text-[#ff6b6b] transition-colors"
+								class="font-bold text-gray-900 hover:text-brand-danger transition-colors"
 								on:click={() => switchTab('login')}
 							>
 								Log in
@@ -386,7 +386,7 @@
 							Don't have an account?
 							<button
 								type="button"
-								class="font-bold text-gray-900 hover:text-[#ffc480] transition-colors"
+								class="font-bold text-gray-900 hover:text-brand-accent transition-colors"
 								on:click={() => switchTab('signup')}
 							>
 								Sign up

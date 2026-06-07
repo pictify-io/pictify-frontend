@@ -3,7 +3,7 @@
 		{
 			title: 'Automation',
 			description: 'Connect to your existing workflows',
-			color: 'bg-[#ff6b6b]',
+			color: 'bg-brand-danger',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
 			items: ['Zapier', 'Make', 'n8n', 'Pipedream'],
@@ -21,7 +21,7 @@
 		{
 			title: 'Webhooks',
 			description: 'Real-time event notifications',
-			color: 'bg-[#ffc480]',
+			color: 'bg-brand-accent',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
 			items: ['render.completed', 'render.failed', 'experiment.winner'],
@@ -50,7 +50,7 @@
 			description:
 				'Scale with your organization. Advanced access control, custom domains, and audit logs.',
 			color: 'bg-white',
-			iconBg: 'bg-[#ffc480]',
+			iconBg: 'bg-brand-accent',
 			iconColor: 'text-black',
 			items: ['Multi-Workspace', 'Role-Based Access', 'SSO/SAML', 'Audit Logs'],
 			cols: 'xl:col-span-12'
@@ -59,7 +59,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -70,7 +70,7 @@
 		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
@@ -84,7 +84,7 @@
 
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Plugs Into Your Stack.<br />
-				<span class="relative inline-block text-[#ff6b6b] transform rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					No Glue Code
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
@@ -236,7 +236,7 @@
 		<div class="text-center mt-20">
 			<a
 				href="/integrations"
-				class="inline-flex items-center gap-3 px-8 py-4 bg-[#ffc480] text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all group"
+				class="inline-flex items-center gap-3 px-8 py-4 bg-brand-accent text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all group"
 			>
 				<span class="text-lg">View All Integrations</span>
 				<div

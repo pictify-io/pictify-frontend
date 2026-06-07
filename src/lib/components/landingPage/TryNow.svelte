@@ -3,7 +3,7 @@
 	import { analytics } from '$lib/analytics.js';
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] border-t-[3px] border-gray-900 overflow-hidden">
+<section class="w-full py-24 md:py-32 bg-brand-bg border-t-[3px] border-gray-900 overflow-hidden">
 	<div class="max-w-6xl mx-auto px-4">
 		<!-- The Monolith CTA Card -->
 		<div class="relative group">
@@ -12,7 +12,7 @@
 				class="absolute top-4 left-4 w-full h-full bg-gray-900 rounded-3xl border-[3px] border-gray-900 opacity-20 hidden sm:block"
 			/>
 			<div
-				class="absolute top-2 left-2 w-full h-full bg-[#ffc480] rounded-3xl border-[3px] border-gray-900 hidden sm:block"
+				class="absolute top-2 left-2 w-full h-full bg-brand-accent rounded-3xl border-[3px] border-gray-900 hidden sm:block"
 			/>
 
 			<!-- Main Container -->
@@ -24,8 +24,8 @@
 					class="h-12 bg-gray-50 border-b-[3px] border-gray-900 flex items-center px-6"
 				>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
 					</div>
 				</div>
@@ -53,7 +53,7 @@
 							class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight"
 						>
 							Render Your First Image <br class="md:hidden" />
-							<span class="text-[#ff6b6b]">in Under 5 Minutes</span>
+							<span class="text-brand-danger">in Under 5 Minutes</span>
 						</h2>
 
 						<p class="text-xl text-gray-700 max-w-xl mx-auto mb-8 font-medium">
@@ -63,7 +63,7 @@
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
 							<SignUpButton
-								class="w-full sm:w-auto px-8 py-4 bg-[#ffc480] text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
+								class="w-full sm:w-auto px-8 py-4 bg-brand-accent text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
 								text="Start Building Free"
 								location="cta_section"
 							/>
@@ -163,7 +163,7 @@
 						class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors"
 					>
 						<div
-							class="w-10 h-10 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+							class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
 						>
 							<svg
 								class="w-5 h-5 text-gray-900"
@@ -188,7 +188,7 @@
 						class="p-6 flex items-center justify-center gap-4 group hover:bg-gray-100 transition-colors"
 					>
 						<div
-							class="w-10 h-10 rounded-lg bg-[#ff6b6b] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
+							class="w-10 h-10 rounded-lg bg-brand-danger border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#000]"
 						>
 							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path

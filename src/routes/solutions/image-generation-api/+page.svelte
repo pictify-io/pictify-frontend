@@ -80,7 +80,7 @@
 		<h1
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
-			Image Generation <span class="text-[#ff6b6b]">API</span>
+			Image Generation <span class="text-brand-danger">API</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			POST a template + variables. Get a CDN-cached image URL. Logic in the template, not your backend.
@@ -197,27 +197,27 @@
 				The comparison table lives on the
 				<a
 					href="/solutions/automated-image-generation#comparison"
-					class="text-[#ff6b6b] underline font-bold">pillar page</a
+					class="text-brand-danger underline font-bold">pillar page</a
 				>. One-line summary:
 			</p>
-			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-4 list-disc pl-6 marker:text-[#ff6b6b]">
+			<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-4 list-disc pl-6 marker:text-brand-danger">
 				<li>
-					<a href="/compare/pictify-vs-bannerbear" class="text-[#ff6b6b] underline">Bannerbear</a> —
+					<a href="/compare/pictify-vs-bannerbear" class="text-brand-danger underline">Bannerbear</a> —
 					stable, great SDKs, no expression engine.
 				</li>
 				<li>
-					<a href="/compare/pictify-vs-placid" class="text-[#ff6b6b] underline">Placid</a> — pretty
+					<a href="/compare/pictify-vs-placid" class="text-brand-danger underline">Placid</a> — pretty
 					editor, aggressive per-render pricing at volume.
 				</li>
 				<li>
-					<a href="/compare/pictify-vs-renderform" class="text-[#ff6b6b] underline">RenderForm</a> —
+					<a href="/compare/pictify-vs-renderform" class="text-brand-danger underline">RenderForm</a> —
 					smaller ecosystem, competitive pricing.
 				</li>
 				<li>
 					DynaPictures — Google Sheets bindings, thin elsewhere.
 				</li>
 				<li>
-					<a href="/compare/pictify-vs-htmlcsstoimage" class="text-[#ff6b6b] underline"
+					<a href="/compare/pictify-vs-htmlcsstoimage" class="text-brand-danger underline"
 						>Htmlcsstoimage</a
 					> — no visual editor; you always POST raw HTML.
 				</li>

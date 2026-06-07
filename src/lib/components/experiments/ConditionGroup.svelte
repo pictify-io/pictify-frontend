@@ -184,7 +184,7 @@
 				type="button"
 				on:click={addGroup}
 				{disabled}
-				class="px-3.5 py-2 border-[3px] border-black rounded-lg bg-[#ffc480] text-black shadow-[2px_2px_0_0_black]
+				class="px-3.5 py-2 border-[3px] border-black rounded-lg bg-brand-accent text-black shadow-[2px_2px_0_0_black]
 					hover:shadow-[4px_4px_0_0_black] hover:-translate-y-[2px] active:translate-y-0 active:shadow-none
 					transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest cursor-pointer"
 			>

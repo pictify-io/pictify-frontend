@@ -521,10 +521,10 @@
 	}
 </script>
 
-<div class="flex flex-col h-full bg-[#FFFDF8]">
+<div class="flex flex-col h-full bg-brand-bg">
 	<!-- Header -->
 	<div
-		class="px-3 py-2.5 border-b-[3px] border-gray-900 bg-[#FFFDF8] flex justify-between items-center shrink-0 z-10 relative"
+		class="px-3 py-2.5 border-b-[3px] border-gray-900 bg-brand-bg flex justify-between items-center shrink-0 z-10 relative"
 	>
 		<div class="flex items-center gap-1.5 min-w-0">
 			<div class="w-5 h-5 rounded-md bg-gray-900 flex items-center justify-center shrink-0">
@@ -547,7 +547,7 @@
 
 			{#if aiCopilotLimit?.remaining >= 0 && hasCopilotAccess && !featureLimitReached}
 				<span
-					class="text-[9px] px-1.5 py-0.5 rounded-full border-[2px] border-gray-900 bg-[#ffc480] text-gray-900 font-bold shrink-0"
+					class="text-[9px] px-1.5 py-0.5 rounded-full border-[2px] border-gray-900 bg-brand-accent text-gray-900 font-bold shrink-0"
 				>
 					{aiCopilotLimit.remaining}/{aiCopilotLimit.limit}
 				</span>
@@ -572,7 +572,7 @@
 			<div class="flex items-center shrink-0">
 				{#if $canSafelyUndo}
 					<button
-						class="p-1 text-gray-900 hover:bg-[#ffc480] rounded transition-all"
+						class="p-1 text-gray-900 hover:bg-brand-accent rounded transition-all"
 						on:click={handleUndo}
 						title="Undo (Ctrl+Z)"
 					>
@@ -592,7 +592,7 @@
 					</button>
 				{/if}
 				<button
-					class="p-1 text-gray-900 hover:bg-[#ffc480] rounded transition-all"
+					class="p-1 text-gray-900 hover:bg-brand-accent rounded transition-all"
 					on:click={handleClearHistory}
 					title="Clear"
 				>
@@ -618,12 +618,12 @@
 
 	<!-- Content Area -->
 	{#if !hasCopilotAccess || featureLimitReached}
-		<div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-[#FFFDF8]">
+		<div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-brand-bg">
 			<div
 				class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex flex-col items-center text-center"
 			>
 				<div
-					class="w-10 h-10 rounded-lg bg-[#ffc480] border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center mb-3"
+					class="w-10 h-10 rounded-lg bg-brand-accent border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center mb-3"
 				>
 					<svg
 						width="20"
@@ -662,7 +662,7 @@
 		<!-- Low usage warning -->
 		{#if aiCopilotLimit?.remaining > 0 && aiCopilotLimit?.remaining <= 3}
 			<div
-				class="px-3 py-1.5 border-b-[3px] border-gray-900 bg-[#ffc480] text-gray-900 text-[10px] font-bold flex items-center justify-between shrink-0"
+				class="px-3 py-1.5 border-b-[3px] border-gray-900 bg-brand-accent text-gray-900 text-[10px] font-bold flex items-center justify-between shrink-0"
 			>
 				<span class="flex items-center gap-1">
 					<svg
@@ -719,7 +719,7 @@
 					<div class="flex flex-col gap-2 w-full px-1">
 						{#each QUICK_ACTIONS as action}
 							<button
-								class="text-[11px] text-left px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg hover:bg-[#ffc480] transition-all shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none font-bold text-gray-800"
+								class="text-[11px] text-left px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg hover:bg-brand-accent transition-all shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none font-bold text-gray-800"
 								on:click={() => handleGenerate(action)}
 							>
 								{action}
@@ -744,7 +744,7 @@
 						<div
 							class="max-w-[85%] rounded-lg border-[2px] border-gray-900 px-3 py-2 text-xs font-medium leading-relaxed
 							{msg.role === 'user'
-								? 'bg-[#ffc480] text-gray-900 shadow-[2px_2px_0_0_#000] rounded-tr-sm'
+								? 'bg-brand-accent text-gray-900 shadow-[2px_2px_0_0_#000] rounded-tr-sm'
 								: 'bg-white text-gray-900 shadow-[2px_2px_0_0_#000] rounded-tl-sm'}"
 						>
 							{msg.content}
@@ -809,7 +809,7 @@
 					>
 						Execution
 						{#if $copilotExecution.isLoading}
-							<span class="text-[#ff6b6b] animate-pulse text-[8px]">LIVE</span>
+							<span class="text-brand-danger animate-pulse text-[8px]">LIVE</span>
 						{/if}
 					</p>
 					<div class="space-y-1">
@@ -882,7 +882,7 @@
 		</div>
 
 		<!-- Input Area -->
-		<div class="p-2.5 border-t-[3px] border-gray-900 bg-[#FFFDF8] shrink-0">
+		<div class="p-2.5 border-t-[3px] border-gray-900 bg-brand-bg shrink-0">
 			{#if isLoading}
 				<div class="flex items-center gap-2">
 					<div
@@ -934,7 +934,7 @@
 					<input
 						type="checkbox"
 						bind:checked={usePerformanceInsights}
-						class="w-3 h-3 rounded border-gray-300 text-[#ffc480] focus:ring-[#ffc480] cursor-pointer"
+						class="w-3 h-3 rounded border-gray-300 text-brand-accent focus:ring-brand-accent cursor-pointer"
 					/>
 					<span class="text-[9px] text-gray-400 group-hover:text-gray-600 transition-colors flex items-center gap-1">
 						{#if usePerformanceInsights}

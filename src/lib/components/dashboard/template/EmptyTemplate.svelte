@@ -12,7 +12,7 @@
 	<div class="text-center mt-20">
 		<div class="mb-6 inline-flex">
 			<div
-				class="w-24 h-24 bg-[#ffc480]/30 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center shadow-[6px_6px_0_0_#1f293780]"
+				class="w-24 h-24 bg-brand-accent/30 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center shadow-[6px_6px_0_0_#1f293780]"
 			>
 				<svg class="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -30,7 +30,7 @@
 		</div>
 		<div>
 			<button
-				class="bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-bold py-3 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200"
+				class="bg-brand-danger hover:bg-[#ff5252] text-white font-bold py-3 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f293780] hover:shadow-[2px_2px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200"
 				on:click={openTemplateCreator}
 			>
 				<div class="flex justify-between items-center gap-2">

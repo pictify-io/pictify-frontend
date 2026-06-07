@@ -403,7 +403,7 @@
 		{disabled
 		? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
 		: open
-		? 'border-[#ffc480] shadow-[4px_4px_0_0_#ffc480]'
+		? 'border-brand-accent shadow-[4px_4px_0_0_#ffc480]'
 		: 'border-gray-900 hover:shadow-[4px_4px_0_0_#1f2937] cursor-pointer'}"
 >
 	{#if displayTemplate}

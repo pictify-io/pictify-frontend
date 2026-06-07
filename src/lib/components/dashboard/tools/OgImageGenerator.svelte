@@ -560,13 +560,13 @@
 	});
 </script>
 
-<div class="min-h-screen w-full bg-[#FFFDF8] font-['Manrope']">
+<div class="min-h-screen w-full bg-brand-bg font-['Manrope']">
 	<div class="max-w-7xl mx-auto px-6 py-12">
 		<!-- Header Section -->
 		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
 			<div>
 				<h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight mb-2">
-					OG Image <span class="text-[#ff6b6b] relative inline-block">
+					OG Image <span class="text-brand-danger relative inline-block">
 						Generator
 						<svg
 							class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -670,7 +670,7 @@
 
 									{#if template === selectedTemplate}
 										<div
-											class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
+											class="absolute top-3 left-3 bg-brand-danger text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
 										>
 											Selected
 										</div>
@@ -722,7 +722,7 @@
 								Start by customizing one of our default templates and save it to reuse later.
 							</p>
 							<button
-								class="px-6 py-3 bg-[#ff6b6b] text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
+								class="px-6 py-3 bg-brand-danger text-white font-bold rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
 								on:click={() => (activeTab = 'templates')}
 							>
 								Browse Templates
@@ -768,7 +768,7 @@
 
 										{#if template === selectedTemplate}
 											<div
-												class="absolute top-3 left-3 bg-[#ff6b6b] text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
+												class="absolute top-3 left-3 bg-brand-danger text-white px-3 py-1.5 rounded-lg border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937] text-xs font-bold uppercase tracking-wider z-10"
 											>
 												Selected
 											</div>
@@ -819,7 +819,7 @@
 									>
 										<div
 											class={`h-3 w-3 rounded-full shadow-sm ${
-												isApiOperational ? 'bg-[#4ade80]' : 'bg-[#ff6b6b]'
+												isApiOperational ? 'bg-[#4ade80]' : 'bg-brand-danger'
 											}`}
 										/>
 										<span class="text-sm font-bold text-gray-700"
@@ -828,7 +828,7 @@
 									</div>
 									{#if isUserLoggedIn}
 										<button
-											class="px-4 py-2 bg-[#ffc480] text-gray-900 font-bold rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
+											class="px-4 py-2 bg-brand-accent text-gray-900 font-bold rounded-lg border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#1f2937] transition-all"
 											on:click={() => {
 												/* Get API Key */
 											}}
@@ -896,7 +896,7 @@
 												</div>
 											{:else}
 												<div class="text-sm font-medium text-gray-600 text-center py-2">
-													Please <a href="/login" class="text-[#ff6b6b] hover:underline font-bold"
+													Please <a href="/login" class="text-brand-danger hover:underline font-bold"
 														>login</a
 													> to get your API key.
 												</div>
@@ -960,7 +960,7 @@
 												class="bg-white rounded-xl border-[3px] border-gray-900 p-6 shadow-[4px_4px_0_0_#1f2937]"
 											>
 												<h3 class="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-													<div class="w-2 h-6 bg-[#ff6b6b] rounded-full" />
+													<div class="w-2 h-6 bg-brand-danger rounded-full" />
 													Request Parameters
 												</h3>
 												<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -970,7 +970,7 @@
 																<span>{param.name}</span>
 																{#if param.required}
 																	<span
-																		class="text-[10px] text-[#ff6b6b] bg-[#ff6b6b]/10 px-2 py-0.5 rounded-full uppercase tracking-wider"
+																		class="text-[10px] text-brand-danger bg-brand-danger/10 px-2 py-0.5 rounded-full uppercase tracking-wider"
 																		>Required</span
 																	>
 																{/if}
@@ -1063,7 +1063,7 @@
 
 											<!-- Action Button -->
 											<button
-												class="w-full py-4 bg-[#ff6b6b] text-white font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+												class="w-full py-4 bg-brand-danger text-white font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] active:translate-y-0 active:shadow-[2px_2px_0_0_#1f2937] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
 												on:click={handleTestEndpoint}
 												disabled={!apiKey ||
 													(selectedEndpoint === 'generate' &&
@@ -1110,7 +1110,7 @@
 															class={`px-3 py-1 text-xs font-bold rounded-full border-2 border-gray-900 ${
 																testResponse.status >= 200 && testResponse.status < 300
 																	? 'bg-[#4ade80] text-gray-900'
-																	: 'bg-[#ff6b6b] text-white'
+																	: 'bg-brand-danger text-white'
 															}`}
 														>
 															Status: {testResponse.status}
@@ -1183,7 +1183,7 @@
 		class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
 	>
 		<div
-			class="bg-[#FFFDF8] rounded-3xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
+			class="bg-brand-bg rounded-3xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
 		>
 			<!-- Decorative elements -->
 			<div class="absolute -top-6 -right-6 text-6xl">✨</div>

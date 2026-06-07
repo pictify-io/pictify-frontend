@@ -422,7 +422,7 @@
 		<div class="bg-white">
 			<!-- Header with close button -->
 			<div
-				class="px-3 py-2 border-b-[2px] border-gray-900 flex items-center justify-between bg-[#FFFDF8]"
+				class="px-3 py-2 border-b-[2px] border-gray-900 flex items-center justify-between bg-brand-bg"
 			>
 				<span class="text-xs font-black text-gray-900 uppercase tracking-widest">{label}</span>
 				<div class="flex items-center gap-1">
@@ -456,8 +456,8 @@
 							type="button"
 							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode ===
 							'solid'
-								? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
-								: 'text-white hover:text-[#ffc480]'}"
+								? 'bg-brand-accent text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
+								: 'text-white hover:text-brand-accent'}"
 							on:click={switchToSolid}
 						>
 							Solid
@@ -466,8 +466,8 @@
 							type="button"
 							class="flex-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded transition-all {mode ===
 							'gradient'
-								? 'bg-[#ffc480] text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
-								: 'text-white hover:text-[#ffc480]'}"
+								? 'bg-brand-accent text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000]'
+								: 'text-white hover:text-brand-accent'}"
 							on:click={switchToGradient}
 						>
 							Gradient
@@ -478,7 +478,7 @@
 
 			<!-- Gradient Presets (shown in gradient mode) -->
 			{#if mode === 'gradient'}
-				<div class="px-3 py-2 bg-[#FFFDF8] border-b-[2px] border-gray-900">
+				<div class="px-3 py-2 bg-brand-bg border-b-[2px] border-gray-900">
 					<div class="text-[10px] text-gray-500 mb-1.5 uppercase font-black tracking-widest">
 						Quick Presets
 					</div>
@@ -576,7 +576,7 @@
 				<div class="px-3 pb-2 bg-white border-b-[2px] border-gray-900 pt-2">
 					<button
 						type="button"
-						class="w-full text-xs font-black uppercase tracking-wider text-white bg-[#ff6b6b] px-2 py-1.5 rounded border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all flex items-center justify-center gap-1.5"
+						class="w-full text-xs font-black uppercase tracking-wider text-white bg-brand-danger px-2 py-1.5 rounded border-[2px] border-gray-900 hover:shadow-[2px_2px_0_0_#1f2937] transition-all flex items-center justify-center gap-1.5"
 						on:click={() => handleStopDelete(activeStopId)}
 					>
 						<i class="fa fa-trash" />
@@ -596,7 +596,7 @@
 
 					<!-- Canvas Palette Section -->
 					<div
-						class="px-3 py-3 bg-[#FFFDF8] border-t-[2px] border-gray-900 space-y-3 mt-3 rounded border-[2px]"
+						class="px-3 py-3 bg-brand-bg border-t-[2px] border-gray-900 space-y-3 mt-3 rounded border-[2px]"
 					>
 						<!-- Canvas Colors -->
 						{#if canvasColors.length > 0}

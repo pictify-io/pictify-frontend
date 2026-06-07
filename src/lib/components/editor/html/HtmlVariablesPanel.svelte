@@ -201,9 +201,9 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+<div class="flex h-full w-full flex-col bg-brand-bg">
 	<!-- Header strip -->
-	<div class="border-b-[3px] border-gray-900 bg-[#ffc480] px-6 py-4">
+	<div class="border-b-[3px] border-gray-900 bg-brand-accent px-6 py-4">
 		<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 			<div>
 				<h2 class="text-lg font-black uppercase tracking-widest text-gray-900">
@@ -227,7 +227,7 @@
 						type="button"
 						on:click={bulkDelete}
 						disabled={selectedNames.size === 0}
-						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-[#ff6b6b] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+						class="flex items-center gap-1.5 rounded-lg border-[2px] border-gray-900 bg-brand-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						<i class="fa fa-trash text-[10px]"></i>
 						Delete ({selectedNames.size})
@@ -308,16 +308,16 @@
 				     have to guess whether they're supposed to type in code or
 				     click a button. -->
 				<div class="mt-4 grid grid-cols-2 gap-3 text-left">
-					<div class="rounded-lg border-[2px] border-gray-900 bg-[#FFFDF8] p-3">
+					<div class="rounded-lg border-[2px] border-gray-900 bg-brand-bg p-3">
 						<div class="mb-2 flex items-center gap-2">
-							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#ffc480] text-[9px] font-black text-gray-900">1</span>
+							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-brand-accent text-[9px] font-black text-gray-900">1</span>
 							<span class="text-[10px] font-black uppercase tracking-widest text-gray-900">In code</span>
 						</div>
 						<p class="text-[11px] font-semibold leading-snug text-gray-700">
-							Type <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-[#ffc480]">{'{{'}name{'}}'}</code> anywhere. We auto-declare it.
+							Type <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent">{'{{'}name{'}}'}</code> anywhere. We auto-declare it.
 						</p>
 					</div>
-					<div class="rounded-lg border-[2px] border-gray-900 bg-[#FFFDF8] p-3">
+					<div class="rounded-lg border-[2px] border-gray-900 bg-brand-bg p-3">
 						<div class="mb-2 flex items-center gap-2">
 							<span class="flex h-5 w-5 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#4ade80] text-[9px] font-black text-gray-900">2</span>
 							<span class="text-[10px] font-black uppercase tracking-widest text-gray-900">Right here</span>
@@ -358,9 +358,9 @@
 						}}
 						class="group flex cursor-pointer items-center gap-3 rounded-lg border-[2px] px-3 py-2 transition-all
 							{openIndex === i
-								? 'border-gray-900 bg-[#ffc480]/20 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
+								? 'border-gray-900 bg-brand-accent/20 shadow-[3px_3px_0_0_#1f2937] -translate-x-[1px] -translate-y-[1px]'
 								: selectMode && selectedNames.has(v.name)
-									? 'border-gray-900 bg-[#ffc480]/30 shadow-[2px_2px_0_0_#1f2937]'
+									? 'border-gray-900 bg-brand-accent/30 shadow-[2px_2px_0_0_#1f2937]'
 									: 'border-gray-900 bg-white hover:shadow-[2px_2px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px]'}"
 					>
 						<!-- Selection checkbox (visible only in select mode) -->
@@ -370,7 +370,7 @@
 								checked={selectedNames.has(v.name)}
 								on:click|stopPropagation
 								on:change={() => toggleSelection(v.name)}
-								class="h-4 w-4 flex-shrink-0 accent-[#ffc480]"
+								class="h-4 w-4 flex-shrink-0 accent-brand-accent"
 							/>
 						{:else}
 							<!-- Drag handle (visual only for now — a proper dnd lib is out of scope) -->
@@ -400,7 +400,7 @@
 							{/if}
 							{#if v.allowRawHtml}
 								<span
-									class="inline-flex flex-shrink-0 items-center gap-1 rounded-md border-[1.5px] border-gray-900 bg-[#ff6b6b] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-white"
+									class="inline-flex flex-shrink-0 items-center gap-1 rounded-md border-[1.5px] border-gray-900 bg-brand-danger px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-white"
 									title="Renders as raw HTML"
 								>
 									<i class="fa fa-triangle-exclamation text-[8px]"></i>
@@ -409,7 +409,7 @@
 							{/if}
 							{#if autoAdded.includes(v.name)}
 								<span
-									class="inline-flex flex-shrink-0 items-center gap-1 rounded-md border-[1.5px] border-gray-900 bg-[#ffc480] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-gray-900"
+									class="inline-flex flex-shrink-0 items-center gap-1 rounded-md border-[1.5px] border-gray-900 bg-brand-accent px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-gray-900"
 								>
 									<i class="fa fa-bolt text-[8px]"></i>
 									Auto

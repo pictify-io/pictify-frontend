@@ -97,7 +97,7 @@
 
 	<!-- Modal container -->
 	<div
-		class="relative w-full max-w-2xl border-[3px] border-black rounded-2xl bg-[#FFFDF8] shadow-[12px_12px_0_0_black] overflow-hidden"
+		class="relative w-full max-w-2xl border-[3px] border-black rounded-2xl bg-brand-bg shadow-[12px_12px_0_0_black] overflow-hidden"
 	>
 		{#if step === 'category'}
 			<!-- Step 1: Category grid -->

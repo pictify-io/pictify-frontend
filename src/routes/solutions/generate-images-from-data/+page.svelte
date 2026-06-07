@@ -71,7 +71,7 @@
 			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
 			Generate images<br />
-			<span class="text-[#10b981]">from any data source.</span>
+			<span class="text-brand-success">from any data source.</span>
 		</h1>
 		<p class="mt-5 text-lg md:text-xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
 			Bind templates to HTTP endpoints, Google Sheets, or webhooks. When data changes, images follow.

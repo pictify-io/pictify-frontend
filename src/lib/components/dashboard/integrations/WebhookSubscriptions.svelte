@@ -213,7 +213,7 @@
 										class="ml-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 {getStatusColor(
 											sub.status
 										)
-											.replace('border-green-300', 'border-green-900 bg-[#10b981]')
+											.replace('border-green-300', 'border-green-900 bg-brand-success')
 											.replace('text-green-800', 'text-white')
 											.replace('bg-green-100', '')}"
 									>
@@ -293,7 +293,7 @@
 				</p>
 				<button
 					on:click={() => (showCreateModal = true)}
-					class="px-5 py-2 text-xs font-bold text-gray-900 bg-[#ffc480] rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+					class="px-5 py-2 text-xs font-bold text-gray-900 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 				>
 					Create Webhook
 				</button>
@@ -332,7 +332,7 @@
 										class="ml-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 {getStatusColor(
 											sub.status
 										)
-											.replace('border-green-300', 'border-green-900 bg-[#10b981]')
+											.replace('border-green-300', 'border-green-900 bg-brand-success')
 											.replace('text-green-800', 'text-white')
 											.replace('bg-green-100', '')}"
 									>
@@ -429,11 +429,11 @@
 		on:keydown={(e) => e.key === 'Escape' && closeModal()}
 	>
 		<div
-			class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
+			class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
 		>
 			<!-- Header Strip -->
 			<div
-				class="absolute top-0 left-0 w-full h-1.5 bg-[#ffc480] border-b-[3px] border-gray-900 z-10"
+				class="absolute top-0 left-0 w-full h-1.5 bg-brand-accent border-b-[3px] border-gray-900 z-10"
 			/>
 			<!-- Decorative bg pattern -->
 			<div
@@ -467,13 +467,13 @@
 					<!-- Success: Show secret -->
 					<div class="space-y-6">
 						<div
-							class="p-4 bg-[#10b981]/10 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
+							class="p-4 bg-brand-success/10 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937]"
 						>
 							<div
 								class="text-gray-900 font-black mb-2 flex items-center gap-2 uppercase tracking-wide"
 							>
 								<div
-									class="p-1 bg-[#10b981] rounded text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+									class="p-1 bg-brand-success rounded text-white border-2 border-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path

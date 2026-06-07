@@ -271,7 +271,7 @@
 	})}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -279,10 +279,10 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -313,7 +313,7 @@
 					class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 				>
 					<div
-						class="px-6 py-2 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg"
+						class="px-6 py-2 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg"
 					>
 						★ Workflow
 					</div>
@@ -325,7 +325,7 @@
 				>
 					Generate
 					<br class="hidden sm:block" />
-					<span class="relative inline-block text-[#ff6b6b] px-2">
+					<span class="relative inline-block text-brand-danger px-2">
 						{config.label}
 					</span>
 				</h1>
@@ -363,8 +363,8 @@
 						class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
 					>
 						<div class="flex items-center gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
 							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
 						</div>
 						<div
@@ -542,7 +542,7 @@
 						<span class="font-black uppercase tracking-widest text-sm">Overview</span>
 					</div>
 					<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-						Why teams <span class="text-[#ff6b6b]">choose</span> this workflow
+						Why teams <span class="text-brand-danger">choose</span> this workflow
 					</h2>
 				</div>
 
@@ -552,10 +552,10 @@
 							class="bg-white border-[3px] border-gray-900 p-8 rounded-3xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-1 transition-all relative overflow-hidden group"
 						>
 							<div
-								class="absolute top-0 right-0 w-32 h-32 bg-[#ffc480]/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"
+								class="absolute top-0 right-0 w-32 h-32 bg-brand-accent/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"
 							/>
 							<div
-								class="w-12 h-12 bg-[#ffc480] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-xl font-black mb-6 shadow-[3px_3px_0_0_#1f2937] relative z-10"
+								class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-xl font-black mb-6 shadow-[3px_3px_0_0_#1f2937] relative z-10"
 							>
 								{i + 1}
 							</div>
@@ -587,10 +587,10 @@
 									: 'lg:col-span-12'}
 							>
 								<div
-									class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[12px_12px_0_0_#1f2937] h-full"
+									class="bg-brand-bg border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[12px_12px_0_0_#1f2937] h-full"
 								>
 									<span
-										class="inline-block px-4 py-1.5 bg-[#ff6b6b] text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6"
+										class="inline-block px-4 py-1.5 bg-brand-danger text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937] mb-6"
 										>Deep Dive</span
 									>
 
@@ -635,7 +635,7 @@
 												class="flex items-start gap-4 p-4 bg-white/90 border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#1f2937] transition-all"
 											>
 												<div
-													class="flex-shrink-0 w-6 h-6 rounded-full bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center mt-1"
+													class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-accent border-2 border-gray-900 flex items-center justify-center mt-1"
 												>
 													<svg
 														class="w-3.5 h-3.5 text-gray-900"
@@ -665,11 +665,11 @@
 			<SectionSeparator icon="bolt" />
 
 			<!-- Pain Points Section -->
-			<section class="py-20 bg-[#FFFDF8]">
+			<section class="py-20 bg-brand-bg">
 				<div class="max-w-5xl mx-auto px-6">
 					<div class="text-center mb-16">
 						<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-							Problems <span class="bg-[#ff6b6b] text-white px-2 transform -skew-x-6 inline-block"
+							Problems <span class="bg-brand-danger text-white px-2 transform -skew-x-6 inline-block"
 								>Solved</span
 							>
 						</h2>
@@ -681,7 +681,7 @@
 								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[5px_5px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
 							>
 								<div class="flex items-start gap-4">
-									<span class="text-[#ff6b6b] text-2xl font-black">✗</span>
+									<span class="text-brand-danger text-2xl font-black">✗</span>
 									<p class="text-gray-800 font-bold">{point}</p>
 								</div>
 							</div>
@@ -724,7 +724,7 @@
 					<button
 						type="button"
 						on:click={openInCanvasEditor}
-						class="px-10 py-5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
+						class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
 					>
 						Start Creating Now
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -752,11 +752,11 @@
 							<div class="flex flex-col gap-8">
 								<div>
 									<span
-										class="px-4 py-2 bg-[#ffc480] border-2 border-gray-900 rounded-lg text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937]"
+										class="px-4 py-2 bg-brand-accent border-2 border-gray-900 rounded-lg text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#1f2937]"
 										>Developer Friendly</span
 									>
 									<h2 class="mt-6 text-3xl md:text-5xl font-black text-gray-900 leading-[1.1]">
-										Automate with <span class="text-[#ff6b6b]">API</span>
+										Automate with <span class="text-brand-danger">API</span>
 									</h2>
 									<p class="mt-6 text-xl text-gray-600 font-medium leading-relaxed">
 										Trigger this workflow programmatically. Personalized images, generated instantly
@@ -767,7 +767,7 @@
 								<div class="flex flex-wrap gap-4">
 									<a
 										href="/signup"
-										class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-[#ff6b6b] hover:text-gray-900 transition-colors"
+										class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-brand-danger hover:text-gray-900 transition-colors"
 									>
 										Get API Key
 									</a>
@@ -784,7 +784,7 @@
 							<!-- Right: Code Window -->
 							<div class="relative group">
 								<div
-									class="absolute -inset-4 bg-gradient-to-r from-[#ff6b6b] to-[#ffc480] rounded-[2rem] opacity-20 blur-xl group-hover:opacity-30 transition-opacity"
+									class="absolute -inset-4 bg-gradient-to-r from-brand-danger to-brand-accent rounded-[2rem] opacity-20 blur-xl group-hover:opacity-30 transition-opacity"
 								/>
 								<div
 									class="relative rounded-2xl border-[3px] border-gray-900 bg-[#1e1e1e] shadow-[8px_8px_0_0_#1f2937] overflow-hidden"
@@ -817,7 +817,7 @@
 						>
 							<span class="relative z-10">Frequently Asked Questions</span>
 							<span
-								class="absolute bottom-1 left-0 w-full h-3 bg-[#ffc480] -z-0 transform -rotate-1"
+								class="absolute bottom-1 left-0 w-full h-3 bg-brand-accent -z-0 transform -rotate-1"
 							/>
 						</h2>
 					</div>
@@ -863,7 +863,7 @@
 						{#each config.related as relatedId}
 							<a
 								href={`/tools/${relatedId}`}
-								class="px-6 py-3 bg-[#FFFDF8] border-[3px] border-gray-900 font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all rounded-xl"
+								class="px-6 py-3 bg-brand-bg border-[3px] border-gray-900 font-bold text-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#4ade80] transition-all rounded-xl"
 							>
 								{useCaseDetails[relatedId]?.label || relatedId}
 							</a>
@@ -883,7 +883,7 @@
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-[#ff6b6b] rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
+					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-[8px_8px_0_0_#1f2937]"
 				>
 					?
 				</div>
@@ -892,7 +892,7 @@
 				</h1>
 				<a
 					href="/tools"
-					class="px-8 py-4 bg-[#ffc480] border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
 				>
 					Explore All Tools
 				</a>

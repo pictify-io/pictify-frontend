@@ -29,7 +29,7 @@
 		<!-- Section Header -->
 		<div class="text-center space-y-4 md:space-y-6">
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 leading-tight">
-				Real-World <span class="text-[#ff6b6b]">Use Cases</span>
+				Real-World <span class="text-brand-danger">Use Cases</span>
 			</h2>
 			<p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto font-medium">
 				See how leading companies use Pictify to automate their image generation needs. Perfect for
@@ -43,8 +43,8 @@
 				<button
 					class="group bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-xl md:rounded-2xl border border-gray-200 shadow-sm transition-all duration-300 w-full text-left {activeCase ===
 					i
-						? 'border-[#ff6b6b] ring-1 ring-[#ff6b6b]/20'
-						: 'hover:border-[#ff6b6b]/30'}"
+						? 'border-brand-danger ring-1 ring-brand-danger/20'
+						: 'hover:border-brand-danger/30'}"
 					on:click={() => (activeCase = i)}
 					on:keydown={(e) => {
 						if (e.key === 'Enter' || e.key === ' ') {
@@ -124,20 +124,20 @@
 									<text x="50" y="130" class="fill-gray-400 text-[8px] font-mono">4</text>
 									<text x="50" y="145" class="fill-gray-400 text-[8px] font-mono">5</text>
 									<!-- HTML Code -->
-									<text x="60" y="85" class="fill-[#ff6b6b] text-[8px] font-mono"
+									<text x="60" y="85" class="fill-brand-danger text-[8px] font-mono"
 										>&lt;div class="card"&gt;</text
 									>
-									<text x="70" y="100" class="fill-[#ff6b6b] text-[8px] font-mono"
+									<text x="70" y="100" class="fill-brand-danger text-[8px] font-mono"
 										>&lt;h1&gt;Welcome&lt;/h1&gt;</text
 									>
-									<text x="70" y="115" class="fill-[#ff6b6b] text-[8px] font-mono"
+									<text x="70" y="115" class="fill-brand-danger text-[8px] font-mono"
 										>&lt;p&gt;Hello World&lt;/p&gt;</text
 									>
-									<text x="60" y="130" class="fill-[#ff6b6b] text-[8px] font-mono"
+									<text x="60" y="130" class="fill-brand-danger text-[8px] font-mono"
 										>&lt;/div&gt;</text
 									>
 									<!-- Animated Cursor -->
-									<rect x="60" y="140" width="2" height="10" class="fill-[#ff6b6b] animate-blink" />
+									<rect x="60" y="140" width="2" height="10" class="fill-brand-danger animate-blink" />
 								</svg>
 							</div>
 							<div class="text-center">
@@ -169,7 +169,7 @@
 									<rect x="70" y="90" width="60" height="2" rx="1" class="fill-gray-200" />
 
 									<!-- Single Status Light -->
-									<circle cx="75" cy="120" r="3" class="fill-[#ff6b6b] animate-pulse" />
+									<circle cx="75" cy="120" r="3" class="fill-brand-danger animate-pulse" />
 								</svg>
 							</div>
 							<div class="text-center">
@@ -200,7 +200,7 @@
 									<!-- Small Download Arrow in Corner -->
 									<path
 										d="M145 50v15m-4-4l4 4 4-4"
-										class="stroke-[#ff6b6b]"
+										class="stroke-brand-danger"
 										stroke-width="1.5"
 										stroke-linecap="round"
 										stroke-linejoin="round"
@@ -218,42 +218,42 @@
 					<div class="absolute top-[40%] left-0 w-full h-0.5 hidden md:block">
 						<!-- First Connection Dots -->
 						<div
-							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-1"
+							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-1"
 						/>
 						<div
-							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-2"
+							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-2"
 						/>
 						<div
-							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-3"
+							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-3"
 						/>
 						<div
-							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-4"
+							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-4"
 						/>
 						<div
-							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-5"
+							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-5"
 						/>
 						<div
-							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-5"
+							class="absolute left-[28%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-5"
 						/>
 
 						<!-- Second Connection Dots -->
 						<div
-							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-1"
+							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-1"
 						/>
 						<div
-							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-2"
+							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-2"
 						/>
 						<div
-							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-3"
+							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-3"
 						/>
 						<div
-							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-4"
+							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-4"
 						/>
 						<div
-							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-5"
+							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-5"
 						/>
 						<div
-							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#ff6b6b] rounded-full animate-flow-5"
+							class="absolute left-[60.5%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-brand-danger rounded-full animate-flow-5"
 						/>
 					</div>
 				</div>

@@ -180,7 +180,7 @@
 		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
 			<!-- Period Views -->
 			<div
-				class="bg-[#ffc480] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-brand-accent rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -right-8 -top-8 w-28 h-28 bg-white/20 rounded-full blur-2xl group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-700"
@@ -237,7 +237,7 @@
 
 			<!-- Total Assets -->
 			<div
-				class="bg-[#ff6b6b] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-brand-danger rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -left-10 -top-10 w-32 h-32 bg-white/20 rounded-full blur-xl group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700"
@@ -263,10 +263,10 @@
 			>
 				<div class="flex items-center gap-3">
 					<div
-						class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-black shadow-[1px_1px_0_0_black]"
+						class="w-3 h-3 rounded-full bg-brand-danger border border-black shadow-[1px_1px_0_0_black]"
 					/>
 					<div
-						class="w-3 h-3 rounded-full bg-[#ffc480] border border-black shadow-[1px_1px_0_0_black]"
+						class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_black]"
 					/>
 					<div
 						class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_black]"
@@ -365,7 +365,7 @@
 											class="w-full border-[2px] border-b-0 border-black rounded-t-sm transition-all duration-300 group-hover:-translate-y-1 relative overflow-hidden
 											{chartMode === 'views'
 												? 'bg-[#c4b5fd] group-hover:bg-[#a78bfa]'
-												: 'bg-[#ffc480] group-hover:bg-[#f59e0b]'}"
+												: 'bg-brand-accent group-hover:bg-[#f59e0b]'}"
 											style="height: {Math.max(
 												((chartMode === 'views' ? stat.hits : stat.bytes) / currentMax) * 100,
 												1
@@ -438,7 +438,7 @@
 				<div class="flex items-center justify-between p-5 border-b-[3px] border-black bg-gray-50">
 					<div class="flex items-center gap-3">
 						<div
-							class="w-7 h-7 rounded-lg bg-[#ffc480] border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+							class="w-7 h-7 rounded-lg bg-brand-accent border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
 						>
 							<svg
 								class="w-3.5 h-3.5 text-black"
@@ -461,7 +461,7 @@
 					{#if topReferrers.length > 10}
 						<button
 							on:click={() => (expandedReferrers = !expandedReferrers)}
-							class="text-[10px] font-black text-[#ff6b6b] uppercase tracking-wider"
+							class="text-[10px] font-black text-brand-danger uppercase tracking-wider"
 						>
 							{expandedReferrers ? 'Show less' : 'Show all'}
 						</button>
@@ -485,7 +485,7 @@
 									</div>
 									<div class="w-full bg-gray-200 rounded-full h-1.5 border border-gray-300">
 										<div
-											class="bg-[#ffc480] h-full rounded-full border-r border-black/20 transition-all duration-500"
+											class="bg-brand-accent h-full rounded-full border-r border-black/20 transition-all duration-500"
 											style="width: {getPercentage(ref.hits, topReferrers[0]?.hits)}%"
 										/>
 									</div>
@@ -530,7 +530,7 @@
 					{#if topCountries.length > 10}
 						<button
 							on:click={() => (expandedCountries = !expandedCountries)}
-							class="text-[10px] font-black text-[#ff6b6b] uppercase tracking-wider"
+							class="text-[10px] font-black text-brand-danger uppercase tracking-wider"
 						>
 							{expandedCountries ? 'Show less' : 'Show all'}
 						</button>
@@ -613,7 +613,7 @@
 							{/if}
 							{#if statusCodes._304 > 0}
 								<div
-									class="bg-[#ffc480] flex items-center justify-center transition-all duration-500"
+									class="bg-brand-accent flex items-center justify-center transition-all duration-500"
 									style="width: {getPercentage(statusCodes._304, totalStatusHits)}%"
 								>
 									{#if getPercentage(statusCodes._304, totalStatusHits) > 15}
@@ -623,7 +623,7 @@
 							{/if}
 							{#if statusCodes._other > 0}
 								<div
-									class="bg-[#ff6b6b] flex items-center justify-center transition-all duration-500"
+									class="bg-brand-danger flex items-center justify-center transition-all duration-500"
 									style="width: {getPercentage(statusCodes._other, totalStatusHits)}%"
 								>
 									{#if getPercentage(statusCodes._other, totalStatusHits) > 15}
@@ -652,7 +652,7 @@
 							</div>
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="w-4 h-4 bg-[#ffc480] rounded border-[2px] border-black" />
+									<div class="w-4 h-4 bg-brand-accent rounded border-[2px] border-black" />
 									<span class="text-xs font-black text-black uppercase tracking-wider"
 										>304 Cached</span
 									>
@@ -669,7 +669,7 @@
 							</div>
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="w-4 h-4 bg-[#ff6b6b] rounded border-[2px] border-black" />
+									<div class="w-4 h-4 bg-brand-danger rounded border-[2px] border-black" />
 									<span class="text-xs font-black text-black uppercase tracking-wider">Other</span>
 								</div>
 								<div class="flex items-center gap-2">
@@ -716,7 +716,7 @@
 			>
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 rounded-xl bg-[#ffc480] border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
+						class="w-8 h-8 rounded-xl bg-brand-accent border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_0_black]"
 					>
 						<svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -759,7 +759,7 @@
 				{#if assets.length > 0}
 					{#each assets as asset, i}
 						<div
-							class="flex items-center gap-4 p-4 md:p-5 hover:bg-[#ffc480]/10 transition-colors group"
+							class="flex items-center gap-4 p-4 md:p-5 hover:bg-brand-accent/10 transition-colors group"
 						>
 							<!-- Rank -->
 							<div class="w-6 font-black text-gray-400 text-sm text-center flex-shrink-0">
@@ -797,7 +797,7 @@
 									{#if asset.templateName}
 										<a
 											href="/dashboard/template/{asset.templateUid}"
-											class="text-sm font-black text-black truncate block hover:text-[#ff6b6b] transition-colors"
+											class="text-sm font-black text-black truncate block hover:text-brand-danger transition-colors"
 											>{asset.templateName}</a
 										>
 									{/if}

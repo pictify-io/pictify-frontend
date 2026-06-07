@@ -38,7 +38,7 @@
 					Serve this URL inside an {@html '<code>&lt;img&gt;</code>'} or CSS background.
 				</p>
 				<div
-					class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-[#ffc480]"
+					class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-brand-accent"
 				>
 					{previewUrl}
 				</div>

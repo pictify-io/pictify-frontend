@@ -62,7 +62,7 @@
 	}
 </script>
 
-<div class="bg-[#ffc480] border-t-[3px] border-b-[3px] border-gray-900">
+<div class="bg-brand-accent border-t-[3px] border-b-[3px] border-gray-900">
 	<button
 		type="button"
 		class="w-full text-left px-5 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between focus:outline-none focus-visible:ring-4 focus-visible:ring-gray-900 disabled:opacity-80 group"

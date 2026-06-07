@@ -24,10 +24,10 @@
 	});
 </script>
 
-<section class="w-full py-24 md:py-32 bg-[#FFFDF8] relative">
+<section class="w-full py-24 md:py-32 bg-brand-bg relative">
 	<!-- Decorative Background Elements -->
 	<div
-		class="absolute top-20 right-0 w-64 h-64 bg-[#ffc480]/20 rounded-full blur-3xl -z-10 pointer-events-none"
+		class="absolute top-20 right-0 w-64 h-64 bg-brand-accent/20 rounded-full blur-3xl -z-10 pointer-events-none"
 	/>
 	<div
 		class="absolute bottom-0 left-0 w-72 h-72 bg-green-100/40 rounded-full blur-3xl -z-10 pointer-events-none"
@@ -36,13 +36,13 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-24">
 			<div
-				class="inline-block px-4 py-1.5 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
+				class="inline-block px-4 py-1.5 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform -rotate-2"
 			>
 				<span class="text-sm font-bold text-white uppercase tracking-wider">How It Works</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				From Data to <br />
-				<span class="relative inline-block text-[#ff6b6b]">
+				<span class="relative inline-block text-brand-danger">
 					Pixel-Perfect Output
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -80,7 +80,7 @@
 				>
 					<div class="flex items-center gap-6 mb-4">
 						<div
-							class="w-16 h-16 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
+							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-gray-900 rounded-xl transition-transform duration-300 {activeStep ===
 							0
 								? 'scale-110'
 								: 'scale-100'}"
@@ -115,7 +115,7 @@
 				>
 					<div class="flex items-center gap-6 mb-4">
 						<div
-							class="w-16 h-16 bg-[#ff6b6b] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-white rounded-xl transition-transform duration-300 {activeStep ===
+							class="w-16 h-16 bg-brand-danger border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center text-3xl font-bold text-white rounded-xl transition-transform duration-300 {activeStep ===
 							1
 								? 'scale-110'
 								: 'scale-100'}"
@@ -201,7 +201,7 @@
 								<div class="flex-1 flex">
 									<!-- Sidebar -->
 									<div
-										class="w-16 border-r-[3px] border-gray-900 flex flex-col items-center py-4 gap-4 bg-[#ffc480]/20"
+										class="w-16 border-r-[3px] border-gray-900 flex flex-col items-center py-4 gap-4 bg-brand-accent/20"
 									>
 										<div
 											class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg shadow-[2px_2px_0_0_#000]"
@@ -220,7 +220,7 @@
 										<div
 											class="w-64 aspect-video bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] flex flex-col relative"
 										>
-											<div class="h-2/3 bg-[#ff6b6b] border-b-[3px] border-gray-900 p-4">
+											<div class="h-2/3 bg-brand-danger border-b-[3px] border-gray-900 p-4">
 												<div class="w-1/2 h-4 bg-white border-[2px] border-gray-900 mb-2" />
 											</div>
 											<div class="flex-1 p-3 flex justify-between items-center">
@@ -251,7 +251,7 @@
 								? 'translate-y-0 opacity-100'
 								: activeStep > 1
 								? '-translate-y-full opacity-0'
-								: 'translate-y-full opacity-0'} flex items-center justify-center bg-[#ff6b6b] p-8"
+								: 'translate-y-full opacity-0'} flex items-center justify-center bg-brand-danger p-8"
 						>
 							<div
 								class="w-full max-w-md bg-black border-[3px] border-gray-900 shadow-[8px_8px_0_0_#000] rounded-xl overflow-hidden"
@@ -267,12 +267,12 @@
 								</div>
 								<div class="p-6 font-mono text-sm text-green-400">
 									<div class="mb-4">
-										<span class="text-[#ff6b6b]">user@pictify:~$</span> curl -X POST /generate
+										<span class="text-brand-danger">user@pictify:~$</span> curl -X POST /generate
 									</div>
 									<div class="text-white opacity-90">
 										{`{`}
-										<div class="pl-4"><span class="text-[#ffc480]">"template"</span>: "promo",</div>
-										<div class="pl-4"><span class="text-[#ffc480]">"variables"</span>: {`{`}</div>
+										<div class="pl-4"><span class="text-brand-accent">"template"</span>: "promo",</div>
+										<div class="pl-4"><span class="text-brand-accent">"variables"</span>: {`{`}</div>
 										<div class="pl-8">"product": "Nike Air",</div>
 										<div class="pl-8">"price": <span class="text-[#4ade80]">129</span>,</div>
 										<div class="pl-8">"inStock": <span class="text-[#4ade80]">true</span></div>
@@ -314,7 +314,7 @@
 
 								<!-- Decorative Elements -->
 								<div
-									class="absolute -top-6 -right-6 w-12 h-12 bg-[#ffc480] rounded-full border-[3px] border-gray-900 flex items-center justify-center font-bold shadow-[3px_3px_0_0_#000] animate-bounce"
+									class="absolute -top-6 -right-6 w-12 h-12 bg-brand-accent rounded-full border-[3px] border-gray-900 flex items-center justify-center font-bold shadow-[3px_3px_0_0_#000] animate-bounce"
 								>
 									<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path

@@ -158,8 +158,8 @@
 
 	function getStatusDot(status) {
 		if (status === 'success') return 'bg-[#4ade80]';
-		if (status === 'failure') return 'bg-[#ff6b6b]';
-		return 'bg-[#ffc480]';
+		if (status === 'failure') return 'bg-brand-danger';
+		return 'bg-brand-accent';
 	}
 
 	function handleDismissNudge(id) {
@@ -347,7 +347,7 @@
 	<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 sm:mb-12 pt-4">
 		<div>
 			<div
-				class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#ffc480] border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-1 mb-6"
+				class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-[4px_4px_0_0_black] rounded-full transform -rotate-1 mb-6"
 			>
 				<span class="w-2 h-2 bg-[#4ade80] rounded-full animate-pulse border border-black" />
 				<span class="text-xs font-black text-black uppercase tracking-widest">Command Center</span>
@@ -373,7 +373,7 @@
 		<div class="flex items-center gap-4">
 			<a
 				href={primaryCTA?.href || '/dashboard/template/create'}
-				class="group flex items-center gap-3 bg-[#ff6b6b] border-[3px] border-black shadow-[6px_6px_0_0_black] rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-[2px_2px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
+				class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-[6px_6px_0_0_black] rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-[2px_2px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
 			>
 				<span class="text-white font-black text-lg uppercase tracking-wide"
 					>{primaryCTA?.label || 'Create Template'}</span
@@ -421,7 +421,7 @@
 	{#if isLoading}
 		<div class="flex flex-col items-center justify-center py-20">
 			<div
-				class="w-12 h-12 border-[3px] border-gray-900 border-t-[#ffc480] rounded-full animate-spin"
+				class="w-12 h-12 border-[3px] border-gray-900 border-t-brand-accent rounded-full animate-spin"
 			/>
 			<p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">
 				Loading dashboard...
@@ -435,7 +435,7 @@
 					<h2
 						class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
 					>
-						<span class="w-3 h-3 bg-[#ffc480] rounded-full border-[2px] border-black" />
+						<span class="w-3 h-3 bg-brand-accent rounded-full border-[2px] border-black" />
 						Recommended For You
 					</h2>
 				</div>
@@ -459,10 +459,10 @@
 								{:else}
 									<div class="w-full h-full flex items-center justify-center">
 										<div
-											class="w-14 h-14 bg-[#ffc480]/20 rounded-xl border-[2px] border-[#ffc480] flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform"
+											class="w-14 h-14 bg-brand-accent/20 rounded-xl border-[2px] border-brand-accent flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform"
 										>
 											<svg
-												class="w-7 h-7 text-[#ffc480]"
+												class="w-7 h-7 text-brand-accent"
 												fill="none"
 												stroke="currentColor"
 												viewBox="0 0 24 24"
@@ -512,7 +512,7 @@
 				<h2
 					class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
 				>
-					<span class="w-3 h-3 bg-[#ff6b6b] rounded-full border-[2px] border-black" />
+					<span class="w-3 h-3 bg-brand-danger rounded-full border-[2px] border-black" />
 					Performance Analytics
 				</h2>
 			</div>
@@ -521,7 +521,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<!-- Aggregated Metric: Views -->
 				<div
-					class="bg-[#ffc480] rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-brand-accent rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -601,10 +601,10 @@
 					>
 						<div class="flex items-center gap-3">
 							<div
-								class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-black shadow-[1px_1px_0_0_black]"
+								class="w-3 h-3 rounded-full bg-brand-danger border border-black shadow-[1px_1px_0_0_black]"
 							/>
 							<div
-								class="w-3 h-3 rounded-full bg-[#ffc480] border border-black shadow-[1px_1px_0_0_black]"
+								class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_black]"
 							/>
 							<div
 								class="w-3 h-3 rounded-full bg-[#4ade80] border border-black shadow-[1px_1px_0_0_black]"
@@ -768,7 +768,7 @@
 									<h4
 										class="text-[10px] font-black text-black uppercase tracking-widest mb-4 flex items-center gap-2"
 									>
-										<div class="w-2 h-2 bg-[#ffc480] border-[2px] border-black rounded-sm" />
+										<div class="w-2 h-2 bg-brand-accent border-[2px] border-black rounded-sm" />
 										Top Referrers
 									</h4>
 									<div class="space-y-2">
@@ -944,7 +944,7 @@
 						{#if recentTemplates.length > 0}
 							<a
 								href="/dashboard/template"
-								class="text-xs font-black text-[#ff6b6b] uppercase tracking-wider hover:text-[#ff5252] flex items-center gap-1 group"
+								class="text-xs font-black text-brand-danger uppercase tracking-wider hover:text-[#ff5252] flex items-center gap-1 group"
 							>
 								View all templates
 								<svg
@@ -994,10 +994,10 @@
 											</div>
 										{:else}
 											<div
-												class="w-full h-full flex items-center justify-center bg-gray-50 group-hover:bg-[#ffc480]/10 transition-colors"
+												class="w-full h-full flex items-center justify-center bg-gray-50 group-hover:bg-brand-accent/10 transition-colors"
 											>
 												<svg
-													class="w-8 h-8 text-gray-400 group-hover:text-[#ffc480] transition-colors"
+													class="w-8 h-8 text-gray-400 group-hover:text-brand-accent transition-colors"
 													fill="none"
 													stroke="currentColor"
 													viewBox="0 0 24 24"
@@ -1016,7 +1016,7 @@
 											class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
 										>
 											<div
-												class="bg-[#ffc480] text-black text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full border-[2px] border-black transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+												class="bg-brand-accent text-black text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full border-[2px] border-black transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
 											>
 												Open Editor
 											</div>
@@ -1125,7 +1125,7 @@
 							{#each $cdnStore.topTemplates as tpl, i}
 								<a
 									href="/dashboard/template/{tpl.uid}"
-									class="flex items-center gap-4 p-4 hover:bg-[#ffc480]/20 transition-colors group"
+									class="flex items-center gap-4 p-4 hover:bg-brand-accent/20 transition-colors group"
 								>
 									<!-- Rank -->
 									<div

@@ -69,9 +69,9 @@
 	}
 
 	function getBannerStyle(percentage) {
-		if (percentage >= 95) return 'bg-[#ff6b6b]'; // Critical - red
+		if (percentage >= 95) return 'bg-brand-danger'; // Critical - red
 		if (percentage >= 85) return 'bg-[#f59e0b]'; // Urgent - orange
-		return 'bg-[#ffc480]'; // Default - yellow
+		return 'bg-brand-accent'; // Default - yellow
 	}
 
 	onMount(() => {

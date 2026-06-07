@@ -133,7 +133,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-b-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-b-[3px] border-gray-900"
 >
 	<!-- Background Pattern from Integrations/Experiments -->
 	<div
@@ -144,7 +144,7 @@
 		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
@@ -156,7 +156,7 @@
 			>
 				<!-- Sparkle SVG -->
 				<svg
-					class="absolute -top-3 -right-3 w-6 h-6 text-[#ff6b6b] transform rotate-12"
+					class="absolute -top-3 -right-3 w-6 h-6 text-brand-danger transform rotate-12"
 					fill="currentColor"
 					viewBox="0 0 24 24"
 					><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z" /></svg
@@ -169,7 +169,7 @@
 			<!-- Headline -->
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
 				Generate Images From Data.<br />
-				<span class="relative inline-block text-[#ff6b6b] transform rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					One API Call
 					<!-- Scribble Underline -->
 					<svg
@@ -194,7 +194,7 @@
 					<SignUpButton
 						text="Start Building Free"
 						location="hero"
-						class="w-full sm:w-auto bg-[#ff6b6b] text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all font-black uppercase tracking-wider text-center"
+						class="w-full sm:w-auto bg-brand-danger text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#000] transition-all font-black uppercase tracking-wider text-center"
 					/>
 
 					<a
@@ -250,7 +250,7 @@
 				<div class="w-full lg:w-[42%] flex flex-col justify-center relative">
 					<!-- Accent background block -->
 					<div
-						class="absolute inset-0 bg-[#ff6b6b] rounded-3xl transform -rotate-2 -translate-x-2 -translate-y-2 pointer-events-none shadow-[8px_8px_0_0_#1f2937]"
+						class="absolute inset-0 bg-brand-danger rounded-3xl transform -rotate-2 -translate-x-2 -translate-y-2 pointer-events-none shadow-[8px_8px_0_0_#1f2937]"
 					/>
 
 					<div
@@ -258,7 +258,7 @@
 					>
 						<!-- Quirky Floating Label -->
 						<div
-							class="absolute -top-4 -right-4 bg-[#ffc480] border-[3px] border-gray-900 rounded-xl px-4 py-1.5 shadow-[4px_4px_0_0_#1f2937] transform rotate-6 group-hover:-rotate-3 transition-transform duration-300"
+							class="absolute -top-4 -right-4 bg-brand-accent border-[3px] border-gray-900 rounded-xl px-4 py-1.5 shadow-[4px_4px_0_0_#1f2937] transform rotate-6 group-hover:-rotate-3 transition-transform duration-300"
 						>
 							<span class="text-xs font-black uppercase text-gray-900 whitespace-nowrap"
 								>Edit JSON</span
@@ -281,7 +281,7 @@
 									id="hero-header"
 									bind:value={header}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-[#ff6b6b] focus:ring-4 focus:ring-[#ff6b6b]/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
@@ -294,7 +294,7 @@
 									id="hero-header2"
 									bind:value={heading_2}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-[#ff6b6b] focus:ring-4 focus:ring-[#ff6b6b]/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
@@ -307,7 +307,7 @@
 									id="hero-header3"
 									bind:value={header_3}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-[#ff6b6b] focus:ring-4 focus:ring-[#ff6b6b]/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
@@ -320,7 +320,7 @@
 									id="hero-subheading"
 									bind:value={subheading}
 									on:input={handleInput}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-[#ff6b6b] focus:ring-4 focus:ring-[#ff6b6b]/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
+									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-[2px_2px_0_0_#1f2937] transition-all"
 								/>
 							</div>
 						</div>
@@ -346,8 +346,8 @@
 							class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 						>
 							<div class="px-5 flex gap-2 h-full items-center py-4">
-								<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-[2px] border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-[2px] border-gray-900" />
 								<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-[2px] border-gray-900" />
 							</div>
 							<div

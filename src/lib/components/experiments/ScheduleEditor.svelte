@@ -14,7 +14,7 @@
 
 	// Color palette for variant bars
 	const VARIANT_COLORS = [
-		{ bg: 'bg-[#ffc480]', border: 'border-[#e6a050]', text: 'text-gray-900' },
+		{ bg: 'bg-brand-accent', border: 'border-[#e6a050]', text: 'text-gray-900' },
 		{ bg: 'bg-[#4ade80]', border: 'border-[#22c55e]', text: 'text-gray-900' },
 		{ bg: 'bg-[#a78bfa]', border: 'border-[#7c3aed]', text: 'text-white' },
 		{ bg: 'bg-[#f472b6]', border: 'border-[#ec4899]', text: 'text-white' },
@@ -212,7 +212,7 @@
 	<!-- Overlap Warning -->
 	{#if overlaps.length > 0}
 		<div
-			class="bg-[#ffc480]/20 border-[3px] border-[#ffc480] rounded-xl p-4 flex items-start gap-3"
+			class="bg-brand-accent/20 border-[3px] border-brand-accent rounded-xl p-4 flex items-start gap-3"
 		>
 			<svg
 				class="w-5 h-5 text-[#e6a050] shrink-0 mt-0.5"

@@ -152,17 +152,17 @@
 	$: selectedItem = canvasItems.find((i) => i.id === selectedId);
 </script>
 
-<section class="w-full py-20 md:py-32 bg-[#FFFDF8] relative overflow-hidden">
+<section class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<div class="max-w-7xl mx-auto px-6">
 		<div class="text-center mb-16">
 			<div
-				class="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc480] rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1"
+				class="inline-flex items-center gap-2 px-4 py-2 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] mb-6 transform rotate-1"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Visual Editor</span>
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				Build Templates <br />
-				<span class="relative inline-block text-[#ff6b6b]">
+				<span class="relative inline-block text-brand-danger">
 					Without Writing HTML.
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
@@ -191,8 +191,8 @@
 					class="h-12 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 gap-3 select-none"
 				>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+						<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
 					</div>
 					<div class="flex-1 flex justify-center">
@@ -214,7 +214,7 @@
 						>
 							<button
 								on:click={() => goto('/canvas/try')}
-								class="group relative px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
+								class="group relative px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all duration-200"
 							>
 								<div class="flex items-center gap-3">
 									<span>Try Canvas Editor</span>
@@ -267,7 +267,7 @@
 							<div
 								class="w-10 h-10 rounded-lg border-[2px] border-gray-900 flex items-center justify-center transition-all cursor-pointer shadow-[2px_2px_0_0_#000]
 								{activeTool === i
-									? 'bg-[#ffc480] translate-x-0.5 translate-y-0.5 shadow-none'
+									? 'bg-brand-accent translate-x-0.5 translate-y-0.5 shadow-none'
 									: 'bg-white hover:bg-gray-50'}"
 								on:mouseenter={() => (activeTool = i)}
 							>
@@ -434,7 +434,7 @@
 
 								<div class="pt-4">
 									<div
-										class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] font-bold text-center text-xs hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer rounded"
+										class="w-full py-2 bg-brand-danger text-white border-[2px] border-gray-900 shadow-[2px_2px_0_0_#000] font-bold text-center text-xs hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer rounded"
 									>
 										DELETE LAYER
 									</div>
@@ -453,7 +453,7 @@
 			<div class="md:hidden mt-6 flex justify-center">
 				<button
 					on:click={() => goto('/canvas/try')}
-					class="px-8 py-4 bg-[#ffc480] text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0_0_#1f2937] transition-all uppercase tracking-wider flex items-center gap-3"
+					class="px-8 py-4 bg-brand-accent text-gray-900 font-black text-lg rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0_0_#1f2937] transition-all uppercase tracking-wider flex items-center gap-3"
 				>
 					<span>Try Canvas Editor</span>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -469,10 +469,10 @@
 
 			<!-- Decorative Elements -->
 			<div
-				class="hidden md:block absolute -top-10 -right-10 w-32 h-32 bg-[#ffc480] border-[3px] border-gray-900 -z-10 rotate-12 animate-[float_6s_ease-in-out_infinite]"
+				class="hidden md:block absolute -top-10 -right-10 w-32 h-32 bg-brand-accent border-[3px] border-gray-900 -z-10 rotate-12 animate-[float_6s_ease-in-out_infinite]"
 			/>
 			<div
-				class="hidden md:block absolute -bottom-10 -left-10 w-40 h-40 bg-[#ff6b6b] border-[3px] border-gray-900 -z-10 rotate-[-12deg] animate-[float_7s_ease-in-out_infinite_reverse]"
+				class="hidden md:block absolute -bottom-10 -left-10 w-40 h-40 bg-brand-danger border-[3px] border-gray-900 -z-10 rotate-[-12deg] animate-[float_7s_ease-in-out_infinite_reverse]"
 			>
 				<div
 					class="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,#000_45%,#000_55%,transparent_55%)] [background-size:10px_10px] opacity-10"
@@ -489,7 +489,7 @@
 				<!-- Mac Header -->
 				<div class="bg-[#facc15] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">
 					<div class="flex gap-2">
-						<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-black"></div>
+						<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-black"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-white border-2 border-black"></div>
 						<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-black"></div>
 					</div>
@@ -499,7 +499,7 @@
 					</div>
 				</div>
 
-				<div class="flex flex-col md:flex-row bg-[#FFFDF8]">
+				<div class="flex flex-col md:flex-row bg-brand-bg">
 					<!-- Left: Visual Flow -->
 					<div class="flex-1 p-8 md:p-14 flex items-center justify-center border-b-[3px] md:border-b-0 md:border-r-[3px] border-black relative overflow-hidden">
 						<!-- Grid Background -->
@@ -518,7 +518,7 @@
 									</div>
 									<div class="flex gap-2">
 										<div class="flex-1 h-3 bg-[#4ade80] rounded-sm border-2 border-black"></div>
-										<div class="w-8 h-3 bg-[#ff6b6b] rounded-sm border-2 border-black"></div>
+										<div class="w-8 h-3 bg-brand-danger rounded-sm border-2 border-black"></div>
 									</div>
 								</div>
 								<!-- Figma logo badge -->
@@ -536,7 +536,7 @@
 							<div class="relative group/template hover:-translate-y-2 hover:-rotate-3 transition-transform duration-300">
 								<div class="w-28 h-36 md:w-40 md:h-48 bg-white rounded-xl border-[3px] border-black shadow-[6px_6px_0_0_#4ade80] overflow-hidden p-3 flex flex-col gap-2 relative z-10">
 									<!-- Pictify mini template mockup -->
-									<div class="w-full h-4 bg-[#ffc480] rounded-sm border-2 border-black"></div>
+									<div class="w-full h-4 bg-brand-accent rounded-sm border-2 border-black"></div>
 									<div class="flex-1 bg-gray-100 rounded-sm border-2 border-black relative overflow-hidden flex flex-col items-center justify-center">
 										<!-- Graphic lines -->
 										<div class="absolute -left-4 -top-4 w-12 h-12 border-4 border-black rounded-full text-transparent"></div>
@@ -589,7 +589,7 @@
 								<span class="text-base font-bold text-black">Install the plugin</span>
 							</div>
 							<div class="flex items-center gap-4 group/step">
-								<div class="w-8 h-8 bg-[#ffc480] border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
+								<div class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_black] group-hover/step:-translate-y-1 group-hover/step:-translate-x-1 group-hover/step:shadow-[4px_4px_0_0_black] transition-all">
 									<span class="text-sm font-black text-black">2</span>
 								</div>
 								<span class="text-base font-bold text-black">Select frames</span>

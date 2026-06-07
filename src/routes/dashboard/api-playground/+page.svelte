@@ -1079,7 +1079,7 @@
 				<div
 					class="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 				>
-					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full animate-pulse" />
 					Dev Tools
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -1168,7 +1168,7 @@
 								</p>
 								<a
 									href="/dashboard/api-token"
-									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#ff6b6b] text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-danger text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] sm:shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 								>
 									Get API Key
 								</a>
@@ -1200,7 +1200,7 @@
 							API Endpoints
 						</h3>
 					</div>
-					<div class="p-1.5 sm:p-2 space-y-2 bg-[#FFFDF8] max-h-[600px] overflow-y-auto">
+					<div class="p-1.5 sm:p-2 space-y-2 bg-brand-bg max-h-[600px] overflow-y-auto">
 						{#each endpointCategories as category}
 							<div class="border rounded-lg border-gray-200 overflow-hidden">
 								<button
@@ -1255,7 +1255,7 @@
 														</div>
 													</div>
 													{#if selectedEndpoint === endpoint.id}
-														<div class="w-1.5 h-1.5 bg-[#ffc480] rounded-full animate-pulse" />
+														<div class="w-1.5 h-1.5 bg-brand-accent rounded-full animate-pulse" />
 													{/if}
 												</div>
 											</button>
@@ -1271,7 +1271,7 @@
 			<!-- Right Panel: Console -->
 			<div class="col-span-12 lg:col-span-8 space-y-4 sm:space-y-6 md:space-y-8">
 				<!-- Endpoint Description -->
-				<div class="bg-[#ffc480] rounded-xl border-[3px] border-gray-900 p-4">
+				<div class="bg-brand-accent rounded-xl border-[3px] border-gray-900 p-4">
 					<div class="flex items-center gap-3">
 						<svg
 							class="w-5 h-5 text-gray-900 flex-shrink-0"
@@ -1298,8 +1298,8 @@
 						class="bg-gray-100 p-4 border-b-[3px] border-gray-900 flex items-center justify-between"
 					>
 						<div class="flex items-center gap-3">
-							<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-							<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
+							<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+							<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
 							<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
 						</div>
 						<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
@@ -1865,7 +1865,7 @@
 													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(
 														layout.key
 													)
-														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => togglePlaygroundLayout(layout.key)}
 												>
@@ -2108,7 +2108,7 @@
 													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(
 														layout.key
 													)
-														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchLayout(layout.key)}
 												>
@@ -2352,7 +2352,7 @@
 													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(
 														layout.key
 													)
-														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+														? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchCsvLayout(layout.key)}
 												>
@@ -2549,7 +2549,7 @@
 								/>
 							{/if}
 							<button
-								class="w-full py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-[4px_4px_0_0_#1f2937]"
+								class="w-full py-4 bg-brand-danger text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-[4px_4px_0_0_#1f2937]"
 								on:click={() => testEndpoint(selectedEndpoint)}
 								disabled={loading || requiresEmailVerification}
 							>
@@ -2592,8 +2592,8 @@
 						>
 							<div class="flex items-center gap-3">
 								<div class="flex gap-1.5 mr-4">
-									<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-gray-900" />
-									<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-gray-900" />
+									<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
+									<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
 									<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-gray-900" />
 								</div>
 								<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
@@ -2603,7 +2603,7 @@
 
 							{#if curlExample && !response}
 								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-[#ffc480] text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex items-center gap-2 px-3 py-1.5 bg-brand-accent text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={handleCopyCurl}
 								>
 									{#if copiedCurl}
@@ -2807,12 +2807,12 @@
 												class="text-gray-900 whitespace-pre-wrap break-all text-xs font-mono leading-relaxed">{@html escapeHtml(
 													curlExample.display
 												)
-													.replace(/curl/g, '<span class="text-[#ff6b6b] font-bold">curl</span>')
-													.replace(/-X/g, '<span class="text-[#ffc480] font-bold">-X</span>')
-													.replace(/-H/g, '<span class="text-[#ffc480] font-bold">-H</span>')
+													.replace(/curl/g, '<span class="text-brand-danger font-bold">curl</span>')
+													.replace(/-X/g, '<span class="text-brand-accent font-bold">-X</span>')
+													.replace(/-H/g, '<span class="text-brand-accent font-bold">-H</span>')
 													.replace(
 														/--data-raw/g,
-														'<span class="text-[#ffc480] font-bold">--data-raw</span>'
+														'<span class="text-brand-accent font-bold">--data-raw</span>'
 													)
 													.replace(
 														/(GET|POST|PUT|DELETE)/g,
@@ -2825,7 +2825,7 @@
 									<div class="flex flex-col items-center justify-center h-[200px]">
 										<div class="mb-4">
 											<div
-												class="w-16 h-16 rounded-full border-[3px] border-gray-300 border-t-[#ffc480] animate-spin"
+												class="w-16 h-16 rounded-full border-[3px] border-gray-300 border-t-brand-accent animate-spin"
 											/>
 										</div>
 										<p class="text-xs font-black text-gray-600 uppercase tracking-wider">
@@ -2858,7 +2858,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -2919,7 +2919,7 @@
 			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
 				<div class="text-[10px] text-gray-500">HTML with inline styles and CSS</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeImageHtml = false)}
 				>
 					Close
@@ -2944,7 +2944,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -3005,7 +3005,7 @@
 			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
 				<div class="text-[10px] text-gray-500">HTML with CSS animations for GIF generation</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeGifHtml = false)}
 				>
 					Close
@@ -3030,7 +3030,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -3093,7 +3093,7 @@
 					Format: <code class="bg-gray-100 px-1 rounded">{'{'}"key": "value"{'}'}</code>
 				</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeRenderVars = false)}
 				>
 					Close
@@ -3118,7 +3118,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -3182,7 +3182,7 @@
 					is one variation
 				</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeBatchVars = false)}
 				>
 					Close
@@ -3207,7 +3207,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -3271,7 +3271,7 @@
 					>
 				</div>
 				<button
-					class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 					on:click={() => (maximizeCsvMappings = false)}
 				>
 					Close

@@ -7,7 +7,7 @@
 <section>
 	<div class="flex items-center gap-4 mb-12">
 		<div
-			class="py-3 px-6 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1"
+			class="py-3 px-6 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-1"
 		>
 			<h2 class="text-2xl font-black uppercase tracking-tighter text-gray-900">{title}</h2>
 		</div>
@@ -48,7 +48,7 @@
 						<div class="mt-auto pt-4 border-t-2 border-gray-100 flex items-center justify-between">
 							<div class="flex items-center gap-3">
 								<div
-									class="w-8 h-8 rounded-full bg-[#ffc480] border-2 border-gray-900 flex items-center justify-center text-xs font-black shadow-[2px_2px_0_0_#1f2937]"
+									class="w-8 h-8 rounded-full bg-brand-accent border-2 border-gray-900 flex items-center justify-center text-xs font-black shadow-[2px_2px_0_0_#1f2937]"
 								>
 									{blog.author.charAt(0)}
 								</div>

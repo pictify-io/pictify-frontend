@@ -115,7 +115,7 @@
 </svelte:head>
 
 <section
-	class="w-screen bg-[#FFFDF8] min-h-screen flex flex-col justify-between md:items-start items-between lg:overflow-x-hidden md:overflow-x-hidden"
+	class="w-screen bg-brand-bg min-h-screen flex flex-col justify-between md:items-start items-between lg:overflow-x-hidden md:overflow-x-hidden"
 >
 	<Nav />
 
@@ -155,7 +155,7 @@
 	<SectionSeparator icon="bolt" />
 
 	<!-- 9. Final CTA -->
-	<div class="w-full bg-[#FFFDF8]">
+	<div class="w-full bg-brand-bg">
 		<div class="max-w-5xl mx-auto px-4">
 			<TryNow />
 		</div>

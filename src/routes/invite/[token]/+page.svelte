@@ -92,7 +92,7 @@
 	<title>Team Invitation | Pictify</title>
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8] flex items-center justify-center p-4">
+<div class="min-h-screen bg-brand-bg flex items-center justify-center p-4">
 	<div class="w-full max-w-md">
 		<!-- Logo -->
 		<div class="text-center mb-8">
@@ -141,7 +141,7 @@
 				class="bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f2937] overflow-hidden"
 			>
 				<!-- Header -->
-				<div class="px-8 py-6 bg-[#ffc480] border-b-[3px] border-gray-900 text-center">
+				<div class="px-8 py-6 bg-brand-accent border-b-[3px] border-gray-900 text-center">
 					<h1 class="text-2xl font-black text-gray-900">You're Invited!</h1>
 				</div>
 

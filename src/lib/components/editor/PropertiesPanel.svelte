@@ -3421,8 +3421,8 @@
 	}
 </script>
 
-<div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
-	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+<div class="w-full bg-brand-bg h-full flex flex-col z-10">
+	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-brand-bg">
 		<div class="flex items-center justify-between">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Properties</h3>
 		</div>
@@ -3441,7 +3441,7 @@
 			/>
 		</div>
 	{/if}
-	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar space-y-4 bg-[#FFFDF8]">
+	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar space-y-4 bg-brand-bg">
 		{#if $selectedComponent}
 			<!-- Element Type Badge -->
 			<div class="flex items-center gap-2 pb-3 border-b border-gray-200">
@@ -4619,7 +4619,7 @@
 								class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-[4px_4px_0_0_#1f2937] flex flex-col items-center text-center mt-2"
 							>
 								<div
-									class="w-10 h-10 rounded-xl bg-[#ffc480] border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center mb-3"
+									class="w-10 h-10 rounded-xl bg-brand-accent border-[3px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-center mb-3"
 								>
 									<i class="fa fa-magic text-gray-900 text-base" />
 								</div>
@@ -4639,7 +4639,7 @@
 						{:else}
 							<div class="space-y-2.5 mt-2">
 								<button
-									class="w-full py-2.5 px-3 bg-[#ffc480] border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-[3px_3px_0_0_#1f2937]"
+									class="w-full py-2.5 px-3 bg-brand-accent border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-[3px_3px_0_0_#1f2937]"
 									on:click={removeBackground}
 									disabled={isRemovingBackground}
 								>
@@ -4664,7 +4664,7 @@
 
 								{#if backgroundRemovalError}
 									<div
-										class="bg-[#ff6b6b] border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#1f2937]"
+										class="bg-brand-danger border-[2px] border-gray-900 rounded-lg p-2.5 shadow-[2px_2px_0_0_#1f2937]"
 									>
 										<p class="text-xs font-bold text-white">
 											<i class="fa fa-exclamation-triangle mr-1" />{backgroundRemovalError}
@@ -6375,7 +6375,7 @@
 			<div class="flex items-center justify-between px-5 py-4 border-b-[2px] border-gray-900">
 				<div class="flex items-center gap-3">
 					<div
-						class="w-8 h-8 bg-[#ffc480] rounded-lg border-[2px] border-gray-900 flex items-center justify-center"
+						class="w-8 h-8 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center"
 					>
 						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -6510,7 +6510,7 @@
 						<i class="fa fa-undo mr-1" />Load Current
 					</button>
 					<button
-						class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						on:click={() => {
 							applyChartDataFromInput();
 							if (!chartDataError) maximizeChartEditor = false;
@@ -6677,7 +6677,7 @@
 						<i class="fa fa-undo mr-1" />Load Current
 					</button>
 					<button
-						class="px-4 py-2 bg-[#ffc480] text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[2px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						on:click={() => {
 							applyTableDataFromInput();
 							if (!tableDataError) maximizeTableEditor = false;

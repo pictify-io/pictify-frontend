@@ -154,7 +154,7 @@
 				</div>
 			{:else if isPaidPlanWithoutLS}
 				<div
-					class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 bg-[#10b981] text-gray-900"
+					class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border-2 border-gray-900 bg-brand-success text-gray-900"
 				>
 					Active
 				</div>
@@ -220,7 +220,7 @@
 				{:else if subscription.renewsAt}
 					<div class="flex items-center gap-3">
 						<div
-							class="w-8 h-8 rounded-lg bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+							class="w-8 h-8 rounded-lg bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
 						>
 							<svg
 								class="w-4 h-4 text-gray-900"
@@ -318,7 +318,7 @@
 					<button
 						on:click={updatePaymentMethod}
 						disabled={loadingPortalUrl}
-						class="text-[10px] font-black text-gray-900 hover:text-[#ff6b6b] uppercase tracking-wider hover:underline decoration-2 underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-wait"
+						class="text-[10px] font-black text-gray-900 hover:text-brand-danger uppercase tracking-wider hover:underline decoration-2 underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-wait"
 					>
 						{#if loadingPortalUrl}
 							<span class="inline-flex items-center gap-1">
@@ -383,7 +383,7 @@
 					<button
 						on:click={handleResume}
 						disabled={resuming}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-[#10b981] rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if resuming}
 							<span class="inline-flex items-center gap-2">
@@ -414,7 +414,7 @@
 					<button
 						on:click={handleReactivate}
 						disabled={reactivating}
-						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-[#10b981] rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+						class="px-4 py-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-900 bg-brand-success rounded-lg border-2 border-gray-900 hover:bg-[#059669] shadow-[4px_4px_0_0_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#000] transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
 					>
 						{#if reactivating}
 							<span class="inline-flex items-center gap-2">
@@ -533,7 +533,7 @@
 					</p>
 				</div>
 				<div
-					class="w-12 h-12 bg-[#10b981] rounded-xl border-2 border-gray-900 flex items-center justify-center shadow-[3px_3px_0_0_#1f2937]"
+					class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center shadow-[3px_3px_0_0_#1f2937]"
 				>
 					<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -608,7 +608,7 @@
 			</p>
 			<a
 				href="/dashboard/upgrade"
-				class="inline-flex items-center gap-2 px-6 py-3 bg-[#ffc480] text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
+				class="inline-flex items-center gap-2 px-6 py-3 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_#1f2937] transition-all"
 			>
 				Upgrade to Pro
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

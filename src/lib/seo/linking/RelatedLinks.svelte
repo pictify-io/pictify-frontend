@@ -49,7 +49,7 @@
 						href={getHref(item)}
 						class="bg-white border-[3px] border-gray-900 p-5 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 					>
-						<h3 class="font-black text-gray-900 mb-1 group-hover:text-[#ff6b6b] transition-colors">
+						<h3 class="font-black text-gray-900 mb-1 group-hover:text-brand-danger transition-colors">
 							{getTitle(item)}
 						</h3>
 						{#if getDescription(item)}
@@ -68,8 +68,8 @@
 							href={getHref(item)}
 							class="flex items-center gap-3 p-3 bg-white border-[2px] border-gray-200 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all group"
 						>
-							<div class="w-2 h-2 bg-[#ff6b6b] rounded-full flex-shrink-0" />
-							<span class="font-bold text-gray-900 group-hover:text-[#ff6b6b] transition-colors">
+							<div class="w-2 h-2 bg-brand-danger rounded-full flex-shrink-0" />
+							<span class="font-bold text-gray-900 group-hover:text-brand-danger transition-colors">
 								{getTitle(item)}
 							</span>
 						</a>
@@ -81,7 +81,7 @@
 				{#each items as item}
 					<a
 						href={getHref(item)}
-						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-gray-900 hover:bg-[#ffc480] transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
+						class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg font-bold text-gray-900 hover:bg-brand-accent transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
 					>
 						{getTitle(item)}
 					</a>

@@ -296,11 +296,11 @@
 
 					<div class="divide-y-[3px] divide-gray-100">
 						{#each $teamMembers as member}
-							<div class="p-6 hover:bg-[#FFFDF8] transition-colors group">
+							<div class="p-6 hover:bg-brand-bg transition-colors group">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
-											class="w-10 h-10 rounded-lg bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+											class="w-10 h-10 rounded-lg bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
 										>
 											<span class="text-sm font-black text-gray-900">
 												{member.user?.email?.charAt(0)?.toUpperCase() || '?'}
@@ -333,7 +333,7 @@
 										<button
 											on:click={() => handleRemoveMember(member)}
 											disabled={removingMemberId === member.uid}
-											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-[#ff6b6b] transition-all disabled:opacity-50"
+											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-brand-danger transition-all disabled:opacity-50"
 											title="Remove Member"
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,7 +389,7 @@
 
 						<div class="divide-y-[3px] divide-gray-100">
 							{#each $teamInvitations as invitation}
-								<div class="p-6 hover:bg-[#FFFDF8] transition-colors">
+								<div class="p-6 hover:bg-brand-bg transition-colors">
 									<div class="flex items-center justify-between">
 										<div>
 											<p class="font-bold text-gray-900 text-sm">{invitation.email}</p>
@@ -427,7 +427,7 @@
 												<button
 													on:click={() => handleRevokeInvitation(invitation)}
 													disabled={revokingInvitationId === invitation.uid}
-													class="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-gray-500 hover:text-[#ff6b6b] hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+													class="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-gray-500 hover:text-brand-danger hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
 												>
 													{revokingInvitationId === invitation.uid ? 'Revoking...' : 'Revoke'}
 												</button>
@@ -495,10 +495,10 @@
 
 							{#if error}
 								<div
-									class="bg-red-50 border-2 border-[#ff6b6b] rounded-xl p-3 mb-4 flex items-start gap-2"
+									class="bg-red-50 border-2 border-brand-danger rounded-xl p-3 mb-4 flex items-start gap-2"
 								>
 									<svg
-										class="w-4 h-4 text-[#ff6b6b] flex-shrink-0 mt-0.5"
+										class="w-4 h-4 text-brand-danger flex-shrink-0 mt-0.5"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -510,7 +510,7 @@
 											d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
 										/>
 									</svg>
-									<p class="text-[#ff6b6b] text-xs font-bold">{error}</p>
+									<p class="text-brand-danger text-xs font-bold">{error}</p>
 								</div>
 							{/if}
 
@@ -524,7 +524,7 @@
 						{:else}
 							<div class="flex items-center">
 								<div
-									class="w-12 h-12 rounded-xl bg-[#ffc480] border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+									class="w-12 h-12 rounded-xl bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
 								>
 									<span class="text-xl font-black text-gray-900">
 										{$currentTeam?.name?.charAt(0)?.toUpperCase() || 'T'}
@@ -607,7 +607,7 @@
 									</div>
 
 									{#if inviteError}
-										<p class="text-[#ff6b6b] text-xs font-bold">{inviteError}</p>
+										<p class="text-brand-danger text-xs font-bold">{inviteError}</p>
 									{/if}
 
 									<button

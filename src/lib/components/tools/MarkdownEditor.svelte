@@ -624,8 +624,8 @@ function generateImage(markdown) {
 		<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col max-h-[600px]">
 			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
 					<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
 				</div>
 				<span class="font-mono text-xs font-bold text-gray-500 uppercase tracking-widest">Markdown</span>
@@ -644,8 +644,8 @@ function generateImage(markdown) {
 		<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-[8px_8px_0_0_#1f2937] overflow-hidden flex flex-col max-h-[600px]">
 			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
 					<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
 				</div>
 				<div class="flex items-center gap-2">
@@ -673,7 +673,7 @@ function generateImage(markdown) {
 			<a
 				href="/signup?redirect=/tools/markdown"
 				on:click={handleSignupClick}
-				class="px-10 py-5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
+				class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-[6px_6px_0_0_#1f2937] hover:shadow-[3px_3px_0_0_#1f2937] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
 			>
 				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
 				Sign Up to Continue
@@ -753,14 +753,14 @@ function generateImage(markdown) {
 	{:else if generationError}
 		<div class="mt-8">
 			<div class="bg-white border-[3px] border-gray-900 rounded-3xl p-6 shadow-[8px_8px_0_0_#1f2937] flex items-center gap-4">
-				<div class="w-12 h-12 bg-[#ff6b6b] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-white font-black shadow-[3px_3px_0_0_#1f2937]">!</div>
+				<div class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-white font-black shadow-[3px_3px_0_0_#1f2937]">!</div>
 				<div class="flex-1">
 					<h4 class="font-black text-gray-900 uppercase tracking-wide">Generation Failed</h4>
 					<p class="text-gray-600 font-medium">{generationError}</p>
 				</div>
 				<button
 					on:click={handleGenerate}
-					class="px-5 py-2.5 bg-[#ff6b6b] text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg text-sm"
+					class="px-5 py-2.5 bg-brand-danger text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg text-sm"
 				>
 					Retry
 				</button>
@@ -775,7 +775,7 @@ function generateImage(markdown) {
 				<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 			</div>
 			<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-				Automate with the <span class="text-[#ff6b6b]">API</span>
+				Automate with the <span class="text-brand-danger">API</span>
 			</h2>
 			<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
 				Generate markdown images programmatically. Render changelogs, README previews, and release notes as images in your CI/CD pipeline.
@@ -1016,7 +1016,7 @@ function generateImage(markdown) {
 						Great First Image!
 					</h3>
 					<button
-						class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-[#ff6b6b] hover:text-white transition-colors"
+						class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors"
 						on:click={() => (showFirstGenerationPrompt = false)}
 					>
 						<span class="font-black">x</span>
@@ -1042,12 +1042,12 @@ function generateImage(markdown) {
 						<a
 							href="/signup?redirect=/tools/markdown"
 							on:click={handleSignupClick}
-							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							Create Free Account
 						</a>
 						<button
-							class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide"
+							class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
 							on:click={() => (showFirstGenerationPrompt = false)}
 						>
 							Continue as Guest
@@ -1062,7 +1062,7 @@ function generateImage(markdown) {
 	{#if showUpgradePrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
 			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-[12px_12px_0_0_#000]">
-				<div class="bg-[#ff6b6b] px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
+				<div class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
 					<h3 class="text-lg font-black text-white uppercase tracking-wider">
 						Ready to Create More?
 					</h3>
@@ -1079,19 +1079,19 @@ function generateImage(markdown) {
 					</p>
 					<ul class="space-y-2 mb-6">
 						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-[#ff6b6b]">✓</span>
+							<span class="font-black text-brand-danger">✓</span>
 							<span class="font-bold text-black text-sm">Unlimited image generations</span>
 						</li>
 						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-[#ff6b6b]">✓</span>
+							<span class="font-black text-brand-danger">✓</span>
 							<span class="font-bold text-black text-sm">No watermarks</span>
 						</li>
 						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-[#ff6b6b]">✓</span>
+							<span class="font-black text-brand-danger">✓</span>
 							<span class="font-bold text-black text-sm">API Access</span>
 						</li>
 						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-[#ff6b6b]">✓</span>
+							<span class="font-black text-brand-danger">✓</span>
 							<span class="font-bold text-black text-sm">Priority support</span>
 						</li>
 					</ul>
@@ -1099,12 +1099,12 @@ function generateImage(markdown) {
 						<a
 							href="/signup?redirect=/tools/markdown"
 							on:click={handleSignupClick}
-							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-[#ff6b6b] uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							Sign Up Free
 						</a>
 						<button
-							class="w-full py-3 px-6 font-bold text-black hover:text-[#ff6b6b] transition-colors uppercase tracking-wide"
+							class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
 							on:click={() => (showUpgradePrompt = false)}
 						>
 							Maybe Later

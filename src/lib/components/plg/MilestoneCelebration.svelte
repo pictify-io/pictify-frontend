@@ -118,28 +118,28 @@
 	function getHeaderBg(type) {
 		switch (type) {
 			case 'celebration':
-				return 'bg-[#10b981]';
+				return 'bg-brand-success';
 			case 'soft_upsell':
-				return 'bg-[#ffc480]';
+				return 'bg-brand-accent';
 			case 'urgent_upsell':
-				return 'bg-[#ff6b6b]';
+				return 'bg-brand-danger';
 			case 'limit_reached':
-				return 'bg-[#ff6b6b]';
+				return 'bg-brand-danger';
 			default:
-				return 'bg-[#ffc480]';
+				return 'bg-brand-accent';
 		}
 	}
 
 	function getButtonBg(type) {
 		switch (type) {
 			case 'celebration':
-				return 'bg-[#10b981] hover:bg-[#059669]';
+				return 'bg-brand-success hover:bg-[#059669]';
 			case 'soft_upsell':
 			case 'urgent_upsell':
 			case 'limit_reached':
-				return 'bg-[#ffc480] hover:bg-[#ffb347]';
+				return 'bg-brand-accent hover:bg-[#ffb347]';
 			default:
-				return 'bg-[#ffc480] hover:bg-[#ffb347]';
+				return 'bg-brand-accent hover:bg-[#ffb347]';
 		}
 	}
 </script>
@@ -173,7 +173,7 @@
 
 		<!-- Modal -->
 		<div
-			class="relative bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
+			class="relative bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-md w-full overflow-hidden"
 			transition:scale={{ duration: 400, easing: elasticOut, start: 0.8 }}
 			on:click|stopPropagation
 		>
@@ -245,7 +245,7 @@
 				<!-- Time saved badge -->
 				{#if $activeMilestone.timeSaved}
 					<div
-						class="inline-flex items-center gap-2 px-4 py-2 bg-[#10b981] text-gray-900 rounded-lg text-sm font-black mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
+						class="inline-flex items-center gap-2 px-4 py-2 bg-brand-success text-gray-900 rounded-lg text-sm font-black mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937]"
 						in:fly={{ y: 20, duration: 400, delay: 450 }}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,7 +263,7 @@
 				<!-- Discount badge -->
 				{#if $activeMilestone.cta?.discount}
 					<div
-						class="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc480] text-gray-900 rounded-lg text-sm font-black mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform rotate-1"
+						class="inline-flex items-center gap-2 px-4 py-2 bg-brand-accent text-gray-900 rounded-lg text-sm font-black mb-6 border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform rotate-1"
 						in:scale={{ duration: 400, delay: 500, start: 0.8 }}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

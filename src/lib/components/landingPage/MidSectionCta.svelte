@@ -3,7 +3,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -11,7 +11,7 @@
 		style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 32px 32px;"
 	></div>
 	<div
-		class="absolute top-1/2 -right-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 -z-10"
+		class="absolute top-1/2 -right-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 -z-10"
 	></div>
 	<div
 		class="absolute top-1/2 -left-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 -z-10"
@@ -49,7 +49,7 @@
 						class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-8 leading-[1.1] max-w-2xl"
 					>
 						Get your API key in <br class="hidden sm:block" />
-						<span class="relative inline-block text-[#ff6b6b] transform -rotate-1 mt-2">
+						<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
 							30 seconds
 							<svg
 								class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-gray-900 z-[-1] opacity-20"
@@ -72,7 +72,7 @@
 						<SignUpButton
 							text="Start Building Free"
 							location="mid_cta"
-							class="w-full sm:w-auto bg-[#ff6b6b] text-white text-lg md:text-xl px-8 py-5 rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all font-black uppercase tracking-wider flex-shrink-0 inline-flex items-center justify-center gap-3"
+							class="w-full sm:w-auto bg-brand-danger text-white text-lg md:text-xl px-8 py-5 rounded-2xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:translate-y-1 hover:translate-x-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all font-black uppercase tracking-wider flex-shrink-0 inline-flex items-center justify-center gap-3"
 						/>
 					</div>
 				</div>
@@ -86,7 +86,7 @@
 						<div
 							class="flex items-center gap-2 px-4 py-2 bg-white text-gray-900 font-black uppercase tracking-wider text-xs border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] transform -rotate-6"
 						>
-							<svg class="w-4 h-4 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24">
+							<svg class="w-4 h-4 text-brand-accent" fill="currentColor" viewBox="0 0 24 24">
 								<path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
 							</svg>
 							Instant Access
@@ -108,8 +108,8 @@
 					>
 						<!-- Terminal Header -->
 						<div class="flex items-center gap-2 mb-8">
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-							<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border border-gray-900"></div>
+							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border border-gray-900"></div>
 							<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
 							<div class="ml-2 text-gray-500 text-xs font-mono font-bold tracking-wider">api_key_gen.sh</div>
 						</div>
@@ -117,7 +117,7 @@
 						<!-- Fake Code -->
 						<div class="font-mono text-sm leading-relaxed space-y-5">
 							<div class="text-gray-400">
-								<span class="text-[#ff6b6b] font-bold mr-2">$</span>pictify auth login
+								<span class="text-brand-danger font-bold mr-2">$</span>pictify auth login
 							</div>
 							<div class="text-[#4ade80] font-bold flex items-center gap-2">
 								<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +126,7 @@
 								Successfully authenticated
 							</div>
 							<div class="text-gray-400 mt-4">
-								<span class="text-[#ff6b6b] font-bold mr-2">$</span>pictify keys create --name "Prod"
+								<span class="text-brand-danger font-bold mr-2">$</span>pictify keys create --name "Prod"
 							</div>
 							<div class="text-gray-300 bg-black/40 p-4 rounded-lg break-all border border-gray-700 font-bold relative overflow-hidden group-hover:bg-black/60 transition-colors">
 								<div class="absolute inset-y-0 left-0 w-1 bg-[#4ade80]"></div>
@@ -134,7 +134,7 @@
 								pk_live_8f92jK9x...<span class="text-gray-600">hidden</span>
 							</div>
 							<div class="flex items-center gap-3 text-gray-400 text-xs mt-4">
-								<svg class="w-4 h-4 text-[#ffc480] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<svg class="w-4 h-4 text-brand-accent animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
 								</svg>
 								Ready to render images at scale

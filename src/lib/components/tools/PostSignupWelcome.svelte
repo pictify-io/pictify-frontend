@@ -106,7 +106,7 @@
 					</div>
 					<p class="mt-3 text-xs font-bold text-gray-500">
 						Use this key in the <code class="bg-gray-100 px-1 py-0.5 border border-gray-200">Authorization: Bearer</code> header.
-						<a href="/dashboard" class="text-[#ff6b6b] hover:underline ml-1">Go to dashboard</a> for templates, bulk render, and more.
+						<a href="/dashboard" class="text-brand-danger hover:underline ml-1">Go to dashboard</a> for templates, bulk render, and more.
 					</p>
 				{/if}
 			</div>

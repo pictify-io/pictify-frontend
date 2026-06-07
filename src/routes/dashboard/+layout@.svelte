@@ -79,7 +79,7 @@
 </svelte:head>
 
 <PLGProvider>
-	<div class="h-screen flex flex-col overflow-hidden bg-[#FFFDF8]">
+	<div class="h-screen flex flex-col overflow-hidden bg-brand-bg">
 		<Nav on:toggleSidebar={toggleSidebar} />
 		{#if user?.isEmailVerified === false}
 			<VerifyEmailBanner email={user?.email} />
@@ -104,7 +104,7 @@
 			<!-- Sidebar -->
 			<div
 				class="
-				fixed inset-y-0 left-0 z-50 bg-[#FFFDF8] transition-transform duration-300 ease-in-out
+				fixed inset-y-0 left-0 z-50 bg-brand-bg transition-transform duration-300 ease-in-out
 				lg:relative lg:z-0 lg:h-full lg:overflow-hidden
 				w-64 min-w-[16rem]
 				{isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -116,7 +116,7 @@
 
 			<!-- Main content -->
 			<div
-				class="flex-grow h-full overflow-y-auto overflow-x-hidden min-w-0 bg-[#FFFDF8] relative"
+				class="flex-grow h-full overflow-y-auto overflow-x-hidden min-w-0 bg-brand-bg relative"
 				style="scrollbar-gutter: stable;"
 			>
 				<!-- Background Grid -->

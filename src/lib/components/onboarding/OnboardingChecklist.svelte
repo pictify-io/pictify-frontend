@@ -63,7 +63,7 @@
 		<!-- Header -->
 		<button
 			type="button"
-			class="w-full bg-[#ffc480] px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-[#ffb860] transition-colors border-b-[3px] border-gray-900"
+			class="w-full bg-brand-accent px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-[#ffb860] transition-colors border-b-[3px] border-gray-900"
 			on:click={handleToggleCollapse}
 		>
 			<div class="flex items-center gap-3">
@@ -127,7 +127,7 @@
 		</button>
 
 		<!-- Steps list -->
-		<div class="p-4 space-y-3 bg-[#FFFDF8]">
+		<div class="p-4 space-y-3 bg-brand-bg">
 			{#each $onboardingStore.steps as step (step.id)}
 				<button
 					type="button"
@@ -145,7 +145,7 @@
 						class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center border-[2px]
 							{step.completed
 							? 'bg-green-100 text-green-600 border-transparent'
-							: 'bg-[#ffc480] text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'}"
+							: 'bg-brand-accent text-gray-900 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'}"
 					>
 						{#if step.completed}
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +197,7 @@
 		</div>
 
 		<!-- Footer -->
-		<div class="px-4 pb-4 pt-2 bg-[#FFFDF8]">
+		<div class="px-4 pb-4 pt-2 bg-brand-bg">
 			<button
 				type="button"
 				class="w-full py-2.5 text-xs font-black text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg border-[2px] border-transparent hover:border-gray-900 transition-all uppercase tracking-widest"

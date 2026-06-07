@@ -190,7 +190,7 @@
 					<div>
 						<label class="block text-sm font-medium text-gray-900 mb-2"> Screenshot Prompt </label>
 						<textarea
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-[#ff6b6b] focus:border-transparent"
+							class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-brand-danger focus:border-transparent"
 							rows="3"
 							placeholder="Enter a natural language description of what you want to screenshot..."
 							bind:value={prompt}
@@ -224,7 +224,7 @@
 					<!-- Generate Button -->
 					<div class="flex justify-center">
 						<button
-							class="bg-[#ff6b6b] text-white px-8 py-3 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+							class="bg-brand-danger text-white px-8 py-3 rounded-lg hover:bg-[#ff5252] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 							on:click={generateScreenshot}
 							disabled={isGenerating ||
 								!prompt.trim() ||
@@ -344,7 +344,7 @@
 												href={finalResult.metadata.url}
 												target="_blank"
 												rel="noopener noreferrer"
-												class="text-[#ff6b6b] hover:text-[#ff5252]"
+												class="text-brand-danger hover:text-[#ff5252]"
 											>
 												{finalResult.metadata.url}
 											</a>
@@ -370,7 +370,7 @@
 										href={finalResult.url}
 										target="_blank"
 										rel="noopener noreferrer"
-										class="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
+										class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
 									>
 										View Full Size
 									</a>
@@ -409,7 +409,7 @@
 			<div class="flex gap-3">
 				<a
 					href="/login"
-					class="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
+					class="bg-brand-danger text-white px-4 py-2 rounded-lg hover:bg-[#ff5252] transition-colors"
 				>
 					Login
 				</a>

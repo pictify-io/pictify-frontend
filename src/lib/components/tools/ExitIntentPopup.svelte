@@ -181,7 +181,7 @@
 			aria-labelledby="exit-popup-title"
 		>
 			<!-- Header -->
-			<div class="bg-[#ff6b6b] text-white px-6 py-4 border-b-[4px] border-black relative">
+			<div class="bg-brand-danger text-white px-6 py-4 border-b-[4px] border-black relative">
 				<button
 					on:click={closePopup}
 					class="absolute top-3 right-3 w-8 h-8 bg-white text-black border-[2px] border-black flex items-center justify-center font-black hover:bg-gray-100 transition-colors"
@@ -266,7 +266,7 @@
 					<button
 						type="submit"
 						disabled={isSubmitting}
-						class="w-full py-4 bg-[#ffc480] text-black border-[3px] border-black font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+						class="w-full py-4 bg-brand-accent text-black border-[3px] border-black font-black text-lg uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
 					>
 						{isSubmitting ? 'Saving...' : 'Get Free Access'}
 					</button>

@@ -36,7 +36,7 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col bg-[#FFFDF8]">
+<div class="flex h-full w-full flex-col bg-brand-bg">
 	<!-- Header -->
 	<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffe066] px-4 py-3">
 		<div class="flex items-center gap-2">

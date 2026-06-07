@@ -160,7 +160,7 @@
 </svelte:head>
 
 <div
-	class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black"
+	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
 >
 	<Nav />
 
@@ -171,7 +171,7 @@
 				class="relative w-full mx-auto flex flex-col justify-center items-center text-center space-y-6"
 			>
 				<div
-					class="inline-block bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform -rotate-2"
+					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-4 transform -rotate-2"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">Dev Tools</span>
 				</div>
@@ -201,17 +201,17 @@
 						>
 							<!-- Background Pattern -->
 							<div
-								class="absolute top-0 right-0 w-32 h-32 bg-[#ffc480] opacity-10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"
+								class="absolute top-0 right-0 w-32 h-32 bg-brand-accent opacity-10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"
 							/>
 
 							<div
-								class="w-16 h-16 bg-[#FFFDF8] border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-[4px_4px_0_0_#1f2937] group-hover:bg-[#ffc480] transition-colors duration-200 text-gray-900"
+								class="w-16 h-16 bg-brand-bg border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-[4px_4px_0_0_#1f2937] group-hover:bg-brand-accent transition-colors duration-200 text-gray-900"
 							>
 								<i class={tool.icon} />
 							</div>
 
 							<h3
-								class="text-2xl font-black uppercase tracking-wide mb-3 group-hover:underline decoration-4 decoration-[#ffc480] underline-offset-4"
+								class="text-2xl font-black uppercase tracking-wide mb-3 group-hover:underline decoration-4 decoration-brand-accent underline-offset-4"
 							>
 								{tool.name}
 							</h3>
@@ -242,7 +242,7 @@
 					<span class="font-black uppercase tracking-widest text-sm">Workflows</span>
 				</div>
 				<h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter">
-					Ready-to-use <span class="text-[#ff6b6b]">automation</span> recipes
+					Ready-to-use <span class="text-brand-danger">automation</span> recipes
 				</h2>
 				<p class="text-lg md:text-xl font-bold text-gray-700 max-w-3xl mx-auto">
 					These pages come with a starter template, recommended sizes, and a prefilled API snippet.
@@ -256,7 +256,7 @@
 						on:click={() => activeCategory = cat.id}
 						class="px-4 py-2 text-sm font-bold border-2 whitespace-nowrap transition-all rounded-lg
 							{activeCategory === cat.id
-								? 'border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937] text-gray-900'
+								? 'border-gray-900 bg-brand-accent shadow-[3px_3px_0_0_#1f2937] text-gray-900'
 								: 'border-gray-200 hover:border-gray-400 bg-white text-gray-600'}"
 					>
 						{cat.label}
@@ -279,7 +279,7 @@
 									Workflow
 								</div>
 								<div
-									class="text-2xl font-black mt-1 group-hover:underline underline-offset-4 decoration-4 decoration-[#ffc480]"
+									class="text-2xl font-black mt-1 group-hover:underline underline-offset-4 decoration-4 decoration-brand-accent"
 								>
 									{useCaseDetails[uc.id]?.label || uc.label}
 								</div>
@@ -310,7 +310,7 @@
 		</div>
 
 		<!-- Feature Section -->
-		<div class="py-24 bg-[#ffc480] border-y-[3px] border-gray-900 pattern-grid">
+		<div class="py-24 bg-brand-accent border-y-[3px] border-gray-900 pattern-grid">
 			<div class="max-w-6xl mx-auto px-6">
 				<div
 					class="bg-white border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] rounded-2xl overflow-hidden"
@@ -329,7 +329,7 @@
 					<div class="p-8 md:p-12 bg-white">
 						<ul class="grid md:grid-cols-2 gap-6">
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-[#FFFDF8] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">⚡️</div>
 								<p class="font-bold text-lg">
@@ -337,7 +337,7 @@
 								</p>
 							</li>
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-[#FFFDF8] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">🌏</div>
 								<p class="font-bold text-lg">
@@ -345,7 +345,7 @@
 								</p>
 							</li>
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-[#FFFDF8] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">🔄</div>
 								<p class="font-bold text-lg">
@@ -353,7 +353,7 @@
 								</p>
 							</li>
 							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-[#FFFDF8] shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
+								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-[4px_4px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:-translate-y-1 transition-all"
 							>
 								<div class="mr-4 text-2xl">📸</div>
 								<p class="font-bold text-lg">
@@ -389,11 +389,11 @@
 					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
 				>
 					<summary
-						class="flex items-center justify-between p-6 cursor-pointer list-none bg-[#FFFDF8] hover:bg-gray-50 transition-colors"
+						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
 					>
 						<span class="font-black text-xl uppercase tracking-wide">What is Pictify.io?</span>
 						<span
-							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-[#ffc480] group-hover:text-black"
+							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-brand-accent group-hover:text-black"
 						>
 							<i class="fa fa-chevron-down" />
 						</span>
@@ -411,13 +411,13 @@
 					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
 				>
 					<summary
-						class="flex items-center justify-between p-6 cursor-pointer list-none bg-[#FFFDF8] hover:bg-gray-50 transition-colors"
+						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
 					>
 						<span class="font-black text-xl uppercase tracking-wide"
 							>Are these tools really free?</span
 						>
 						<span
-							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-[#ffc480] group-hover:text-black"
+							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-brand-accent group-hover:text-black"
 						>
 							<i class="fa fa-chevron-down" />
 						</span>
@@ -435,13 +435,13 @@
 					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] overflow-hidden transition-all duration-200 open:shadow-[8px_8px_0_0_#1f2937] open:-translate-y-1"
 				>
 					<summary
-						class="flex items-center justify-between p-6 cursor-pointer list-none bg-[#FFFDF8] hover:bg-gray-50 transition-colors"
+						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
 					>
 						<span class="font-black text-xl uppercase tracking-wide"
 							>Can I use these tools for commercial projects?</span
 						>
 						<span
-							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-[#ffc480] group-hover:text-black"
+							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-brand-accent group-hover:text-black"
 						>
 							<i class="fa fa-chevron-down" />
 						</span>

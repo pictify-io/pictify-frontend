@@ -434,7 +434,7 @@ console.log(result.url); // CDN URL of rendered image
 							<h2
 								class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"
 							>
-								<span class="w-3 h-3 bg-[#ffc480] border-2 border-gray-900 rounded-full" />
+								<span class="w-3 h-3 bg-brand-accent border-2 border-gray-900 rounded-full" />
 								Variables
 							</h2>
 						</div>
@@ -501,7 +501,7 @@ console.log(result.url); // CDN URL of rendered image
 										<!-- Default layout -->
 										<button
 											class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has('default')
-												? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+												? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 												: 'bg-white border-gray-200 hover:border-gray-900'}"
 											on:click={() => toggleLayout('default')}
 										>
@@ -526,7 +526,7 @@ console.log(result.url); // CDN URL of rendered image
 										{#each templateLayouts as [key, layout]}
 											<button
 												class="text-left px-3 py-2.5 rounded-lg border-[3px] transition-all {selectedLayouts.has(key)
-													? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
+													? 'bg-brand-accent/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 													: 'bg-white border-gray-200 hover:border-gray-900'}"
 												on:click={() => toggleLayout(key)}
 											>
@@ -640,7 +640,7 @@ console.log(result.url); // CDN URL of rendered image
 										<EmailVerificationRequired email={userEmail} feature="template rendering" />
 									{:else}
 										<button
-											class="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+											class="w-full bg-brand-danger hover:bg-[#ff5252] text-white font-black py-4 px-6 rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
 											on:click={handleRender}
 											disabled={isRendering || !selectedApiKey}
 										>

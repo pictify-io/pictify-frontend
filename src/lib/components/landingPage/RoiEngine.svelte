@@ -30,7 +30,7 @@
 	});
 </script>
 
-<section class="w-full py-20 md:py-32 bg-[#FFFDF8] relative overflow-hidden">
+<section class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Background Grid -->
 	<div
 		class="absolute inset-0 bg-[linear-gradient(45deg,#f3f4f6_25%,transparent_25%,transparent_75%,#f3f4f6_75%,#f3f4f6),linear-gradient(45deg,#f3f4f6_25%,transparent_25%,transparent_75%,#f3f4f6_75%,#f3f4f6)] [background-size:20px_20px] [background-position:0_0,10px_10px] opacity-50"
@@ -46,7 +46,7 @@
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				The ROI <br />
-				<span class="text-[#ff6b6b]">Engine.</span>
+				<span class="text-brand-danger">Engine.</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
 				Don't just generate images. Generate results. Infrastructure designed to impact your bottom
@@ -75,7 +75,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-[#ff6b6b] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-brand-danger rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -109,12 +109,12 @@
 						</div>
 						<div>
 							<div
-								class="flex justify-between text-xs font-bold text-[#ff6b6b] mb-1 uppercase tracking-wider"
+								class="flex justify-between text-xs font-bold text-brand-danger mb-1 uppercase tracking-wider"
 							>
 								Pictify Dynamic
 							</div>
 							<div
-								class="h-8 bg-[#ff6b6b] rounded w-3/4 flex items-center px-2 text-xs font-bold text-white relative shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] animate-[grow_1s_ease-out]"
+								class="h-8 bg-brand-danger rounded w-3/4 flex items-center px-2 text-xs font-bold text-white relative shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] animate-[grow_1s_ease-out]"
 							>
 								4.8%
 								<span class="absolute right-2 bg-white/20 px-1.5 rounded text-[9px]">4x Lift</span>
@@ -143,7 +143,7 @@
 
 				<div class="mb-6">
 					<div
-						class="w-12 h-12 bg-[#ffc480] rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
+						class="w-12 h-12 bg-brand-accent rounded-lg border-[2px] border-gray-900 flex items-center justify-center mb-4 shadow-[4px_4px_0_0_#000]"
 					>
 						<svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path

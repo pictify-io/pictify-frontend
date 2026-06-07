@@ -149,7 +149,7 @@
 			{#each snippetFormats as fmt}
 				<button
 					on:click|stopPropagation={() => copySnippet(fmt)}
-					class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-[#ffc480]/20 border-b border-gray-200 last:border-b-0 transition-colors"
+					class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-brand-accent/20 border-b border-gray-200 last:border-b-0 transition-colors"
 				>
 					<svg class="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={fmt.iconPath} />

@@ -235,21 +235,21 @@
 		<!-- Spotlight border highlight -->
 		{#if spotlight}
 			<div
-				class="pointer-events-none absolute rounded-lg border-[3px] border-[#ffc480] shadow-[0_0_0_3px_rgba(255,196,128,0.35)]"
+				class="pointer-events-none absolute rounded-lg border-[3px] border-brand-accent shadow-[0_0_0_3px_rgba(255,196,128,0.35)]"
 				style="left: {spotlight.left}px; top: {spotlight.top}px; width: {spotlight.width}px; height: {spotlight.height}px;"
 			></div>
 		{/if}
 
 		<!-- Callout card -->
 		<div
-			class="w-[360px] overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[8px_8px_0_0_#1f2937]"
+			class="w-[360px] overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-[8px_8px_0_0_#1f2937]"
 			style={calloutStyle}
 			role="dialog"
 			aria-modal="true"
 			aria-label={currentStep.title}
 		>
 			<!-- Header strip -->
-			<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-4 py-3">
+			<div class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-4 py-3">
 				<div class="flex items-center gap-2">
 					<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
 						<i class="fa {currentStep.icon} text-[11px] text-gray-900"></i>

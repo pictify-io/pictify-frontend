@@ -33,7 +33,7 @@
 	<meta name="twitter:image" content="https://pictify.io/og/compare/index.png" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -41,7 +41,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -63,7 +63,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
 			>
 				<div
-					class="px-6 py-2 bg-[#ff6b6b] border-[3px] border-gray-900 text-white font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
+					class="px-6 py-2 bg-brand-danger border-[3px] border-gray-900 text-white font-black text-sm uppercase tracking-widest shadow-[4px_4px_0_0_#1f2937] rounded-lg"
 				>
 					Honest Comparisons
 				</div>
@@ -74,7 +74,7 @@
 				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
 			>
 				How Pictify
-				<span class="block text-[#ff6b6b]">Compares</span>
+				<span class="block text-brand-danger">Compares</span>
 			</h1>
 
 			<!-- Description -->
@@ -147,11 +147,11 @@
 
 							<div class="mb-4">
 								<h2
-									class="text-2xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors leading-tight"
+									class="text-2xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors leading-tight"
 								>
 									Pictify vs <br />{comparison.competitor}
 								</h2>
-								<div class="h-1 w-12 bg-[#ff6b6b] mb-4" />
+								<div class="h-1 w-12 bg-brand-danger mb-4" />
 								<p class="text-gray-500 font-medium leading-relaxed line-clamp-3 mb-6">
 									{comparison.tldr}
 								</p>
@@ -163,7 +163,7 @@
 								>
 									Compare Features
 									<svg
-										class="w-4 h-4 text-[#ff6b6b]"
+										class="w-4 h-4 text-brand-danger"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -193,7 +193,7 @@
 			</p>
 			<a
 				href="/signup"
-				class="inline-block px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+				class="inline-block px-8 py-4 bg-brand-danger text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 			>
 				Get Started Free
 			</a>

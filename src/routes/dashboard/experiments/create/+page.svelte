@@ -841,7 +841,7 @@
 						</p>
 					</div>
 				</div>
-				<div class="p-6 space-y-6 bg-[#FFFDF8]">
+				<div class="p-6 space-y-6 bg-brand-bg">
 					<!-- Experiment Name -->
 					<div>
 						<label
@@ -856,7 +856,7 @@
 							bind:value={form.name}
 							on:input={handleNameInput}
 							placeholder="e.g. Homepage Hero Banner Test"
-							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						/>
 					</div>
 
@@ -871,12 +871,12 @@
 								on:click={() => (form.testMode = 'same_template')}
 								class="text-left p-5 border-[3px] rounded-xl transition-all relative overflow-hidden group
 									{form.testMode === 'same_template'
-									? 'border-gray-900 bg-[#ffc480]/20 shadow-[6px_6px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
+									? 'border-gray-900 bg-brand-accent/20 shadow-[6px_6px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
 									: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937]'}"
 							>
 								{#if form.testMode === 'same_template'}
 									<div
-										class="absolute top-4 right-4 w-6 h-6 bg-[#ffc480] border-[3px] border-gray-900 rounded-full flex items-center justify-center"
+										class="absolute top-4 right-4 w-6 h-6 bg-brand-accent border-[3px] border-gray-900 rounded-full flex items-center justify-center"
 									>
 										<div class="w-3 h-3 bg-gray-900 rounded-full" />
 									</div>
@@ -889,7 +889,7 @@
 									<div
 										class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border-[2px]
 										{form.testMode === 'same_template'
-											? 'bg-[#ffc480] border-gray-900 shadow-[2px_2px_0_0_#000] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
+											? 'bg-brand-accent border-gray-900 shadow-[2px_2px_0_0_#000] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
 											: 'bg-gray-100 border-gray-300 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]'}"
 									>
 										<svg
@@ -925,12 +925,12 @@
 								on:click={() => (form.testMode = 'different_templates')}
 								class="text-left p-5 border-[3px] rounded-xl transition-all relative overflow-hidden group
 									{form.testMode === 'different_templates'
-									? 'border-gray-900 bg-[#ffc480]/20 shadow-[6px_6px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
+									? 'border-gray-900 bg-brand-accent/20 shadow-[6px_6px_0_0_#1f2937] translate-x-[-2px] translate-y-[-2px]'
 									: 'border-gray-900 bg-white shadow-[card] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#1f2937]'}"
 							>
 								{#if form.testMode === 'different_templates'}
 									<div
-										class="absolute top-4 right-4 w-6 h-6 bg-[#ffc480] border-[3px] border-gray-900 rounded-full flex items-center justify-center"
+										class="absolute top-4 right-4 w-6 h-6 bg-brand-accent border-[3px] border-gray-900 rounded-full flex items-center justify-center"
 									>
 										<div class="w-3 h-3 bg-gray-900 rounded-full" />
 									</div>
@@ -943,7 +943,7 @@
 									<div
 										class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border-[2px]
 										{form.testMode === 'different_templates'
-											? 'bg-[#ffc480] border-gray-900 shadow-[2px_2px_0_0_#000] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
+											? 'bg-brand-accent border-gray-900 shadow-[2px_2px_0_0_#000] shadow-[inset_2px_2px_0_0_rgba(255,255,255,0.7)]'
 											: 'bg-gray-100 border-gray-300 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.1)]'}"
 									>
 										<svg
@@ -992,7 +992,7 @@
 							bind:value={form.hypothesis}
 							placeholder="I believe changing the headline will increase click-through rate by 15%..."
 							rows="3"
-							class="w-full px-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] resize-none placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
+							class="w-full px-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] resize-none placeholder-gray-400 transition-all shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
 						/>
 					</div>
 				</div>
@@ -1080,7 +1080,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="p-6 space-y-6 bg-[#FFFDF8]">
+				<div class="p-6 space-y-6 bg-brand-bg">
 					<!-- Shared Template (same_template mode) -->
 					{#if form.testMode === 'same_template'}
 						<div
@@ -1161,7 +1161,7 @@
 								<button
 									type="button"
 									on:click={qs.fn}
-									class="px-4 py-2 border-[2px] border-gray-900 rounded-lg text-xs font-black text-gray-900 uppercase tracking-wide bg-white shadow-[2px_2px_0_0_#1f2937] hover:bg-[#ffc480] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_0_#1f2937] transition-all"
+									class="px-4 py-2 border-[2px] border-gray-900 rounded-lg text-xs font-black text-gray-900 uppercase tracking-wide bg-white shadow-[2px_2px_0_0_#1f2937] hover:bg-brand-accent hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_0_#1f2937] transition-all"
 								>
 									{qs.label}
 								</button>
@@ -1199,7 +1199,7 @@
 							<div
 								class="border-[3px] rounded-xl overflow-hidden shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all relative
 								{variant.isDefault
-									? 'border-[#ffc480] shadow-[6px_6px_0_0_#ffc480]'
+									? 'border-brand-accent shadow-[6px_6px_0_0_#ffc480]'
 									: 'border-gray-900 shadow-[8px_8px_0_0_#1f2937]'}"
 							>
 								<!-- Background Grid Pattern -->
@@ -1210,14 +1210,14 @@
 								<!-- Variant Header -->
 								<div
 									class="px-6 py-4 border-b-[3px] flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10
-									{variant.isDefault ? 'bg-[#ffc480]/20 border-[#ffc480]' : 'bg-gray-50 border-gray-900'}"
+									{variant.isDefault ? 'bg-brand-accent/20 border-brand-accent' : 'bg-gray-50 border-gray-900'}"
 								>
 									<div class="flex items-center gap-4">
 										<div
 											class="w-9 h-9 {index === 0
 												? 'bg-[#4ade80]'
 												: index === 1
-												? 'bg-[#ffc480]'
+												? 'bg-brand-accent'
 												: index === 2
 												? 'bg-[#60a5fa]'
 												: 'bg-[#f472b6]'} border-[2px] border-gray-900 text-gray-900 rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-[2px_2px_0_0_#1f2937]"
@@ -1232,7 +1232,7 @@
 										/>
 										{#if variant.isDefault}
 											<span
-												class="px-3 py-1 bg-[#ffc480] border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+												class="px-3 py-1 bg-brand-accent border-[2px] border-gray-900 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 											>
 												Default Variant
 											</span>
@@ -1367,7 +1367,7 @@
 																bind:value={row.value}
 																on:input={() => syncVarsFromEditor(index)}
 																placeholder="Override value"
-																class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-[#FFFDF8] transition-colors"
+																class="flex-1 px-3 py-2 border-[2px] border-gray-400 rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gray-900 focus:bg-brand-bg transition-colors"
 															/>
 														</div>
 													{/each}
@@ -1424,7 +1424,7 @@
 											<label
 												class="text-sm font-black uppercase tracking-widest text-gray-900 flex items-center gap-2"
 											>
-												<svg class="w-5 h-5 text-[#ffc480]" fill="currentColor" viewBox="0 0 24 24"
+												<svg class="w-5 h-5 text-brand-accent" fill="currentColor" viewBox="0 0 24 24"
 													><path
 														d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
 													/></svg
@@ -1433,7 +1433,7 @@
 											</label>
 											{#if variantPreviews[index]?.loading}
 												<span
-													class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#ffc480] bg-gray-900 px-2 py-1 rounded"
+													class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-brand-accent bg-gray-900 px-2 py-1 rounded"
 												>
 													<svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
 														<circle
@@ -1538,10 +1538,10 @@
 					<button
 						type="button"
 						on:click={addVariant}
-						class="w-full py-4 mt-3 border-[3px] border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-500 hover:border-gray-900 hover:text-gray-900 hover:bg-[#ffc480]/20 hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
+						class="w-full py-4 mt-3 border-[3px] border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-500 hover:border-gray-900 hover:text-gray-900 hover:bg-brand-accent/20 hover:shadow-[3px_3px_0_0_#1f2937] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
 					>
 						<div
-							class="w-8 h-8 rounded-full bg-gray-200 group-hover:bg-gray-900 group-hover:text-[#ffc480] flex items-center justify-center transition-colors"
+							class="w-8 h-8 rounded-full bg-gray-200 group-hover:bg-gray-900 group-hover:text-brand-accent flex items-center justify-center transition-colors"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -1613,7 +1613,7 @@
 							Goal Configuration
 						</p>
 					</div>
-					<div class="p-6 space-y-6 bg-[#FFFDF8]">
+					<div class="p-6 space-y-6 bg-brand-bg">
 						<!-- Goal Type -->
 						<div
 							class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-[3px] border-gray-900 rounded-xl p-2 bg-gray-100 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
@@ -1627,7 +1627,7 @@
 									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
 							>
 								{#if form.goalConfig.type === 'impressions_only'}
-									<div class="absolute top-4 right-4 text-[#ffc480]">
+									<div class="absolute top-4 right-4 text-brand-accent">
 										<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
 											><path
 												d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
@@ -1664,7 +1664,7 @@
 									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
 							>
 								{#if form.goalConfig.type === 'click_through'}
-									<div class="absolute top-4 right-4 text-[#ffc480]">
+									<div class="absolute top-4 right-4 text-brand-accent">
 										<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
 											><path
 												d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
@@ -1700,7 +1700,7 @@
 									: 'border-transparent hover:bg-gray-200 text-gray-500'}"
 							>
 								{#if form.goalConfig.type === 'custom_event'}
-									<div class="absolute top-4 right-4 text-[#ffc480]">
+									<div class="absolute top-4 right-4 text-brand-accent">
 										<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
 											><path
 												d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
@@ -1764,7 +1764,7 @@
 										type="url"
 										bind:value={form.goalConfig.destinationUrl}
 										placeholder="https://example.com/landing-page"
-										class="w-full pl-10 pr-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400"
+										class="w-full pl-10 pr-4 py-3 border-[3px] border-gray-300 rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400"
 									/>
 								</div>
 								<p
@@ -1812,7 +1812,7 @@
 										type="text"
 										bind:value={form.goalConfig.customEventName}
 										placeholder="signup"
-										class="w-full pl-10 pr-4 py-3 border-[3px] rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-[#ffc480] focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400
+										class="w-full pl-10 pr-4 py-3 border-[3px] rounded-xl text-sm font-bold text-gray-900 bg-white focus:outline-none focus:border-brand-accent focus:shadow-[4px_4px_0_0_#ffc480] transition-all shadow-sm placeholder:text-gray-400
 											{form.goalConfig.customEventName && !/^[a-z][a-z0-9_]{0,49}$/.test(form.goalConfig.customEventName) ? 'border-red-400' : 'border-gray-300'}"
 									/>
 								</div>
@@ -1836,7 +1836,7 @@
 				<div
 					class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-[6px_6px_0_0_#1f2937]"
 				>
-					<div class="px-6 py-5 flex items-start gap-4 bg-[#FFFDF8]">
+					<div class="px-6 py-5 flex items-start gap-4 bg-brand-bg">
 						<label class="relative inline-flex items-center cursor-pointer mt-0.5 shrink-0">
 							<input type="checkbox" bind:checked={form.autoOptimize} class="sr-only peer" />
 							<div
@@ -1886,7 +1886,7 @@
 						>
 							<svg
 								class="w-4 h-4 {showAdvanced
-									? 'text-[#ffc480]'
+									? 'text-brand-accent'
 									: 'text-gray-400'} transition-colors"
 								fill="none"
 								stroke="currentColor"
@@ -1924,7 +1924,7 @@
 					</button>
 
 					{#if showAdvanced}
-						<div class="p-6 space-y-6 bg-[#FFFDF8]">
+						<div class="p-6 space-y-6 bg-brand-bg">
 							<!-- Slug -->
 							<div>
 								<label
@@ -2081,7 +2081,7 @@
 												on:click={() => (form.outputConfig.format = fmt.value)}
 												class="flex-1 px-4 py-3 border-[3px] rounded-xl text-center text-sm font-black uppercase tracking-widest transition-all
 													{form.outputConfig.format === fmt.value
-													? 'border-gray-900 bg-[#ffc480]/20 shadow-[4px_4px_0_0_#1f2937] text-gray-900 -translate-y-[2px]'
+													? 'border-gray-900 bg-brand-accent/20 shadow-[4px_4px_0_0_#1f2937] text-gray-900 -translate-y-[2px]'
 													: 'border-gray-300 bg-white text-gray-500 hover:border-gray-900 hover:text-gray-900'}"
 											>
 												{fmt.label}
@@ -2181,7 +2181,7 @@
 										<div class="text-right">
 											<span
 												class="font-black {form.goalConfig.type !== 'impressions_only'
-													? 'bg-[#ffc480] px-1'
+													? 'bg-brand-accent px-1'
 													: ''} text-gray-900"
 											>
 												{form.goalConfig.type === 'click_through' ? 'CLICKS' : form.goalConfig.type === 'custom_event' ? 'CUSTOM EVENT' : 'IMPRESSIONS'}
@@ -2262,7 +2262,7 @@
 											Serve this URL inside an {@html '<code>&lt;img&gt;</code>'} or CSS background.
 										</p>
 										<div
-											class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-[#ffc480]"
+											class="bg-black/50 p-3 rounded-lg border-[2px] border-gray-800 break-all text-sm text-brand-accent"
 										>
 											{previewUrl}
 										</div>

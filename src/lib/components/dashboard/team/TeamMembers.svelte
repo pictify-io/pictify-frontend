@@ -188,7 +188,7 @@
 		</div>
 	{:else if !$currentTeam}
 		<div
-			class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-[4px_4px_0_0_#1f2937]"
+			class="bg-brand-bg border-[3px] border-gray-900 rounded-2xl p-8 text-center shadow-[4px_4px_0_0_#1f2937]"
 		>
 			<p class="text-xl font-black text-gray-900">No team selected</p>
 		</div>
@@ -213,7 +213,7 @@
 					{#if seatUsage >= seatLimit && $isTeamOwner}
 						<a
 							href="/dashboard/upgrade"
-							class="px-6 py-3 text-sm font-black uppercase tracking-wider text-white bg-[#ff6b6b] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+							class="px-6 py-3 text-sm font-black uppercase tracking-wider text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
 						>
 							Add More Seats
 						</a>
@@ -225,7 +225,7 @@
 					<div
 						class="h-full border-r-[3px] border-gray-900 transition-all duration-500 {seatUsage >=
 						seatLimit
-							? 'bg-[#ff6b6b]'
+							? 'bg-brand-danger'
 							: 'bg-[#4ade80]'}"
 						style="width: {Math.max(Math.min((seatUsage / seatLimit) * 100, 100), 2)}%"
 					/>
@@ -251,11 +251,11 @@
 
 					<div class="divide-y-[3px] divide-gray-100">
 						{#each $teamMembers as member}
-							<div class="p-6 hover:bg-[#FFFDF8] transition-colors group">
+							<div class="p-6 hover:bg-brand-bg transition-colors group">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
-											class="w-12 h-12 rounded-xl bg-[#ffc480] border-[3px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
+											class="w-12 h-12 rounded-xl bg-brand-accent border-[3px] border-gray-900 flex items-center justify-center shadow-[2px_2px_0_0_#1f2937]"
 										>
 											<span class="text-lg font-black text-gray-900">
 												{member.user?.email?.charAt(0)?.toUpperCase() || '?'}
@@ -290,7 +290,7 @@
 										<button
 											on:click={() => handleRemoveMember(member)}
 											disabled={removingMemberId === member.uid}
-											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-[#ff6b6b] transition-all disabled:opacity-50"
+											class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-gray-400 hover:text-brand-danger transition-all disabled:opacity-50"
 											title="Remove Member"
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@
 					</div>
 					<div class="divide-y-[3px] divide-gray-100">
 						{#each $teamInvitations as invitation}
-							<div class="p-6 hover:bg-[#FFFDF8] transition-colors">
+							<div class="p-6 hover:bg-brand-bg transition-colors">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-4">
 										<div
@@ -380,7 +380,7 @@
 										<button
 											on:click={() => handleRevokeInvitation(invitation)}
 											disabled={revokingInvitationId === invitation.uid}
-											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#ff6b6b] hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+											class="px-3 py-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-brand-danger hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
 										>
 											{revokingInvitationId === invitation.uid ? 'Revoking...' : 'Revoke'}
 										</button>
@@ -442,7 +442,7 @@
 										{inviting ? 'Sending...' : 'Send Invite'}
 									</button>
 									{#if error}
-										<p class="text-[#ff6b6b] text-sm font-bold mt-2">{error}</p>
+										<p class="text-brand-danger text-sm font-bold mt-2">{error}</p>
 									{/if}
 								</div>
 							{/if}

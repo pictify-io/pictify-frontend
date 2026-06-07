@@ -65,7 +65,7 @@
 					</div>
 				</div>
 				<p class="text-sm font-bold text-gray-900 truncate">
-					<span class="text-[#ff6b6b]">Remove watermarks</span> and get unlimited generations + API access
+					<span class="text-brand-danger">Remove watermarks</span> and get unlimited generations + API access
 				</p>
 			</div>
 
@@ -73,7 +73,7 @@
 				<a
 					href="/signup?redirect=/tools/{toolName.replace(/_/g, '-')}"
 					on:click={handleSignupClick}
-					class="px-5 py-2 bg-[#ff6b6b] text-white border-[2px] border-black font-black text-xs uppercase tracking-wide shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-5 py-2 bg-brand-danger text-white border-[2px] border-black font-black text-xs uppercase tracking-wide shadow-[3px_3px_0_0_#000] hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					Sign Up Free
 				</a>

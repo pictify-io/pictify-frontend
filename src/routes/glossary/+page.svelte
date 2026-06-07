@@ -42,7 +42,7 @@
 	<meta name="twitter:image" content="https://media.pictify.io/8ixg5-1775406897273.png" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -50,7 +50,7 @@
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 
 	<main
@@ -69,7 +69,7 @@
 		<div class="relative flex flex-col items-center justify-center text-center mb-16 pt-4 sm:pt-8">
 			<!-- Icon -->
 			<div
-				class="w-20 h-20 bg-[#ffc480] border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
+				class="w-20 h-20 bg-brand-accent border-[4px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[6px_6px_0_0_#1f2937] mb-8"
 			>
 				<svg class="w-10 h-10 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -86,7 +86,7 @@
 				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
 			>
 				Image Generation
-				<span class="block text-[#ff6b6b]">Glossary</span>
+				<span class="block text-brand-danger">Glossary</span>
 			</h1>
 
 			<!-- Description -->
@@ -101,7 +101,7 @@
 			{#each letters as letter}
 				<a
 					href="#letter-{letter}"
-					class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 hover:bg-[#ffc480] transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
+					class="w-10 h-10 bg-white border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 hover:bg-brand-accent transition-colors shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px]"
 				>
 					{letter}
 				</a>
@@ -127,7 +127,7 @@
 								class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all group"
 							>
 								<h3
-									class="text-xl font-black text-gray-900 mb-2 group-hover:text-[#ff6b6b] transition-colors"
+									class="text-xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
 								>
 									{term.title}
 								</h3>
@@ -151,7 +151,7 @@
 			</p>
 			<a
 				href="/signup"
-				class="inline-block px-8 py-4 bg-[#ff6b6b] text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+				class="inline-block px-8 py-4 bg-brand-danger text-white border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 			>
 				Get Started Free
 			</a>

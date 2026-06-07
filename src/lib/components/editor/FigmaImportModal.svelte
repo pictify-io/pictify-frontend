@@ -223,7 +223,7 @@
 	on:click|self={close}
 >
 	<div
-		class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
+		class="bg-brand-bg border-[3px] border-gray-900 rounded-xl shadow-[8px_8px_0_0_#1f2937] w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
 	>
 		<!-- Header -->
 		<div

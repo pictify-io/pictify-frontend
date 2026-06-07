@@ -239,7 +239,7 @@
 							on:click={() => {
 								createGif();
 							}}
-							class="bg-[#ffc480] hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+							class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-[2px_2px_0_0_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -262,7 +262,7 @@
 				<!-- Size Controls -->
 				<div class="flex items-center gap-2">
 					<select
-						class="px-2 py-1 border border-gray-600 text-xs font-bold bg-[#2a2a3e] text-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b] cursor-pointer"
+						class="px-2 py-1 border border-gray-600 text-xs font-bold bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger cursor-pointer"
 						value={`${previewWidth}x${previewHeight}`}
 						on:change={(e) => {
 							const val = e.target.value;
@@ -283,7 +283,7 @@
 					<div class="flex items-center gap-1">
 						<input
 							type="number"
-							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
+							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
 							value={previewWidth}
 							min="100"
 							max="1920"
@@ -295,7 +295,7 @@
 						<span class="text-gray-400 text-xs font-bold">×</span>
 						<input
 							type="number"
-							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-[#ff6b6b] focus:ring-1 focus:ring-[#ff6b6b]"
+							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
 							value={previewHeight}
 							min="100"
 							max="1080"

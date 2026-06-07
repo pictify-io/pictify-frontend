@@ -704,7 +704,7 @@
 </svelte:head>
 
 <div
-	class="min-h-screen bg-[#FFFDF8] relative overflow-hidden font-sans text-gray-900 selection:bg-[#ff6b6b] selection:text-white"
+	class="min-h-screen bg-brand-bg relative overflow-hidden font-sans text-gray-900 selection:bg-brand-danger selection:text-white"
 >
 	<!-- Background Pattern -->
 	<div
@@ -741,7 +741,7 @@
 				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
 			>
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-[#ffc480] border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>
 					★ Free Tool
 				</div>
@@ -755,7 +755,7 @@
 				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
 					<span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
 					<span
-						class="absolute inset-0 bg-[#ff6b6b] transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
+						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] -z-0"
 					/>
 				</span>
 			</h1>
@@ -766,7 +766,7 @@
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
 					Convert any webpage URL into a high-quality <span
-						class="bg-[#ffc480] px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
+						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
 					>
 					instantly.
 					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
@@ -790,8 +790,8 @@
 					class="bg-black text-white px-4 py-2 flex justify-between items-center border-b-[3px] border-black"
 				>
 					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border border-white" />
-						<div class="w-3 h-3 rounded-full bg-[#ffc480] border border-white" />
+						<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
+						<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
 						<div class="w-3 h-3 rounded-full bg-[#4ade80] border border-white" />
 					</div>
 					<div class="font-mono font-bold tracking-widest text-sm uppercase">
@@ -829,7 +829,7 @@
 							<button
 								on:click={handleLoadPreviewClick}
 								disabled={isLoading || !url}
-								class="w-full h-full px-8 py-4 bg-[#ffc480] text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+								class="w-full h-full px-8 py-4 bg-brand-accent text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-[4px_4px_0_0_#000] hover:bg-[#ffb050] hover:shadow-[6px_6px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
 							>
 								{#if isLoading}Loading...{:else}Load Preview{/if}
 							</button>
@@ -923,7 +923,7 @@
 										on:input={handleDimensionInput}
 										min="1"
 										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-[#ff6b6b]"
+										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
 									/>
 									<span class="font-black text-gray-400">×</span>
 									<input
@@ -932,7 +932,7 @@
 										on:input={handleDimensionInput}
 										min="1"
 										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-[#ff6b6b]"
+										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
 									/>
 								</div>
 							</div>
@@ -1146,7 +1146,7 @@
 						 the fixed StickySignupBar (below); control renders neither. -->
 					{#if !isUserLoggedIn && ctaVariant === 'inline-value-prop'}
 						<div
-							class="mt-8 border-[3px] border-black bg-[#ffc480]/20 p-6 flex flex-col items-center text-center gap-3"
+							class="mt-8 border-[3px] border-black bg-brand-accent/20 p-6 flex flex-col items-center text-center gap-3"
 						>
 							<p class="font-black text-gray-900 text-base uppercase tracking-wide">
 								Like it? Automate it.
@@ -1173,14 +1173,14 @@
 			<div class="border-[3px] border-black shadow-[8px_8px_0_0_#1f2937] overflow-hidden">
 				<div class="bg-black px-4 py-3 flex items-center justify-between">
 					<div class="flex items-center gap-3">
-						<span class="text-xs font-black uppercase tracking-widest text-[#ffc480]"
+						<span class="text-xs font-black uppercase tracking-widest text-brand-accent"
 							>Your API Request</span
 						>
 						<span class="text-xs text-gray-500 font-mono">— updates as you change settings</span>
 					</div>
 					<button
 						on:click={() => copyToClipboard(liveCurlSnippet)}
-						class="px-3 py-1 bg-[#ffc480] text-black border-[2px] border-[#ffc480] font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
+						class="px-3 py-1 bg-brand-accent text-black border-[2px] border-brand-accent font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
 					>
 						Copy
 					</button>
@@ -1427,15 +1427,15 @@
 			</section>
 
 			<!-- Best Practices -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-[#fffdf8] shadow-[8px_8px_0_0_#000]">
+			<section class="border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-[8px_8px_0_0_#000]">
 				<h3 class="text-2xl font-black mb-6 uppercase">Pro Tips</h3>
 				<ul class="space-y-4">
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-[#ff6b6b] text-xl">01.</span>
+						<span class="font-black text-brand-danger text-xl">01.</span>
 						<span class="font-bold text-lg">Ensure the URL is publicly accessible.</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-[#ffc480] text-xl">02.</span>
+						<span class="font-black text-brand-accent text-xl">02.</span>
 						<span class="font-bold text-lg">Use the selector to remove ads/navbars.</span>
 					</li>
 					<li class="flex gap-4 items-start">

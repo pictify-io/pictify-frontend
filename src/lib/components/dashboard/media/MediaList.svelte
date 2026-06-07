@@ -172,7 +172,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-[#ffc480] rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full animate-pulse" />
 					Media Library
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -273,7 +273,7 @@
 				</p>
 				<a
 					href="/dashboard/template"
-					class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-[#ffc480] hover:text-gray-900 transition-colors border-2 border-gray-900"
+					class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-brand-accent hover:text-gray-900 transition-colors border-2 border-gray-900"
 				>
 					Open Templates
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -396,7 +396,7 @@
 								</button>
 								<button
 									on:click={(e) => downloadMedia(media.url, e)}
-									class="bg-[#ff6b6b] rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
+									class="bg-brand-danger rounded-lg w-9 h-9 border-[2px] border-gray-900 shadow-[2px_2px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center justify-center"
 									title="Download"
 								>
 									<svg
@@ -426,7 +426,7 @@
 									>
 								</div>
 								<span
-									class="text-[9px] font-black text-gray-900 bg-[#ffc480]/30 px-2 py-0.5 rounded border border-[#ffc480] uppercase tracking-wider"
+									class="text-[9px] font-black text-gray-900 bg-brand-accent/30 px-2 py-0.5 rounded border border-brand-accent uppercase tracking-wider"
 								>
 									{mediaType === 'images' ? 'PNG' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
 								</span>
@@ -589,7 +589,7 @@
 							class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20"
 						>
 							<svg
-								class="w-4 h-4 text-[#ffc480]"
+								class="w-4 h-4 text-brand-accent"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -610,7 +610,7 @@
 							class="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg border-2 border-white/20"
 						>
 							<svg
-								class="w-4 h-4 text-[#ffc480]"
+								class="w-4 h-4 text-brand-accent"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -665,7 +665,7 @@
 						Copy Link
 					</button>
 					<button
-						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#ff6b6b] text-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
+						class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-wide"
 						on:click={(e) => downloadMedia(selectedMedia.url, e)}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

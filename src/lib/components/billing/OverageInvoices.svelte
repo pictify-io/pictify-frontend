@@ -147,7 +147,7 @@
 										class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all
 											{isOverdue(invoice)
 											? 'bg-red-600 text-white hover:bg-red-700 shadow-[3px_3px_0_0_#991b1b]'
-											: 'bg-[#ffc480] text-gray-900 hover:bg-[#ffb360] border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937]'}
+											: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937]'}
 											hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937]"
 									>
 										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

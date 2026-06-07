@@ -305,7 +305,7 @@
 				</p>
 				<button
 					on:click={() => (showCreateModal = true)}
-					class="px-5 py-2 text-xs font-bold text-gray-900 bg-[#ffc480] rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
+					class="px-5 py-2 text-xs font-bold text-gray-900 bg-brand-accent rounded-lg border-2 border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest"
 				>
 					Add Connector
 				</button>
@@ -415,7 +415,7 @@
 		on:keydown={(e) => e.key === 'Escape' && closeModal()}
 	>
 		<div
-			class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
+			class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] max-w-lg w-full max-h-[90vh] overflow-y-auto relative overflow-hidden"
 		>
 			<!-- Header Strip -->
 			<div
@@ -565,7 +565,7 @@
 								type="text"
 								bind:value={newConnector.name}
 								required
-								class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ffc480]"
+								class="w-full px-4 py-3 border-[3px] border-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent"
 							/>
 						</div>
 
@@ -631,7 +631,7 @@
 							<button
 								type="submit"
 								disabled={creating}
-								class="flex-1 px-4 py-3 text-sm font-bold text-white bg-[#ff6b6b] rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+								class="flex-1 px-4 py-3 text-sm font-bold text-white bg-brand-danger rounded-xl border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{creating ? 'Saving...' : 'Save Connector'}
 							</button>

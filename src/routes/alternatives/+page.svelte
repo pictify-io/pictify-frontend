@@ -38,7 +38,7 @@
 	<meta name="twitter:image:alt" content="Pictify alternatives — 34 tools compared" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-[#FFFDF8] relative overflow-hidden font-['Manrope']">
+<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
 
 	<!-- Background Elements -->
@@ -121,7 +121,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-12 h-12 bg-[#ffc480] border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
+							class="w-12 h-12 bg-brand-accent border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
 						>
 							<svg
 								class="w-6 h-6 text-gray-900"
@@ -142,7 +142,7 @@
 					</div>
 					<div class="text-center">
 						<div
-							class="w-12 h-12 bg-[#ff6b6b] border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
+							class="w-12 h-12 bg-brand-danger border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
 						>
 							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path

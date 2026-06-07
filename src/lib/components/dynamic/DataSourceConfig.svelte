@@ -398,7 +398,7 @@
 					{:else}
 						<div class="flex items-start gap-3">
 							<div
-								class="w-8 h-8 rounded-full bg-[#ff6b6b] flex items-center justify-center border-2 border-[#991b1b] flex-shrink-0"
+								class="w-8 h-8 rounded-full bg-brand-danger flex items-center justify-center border-2 border-[#991b1b] flex-shrink-0"
 							>
 								<svg
 									class="w-5 h-5 text-[#7f1d1d]"

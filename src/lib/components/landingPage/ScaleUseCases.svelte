@@ -11,7 +11,7 @@
 			status: 'GOLD',
 			points: '450',
 			nextReward: 'Free Ship',
-			color: 'bg-[#ffc480]'
+			color: 'bg-brand-accent'
 		},
 		{
 			id: 'silver',
@@ -29,7 +29,7 @@
 			status: 'PLATINUM',
 			points: '890',
 			nextReward: '$50 Credit',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		}
 	];
 
@@ -68,7 +68,7 @@
 			rating: '4.8',
 			image:
 				'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80',
-			color: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger'
 		},
 		{
 			product: 'Adidas Ultra',
@@ -83,7 +83,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-[#FFFDF8] relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -94,14 +94,14 @@
 		class="absolute top-1/4 -right-64 w-[800px] h-[800px] bg-[#4ade80]/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 	<div
-		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-[#ffc480]/20 rounded-full blur-[100px] pointer-events-none -z-10"
+		class="absolute bottom-1/4 -left-64 w-[800px] h-[800px] bg-brand-accent/20 rounded-full blur-[100px] pointer-events-none -z-10"
 	/>
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
 			<div
-				class="inline-block mb-6 px-6 py-2 bg-[#ffc480] border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform rotate-2 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
+				class="inline-block mb-6 px-6 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] rounded-full transform rotate-2 hover:-rotate-1 hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_0_#1f2937] transition-all cursor-default"
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
 					>Dynamic Generation</span
@@ -109,7 +109,7 @@
 			</div>
 			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template. <br />
-				<span class="relative inline-block text-[#ff6b6b] transform -rotate-1 mt-2">
+				<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
 					Million Variations
 					<svg
 						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
@@ -327,7 +327,7 @@
 				<div class="p-8 md:p-10 flex flex-col relative z-10 text-gray-900">
 					<div class="flex items-center gap-4">
 						<div
-							class="w-14 h-14 bg-[#ff6b6b] border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-6 transition-transform"
+							class="w-14 h-14 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -485,10 +485,10 @@
 							>
 								<div class="flex flex-1 gap-1.5 h-full items-center">
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-[#ff6b6b] border-[1.5px] border-gray-900"
+										class="w-2.5 h-2.5 rounded-full bg-brand-danger border-[1.5px] border-gray-900"
 									/>
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-[#ffc480] border-[1.5px] border-gray-900"
+										class="w-2.5 h-2.5 rounded-full bg-brand-accent border-[1.5px] border-gray-900"
 									/>
 									<div
 										class="w-2.5 h-2.5 rounded-full bg-[#4ade80] border-[1.5px] border-gray-900"

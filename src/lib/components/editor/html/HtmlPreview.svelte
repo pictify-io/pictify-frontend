@@ -109,7 +109,7 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col gap-4 bg-[#FFFDF8] p-6">
+<div class="flex h-full w-full flex-col gap-4 bg-brand-bg p-6">
 	<!-- Image frame. The inner padding gives the rendered image some
 	     breathing room against the neobrutalist border so wide
 	     templates don't visually touch the frame corners. -->
@@ -136,7 +136,7 @@
 			/>
 		{:else if loading}
 			<div class="flex flex-col items-center gap-3 text-gray-500">
-				<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-[#ffc480] shadow-[3px_3px_0_0_#1f2937]">
+				<div class="flex h-12 w-12 animate-pulse items-center justify-center rounded-xl border-[3px] border-gray-900 bg-brand-accent shadow-[3px_3px_0_0_#1f2937]">
 					<i class="fa fa-hourglass-half text-gray-900"></i>
 				</div>
 				<span class="text-[11px] font-black uppercase tracking-widest">Rendering…</span>
@@ -152,7 +152,7 @@
 				<p class="text-[12px] font-bold leading-relaxed text-gray-600">
 					Every keystroke renders here. Write HTML on the left, see the image on the right.
 				</p>
-				<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-1 font-mono text-[11px] text-[#ffc480]">
+				<code class="rounded-md border-[2px] border-gray-900 bg-gray-900 px-2 py-1 font-mono text-[11px] text-brand-accent">
 					&lt;h1&gt;{'{{'}title{'}}'}&lt;/h1&gt;
 				</code>
 			</div>
@@ -160,7 +160,7 @@
 
 		{#if loading && dataUrl}
 			<div
-				class="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-[#ffc480] px-2 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
+				class="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-brand-accent px-2 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937]"
 			>
 				<i class="fa fa-rotate-right fa-spin text-[9px]"></i>
 				Rendering
@@ -200,7 +200,7 @@
 
 		{#if status === 'error'}
 			<span
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-[#ff6b6b] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937]"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-brand-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#1f2937]"
 			>
 				<i class="fa fa-triangle-exclamation text-[10px]"></i>
 				{error}

@@ -501,10 +501,10 @@
 	inner rounded-xl card carries the code face; the buffer keeps its
 	JetBrains Mono + brand Handlebars token styling (the signature detail).
 -->
-<div class="flex h-full w-full flex-col bg-[#FFFDF8] p-6">
+<div class="flex h-full w-full flex-col bg-brand-bg p-6">
 	<div
 		bind:this={container}
-		class="cm-html-editor h-full w-full overflow-hidden rounded-xl border-[3px] border-gray-900 bg-[#FFFDF8] shadow-[4px_4px_0_0_#1f2937]"
+		class="cm-html-editor h-full w-full overflow-hidden rounded-xl border-[3px] border-gray-900 bg-brand-bg shadow-[4px_4px_0_0_#1f2937]"
 	></div>
 </div>
 

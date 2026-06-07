@@ -240,7 +240,7 @@
 	>
 		<!-- Header -->
 		<div
-			class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-4 py-3"
+			class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-4 py-3"
 		>
 			<div class="flex items-center gap-2">
 				<div class="flex h-7 w-7 items-center justify-center rounded-md border-[2px] border-gray-900 bg-white shadow-[2px_2px_0_0_#1f2937]">
@@ -327,7 +327,7 @@
 						rows="6"
 						spellcheck="false"
 						placeholder={draft.type === 'array' ? '[\n  { "name": "…" }\n]' : '{\n  "field": "…"\n}'}
-						class="w-full resize-y rounded-lg border-[2px] {jsonError ? 'border-[#ff6b6b]' : 'border-gray-900'} bg-white px-3 py-2 font-mono text-[11px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
+						class="w-full resize-y rounded-lg border-[2px] {jsonError ? 'border-brand-danger' : 'border-gray-900'} bg-white px-3 py-2 font-mono text-[11px] leading-relaxed text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 					></textarea>
 					{#if jsonError}
 						<p class="pt-0.5 text-[10px] font-bold text-[#c62828]">{jsonError}</p>
@@ -384,7 +384,7 @@
 								}
 							};
 						}}
-						class="h-4 w-4 accent-[#ffc480]"
+						class="h-4 w-4 accent-brand-accent"
 					/>
 				</label>
 
@@ -392,7 +392,7 @@
 				<label
 					class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-[2px] px-3 py-2 transition-all
 						{draft.allowRawHtml
-							? 'border-gray-900 bg-[#ff6b6b] text-white shadow-[2px_2px_0_0_#1f2937]'
+							? 'border-gray-900 bg-brand-danger text-white shadow-[2px_2px_0_0_#1f2937]'
 							: 'border-gray-900 bg-white text-gray-900 hover:shadow-[2px_2px_0_0_#1f2937]'}"
 				>
 					<div class="flex items-center gap-2">
@@ -415,7 +415,7 @@
 
 				{#if draft.allowRawHtml}
 					<p
-						class="rounded-md border-[2px] border-gray-900 bg-[#ff6b6b]/10 px-3 py-2 text-[10px] font-bold text-gray-800"
+						class="rounded-md border-[2px] border-gray-900 bg-brand-danger/10 px-3 py-2 text-[10px] font-bold text-gray-800"
 					>
 						<i class="fa fa-info-circle mr-1"></i>
 						Use <code class="text-[#c88a3b]">{'{{{' + draft.name + '}}}'}</code> in the
@@ -432,7 +432,7 @@
 			<button
 				type="button"
 				on:click={remove}
-				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-[#ff6b6b] hover:text-white hover:shadow-none"
+				class="inline-flex items-center gap-1.5 rounded-md border-[2px] border-gray-900 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow-[2px_2px_0_0_#1f2937] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-brand-danger hover:text-white hover:shadow-none"
 			>
 				<i class="fa fa-trash text-[10px]"></i>
 				Delete

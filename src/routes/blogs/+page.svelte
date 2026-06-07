@@ -40,7 +40,7 @@
 </svelte:head>
 
 <div
-	class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black"
+	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
 >
 	<Nav />
 
@@ -48,11 +48,11 @@
 	<div class="w-full flex flex-col md:flex-row border-b-[3px] border-gray-900">
 		<!-- Left Content -->
 		<div
-			class="flex-1 px-6 md:px-12 py-12 md:py-20 flex flex-col justify-center md:border-r-[3px] border-gray-900 bg-[#FFFDF8]"
+			class="flex-1 px-6 md:px-12 py-12 md:py-20 flex flex-col justify-center md:border-r-[3px] border-gray-900 bg-brand-bg"
 		>
 			<div class="mb-8">
 				<div
-					class="inline-block bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-2"
+					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] px-4 py-1 mb-6 transform -rotate-2"
 				>
 					<span class="font-black uppercase tracking-widest text-sm">Resources</span>
 				</div>
@@ -80,7 +80,7 @@
 
 		<!-- Right Content (Featured) -->
 		<div
-			class="flex-1 bg-[#ffc480] pattern-grid flex items-center justify-center p-8 md:p-16 relative overflow-hidden"
+			class="flex-1 bg-brand-accent pattern-grid flex items-center justify-center p-8 md:p-16 relative overflow-hidden"
 		>
 			<!-- Decorative Elements -->
 			<div
@@ -98,7 +98,7 @@
 					>
 						<!-- Featured Badge -->
 						<div
-							class="absolute -top-4 -right-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-[4px_4px_0_0_#1f2937] z-20"
+							class="absolute -top-4 -right-4 bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-[4px_4px_0_0_#1f2937] z-20"
 						>
 							<span class="font-black uppercase tracking-widest text-sm">Featured</span>
 						</div>

@@ -75,7 +75,7 @@
 </svelte:head>
 
 <div
-	class="bg-[#FFFDF8] min-h-screen flex flex-col font-sans text-gray-900 selection:bg-[#ffc480] selection:text-black"
+	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
 >
 	<Nav />
 
@@ -95,13 +95,13 @@
 
 			<!-- Title & Info -->
 			<div
-				class="flex-1 flex flex-col w-full bg-[#FFFDF8] justify-center p-8 md:p-16 relative pattern-grid"
+				class="flex-1 flex flex-col w-full bg-brand-bg justify-center p-8 md:p-16 relative pattern-grid"
 			>
 				<div class="relative z-10">
 					{#if blog?.tags?.length > 0}
 						<div class="mb-6">
 							<span
-								class="bg-[#ff6b6b] text-white border-[3px] border-gray-900 px-4 py-1.5 font-black uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#1f2937] inline-block transform -rotate-1"
+								class="bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1.5 font-black uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#1f2937] inline-block transform -rotate-1"
 							>
 								{blog?.tags[0]}
 							</span>

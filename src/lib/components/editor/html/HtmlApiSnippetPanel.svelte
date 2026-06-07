@@ -419,11 +419,11 @@
 	on:keydown={onKey}
 	role="region"
 	aria-label="API playground"
-	class="flex h-full w-full flex-col bg-[#FFFDF8]"
+	class="flex h-full w-full flex-col bg-brand-bg"
 >
 	<!-- Slim header strip — label + shortcut hint only. -->
 	<header
-		class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-[#ffc480] px-5 py-3"
+		class="flex items-center justify-between gap-3 border-b-[3px] border-gray-900 bg-brand-accent px-5 py-3"
 	>
 		<div class="flex items-center gap-3">
 			<h2 class="text-[13px] font-black uppercase tracking-widest text-gray-900">API</h2>
@@ -433,7 +433,7 @@
 				>
 					<span class="relative flex h-1.5 w-1.5">
 						<span
-							class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff6b6b] opacity-75"
+							class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-danger opacity-75"
 						></span>
 						<span
 							class="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#ff5252]"
@@ -453,7 +453,7 @@
 	<!-- Scrollable body -->
 	<div class="flex min-h-0 flex-1 flex-col overflow-auto">
 		<!-- Sticky request bar + inline config row -->
-		<div class="sticky top-0 z-10 border-b-[2px] border-gray-900 bg-[#FFFDF8]">
+		<div class="sticky top-0 z-10 border-b-[2px] border-gray-900 bg-brand-bg">
 			<!-- POST bar -->
 			<div class="flex items-stretch gap-0 px-5 pt-5">
 				<div
@@ -478,7 +478,7 @@
 						{isSending
 							? 'bg-gray-200 text-gray-600'
 							: canSend
-								? 'bg-[#ffc480] text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
+								? 'bg-brand-accent text-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[4px_4px_0_0_#1f2937] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
 								: 'bg-gray-100 text-gray-400 cursor-not-allowed'}"
 				>
 					{#if isSending}
@@ -504,7 +504,7 @@
 							class="inline-flex items-center overflow-hidden rounded-md border-[2px] border-gray-900 bg-white"
 						>
 							<span class="px-2 text-[10px] font-black text-gray-500">
-								<i class="fa fa-key text-[#ffc480]"></i>
+								<i class="fa fa-key text-brand-accent"></i>
 							</span>
 							<select
 								bind:value={selectedToken}
@@ -593,7 +593,7 @@
 				class="overflow-hidden rounded-lg border-[2px] border-gray-900 bg-white"
 			>
 				<div
-					class="flex items-center justify-between border-b-[2px] border-gray-900 bg-[#FFFDF8] px-3 py-2"
+					class="flex items-center justify-between border-b-[2px] border-gray-900 bg-brand-bg px-3 py-2"
 				>
 					<span class="text-[9px] font-black uppercase tracking-widest text-gray-600">
 						Variables
@@ -648,7 +648,7 @@
 													type="checkbox"
 													checked={v === true || v === 'true'}
 													on:change={(e) => handleVarEdit(def.name, e.target.checked)}
-													class="h-4 w-4 accent-[#ffc480]"
+													class="h-4 w-4 accent-brand-accent"
 												/>
 												<span class="text-[11px] font-bold text-gray-700">
 													{v ? 'true' : 'false'}
@@ -748,7 +748,7 @@
 			>
 				<!-- Tab bar + status -->
 				<div
-					class="flex items-center justify-between gap-3 border-b-[2px] border-gray-900 bg-[#FFFDF8] px-3 py-2"
+					class="flex items-center justify-between gap-3 border-b-[2px] border-gray-900 bg-brand-bg px-3 py-2"
 				>
 					<div class="flex items-center gap-1">
 						{#each [
@@ -779,7 +779,7 @@
 										? 'bg-[#4ade80] text-gray-900'
 										: statusCode < 500
 											? 'bg-[#fbbf24] text-gray-900'
-											: 'bg-[#ff6b6b] text-white'}"
+											: 'bg-brand-danger text-white'}"
 							>
 								{statusCode}
 							</span>
@@ -806,12 +806,12 @@
 						<div
 							class="absolute left-0 right-0 top-0 h-0.5 overflow-hidden bg-gray-200"
 						>
-							<div class="h-full w-1/3 animate-[slide_1.2s_ease-in-out_infinite] bg-[#ffc480]"></div>
+							<div class="h-full w-1/3 animate-[slide_1.2s_ease-in-out_infinite] bg-brand-accent"></div>
 						</div>
 					</div>
 				{:else if responseError && responseTab !== 'curl' && responseTab !== 'js'}
 					<div
-						class="border-l-[4px] border-[#ff5252] bg-[#ff6b6b]/10 px-4 py-3"
+						class="border-l-[4px] border-[#ff5252] bg-brand-danger/10 px-4 py-3"
 					>
 						<div class="flex items-start gap-2">
 							<i class="fa fa-triangle-exclamation mt-0.5 text-[#ff5252]"></i>
@@ -861,7 +861,7 @@
 										class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/95 p-4 text-center"
 									>
 										<div
-											class="flex h-9 w-9 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#ff6b6b] text-white"
+											class="flex h-9 w-9 items-center justify-center rounded-md border-[2px] border-gray-900 bg-brand-danger text-white"
 										>
 											<i class="fa fa-triangle-exclamation text-[13px]"></i>
 										</div>
@@ -875,7 +875,7 @@
 										<button
 											type="button"
 											on:click={retryImgManually}
-											class="inline-flex items-center gap-1 rounded-md border-[2px] border-gray-900 bg-[#ffc480] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
+											class="inline-flex items-center gap-1 rounded-md border-[2px] border-gray-900 bg-brand-accent px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-[2px_2px_0_0_#1f2937] transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_0_#1f2937]"
 										>
 											<i class="fa fa-rotate-right text-[9px]"></i>
 											Retry
@@ -886,7 +886,7 @@
 						{/if}
 						<!-- Meta + actions strip -->
 						<div
-							class="flex flex-wrap items-center justify-between gap-2 border-t-[2px] border-gray-900 bg-[#FFFDF8] px-3 py-2"
+							class="flex flex-wrap items-center justify-between gap-2 border-t-[2px] border-gray-900 bg-brand-bg px-3 py-2"
 						>
 							<div
 								class="flex items-center gap-2 font-mono text-[10px] font-bold text-gray-700"
@@ -925,7 +925,7 @@
 							class="flex h-[220px] flex-col items-center justify-center gap-2 bg-gray-50 px-4 text-center"
 						>
 							<div
-								class="flex h-9 w-9 items-center justify-center rounded-md border-[2px] border-gray-900 bg-[#ffc480]"
+								class="flex h-9 w-9 items-center justify-center rounded-md border-[2px] border-gray-900 bg-brand-accent"
 							>
 								<i class="fa fa-paper-plane text-[13px] text-gray-900"></i>
 							</div>

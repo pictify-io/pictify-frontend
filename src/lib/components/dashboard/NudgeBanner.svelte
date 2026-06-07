@@ -13,9 +13,9 @@
 >
 	<!-- Lightbulb icon -->
 	<div
-		class="w-10 h-10 bg-[#ffc480]/20 rounded-xl border-[2px] border-[#ffc480] flex items-center justify-center flex-shrink-0"
+		class="w-10 h-10 bg-brand-accent/20 rounded-xl border-[2px] border-brand-accent flex items-center justify-center flex-shrink-0"
 	>
-		<svg class="w-5 h-5 text-[#ffc480]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		<svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path
 				stroke-linecap="round"
 				stroke-linejoin="round"
@@ -34,7 +34,7 @@
 	{#if cta && href}
 		<a
 			{href}
-			class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase tracking-wider bg-[#ffc480] text-black border-[2px] border-black rounded-lg shadow-[2px_2px_0_0_black] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+			class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase tracking-wider bg-brand-accent text-black border-[2px] border-black rounded-lg shadow-[2px_2px_0_0_black] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 		>
 			{cta}
 		</a>

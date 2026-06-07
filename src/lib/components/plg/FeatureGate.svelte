@@ -222,7 +222,7 @@
 
 				<div class="relative z-10">
 					<div
-						class="w-16 h-16 mx-auto mb-4 bg-[#ffc480] rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center transform hover:scale-105 transition-transform duration-200"
+						class="w-16 h-16 mx-auto mb-4 bg-brand-accent rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center transform hover:scale-105 transition-transform duration-200"
 					>
 						<svg
 							class="w-8 h-8 text-gray-900"
@@ -251,7 +251,7 @@
 
 					{#if upgradePrompt?.benefit}
 						<div
-							class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#10b981]/10 text-gray-900 border border-[#10b981]/30 rounded-md text-xs font-black mb-5 transform -rotate-1"
+							class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-success/10 text-gray-900 border border-brand-success/30 rounded-md text-xs font-black mb-5 transform -rotate-1"
 						>
 							<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -294,7 +294,7 @@
 			<div
 				class="bg-white rounded-xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] p-6 max-w-sm w-full text-center relative overflow-hidden"
 			>
-				<div class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b border-gray-900" />
+				<div class="absolute top-0 left-0 w-full h-1.5 bg-brand-danger border-b border-gray-900" />
 
 				<div class="relative z-10 mt-2">
 					<div
@@ -327,7 +327,7 @@
 
 					{#if upgradePrompt}
 						<button
-							class="w-full py-3 px-4 bg-[#ffc480] text-gray-900 font-black uppercase tracking-widest text-xs rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="w-full py-3 px-4 bg-brand-accent text-gray-900 font-black uppercase tracking-widest text-xs rounded-lg border-2 border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							on:click={handleUpgrade}
 						>
 							Upgrade for {upgradePrompt.targetLimit === null

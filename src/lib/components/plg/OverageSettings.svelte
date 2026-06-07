@@ -95,7 +95,7 @@
 	<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4">
 		<div class="flex items-center gap-3">
 			<div
-				class="w-8 h-8 rounded-lg bg-[#10b981] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
+				class="w-8 h-8 rounded-lg bg-brand-success border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_#1f2937]"
 			>
 				<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path

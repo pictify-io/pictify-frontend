@@ -20,14 +20,14 @@
 			title: 'A/B Testing',
 			description: 'Create variants with different copy, colors, or layouts. Split traffic and measure which image drives more clicks.',
 			iconPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-			color: 'bg-[#ffc480]',
+			color: 'bg-brand-accent',
 			tag: 'CORE'
 		},
 		{
 			title: 'Smart Links',
 			description: 'Route visitors to different image variants based on device, country, browser, or custom rules. One URL, many experiences.',
 			iconPath: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
-			color: 'bg-[#ff6b6b]',
+			color: 'bg-brand-danger',
 			tag: 'TARGETING'
 		},
 		{
@@ -183,7 +183,7 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-[#FFFDF8]">
+<div class="min-h-screen bg-brand-bg">
 	<Nav />
 
 <!-- Hero Section -->
@@ -216,7 +216,7 @@
 
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8">
 				Test Your Images<br />
-				<span class="relative inline-block text-[#ff6b6b] mt-2">
+				<span class="relative inline-block text-brand-danger mt-2">
 					Like You Test Your Copy
 					<svg
 						class="absolute w-full h-8 -bottom-3 left-0 text-black z-[-1] opacity-20"
@@ -231,7 +231,7 @@
 			<p class="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto mb-12">
 				Stop guessing which image performs best. Run experiments with multiple variants, target by
 				device and location, and let our algorithm pick the winner. <br class="hidden sm:block" />
-				<span class="font-black text-gray-900 bg-[#ffc480] px-2 border-b-[3px] border-gray-900"
+				<span class="font-black text-gray-900 bg-brand-accent px-2 border-b-[3px] border-gray-900"
 					>One URL. Data-driven visuals.</span
 				>
 			</p>
@@ -274,7 +274,7 @@
 
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center mb-16">
-				<div class="inline-block px-4 py-1.5 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
+				<div class="inline-block px-4 py-1.5 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Features</span>
 				</div>
 				<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -342,7 +342,7 @@
 				<div class="hidden md:block absolute left-12 top-10 bottom-10 w-[3px] bg-gray-900 z-0"></div>
 
 				{#each howItWorks as step, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#4ade80]']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#4ade80]']}
 					<div
 						class="flex flex-col md:flex-row items-start gap-6 relative z-10 group"
 						in:fly={{ x: -20, duration: 400, delay: i * 150 }}
@@ -390,7 +390,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
 				{#each useCases as uc, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#ff6b6b]', 'bg-[#a78bfa]', 'bg-[#4ade80]', 'bg-[#7dd3fc]', 'bg-[#f43f5e]']}
+					{@const colors = ['bg-brand-accent', 'bg-brand-danger', 'bg-[#a78bfa]', 'bg-[#4ade80]', 'bg-[#7dd3fc]', 'bg-[#f43f5e]']}
 					{@const rotations = ['rotate-1', '-rotate-1', 'rotate-2', '-rotate-2', 'rotate-1', '-rotate-1']}
 					<div
 						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#1f2937] hover:shadow-[12px_12px_0_0_#1f2937] hover:-translate-y-2 transition-all duration-300 flex flex-col group overflow-hidden {rotations[i]}"
@@ -414,14 +414,14 @@
 								<!-- Email Header Images -->
 								<div class="w-full max-w-[200px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all">
 									<div class="bg-gray-100 border-b-[2px] border-gray-900 px-2 py-1 flex items-center gap-1.5">
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ff6b6b] border border-gray-900"></div>
-										<div class="w-1.5 h-1.5 rounded-full bg-[#ffc480] border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-danger border border-gray-900"></div>
+										<div class="w-1.5 h-1.5 rounded-full bg-brand-accent border border-gray-900"></div>
 										<div class="w-1.5 h-1.5 rounded-full bg-[#4ade80] border border-gray-900"></div>
 									</div>
-									<div class="h-16 bg-[#ffc480] border-b-[2px] border-gray-900 flex items-center justify-center overflow-hidden relative">
+									<div class="h-16 bg-brand-accent border-b-[2px] border-gray-900 flex items-center justify-center overflow-hidden relative">
 										<!-- AB Test Split Visual inside Email -->
 										<div class="absolute inset-0 flex">
-											<div class="w-1/2 h-full bg-[#ffc480] flex items-center justify-center border-r-[2px] border-gray-900">
+											<div class="w-1/2 h-full bg-brand-accent flex items-center justify-center border-r-[2px] border-gray-900">
 												<span class="font-black text-xs">V1</span>
 											</div>
 											<div class="w-1/2 h-full bg-[#a78bfa] flex items-center justify-center">
@@ -458,7 +458,7 @@
 										</div>
 										<span class="text-[7px] font-bold text-gray-400">Sponsored</span>
 									</div>
-									<div class="h-20 bg-gradient-to-r from-[#f43f5e] to-[#ffc480] flex flex-col justify-center items-center text-center p-2 relative">
+									<div class="h-20 bg-gradient-to-r from-[#f43f5e] to-brand-accent flex flex-col justify-center items-center text-center p-2 relative">
 										<div class="absolute inset-0 flex items-center justify-center opacity-20">
 											<div class="w-full h-2 bg-white rotate-45 scale-150"></div>
 											<div class="w-full h-2 bg-white -rotate-45 scale-150 absolute"></div>
@@ -480,7 +480,7 @@
 									</div>
 									<div class="w-1/2 h-full bg-[#7dd3fc]/20 flex flex-col justify-center items-center">
 										<span class="text-xl mb-1">🇪🇺</span>
-										<div class="bg-[#ff6b6b] text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-gray-900">€119</div>
+										<div class="bg-brand-danger text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-gray-900">€119</div>
 									</div>
 								</div>
 							{:else if i === 4}
@@ -531,7 +531,7 @@
 												<div class="w-1/5 h-[100%] bg-gray-900"></div>
 											</div>
 										</div>
-										<div class="bg-[#ffc480]/20 border-[2px] border-[#ffc480] rounded p-2 flex flex-col justify-center items-center">
+										<div class="bg-brand-accent/20 border-[2px] border-brand-accent rounded p-2 flex flex-col justify-center items-center">
 											<div class="text-xs font-black text-gray-900">82%</div>
 											<div class="text-[6px] font-bold text-gray-500 uppercase">Score</div>
 										</div>
@@ -577,7 +577,7 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each analyticsFeatures as feature, i}
-					{@const colors = ['bg-[#ffc480]', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-[#ff6b6b]', 'bg-[#4ade80]', 'bg-white']}
+					{@const colors = ['bg-brand-accent', 'bg-[#7dd3fc]', 'bg-[#a78bfa]', 'bg-brand-danger', 'bg-[#4ade80]', 'bg-white']}
 					<div class="flex items-center gap-4 p-5 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] rounded-2xl transition-all group">
 						<div class="w-14 h-14 {colors[i % colors.length]} border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_0_#1f2937] group-hover:-rotate-6 transition-transform">
 							<svg class="w-6 h-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -603,7 +603,7 @@
 
 		<!-- Floating decorative elements -->
 		<div class="absolute top-10 left-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] animate-bounce" style="animation-duration: 3s; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;"></div>
-		<div class="absolute bottom-10 right-10 w-20 h-20 bg-[#ffc480] border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4s;"></div>
+		<div class="absolute bottom-10 right-10 w-20 h-20 bg-brand-accent border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] rounded-full animate-bounce" style="animation-duration: 4s;"></div>
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->

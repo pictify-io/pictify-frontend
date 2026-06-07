@@ -288,10 +288,10 @@
 			.replace(/&/g, '&amp;')
 			.replace(/</g, '&lt;')
 			.replace(/>/g, '&gt;')
-			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-[#ffc480]">$1</span>=')
+			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-brand-accent">$1</span>=')
 			.replace(/"([^"]*)"/g, '"<span class="text-[#4ade80]">$1</span>"')
-			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-[#ff6b6b]">$2</span>')
-			.replace(/(\[\/?\w+\])/g, '<span class="text-[#ff6b6b]">$1</span>');
+			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-brand-danger">$2</span>')
+			.replace(/(\[\/?\w+\])/g, '<span class="text-brand-danger">$1</span>');
 	}
 
 	onMount(() => {
@@ -358,16 +358,16 @@
 	{/if}
 </svelte:head>
 
-<div class="bg-[#FFFDF8] min-h-screen flex flex-col relative overflow-hidden font-sans">
+<div class="bg-brand-bg min-h-screen flex flex-col relative overflow-hidden font-sans">
 	<!-- Background Elements -->
 	<div
 		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
 	/>
 	<div
-		class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ffc480]/10 rounded-full blur-[100px] -z-10 pointer-events-none"
+		class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
 	/>
 	<div
-		class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#ff6b6b]/5 rounded-full blur-[80px] -z-10 pointer-events-none"
+		class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
 	/>
 
 	<Nav />
@@ -377,7 +377,7 @@
 			<!-- Loading state -->
 			<div class="flex flex-col items-center justify-center min-h-[400px]">
 				<div
-					class="w-16 h-16 border-[4px] border-gray-900 border-t-[#ff6b6b] rounded-full animate-spin"
+					class="w-16 h-16 border-[4px] border-gray-900 border-t-brand-danger rounded-full animate-spin"
 				/>
 				<p class="mt-6 text-xl font-black text-gray-900 uppercase tracking-widest animate-pulse">
 					Loading Asset...
@@ -390,7 +390,7 @@
 			>
 				<div class="absolute inset-0 bg-red-50/50 -z-10" />
 				<div
-					class="inline-flex items-center justify-center w-20 h-20 bg-[#ff6b6b]/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-[#ff6b6b]"
+					class="inline-flex items-center justify-center w-20 h-20 bg-brand-danger/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-brand-danger"
 				>
 					<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -407,7 +407,7 @@
 				<p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
 				<a
 					href="/tools"
-					class="inline-block px-8 py-4 bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="inline-block px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
 				>
 					Create your own
 				</a>
@@ -426,8 +426,8 @@
 							class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
 						>
 							<div class="flex items-center gap-2">
-								<div class="w-3.5 h-3.5 rounded-full bg-[#ff6b6b] border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-[#ffc480] border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
 								<div class="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-gray-900" />
 							</div>
 							<div
@@ -476,7 +476,7 @@
 								rel="noopener noreferrer"
 								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
 							>
-								<svg class="w-3.5 h-3.5 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"
+								<svg class="w-3.5 h-3.5 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
 									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
 								>
 								Made with Pictify
@@ -625,13 +625,13 @@
 							</div>
 							<!-- B5: Social Proof -->
 							<div class="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-gray-100">
-								<svg class="w-4 h-4 text-[#ff6b6b]" viewBox="0 0 24 24" fill="currentColor"
+								<svg class="w-4 h-4 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
 									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
 								>
 								<span class="text-xs text-gray-400 font-medium"
 									>Powered by <a
 										href="https://pictify.io"
-										class="text-[#ff6b6b] font-bold hover:underline">Pictify</a
+										class="text-brand-danger font-bold hover:underline">Pictify</a
 									> &mdash; Join 10,000+ developers</span
 								>
 							</div>
@@ -665,7 +665,7 @@
 							<div class="relative download-dropdown">
 								<button
 									on:click={() => (downloadOpen = !downloadOpen)}
-									class="w-full py-3 bg-[#ffc480] text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
+									class="w-full py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] hover:shadow-[2px_2px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -726,7 +726,7 @@
 								class="absolute inset-0 bg-[radial-gradient(#fff_0.5px,transparent_0.5px)] [background-size:12px_12px] opacity-5"
 							/>
 							<div class="relative z-10">
-								<p class="text-[10px] font-black uppercase tracking-widest text-[#ffc480] mb-2">
+								<p class="text-[10px] font-black uppercase tracking-widest text-brand-accent mb-2">
 									{ctaConfig.sidebar.heading}
 								</p>
 								<p class="text-sm text-gray-400 font-medium mb-4">
@@ -742,7 +742,7 @@
 								</p>
 								<button
 									on:click={handleSidebarCta}
-									class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[2px] border-[#ff6b6b] hover:bg-[#ff5252] transition-all rounded-lg text-sm"
+									class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[2px] border-brand-danger hover:bg-[#ff5252] transition-all rounded-lg text-sm"
 								>
 									{ctaConfig.sidebar.button}
 								</button>
@@ -781,7 +781,7 @@
 							<button
 								on:click={handleRemix}
 								disabled={forking}
-								class="w-full py-3 text-center bg-[#ff6b6b] text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
+								class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f2937] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
 							>
 								{#if forking}
 									<span class="flex items-center justify-center gap-2">
@@ -1021,7 +1021,7 @@
 			{#if !isLoggedIn}
 				<div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
 					<div
-						class="bg-[#ff6b6b] rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden"
+						class="bg-brand-danger rounded-3xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] p-8 md:p-12 text-center relative overflow-hidden"
 					>
 						<div
 							class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"

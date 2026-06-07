@@ -1133,9 +1133,9 @@
 	}
 </script>
 
-<div class="w-full bg-[#FFFDF8] h-full flex flex-col z-10">
+<div class="w-full bg-brand-bg h-full flex flex-col z-10">
 	<!-- Header with Tabs -->
-	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-[#FFFDF8]">
+	<div class="px-5 py-4 border-b-[3px] border-gray-900 flex-shrink-0 bg-brand-bg">
 		<div class="flex items-center justify-between">
 			<h3 class="font-black text-sm text-gray-900 uppercase tracking-widest">Variables</h3>
 			<button
@@ -1161,7 +1161,7 @@
 		/>
 	</div>
 
-	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar bg-[#FFFDF8]">
+	<div class="px-4 py-4 flex-1 overflow-y-auto custom-scrollbar bg-brand-bg">
 		<!-- Create/Edit Form -->
 		{#if activeTab === 'create'}
 			<div class="space-y-4">
@@ -1315,7 +1315,7 @@
 			{#if $variables.length === 0}
 				<div class="text-center py-8">
 					<div
-						class="w-16 h-16 mx-auto mb-4 bg-[#FFFDF8] border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#e5e5e5]"
+						class="w-16 h-16 mx-auto mb-4 bg-brand-bg border-[2px] border-gray-900 rounded-full flex items-center justify-center shadow-[2px_2px_0_0_#e5e5e5]"
 					>
 						<i class="fa fa-code text-2xl text-gray-900" />
 					</div>
@@ -1571,7 +1571,7 @@
 
 					{#if $variables.length === 0}
 						<div
-							class="text-center py-6 bg-[#FFFDF8] rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
+							class="text-center py-6 bg-brand-bg rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
 						>
 							<div class="block mb-2">
 								<i class="fa fa-info-circle text-gray-400 text-xl" />
@@ -1715,7 +1715,7 @@
 				<div class="pt-3 border-t border-gray-200">
 					<div class="flex items-center justify-between mb-3">
 						<div class="flex items-center gap-2">
-							<i class="fa fa-eye text-[#ff6b6b] text-sm" />
+							<i class="fa fa-eye text-brand-danger text-sm" />
 							<span class={sectionHeaderClass}>Canvas Preview</span>
 						</div>
 						{#if $isPreviewActive}
@@ -2086,7 +2086,7 @@
 					</div>
 				{:else}
 					<div
-						class="text-center py-6 bg-[#FFFDF8] rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
+						class="text-center py-6 bg-brand-bg rounded-lg border-[2px] border-gray-900 border-dashed shadow-[2px_2px_0_0_#e5e5e5]"
 					>
 						<i class="fa fa-flask text-gray-300 text-xl mb-2" />
 						<p class="text-xs font-bold text-gray-500 uppercase">No variables to test</p>
@@ -2124,7 +2124,7 @@
 							<button
 								class="px-2 py-1 text-[10px] font-bold border-2 rounded transition-all
 									{selectedRenderLayouts.has('default')
-									? 'border-gray-900 bg-[#ffc480]/20 shadow-[1px_1px_0_0_#1f2937]'
+									? 'border-gray-900 bg-brand-accent/20 shadow-[1px_1px_0_0_#1f2937]'
 									: 'border-gray-200 text-gray-400 hover:border-gray-400'}"
 								on:click={() => toggleRenderLayout('default')}
 							>
@@ -2135,7 +2135,7 @@
 								<button
 									class="px-2 py-1 text-[10px] font-bold border-2 rounded transition-all
 										{selectedRenderLayouts.has(key)
-										? 'border-gray-900 bg-[#ffc480]/20 shadow-[1px_1px_0_0_#1f2937]'
+										? 'border-gray-900 bg-brand-accent/20 shadow-[1px_1px_0_0_#1f2937]'
 										: 'border-gray-200 text-gray-400 hover:border-gray-400'}"
 									on:click={() => toggleRenderLayout(key)}
 								>
@@ -2150,7 +2150,7 @@
 				<!-- Render Button -->
 				<button
 					class="w-full py-2.5 px-3 {guestMode && !$user?.email
-						? 'bg-[#ffc480]'
+						? 'bg-brand-accent'
 						: guestMode
 						? 'bg-[#4ade80]'
 						: 'bg-gray-900'} hover:opacity-90 text-{guestMode && !$user?.email
@@ -2263,11 +2263,11 @@
 						{#if guestMode}
 							<div class="bg-[#f0fdf4] border-[2px] border-green-300 rounded-lg p-3">
 								<p class="text-xs font-bold text-gray-700 mb-2">
-									<i class="fa fa-star text-[#ffc480] mr-1" />
+									<i class="fa fa-star text-brand-accent mr-1" />
 									Sign up to save your template and automate variants via API.
 								</p>
 								<button
-									class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="w-full py-2 bg-brand-danger text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={saveAndShowAuth}
 								>
 									Create free account
@@ -2387,7 +2387,7 @@
 									Copy URL
 								</button>
 								<button
-									class="flex-1 py-2 bg-[#ffc480] border-[2px] border-amber-500 rounded-lg font-black text-xs uppercase hover:border-amber-600 transition-all flex items-center justify-center gap-1.5"
+									class="flex-1 py-2 bg-brand-accent border-[2px] border-amber-500 rounded-lg font-black text-xs uppercase hover:border-amber-600 transition-all flex items-center justify-center gap-1.5"
 									on:click={() => window.open(renderedPdfUrl, '_blank')}
 								>
 									<i class="fa fa-external-link-alt" />
@@ -2400,11 +2400,11 @@
 						{#if guestMode}
 							<div class="bg-[#f0fdf4] border-[2px] border-green-300 rounded-lg p-3">
 								<p class="text-xs font-bold text-gray-700 mb-2">
-									<i class="fa fa-star text-[#ffc480] mr-1" />
+									<i class="fa fa-star text-brand-accent mr-1" />
 									Sign up to save your template and automate PDF generation via API.
 								</p>
 								<button
-									class="w-full py-2 bg-[#ff6b6b] text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="w-full py-2 bg-brand-danger text-white border-[2px] border-red-600 rounded-lg font-black text-xs uppercase shadow-[2px_2px_0_0_#b91c1c] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={saveAndShowAuth}
 								>
 									Create free account
@@ -2498,11 +2498,11 @@
 			}}
 		>
 			<div
-				class="bg-[#FFFDF8] rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-sm w-full relative overflow-hidden"
+				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] max-w-sm w-full relative overflow-hidden"
 			>
 				<!-- Red header strip -->
 				<div
-					class="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b6b] border-b-[3px] border-gray-900 z-10"
+					class="absolute top-0 left-0 w-full h-1.5 bg-brand-danger border-b-[3px] border-gray-900 z-10"
 				/>
 				<!-- Decorative bg pattern -->
 				<div
@@ -2541,7 +2541,7 @@
 							<div class="flex flex-wrap gap-1.5 justify-center mb-5">
 								{#each [...selectedVariableNames] as name}
 									<span
-										class="font-mono font-bold text-gray-900 bg-[#ffc480] px-2 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]"
+										class="font-mono font-bold text-gray-900 bg-brand-accent px-2 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]"
 										>{name}</span
 									>
 								{/each}
@@ -2556,7 +2556,7 @@
 									Cancel
 								</button>
 								<button
-									class="flex-1 py-2.5 px-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex-1 py-2.5 px-4 bg-brand-danger text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={deleteSelectedVariables}
 								>
 									Delete {selectedCount}
@@ -2573,7 +2573,7 @@
 							<p class="text-sm font-medium text-gray-600 mb-5">
 								Are you sure you want to delete
 								<span
-									class="font-mono font-bold text-gray-900 bg-[#ffc480] px-1.5 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]"
+									class="font-mono font-bold text-gray-900 bg-brand-accent px-1.5 py-0.5 rounded border-[2px] border-gray-900 text-xs shadow-[2px_2px_0_0_#1f2937]"
 									>"{variableToDelete?.name}"</span
 								>&nbsp;&nbsp;?
 								{#if variableToDelete?.source === 'property'}
@@ -2593,7 +2593,7 @@
 									Cancel
 								</button>
 								<button
-									class="flex-1 py-2.5 px-4 bg-[#ff6b6b] text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="flex-1 py-2.5 px-4 bg-brand-danger text-white border-[3px] border-gray-900 rounded-lg text-sm font-black uppercase tracking-wider shadow-[4px_4px_0_0_#1f2937] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									on:click={deleteVariable}
 								>
 									Delete

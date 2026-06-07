@@ -81,7 +81,7 @@
 		},
 		batch: {
 			iconPath: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
-			color: 'bg-[#ffc480] text-gray-900 border-2 border-gray-900'
+			color: 'bg-brand-accent text-gray-900 border-2 border-gray-900'
 		},
 		auth: {
 			iconPath:
@@ -122,12 +122,12 @@
 			dot: 'bg-green-500'
 		},
 		failure: {
-			color: 'bg-[#ff6b6b]/20 text-[#ff6b6b] border-2 border-[#ff6b6b]',
-			dot: 'bg-[#ff6b6b]'
+			color: 'bg-brand-danger/20 text-brand-danger border-2 border-brand-danger',
+			dot: 'bg-brand-danger'
 		},
 		pending: {
-			color: 'bg-[#ffc480]/30 text-gray-900 border-2 border-gray-900',
-			dot: 'bg-[#ffc480]'
+			color: 'bg-brand-accent/30 text-gray-900 border-2 border-gray-900',
+			dot: 'bg-brand-accent'
 		}
 	};
 
@@ -234,7 +234,7 @@
 	}
 </script>
 
-<section class="h-full bg-[#FFFDF8] min-h-screen">
+<section class="h-full bg-brand-bg min-h-screen">
 	<div class="max-w-7xl p-4 sm:p-6 mx-auto">
 		<!-- Header -->
 		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
@@ -277,13 +277,13 @@
 						class="absolute right-0 mt-2 w-36 bg-white border-[3px] border-gray-900 rounded-xl shadow-[4px_4px_0_0_#1f293780] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10"
 					>
 						<button
-							class="w-full px-4 py-2.5 text-sm font-bold text-left text-gray-900 hover:bg-[#ffc480]/30 rounded-t-lg"
+							class="w-full px-4 py-2.5 text-sm font-bold text-left text-gray-900 hover:bg-brand-accent/30 rounded-t-lg"
 							on:click={() => handleExport('json')}
 						>
 							Export JSON
 						</button>
 						<button
-							class="w-full px-4 py-2.5 text-sm font-bold text-left text-gray-900 hover:bg-[#ffc480]/30 rounded-b-lg border-t-2 border-gray-200"
+							class="w-full px-4 py-2.5 text-sm font-bold text-left text-gray-900 hover:bg-brand-accent/30 rounded-b-lg border-t-2 border-gray-200"
 							on:click={() => handleExport('csv')}
 						>
 							Export CSV
@@ -309,10 +309,10 @@
 					<div class="text-sm font-medium text-green-700">Successful</div>
 				</div>
 				<div
-					class="bg-[#ff6b6b]/10 rounded-xl border-[3px] border-[#ff6b6b] p-4 shadow-[4px_4px_0_0_#ff6b6b80]"
+					class="bg-brand-danger/10 rounded-xl border-[3px] border-brand-danger p-4 shadow-[4px_4px_0_0_#ff6b6b80]"
 				>
-					<div class="text-3xl font-bold text-[#ff6b6b]">{summary.byStatus?.failure || 0}</div>
-					<div class="text-sm font-medium text-[#ff6b6b]">Failed</div>
+					<div class="text-3xl font-bold text-brand-danger">{summary.byStatus?.failure || 0}</div>
+					<div class="text-sm font-medium text-brand-danger">Failed</div>
 				</div>
 				<div
 					class="bg-blue-50 rounded-xl border-[3px] border-blue-800 p-4 shadow-[4px_4px_0_0_#1e40af80]"
@@ -386,7 +386,7 @@
 				</div>
 				<div class="mt-4 flex justify-end">
 					<button
-						class="text-sm font-bold text-[#ff6b6b] hover:underline"
+						class="text-sm font-bold text-brand-danger hover:underline"
 						on:click={handleClearFilters}
 					>
 						Clear all filters
@@ -404,7 +404,7 @@
 					<Loader size="8" show={true} />
 				</div>
 			{:else if error}
-				<div class="p-8 text-center text-[#ff6b6b]">
+				<div class="p-8 text-center text-brand-danger">
 					<p class="font-bold">{error}</p>
 					<button
 						class="mt-4 text-sm font-bold text-gray-900 hover:underline"
@@ -416,7 +416,7 @@
 			{:else if logs.length === 0}
 				<div class="p-8 text-center text-gray-600">
 					<div
-						class="w-20 h-20 mx-auto mb-4 bg-[#ffc480]/30 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center shadow-[4px_4px_0_0_#1f293780]"
+						class="w-20 h-20 mx-auto mb-4 bg-brand-accent/30 rounded-2xl border-[3px] border-gray-900 flex items-center justify-center shadow-[4px_4px_0_0_#1f293780]"
 					>
 						<svg
 							class="w-10 h-10 text-gray-700"
@@ -441,7 +441,7 @@
 				<!-- Desktop Table -->
 				<div class="hidden md:block overflow-x-auto">
 					<table class="w-full">
-						<thead class="bg-[#ffc480]/20 border-b-[3px] border-gray-900">
+						<thead class="bg-brand-accent/20 border-b-[3px] border-gray-900">
 							<tr>
 								<th
 									class="px-4 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
@@ -474,7 +474,7 @@
 						</thead>
 						<tbody class="divide-y-2 divide-gray-200">
 							{#each logs as log}
-								<tr class="hover:bg-[#ffc480]/10 transition-colors">
+								<tr class="hover:bg-brand-accent/10 transition-colors">
 									<td class="px-4 py-4">
 										<div class="flex items-center gap-3">
 											<div
@@ -539,7 +539,7 @@
 									</td>
 									<td class="px-4 py-4 text-right">
 										<button
-											class="text-gray-500 hover:text-[#ff6b6b] p-1"
+											class="text-gray-500 hover:text-brand-danger p-1"
 											on:click={() => openLogDetail(log)}
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -562,7 +562,7 @@
 				<div class="md:hidden divide-y-2 divide-gray-200">
 					{#each logs as log}
 						<button
-							class="w-full px-4 py-4 text-left hover:bg-[#ffc480]/10 transition-colors"
+							class="w-full px-4 py-4 text-left hover:bg-brand-accent/10 transition-colors"
 							on:click={() => openLogDetail(log)}
 						>
 							<div class="flex items-start justify-between gap-3">
@@ -622,14 +622,14 @@
 				<!-- Pagination -->
 				{#if totalPages > 1}
 					<div
-						class="border-t-[3px] border-gray-900 px-4 py-4 flex items-center justify-between bg-[#ffc480]/10"
+						class="border-t-[3px] border-gray-900 px-4 py-4 flex items-center justify-between bg-brand-accent/10"
 					>
 						<div class="text-sm font-medium text-gray-700">
 							Showing {offset + 1} to {Math.min(offset + limit, total)} of {total} results
 						</div>
 						<div class="flex items-center gap-2">
 							<button
-								class="px-4 py-2 text-sm font-bold border-[3px] border-gray-900 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ffc480]/30 transition-colors"
+								class="px-4 py-2 text-sm font-bold border-[3px] border-gray-900 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-accent/30 transition-colors"
 								disabled={currentPage === 1}
 								on:click={() => handlePageChange(currentPage - 1)}
 							>
@@ -639,7 +639,7 @@
 								Page {currentPage} of {totalPages}
 							</span>
 							<button
-								class="px-4 py-2 text-sm font-bold border-[3px] border-gray-900 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ffc480]/30 transition-colors"
+								class="px-4 py-2 text-sm font-bold border-[3px] border-gray-900 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-accent/30 transition-colors"
 								disabled={currentPage === totalPages}
 								on:click={() => handlePageChange(currentPage + 1)}
 							>
@@ -666,16 +666,16 @@
 	>
 		<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 		<div
-			class="bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] max-w-2xl w-full max-h-[90vh] overflow-y-auto"
 			on:click|stopPropagation
 			on:keydown|stopPropagation
 			role="document"
 		>
 			<div
-				class="sticky top-0 bg-[#ffc480] border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
+				class="sticky top-0 bg-brand-accent border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
 			>
 				<h2 id="modal-title" class="text-lg font-bold text-gray-900">Activity Details</h2>
-				<button class="text-gray-900 hover:text-[#ff6b6b] p-1" on:click={closeLogDetail}>
+				<button class="text-gray-900 hover:text-brand-danger p-1" on:click={closeLogDetail}>
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"
@@ -834,7 +834,7 @@
 									<a
 										href={selectedLog.metadata.url}
 										target="_blank"
-										class="text-[#ff6b6b] hover:underline break-all font-bold"
+										class="text-brand-danger hover:underline break-all font-bold"
 									>
 										{selectedLog.metadata.url}
 									</a>
@@ -858,11 +858,11 @@
 
 				<!-- Error Info -->
 				{#if selectedLog.error}
-					<div class="bg-[#ff6b6b]/10 rounded-xl border-[3px] border-[#ff6b6b] p-4">
-						<h3 class="text-sm font-bold text-[#ff6b6b] mb-2">Error Details</h3>
-						<p class="text-[#ff6b6b] font-medium">{selectedLog.error.message}</p>
+					<div class="bg-brand-danger/10 rounded-xl border-[3px] border-brand-danger p-4">
+						<h3 class="text-sm font-bold text-brand-danger mb-2">Error Details</h3>
+						<p class="text-brand-danger font-medium">{selectedLog.error.message}</p>
 						{#if selectedLog.error.code}
-							<p class="text-[#ff6b6b]/80 text-sm mt-1">Code: {selectedLog.error.code}</p>
+							<p class="text-brand-danger/80 text-sm mt-1">Code: {selectedLog.error.code}</p>
 						{/if}
 					</div>
 				{/if}
