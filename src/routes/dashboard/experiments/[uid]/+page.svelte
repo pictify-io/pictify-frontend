@@ -997,7 +997,7 @@
 										<div class="flex items-center gap-4 min-w-0">
 											<!-- Priority badge -->
 											<div
-												class="w-10 h-10 bg-[#c084fc] text-gray-900 rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0"
+												class="w-10 h-10 bg-[#c084fc] text-gray-900 rounded-xl border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center text-sm font-black shrink-0"
 											>
 												#{idx + 1}
 											</div>
@@ -1292,7 +1292,7 @@
 								>
 									<div class="flex items-center gap-4 min-w-0">
 										<div
-											class="w-10 h-10 {color.bg} {color.text} rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0"
+											class="w-10 h-10 {color.bg} {color.text} rounded-xl border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center text-sm font-black shrink-0"
 										>
 											{String.fromCharCode(65 + idx)}
 										</div>
@@ -1483,7 +1483,7 @@
 										<div class="flex items-center gap-4 min-w-0 w-full sm:w-auto">
 											<!-- Variant Index Badge -->
 											<div
-												class="w-10 h-10 bg-gray-900 text-white rounded-xl border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center text-sm font-black shrink-0 relative overflow-hidden group"
+												class="w-10 h-10 bg-gray-900 text-white rounded-xl border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center text-sm font-black shrink-0 relative overflow-hidden group"
 											>
 												<div
 													class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"

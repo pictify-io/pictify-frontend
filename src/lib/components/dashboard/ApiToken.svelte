@@ -63,7 +63,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
 				>
-					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-data-green rounded-full animate-pulse" />
+					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-data-green rounded-full" />
 					Live Console
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">

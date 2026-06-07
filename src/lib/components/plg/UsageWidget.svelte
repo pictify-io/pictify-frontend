@@ -131,7 +131,7 @@
 							>Monthly Usage</span
 						>
 						<span
-							class="text-[9px] sm:text-[10px] font-black px-2 py-1 rounded bg-brand-accent text-gray-900 border border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] uppercase tracking-wider"
+							class="text-[9px] sm:text-[10px] font-black px-2 py-1 rounded bg-brand-accent text-gray-900 border border-gray-900 shadow-brutal-sm uppercase tracking-wider"
 						>
 							{$usageWidget.plan}
 						</span>

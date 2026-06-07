@@ -198,7 +198,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-brand-accent rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-accent rounded-full" />
 					Design Studio
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">

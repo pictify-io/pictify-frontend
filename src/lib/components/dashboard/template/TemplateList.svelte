@@ -576,7 +576,7 @@
 			<div
 				class="flex items-center gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border-[2px] border-gray-900 shadow-sm"
 			>
-				<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full animate-pulse" />
+				<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full" />
 				<div class="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wide">
 					<span class="hidden sm:inline">Showing </span><span class="text-gray-900"
 						>{Math.min(pagination.page * pagination.limit, pagination.total)}</span

@@ -675,7 +675,7 @@
 				class="sticky top-0 bg-brand-accent border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between"
 			>
 				<h2 id="modal-title" class="text-lg font-bold text-gray-900">Activity Details</h2>
-				<button class="text-gray-900 hover:text-brand-danger min-w-[44px] min-h-[44px] flex items-center justify-center" on:click={closeLogDetail}>
+				<button aria-label="Close activity details" class="text-gray-900 hover:text-brand-danger min-w-[44px] min-h-[44px] flex items-center justify-center" on:click={closeLogDetail}>
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							stroke-linecap="round"

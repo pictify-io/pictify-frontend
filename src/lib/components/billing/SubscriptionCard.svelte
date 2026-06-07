@@ -132,7 +132,7 @@
 	<div class="bg-gray-100 border-b-[3px] border-gray-900 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-3">
-				<div class="w-2 h-2 rounded-full bg-gray-900 animate-pulse" />
+				<div class="w-2 h-2 rounded-full bg-gray-900" />
 				<h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">
 					{#if hasLemonSqueezySubscription}
 						Manage Subscription

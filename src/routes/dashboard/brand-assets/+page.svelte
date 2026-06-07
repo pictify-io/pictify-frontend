@@ -311,7 +311,7 @@
 				<div
 					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
 				>
-					<span class="w-2 h-2 bg-brand-danger rounded-full animate-pulse" />
+					<span class="w-2 h-2 bg-brand-danger rounded-full" />
 					Asset Vault
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
@@ -787,7 +787,7 @@
 					<span class="text-brand-accent">Upload</span>
 					{ASSET_TYPE_LABELS[uploadType]}
 				</h2>
-				<button on:click={closeUploadModal} class="text-gray-400 hover:text-white">
+				<button on:click={closeUploadModal} aria-label="Close upload modal" class="text-gray-400 hover:text-white">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
 							stroke-linecap="round"
@@ -961,7 +961,7 @@
 				<h2 class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
 					<span class="text-data-green">New</span> Color
 				</h2>
-				<button on:click={closeColorModal} class="text-gray-400 hover:text-white">
+				<button on:click={closeColorModal} aria-label="Close color modal" class="text-gray-400 hover:text-white">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
 							stroke-linecap="round"

@@ -261,7 +261,7 @@
 								class="flex-1 px-3 py-2 text-xs font-bold text-gray-400 bg-gray-50 rounded-lg border border-gray-200"
 								>Test Connection</button
 							>
-							<button class="p-2 text-gray-300 border border-transparent"
+							<button aria-label="Delete connector" class="p-2 text-gray-300 border border-transparent"
 								><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
 										stroke-linecap="round"

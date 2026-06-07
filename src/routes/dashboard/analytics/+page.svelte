@@ -137,7 +137,7 @@
 			<div
 				class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#c4b5fd] border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-1 mb-6"
 			>
-				<span class="w-2 h-2 bg-data-green rounded-full animate-pulse border border-black" />
+				<span class="w-2 h-2 bg-data-green rounded-full border border-black" />
 				<span class="text-xs font-black text-black uppercase tracking-widest">Analytics</span>
 			</div>
 			<h1

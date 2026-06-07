@@ -156,7 +156,7 @@
 				<!-- Left: Message -->
 				<div class="flex-1 min-w-0">
 					<div class="flex items-center gap-2 mb-0.5">
-						<div class="w-2 h-2 rounded-full bg-black animate-pulse" />
+						<div class="w-2 h-2 rounded-full bg-black" />
 						<p class="text-sm font-black text-gray-900 uppercase tracking-widest">
 							{headline}
 						</p>

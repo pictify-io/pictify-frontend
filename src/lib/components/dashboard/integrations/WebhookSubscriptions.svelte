@@ -238,7 +238,7 @@
 								</div>
 							</div>
 							<div class="flex items-center gap-2 opacity-50">
-								<button class="p-2 text-gray-400 border-2 border-transparent"
+								<button aria-label="Pause webhook" class="p-2 text-gray-400 border-2 border-transparent"
 									><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
@@ -248,7 +248,7 @@
 										/></svg
 									></button
 								>
-								<button class="p-2 text-gray-400 border-2 border-transparent"
+								<button aria-label="Delete webhook" class="p-2 text-gray-400 border-2 border-transparent"
 									><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"

@@ -523,13 +523,10 @@
 		{#if !isPaidPlan}
 			<a
 				href="/dashboard/billing"
-				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-brand-danger uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all overflow-hidden"
+				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-brand-danger uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
-				<div
-					class="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%] animate-[shimmer_2s_infinite]"
-				/>
 				<svg
-					class="w-4 h-4 mr-2 relative z-10"
+					class="w-4 h-4 mr-2"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -541,7 +538,7 @@
 						d="M13 10V3L4 14h7v7l9-11h-7z"
 					/>
 				</svg>
-				<span class="relative z-10">Upgrade Plan</span>
+				<span>Upgrade Plan</span>
 			</a>
 		{/if}
 
