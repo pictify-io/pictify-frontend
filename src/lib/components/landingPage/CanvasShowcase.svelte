@@ -160,7 +160,7 @@
 			>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider">Visual Editor</span>
 			</div>
-			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
+			<h2 class="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-900 mb-6 leading-tight">
 				Build Templates <br />
 				<span class="relative inline-block text-brand-danger">
 					Without Writing HTML.

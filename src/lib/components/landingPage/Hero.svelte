@@ -167,7 +167,7 @@
 			</div>
 
 			<!-- Headline -->
-			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
+			<h1 class="text-5xl md:text-6xl lg:text-7xl font-bold font-heading text-gray-900 mb-6 leading-tight">
 				Generate Images From Data.<br />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					One API Call

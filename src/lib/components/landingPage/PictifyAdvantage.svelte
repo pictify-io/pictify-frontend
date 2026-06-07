@@ -98,7 +98,7 @@
 			</div>
 
 			<h2
-				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight {!isPictify
+				class="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-900 mb-6 leading-tight {!isPictify
 					? 'text-white font-mono'
 					: ''}"
 			>

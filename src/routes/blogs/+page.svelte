@@ -57,7 +57,7 @@
 					<span class="font-black uppercase tracking-widest text-sm">Resources</span>
 				</div>
 				<h1
-					class="text-5xl md:text-6xl lg:text-7xl font-black leading-none tracking-tighter mb-6 uppercase"
+					class="text-5xl md:text-6xl lg:text-7xl font-bold font-heading leading-none tracking-tighter mb-6 uppercase"
 				>
 					Programmatic Media:<br />
 					<span class="text-gray-900">Templates & Tutorials</span>

@@ -109,7 +109,7 @@
 					{/if}
 
 					<h1
-						class="font-black text-3xl md:text-5xl lg:text-6xl leading-tight mb-8 uppercase tracking-tight"
+						class="font-bold font-heading text-3xl md:text-5xl lg:text-6xl leading-tight mb-8 uppercase tracking-tight"
 					>
 						{blog?.title}
 					</h1>

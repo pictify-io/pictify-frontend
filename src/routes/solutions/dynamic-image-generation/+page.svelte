@@ -68,7 +68,7 @@
 			<span class="font-black uppercase tracking-widest text-sm">Dynamic Images</span>
 		</div>
 		<h1
-			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
+			class="text-4xl md:text-6xl font-bold font-heading text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
 			Images that change<br /><span class="text-[#06b6d4]">with your data.</span>
 		</h1>

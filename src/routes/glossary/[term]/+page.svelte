@@ -110,7 +110,7 @@
 					>
 						Definition
 					</div>
-					<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+					<h1 class="text-3xl sm:text-4xl md:text-5xl font-bold font-heading text-gray-900 tracking-tight">
 						{term.title}
 					</h1>
 				</div>
