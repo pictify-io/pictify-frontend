@@ -174,7 +174,7 @@
 
 				<!-- Title: primary keyword "{Competitor} alternative" in <h1>. -->
 				<h1
-					class="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-900 tracking-tight leading-tight mb-4"
+					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-4"
 				>
 					The Best {alt.competitor} Alternative
 					<span class="block text-[#4ade80]">for Developers</span>

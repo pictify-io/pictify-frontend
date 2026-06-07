@@ -247,7 +247,7 @@
 >
 	<!-- Hero -->
 	<header class="text-center mb-20 pt-6" in:fly={{ y: 30, duration: 600 }}>
-		<h1 class="text-5xl md:text-6xl lg:text-7xl font-bold font-heading text-gray-900 leading-[0.95] mb-8 max-w-5xl mx-auto">
+		<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[0.95] mb-8 max-w-5xl mx-auto">
 			Automated image generation,<br />
 			<span class="relative inline-block text-brand-danger mt-2">
 				done right.

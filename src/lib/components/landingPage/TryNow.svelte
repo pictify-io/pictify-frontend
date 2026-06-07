@@ -50,7 +50,7 @@
 						</div>
 
 						<h2
-							class="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-900 mb-6 leading-tight"
+							class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight"
 						>
 							Render Your First Image <br class="md:hidden" />
 							<span class="text-brand-danger">in Under 5 Minutes</span>

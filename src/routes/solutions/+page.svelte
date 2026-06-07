@@ -45,7 +45,7 @@
 		</nav>
 
 		<header class="text-center mb-16">
-			<h1 class="text-5xl md:text-6xl font-bold font-heading text-gray-900 leading-[0.95] mb-6">
+			<h1 class="text-5xl md:text-6xl font-black text-gray-900 leading-[0.95] mb-6">
 				Every way teams<br />
 				<span class="text-brand-danger">automate images.</span>
 			</h1>

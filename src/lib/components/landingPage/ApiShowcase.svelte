@@ -127,7 +127,7 @@ const image = await pictify.render({
 					<span class="text-sm font-black text-white uppercase tracking-wider">Developer-First</span>
 				</div>
 
-				<h2 class="text-5xl md:text-6xl lg:text-7xl font-bold font-heading text-black leading-[1.1] mb-6">
+				<h2 class="text-5xl md:text-6xl lg:text-7xl font-black text-black leading-[1.1] mb-6">
 					Developer-First API.<br />
 					<span class="relative inline-block mt-2">
 						5 Minutes to Integrate

@@ -83,7 +83,7 @@
 
 			<!-- Title -->
 			<h1
-				class="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-900 tracking-tight leading-tight mb-6"
+				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
 			>
 				Image Generation
 				<span class="block text-brand-danger">Glossary</span>

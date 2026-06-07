@@ -78,7 +78,7 @@
 			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
 		</div>
 		<h1
-			class="text-4xl md:text-6xl font-bold font-heading text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
+			class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tighter max-w-4xl mx-auto"
 		>
 			Image Generation <span class="text-brand-danger">API</span>
 		</h1>
