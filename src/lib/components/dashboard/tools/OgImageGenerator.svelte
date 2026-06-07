@@ -800,7 +800,7 @@
 					<!-- API Playground -->
 				{:else if activeTab === 'api'}
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-brutal-2xl overflow-hidden"
+						class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden"
 					>
 						<div class="p-8 md:p-10">
 							<!-- API Header -->
@@ -1180,10 +1180,10 @@
 <!-- Signup Prompt Modal -->
 {#if showSignupPrompt}
 	<div
-		class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+		class="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 p-4"
 	>
 		<div
-			class="bg-brand-bg rounded-3xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
+			class="bg-brand-bg rounded-2xl max-w-md w-full p-8 border-[3px] border-gray-900 shadow-[8px_8px_0_0_#ff6b6b] relative"
 		>
 			<!-- Decorative elements -->
 			<div class="absolute -top-6 -right-6 text-6xl">✨</div>

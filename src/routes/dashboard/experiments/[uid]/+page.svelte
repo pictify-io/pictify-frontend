@@ -2350,7 +2350,7 @@ fetch("https://pictify.io/s/events", {
 {#if !isSmartLink && showDeclareWinner}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
 		on:click={() => {
 			showDeclareWinner = false;
 			selectedWinner = null;
@@ -2511,7 +2511,7 @@ fetch("https://pictify.io/s/events", {
 {#if showDeleteConfirm}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
 		on:click={() => (showDeleteConfirm = false)}
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->

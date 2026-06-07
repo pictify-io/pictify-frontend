@@ -109,7 +109,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 auto-rows-[minmax(340px,auto)]">
 			<!-- Card 1: Design Freedom (Visual Editor) -->
 			<div
-				class="md:col-span-12 lg:col-span-7 bg-[#E0F2FE] rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col md:flex-row"
+				class="md:col-span-12 lg:col-span-7 bg-[#E0F2FE] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col md:flex-row"
 				on:mouseenter={() => (activeHover = 'design')}
 				on:mouseleave={() => (activeHover = null)}
 			>
@@ -202,7 +202,7 @@
 
 			<!-- Card 2: Developer Experience (API) -->
 			<div
-				class="md:col-span-12 lg:col-span-5 bg-[#1F2937] rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col"
+				class="md:col-span-12 lg:col-span-5 bg-[#1F2937] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col"
 				on:mouseenter={handleApiEnter}
 				on:mouseleave={() => (activeHover = null)}
 			>
@@ -273,7 +273,7 @@
 
 			<!-- Card 3: Infinite Scale (Infrastructure) -->
 			<div
-				class="md:col-span-12 bg-[#FFF4C3] rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer"
+				class="md:col-span-12 bg-[#FFF4C3] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] hover:shadow-[12px_12px_0_0_black] transition-all duration-300 relative overflow-hidden group cursor-pointer"
 				on:mouseenter={() => (activeHover = 'scale')}
 				on:mouseleave={() => (activeHover = null)}
 			>

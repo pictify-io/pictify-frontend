@@ -1140,7 +1140,7 @@
 						</div>
 
 						<!-- Body -->
-						<div class="relative z-10 bg-white/80 backdrop-blur-sm">
+						<div class="relative z-10 bg-white/80">
 							<!-- Template select (full width) -->
 							<div class="px-6 py-4 border-b-[2px] border-gray-200">
 								<label
@@ -1430,7 +1430,7 @@
 						</div>
 
 						<!-- Body: Rules-first layout -->
-						<div class="relative z-10 bg-white/80 backdrop-blur-sm">
+						<div class="relative z-10 bg-white/80">
 							<!-- Template select (full width) -->
 							<div class="px-6 py-4 border-b-[2px] border-gray-200">
 								<label

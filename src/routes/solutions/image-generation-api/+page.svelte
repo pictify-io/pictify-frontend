@@ -113,7 +113,7 @@
 		<p class="text-lg text-gray-700 leading-relaxed mb-6">
 			Get your API key from the dashboard, and hit the render endpoint:
 		</p>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
+		<div class="bg-[#282c34] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>

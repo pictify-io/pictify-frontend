@@ -2216,7 +2216,7 @@
 							/>
 							{#if imgLoaded}
 								<div
-									class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2 backdrop-blur-sm"
+									class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2"
 								>
 									<button
 										class="p-2 bg-white border-[2px] border-gray-900 rounded-full hover:bg-gray-100 transition-colors shadow-[2px_2px_0_0_#000]"
@@ -2482,7 +2482,7 @@
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 			role="alertdialog"
 			aria-modal="true"
 			aria-labelledby="delete-dialog-title"

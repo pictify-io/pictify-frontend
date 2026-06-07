@@ -52,11 +52,11 @@
 		<!-- Main Split Pane Showcase -->
 		<div class="max-w-5xl mx-auto group relative mt-12 block">
 			<!-- Decorative offset background -->
-			<div class="absolute inset-0 bg-[#3b82f6] rounded-3xl border-[3px] border-gray-900 transform translate-x-3 translate-y-3 z-0 pointer-events-none transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300"></div>
+			<div class="absolute inset-0 bg-[#3b82f6] rounded-2xl border-[3px] border-gray-900 transform translate-x-3 translate-y-3 z-0 pointer-events-none transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300"></div>
 			
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div 
-				class="relative bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden z-10 flex flex-col transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300"
+				class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden z-10 flex flex-col transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300"
 				on:mouseenter={() => isHovering = true}
 				on:mouseleave={() => isHovering = false}
 			>

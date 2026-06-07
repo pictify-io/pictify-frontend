@@ -106,10 +106,10 @@
 
 <!-- Full-screen overlay -->
 <div
-	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
 >
 	<div
-		class="w-full max-w-2xl bg-brand-bg border-[3px] border-black rounded-3xl shadow-[8px_8px_0_0_black] overflow-hidden animate-wizard-in"
+		class="w-full max-w-2xl bg-brand-bg border-[3px] border-black rounded-2xl shadow-[8px_8px_0_0_black] overflow-hidden animate-wizard-in"
 	>
 		<!-- Header -->
 		<div class="px-8 pt-8 pb-4">

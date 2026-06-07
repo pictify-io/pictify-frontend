@@ -180,7 +180,7 @@
 		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
 			<!-- Period Views -->
 			<div
-				class="bg-brand-accent rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-brand-accent rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -right-8 -top-8 w-28 h-28 bg-white/20 rounded-full blur-2xl group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-700"
@@ -200,7 +200,7 @@
 
 			<!-- Bandwidth -->
 			<div
-				class="bg-[#c4b5fd] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-[#c4b5fd] rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -left-6 -bottom-6 w-24 h-24 bg-black/5 transform rotate-12 group-hover:rotate-45 transition-transform duration-700"
@@ -220,7 +220,7 @@
 
 			<!-- Unique Visitors -->
 			<div
-				class="bg-[#4ade80] rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-[#4ade80] rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/30 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"
@@ -237,7 +237,7 @@
 
 			<!-- Total Assets -->
 			<div
-				class="bg-brand-danger rounded-3xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
+				class="bg-brand-danger rounded-2xl border-[3px] border-black shadow-[6px_6px_0_0_black] p-5 md:p-6 relative overflow-hidden group"
 			>
 				<div
 					class="absolute -left-10 -top-10 w-32 h-32 bg-white/20 rounded-full blur-xl group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700"
@@ -255,7 +255,7 @@
 
 		<!-- Chart Section -->
 		<div
-			class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden mb-10"
+			class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden mb-10"
 		>
 			<!-- Chart Header -->
 			<div
@@ -404,7 +404,7 @@
 					{/if}
 				{:else}
 					<div
-						class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50 backdrop-blur-sm"
+						class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50"
 					>
 						<div
 							class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-[4px_4px_0_0_black] rotate-3"
@@ -433,7 +433,7 @@
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 mb-10">
 			<!-- Top Referrers -->
 			<div
-				class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
 			>
 				<div class="flex items-center justify-between p-5 border-b-[3px] border-black bg-gray-50">
 					<div class="flex items-center gap-3">
@@ -502,7 +502,7 @@
 
 			<!-- Top Countries -->
 			<div
-				class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
 			>
 				<div class="flex items-center justify-between p-5 border-b-[3px] border-black bg-gray-50">
 					<div class="flex items-center gap-3">
@@ -571,7 +571,7 @@
 
 			<!-- Status Code Breakdown -->
 			<div
-				class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+				class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
 			>
 				<div class="flex items-center gap-3 p-5 border-b-[3px] border-black bg-gray-50">
 					<div
@@ -708,7 +708,7 @@
 
 		<!-- Asset-Level Breakdown Table -->
 		<div
-			class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+			class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
 		>
 			<!-- Table Header -->
 			<div

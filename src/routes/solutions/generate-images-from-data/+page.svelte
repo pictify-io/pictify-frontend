@@ -137,7 +137,7 @@
 		<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
 			Example: bind a template to your product API
 		</h2>
-		<div class="bg-[#282c34] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
+		<div class="bg-[#282c34] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center gap-2">
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
 				<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>

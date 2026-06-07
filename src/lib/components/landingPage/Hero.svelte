@@ -250,11 +250,11 @@
 				<div class="w-full lg:w-[42%] flex flex-col justify-center relative">
 					<!-- Accent background block -->
 					<div
-						class="absolute inset-0 bg-brand-danger rounded-3xl transform -rotate-2 -translate-x-2 -translate-y-2 pointer-events-none shadow-brutal-2xl"
+						class="absolute inset-0 bg-brand-danger rounded-2xl transform -rotate-2 -translate-x-2 -translate-y-2 pointer-events-none shadow-brutal-2xl"
 					/>
 
 					<div
-						class="bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 sm:p-10 relative z-10 flex flex-col h-full group"
+						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 sm:p-10 relative z-10 flex flex-col h-full group"
 					>
 						<!-- Quirky Floating Label -->
 						<div
@@ -339,7 +339,7 @@
 					aria-hidden="true"
 				>
 					<div
-						class="bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 overflow-hidden flex flex-col h-full relative z-10 group/canvas"
+						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 overflow-hidden flex flex-col h-full relative z-10 group/canvas"
 					>
 						<!-- Light macOS Header -->
 						<div

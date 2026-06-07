@@ -615,7 +615,7 @@
 {#if showLogDetail && selectedLog}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
 		on:click={() => (showLogDetail = false)}
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->

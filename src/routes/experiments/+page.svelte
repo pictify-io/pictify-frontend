@@ -288,7 +288,7 @@
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{#each capabilities as cap, i}
 					<div
-						class="flex flex-col sm:flex-row gap-6 p-8 bg-white border-[3px] border-gray-900 rounded-3xl shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 group"
+						class="flex flex-col sm:flex-row gap-6 p-8 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 group"
 						style="transform: rotate({i % 2 === 0 ? '-1deg' : '1deg'})"
 						role="region"
 						aria-label={cap.title}
@@ -353,7 +353,7 @@
 						</div>
 
 						<!-- Content Card -->
-						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
+						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-2xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
 							<h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-3">{step.title}</h3>
 							<p class="text-gray-700 text-lg md:text-xl font-medium leading-relaxed">{step.description}</p>
 						</div>
@@ -439,7 +439,7 @@
 								<!-- OG Images for Social -->
 								<div class="w-full max-w-[220px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all">
 									<div class="h-20 bg-gradient-to-br from-[#7dd3fc] to-blue-500 border-b-[3px] border-gray-900 flex items-center justify-center">
-										<div class="w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center border-2 border-white/50">
+										<div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/50">
 											<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
 										</div>
 									</div>
@@ -607,7 +607,7 @@
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
 				<div class="inline-block px-4 py-1.5 bg-gray-900 text-white border-[3px] border-gray-900 shadow-brutal-accent rounded-full mb-6 transform -rotate-1">
 					<span class="text-sm font-bold uppercase tracking-wider">Get Started</span>

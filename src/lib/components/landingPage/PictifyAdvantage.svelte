@@ -138,7 +138,7 @@
 			<!-- Card 1: Cold Starts -->
 			<!-- Card 1: Cold Starts -->
 			<div
-				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
 					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
@@ -186,7 +186,7 @@
 			<!-- Card 2: Designer Flow -->
 			<!-- Card 2: Designer Flow -->
 			<div
-				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
 					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>
@@ -253,7 +253,7 @@
 			<!-- Card 3: Maintenance -->
 			<!-- Card 3: Maintenance -->
 			<div
-				class="bg-white rounded-[2rem] border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
+				class="bg-white rounded-2xl border-[3px] border-gray-900 p-8 transition-all duration-500 relative overflow-hidden group {isPictify
 					? 'shadow-brutal-2xl'
 					: 'shadow-[8px_8px_0_0_#ef4444] border-red-500 bg-gray-900 animate-shake'}"
 			>

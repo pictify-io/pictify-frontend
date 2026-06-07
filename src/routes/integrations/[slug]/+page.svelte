@@ -256,7 +256,7 @@
 			{#if integration.useCases?.length}
 				<section class="mb-20">
 					<div
-						class="bg-brand-accent border-[3px] border-gray-900 rounded-3xl p-1 shadow-brutal-2xl"
+						class="bg-brand-accent border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl"
 					>
 						<div class="bg-brand-bg rounded-[20px] p-8 md:p-12 border border-[#b45309]">
 							<h2 class="text-3xl font-black uppercase tracking-tighter text-gray-900 mb-8">
@@ -434,7 +434,7 @@
 			{#if integration.installCommand}
 				<section class="mb-20">
 					<div
-						class="bg-gray-900 rounded-3xl p-8 md:p-12 text-center border-[4px] border-gray-900 shadow-[8px_8px_0_0_#4ade80]"
+						class="bg-gray-900 rounded-2xl p-8 md:p-12 text-center border-[4px] border-gray-900 shadow-[8px_8px_0_0_#4ade80]"
 					>
 						<h2 class="text-3xl font-black uppercase tracking-tight text-white mb-8">
 							Fast Install
@@ -464,7 +464,7 @@
 
 			<!-- CTA Section -->
 			<section
-				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-10 md:p-16 text-center shadow-[12px_12px_0_0_#ff6b6b] relative overflow-hidden"
+				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-10 md:p-16 text-center shadow-[12px_12px_0_0_#ff6b6b] relative overflow-hidden"
 			>
 				<!-- Abstract Shapes -->
 				<div

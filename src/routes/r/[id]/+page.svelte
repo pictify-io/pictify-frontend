@@ -386,7 +386,7 @@
 		{:else if error}
 			<!-- Error state -->
 			<div
-				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-3xl p-12 relative overflow-hidden"
+				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl p-12 relative overflow-hidden"
 			>
 				<div class="absolute inset-0 bg-red-50/50 -z-10" />
 				<div
@@ -419,7 +419,7 @@
 				<div class="lg:col-span-8 flex flex-col gap-8">
 					<!-- "Window" Card -->
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-3xl overflow-hidden relative group"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
 					>
 						<!-- Window Header -->
 						<div
@@ -474,7 +474,7 @@
 								href="https://pictify.io"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
+								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
 							>
 								<svg class="w-3.5 h-3.5 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
 									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
@@ -1021,7 +1021,7 @@
 			{#if !isLoggedIn}
 				<div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
 					<div
-						class="bg-brand-danger rounded-3xl border-[3px] border-gray-900 shadow-brutal-xl p-8 md:p-12 text-center relative overflow-hidden"
+						class="bg-brand-danger rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl p-8 md:p-12 text-center relative overflow-hidden"
 					>
 						<div
 							class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"

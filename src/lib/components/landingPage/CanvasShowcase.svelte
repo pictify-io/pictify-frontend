@@ -209,7 +209,7 @@
 					<!-- Try Canvas Editor CTA Overlay -->
 					{#if isHovering}
 						<div
-							class="absolute inset-0 z-40 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300"
+							class="absolute inset-0 z-40 bg-gray-900/60 flex items-center justify-center transition-all duration-300"
 							in:fade={{ duration: 200 }}
 						>
 							<button
@@ -483,9 +483,9 @@
 		<!-- Figma Import Showcase -->
 		<div class="mt-24 max-w-5xl mx-auto group relative">
 			<!-- Decorative offset background -->
-			<div class="hidden sm:block absolute inset-0 bg-[#a259ff] rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
+			<div class="hidden sm:block absolute inset-0 bg-[#a259ff] rounded-2xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 			
-			<div class="relative bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300">
+			<div class="relative bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300">
 				<!-- Mac Header -->
 				<div class="bg-[#facc15] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">
 					<div class="flex gap-2">

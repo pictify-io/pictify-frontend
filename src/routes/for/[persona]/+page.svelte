@@ -215,7 +215,7 @@
 			{#if persona.testimonial}
 				<section class="mb-20">
 					<div
-						class="bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-[8px_8px_0_0_#ff6b6b] relative overflow-hidden"
+						class="bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-[8px_8px_0_0_#ff6b6b] relative overflow-hidden"
 					>
 						<div class="absolute top-4 left-4 text-6xl text-gray-700 opacity-50">"</div>
 						<div class="relative z-10 text-center">
@@ -234,7 +234,7 @@
 
 			<!-- CTA Section -->
 			<section
-				class="mb-20 bg-white border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
+				class="mb-20 bg-white border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
 			>
 				<h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Ready to get started?</h2>
 				<p class="text-gray-600 font-bold mb-8 max-w-xl mx-auto">

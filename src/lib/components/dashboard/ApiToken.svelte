@@ -206,7 +206,7 @@
 			<!-- Right Column: Tokens (The "Key Rack") -->
 			<div class="lg:col-span-2">
 				<div
-					class="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl border-[3px] border-gray-900 shadow-brutal-xl sm:shadow-brutal-3xl h-full flex flex-col relative overflow-hidden"
+					class="bg-white rounded-xl sm:rounded-2xl lg:rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl sm:shadow-brutal-3xl h-full flex flex-col relative overflow-hidden"
 				>
 					<!-- Header -->
 					<div
@@ -373,7 +373,7 @@
 	<!-- Revoke Confirmation Modal -->
 	{#if showRevokeConfirm}
 		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 		>
 			<div
 				class="bg-brand-bg rounded-xl border-[3px] border-gray-900 shadow-brutal-2xl max-w-md w-full relative overflow-hidden"

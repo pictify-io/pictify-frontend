@@ -587,7 +587,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	<!-- Editor + Preview Grid -->
 	<div class="grid grid-cols-1 gap-6">
 		<!-- Input Panel -->
-		<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
+		<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
 			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
@@ -606,7 +606,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		</div>
 
 		<!-- Preview Panel -->
-		<div class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
+		<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px] max-h-[700px]">
 			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
@@ -674,7 +674,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 	<!-- Generated Result -->
 	{#if generatedImageUrl}
 		<div class="mt-12">
-			<div class="bg-white border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-brutal-2xl text-center relative overflow-hidden">
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-2xl text-center relative overflow-hidden">
 				<div class="absolute top-0 right-0 w-40 h-40 bg-[#4ade80]/10 rounded-full -mr-10 -mt-10" />
 				<span class="inline-block px-4 py-1.5 bg-[#4ade80] text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6">Success</span>
 				<h3 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight mb-8">Your image is ready</h3>
@@ -702,7 +702,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		</div>
 	{:else if generationError}
 		<div class="mt-8">
-			<div class="bg-white border-[3px] border-gray-900 rounded-3xl p-6 shadow-brutal-2xl flex items-center gap-4">
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-brutal-2xl flex items-center gap-4">
 				<div class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-white font-black shadow-brutal-md">!</div>
 				<div class="flex-1">
 					<h4 class="font-black text-gray-900 uppercase tracking-wide">Generation Failed</h4>
@@ -754,7 +754,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		</div>
 
 		<!-- Code Snippet -->
-		<div class="bg-[#1e1e1e] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
+		<div class="bg-[#1e1e1e] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>

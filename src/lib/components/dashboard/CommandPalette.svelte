@@ -257,7 +257,7 @@
 {#if isOpen}
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh]"
+		class="fixed inset-0 bg-black/50 z-[100] flex items-start justify-center pt-[15vh]"
 		on:click={close}
 	>
 		<!-- svelte-ignore a11y-no-static-element-interactions -->

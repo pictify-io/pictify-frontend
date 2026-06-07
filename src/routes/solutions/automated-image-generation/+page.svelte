@@ -374,7 +374,7 @@
 								<!-- Social card mock -->
 								<div class="w-full max-w-[240px] bg-white border-[3px] border-gray-900 rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] overflow-hidden relative z-10 group-hover:-translate-y-1 transition-transform">
 									<div class="h-20 bg-gradient-to-br from-brand-danger to-[#ec4899] border-b-[2px] border-gray-900 relative flex items-end p-2">
-										<div class="text-[9px] font-black text-white uppercase tracking-widest bg-black/30 backdrop-blur px-1.5 py-0.5 rounded">Customer Win</div>
+										<div class="text-[9px] font-black text-white uppercase tracking-widest bg-black/30 px-1.5 py-0.5 rounded">Customer Win</div>
 									</div>
 									<div class="p-3 bg-white">
 										<div class="h-2 w-full bg-gray-900 rounded mb-1.5"></div>

@@ -567,7 +567,7 @@
 				<div class="relative min-h-[400px]">
 					{#if isLoading}
 						<div
-							class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 backdrop-blur-sm"
+							class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80"
 						>
 							<Loader size="16" show={isLoading} />
 						</div>
@@ -575,7 +575,7 @@
 
 					{#if assets.length === 0 && !isLoading}
 						<div
-							class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
+							class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border-[3px] border-gray-900 border-dashed shadow-sm"
 						>
 							<div
 								class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg"
@@ -768,7 +768,7 @@
 {#if showUploadModal}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 	<div
-		class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
 		on:click={closeUploadModal}
 		role="dialog"
 		aria-modal="true"
@@ -947,7 +947,7 @@
 {#if showColorModal}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 	<div
-		class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
 		on:click={closeColorModal}
 		role="dialog"
 		aria-modal="true"

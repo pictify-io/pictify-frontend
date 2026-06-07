@@ -176,7 +176,7 @@
 			<div class="flex-1 hidden md:block relative">
 				<div class="sticky top-32 h-[500px] w-full">
 					<div
-						class="relative w-full h-full bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#000] rounded-[2rem] overflow-hidden"
+						class="relative w-full h-full bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_0_#000] rounded-2xl overflow-hidden"
 					>
 						<!-- Visual 1: Template Editor (Neo-Brutalist) -->
 						<div

@@ -433,7 +433,7 @@
 
 			<!-- CTA Section -->
 			<section
-				class="mb-12 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
+				class="mb-12 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
 			>
 				<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Ready to Switch?</h2>
 				<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">

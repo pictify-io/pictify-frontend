@@ -78,7 +78,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="fixed inset-0 z-[120] flex items-start justify-center bg-black/40 p-4 pt-[12vh] backdrop-blur-sm"
+	class="fixed inset-0 z-[120] flex items-start justify-center bg-black/40 p-4 pt-[12vh]"
 	role="dialog"
 	aria-modal="true"
 	aria-label="Command palette"

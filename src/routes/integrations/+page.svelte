@@ -230,7 +230,7 @@
 		<!-- Developer CTA -->
 		<section class="mt-32">
 			<div
-				class="bg-gray-900 rounded-3xl p-1 border-[4px] border-gray-900 shadow-[12px_12px_0_0_#ff6b6b]"
+				class="bg-gray-900 rounded-2xl p-1 border-[4px] border-gray-900 shadow-[12px_12px_0_0_#ff6b6b]"
 			>
 				<div
 					class="bg-gray-900 rounded-[20px] p-8 md:p-12 border border-gray-800 overflow-hidden relative"

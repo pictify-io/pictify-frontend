@@ -345,7 +345,7 @@
 		<div class="absolute top-10 right-10 w-16 h-16 bg-white border-[3px] border-gray-900 shadow-brutal-lg animate-bounce rounded-full" style="animation-duration: 3s;" />
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow">
 				<h2 class="text-4xl sm:text-5xl font-black text-gray-900 mb-6 leading-tight">
 					Start Measuring <span class="text-[#4ade80]">Today</span>
 				</h2>

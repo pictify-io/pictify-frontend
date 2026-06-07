@@ -131,7 +131,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-8">
 			<!-- Block 1: Social Automation (Spans 7 cols) -->
 			<div
-				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
+				class="md:col-span-2 xl:col-span-7 bg-[#7dd3fc] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<!-- Subtle texture -->
 				<div
@@ -139,7 +139,7 @@
 				/>
 
 				<div
-					class="p-6 md:p-8 relative z-10 flex items-center justify-between border-b-[3px] border-gray-900 bg-[#7dd3fc]/50 backdrop-blur-sm"
+					class="p-6 md:p-8 relative z-10 flex items-center justify-between border-b-[3px] border-gray-900 bg-[#7dd3fc]/50"
 				>
 					<div class="flex items-center gap-4">
 						<div
@@ -318,7 +318,7 @@
 
 			<!-- Block 2: Dynamic Retail (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-white rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
+				class="xl:col-span-5 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<div
 					class="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.15] pointer-events-none"
@@ -385,7 +385,7 @@
 
 			<!-- Block 3: Email Personalization (Spans 12 cols, Split) -->
 			<div
-				class="xl:col-span-12 bg-[#4ade80] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group"
+				class="xl:col-span-12 bg-[#4ade80] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Interactive Selector (Right via order, Left in DOM, 5 columns) -->

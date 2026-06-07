@@ -173,7 +173,7 @@
 <div class="h-full w-full max-w-6xl m-auto p-5">
 	<div class="space-y-8">
 		<!-- Header -->
-		<div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8">
+		<div class="bg-white/90 rounded-2xl border border-gray-200 p-8">
 			<div class="text-center">
 				<h1 class="text-3xl font-bold mb-4">AI Agent Screenshot</h1>
 				<p class="text-gray-600 max-w-2xl mx-auto">
@@ -184,7 +184,7 @@
 		</div>
 
 		<!-- Prompt Input -->
-		<div class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8">
+		<div class="bg-white/90 rounded-2xl border border-gray-200 p-8">
 			<div class="max-w-4xl mx-auto">
 				<div class="space-y-6">
 					<div>
@@ -264,7 +264,7 @@
 		<!-- Results -->
 		{#if streamingLogs.length > 0 || finalResult}
 			<div
-				class="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8"
+				class="bg-white/90 rounded-2xl border border-gray-200 p-8"
 				transition:slide
 			>
 				<div class="max-w-4xl mx-auto">

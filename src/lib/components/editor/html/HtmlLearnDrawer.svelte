@@ -88,7 +88,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[130] bg-black/40 backdrop-blur-sm"
+		class="fixed inset-0 z-[130] bg-black/40"
 		on:click|self={close}
 	>
 		<aside

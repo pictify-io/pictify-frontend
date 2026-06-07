@@ -664,7 +664,7 @@
 		{#if generatedImageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 				<div
-					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
+					class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden"
 				>
 					<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
 
@@ -1023,7 +1023,7 @@
 			<!-- Open in Editor CTA -->
 			<section class="mb-12 sm:mb-16 text-center">
 				<div
-					class="bg-gray-900 border-[3px] border-black rounded-3xl p-8 sm:p-12 relative overflow-hidden"
+					class="bg-gray-900 border-[3px] border-black rounded-2xl p-8 sm:p-12 relative overflow-hidden"
 				>
 					<div
 						class="absolute top-0 right-0 w-40 h-40 bg-brand-accent/20 rounded-full blur-2xl pointer-events-none"

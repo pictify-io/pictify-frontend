@@ -220,7 +220,7 @@
 
 			<!-- Browse All Templates CTA -->
 			<section
-				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-3xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
+				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#ff6b6b]"
 			>
 				<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Browse All Templates</h2>
 				<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">

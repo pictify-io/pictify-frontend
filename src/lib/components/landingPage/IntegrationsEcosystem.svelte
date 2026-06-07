@@ -106,7 +106,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 xl:gap-8">
 			{#each categories as cat}
 				<div
-					class="{cat.cols} {cat.color} rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
+					class="{cat.cols} {cat.color} rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 				>
 					<!-- Optional Gradient Overlay for non-white cards -->
 					{#if cat.color !== 'bg-white'}

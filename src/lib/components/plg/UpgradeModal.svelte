@@ -122,7 +122,7 @@
 {#if prompt}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+		class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
 		transition:fade={{ duration: 150 }}
 		on:click={dismissUpgradePrompt}
 		on:keydown={(e) => e.key === 'Escape' && dismissUpgradePrompt()}

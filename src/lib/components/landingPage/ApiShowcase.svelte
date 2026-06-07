@@ -211,9 +211,9 @@ const image = await pictify.render({
 			<!-- Right: Code Terminal (V2 Styling Preserved) -->
 			<div class="relative w-full z-10 mx-auto group">
 				<!-- Decorative yellow offset shadow box -->
-				<div class="absolute inset-0 bg-brand-accent rounded-3xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
+				<div class="absolute inset-0 bg-brand-accent rounded-2xl border-[3px] border-black transform translate-x-3 translate-y-3 z-0 pointer-events-none"></div>
 
-				<div class="relative bg-[#1e1e1e] rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
+				<div class="relative bg-[#1e1e1e] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] flex flex-col overflow-hidden z-10 transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 duration-300 min-h-[400px] md:min-h-[500px]">
 
 					<!-- Mac Header -->
 					<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-black flex items-center justify-between">

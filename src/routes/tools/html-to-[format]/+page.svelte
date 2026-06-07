@@ -1266,7 +1266,7 @@
 		<!-- First Generation Prompt -->
 		{#if showFirstGenerationPrompt}
 			<div
-				class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+				class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 			>
 				<div
 					class="bg-white max-w-md w-full mx-auto p-8 shadow-[12px_12px_0_0_#000] border-[4px] border-black relative"
@@ -1373,7 +1373,7 @@
 		<!-- Upgrade Prompt -->
 		{#if showUpgradePrompt}
 			<div
-				class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+				class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 				style="margin-top: 0px;"
 			>
 				<div
@@ -1698,7 +1698,7 @@
 
 			<!-- Best Practices Section -->
 			<section
-				class="mb-16 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300"
+				class="mb-16 bg-white/90 rounded-2xl border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all duration-300"
 			>
 				<h2 class="text-3xl font-bold mb-6 text-gray-900">
 					Best Practices for {currentFormat.fullName} Conversion {#if hasSize} at {sizeString}{/if}

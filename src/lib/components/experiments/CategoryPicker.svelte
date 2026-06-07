@@ -84,7 +84,7 @@
 </script>
 
 <!-- Full screen overlay with blur -->
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/20">
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20">
 	<!-- Clickable backdrop to close -->
 	<div
 		class="absolute inset-0"

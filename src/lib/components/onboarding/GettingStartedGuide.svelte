@@ -101,7 +101,7 @@
 </script>
 
 <div
-	class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
+	class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden"
 >
 	<!-- Header -->
 	<div class="flex items-center justify-between px-6 py-4 bg-brand-accent border-b-[3px] border-black">

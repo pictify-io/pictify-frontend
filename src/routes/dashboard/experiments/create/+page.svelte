@@ -1313,7 +1313,7 @@
 
 								<!-- Variant Body -->
 								<div
-									class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10 bg-white/80 backdrop-blur-sm"
+									class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10 bg-white/80"
 								>
 									<!-- Left: Config & Variables -->
 									<div class="space-y-6">
@@ -1520,7 +1520,7 @@
 														</div>
 													{:else}
 														<div
-															class="bg-white/80 backdrop-blur px-6 py-4 rounded-xl border-[3px] border-dashed border-gray-400 text-center text-gray-500 font-bold text-sm"
+															class="bg-white/80 px-6 py-4 rounded-xl border-[3px] border-dashed border-gray-400 text-center text-gray-500 font-bold text-sm"
 														>
 															Awaiting template...
 														</div>

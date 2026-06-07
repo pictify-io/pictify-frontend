@@ -9,15 +9,15 @@
 		<div class="relative group">
 			<!-- Decorative Under-layers for depth (hidden on mobile to prevent overflow) -->
 			<div
-				class="absolute top-4 left-4 w-full h-full bg-gray-900 rounded-3xl border-[3px] border-gray-900 opacity-20 hidden sm:block"
+				class="absolute top-4 left-4 w-full h-full bg-gray-900 rounded-2xl border-[3px] border-gray-900 opacity-20 hidden sm:block"
 			/>
 			<div
-				class="absolute top-2 left-2 w-full h-full bg-brand-accent rounded-3xl border-[3px] border-gray-900 hidden sm:block"
+				class="absolute top-2 left-2 w-full h-full bg-brand-accent rounded-2xl border-[3px] border-gray-900 hidden sm:block"
 			/>
 
 			<!-- Main Container -->
 			<div
-				class="relative bg-white rounded-[2.5rem] border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#ffc480] sm:shadow-2xl"
+				class="relative bg-white rounded-2xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#ffc480] sm:shadow-2xl"
 			>
 				<!-- Terminal Header / Window Controls -->
 				<div

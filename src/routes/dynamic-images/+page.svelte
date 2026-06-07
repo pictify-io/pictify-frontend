@@ -305,7 +305,7 @@
 									<div class="h-24 bg-gradient-to-r from-[#a78bfa] to-[#ffb6ff] border-b-[3px] border-gray-900 flex items-center justify-center flex-col relative pt-2">
 										<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:10px_10px]"></div>
 										<div class="font-black text-3xl text-gray-900 drop-shadow-[2px_2px_0_#fff] relative z-10 mix-blend-hard-light">+1,200</div>
-										<div class="text-[10px] font-bold text-gray-900 uppercase tracking-widest bg-white/50 backdrop-blur px-2 py-0.5 rounded border border-gray-900 mt-1 shadow-sm relative z-10">New Followers</div>
+										<div class="text-[10px] font-bold text-gray-900 uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded border border-gray-900 mt-1 shadow-sm relative z-10">New Followers</div>
 									</div>
 									<div class="p-2.5 bg-gray-100 flex items-center gap-2">
 										<div class="w-4 h-4 rounded-full bg-gray-300"></div>
@@ -363,7 +363,7 @@
 						</div>
 
 						<!-- Content Card -->
-						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
+						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-2xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
 							<h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-3">{step.title}</h3>
 							<p class="text-gray-700 text-lg md:text-xl font-medium leading-relaxed">{step.description}</p>
 						</div>
@@ -527,7 +527,7 @@
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
 				<div class="inline-block px-4 py-1.5 bg-gray-900 text-white border-[3px] border-gray-900 shadow-[4px_4px_0_0_#4ade80] rounded-full mb-6 transform rotate-1">
 					<span class="text-sm font-bold uppercase tracking-wider">Get Started</span>

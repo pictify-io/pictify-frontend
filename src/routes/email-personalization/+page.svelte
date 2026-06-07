@@ -263,7 +263,7 @@
 						</div>
 
 						<!-- Content Card -->
-						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-3xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
+						<div class="flex-1 bg-white p-6 md:p-8 border-[3px] border-gray-900 shadow-brutal-2xl group-hover:shadow-brutal-3xl rounded-2xl transition-all duration-300 md:-ml-8 md:mt-4 z-0 group-hover:translate-x-1 group-hover:-translate-y-1">
 							<h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-3">{step.title}</h3>
 							<p class="text-gray-700 text-lg md:text-xl font-medium leading-relaxed">{step.description}</p>
 						</div>
@@ -352,7 +352,7 @@
 								</div>
 							{:else if i === 3}
 								<!-- Weather Visual -->
-								<div class="w-full max-w-[220px] bg-gradient-to-br from-blue-400 to-blue-600 border-[3px] border-gray-900 rounded-[2rem] shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden p-6 items-center gap-4 text-white">
+								<div class="w-full max-w-[220px] bg-gradient-to-br from-blue-400 to-blue-600 border-[3px] border-gray-900 rounded-2xl shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] flex relative z-10 group-hover:-translate-y-2 group-hover:shadow-[6px_6px_0_0_rgba(0,0,0,0.1)] transition-all overflow-hidden p-6 items-center gap-4 text-white">
 									<div class="flex-1">
 										<div class="text-[10px] font-bold uppercase tracking-widest text-blue-100 mb-1">Your Local Weather</div>
 										<div class="font-black text-4xl">72°</div>
@@ -598,7 +598,7 @@
 
 		<div class="max-w-4xl mx-auto text-center relative z-10">
 			<!-- Neo-Brutalist Container -->
-			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-[2rem] shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
+			<div class="p-8 sm:p-12 md:p-16 bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-3xl hover:shadow-[16px_16px_0_0_#1f2937] transition-shadow duration-300">
 				
 				<div class="inline-block px-4 py-1.5 bg-[#4ade80] text-gray-900 border-[3px] border-gray-900 shadow-brutal-lg rounded-full mb-6 transform rotate-2">
 					<span class="text-sm font-bold uppercase tracking-wider">Start Now</span>

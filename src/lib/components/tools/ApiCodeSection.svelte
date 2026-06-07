@@ -65,7 +65,7 @@
 		</div>
 
 		<!-- Code Snippet -->
-		<div class="bg-[#1e1e1e] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
+		<div class="bg-[#1e1e1e] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
 			<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>

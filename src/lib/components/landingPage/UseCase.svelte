@@ -41,7 +41,7 @@
 		<div class="grid md:grid-cols-2 gap-6 md:gap-8">
 			{#each cases as useCase, i}
 				<button
-					class="group bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-xl md:rounded-2xl border border-gray-200 shadow-sm transition-all duration-300 w-full text-left {activeCase ===
+					class="group bg-white/90 p-6 md:p-8 rounded-xl md:rounded-2xl border border-gray-200 shadow-sm transition-all duration-300 w-full text-left {activeCase ===
 					i
 						? 'border-brand-danger ring-1 ring-brand-danger/20'
 						: 'hover:border-brand-danger/30'}"
@@ -74,7 +74,7 @@
 
 		<!-- Workflow Showcase -->
 		<div
-			class="bg-white/90 backdrop-blur-sm rounded-xl md:rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8"
+			class="bg-white/90 rounded-xl md:rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8"
 		>
 			<div class="space-y-12">
 				<div class="text-center">

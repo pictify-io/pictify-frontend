@@ -521,7 +521,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<!-- Aggregated Metric: Views -->
 				<div
-					class="bg-brand-accent rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-brand-accent rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -543,7 +543,7 @@
 
 				<!-- Aggregated Metric: Templates -->
 				<div
-					class="bg-indigo-300 rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-indigo-300 rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -565,7 +565,7 @@
 
 				<!-- Aggregated Metric: Assets -->
 				<div
-					class="bg-[#4ade80] rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
+					class="bg-[#4ade80] rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] p-6 flex flex-col justify-center relative overflow-hidden group"
 				>
 					<!-- Geometric background shape -->
 					<div
@@ -593,7 +593,7 @@
 			<div class="lg:col-span-8 flex flex-col h-full">
 				<!-- Image Delivery Chart -->
 				<div
-					class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden flex flex-col h-full"
+					class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden flex flex-col h-full"
 				>
 					<!-- Chart Header -->
 					<div
@@ -732,7 +732,7 @@
 							</div>
 						{:else}
 							<div
-								class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50 backdrop-blur-sm"
+								class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50"
 							>
 								<div
 									class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-[4px_4px_0_0_black] rotate-3"
@@ -968,7 +968,7 @@
 							{#each recentTemplates.slice(0, 4) as template}
 								<a
 									href="/dashboard/template/{template.uid}"
-									class="group bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden hover:shadow-[4px_4px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex flex-col h-full"
+									class="group bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden hover:shadow-[4px_4px_0_0_black] hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex flex-col h-full"
 								>
 									<div
 										class="aspect-video bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:12px_12px] border-b-[3px] border-black relative overflow-hidden flex-shrink-0"
@@ -1050,7 +1050,7 @@
 							<!-- Empty State (personalized or generic) -->
 							<div class="col-span-full">
 								<div
-									class="bg-white rounded-3xl border-[3px] border-black border-dashed p-12 text-center flex flex-col items-center justify-center"
+									class="bg-white rounded-2xl border-[3px] border-black border-dashed p-12 text-center flex flex-col items-center justify-center"
 								>
 									<div
 										class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-300 flex items-center justify-center mb-4 transform -rotate-3"
@@ -1091,7 +1091,7 @@
 			<div class="lg:col-span-4 flex flex-col h-full">
 				<!-- Top Performing Templates -->
 				<div
-					class="bg-white rounded-3xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden flex flex-col h-full"
+					class="bg-white rounded-2xl border-[3px] border-black shadow-[8px_8px_0_0_black] overflow-hidden flex flex-col h-full"
 				>
 					<div
 						class="flex items-center justify-between p-5 md:p-6 border-b-[3px] border-black bg-gray-50 flex-shrink-0"

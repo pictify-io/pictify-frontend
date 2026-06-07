@@ -198,7 +198,7 @@
 	/>
 
 	<div
-		class="bg-white border-[3px] border-black shadow-[8px_8px_0_0_black] rounded-3xl p-6 md:p-10 w-full max-w-md relative z-10 transition-all duration-300"
+		class="bg-white border-[3px] border-black shadow-[8px_8px_0_0_black] rounded-2xl p-6 md:p-10 w-full max-w-md relative z-10 transition-all duration-300"
 	>
 		<div class="flex flex-col items-center justify-center mb-8">
 			<!-- Logo/Brand -->

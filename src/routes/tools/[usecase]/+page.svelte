@@ -356,7 +356,7 @@
 			<!-- Template Preview Section (Window Style) -->
 			<div class="max-w-5xl mx-auto px-4 mb-20">
 				<div
-					class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-3xl overflow-hidden relative group"
+					class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
 				>
 					<!-- Window Header -->
 					<div
@@ -460,7 +460,7 @@
 			{#if generatedImageUrl}
 				<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 					<div
-						class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-3xl p-8 text-center relative overflow-hidden"
+						class="bg-[#4ade80]/10 border-[3px] border-[#4ade80] rounded-2xl p-8 text-center relative overflow-hidden"
 					>
 						<div class="absolute top-0 right-0 w-32 h-32 bg-[#4ade80]/20 rounded-full blur-2xl" />
 
@@ -549,7 +549,7 @@
 				<div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6">
 					{#each config.overview as paragraph, i}
 						<div
-							class="bg-white border-[3px] border-gray-900 p-8 rounded-3xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1 transition-all relative overflow-hidden group"
+							class="bg-white border-[3px] border-gray-900 p-8 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1 transition-all relative overflow-hidden group"
 						>
 							<div
 								class="absolute top-0 right-0 w-32 h-32 bg-brand-accent/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"
@@ -587,7 +587,7 @@
 									: 'lg:col-span-12'}
 							>
 								<div
-									class="bg-brand-bg border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-brutal-3xl h-full"
+									class="bg-brand-bg border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-3xl h-full"
 								>
 									<span
 										class="inline-block px-4 py-1.5 bg-brand-danger text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6"
@@ -611,7 +611,7 @@
 						{#if config.useCaseScenarios && config.useCaseScenarios.length}
 							<div class={config.longDescription ? 'lg:col-span-5' : 'lg:col-span-12'}>
 								<div
-									class="bg-[#4ade80] border-[3px] border-gray-900 rounded-3xl p-8 md:p-12 shadow-brutal-3xl h-full relative overflow-hidden"
+									class="bg-[#4ade80] border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-3xl h-full relative overflow-hidden"
 								>
 									<!-- Decorative Circle -->
 									<div
@@ -701,7 +701,7 @@
 				<div class="max-w-4xl mx-auto px-6 space-y-8">
 					{#each config.workflow as step, i}
 						<div
-							class="bg-white border-[3px] border-gray-900 rounded-3xl shadow-brutal-2xl overflow-hidden hover:-translate-y-1 transition-all group"
+							class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden hover:-translate-y-1 transition-all group"
 						>
 							<div class="flex flex-col md:flex-row items-stretch">
 								<div
@@ -745,7 +745,7 @@
 			<section class="py-20 px-4">
 				<div class="max-w-6xl mx-auto">
 					<div
-						class="rounded-[2.5rem] border-[3px] border-gray-900 bg-white shadow-brutal-3xl overflow-hidden"
+						class="rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-3xl overflow-hidden"
 					>
 						<div class="grid gap-10 lg:grid-cols-[1fr,1.2fr] p-8 md:p-16 items-center">
 							<!-- Left: Pitch -->
@@ -784,7 +784,7 @@
 							<!-- Right: Code Window -->
 							<div class="relative group">
 								<div
-									class="absolute -inset-4 bg-gradient-to-r from-brand-danger to-brand-accent rounded-[2rem] opacity-20 blur-xl group-hover:opacity-30 transition-opacity"
+									class="absolute -inset-4 bg-gradient-to-r from-brand-danger to-brand-accent rounded-2xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity"
 								/>
 								<div
 									class="relative rounded-2xl border-[3px] border-gray-900 bg-[#1e1e1e] shadow-brutal-2xl overflow-hidden"

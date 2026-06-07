@@ -2848,7 +2848,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeImageHtml = false)}
 	>
 		<div
@@ -2934,7 +2934,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeGifHtml = false)}
 	>
 		<div
@@ -3020,7 +3020,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeRenderVars = false)}
 	>
 		<div
@@ -3108,7 +3108,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeBatchVars = false)}
 	>
 		<div
@@ -3197,7 +3197,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
 		on:click|self={() => (maximizeCsvMappings = false)}
 	>
 		<div

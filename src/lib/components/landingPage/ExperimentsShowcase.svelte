@@ -291,7 +291,7 @@
 		<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
 			<!-- Block 1: A/B Testing (Spans 7 cols) -->
 			<div
-				class="xl:col-span-7 bg-white rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
+				class="xl:col-span-7 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 			>
 				<div
 					class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"
@@ -403,7 +403,7 @@
 
 			<!-- Block 2: Auto-Optimize (Spans 5 cols) -->
 			<div
-				class="xl:col-span-5 bg-[#4ade80] rounded-3xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
+				class="xl:col-span-5 bg-[#4ade80] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col"
 			>
 				<div class="absolute inset-0 bg-white/10 pointer-events-none" />
 
@@ -462,7 +462,7 @@
 
 			<!-- Block 3: Live URL / Data Binding (Spans 12 cols) -->
 			<div
-				class="xl:col-span-12 bg-[#bfdbfe] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative group"
+				class="xl:col-span-12 bg-[#bfdbfe] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Text Content (Left, 5 columns) -->
@@ -615,7 +615,7 @@
 									{/if}
 									{#if liveUrlLoading}
 										<div
-											class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm z-10 transition-opacity"
+											class="absolute inset-0 flex items-center justify-center bg-white/40 z-10 transition-opacity"
 										>
 											<div
 												class="px-4 py-2 bg-black text-white font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-white shadow-brutal-lg animate-pulse"
@@ -633,7 +633,7 @@
 
 			<!-- Block 4: Target Context (Spans 12 cols, Flipped Layout) -->
 			<div
-				class="xl:col-span-12 bg-[#fce7f3] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative group"
+				class="xl:col-span-12 bg-[#fce7f3] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative group"
 			>
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Visual (Left, 7 columns) -->
@@ -736,7 +736,7 @@
 									{/if}
 									{#if smartLinkLoading}
 										<div
-											class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm z-10 transition-opacity"
+											class="absolute inset-0 flex items-center justify-center bg-white/40 z-10 transition-opacity"
 										>
 											<div
 												class="px-4 py-2 bg-black text-[#4ade80] font-black uppercase tracking-widest text-[10px] md:text-sm rounded border-[2px] border-[#4ade80] shadow-brutal-lg animate-pulse"

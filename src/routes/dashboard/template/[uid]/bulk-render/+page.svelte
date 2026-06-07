@@ -1645,7 +1645,7 @@
 													</svg>
 												</button>
 											</div>
-											<div class="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-[10px] font-bold rounded backdrop-blur-sm">
+											<div class="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-[10px] font-bold rounded">
 												#{(item.index ?? i) + 1}
 											</div>
 										</div>

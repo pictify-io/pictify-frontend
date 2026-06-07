@@ -34,7 +34,7 @@
 {#if show}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
 		on:click={handleCancel}
 		on:keydown={(e) => e.key === 'Escape' && handleCancel()}
 		role="presentation"

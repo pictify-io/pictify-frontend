@@ -212,7 +212,7 @@
 			</div>
 		{:else if mediaList.length === 0}
 			<div
-				class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-[3px] border-gray-900 border-dashed shadow-sm"
+				class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border-[3px] border-gray-900 border-dashed shadow-sm"
 			>
 				<div
 					class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg"
@@ -331,7 +331,7 @@
 									<!-- PDF Badge -->
 									<div class="absolute top-3 left-3 z-20">
 										<span
-											class="text-[10px] font-black text-gray-900 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md border-[2px] border-gray-900 uppercase tracking-wide shadow-sm"
+											class="text-[10px] font-black text-gray-900 bg-white/95 px-2 py-1 rounded-md border-[2px] border-gray-900 uppercase tracking-wide shadow-sm"
 										>
 											PDF
 										</span>
@@ -520,7 +520,7 @@
 {#if showLightbox && selectedMedia}
 	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 	<div
-		class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
 		on:click={closeLightbox}
 		role="dialog"
 		aria-modal="true"

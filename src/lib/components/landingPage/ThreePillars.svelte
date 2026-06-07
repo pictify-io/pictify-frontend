@@ -97,7 +97,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(250px,auto)]">
 			<!-- Cell 1: Programmable (Large, spans 2 cols) -->
 			<div
-				class="md:col-span-2 bg-brand-bg rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-0 transform {visible
+				class="md:col-span-2 bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-0 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>
@@ -161,7 +161,7 @@
 
 			<!-- Cell 2: Visual Power (Tall) -->
 			<div
-				class="md:row-span-2 bg-brand-bg rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-150 transform {visible
+				class="md:row-span-2 bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-150 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>
@@ -197,12 +197,12 @@
 							<span class="font-bold text-gray-300 text-4xl">BG</span>
 						</div>
 						<div
-							class="w-40 h-48 bg-white/80 border-2 border-gray-900 rounded-lg shadow-sm absolute top-4 left-1/2 -translate-x-1/2 transform translate-z-10 group-hover:translate-y-0 transition-transform duration-500 z-20 flex items-center justify-center backdrop-blur-sm"
+							class="w-40 h-48 bg-white/80 border-2 border-gray-900 rounded-lg shadow-sm absolute top-4 left-1/2 -translate-x-1/2 transform translate-z-10 group-hover:translate-y-0 transition-transform duration-500 z-20 flex items-center justify-center"
 						>
 							<span class="font-bold text-gray-400 text-4xl">IMG</span>
 						</div>
 						<div
-							class="w-40 h-48 bg-white/60 border-2 border-gray-900 rounded-lg shadow-sm absolute top-8 left-1/2 -translate-x-1/2 transform translate-z-20 group-hover:-translate-y-4 transition-transform duration-500 z-30 flex items-center justify-center backdrop-blur-sm"
+							class="w-40 h-48 bg-white/60 border-2 border-gray-900 rounded-lg shadow-sm absolute top-8 left-1/2 -translate-x-1/2 transform translate-z-20 group-hover:-translate-y-4 transition-transform duration-500 z-30 flex items-center justify-center"
 						>
 							<span class="font-bold text-gray-900 text-4xl">TXT</span>
 						</div>
@@ -212,7 +212,7 @@
 
 			<!-- Cell 3: Speed (Medium) -->
 			<div
-				class="bg-brand-bg rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-300 transform {visible
+				class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-300 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>
@@ -244,7 +244,7 @@
 
 			<!-- Cell 4: Scale (Medium) -->
 			<div
-				class="bg-brand-bg rounded-3xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-450 transform {visible
+				class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f293780] overflow-hidden relative group hover:-translate-y-1 transition-all duration-700 delay-450 transform {visible
 					? 'translate-y-0 opacity-100'
 					: 'translate-y-10 opacity-0'}"
 			>

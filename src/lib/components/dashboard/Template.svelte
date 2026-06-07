@@ -385,7 +385,7 @@
 			</div>
 			{#if isLoading}
 				<div
-					class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 backdrop-blur-sm rounded-xl"
+					class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80 rounded-xl"
 				>
 					<Loader size="16" show={isLoading} />
 				</div>
@@ -394,7 +394,7 @@
 			{#if templateList.length === 0 && !isLoading}
 				{#if searchQuery}
 					<div
-						class="text-center py-12 sm:py-16 md:py-20 bg-white rounded-xl sm:rounded-2xl md:rounded-3xl border-[2px] sm:border-[3px] border-gray-900 border-dashed shadow-sm px-4"
+						class="text-center py-12 sm:py-16 md:py-20 bg-white rounded-xl sm:rounded-2xl md:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 border-dashed shadow-sm px-4"
 					>
 						<div
 							class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 bg-gray-50 rounded-full border-[2px] sm:border-[3px] border-gray-900 flex items-center justify-center"

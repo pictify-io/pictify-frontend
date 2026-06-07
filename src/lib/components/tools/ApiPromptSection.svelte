@@ -54,7 +54,7 @@
 
 <section class="w-full max-w-7xl mx-auto px-6 md:px-0 mt-20">
 	<div
-		class="rounded-3xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-2xl overflow-hidden transform transition-transform hover:-translate-y-1"
+		class="rounded-2xl border-[3px] border-gray-900 bg-brand-bg shadow-brutal-2xl overflow-hidden transform transition-transform hover:-translate-y-1"
 	>
 		<div class="grid gap-12 lg:grid-cols-[1.1fr,1fr] p-8 md:p-12 items-center">
 			<!-- Left Column: Content -->

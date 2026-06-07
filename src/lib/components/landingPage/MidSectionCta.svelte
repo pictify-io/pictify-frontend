@@ -22,7 +22,7 @@
 			
 			<!-- Main Bento-style Card -->
 			<div
-				class="relative bg-[#E0F2FE] rounded-[2rem] border-[3px] border-gray-900 shadow-brutal-3xl p-8 md:p-12 lg:p-16 overflow-hidden group hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 flex flex-col lg:flex-row items-center justify-between gap-12"
+				class="relative bg-[#E0F2FE] rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl p-8 md:p-12 lg:p-16 overflow-hidden group hover:shadow-[16px_16px_0_0_#1f2937] transition-all duration-300 flex flex-col lg:flex-row items-center justify-between gap-12"
 			>
 				<!-- Subtle texture -->
 				<div

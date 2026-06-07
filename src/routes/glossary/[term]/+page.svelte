@@ -101,7 +101,7 @@
 
 			<!-- Main Content Card -->
 			<article
-				class="bg-white border-[4px] border-gray-900 rounded-3xl shadow-brutal-2xl overflow-hidden mb-12"
+				class="bg-white border-[4px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden mb-12"
 			>
 				<!-- Header -->
 				<div class="bg-brand-accent border-b-[4px] border-gray-900 p-8">

@@ -100,7 +100,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 backdrop-blur-sm"
+	class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4"
 	on:click|self={handleClose}
 >
 	<div
