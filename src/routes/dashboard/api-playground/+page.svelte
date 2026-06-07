@@ -274,7 +274,7 @@
 		if (playgroundSelectedLayouts.size === playgroundAvailableLayouts.length) {
 			playgroundSelectedLayouts = new Set();
 		} else {
-			playgroundSelectedLayouts = new Set(playgroundAvailableLayouts.map(l => l.key));
+			playgroundSelectedLayouts = new Set(playgroundAvailableLayouts.map((l) => l.key));
 		}
 		renderTemplateParams.layouts = [...playgroundSelectedLayouts];
 		renderTemplateParams.layout = '';
@@ -361,47 +361,87 @@
 				// Auto-fetch variables when template is selected
 				fetchTemplateVariables(templateUid);
 				// Fetch template to get available layouts
-				getTemplateById(templateUid).then(res => {
-					const layouts = res?.template?.layouts || {};
-					const entries = Object.entries(layouts);
-					playgroundAvailableLayouts = [
-						{ key: 'default', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
-						...entries.map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
-					];
-					playgroundSelectedLayouts = new Set(['default']);
-					renderTemplateParams.layouts = [];
-					renderTemplateParams.layout = '';
-				}).catch(() => {
-					playgroundAvailableLayouts = [];
-				});
+				getTemplateById(templateUid)
+					.then((res) => {
+						const layouts = res?.template?.layouts || {};
+						const entries = Object.entries(layouts);
+						playgroundAvailableLayouts = [
+							{
+								key: 'default',
+								name: 'Default',
+								width: res?.template?.width || 1080,
+								height: res?.template?.height || 1080
+							},
+							...entries.map(([key, l]) => ({
+								key,
+								name: l.name || key,
+								width: l.width,
+								height: l.height
+							}))
+						];
+						playgroundSelectedLayouts = new Set(['default']);
+						renderTemplateParams.layouts = [];
+						renderTemplateParams.layout = '';
+					})
+					.catch(() => {
+						playgroundAvailableLayouts = [];
+					});
 				break;
 			case 'batch-render':
 				batchRenderParams.templateUid = templateUid;
 				// Auto-fetch variables for batch render
 				fetchTemplateVariables(templateUid, true);
 				// Fetch layouts
-				getTemplateById(templateUid).then(res => {
-					const layouts = res?.template?.layouts || {};
-					batchAvailableLayouts = [
-						{ key: '', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
-						...Object.entries(layouts).map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
-					];
-					batchRenderParams.layout = '';
-				}).catch(() => { batchAvailableLayouts = []; });
+				getTemplateById(templateUid)
+					.then((res) => {
+						const layouts = res?.template?.layouts || {};
+						batchAvailableLayouts = [
+							{
+								key: '',
+								name: 'Default',
+								width: res?.template?.width || 1080,
+								height: res?.template?.height || 1080
+							},
+							...Object.entries(layouts).map(([key, l]) => ({
+								key,
+								name: l.name || key,
+								width: l.width,
+								height: l.height
+							}))
+						];
+						batchRenderParams.layout = '';
+					})
+					.catch(() => {
+						batchAvailableLayouts = [];
+					});
 				break;
 			case 'batch-render-csv':
 				batchRenderCsvParams.templateUid = templateUid;
 				// Auto-fetch variables for CSV batch render mappings
 				fetchTemplateVariablesForCsv(templateUid);
 				// Fetch layouts
-				getTemplateById(templateUid).then(res => {
-					const layouts = res?.template?.layouts || {};
-					batchCsvAvailableLayouts = [
-						{ key: '', name: 'Default', width: res?.template?.width || 1080, height: res?.template?.height || 1080 },
-						...Object.entries(layouts).map(([key, l]) => ({ key, name: l.name || key, width: l.width, height: l.height }))
-					];
-					batchRenderCsvParams.layout = '';
-				}).catch(() => { batchCsvAvailableLayouts = []; });
+				getTemplateById(templateUid)
+					.then((res) => {
+						const layouts = res?.template?.layouts || {};
+						batchCsvAvailableLayouts = [
+							{
+								key: '',
+								name: 'Default',
+								width: res?.template?.width || 1080,
+								height: res?.template?.height || 1080
+							},
+							...Object.entries(layouts).map(([key, l]) => ({
+								key,
+								name: l.name || key,
+								width: l.width,
+								height: l.height
+							}))
+						];
+						batchRenderCsvParams.layout = '';
+					})
+					.catch(() => {
+						batchCsvAvailableLayouts = [];
+					});
 				break;
 			case 'get-variables':
 				getVariablesParams.uid = templateUid;
@@ -567,7 +607,10 @@
 						};
 						if (playgroundSelectedLayouts.size > 1) {
 							opts.layouts = [...playgroundSelectedLayouts];
-						} else if (playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default')) {
+						} else if (
+							playgroundSelectedLayouts.size === 1 &&
+							!playgroundSelectedLayouts.has('default')
+						) {
 							opts.layout = [...playgroundSelectedLayouts][0];
 						} else if (renderTemplateParams.layout) {
 							opts.layout = renderTemplateParams.layout;
@@ -591,7 +634,11 @@
 							format: batchRenderParams.format,
 							quality: batchRenderParams.quality,
 							concurrency: batchRenderParams.concurrency,
-							...(batchSelectedLayouts.size > 1 ? { layouts: [...batchSelectedLayouts] } : batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default') ? { layout: [...batchSelectedLayouts][0] } : {}),
+							...(batchSelectedLayouts.size > 1
+								? { layouts: [...batchSelectedLayouts] }
+								: batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default')
+								? { layout: [...batchSelectedLayouts][0] }
+								: {}),
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -612,7 +659,11 @@
 							format: batchRenderCsvParams.format,
 							quality: batchRenderCsvParams.quality,
 							concurrency: batchRenderCsvParams.concurrency,
-							...(batchCsvSelectedLayouts.size > 1 ? { layouts: [...batchCsvSelectedLayouts] } : batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default') ? { layout: [...batchCsvSelectedLayouts][0] } : {}),
+							...(batchCsvSelectedLayouts.size > 1
+								? { layouts: [...batchCsvSelectedLayouts] }
+								: batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default')
+								? { layout: [...batchCsvSelectedLayouts][0] }
+								: {}),
 							headers: { Authorization: `Bearer ${apiToken}` }
 						}
 					);
@@ -851,7 +902,9 @@
 				format: renderTemplateParams.format,
 				quality: renderTemplateParams.quality,
 				...(playgroundSelectedLayouts.size > 1 ? { layouts: [...playgroundSelectedLayouts] } : {}),
-				...(playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default') ? { layout: [...playgroundSelectedLayouts][0] } : {}),
+				...(playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default')
+					? { layout: [...playgroundSelectedLayouts][0] }
+					: {})
 			},
 			requiresAuth: true
 		},
@@ -864,7 +917,11 @@
 				format: batchRenderParams.format,
 				quality: batchRenderParams.quality,
 				concurrency: batchRenderParams.concurrency,
-				...(batchSelectedLayouts.size > 1 ? { layouts: [...batchSelectedLayouts] } : batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default') ? { layout: [...batchSelectedLayouts][0] } : {})
+				...(batchSelectedLayouts.size > 1
+					? { layouts: [...batchSelectedLayouts] }
+					: batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default')
+					? { layout: [...batchSelectedLayouts][0] }
+					: {})
 			},
 			requiresAuth: true
 		},
@@ -878,7 +935,11 @@
 				format: batchRenderCsvParams.format,
 				quality: batchRenderCsvParams.quality,
 				concurrency: batchRenderCsvParams.concurrency,
-				...(batchCsvSelectedLayouts.size > 1 ? { layouts: [...batchCsvSelectedLayouts] } : batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default') ? { layout: [...batchCsvSelectedLayouts][0] } : {})
+				...(batchCsvSelectedLayouts.size > 1
+					? { layouts: [...batchCsvSelectedLayouts] }
+					: batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default')
+					? { layout: [...batchCsvSelectedLayouts][0] }
+					: {})
 			},
 			requiresAuth: true
 		},
@@ -1022,10 +1083,7 @@
 					Dev Tools
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					API <span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Playground</span
-					>
+					API <span class="text-gray-900">Playground</span>
 				</h1>
 			</div>
 
@@ -1324,7 +1382,9 @@
 							<div class="space-y-4">
 								<!-- Name -->
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+									<label
+										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>
 										Name
 									</label>
 									<input
@@ -1337,7 +1397,9 @@
 
 								<!-- HTML body -->
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
+									<label
+										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>
 										HTML
 									</label>
 									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
@@ -1345,21 +1407,33 @@
 											bind:value={createTemplateParams.html}
 											lang={htmlLang()}
 											styles={{
-												'&': { height: '240px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+												'&': {
+													height: '240px',
+													fontSize: '13px',
+													fontFamily: 'ui-monospace, monospace'
+												},
 												'.cm-content': { padding: '12px' },
-												'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '40px'
+												}
 											}}
 										/>
 									</div>
 									<p class="mt-1 text-[10px] text-gray-500 font-medium">
-										Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared names auto-register on save.
+										Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared
+										names auto-register on save.
 									</p>
 								</div>
 
 								<!-- Dimensions + format -->
 								<div class="grid grid-cols-3 gap-3">
 									<div>
-										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+										<label
+											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
+										>
 											Width
 										</label>
 										<input
@@ -1371,7 +1445,9 @@
 										/>
 									</div>
 									<div>
-										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+										<label
+											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
+										>
 											Height
 										</label>
 										<input
@@ -1383,7 +1459,9 @@
 										/>
 									</div>
 									<div>
-										<label class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1">
+										<label
+											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
+										>
 											Format
 										</label>
 										<select
@@ -1398,34 +1476,64 @@
 
 								<!-- Variable definitions (optional) -->
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2">
-										Variable definitions <span class="text-gray-500 font-medium normal-case">(optional · JSON array)</span>
+									<label
+										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>
+										Variable definitions <span class="text-gray-500 font-medium normal-case"
+											>(optional · JSON array)</span
+										>
 									</label>
 									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
 										<CodeMirror
 											bind:value={createTemplateParams.variableDefinitions}
 											lang={json()}
 											styles={{
-												'&': { height: '120px', fontSize: '13px', fontFamily: 'ui-monospace, monospace' },
+												'&': {
+													height: '120px',
+													fontSize: '13px',
+													fontFamily: 'ui-monospace, monospace'
+												},
 												'.cm-content': { padding: '12px' },
-												'.cm-gutters': { backgroundColor: '#f9fafb', color: '#9ca3af', borderRight: '1px solid #f3f4f6', minWidth: '40px' }
+												'.cm-gutters': {
+													backgroundColor: '#f9fafb',
+													color: '#9ca3af',
+													borderRight: '1px solid #f3f4f6',
+													minWidth: '40px'
+												}
 											}}
 										/>
 									</div>
 									<p class="mt-1 text-[10px] text-gray-500 font-medium">
-										Leave as <code class="font-mono">[]</code> to auto-declare variables from the HTML body.
+										Leave as <code class="font-mono">[]</code> to auto-declare variables from the HTML
+										body.
 									</p>
 								</div>
 
 								<!-- Safety toggles -->
 								<div class="grid grid-cols-2 gap-3">
-									<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
-										<input type="checkbox" bind:checked={createTemplateParams.jsEnabled} class="h-4 w-4 accent-gray-900" />
-										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">jsEnabled</span>
+									<label
+										class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer"
+									>
+										<input
+											type="checkbox"
+											bind:checked={createTemplateParams.jsEnabled}
+											class="h-4 w-4 accent-gray-900"
+										/>
+										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900"
+											>jsEnabled</span
+										>
 									</label>
-									<label class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer">
-										<input type="checkbox" bind:checked={createTemplateParams.strictVariables} class="h-4 w-4 accent-gray-900" />
-										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900">strictVariables</span>
+									<label
+										class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer"
+									>
+										<input
+											type="checkbox"
+											bind:checked={createTemplateParams.strictVariables}
+											class="h-4 w-4 accent-gray-900"
+										/>
+										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900"
+											>strictVariables</span
+										>
 									</label>
 								</div>
 							</div>
@@ -1746,35 +1854,57 @@
 												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider transition-colors"
 												on:click={toggleAllPlaygroundLayouts}
 											>
-												{playgroundSelectedLayouts.size === playgroundAvailableLayouts.length ? 'Deselect All' : 'Select All'}
+												{playgroundSelectedLayouts.size === playgroundAvailableLayouts.length
+													? 'Deselect All'
+													: 'Select All'}
 											</button>
 										</div>
 										<div class="grid grid-cols-2 gap-2">
 											{#each playgroundAvailableLayouts as layout}
 												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(layout.key)
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(
+														layout.key
+													)
 														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => togglePlaygroundLayout(layout.key)}
 												>
 													<div class="flex items-center gap-2">
-														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{playgroundSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+														<div
+															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{playgroundSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
+														>
 															{#if playgroundSelectedLayouts.has(layout.key)}
-																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																<svg
+																	class="w-3 h-3 text-white"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																	stroke="currentColor"
+																	stroke-width="3"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		d="M5 13l4 4L19 7"
+																	/>
 																</svg>
 															{/if}
 														</div>
 														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+															<span class="block text-xs font-black text-gray-900 leading-tight"
+																>{layout.name}</span
+															>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono"
+																>{layout.width}x{layout.height}</span
+															>
 														</div>
 													</div>
 												</button>
 											{/each}
 										</div>
-										<p class="text-[10px] text-gray-500 mt-1">{playgroundSelectedLayouts.size} of {playgroundAvailableLayouts.length} selected</p>
+										<p class="text-[10px] text-gray-500 mt-1">
+											{playgroundSelectedLayouts.size} of {playgroundAvailableLayouts.length} selected
+										</p>
 									</div>
 								{:else}
 									<div>
@@ -1956,41 +2086,68 @@
 								{#if batchAvailableLayouts.length > 1}
 									<div>
 										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Layouts</label>
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+												>Layouts</label
+											>
 											<button
 												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
 												on:click={() => {
-													if (batchSelectedLayouts.size === batchAvailableLayouts.length) batchSelectedLayouts = new Set(['default']);
-													else batchSelectedLayouts = new Set(batchAvailableLayouts.map(l => l.key));
+													if (batchSelectedLayouts.size === batchAvailableLayouts.length)
+														batchSelectedLayouts = new Set(['default']);
+													else
+														batchSelectedLayouts = new Set(batchAvailableLayouts.map((l) => l.key));
 												}}
-											>{batchSelectedLayouts.size === batchAvailableLayouts.length ? 'Deselect All' : 'Select All'}</button>
+												>{batchSelectedLayouts.size === batchAvailableLayouts.length
+													? 'Deselect All'
+													: 'Select All'}</button
+											>
 										</div>
 										<div class="grid grid-cols-2 gap-2">
 											{#each batchAvailableLayouts as layout}
 												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(layout.key)
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(
+														layout.key
+													)
 														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchLayout(layout.key)}
 												>
 													<div class="flex items-center gap-2">
-														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{batchSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+														<div
+															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{batchSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
+														>
 															{#if batchSelectedLayouts.has(layout.key)}
-																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																<svg
+																	class="w-3 h-3 text-white"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																	stroke="currentColor"
+																	stroke-width="3"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		d="M5 13l4 4L19 7"
+																	/>
 																</svg>
 															{/if}
 														</div>
 														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+															<span class="block text-xs font-black text-gray-900 leading-tight"
+																>{layout.name}</span
+															>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono"
+																>{layout.width}x{layout.height}</span
+															>
 														</div>
 													</div>
 												</button>
 											{/each}
 										</div>
-										<p class="text-[10px] text-gray-500 mt-1">{batchSelectedLayouts.size} selected</p>
+										<p class="text-[10px] text-gray-500 mt-1">
+											{batchSelectedLayouts.size} selected
+										</p>
 									</div>
 								{/if}
 							</div>
@@ -2171,41 +2328,70 @@
 								{#if batchCsvAvailableLayouts.length > 1}
 									<div>
 										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide">Layouts</label>
+											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
+												>Layouts</label
+											>
 											<button
 												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
 												on:click={() => {
-													if (batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length) batchCsvSelectedLayouts = new Set(['default']);
-													else batchCsvSelectedLayouts = new Set(batchCsvAvailableLayouts.map(l => l.key));
+													if (batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length)
+														batchCsvSelectedLayouts = new Set(['default']);
+													else
+														batchCsvSelectedLayouts = new Set(
+															batchCsvAvailableLayouts.map((l) => l.key)
+														);
 												}}
-											>{batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length ? 'Deselect All' : 'Select All'}</button>
+												>{batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length
+													? 'Deselect All'
+													: 'Select All'}</button
+											>
 										</div>
 										<div class="grid grid-cols-2 gap-2">
 											{#each batchCsvAvailableLayouts as layout}
 												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(layout.key)
+													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(
+														layout.key
+													)
 														? 'bg-[#ffc480]/20 border-gray-900 shadow-[2px_2px_0_0_#1f2937]'
 														: 'bg-white border-gray-200 hover:border-gray-900'}"
 													on:click={() => toggleBatchCsvLayout(layout.key)}
 												>
 													<div class="flex items-center gap-2">
-														<div class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{batchCsvSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}">
+														<div
+															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
+															{batchCsvSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
+														>
 															{#if batchCsvSelectedLayouts.has(layout.key)}
-																<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																<svg
+																	class="w-3 h-3 text-white"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																	stroke="currentColor"
+																	stroke-width="3"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		d="M5 13l4 4L19 7"
+																	/>
 																</svg>
 															{/if}
 														</div>
 														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight">{layout.name}</span>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono">{layout.width}x{layout.height}</span>
+															<span class="block text-xs font-black text-gray-900 leading-tight"
+																>{layout.name}</span
+															>
+															<span class="block text-[10px] font-bold text-gray-500 font-mono"
+																>{layout.width}x{layout.height}</span
+															>
 														</div>
 													</div>
 												</button>
 											{/each}
 										</div>
-										<p class="text-[10px] text-gray-500 mt-1">{batchCsvSelectedLayouts.size} selected</p>
+										<p class="text-[10px] text-gray-500 mt-1">
+											{batchCsvSelectedLayouts.size} selected
+										</p>
 									</div>
 								{/if}
 							</div>

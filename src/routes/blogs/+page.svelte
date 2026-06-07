@@ -19,7 +19,10 @@
 	/>
 	<link rel="canonical" href="https://pictify.io/blogs" />
 	<meta property="og:title" content="Pictify Blog — Programmatic Media Automation" />
-	<meta property="og:description" content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows for developers." />
+	<meta
+		property="og:description"
+		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows for developers."
+	/>
 	<meta property="og:url" content="https://pictify.io/blogs" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify" />
@@ -29,7 +32,10 @@
 	<meta property="og:image:alt" content="Pictify Blog — deep technical image dev content" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Pictify Blog — Programmatic Media Automation" />
-	<meta name="twitter:description" content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows." />
+	<meta
+		name="twitter:description"
+		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows."
+	/>
 	<meta name="twitter:image" content="https://pictify.io/og/blogs/index.png" />
 </svelte:head>
 
@@ -54,9 +60,7 @@
 					class="text-5xl md:text-6xl lg:text-7xl font-black leading-none tracking-tighter mb-6 uppercase"
 				>
 					Programmatic Media:<br />
-					<span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-700"
-						>Templates & Tutorials</span
-					>
+					<span class="text-gray-900">Templates & Tutorials</span>
 				</h1>
 				<p class="text-xl md:text-2xl font-bold text-gray-600 max-w-lg leading-relaxed">
 					Learn how teams design templates once and render variants via API — the infrastructure

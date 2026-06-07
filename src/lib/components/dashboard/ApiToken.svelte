@@ -67,10 +67,7 @@
 					Live Console
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					API <span
-						class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-						>Access</span
-					>
+					API <span class="text-gray-900">Access</span>
 				</h1>
 			</div>
 			<div class="flex items-center gap-4">

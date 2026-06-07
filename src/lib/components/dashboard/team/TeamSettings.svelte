@@ -87,7 +87,10 @@
 	}
 
 	async function handleInvite() {
-		if (!inviteEmail.trim() || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())) {
+		if (
+			!inviteEmail.trim() ||
+			!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inviteEmail.trim())
+		) {
 			inviteError = 'Please enter a valid email address';
 			return;
 		}
@@ -205,9 +208,7 @@
 				Workspace
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				Team <span class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-					>Settings</span
-				>
+				Team <span class="text-gray-900">Settings</span>
 			</h1>
 		</div>
 		<div class="flex items-center gap-4">

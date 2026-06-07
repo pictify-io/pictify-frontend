@@ -69,7 +69,7 @@
 		analytics.track('checkout_page_loaded', {
 			source: source || 'dashboard_upgrade',
 			current_plan: currentPlan,
-			discount_code: discountCode || null,
+			discount_code: discountCode || null
 		});
 
 		try {
@@ -139,9 +139,7 @@
 			if (discountCode) {
 				customParams.push(`checkout[discount_code]=${encodeURIComponent(discountCode)}`);
 				// Also pass through custom_data so the webhook can attribute the code on subscription_created
-				customParams.push(
-					`checkout[custom][discount_code]=${encodeURIComponent(discountCode)}`
-				);
+				customParams.push(`checkout[custom][discount_code]=${encodeURIComponent(discountCode)}`);
 				// Fire-and-forget: record on plgEngagement.discountCodesUsed.
 				// Best-effort attribution at intent-to-checkout time — the webhook can confirm later.
 				// Guard against double-recording on rapid multi-card clicks before navigation.
@@ -210,10 +208,7 @@
 				Pricing Plans
 			</div>
 			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-2">
-				Upgrade Your <span
-					class="text-transparent bg-clip-text bg-gradient-to-br from-gray-900 to-gray-600"
-					>Plan</span
-				>
+				Upgrade Your <span class="text-gray-900">Plan</span>
 			</h1>
 			<p class="text-gray-600 font-bold text-sm sm:text-base">
 				Unlock more renders, AI generations, and features
