@@ -53,7 +53,9 @@
 			? `HTML to PNG — Free Online Converter & API | Pictify`
 			: format === 'jpg'
 				? `HTML to JPG — Convert Code to Image Online Free | Pictify`
-				: `HTML to ${(format && format.toUpperCase()) || 'Image'} — Free Online Converter & API | Pictify`;
+				: format === 'image'
+					? `HTML to Image — Convert HTML & CSS to PNG, JPG or WebP (Free + API) | Pictify`
+					: `HTML to ${(format && format.toUpperCase()) || 'Image'} — Free Online Converter & API | Pictify`;
 	$: headDescription = hasSize
 		? `Convert HTML to ${
 				(currentFormat && currentFormat.fullName) || 'image'
@@ -62,7 +64,9 @@
 			? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor — no signup, no file upload. API available for automation.`
 			: format === 'jpg'
 				? `Convert HTML and CSS to a JPG image instantly. Paste your code, see a live preview, and download. Free online tool with API access for developers. No signup required.`
-				: `Convert HTML to ${(format && format.toUpperCase()) || 'IMAGE'} images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
+				: format === 'image'
+					? `Convert HTML and CSS to an image — PNG, JPG, or WebP — instantly. Paste code, preview live, and export, or automate with the API. Free, no signup, no file upload.`
+					: `Convert HTML to ${(format && format.toUpperCase()) || 'IMAGE'} images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
 	$: canonicalUrl = hasSize
 		? `https://pictify.io/tools/html-to-${format}/${sizeString}`
 		: `https://pictify.io/tools/html-to-${format}`;
@@ -151,7 +155,10 @@
 		webp: 'webp'
 	};
 
-	$: fileExtension = formatExtensionMap[format];
+	// The /tools/html-to-image hub renders PNG output by default (general-purpose
+	// HTML→image tool). Truly-invalid formats still resolve to undefined below and
+	// trigger the redirect to html-to-jpg.
+	$: fileExtension = format === 'image' ? 'png' : formatExtensionMap[format];
 
 	$: if (!fileExtension) {
 		if (browser) {
@@ -494,8 +501,23 @@
 		}
 	};
 
+	// Hub info object for the general /tools/html-to-image page. Kept OUT of
+	// formatInfo / formats on purpose so it never leaks into the png/jpg/webp
+	// selectors, comparison tables, or "other formats" lists.
+	const imageHubInfo = {
+		fullName: 'Image',
+		benefits: [
+			'Pick PNG, JPG, or WebP output',
+			'Lossless or compressed',
+			'Perfect for social, OG, email & screenshots'
+		],
+		bestFor: 'social cards, OG images, emails, certificates, and screenshots',
+		drawbacks: ''
+	};
+
 	// Add safe access to format info
-	$: currentFormat = formatInfo[format] || defaultFormatInfo.jpg;
+	$: currentFormat =
+		format === 'image' ? imageHubInfo : formatInfo[format] || defaultFormatInfo.jpg;
 	$: otherFormats = Object.keys(formatInfo).filter((f) => f !== format);
 
 	// Add state for contextual prompts
@@ -621,9 +643,11 @@
 			? `convert image from HTML, HTML to ${format.toUpperCase()} ${sizeString}, ${format.toUpperCase()} converter, ${sizeString} image, online image generator, web design tool, ${
 					currentFormat.fullName
 			  } image creator, Pictify.io`
-			: `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${
-					currentFormat.fullName
-			  } image creator, Pictify.io`}
+			: format === 'image'
+				? `html to image, convert html to image, html and css to image, html to image converter, html to png, html to jpg, html to webp, online image generator, web design tool, Pictify.io`
+				: `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${
+						currentFormat.fullName
+				  } image creator, Pictify.io`}
 	/>
 	<meta name="author" content="Pictify.io" />
 	<meta property="og:title" content={headTitle} />
@@ -734,14 +758,25 @@
 				<p
 					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
 				>
-					Transform your HTML code into high-quality <span
-						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>{currentFormat.fullName}</span
-					>
-					images instantly.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Perfect for {currentFormat.bestFor}</span
-					>
+					{#if format === 'image'}
+						Convert your HTML & CSS into an <span
+							class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
+						>
+						in one click — export <span class="font-black">PNG</span>,
+						<span class="font-black">JPG</span>, or <span class="font-black">WebP</span>.
+						<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
+							>Perfect for {currentFormat.bestFor}</span
+						>
+					{:else}
+						Transform your HTML code into high-quality <span
+							class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
+							>{currentFormat.fullName}</span
+						>
+						images instantly.
+						<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
+							>Perfect for {currentFormat.bestFor}</span
+						>
+					{/if}
 				</p>
 			</div>
 		</div>
@@ -816,6 +851,27 @@
 								</button>
 							{/each}
 						</div>
+
+						{#if format === 'image'}
+							<p class="mt-5 text-sm font-bold text-gray-700">
+								Need a specific format? Use
+								<a
+									href="/tools/html-to-png"
+									class="underline decoration-[3px] decoration-brand-danger underline-offset-2 hover:bg-brand-accent"
+									>HTML to PNG</a
+								>,
+								<a
+									href="/tools/html-to-jpg"
+									class="underline decoration-[3px] decoration-brand-danger underline-offset-2 hover:bg-brand-accent"
+									>HTML to JPG</a
+								>, or
+								<a
+									href="/tools/html-to-webp"
+									class="underline decoration-[3px] decoration-brand-danger underline-offset-2 hover:bg-brand-accent"
+									>HTML to WebP</a
+								>.
+							</p>
+						{/if}
 					</div>
 
 					<!-- Sizes -->
@@ -1004,7 +1060,7 @@
 							{:else}
 								<span
 									class="font-black text-lg md:text-2xl text-white uppercase tracking-tight group-hover:scale-105 transition-transform"
-									>Generate {format.toUpperCase()}</span
+									>Generate {format === 'image' ? 'Image' : format.toUpperCase()}</span
 								>
 								<svg
 									class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1 transition-transform"
