@@ -23,7 +23,9 @@
 	onMount(async () => {
 		try {
 			await initializeTeamState();
-		} catch (error) { /* ignored */ }
+		} catch (error) {
+			/* ignored */
+		}
 	});
 
 	async function gotoPaymentPortal() {
@@ -87,7 +89,7 @@
 				Content
 			</p>
 
-			<!-- Templates -->
+			<!-- Templates (HTML engine) -->
 			<a
 				href="/dashboard/template"
 				aria-current={isActive(currentPath, '/dashboard/template') ? 'page' : undefined}
@@ -108,7 +110,7 @@
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						stroke-width="2.5"
-						d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+						d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"
 					/>
 				</svg>
 				<span>Templates</span>
@@ -139,34 +141,6 @@
 					/>
 				</svg>
 				<span>Brand Assets</span>
-			</a>
-
-			<!-- Experiments -->
-			<a
-				href="/dashboard/experiments"
-				aria-current={isActive(currentPath, '/dashboard/experiments') ? 'page' : undefined}
-				on:click={() => analytics.trackExperimentFeatureDiscovered({ source: 'nav' })}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/experiments')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/experiments')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-					/>
-				</svg>
-				<span>Experiments</span>
 			</a>
 
 			<!-- ═══ MEDIA Section ═══ -->
@@ -525,12 +499,7 @@
 				href="/dashboard/billing"
 				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-brand-danger uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
-				<svg
-					class="w-4 h-4 mr-2"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
+				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"

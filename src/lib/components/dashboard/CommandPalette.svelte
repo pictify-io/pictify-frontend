@@ -20,13 +20,6 @@
 		},
 		{
 			type: 'nav',
-			label: 'Templates',
-			description: 'Manage your templates',
-			path: '/dashboard/template',
-			keywords: 'templates list manage create'
-		},
-		{
-			type: 'nav',
 			label: 'Brand Assets',
 			description: 'Manage brand colors, logos, fonts',
 			path: '/dashboard/brand-assets',
@@ -34,10 +27,10 @@
 		},
 		{
 			type: 'nav',
-			label: 'Experiments',
-			description: 'A/B tests, smart links, scheduled images',
-			path: '/dashboard/experiments',
-			keywords: 'experiments ab test smart link scheduled auto-optimize'
+			label: 'Templates',
+			description: 'Manage your HTML templates',
+			path: '/dashboard/template',
+			keywords: 'templates list manage create html'
 		},
 		{
 			type: 'nav',
@@ -121,16 +114,9 @@
 		{
 			type: 'action',
 			label: 'Create New Template',
-			description: 'Start building a new template',
-			path: '/dashboard/template/create',
-			keywords: 'create new template start build'
-		},
-		{
-			type: 'action',
-			label: 'Create New Experiment',
-			description: 'Set up an A/B test or smart link',
-			path: '/dashboard/experiments/create',
-			keywords: 'create new experiment ab test smart link'
+			description: 'Start building a new HTML template',
+			path: '/template-workspace/html/create?engine=html',
+			keywords: 'create new template start build html'
 		},
 		{
 			type: 'action',
