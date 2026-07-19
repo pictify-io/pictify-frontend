@@ -13,6 +13,7 @@ export async function GET() {
 
 	// Main tool pages
 	const mainTools = [
+		{ path: '/tools/html-to-image', priority: '0.9' },
 		{ path: '/tools/og-image-generator', priority: '0.9' },
 		{ path: '/tools/html-to-jpg', priority: '0.9' },
 		{ path: '/tools/html-to-png', priority: '0.9' },

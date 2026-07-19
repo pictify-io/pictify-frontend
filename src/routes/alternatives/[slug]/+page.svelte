@@ -2,20 +2,14 @@
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
-	import { browser } from '$app/environment';
 	import { alternatives } from '$lib/pseo/comparisons.js';
 	import { brandIcons } from '$lib/config/brandIcons.js';
 
+	// Unknown slugs are redirected server-side in +page.js before this renders.
 	$: slug = $page.params.slug;
 	$: alt = alternatives.find((a) => a.slug === slug);
 	$: validAlt = !!alt;
 	$: icon = validAlt ? brandIcons[slug] || brandIcons.default : brandIcons.default;
-
-	// Redirect if not found
-	$: if (browser && !validAlt && slug) {
-		goto('/alternatives');
-	}
 
 	// Other alternatives for navigation
 	$: otherAlts = alternatives.filter((a) => a.slug !== slug).slice(0, 4);
@@ -182,8 +176,8 @@
 
 				<!-- Supporting subhead: repeats the keyword + adds long-tail variants. -->
 				<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl mb-6">
-					Looking for a free {alt.competitor.toLowerCase()} alternative? Pictify is the programmable image engine
-					teams switch to when {alt.competitor} falls short.
+					Looking for a free {alt.competitor.toLowerCase()} alternative? Pictify is the programmable
+					image engine teams switch to when {alt.competitor} falls short.
 				</p>
 
 				<!-- TL;DR -->
@@ -473,7 +467,12 @@
 									style="color: {otherIcon.color || '#1f2937'}"
 								>
 									{#if otherIcon.type === 'url'}
-										<img loading="lazy" src={otherIcon.url} alt={other.competitor} class="w-4 h-4" />
+										<img
+											loading="lazy"
+											src={otherIcon.url}
+											alt={other.competitor}
+											class="w-4 h-4"
+										/>
 									{:else if otherIcon.type === 'text'}
 										<span class="text-xs font-black" style="color: {otherIcon.color}"
 											>{otherIcon.text}</span

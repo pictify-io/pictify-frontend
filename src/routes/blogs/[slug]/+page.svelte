@@ -25,6 +25,25 @@
 		month: 'short'
 	});
 	$: source = blog.content;
+	$: canonicalUrl = `https://pictify.io/blogs/${blog.slug || $page.params.slug}`;
+	$: blogImage = blog.heroImage || blog.image;
+
+	// Meta description: curated field if set, otherwise an excerpt of the
+	// content with markdown syntax stripped, cut at a word boundary.
+	function contentExcerpt(markdown, max = 155) {
+		if (!markdown) return '';
+		const text = markdown
+			.replace(/```[\s\S]*?```/g, ' ') // code blocks
+			.replace(/^#+\s.*$/gm, ' ') // headings
+			.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // images
+			.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links -> text
+			.replace(/[*_`>#|-]/g, ' ')
+			.replace(/\s+/g, ' ')
+			.trim();
+		if (text.length <= max) return text;
+		return text.slice(0, max).replace(/\s\S*$/, '') + '…';
+	}
+	$: metaDescription = blog.description || contentExcerpt(blog.content);
 
 	const renderers = {
 		code: CodeHighlight,
@@ -42,20 +61,37 @@
 </script>
 
 <svelte:head>
-	<title>{blog.title}</title>
-	<meta name="keywords" content={blog.tags.join(', ')} />
+	<title>{blog.title} | Pictify</title>
+	{#if metaDescription}
+		<meta name="description" content={metaDescription} />
+	{/if}
+	<link rel="canonical" href={canonicalUrl} />
+	<meta name="robots" content="index, follow, max-image-preview:large" />
+	{#if blog.tags?.length}
+		<meta name="keywords" content={blog.tags.join(', ')} />
+	{/if}
 	<meta name="author" content={blog.author} />
 	<meta property="og:title" content={blog.title} />
-	<meta property="og:image" content={blog.heroImage} />
-	<meta property="og:url" content={`https://pictify.io/blogs/${$page.params.slug}`} />
-	<meta property="og:type" content="website" />
+	{#if metaDescription}
+		<meta property="og:description" content={metaDescription} />
+	{/if}
+	<meta property="og:image" content={blogImage} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:type" content="article" />
 	<meta property="og:site_name" content="Pictify.io" />
 	<meta property="og:locale" content="en_US" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={blog.title} />
+	{#if metaDescription}
+		<meta name="twitter:description" content={metaDescription} />
+	{/if}
+	<meta name="twitter:image" content={blogImage} />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org/',
 		'@type': 'BlogPosting',
 		headline: blog.title,
-		image: blog.image,
+		image: blogImage,
+		url: canonicalUrl,
 		author: {
 			'@type': 'Person',
 			name: blog.author
@@ -68,9 +104,9 @@
 				url: 'https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png'
 			}
 		},
-		datePublished: blog.date,
-		dateModified: blog.date,
-		description: blog.description
+		datePublished: blog.createdAt || blog.date,
+		dateModified: blog.updatedAt || blog.createdAt || blog.date,
+		description: metaDescription
 	})}</script>`}
 </svelte:head>
 
@@ -85,7 +121,8 @@
 			<div
 				class="flex-1 bg-white md:border-r-[3px] border-t-[3px] md:border-t-0 border-gray-900 relative overflow-hidden min-h-[400px] md:min-h-[500px]"
 			>
-				<img loading="lazy"
+				<img
+					loading="lazy"
 					src={blog?.heroImage}
 					class="object-cover w-full h-full absolute inset-0"
 					alt={blog?.title}

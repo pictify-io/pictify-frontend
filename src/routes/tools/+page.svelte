@@ -19,35 +19,80 @@
 	];
 
 	const USE_CASE_CATEGORIES = {
-		'youtube-thumbnail': 'social', 'linkedin-banner': 'social', 'instagram-story': 'social',
-		'twitter-header': 'social', 'podcast-cover': 'social', 'blog-featured-image': 'social',
-		'responsive-image-generator': 'social', 'email-header': 'social',
-		'certificate': 'documents', 'receipt': 'documents', 'resume-snapshot': 'documents',
-		'menu-card': 'documents', 'real-estate-flyer': 'documents', 'event-ticket': 'documents',
-		'event-invitation': 'documents', 'membership-card': 'documents', 'discount-coupon': 'documents',
-		'course-certificate': 'documents', 'portfolio-card': 'documents',
-		'kpi-card': 'data', 'leaderboard': 'data', 'status-update': 'data',
-		'stock-chart': 'data', 'weather-widget': 'data', 'sports-score-card': 'data',
-		'html-email': 'developer', 'table': 'developer', 'markdown': 'developer',
-		'code': 'developer', 'json-to-image': 'developer', 'api-response-card': 'developer',
-		'meme-generator': 'creative', 'quote-card': 'creative', 'infographic': 'creative',
-		'testimonial': 'creative', 'badge': 'creative', 'tweet-card': 'creative',
-		'product-banner': 'marketing', 'pricing-card': 'marketing', 'webinar-promo': 'marketing',
-		'job-post': 'marketing', 'changelog-card': 'marketing', 'release-notes-card': 'marketing',
-		'feature-flag-banner': 'marketing', 'report-cover': 'marketing', 'roadmap-card': 'marketing'
+		'youtube-thumbnail': 'social',
+		'linkedin-banner': 'social',
+		'instagram-story': 'social',
+		'twitter-header': 'social',
+		'podcast-cover': 'social',
+		'blog-featured-image': 'social',
+		'responsive-image-generator': 'social',
+		'email-header': 'social',
+		certificate: 'documents',
+		receipt: 'documents',
+		'resume-snapshot': 'documents',
+		'menu-card': 'documents',
+		'real-estate-flyer': 'documents',
+		'event-ticket': 'documents',
+		'event-invitation': 'documents',
+		'membership-card': 'documents',
+		'discount-coupon': 'documents',
+		'course-certificate': 'documents',
+		'portfolio-card': 'documents',
+		'kpi-card': 'data',
+		leaderboard: 'data',
+		'status-update': 'data',
+		'stock-chart': 'data',
+		'weather-widget': 'data',
+		'sports-score-card': 'data',
+		'html-email': 'developer',
+		table: 'developer',
+		markdown: 'developer',
+		code: 'developer',
+		'json-to-image': 'developer',
+		'api-response-card': 'developer',
+		'meme-generator': 'creative',
+		'quote-card': 'creative',
+		infographic: 'creative',
+		testimonial: 'creative',
+		badge: 'creative',
+		'tweet-card': 'creative',
+		'product-banner': 'marketing',
+		'pricing-card': 'marketing',
+		'webinar-promo': 'marketing',
+		'job-post': 'marketing',
+		'changelog-card': 'marketing',
+		'release-notes-card': 'marketing',
+		'feature-flag-banner': 'marketing',
+		'report-cover': 'marketing',
+		'roadmap-card': 'marketing'
 	};
 
 	function getCategoryCount(catId) {
 		if (catId === 'all') return useCases.length;
-		return useCases.filter(uc => USE_CASE_CATEGORIES[uc.id] === catId).length;
+		return useCases.filter((uc) => USE_CASE_CATEGORIES[uc.id] === catId).length;
 	}
 
 	// Reactive filtered set — Svelte tracks activeCategory dependency
-	$: hiddenIds = activeCategory === 'all'
-		? new Set()
-		: new Set(useCases.filter(uc => USE_CASE_CATEGORIES[uc.id] !== activeCategory).map(uc => uc.id));
+	$: hiddenIds =
+		activeCategory === 'all'
+			? new Set()
+			: new Set(
+					useCases.filter((uc) => USE_CASE_CATEGORIES[uc.id] !== activeCategory).map((uc) => uc.id)
+			  );
 
 	const tools = [
+		{
+			name: 'HTML to Image',
+			description: 'Convert HTML & CSS to PNG, JPG, or WebP — free converter with API access.',
+			url: '/tools/html-to-image',
+			icon: 'fa-solid fa-file-code'
+		},
+		{
+			name: 'HTML to PNG',
+			description: 'Paste HTML + CSS and export a high-quality PNG in one click.',
+			url: '/tools/html-to-png',
+			icon: 'fa-solid fa-image'
+		},
 		{
 			name: 'Code to Image',
 			description: 'Turn code snippets into beautiful images with themes and fonts.',
@@ -92,13 +137,15 @@
 		},
 		{
 			name: 'Certificate Generator',
-			description: 'Create professional certificates with 5 beautiful templates. Customize and download for free.',
+			description:
+				'Create professional certificates with 5 beautiful templates. Customize and download for free.',
 			url: '/tools/certificate-generator',
 			icon: 'fa-solid fa-certificate'
 		},
 		{
 			name: 'Tweet Screenshot Generator',
-			description: 'Paste any tweet URL, customize every field, download a clean PNG — no Twitter API key required.',
+			description:
+				'Paste any tweet URL, customize every field, download a clean PNG — no Twitter API key required.',
 			url: '/tools/tweet-screenshot',
 			icon: 'fa-brands fa-x-twitter'
 		},
@@ -253,11 +300,11 @@
 			<div class="flex gap-2 overflow-x-auto pb-3 mb-8 scrollbar-hide">
 				{#each CATEGORIES as cat}
 					<button
-						on:click={() => activeCategory = cat.id}
+						on:click={() => (activeCategory = cat.id)}
 						class="px-4 py-2 text-sm font-bold border-2 whitespace-nowrap transition-all rounded-lg
 							{activeCategory === cat.id
-								? 'border-gray-900 bg-brand-accent shadow-brutal-md text-gray-900'
-								: 'border-gray-200 hover:border-gray-400 bg-white text-gray-600'}"
+							? 'border-gray-900 bg-brand-accent shadow-brutal-md text-gray-900'
+							: 'border-gray-200 hover:border-gray-400 bg-white text-gray-600'}"
 					>
 						{cat.label}
 						<span class="ml-1 text-xs opacity-60">{getCategoryCount(cat.id)}</span>

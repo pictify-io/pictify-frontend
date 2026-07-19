@@ -3,7 +3,6 @@
 	import { browser } from '$app/environment';
 	import BasePage from '../+page.svelte';
 
-	$: format = $page.params.format;
 	$: dimensions = $page.params.dimensions || '';
 
 	function parseDimensions(dim) {
@@ -27,56 +26,10 @@
 		} catch (e) {}
 	}
 
-	$: structuredData =
-		width && height
-			? {
-					'@context': 'https://schema.org',
-					'@type': 'WebApplication',
-					name: `HTML to ${String(format).toUpperCase()} ${width}x${height} Converter`,
-					url: `https://pictify.io/tools/html-to-${format}/${width}x${height}`,
-					description: `Convert HTML to ${String(format).toUpperCase()} at ${width}x${height}.`,
-					applicationCategory: ['DesignApplication', 'Utility'],
-					operatingSystem: 'Web',
-					mainEntity: [
-						{
-							'@type': 'HowTo',
-							name: `How to convert HTML to ${String(format).toUpperCase()} (${width}x${height})`,
-							step: [
-								{ '@type': 'HowToStep', text: 'Open the HTML to Image converter' },
-								{ '@type': 'HowToStep', text: 'Paste your HTML and set dimensions' },
-								{ '@type': 'HowToStep', text: 'Generate and download the image' }
-							]
-						}
-					]
-			  }
-			: null;
+	// All head tags (title, meta, canonical, JSON-LD) come from BasePage, which is
+	// dimension-aware via $page.params.dimensions. A second <svelte:head> here
+	// produced duplicate conflicting titles/canonicals/schema on variant pages.
 </script>
-
-<svelte:head>
-	<title
-		>HTML to {format?.toUpperCase?.() || format}
-		{width && height ? `${width}x${height} ` : ''}Converter | Pictify.io</title
-	>
-	<meta
-		name="description"
-		content={width && height
-			? `Convert HTML to ${
-					format?.toUpperCase?.() || format || 'image'
-			  } at ${width}x${height}. Fast, free HTML to image generator by Pictify.io.`
-			: `Convert HTML to ${
-					format?.toUpperCase?.() || format || 'image'
-			  } in any size. Fast, free HTML to image generator by Pictify.io.`}
-	/>
-	<link
-		rel="canonical"
-		href={width && height
-			? `https://pictify.io/tools/html-to-${format}/${width}x${height}`
-			: `https://pictify.io/tools/html-to-${format}`}
-	/>
-	{#if structuredData}
-		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
-	{/if}
-</svelte:head>
 
 <section>
 	<BasePage />

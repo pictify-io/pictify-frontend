@@ -1,5 +1,6 @@
 <script>
 	import Nav from '$lib/components/landingPage/Nav.svelte';
+	import SEOHead from '$lib/seo/SEOHead.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
 	import { getTemplate, getWebsiteInfo } from '../../../api/tools/og-image';
@@ -713,56 +714,25 @@
 	};
 </script>
 
-<svelte:head>
-	{#if isPlatform}
-		<title>OG Image Generator for {platformLabel} | Pictify.io</title>
-		<meta
-			name="description"
-			content={`Create perfect Open Graph images for ${platformLabel}. Customize templates, fonts, and colors with Pictify.io.`}
-		/>
-		<link rel="canonical" href={`https://pictify.io/tools/og-image-generator/${platformObj.id}`} />
-		<meta property="og:title" content={`OG Image Generator for ${platformLabel} | Pictify.io`} />
-		<meta
-			property="og:description"
-			content={`Design ${platformLabel} OG images in seconds with Pictify.io.`}
-		/>
-		<meta property="og:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
-		<meta
-			property="og:url"
-			content={`https://pictify.io/tools/og-image-generator/${platformObj.id}`}
-		/>
-	{:else}
-		<title>Free OG Image Generator — Create Open Graph Images in Seconds | Pictify</title>
-		<meta
-			name="description"
-			content="Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free with no signup — API available for automation."
-		/>
-		<link rel="canonical" href="https://pictify.io/tools/og-image-generator" />
-		<meta property="og:title" content="Free OG Image Generator — Create Open Graph Images in Seconds | Pictify" />
-		<meta
-			property="og:description"
-			content="Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup."
-		/>
-		<meta property="og:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
-		<meta property="og:url" content="https://pictify.io/tools/og-image-generator" />
-	{/if}
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta
-		name="twitter:title"
-		content={isPlatform
-			? `OG Image Generator for ${platformLabel} | Pictify.io`
-			: 'Best OG Image Generator | Create Open Graph Images Free'}
+{#if !isPlatform}
+	<!-- Platform variants render their own SEOHead in [platform]/+page.svelte -->
+	<SEOHead
+		title="Free OG Image Generator — Create Open Graph Images in Seconds | Pictify"
+		description="Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free with no signup — API available for automation."
+		canonical="https://pictify.io/tools/og-image-generator"
+		robots="index, follow, max-image-preview:large"
+		ogImage="https://media.pictify.io/31hxg-1775406864453.png"
+		openGraph={{
+			description:
+				'Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup.'
+		}}
+		twitter={{
+			description:
+				'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'
+		}}
+		schema={structuredData}
 	/>
-	<meta
-		name="twitter:description"
-		content={isPlatform
-			? `Design ${platformLabel} OG images in seconds with Pictify.io.`
-			: 'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'}
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/31hxg-1775406864453.png" />
-	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
-</svelte:head>
+{/if}
 
 <section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
 	<Nav />
@@ -1039,9 +1009,7 @@
 					<!-- Preview Section -->
 					<div class="p-6 md:p-8 bg-gray-100 border-b-[3px] border-black">
 						<div class="flex justify-center items-center">
-							<div
-								class="border-[3px] border-black shadow-brutal-xl overflow-hidden bg-white"
-							>
+							<div class="border-[3px] border-black shadow-brutal-xl overflow-hidden bg-white">
 								<OgImageTemplate
 									html={typeof selectedTemplate === 'string'
 										? selectedTemplate
@@ -1080,7 +1048,8 @@
 											{#if websiteInfo.logo.startsWith('<svg')}
 												<div style="width: 120px;">{@html websiteInfo.logo}</div>
 											{:else}
-												<img loading="lazy"
+												<img
+													loading="lazy"
 													src={websiteInfo.logo}
 													style="width: 120px;"
 													alt="Logo"
@@ -1244,9 +1213,16 @@
 							<div
 								class="bg-data-green border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
 							>
-								<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2">
+								<span
+									class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2"
+								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="3"
+											d="M5 13l4 4L19 7"
+										/></svg
 									>
 									Image generated
 								</span>
@@ -1345,7 +1321,11 @@
 				{#if !isUserLoggedIn}
 					<a
 						href="/signup"
-						on:click={() => analytics.track('tool_signup_click', { tool_name: 'og_image_generator', cta_location: 'view_all_templates' })}
+						on:click={() =>
+							analytics.track('tool_signup_click', {
+								tool_name: 'og_image_generator',
+								cta_location: 'view_all_templates'
+							})}
 						class="font-bold text-black hover:text-brand-danger transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
 					>
 						View All Templates →
@@ -1556,10 +1536,11 @@
 			</div>
 		</div>
 	</main>
-	<RelatedTools tools={['youtube-thumbnail', 'linkedin-banner', 'twitter-header', 'responsive-image-generator']} />
+	<RelatedTools
+		tools={['youtube-thumbnail', 'linkedin-banner', 'twitter-header', 'responsive-image-generator']}
+	/>
 	<Footer />
 	<Toast />
-
 </section>
 
 <style>
