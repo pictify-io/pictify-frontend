@@ -33,6 +33,9 @@
 		} catch (e) {
 			/* ignored */
 		}
+
+		// Canvas engine retired (2026-07): no picker — HTML is the only template engine.
+		goto('/template-workspace/html/create?engine=html', { replaceState: true });
 	});
 
 	function handleEngineSelect(event) {
@@ -62,7 +65,7 @@
 
 <div class="h-full w-full">
 	{#if stage === 'engine'}
-		<EnginePicker on:select={handleEngineSelect} />
+		<!-- Canvas engine retired (2026-07): onMount redirects straight to HTML creation. -->
 	{:else if showSelector && stage === 'format'}
 		<TemplateTypeSelector on:select={handleFormatSelect} />
 	{/if}
