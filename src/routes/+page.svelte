@@ -6,10 +6,8 @@
 	import ScaleUseCases from '$lib/components/landingPage/ScaleUseCases.svelte';
 	import ApiShowcase from '$lib/components/landingPage/ApiShowcase.svelte';
 	import HowItWorks from '$lib/components/landingPage/HowItWorks.svelte';
-	import CanvasShowcase from '$lib/components/landingPage/CanvasShowcase.svelte';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
 	import MidSectionCta from '$lib/components/landingPage/MidSectionCta.svelte';
-	import ExperimentsShowcase from '$lib/components/landingPage/ExperimentsShowcase.svelte';
 	import IntegrationsEcosystem from '$lib/components/landingPage/IntegrationsEcosystem.svelte';
 	import ResponsiveShowcase from '$lib/components/landingPage/ResponsiveShowcase.svelte';
 	import { onMount, onDestroy } from 'svelte';
@@ -64,10 +62,7 @@
 		property="og:description"
 		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
 	/>
-	<meta
-		property="og:image"
-		content="https://media.pictify.io/v3g37-1775406808141.png"
-	/>
+	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta property="og:url" content="https://pictify.io" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify.io" />
@@ -78,10 +73,7 @@
 		name="twitter:description"
 		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
 	/>
-	<meta
-		name="twitter:image"
-		content="https://media.pictify.io/v3g37-1775406808141.png"
-	/>
+	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta name="twitter:site" content="@pictify_io" />
 	<link rel="canonical" href="https://pictify.io/" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
@@ -90,19 +82,16 @@
 		name: 'Pictify.io',
 		url: 'https://pictify.io',
 		image: 'https://media.pictify.io/v3g37-1775406808141.png',
-		description: 'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
+		description:
+			'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
 		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
 		operatingSystem: 'Web',
 		featureList: [
+			'HTML and URL to image rendering',
 			'Expression engine with 50+ functions',
-			'Visual template editor with drag-and-drop',
-			'A/B testing with Thompson Sampling',
-			'Smart links with geo/device targeting',
-			'Scheduled image variants',
 			'REST API with <200ms latency',
 			'Webhooks and storage connectors',
-			'AI copilot for template generation',
-			'AI-powered smart resize',
+			'PDF and GIF generation',
 			'Batch image generation'
 		],
 		offers: {
@@ -138,11 +127,7 @@
 	<ApiShowcase />
 	<SectionSeparator icon="hash" />
 
-	<!-- 6. Template Builder: Visual Editor -->
-	<CanvasShowcase />
-	<SectionSeparator icon="star" />
-
-	<!-- 6.5. Responsive Image API -->
+	<!-- 6. Responsive Image API -->
 	<ResponsiveShowcase />
 	<SectionSeparator icon="bolt" />
 
@@ -150,11 +135,7 @@
 	<IntegrationsEcosystem />
 	<SectionSeparator icon="arrow" />
 
-	<!-- 8. Advanced: Experiments & Optimization -->
-	<ExperimentsShowcase />
-	<SectionSeparator icon="bolt" />
-
-	<!-- 9. Final CTA -->
+	<!-- 8. Final CTA -->
 	<div class="w-full bg-brand-bg">
 		<div class="max-w-5xl mx-auto px-4">
 			<TryNow />

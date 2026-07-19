@@ -245,7 +245,7 @@
 						: 'text-red-400 font-mono'}"
 				>
 					{isPictify
-						? 'Visual editor with expressions, AI copilot, and A/B testing. No deploys needed.'
+						? 'Visual editor with expressions and AI copilot. No deploys needed.'
 						: 'Code-Only. Dev Time: Weeks.'}
 				</p>
 			</div>
@@ -304,7 +304,7 @@
 						: 'text-red-400 font-mono'}"
 				>
 					{isPictify
-						? 'Save $350+/mo in DevOps. Plus: experiments, smart links, and auto-optimization built in.'
+						? 'Save $350+/mo in DevOps. Batch rendering, webhooks, and CDN hosting built in.'
 						: 'Endless library updates and breaking changes.'}
 				</p>
 			</div>
