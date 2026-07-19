@@ -38,7 +38,9 @@
 	$: config = useCaseDetails[useCaseId];
 	$: useCase = config ? useCases.find((u) => u.id === useCaseId) : null;
 	$: validCase = !!useCase;
-	$: title = validCase ? (config.seoTitle || `${config.label} | Pictify.io`) : 'Use Case | Pictify.io';
+	$: title = validCase
+		? config.seoTitle || `${config.label} | Pictify.io`
+		: 'Use Case | Pictify.io';
 	$: description = validCase
 		? config.description
 		: 'Convert HTML to images instantly with Pictify.io.';
@@ -190,20 +192,21 @@
 		: null;
 
 	// FAQ structured data for SEO
-	$: faqSchema = validCase && config.faqs && config.faqs.length > 0
-		? {
-				'@context': 'https://schema.org',
-				'@type': 'FAQPage',
-				mainEntity: config.faqs.map((faq) => ({
-					'@type': 'Question',
-					name: faq.q,
-					acceptedAnswer: {
-						'@type': 'Answer',
-						text: faq.a
-					}
-				}))
-		  }
-		: null;
+	$: faqSchema =
+		validCase && config.faqs && config.faqs.length > 0
+			? {
+					'@context': 'https://schema.org',
+					'@type': 'FAQPage',
+					mainEntity: config.faqs.map((faq) => ({
+						'@type': 'Question',
+						name: faq.q,
+						acceptedAnswer: {
+							'@type': 'Answer',
+							text: faq.a
+						}
+					}))
+			  }
+			: null;
 
 	// API example snippet
 	$: apiSnippet = `curl -X POST https://api.pictify.io/image \\
@@ -234,6 +237,7 @@
 	<title>{title}</title>
 	<meta name="description" content={description} />
 	<link rel="canonical" href={canonical} />
+	<meta name="robots" content="index, follow, max-image-preview:large" />
 	<meta
 		name="keywords"
 		content="{config?.seoKeywords?.join(', ') ||
@@ -246,13 +250,19 @@
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'} />
+	<meta
+		property="og:image"
+		content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'}
+	/>
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'} />
+	<meta
+		name="twitter:image"
+		content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'}
+	/>
 
 	{#if structuredData}
 		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
@@ -353,184 +363,195 @@
 				<!-- Barcode Editor (self-contained: input, preview, generate, result, API examples) -->
 				<BarcodeEditor />
 			{:else}
-			<!-- Template Preview Section (Window Style) -->
-			<div class="max-w-5xl mx-auto px-4 mb-20">
-				<div
-					class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
-				>
-					<!-- Window Header -->
+				<!-- Template Preview Section (Window Style) -->
+				<div class="max-w-5xl mx-auto px-4 mb-20">
 					<div
-						class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
+						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
 					>
-						<div class="flex items-center gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
-						</div>
+						<!-- Window Header -->
 						<div
-							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
+							class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
 						>
-							<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700">Interactive Editor</span>
-							{templateWidth} x {templateHeight}px
+							<div class="flex items-center gap-2">
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
+								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
+							</div>
+							<div
+								class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
+							>
+								<span
+									class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
+									>Interactive Editor</span
+								>
+								{templateWidth} x {templateHeight}px
+							</div>
+						</div>
+
+						<!-- Interactive Mini-Editor Preview -->
+						<div
+							class="p-8 bg-gray-100 flex flex-col items-center justify-center relative min-h-[400px]"
+						>
+							<div
+								class="absolute inset-0 opacity-10"
+								style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
+							/>
+
+							<div
+								class="relative z-10 flex flex-col items-center gap-8 w-full max-w-[640px] mx-auto"
+							>
+								<!-- MiniEditor (interactive canvas — replaces StaticCanvas) -->
+								{#if template?.fabricJSData}
+									<MiniEditor
+										bind:this={miniEditorRef}
+										fabricJSData={template.fabricJSData}
+										width={templateWidth}
+										height={templateHeight}
+									/>
+								{:else}
+									<div
+										class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
+									>
+										<p class="font-bold text-gray-400">Preview not available</p>
+									</div>
+								{/if}
+
+								<!-- Action Bar -->
+								<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
+									<button
+										type="button"
+										on:click={openInCanvasEditor}
+										class="flex-1 py-4 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
+									>
+										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+											/></svg
+										>
+										Open Editor — Free
+									</button>
+									<button
+										type="button"
+										on:click={handleQuickGenerate}
+										disabled={isGenerating}
+										class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+									>
+										{#if isGenerating}
+											<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"
+												><circle
+													class="opacity-25"
+													cx="12"
+													cy="12"
+													r="10"
+													stroke="currentColor"
+													stroke-width="4"
+												/><path
+													class="opacity-75"
+													fill="currentColor"
+													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+												/></svg
+											>
+											Working...
+										{:else}
+											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+												><path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M13 10V3L4 14h7v7l9-11h-7z"
+												/></svg
+											>
+											Quick Preview
+										{/if}
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
+				</div>
 
-					<!-- Interactive Mini-Editor Preview -->
-					<div
-						class="p-8 bg-gray-100 flex flex-col items-center justify-center relative min-h-[400px]"
-					>
+				<!-- Generated Result + NextSteps -->
+				{#if generatedImageUrl}
+					<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 						<div
-							class="absolute inset-0 opacity-10"
-							style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
-						/>
+							class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
+						>
+							<div
+								class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl"
+							/>
 
-						<div class="relative z-10 flex flex-col items-center gap-8 w-full max-w-[640px] mx-auto">
-							<!-- MiniEditor (interactive canvas — replaces StaticCanvas) -->
-							{#if template?.fabricJSData}
-								<MiniEditor
-									bind:this={miniEditorRef}
-									fabricJSData={template.fabricJSData}
-									width={templateWidth}
-									height={templateHeight}
+							<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
+								Success! Here is your image
+							</h3>
+
+							<div
+								class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
+							>
+								<img
+									loading="lazy"
+									src={generatedImageUrl}
+									alt="Generated result"
+									class="max-w-full h-auto max-h-[400px]"
 								/>
-							{:else}
-								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl">
-									<p class="font-bold text-gray-400">Preview not available</p>
-								</div>
-							{/if}
+							</div>
 
-							<!-- Action Bar -->
-							<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
-								<button
-									type="button"
-									on:click={openInCanvasEditor}
-									class="flex-1 py-4 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
+							<div class="flex flex-wrap justify-center gap-4">
+								<a
+									href={generatedImageUrl}
+									download="pictify-result.png"
+									class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
 											stroke-linejoin="round"
 											stroke-width="2"
-											d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
 										/></svg
 									>
-									Open Editor — Free
-								</button>
-								<button
-									type="button"
-									on:click={handleQuickGenerate}
-									disabled={isGenerating}
-									class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
-								>
-									{#if isGenerating}
-										<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"
-											><circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-											/><path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/></svg
-										>
-										Working...
-									{:else}
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 10V3L4 14h7v7l9-11h-7z"
-											/></svg
-										>
-										Quick Preview
-									{/if}
-								</button>
+									Download PNG
+								</a>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
 
-			<!-- Generated Result + NextSteps -->
-			{#if generatedImageUrl}
-				<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
-					<div
-						class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
-					>
-						<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
-
-						<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
-							Success! Here is your image
-						</h3>
-
-						<div
-							class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
-						>
-							<img loading="lazy"
-								src={generatedImageUrl}
-								alt="Generated result"
-								class="max-w-full h-auto max-h-[400px]"
+						<div class="mt-12">
+							<NextSteps
+								heading="Now Automate It"
+								description="You've proved it works. Now integrate this into your app."
+								curlSnippet={apiSnippet}
+								{templateDraft}
+								generatedUrl={generatedImageUrl}
+								generatedWidth={templateWidth}
+								generatedHeight={templateHeight}
+								generatedFormat="png"
+								toolName={config?.label || useCaseId}
 							/>
 						</div>
-
-						<div class="flex flex-wrap justify-center gap-4">
-							<a
-								href={generatedImageUrl}
-								download="pictify-result.png"
-								class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-									/></svg
-								>
-								Download PNG
-							</a>
-						</div>
 					</div>
-
-					<div class="mt-12">
-						<NextSteps
-							heading="Now Automate It"
-							description="You've proved it works. Now integrate this into your app."
-							curlSnippet={apiSnippet}
-							{templateDraft}
-							generatedUrl={generatedImageUrl}
-							generatedWidth={templateWidth}
-							generatedHeight={templateHeight}
-							generatedFormat="png"
-							toolName={config?.label || useCaseId}
-						/>
-					</div>
-				</div>
-			{:else if generationError}
-				<div class="max-w-3xl mx-auto px-4 mb-12">
-					<div
-						class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4"
-					>
+				{:else if generationError}
+					<div class="max-w-3xl mx-auto px-4 mb-12">
 						<div
-							class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500"
+							class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4"
 						>
-							!
+							<div
+								class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500"
+							>
+								!
+							</div>
+							<div>
+								<h4 class="font-black text-red-900 uppercase">Generation Failed</h4>
+								<p class="text-red-700 font-medium">{generationError}</p>
+							</div>
+							<button
+								on:click={handleQuickGenerate}
+								class="ml-auto underline font-bold text-red-900">Retry</button
+							>
 						</div>
-						<div>
-							<h4 class="font-black text-red-900 uppercase">Generation Failed</h4>
-							<p class="text-red-700 font-medium">{generationError}</p>
-						</div>
-						<button on:click={handleQuickGenerate} class="ml-auto underline font-bold text-red-900"
-							>Retry</button
-						>
 					</div>
-				</div>
-			{/if}
+				{/if}
 			{/if}
 
 			<!-- Why Teams Choose This Section (Three Pillars Style) -->
@@ -669,7 +690,8 @@
 				<div class="max-w-5xl mx-auto px-6">
 					<div class="text-center mb-16">
 						<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-							Problems <span class="bg-brand-danger text-white px-2 transform -skew-x-6 inline-block"
+							Problems <span
+								class="bg-brand-danger text-white px-2 transform -skew-x-6 inline-block"
 								>Solved</span
 							>
 						</h2>
@@ -901,7 +923,6 @@
 	</main>
 
 	<Footer />
-
 </section>
 
 <style>

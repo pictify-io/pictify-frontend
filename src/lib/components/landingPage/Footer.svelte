@@ -72,7 +72,8 @@
 							<a
 								href={PUBLIC_DOCS_URL}
 								target="_blank"
-								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">API Docs</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors"
+								>API Docs</a
 							>
 						</li>
 						<li>
@@ -83,8 +84,23 @@
 						</li>
 						<li>
 							<a
+								href="/tools/html-to-image"
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors"
+								>HTML to Image</a
+							>
+						</li>
+						<li>
+							<a
+								href="/tools/html-to-jpg"
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors"
+								>HTML to JPG</a
+							>
+						</li>
+						<li>
+							<a
 								href="/templates"
-								class="text-gray-600 font-bold hover:text-brand-danger transition-colors">Templates</a
+								class="text-gray-600 font-bold hover:text-brand-danger transition-colors"
+								>Templates</a
 							>
 						</li>
 						<li>

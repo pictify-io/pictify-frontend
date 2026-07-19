@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import OgImageGenerator from '../+page.svelte';
+	import SEOHead from '$lib/seo/SEOHead.svelte';
 	import { ogPlatforms, popularSizes } from '$lib/pseo/config.js';
 
 	$: platformId = $page.params.platform;
@@ -77,12 +78,14 @@
 	};
 </script>
 
-<svelte:head>
-	<title>{title}</title>
-	<meta name="description" content={description} />
-	<link rel="canonical" href={canonical} />
-	{@html `<script type="application/ld+json">${JSON.stringify(schema)}</script>`}
-</svelte:head>
+<SEOHead
+	{title}
+	{description}
+	{canonical}
+	robots="index, follow, max-image-preview:large"
+	ogImage="https://media.pictify.io/31hxg-1775406864453.png"
+	{schema}
+/>
 
 <section>
 	<OgImageGenerator platform={platform.id} />

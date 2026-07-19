@@ -22,7 +22,11 @@
 	let formValues = {
 		recipientName: 'John Doe',
 		organizationName: 'Your Organization',
-		date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+		date: new Date().toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
+		}),
 		achievementText: 'for successfully completing the Advanced Training Program'
 	};
 
@@ -55,7 +59,11 @@
 		formValues = {
 			recipientName: 'John Doe',
 			organizationName: 'Your Organization',
-			date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+			date: new Date().toLocaleDateString('en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			}),
 			achievementText: 'for successfully completing the Advanced Training Program'
 		};
 		generatedImageUrl = '';
@@ -88,7 +96,11 @@
 			if (response?.url) {
 				generatedImageUrl = response.url;
 				lastEditedData = editedData;
-				toast.set({ message: 'Certificate generated successfully!', type: 'success', duration: 2000 });
+				toast.set({
+					message: 'Certificate generated successfully!',
+					type: 'success',
+					duration: 2000
+				});
 				analytics.trackImageGenerated({
 					tool_name: 'certificate_generator',
 					format: 'png',
@@ -149,7 +161,15 @@
 	$: apiSnippet = `curl -X POST https://api.pictify.io/image/canvas \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '${JSON.stringify({ fabricJSData: currentFabricData, width: selectedTemplate.width, height: selectedTemplate.height }, null, 2)}'`;
+  -d '${JSON.stringify(
+		{
+			fabricJSData: currentFabricData,
+			width: selectedTemplate.width,
+			height: selectedTemplate.height
+		},
+		null,
+		2
+	)}'`;
 
 	// FAQ data
 	const faqs = [
@@ -166,8 +186,8 @@
 			a: 'Currently certificates are generated as high-quality PNG images at 1920x1080 resolution. PDF support is coming soon. You can also use our API to generate certificates in JPG and WebP formats.'
 		},
 		{
-			q: 'Can I generate certificates in bulk?',
-			a: 'Yes! Use our API to batch generate certificates programmatically. Pass different recipient names, dates, and achievement text for each request. Perfect for course completions, event attendance, and employee recognition programs.'
+			q: 'Can I bulk generate certificates for events or training programs?',
+			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Use the API to batch generate certificates programmatically — pass different recipient names, dates, and achievement text for each request. Perfect for course completions, event attendance, and employee recognition programs.'
 		},
 		{
 			q: 'Can I add my company logo?',
@@ -186,7 +206,7 @@
 		name: 'Pictify.io Certificate Generator',
 		url: 'https://pictify.io/tools/certificate-generator',
 		description:
-			'Create professional certificates for free with Pictify\'s interactive certificate generator. Choose from 5 beautiful templates, customize recipient names, dates, and achievements, and download as PNG.',
+			"Create professional certificates for free with Pictify's interactive certificate generator. Choose from 5 beautiful templates, customize recipient names, dates, and achievements, and download as PNG.",
 		applicationCategory: ['DesignApplication', 'ImageGenerator'],
 		operatingSystem: 'Web',
 		offers: {
@@ -238,17 +258,49 @@
 		'@type': 'HowTo',
 		name: 'How to Make a Certificate Online',
 		description:
-			'Make a custom certificate online for free in six steps using Pictify\'s certificate generator.',
+			"Make a custom certificate online for free in six steps using Pictify's certificate generator.",
 		totalTime: 'PT2M',
-		supply: [{ '@type': 'HowToSupply', name: 'Recipient name, organization, date, achievement text' }],
+		supply: [
+			{ '@type': 'HowToSupply', name: 'Recipient name, organization, date, achievement text' }
+		],
 		tool: [{ '@type': 'HowToTool', name: 'Pictify Certificate Generator' }],
 		step: [
-			{ '@type': 'HowToStep', position: 1, name: 'Choose a template', text: 'Choose a certificate template from the gallery above.' },
-			{ '@type': 'HowToStep', position: 2, name: 'Enter details', text: 'Enter the recipient name, organization, date, and achievement.' },
-			{ '@type': 'HowToStep', position: 3, name: 'Preview the certificate', text: 'Preview your certificate in the interactive canvas editor.' },
-			{ '@type': 'HowToStep', position: 4, name: 'Edit on canvas', text: 'Click any text on the canvas to make direct edits.' },
-			{ '@type': 'HowToStep', position: 5, name: 'Generate the certificate', text: 'Click Generate Certificate to create a high-resolution PNG.' },
-			{ '@type': 'HowToStep', position: 6, name: 'Download', text: 'Download your certificate or open it in the full editor for further customization.' }
+			{
+				'@type': 'HowToStep',
+				position: 1,
+				name: 'Choose a template',
+				text: 'Choose a certificate template from the gallery above.'
+			},
+			{
+				'@type': 'HowToStep',
+				position: 2,
+				name: 'Enter details',
+				text: 'Enter the recipient name, organization, date, and achievement.'
+			},
+			{
+				'@type': 'HowToStep',
+				position: 3,
+				name: 'Preview the certificate',
+				text: 'Preview your certificate in the interactive canvas editor.'
+			},
+			{
+				'@type': 'HowToStep',
+				position: 4,
+				name: 'Edit on canvas',
+				text: 'Click any text on the canvas to make direct edits.'
+			},
+			{
+				'@type': 'HowToStep',
+				position: 5,
+				name: 'Generate the certificate',
+				text: 'Click Generate Certificate to create a high-resolution PNG.'
+			},
+			{
+				'@type': 'HowToStep',
+				position: 6,
+				name: 'Download',
+				text: 'Download your certificate or open it in the full editor for further customization.'
+			}
 		]
 	});
 
@@ -259,11 +311,56 @@
 		itemListOrder: 'https://schema.org/ItemListUnordered',
 		numberOfItems: 5,
 		itemListElement: [
-			{ '@type': 'ListItem', position: 1, item: { '@type': 'CreativeWork', name: 'Certificate of Achievement Template', description: 'Classic formal certificate of achievement with gold borders and elegant serif typography.' } },
-			{ '@type': 'ListItem', position: 2, item: { '@type': 'CreativeWork', name: 'Certificate of Completion Template', description: 'Sleek dark theme certificate of completion with purple accents and clean sans-serif typography.' } },
-			{ '@type': 'ListItem', position: 3, item: { '@type': 'CreativeWork', name: 'Corporate Certificate Template', description: 'Professional corporate certificate design with navy header and formal layout.' } },
-			{ '@type': 'ListItem', position: 4, item: { '@type': 'CreativeWork', name: 'Minimalist Certificate Template', description: 'Clean minimalist certificate design with generous whitespace and refined typography.' } },
-			{ '@type': 'ListItem', position: 5, item: { '@type': 'CreativeWork', name: 'Creative Award Certificate Template', description: 'Bold, colorful award certificate with coral accents and playful geometric elements.' } }
+			{
+				'@type': 'ListItem',
+				position: 1,
+				item: {
+					'@type': 'CreativeWork',
+					name: 'Certificate of Achievement Template',
+					description:
+						'Classic formal certificate of achievement with gold borders and elegant serif typography.'
+				}
+			},
+			{
+				'@type': 'ListItem',
+				position: 2,
+				item: {
+					'@type': 'CreativeWork',
+					name: 'Certificate of Completion Template',
+					description:
+						'Sleek dark theme certificate of completion with purple accents and clean sans-serif typography.'
+				}
+			},
+			{
+				'@type': 'ListItem',
+				position: 3,
+				item: {
+					'@type': 'CreativeWork',
+					name: 'Corporate Certificate Template',
+					description:
+						'Professional corporate certificate design with navy header and formal layout.'
+				}
+			},
+			{
+				'@type': 'ListItem',
+				position: 4,
+				item: {
+					'@type': 'CreativeWork',
+					name: 'Minimalist Certificate Template',
+					description:
+						'Clean minimalist certificate design with generous whitespace and refined typography.'
+				}
+			},
+			{
+				'@type': 'ListItem',
+				position: 5,
+				item: {
+					'@type': 'CreativeWork',
+					name: 'Creative Award Certificate Template',
+					description:
+						'Bold, colorful award certificate with coral accents and playful geometric elements.'
+				}
+			}
 		]
 	});
 
@@ -273,25 +370,26 @@
 </script>
 
 <svelte:head>
-	<title>Free Certificate Generator & Maker — Make Custom Certificates Online | Pictify</title>
+	<title>Certificate Generator — Free Maker + Bulk API for Events & Training | Pictify</title>
 	<meta
 		name="description"
-		content="Free online certificate generator and maker. Choose from 5 professional templates (Achievement, Completion, Participation, Award, Appreciation), customize names, dates, and achievements, and download a high-resolution PNG. Free API for bulk certificate generation."
+		content="Free certificate generator with 5 professional templates — customize names, dates, and achievements, then download a high-res PNG. Bulk-generate certificates for events, training programs, and courses with the free API."
 	/>
 	<meta
 		name="keywords"
 		content="certificate generator, certificate maker, certificate template, make a certificate, create a certificate, online certificate maker, certificate of achievement template, certificate builder, free certificate maker, bulk certificate generator, certificate generator API, Pictify"
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/certificate-generator" />
+	<meta name="robots" content="index, follow, max-image-preview:large" />
 
 	<!-- Open Graph -->
 	<meta
 		property="og:title"
-		content="Free Certificate Generator & Maker — Make Custom Certificates Online | Pictify"
+		content="Certificate Generator — Free Maker + Bulk API for Events & Training | Pictify"
 	/>
 	<meta
 		property="og:description"
-		content="Free online certificate generator and maker. 5 templates, customize names and dates, download high-resolution PNG. Free API for bulk certificate generation."
+		content="Free certificate generator with 5 templates. Bulk-generate certificates for events, training programs, and courses with the free API."
 	/>
 	<meta property="og:url" content="https://pictify.io/tools/certificate-generator" />
 	<meta property="og:type" content="website" />
@@ -299,21 +397,27 @@
 	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify Certificate Generator — 5 free templates with API for bulk generation" />
+	<meta
+		property="og:image:alt"
+		content="Pictify Certificate Generator — 5 free templates with API for bulk generation"
+	/>
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@pictify_io" />
 	<meta
 		name="twitter:title"
-		content="Free Certificate Generator & Maker — Make Custom Certificates | Pictify"
+		content="Certificate Generator — Free Maker + Bulk API for Events & Training | Pictify"
 	/>
 	<meta
 		name="twitter:description"
-		content="Free online certificate generator and maker. 5 templates, free API for bulk certificate generation."
+		content="Free certificate generator with 5 templates. Bulk-generate certificates for events, training, and courses via API."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
-	<meta name="twitter:image:alt" content="Pictify Certificate Generator — 5 free templates with API for bulk generation" />
+	<meta
+		name="twitter:image:alt"
+		content="Pictify Certificate Generator — 5 free templates with API for bulk generation"
+	/>
 
 	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
 	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
@@ -445,7 +549,8 @@
 						<span class="text-xs font-black text-gray-900 uppercase tracking-wide block text-center"
 							>{template.name}</span
 						>
-						<span class="text-[10px] text-gray-500 font-medium block text-center mt-0.5 line-clamp-1"
+						<span
+							class="text-[10px] text-gray-500 font-medium block text-center mt-0.5 line-clamp-1"
 							>{template.description}</span
 						>
 					</button>
@@ -586,7 +691,10 @@
 						<div
 							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
 						>
-							<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700">Interactive Editor</span>
+							<span
+								class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
+								>Interactive Editor</span
+							>
 							{selectedTemplate.width} x {selectedTemplate.height}px
 						</div>
 					</div>
@@ -609,7 +717,9 @@
 									height={selectedTemplate.height}
 								/>
 							{:else}
-								<div class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl">
+								<div
+									class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
+								>
 									<p class="font-bold text-gray-400">Preview not available</p>
 								</div>
 							{/if}
@@ -675,7 +785,8 @@
 					<div
 						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
-						<img loading="lazy"
+						<img
+							loading="lazy"
 							src={generatedImageUrl}
 							alt="Generated {selectedTemplate.name} certificate for {formValues.recipientName}"
 							class="max-w-full h-auto max-h-[400px]"
@@ -731,9 +842,7 @@
 			</div>
 		{:else if generationError}
 			<div class="max-w-3xl mx-auto px-4 mb-12">
-				<div
-					class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4"
-				>
+				<div class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4">
 					<div
 						class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500 font-black"
 					>
@@ -798,10 +907,12 @@
 					What is a Certificate Generator?
 				</h3>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					A certificate generator is a tool that lets you create professional, customizable certificates for any occasion.
-					Whether you need certificates for course completions, employee awards, event attendance, or academic achievements,
-					a certificate generator streamlines the process from design to download. Instead of spending hours in graphic
-					design software, you can select a template, fill in the details, and generate a print-ready certificate in seconds.
+					A certificate generator is a tool that lets you create professional, customizable
+					certificates for any occasion. Whether you need certificates for course completions,
+					employee awards, event attendance, or academic achievements, a certificate generator
+					streamlines the process from design to download. Instead of spending hours in graphic
+					design software, you can select a template, fill in the details, and generate a
+					print-ready certificate in seconds.
 				</p>
 			</section>
 
@@ -954,37 +1065,64 @@
 					Certificate Templates: Choose from 5 Free Designs
 				</h3>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-6">
-					Every certificate template works for any certificate type — award, achievement, completion, participation, or appreciation. Pick a design that matches your brand and customize the title, recipient name, date, and achievement text. All templates are free and come with commercial-use rights.
+					Every certificate template works for any certificate type — award, achievement,
+					completion, participation, or appreciation. Pick a design that matches your brand and
+					customize the title, recipient name, date, and achievement text. All templates are free
+					and come with commercial-use rights.
 				</p>
 				<div class="space-y-5">
 					<div class="border-l-[4px] border-brand-accent pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Achievement Template</h4>
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+							Certificate of Achievement Template
+						</h4>
 						<p class="text-sm text-gray-700 font-medium">
-							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong>Elegant</strong> template, with gold borders and serif typography, is our most popular certificate of achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
+							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong
+								>Elegant</strong
+							> template, with gold borders and serif typography, is our most popular certificate of
+							achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
 						</p>
 					</div>
 					<div class="border-l-[4px] border-data-sky pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Completion Template</h4>
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+							Certificate of Completion Template
+						</h4>
 						<p class="text-sm text-gray-700 font-medium">
-							Issue a certificate of completion for courses, training programs, workshops, and onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek, contemporary feel that reads well on-screen and in print.
+							Issue a certificate of completion for courses, training programs, workshops, and
+							onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek,
+							contemporary feel that reads well on-screen and in print.
 						</p>
 					</div>
 					<div class="border-l-[4px] border-data-green pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Participation Template</h4>
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+							Certificate of Participation Template
+						</h4>
 						<p class="text-sm text-gray-700 font-medium">
-							Acknowledge attendance and engagement with a certificate of participation. The <strong>Corporate</strong> template's navy header and formal layout make it the right certificate of participation template for conferences, webinars, and corporate events.
+							Acknowledge attendance and engagement with a certificate of participation. The <strong
+								>Corporate</strong
+							> template's navy header and formal layout make it the right certificate of participation
+							template for conferences, webinars, and corporate events.
 						</p>
 					</div>
 					<div class="border-l-[4px] border-brand-danger pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">Award Certificate Template</h4>
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+							Award Certificate Template
+						</h4>
 						<p class="text-sm text-gray-700 font-medium">
-							Celebrate winners and honorees with a bold award certificate. The <strong>Creative</strong> template — coral accents and playful geometry — works well for employee-of-the-month awards, tournament winners, and community recognition.
+							Celebrate winners and honorees with a bold award certificate. The <strong
+								>Creative</strong
+							> template — coral accents and playful geometry — works well for employee-of-the-month
+							awards, tournament winners, and community recognition.
 						</p>
 					</div>
 					<div class="border-l-[4px] border-[#1f2937] pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">Certificate of Appreciation Template</h4>
+						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+							Certificate of Appreciation Template
+						</h4>
 						<p class="text-sm text-gray-700 font-medium">
-							Thank volunteers, partners, and team members with a certificate of appreciation. The <strong>Minimalist</strong> template's generous whitespace and refined typography puts the focus on the recipient — a perfect certificate of appreciation template for donor recognition and retirement gifts.
+							Thank volunteers, partners, and team members with a certificate of appreciation. The <strong
+								>Minimalist</strong
+							> template's generous whitespace and refined typography puts the focus on the recipient
+							— a perfect certificate of appreciation template for donor recognition and retirement gifts.
 						</p>
 					</div>
 				</div>
@@ -1013,10 +1151,17 @@
 					Use Our Online Certificate Maker for Free
 				</h3>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
-					Pictify's online certificate maker runs entirely in your browser — no downloads, no installs, no signup. The certificate maker supports real-time preview, direct-on-canvas editing, and high-resolution PNG export at 1920×1080. Generate one certificate in under a minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds at once from a spreadsheet or database.
+					Pictify's online certificate maker runs entirely in your browser — no downloads, no
+					installs, no signup. The certificate maker supports real-time preview, direct-on-canvas
+					editing, and high-resolution PNG export at 1920×1080. Generate one certificate in under a
+					minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds
+					at once from a spreadsheet or database.
 				</p>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					Because the certificate maker is part of the full Pictify editor, anything you create here can be reopened, edited, or connected to a webhook, Zapier, or Make.com flow. That's the difference between a one-off certificate generator and a programmable certificate builder: you get the fast free tool today and the API for when you're ready to scale.
+					Because the certificate maker is part of the full Pictify editor, anything you create here
+					can be reopened, edited, or connected to a webhook, Zapier, or Make.com flow. That's the
+					difference between a one-off certificate generator and a programmable certificate builder:
+					you get the fast free tool today and the API for when you're ready to scale.
 				</p>
 			</section>
 

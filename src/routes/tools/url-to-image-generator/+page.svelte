@@ -1,5 +1,6 @@
 <script>
 	import Nav from '$lib/components/landingPage/Nav.svelte';
+	import SEOHead from '$lib/seo/SEOHead.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
@@ -658,50 +659,45 @@
 	}
 </script>
 
-<svelte:head>
-	<title>URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify</title>
-	<meta
-		name="description"
-		content="Enter any URL and get a high-quality screenshot as PNG, JPG, or WebP. Choose device size, crop specific elements, and download instantly. Free with API access — no signup needed."
-	/>
-	<meta
-		name="keywords"
-		content="url to image, image url generator, url to picture converter, photo url generator, picture url maker, link to picture, image link generator, screenshot api, webpage to image"
-	/>
-	<link rel="canonical" href="https://pictify.io/tools/url-to-image-generator" />
-	<meta
-		property="og:title"
-		content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify"
-	/>
-	<meta
-		property="og:description"
-		content="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
-	/>
-	<meta property="og:image" content="https://media.pictify.io/vombm-1775406853373.png" />
-	<meta property="og:url" content="https://pictify.io/tools/url-to-image-generator" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta
-		name="twitter:title"
-		content="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify"
-	/>
-	<meta
-		name="twitter:description"
-		content="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/vombm-1775406853373.png" />
-	{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
-	{@html `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`}
-	{@html `<script type="application/ld+json">${JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'URL to Image' }
-		]
-	})}</script>`}
-</svelte:head>
+<SEOHead
+	title="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify"
+	description="Enter any URL and get a high-quality screenshot as PNG, JPG, or WebP. Choose device size, crop specific elements, and download instantly. Free with API access — no signup needed."
+	canonical="https://pictify.io/tools/url-to-image-generator"
+	robots="index, follow, max-image-preview:large"
+	ogImage="https://media.pictify.io/vombm-1775406853373.png"
+	keywords={[
+		'url to image',
+		'image url generator',
+		'url to picture converter',
+		'photo url generator',
+		'picture url maker',
+		'link to picture',
+		'image link generator',
+		'screenshot api',
+		'webpage to image'
+	]}
+	openGraph={{
+		description:
+			'Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access.'
+	}}
+	twitter={{
+		description:
+			'Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access.'
+	}}
+	schema={[
+		structuredData,
+		faqSchema,
+		{
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+				{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+				{ '@type': 'ListItem', position: 3, name: 'URL to Image' }
+			]
+		}
+	]}
+/>
 
 <div
 	class="min-h-screen bg-brand-bg relative overflow-hidden font-sans text-gray-900 selection:bg-brand-danger selection:text-white"
@@ -1101,7 +1097,8 @@
 						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
 					>
 						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
-							<img loading="lazy"
+							<img
+								loading="lazy"
 								src={imageUrl}
 								alt="Generated screenshot"
 								class="max-w-full h-auto max-h-[400px]"

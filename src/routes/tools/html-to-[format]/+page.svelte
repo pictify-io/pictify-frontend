@@ -48,28 +48,34 @@
 
 	// SEO head computed values (dimension-aware)
 	$: headTitle = hasSize
-		? `HTML to ${(currentFormat && currentFormat.fullName) || 'Image'} ${sizeString} — Free Converter | Pictify`
+		? `HTML to ${
+				(currentFormat && currentFormat.fullName) || 'Image'
+		  } ${sizeString} — Free Converter | Pictify`
 		: format === 'png'
-			? `HTML to PNG — Free Online Converter & API | Pictify`
-			: format === 'jpg'
-				? `HTML to JPG — Convert Code to Image Online Free | Pictify`
-				: format === 'image'
-					? `HTML to Image — Convert HTML & CSS to PNG, JPG or WebP (Free + API) | Pictify`
-					: `HTML to ${(format && format.toUpperCase()) || 'Image'} — Free Online Converter & API | Pictify`;
+		? `HTML to PNG — Free Online Converter & API | Pictify`
+		: format === 'jpg'
+		? `HTML to JPG — Free Online Converter & API | Pictify`
+		: format === 'image'
+		? `HTML to Image — Convert HTML & CSS to PNG, JPG or WebP (Free + API) | Pictify`
+		: `HTML to ${
+				(format && format.toUpperCase()) || 'Image'
+		  } — Free Online Converter & API | Pictify`;
 	$: headDescription = hasSize
 		? `Convert HTML to ${
 				(currentFormat && currentFormat.fullName) || 'image'
 		  } at ${sizeString} instantly. Paste your code, preview live, and export. No file upload needed.`
 		: format === 'png'
-			? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor — no signup, no file upload. API available for automation.`
-			: format === 'jpg'
-				? `Convert HTML and CSS to a JPG image instantly. Paste your code, see a live preview, and download. Free online tool with API access for developers. No signup required.`
-				: format === 'image'
-					? `Convert HTML and CSS to an image — PNG, JPG, or WebP — instantly. Paste code, preview live, and export, or automate with the API. Free, no signup, no file upload.`
-					: `Convert HTML to ${(format && format.toUpperCase()) || 'IMAGE'} images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
-	$: canonicalUrl = hasSize
-		? `https://pictify.io/tools/html-to-${format}/${sizeString}`
-		: `https://pictify.io/tools/html-to-${format}`;
+		? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor — no signup, no file upload. API available for automation.`
+		: format === 'jpg'
+		? `Free online HTML to JPG converter — paste HTML + CSS, preview it live, and download a high-quality JPG in one click. No signup, no file upload. API available for automation.`
+		: format === 'image'
+		? `Convert HTML and CSS to an image — PNG, JPG, or WebP — instantly. Paste code, preview live, and export, or automate with the API. Free, no signup, no file upload.`
+		: `Convert HTML to ${
+				(format && format.toUpperCase()) || 'IMAGE'
+		  } images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
+	// Size variants canonicalize to the parent format page so they don't
+	// compete with it in search (they were outranking it for head terms).
+	$: canonicalUrl = `https://pictify.io/tools/html-to-${format}`;
 	$: ogDescription = hasSize
 		? `Convert HTML to high-quality ${
 				(currentFormat && currentFormat.fullName) || 'Image'
@@ -179,7 +185,10 @@
 	}
 
 	function trackSignupClick(ctaLocation) {
-		analytics.track('tool_signup_click', { tool_name: `html_to_${format}`, cta_location: ctaLocation });
+		analytics.track('tool_signup_click', {
+			tool_name: `html_to_${format}`,
+			cta_location: ctaLocation
+		});
 	}
 
 	// Add local storage management
@@ -597,7 +606,11 @@
 								name: `How do I convert HTML to ${currentFormat?.fullName || 'image'}?`,
 								acceptedAnswer: {
 									'@type': 'Answer',
-									text: `Paste your HTML and CSS code into Pictify's free online editor, see a live preview, then click "Capture" to download a high-quality ${currentFormat?.fullName || 'image'} file. No file upload or signup needed. You can also use the Pictify API to convert HTML to ${currentFormat?.fullName || 'image'} programmatically.`
+									text: `Paste your HTML and CSS code into Pictify's free online editor, see a live preview, then click "Capture" to download a high-quality ${
+										currentFormat?.fullName || 'image'
+									} file. No file upload or signup needed. You can also use the Pictify API to convert HTML to ${
+										currentFormat?.fullName || 'image'
+									} programmatically.`
 								}
 							},
 							{
@@ -605,7 +618,9 @@
 								name: `Can I convert HTML to ${currentFormat?.fullName || 'image'} with an API?`,
 								acceptedAnswer: {
 									'@type': 'Answer',
-									text: `Yes. Send a POST request to the Pictify API with your HTML code, width, and height. The API returns a CDN-hosted ${currentFormat?.fullName || 'image'} URL. Supports custom CSS, Google Fonts, and dynamic variables. Free tier includes 100 renders per month.`
+									text: `Yes. Send a POST request to the Pictify API with your HTML code, width, and height. The API returns a CDN-hosted ${
+										currentFormat?.fullName || 'image'
+									} URL. Supports custom CSS, Google Fonts, and dynamic variables. Free tier includes 100 renders per month.`
 								}
 							},
 							{
@@ -613,7 +628,9 @@
 								name: `Is this HTML to ${currentFormat?.fullName || 'image'} converter free?`,
 								acceptedAnswer: {
 									'@type': 'Answer',
-									text: `Yes, the online converter is completely free with no signup required. You get ${format === 'png' ? '5' : '5'} free generations per day as a guest, and unlimited generations when you create a free account.`
+									text: `Yes, the online converter is completely free with no signup required. You get ${
+										format === 'png' ? '5' : '5'
+									} free generations per day as a guest, and unlimited generations when you create a free account.`
 								}
 							},
 							{
@@ -631,7 +648,6 @@
 				]
 		  }
 		: null;
-
 </script>
 
 <svelte:head>
@@ -644,18 +660,16 @@
 					currentFormat.fullName
 			  } image creator, Pictify.io`
 			: format === 'image'
-				? `html to image, convert html to image, html and css to image, html to image converter, html to png, html to jpg, html to webp, online image generator, web design tool, Pictify.io`
-				: `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${
-						currentFormat.fullName
-				  } image creator, Pictify.io`}
+			? `html to image, convert html to image, html and css to image, html to image converter, html to png, html to jpg, html to webp, online image generator, web design tool, Pictify.io`
+			: `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${
+					currentFormat.fullName
+			  } image creator, Pictify.io`}
 	/>
 	<meta name="author" content="Pictify.io" />
+	<meta name="robots" content="index, follow, max-image-preview:large" />
 	<meta property="og:title" content={headTitle} />
 	<meta property="og:description" content={ogDescription} />
-	<meta
-		property="og:image"
-		content="https://media.pictify.io/gre6p-1775406841745.png"
-	/>
+	<meta property="og:image" content="https://media.pictify.io/gre6p-1775406841745.png" />
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify.io" />
@@ -678,7 +692,11 @@
 		itemListElement: [
 			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
 			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'HTML to ' + (format ? format.toUpperCase() : 'Image') }
+			{
+				'@type': 'ListItem',
+				position: 3,
+				name: 'HTML to ' + (format ? format.toUpperCase() : 'Image')
+			}
 		]
 	})}</script>`}
 </svelte:head>
@@ -956,9 +974,7 @@
 		<!-- Usage Bar (Guest) -->
 		{#if !isUserLoggedIn}
 			<div class="w-full max-w-5xl mx-auto mb-12">
-				<div
-					class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl p-6"
-				>
+				<div class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-xl p-6">
 					<div class="flex items-center gap-4">
 						<div class="flex-1">
 							<div class="flex justify-between items-center mb-2">
@@ -1087,9 +1103,7 @@
 		<!-- Generated Image Result -->
 		{#if imageUrl}
 			<div class="w-full max-w-5xl mx-auto mb-20 px-2 md:px-0">
-				<div
-					class="border-[3px] md:border-[4px] border-black bg-white shadow-brutal-2xl relative"
-				>
+				<div class="border-[3px] md:border-[4px] border-black bg-white shadow-brutal-2xl relative">
 					<!-- Success Header -->
 					<div
 						class="bg-data-green border-b-[3px] md:border-b-[4px] border-black p-3 md:p-4 flex justify-between items-center"
@@ -1125,7 +1139,8 @@
 									? `aspect-ratio: ${dimWidth} / ${dimHeight}`
 									: 'aspect-ratio: 1200 / 630'}
 							>
-								<img loading="lazy"
+								<img
+									loading="lazy"
 									src={imageUrl}
 									alt="Generated output"
 									class="absolute inset-0 w-full h-full object-contain bg-white/50 backdrop-blur-[1px]"
@@ -1152,9 +1167,7 @@
 						class="border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
 					>
 						<!-- URL + Copy -->
-						<div
-							class="flex-1 min-w-0 flex items-center gap-0 border-[2px] border-black"
-						>
+						<div class="flex-1 min-w-0 flex items-center gap-0 border-[2px] border-black">
 							<div
 								class="flex-1 min-w-0 bg-gray-50 px-3 py-2 font-mono text-xs overflow-x-auto whitespace-nowrap select-all"
 							>
@@ -1164,11 +1177,7 @@
 								on:click={() => copyToClipboard(imageUrl)}
 								class="bg-black text-white hover:bg-gray-800 font-bold uppercase px-4 py-2 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0 text-xs"
 							>
-								<svg
-									class="w-3.5 h-3.5"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
 										stroke-linecap="round"
 										stroke-linejoin="round"
@@ -1188,11 +1197,7 @@
 								target="_blank"
 								class="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
-								<svg
-									class="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
 										stroke-linecap="round"
 										stroke-linejoin="round"
@@ -1219,14 +1224,20 @@
 				<div class="w-full mt-8 space-y-5">
 					<!-- Automate via API -->
 					<div class="border-[3px] border-black bg-white shadow-brutal-xl">
-						<div class="bg-data-green px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
-							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">01</span>
+						<div
+							class="bg-data-green px-5 py-3 border-b-[3px] border-black flex items-center gap-3"
+						>
+							<span
+								class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs"
+								>01</span
+							>
 							<h4 class="font-black uppercase tracking-widest text-sm">Automate via API</h4>
 						</div>
 						<div class="p-5 md:p-6 flex flex-col md:flex-row gap-5">
 							<div class="flex-1">
 								<p class="text-sm font-bold text-gray-700 mb-3">
-									Generate {currentFormat.fullName} images programmatically. Send HTML, get back a hosted image URL — one API call.
+									Generate {currentFormat.fullName} images programmatically. Send HTML, get back a hosted
+									image URL — one API call.
 								</p>
 								<a
 									href="https://docs.pictify.io/api-reference/overview"
@@ -1237,13 +1248,18 @@
 								</a>
 							</div>
 							<div class="flex-1">
-								<pre class="text-[12px] font-mono bg-[#282c34] text-[#abb2bf] border-[2px] border-black p-4 overflow-auto rounded-sm">{@html `<span style="color:#e06c75">curl</span> -X POST <span style="color:#98c379">https://api.pictify.io/image</span> <span style="color:#5c6370">\\</span>
+								<pre
+									class="text-[12px] font-mono bg-[#282c34] text-[#abb2bf] border-[2px] border-black p-4 overflow-auto rounded-sm">{@html `<span style="color:#e06c75">curl</span> -X POST <span style="color:#98c379">https://api.pictify.io/image</span> <span style="color:#5c6370">\\</span>
   -H <span style="color:#98c379">"Content-Type: application/json"</span> <span style="color:#5c6370">\\</span>
   -H <span style="color:#98c379">"Authorization: Bearer YOUR_API_KEY"</span> <span style="color:#5c6370">\\</span>
   -d <span style="color:#98c379">'{</span>
     <span style="color:#e06c75">"html"</span>: <span style="color:#98c379">"&lt;h1&gt;Hello World&lt;/h1&gt;"</span>,
-    <span style="color:#e06c75">"width"</span>: <span style="color:#d19a66">${hasSize ? dimWidth : previewWidth}</span>,
-    <span style="color:#e06c75">"height"</span>: <span style="color:#d19a66">${hasSize ? dimHeight : previewHeight}</span>,
+    <span style="color:#e06c75">"width"</span>: <span style="color:#d19a66">${
+			hasSize ? dimWidth : previewWidth
+		}</span>,
+    <span style="color:#e06c75">"height"</span>: <span style="color:#d19a66">${
+			hasSize ? dimHeight : previewHeight
+		}</span>,
     <span style="color:#e06c75">"fileExtension"</span>: <span style="color:#98c379">"${fileExtension}"</span>
   <span style="color:#98c379">}'</span>`}</pre>
 							</div>
@@ -1252,14 +1268,20 @@
 
 					<!-- Use with AI via MCP -->
 					<div class="border-[3px] border-black bg-white shadow-brutal-xl">
-						<div class="bg-brand-accent px-5 py-3 border-b-[3px] border-black flex items-center gap-3">
-							<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs">02</span>
+						<div
+							class="bg-brand-accent px-5 py-3 border-b-[3px] border-black flex items-center gap-3"
+						>
+							<span
+								class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs"
+								>02</span
+							>
 							<h4 class="font-black uppercase tracking-widest text-sm">Use with AI agents</h4>
 						</div>
 						<div class="p-5 md:p-6 flex flex-col md:flex-row gap-5">
 							<div class="flex-1">
 								<p class="text-sm font-bold text-gray-700 mb-3">
-									Connect Pictify as an MCP server to Claude, Cursor, or any AI coding agent. Generate and iterate on images using natural language.
+									Connect Pictify as an MCP server to Claude, Cursor, or any AI coding agent.
+									Generate and iterate on images using natural language.
 								</p>
 								<div class="flex flex-wrap gap-3">
 									<a
@@ -1267,7 +1289,12 @@
 										target="_blank"
 										class="inline-flex items-center gap-2 py-2.5 px-5 bg-brand-accent text-black border-[2px] border-black font-black uppercase text-xs shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
-										<svg class="w-4 h-4" viewBox="0 0 256 256" fill="currentColor"><path d="M0 256V0h256v256z" fill="#C12127"/><path d="M48 48h160v160H176V80H128v128H48z" fill="#fff"/></svg>
+										<svg class="w-4 h-4" viewBox="0 0 256 256" fill="currentColor"
+											><path d="M0 256V0h256v256z" fill="#C12127" /><path
+												d="M48 48h160v160H176V80H128v128H48z"
+												fill="#fff"
+											/></svg
+										>
 										npm install
 									</a>
 									<a
@@ -1280,7 +1307,8 @@
 								</div>
 							</div>
 							<div class="flex-1">
-								<pre class="text-[12px] font-mono bg-[#282c34] text-[#abb2bf] border-[2px] border-black p-4 overflow-auto rounded-sm">{@html `<span style="color:#5c6370">// Add to your MCP config</span>
+								<pre
+									class="text-[12px] font-mono bg-[#282c34] text-[#abb2bf] border-[2px] border-black p-4 overflow-auto rounded-sm">{@html `<span style="color:#5c6370">// Add to your MCP config</span>
 <span style="color:#e06c75">"pictify"</span>: {
   <span style="color:#e06c75">"command"</span>: <span style="color:#98c379">"npx"</span>,
   <span style="color:#e06c75">"args"</span>: [<span style="color:#98c379">"-y"</span>, <span style="color:#98c379">"@pictify/mcp-server"</span>],
@@ -1297,9 +1325,14 @@
 						<div class="border-[3px] border-black bg-brand-danger shadow-brutal-xl">
 							<div class="p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
 								<div class="flex items-center gap-4">
-									<span class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs flex-shrink-0">03</span>
+									<span
+										class="w-7 h-7 bg-black text-white flex items-center justify-center font-black text-xs flex-shrink-0"
+										>03</span
+									>
 									<div>
-										<h4 class="font-black uppercase tracking-widest text-sm text-white">Go unlimited</h4>
+										<h4 class="font-black uppercase tracking-widest text-sm text-white">
+											Go unlimited
+										</h4>
 										<p class="text-xs font-bold text-white/80 mt-1">
 											No watermarks, unlimited generations, and your own API key — all free.
 										</p>
@@ -1321,15 +1354,15 @@
 
 		<!-- First Generation Prompt -->
 		{#if showFirstGenerationPrompt}
-			<div
-				class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-			>
+			<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 				<div
 					class="bg-white max-w-md w-full mx-auto p-8 shadow-brutal-3xl border-[4px] border-black relative"
 				>
 					<!-- Geometric decoration -->
 					<div class="absolute -top-3 -left-3 w-6 h-6 bg-brand-danger border-[3px] border-black" />
-					<div class="absolute -bottom-3 -right-3 w-6 h-6 bg-data-green border-[3px] border-black" />
+					<div
+						class="absolute -bottom-3 -right-3 w-6 h-6 bg-data-green border-[3px] border-black"
+					/>
 
 					<div class="flex justify-between items-center mb-6 border-b-[3px] border-black pb-4">
 						<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">
@@ -1573,14 +1606,19 @@
 				title="Automate with the"
 				titleHighlight="API"
 				toolName={`html_to_${format}`}
-				description="Convert HTML to {(format && format.toUpperCase()) || 'image'} programmatically. Render social cards, email headers, and marketing visuals in your CI/CD pipeline."
+				description="Convert HTML to {(format && format.toUpperCase()) ||
+					'image'} programmatically. Render social cards, email headers, and marketing visuals in your CI/CD pipeline."
 				codeExamples={htmlToImageExamples}
 			/>
 		</section>
 
 		<!-- HTML to Image — When to Use Each Format -->
-		<section class="mb-16 border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-[8px_8px_0_0_#9ca3af]">
-			<h2 class="text-3xl font-black mb-6 text-black uppercase">HTML to Image — Choosing the Right Format</h2>
+		<section
+			class="mb-16 border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-[8px_8px_0_0_#9ca3af]"
+		>
+			<h2 class="text-3xl font-black mb-6 text-black uppercase">
+				HTML to Image — Choosing the Right Format
+			</h2>
 			<div class="overflow-x-auto">
 				<table class="w-full text-left border-collapse">
 					<thead>
@@ -1604,7 +1642,7 @@
 							<td class="p-3">No</td>
 							<td class="p-3">Small</td>
 						</tr>
-						<tr class="{format === 'webp' ? 'bg-brand-accent/10' : ''}">
+						<tr class={format === 'webp' ? 'bg-brand-accent/10' : ''}>
 							<td class="p-3 font-black">WebP</td>
 							<td class="p-3">Web graphics, combining quality of PNG with size of JPG</td>
 							<td class="p-3">Yes</td>
@@ -1643,6 +1681,26 @@
 						</div>
 					</a>
 				{/each}
+				{#if format !== 'image'}
+					<a
+						href="/tools/html-to-image"
+						class="flex items-center gap-4 p-5 transition-all border-[3px] border-black bg-white hover:bg-brand-accent hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px] group"
+					>
+						<div
+							class="w-12 h-12 bg-black text-white flex items-center justify-center font-black uppercase text-sm border-[2px] border-white group-hover:border-black group-hover:bg-white group-hover:text-black"
+						>
+							ALL
+						</div>
+						<div>
+							<h3 class="text-xl font-black text-gray-900 group-hover:text-black uppercase">
+								HTML to Image
+							</h3>
+							<p class="text-gray-700 font-bold text-sm group-hover:text-black">
+								One converter for PNG, JPG, and WebP
+							</p>
+						</div>
+					</a>
+				{/if}
 			</div>
 		</div>
 
@@ -2255,17 +2313,37 @@
 	</main>
 	<RelatedTools tools={['html-email', 'table', 'certificate', 'quote-card']} />
 
-		<!-- Internal Links -->
-		<section class="mb-16 w-full max-w-5xl mx-auto px-4">
-			<h2 class="text-2xl font-black mb-6 text-black uppercase text-center">Related Tools</h2>
-			<div class="flex flex-wrap gap-3 justify-center">
-				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">URL to Image</a>
-				<a href="/tools/code-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Code to Image</a>
-				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">OG Image Generator</a>
-				<a href="/glossary/html-to-image" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">What is HTML to Image?</a>
-				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Compare Alternatives</a>
-			</div>
-		</section>
+	<!-- Internal Links -->
+	<section class="mb-16 w-full max-w-5xl mx-auto px-4">
+		<h2 class="text-2xl font-black mb-6 text-black uppercase text-center">Related Tools</h2>
+		<div class="flex flex-wrap gap-3 justify-center">
+			<a
+				href="/tools/url-to-image-generator"
+				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+				>URL to Image</a
+			>
+			<a
+				href="/tools/code-to-image"
+				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+				>Code to Image</a
+			>
+			<a
+				href="/tools/og-image-generator"
+				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+				>OG Image Generator</a
+			>
+			<a
+				href="/glossary/html-to-image"
+				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+				>What is HTML to Image?</a
+			>
+			<a
+				href="/compare"
+				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+				>Compare Alternatives</a
+			>
+		</div>
+	</section>
 
 	<Footer />
 

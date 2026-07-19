@@ -131,7 +131,8 @@ export const useCases = [
 	{ id: 'html-email', label: 'HTML Email to Image' },
 	{ id: 'table', label: 'HTML Table to Image' },
 	{ id: 'markdown', label: 'Markdown to Image' },
-	{ id: 'certificate', label: 'Certificate from HTML' },
+	// 'certificate' intentionally omitted: /tools/certificate 301s to
+	// /tools/certificate-generator (they cannibalized the same keyword).
 	{ id: 'code', label: 'Code to Image' },
 	{ id: 'receipt', label: 'Receipt Generator' },
 	{ id: 'badge', label: 'Badge Generator' },
@@ -445,7 +446,8 @@ export const useCaseDetails = {
 	},
 	markdown: {
 		label: 'Markdown to Image',
-		description: 'Render Markdown content as polished, shareable images for social posts, docs, and presentations.',
+		description:
+			'Render Markdown content as polished, shareable images for social posts, docs, and presentations.',
 		seoKeywords: [
 			'markdown to image',
 			'convert markdown to image',
@@ -504,7 +506,8 @@ export const useCaseDetails = {
 		workflow: [
 			{
 				title: 'Convert Markdown to HTML',
-				detail: 'Use your static site generator or a Markdown parser to create HTML with the desired theme.'
+				detail:
+					'Use your static site generator or a Markdown parser to create HTML with the desired theme.'
 			},
 			{
 				title: 'Pick social-friendly dimensions',
@@ -534,7 +537,8 @@ export const useCaseDetails = {
 	certificate: {
 		label: 'Certificate Generator',
 		toolUrl: '/tools/certificate-generator',
-		description: 'Generate personalized certificates and diplomas as downloadable images for events, courses, and recognition programs.',
+		description:
+			'Generate personalized certificates and diplomas as downloadable images for events, courses, and recognition programs.',
 		seoKeywords: [
 			'certificate generator',
 			'create certificates online',
@@ -593,15 +597,18 @@ export const useCaseDetails = {
 		workflow: [
 			{
 				title: 'Build the template',
-				detail: 'Design your certificate using HTML/CSS with placeholders for names, achievements, and dates.'
+				detail:
+					'Design your certificate using HTML/CSS with placeholders for names, achievements, and dates.'
 			},
 			{
 				title: 'Merge participant data',
-				detail: 'Replace placeholders with dynamic data from your CRM, LMS, or spreadsheet before conversion.'
+				detail:
+					'Replace placeholders with dynamic data from your CRM, LMS, or spreadsheet before conversion.'
 			},
 			{
 				title: 'Generate and distribute',
-				detail: 'Export images and send them via email, allow download from your portal, or embed in your LMS.'
+				detail:
+					'Export images and send them via email, allow download from your portal, or embed in your LMS.'
 			}
 		],
 		faqs: [
@@ -622,7 +629,8 @@ export const useCaseDetails = {
 	},
 	code: {
 		label: 'Code to Image',
-		description: 'Share beautiful code snippets with syntax highlighting — a cleaner alternative to IDE screenshots.',
+		description:
+			'Share beautiful code snippets with syntax highlighting — a cleaner alternative to IDE screenshots.',
 		seoKeywords: [
 			'code to image',
 			'code screenshot generator',
@@ -684,7 +692,8 @@ export const useCaseDetails = {
 			},
 			{
 				title: 'Pick theme and size',
-				detail: 'Choose dark or light theme and select 1200×630 for OG cards or square for carousels.'
+				detail:
+					'Choose dark or light theme and select 1200×630 for OG cards or square for carousels.'
 			},
 			{
 				title: 'Generate and publish',
@@ -709,7 +718,8 @@ export const useCaseDetails = {
 	},
 	receipt: {
 		label: 'Receipt Generator',
-		description: 'Generate branded receipts and transaction records as images for emails, downloads, and customer portals.',
+		description:
+			'Generate branded receipts and transaction records as images for emails, downloads, and customer portals.',
 		seoKeywords: [
 			'receipt generator',
 			'create receipts online',
@@ -797,7 +807,9 @@ export const useCaseDetails = {
 	},
 	badge: {
 		label: 'Badge Generator',
-		description: 'Generate achievement badges, skill labels, and milestone markers as shareable images for gamification and recognition.',
+		seoTitle: 'Free Badge Generator — Achievement & Certification Badges (PNG + API) | Pictify',
+		description:
+			'Generate achievement badges, skill labels, and milestone markers as shareable images for gamification and recognition.',
 		seoKeywords: [
 			'badge generator',
 			'achievement badge maker',
@@ -1200,7 +1212,8 @@ export const useCaseDetails = {
 	},
 	leaderboard: {
 		label: 'Leaderboard Card',
-		description: 'Generate leaderboard snapshots and ranking cards for communities, contests, and gamification programs.',
+		description:
+			'Generate leaderboard snapshots and ranking cards for communities, contests, and gamification programs.',
 		seoKeywords: [
 			'leaderboard generator',
 			'leaderboard image maker',
@@ -1318,7 +1331,8 @@ export const useCaseDetails = {
 	},
 	testimonial: {
 		label: 'Testimonial Card',
-		description: 'Turn customer reviews and testimonials into branded social proof images for marketing and sales.',
+		description:
+			'Turn customer reviews and testimonials into branded social proof images for marketing and sales.',
 		seoKeywords: [
 			'testimonial image generator',
 			'review card maker',
@@ -1377,15 +1391,18 @@ export const useCaseDetails = {
 		workflow: [
 			{
 				title: 'Design template',
-				detail: 'Create a layout with variables for testimonial text, customer name, role, company, and optional photo.'
+				detail:
+					'Create a layout with variables for testimonial text, customer name, role, company, and optional photo.'
 			},
 			{
 				title: 'Render per entry',
-				detail: 'Generate a branded card for each testimonial automatically from your review data source.'
+				detail:
+					'Generate a branded card for each testimonial automatically from your review data source.'
 			},
 			{
 				title: 'Batch refresh',
-				detail: 'Re-render all testimonial cards when brand, typography, or template styling changes.'
+				detail:
+					'Re-render all testimonial cards when brand, typography, or template styling changes.'
 			}
 		],
 		faqs: [
@@ -2905,7 +2922,8 @@ export const useCaseDetails = {
 	},
 	infographic: {
 		label: 'Infographic Generator',
-		description: 'Create data-driven infographics and visual statistics that make complex information shareable.',
+		description:
+			'Create data-driven infographics and visual statistics that make complex information shareable.',
 		seoKeywords: [
 			'infographic generator',
 			'infographic maker',
@@ -2964,7 +2982,8 @@ export const useCaseDetails = {
 		workflow: [
 			{
 				title: 'Design template',
-				detail: 'Create an infographic layout with data variables for headlines, statistics, and comparisons.'
+				detail:
+					'Create an infographic layout with data variables for headlines, statistics, and comparisons.'
 			},
 			{
 				title: 'Connect data',
@@ -2972,7 +2991,8 @@ export const useCaseDetails = {
 			},
 			{
 				title: 'Auto-generate',
-				detail: 'Refresh infographics automatically when data updates — same template, fresh numbers.'
+				detail:
+					'Refresh infographics automatically when data updates — same template, fresh numbers.'
 			}
 		],
 		faqs: [
@@ -3066,7 +3086,8 @@ export const useCaseDetails = {
 	},
 	'responsive-image-generator': {
 		label: 'Responsive Image Generator',
-		description: 'Design one image template in the canvas editor, then auto-resize it to Instagram, Twitter, LinkedIn, YouTube, and 8+ platforms with one click. Free account to start.',
+		description:
+			'Design one image template in the canvas editor, then auto-resize it to Instagram, Twitter, LinkedIn, YouTube, and 8+ platforms with one click. Free account to start.',
 		seoKeywords: [
 			'responsive image generator',
 			'multi-size image generator',
@@ -3122,15 +3143,18 @@ export const useCaseDetails = {
 		workflow: [
 			{
 				title: 'Open the canvas editor',
-				detail: 'Create a free account and open the visual template editor. Design your image with text, shapes, images, and variable bindings.'
+				detail:
+					'Create a free account and open the visual template editor. Design your image with text, shapes, images, and variable bindings.'
 			},
 			{
 				title: 'Hit "Generate All Sizes"',
-				detail: 'Click the resize button in the top bar, then "Generate All Sizes." AI creates optimized layouts for Instagram, Twitter, LinkedIn, YouTube, OG, and more — in seconds.'
+				detail:
+					'Click the resize button in the top bar, then "Generate All Sizes." AI creates optimized layouts for Instagram, Twitter, LinkedIn, YouTube, OG, and more — in seconds.'
 			},
 			{
 				title: 'Fine-tune and serve via API',
-				detail: 'Switch between layout tabs to review each size. Make adjustments if needed. Save, and your template is ready — one API call with ?layout=twitter-post renders the right size.'
+				detail:
+					'Switch between layout tabs to review each size. Make adjustments if needed. Save, and your template is ready — one API call with ?layout=twitter-post renders the right size.'
 			}
 		],
 		faqs: [
@@ -3162,20 +3186,29 @@ export const useCaseDetails = {
 		related: ['og-image-generator', 'youtube-thumbnail', 'linkedin-banner'],
 		templateHtml: simpleCardTemplate({
 			title: 'One Template,<br/>Every Platform',
-			subtitle: 'Design once in the canvas editor. AI generates Instagram, Twitter, LinkedIn, YouTube, and OG sizes automatically. Open the editor to try it free.',
+			subtitle:
+				'Design once in the canvas editor. AI generates Instagram, Twitter, LinkedIn, YouTube, and OG sizes automatically. Open the editor to try it free.',
 			badge: 'CANVAS EDITOR',
 			accent: '#ffc480'
 		})
 	},
 	'barcode-generator': {
 		label: 'Barcodes',
-		seoTitle: 'Free Barcode Generator Online — Create & Download | Pictify',
+		seoTitle: 'Barcode Generator API — Bulk Barcodes for Labels & Inventory (Free) | Pictify',
 		ogImage: 'https://media.pictify.io/que8z-1775618085943.png',
-		description: 'Free online barcode generator — create Code 128, EAN-13, UPC-A, and ITF-14 barcodes instantly. Download as PNG or JPG. API available for bulk generation.',
+		description:
+			'Generate Code 128, EAN-13, UPC-A, and ITF-14 barcodes — free online tool plus a bulk barcode generator API for product labels, inventory, and shipping at scale.',
 		seoKeywords: [
-			'barcode generator', 'barcode maker', 'barcode image', 'generate barcode online',
-			'barcode creator', 'barcode label generator', 'barcode png', 'product barcode generator',
-			'inventory barcode', 'shipping label barcode'
+			'barcode generator',
+			'barcode maker',
+			'barcode image',
+			'generate barcode online',
+			'barcode creator',
+			'barcode label generator',
+			'barcode png',
+			'product barcode generator',
+			'inventory barcode',
+			'shipping label barcode'
 		],
 		longDescription: `Modern inventory and logistics systems require barcodes on demand — for product labels, shipping packages, warehouse bins, and event tickets. Manually creating barcodes in design tools is slow and error-prone. With Pictify, you render barcode HTML (using libraries like JsBarcode or bwip-js) as pixel-perfect images via API. Generate thousands of unique barcode labels in seconds, each with custom text, sizes, and formats.
 
@@ -3206,24 +3239,52 @@ Automate barcode generation in your warehouse management system, e-commerce plat
 			'Inconsistent label formatting across departments'
 		],
 		workflow: [
-			{ title: 'Generate barcode HTML', detail: 'Use JsBarcode or bwip-js to render a barcode as an HTML element with your data encoded.' },
-			{ title: 'Style the label', detail: 'Add product name, SKU, price, or any metadata around the barcode using CSS.' },
-			{ title: 'Render via API', detail: 'Send the HTML to Pictify to get a print-ready PNG or JPG image delivered via CDN.' }
+			{
+				title: 'Generate barcode HTML',
+				detail:
+					'Use JsBarcode or bwip-js to render a barcode as an HTML element with your data encoded.'
+			},
+			{
+				title: 'Style the label',
+				detail: 'Add product name, SKU, price, or any metadata around the barcode using CSS.'
+			},
+			{
+				title: 'Render via API',
+				detail: 'Send the HTML to Pictify to get a print-ready PNG or JPG image delivered via CDN.'
+			}
 		],
 		faqs: [
-			{ q: 'What barcode formats are supported?', a: 'Any format your HTML barcode library supports — Code 128, EAN-13, UPC-A, QR codes, Data Matrix, and more. Pictify renders whatever HTML you send.' },
-			{ q: 'Can I batch generate barcodes?', a: 'Yes. Use the batch render API to generate thousands of unique barcode images in a single request.' },
-			{ q: 'Are the images print-ready?', a: 'Yes. Use 300 DPI-equivalent dimensions (e.g., 600×200 at 2x) for crisp print output.' }
+			{
+				q: 'What barcode formats are supported?',
+				a: 'Any format your HTML barcode library supports — Code 128, EAN-13, UPC-A, QR codes, Data Matrix, and more. Pictify renders whatever HTML you send.'
+			},
+			{
+				q: 'Can I batch generate barcodes?',
+				a: 'Yes. Use the batch render API to generate thousands of unique barcode images in a single request.'
+			},
+			{
+				q: 'Are the images print-ready?',
+				a: 'Yes. Use 300 DPI-equivalent dimensions (e.g., 600×200 at 2x) for crisp print output.'
+			}
 		],
 		related: ['receipt', 'product-banner', 'badge']
 	},
 	'qr-code-generator': {
 		label: 'QR Code Generator',
-		description: 'Create branded QR codes with logos and custom styling as downloadable images.',
+		seoTitle: 'QR Code Generator with Logo — Branded QR Codes + Bulk API | Pictify',
+		description:
+			'Create branded QR codes with your logo, colors, and custom styling — download as PNG or bulk-generate thousands via the free API.',
 		seoKeywords: [
-			'qr code generator', 'custom qr code', 'qr code with logo', 'branded qr code',
-			'qr code maker', 'qr code image', 'qr code creator', 'qr code api',
-			'generate qr code online', 'qr code png'
+			'qr code generator',
+			'custom qr code',
+			'qr code with logo',
+			'branded qr code',
+			'qr code maker',
+			'qr code image',
+			'qr code creator',
+			'qr code api',
+			'generate qr code online',
+			'qr code png'
 		],
 		longDescription: `Plain QR codes work, but branded QR codes convert better. With Pictify, you render styled QR code HTML — with your logo, brand colors, rounded corners, and custom frames — as high-quality images. Use libraries like qrcode.js or QRCode.react to generate the QR code, style it with CSS, and convert to a shareable image via API.
 
@@ -3254,24 +3315,52 @@ Perfect for marketing materials, product packaging, restaurant menus, event tick
 			'No API access for automated QR code generation in most tools'
 		],
 		workflow: [
-			{ title: 'Generate QR code HTML', detail: 'Use qrcode.js or a similar library to render a QR code as an SVG or Canvas element in HTML.' },
-			{ title: 'Brand it', detail: 'Add your logo overlay, brand colors, rounded modules, and a call-to-action frame using CSS.' },
-			{ title: 'Render via API', detail: 'Send the styled HTML to Pictify to get a high-resolution PNG ready for print or digital use.' }
+			{
+				title: 'Generate QR code HTML',
+				detail:
+					'Use qrcode.js or a similar library to render a QR code as an SVG or Canvas element in HTML.'
+			},
+			{
+				title: 'Brand it',
+				detail:
+					'Add your logo overlay, brand colors, rounded modules, and a call-to-action frame using CSS.'
+			},
+			{
+				title: 'Render via API',
+				detail:
+					'Send the styled HTML to Pictify to get a high-resolution PNG ready for print or digital use.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I add a logo to the QR code?', a: 'Yes. Overlay your logo in the center of the QR code using HTML/CSS positioning. The QR spec has error correction that allows up to 30% of the code to be obscured.' },
-			{ q: 'Will the QR code still scan?', a: 'Yes, as long as you use medium or high error correction and keep the logo under 25-30% of the QR area.' },
-			{ q: 'What sizes work best?', a: '1080×1080 for social media, 600×600 for print materials. Higher resolution ensures reliable scanning.' }
+			{
+				q: 'Can I add a logo to the QR code?',
+				a: 'Yes. Overlay your logo in the center of the QR code using HTML/CSS positioning. The QR spec has error correction that allows up to 30% of the code to be obscured.'
+			},
+			{
+				q: 'Will the QR code still scan?',
+				a: 'Yes, as long as you use medium or high error correction and keep the logo under 25-30% of the QR area.'
+			},
+			{
+				q: 'What sizes work best?',
+				a: '1080×1080 for social media, 600×600 for print materials. Higher resolution ensures reliable scanning.'
+			}
 		],
 		related: ['barcode-generator', 'event-ticket', 'product-banner']
 	},
 	'signature-generator': {
 		label: 'Email Signature Generator',
-		description: 'Create professional email signatures as images for consistent branding across your team.',
+		description:
+			'Create professional email signatures as images for consistent branding across your team.',
 		seoKeywords: [
-			'signature generator', 'email signature maker', 'email signature image',
-			'professional email signature', 'html email signature', 'signature creator',
-			'email signature template', 'team email signature', 'branded email signature',
+			'signature generator',
+			'email signature maker',
+			'email signature image',
+			'professional email signature',
+			'html email signature',
+			'signature creator',
+			'email signature template',
+			'team email signature',
+			'branded email signature',
 			'signature block generator'
 		],
 		longDescription: `Email signatures are one of the most viewed pieces of marketing collateral — every employee sends dozens of emails daily. Yet most teams have inconsistent, poorly formatted signatures. With Pictify, you design a signature template once and render personalized variants for every team member via API.
@@ -3303,24 +3392,52 @@ Feed employee data (name, title, phone, photo URL) into your template and genera
 			'Inconsistent formatting undermines brand credibility'
 		],
 		workflow: [
-			{ title: 'Design the template', detail: 'Create an HTML/CSS signature layout with placeholders for name, title, phone, photo, and social links.' },
-			{ title: 'Feed employee data', detail: 'Pass each employee\'s details as template variables to generate personalized signature images.' },
-			{ title: 'Distribute', detail: 'Download or API-deliver the signature images. Employees paste them into their email client settings.' }
+			{
+				title: 'Design the template',
+				detail:
+					'Create an HTML/CSS signature layout with placeholders for name, title, phone, photo, and social links.'
+			},
+			{
+				title: 'Feed employee data',
+				detail:
+					"Pass each employee's details as template variables to generate personalized signature images."
+			},
+			{
+				title: 'Distribute',
+				detail:
+					'Download or API-deliver the signature images. Employees paste them into their email client settings.'
+			}
 		],
 		faqs: [
-			{ q: 'Why use an image signature instead of HTML?', a: 'Image signatures render identically across all email clients — no broken layouts, missing fonts, or inconsistent spacing.' },
-			{ q: 'Can I update all signatures at once?', a: 'Yes. Update the template and batch-render new images for the entire team via API.' },
-			{ q: 'What size should email signatures be?', a: '600×200 pixels is the sweet spot — wide enough for full details, compact enough not to dominate the email.' }
+			{
+				q: 'Why use an image signature instead of HTML?',
+				a: 'Image signatures render identically across all email clients — no broken layouts, missing fonts, or inconsistent spacing.'
+			},
+			{
+				q: 'Can I update all signatures at once?',
+				a: 'Yes. Update the template and batch-render new images for the entire team via API.'
+			},
+			{
+				q: 'What size should email signatures be?',
+				a: '600×200 pixels is the sweet spot — wide enough for full details, compact enough not to dominate the email.'
+			}
 		],
 		related: ['html-email', 'email-header', 'membership-card']
 	},
 	'name-badge': {
 		label: 'Name Badge Generator',
-		description: 'Generate personalized name badges and name tags as printable images for events and conferences.',
+		description:
+			'Generate personalized name badges and name tags as printable images for events and conferences.',
 		seoKeywords: [
-			'name badge generator', 'name tag maker', 'conference badge generator',
-			'event name badge', 'printable name badge', 'name badge template',
-			'badge maker online', 'name tag creator', 'event badge generator',
+			'name badge generator',
+			'name tag maker',
+			'conference badge generator',
+			'event name badge',
+			'printable name badge',
+			'name badge template',
+			'badge maker online',
+			'name tag creator',
+			'event badge generator',
 			'conference name tag'
 		],
 		longDescription: `Conference and event organizers need hundreds or thousands of unique name badges — each with a different name, title, company, and sometimes a QR code or photo. Designing each one manually is impossible at scale. With Pictify, you create one badge template and generate every variant programmatically.
@@ -3352,24 +3469,52 @@ Upload your attendee CSV, map columns to template variables, and batch-render al
 			'Last-minute attendee changes require rapid re-generation'
 		],
 		workflow: [
-			{ title: 'Design your badge template', detail: 'Create an HTML/CSS badge layout with placeholders for name, title, company, and optional QR code or photo.' },
-			{ title: 'Import attendee data', detail: 'Upload a CSV or connect your registration system to provide attendee details as template variables.' },
-			{ title: 'Batch render', detail: 'Generate all badges in one API call. Download as individual PNGs or a combined PDF for printing.' }
+			{
+				title: 'Design your badge template',
+				detail:
+					'Create an HTML/CSS badge layout with placeholders for name, title, company, and optional QR code or photo.'
+			},
+			{
+				title: 'Import attendee data',
+				detail:
+					'Upload a CSV or connect your registration system to provide attendee details as template variables.'
+			},
+			{
+				title: 'Batch render',
+				detail:
+					'Generate all badges in one API call. Download as individual PNGs or a combined PDF for printing.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I add QR codes to badges?', a: 'Yes. Include a QR code library in your HTML template and encode each attendee\'s unique ID or vCard data.' },
-			{ q: 'What print size works best?', a: '4×3 inches (1200×900 pixels at 300 DPI) is standard for conference badges. Adjust based on your badge holder size.' },
-			{ q: 'Can I handle last-minute changes?', a: 'Yes. Re-render individual badges instantly via API when attendee details change.' }
+			{
+				q: 'Can I add QR codes to badges?',
+				a: "Yes. Include a QR code library in your HTML template and encode each attendee's unique ID or vCard data."
+			},
+			{
+				q: 'What print size works best?',
+				a: '4×3 inches (1200×900 pixels at 300 DPI) is standard for conference badges. Adjust based on your badge holder size.'
+			},
+			{
+				q: 'Can I handle last-minute changes?',
+				a: 'Yes. Re-render individual badges instantly via API when attendee details change.'
+			}
 		],
 		related: ['badge', 'event-ticket', 'certificate']
 	},
 	'social-proof-card': {
 		label: 'Social Proof Card',
-		description: 'Generate testimonial and review cards as shareable images for social media and marketing.',
+		description:
+			'Generate testimonial and review cards as shareable images for social media and marketing.',
 		seoKeywords: [
-			'social proof card', 'testimonial card generator', 'review card maker',
-			'testimonial image', 'customer review card', 'social proof widget',
-			'testimonial graphic', 'review screenshot', 'customer feedback image',
+			'social proof card',
+			'testimonial card generator',
+			'review card maker',
+			'testimonial image',
+			'customer review card',
+			'social proof widget',
+			'testimonial graphic',
+			'review screenshot',
+			'customer feedback image',
 			'social proof image generator'
 		],
 		longDescription: `Customer testimonials are your most powerful marketing asset — but they are buried in review platforms and support tickets. With Pictify, you turn raw testimonial text into beautifully designed, shareable image cards that work on Twitter, LinkedIn, Instagram, and your website.
@@ -3401,24 +3546,50 @@ Design a testimonial card template once — with customer photo, name, company, 
 			'Inconsistent formatting across different team members'
 		],
 		workflow: [
-			{ title: 'Design the card template', detail: 'Create an HTML/CSS testimonial card with placeholders for quote, customer name, photo, company, and star rating.' },
-			{ title: 'Pull review data', detail: 'Connect to your review platform, CRM, or spreadsheet to extract testimonial data.' },
-			{ title: 'Generate and share', detail: 'Render cards via API and post directly to social media or embed on your website.' }
+			{
+				title: 'Design the card template',
+				detail:
+					'Create an HTML/CSS testimonial card with placeholders for quote, customer name, photo, company, and star rating.'
+			},
+			{
+				title: 'Pull review data',
+				detail: 'Connect to your review platform, CRM, or spreadsheet to extract testimonial data.'
+			},
+			{
+				title: 'Generate and share',
+				detail: 'Render cards via API and post directly to social media or embed on your website.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I include star ratings?', a: 'Yes. Use HTML/CSS star components or Unicode stars in your template. Style them however you like.' },
-			{ q: 'What size works for social media?', a: '1080×1080 for Instagram and Facebook feed posts, 1200×630 for Twitter and LinkedIn cards.' },
-			{ q: 'Can I automate this from a review platform?', a: 'Yes. Use the API with Zapier, Make, or a custom integration to auto-generate cards when new reviews come in.' }
+			{
+				q: 'Can I include star ratings?',
+				a: 'Yes. Use HTML/CSS star components or Unicode stars in your template. Style them however you like.'
+			},
+			{
+				q: 'What size works for social media?',
+				a: '1080×1080 for Instagram and Facebook feed posts, 1200×630 for Twitter and LinkedIn cards.'
+			},
+			{
+				q: 'Can I automate this from a review platform?',
+				a: 'Yes. Use the API with Zapier, Make, or a custom integration to auto-generate cards when new reviews come in.'
+			}
 		],
 		related: ['testimonial', 'quote-card', 'kpi-card']
 	},
 	'changelog-image': {
 		label: 'Changelog Image Generator',
-		description: 'Generate visual changelog and release notes as shareable images for social media and documentation.',
+		description:
+			'Generate visual changelog and release notes as shareable images for social media and documentation.',
 		seoKeywords: [
-			'changelog image', 'release notes image', 'changelog generator',
-			'release notes graphic', 'product update image', 'changelog card',
-			'release announcement image', 'what is new image', 'product changelog',
+			'changelog image',
+			'release notes image',
+			'changelog generator',
+			'release notes graphic',
+			'product update image',
+			'changelog card',
+			'release announcement image',
+			'what is new image',
+			'product changelog',
 			'version release image'
 		],
 		longDescription: `Shipping features without telling anyone is wasted effort. With Pictify, you turn your changelog or release notes into polished visual cards that get attention on Twitter, LinkedIn, and your product blog. Each release gets a branded image automatically.
@@ -3450,14 +3621,34 @@ Integrate with your CI/CD pipeline to generate a changelog image on every deploy
 			'Inconsistent release communication across channels'
 		],
 		workflow: [
-			{ title: 'Extract release data', detail: 'Pull the release title, version, date, and feature list from your CI/CD pipeline or changelog file.' },
-			{ title: 'Apply the template', detail: 'Map release data to your branded changelog card template with version badge, feature bullets, and release date.' },
-			{ title: 'Post and share', detail: 'Render the image via API and auto-post to Twitter, LinkedIn, Slack, or your blog.' }
+			{
+				title: 'Extract release data',
+				detail:
+					'Pull the release title, version, date, and feature list from your CI/CD pipeline or changelog file.'
+			},
+			{
+				title: 'Apply the template',
+				detail:
+					'Map release data to your branded changelog card template with version badge, feature bullets, and release date.'
+			},
+			{
+				title: 'Post and share',
+				detail: 'Render the image via API and auto-post to Twitter, LinkedIn, Slack, or your blog.'
+			}
 		],
 		faqs: [
-			{ q: 'Can I trigger this from CI/CD?', a: 'Yes. Call the Pictify API in your deploy script — pass release metadata as template variables and get a social-ready image back.' },
-			{ q: 'Can I include a feature list?', a: 'Yes. Render bullet points, icons, or even code diffs in your HTML template. Pictify renders any valid HTML.' },
-			{ q: 'What about dark mode?', a: 'Use a dark background in your template. Many changelog cards look great with dark themes — they stand out in social feeds.' }
+			{
+				q: 'Can I trigger this from CI/CD?',
+				a: 'Yes. Call the Pictify API in your deploy script — pass release metadata as template variables and get a social-ready image back.'
+			},
+			{
+				q: 'Can I include a feature list?',
+				a: 'Yes. Render bullet points, icons, or even code diffs in your HTML template. Pictify renders any valid HTML.'
+			},
+			{
+				q: 'What about dark mode?',
+				a: 'Use a dark background in your template. Many changelog cards look great with dark themes — they stand out in social feeds.'
+			}
 		],
 		related: ['release-notes-card', 'feature-flag-banner', 'status-update']
 	}

@@ -1,28 +1,24 @@
 /**
  * Formats Sitemap
- * Contains all format x dimension variant pages
- * This can scale to many pages (formats × sizes)
+ * Lists the parent HTML-to-format converter pages only.
+ * Size variants (/tools/html-to-{format}/{WxH}) canonicalize to their parent
+ * page and are intentionally excluded so they don't compete with it in search.
  */
 
-import { formats, popularSizes } from '$lib/pseo/config.js';
+import { formats } from '$lib/pseo/config.js';
 
 export async function GET() {
 	const baseUrl = 'https://pictify.io';
 	const today = new Date().toISOString().slice(0, 10);
 
-	const urls = [];
-
-	// Generate URLs for each format × size combination
-	formats.forEach((format) => {
-		popularSizes.forEach((size) => {
-			urls.push(`  <url>
-    <loc>${baseUrl}/tools/html-to-${format.id}/${size}</loc>
+	const urls = formats.map(
+		(format) => `  <url>
+    <loc>${baseUrl}/tools/html-to-${format.id}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>`);
-		});
-	});
+    <priority>0.9</priority>
+  </url>`
+	);
 
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -4,6 +4,7 @@
  */
 
 import { getBlogLinks } from '../../api/blog';
+import { xmlEscape } from '$lib/seo/xml.js';
 
 export async function GET() {
 	const baseUrl = 'https://pictify.io';
@@ -16,7 +17,7 @@ export async function GET() {
 
 		urls = links.map(
 			(link) => `  <url>
-    <loc>${baseUrl}/blogs/${link.slug}</loc>
+    <loc>${baseUrl}/blogs/${xmlEscape(link.slug)}</loc>
     <lastmod>${
 			link.createdAt
 				? new Date(link.createdAt).toISOString().slice(0, 10)

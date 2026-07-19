@@ -1,5 +1,6 @@
 <script>
 	import Nav from '$lib/components/landingPage/Nav.svelte';
+	import SEOHead from '$lib/seo/SEOHead.svelte';
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
@@ -888,39 +889,27 @@
 			}
 		]
 	};
-
 </script>
 
-<svelte:head>
-	<title>Code to Image — Beautiful Code Screenshots Free | Pictify</title>
-	<meta
-		name="description"
-		content="Turn code snippets into shareable images with syntax highlighting. 25+ languages, 18+ themes, custom fonts and window frames. Paste code, pick a theme, export PNG. Free, no signup."
-	/>
-	<link rel="canonical" href="https://pictify.io/tools/code-to-image" />
-	<meta property="og:title" content="Code to Image — Beautiful Code Screenshots Free | Pictify" />
-	<meta
-		property="og:description"
-		content="Create shareable code images with themes, fonts, and window frames. Free and fast."
-	/>
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:title" content="Code to Image — Beautiful Code Screenshots Free | Pictify" />
-	<meta name="twitter:description" content="Turn code into shareable images. 25+ languages, 18+ themes, custom fonts. Paste code, pick a theme, export PNG. Free, no signup." />
-	<meta property="og:url" content="https://pictify.io/tools/code-to-image" />
-	<meta property="og:image" content="https://media.pictify.io/by55n-1775406886142.png" />
-	<meta name="twitter:image" content="https://media.pictify.io/by55n-1775406886142.png" />
-	{@html `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`}
-	{@html `<script type="application/ld+json">${JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'Code to Image' }
-		]
-	})}</script>`}
-</svelte:head>
+<SEOHead
+	title="Code to Image — Code Screenshot Generator (25+ Themes, Free API) | Pictify"
+	description="Turn code snippets into beautiful screenshots with syntax highlighting — 25+ languages, 18+ themes, custom fonts and window frames. Export PNG free, or automate code images with the API."
+	canonical="https://pictify.io/tools/code-to-image"
+	robots="index, follow, max-image-preview:large"
+	ogImage="https://media.pictify.io/by55n-1775406886142.png"
+	schema={[
+		faqSchema,
+		{
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+				{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+				{ '@type': 'ListItem', position: 3, name: 'Code to Image' }
+			]
+		}
+	]}
+/>
 
 <section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
 	<Nav />
@@ -1584,7 +1573,8 @@
 							</div>
 						{:else if generatedImage}
 							<div class="flex items-center justify-center w-full h-full p-4 sm:p-8">
-								<img loading="lazy"
+								<img
+									loading="lazy"
 									src={generatedImage.url}
 									alt="Generated output"
 									class="max-w-full h-auto border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl"
@@ -1692,8 +1682,12 @@
 			/>
 
 			<!-- Code to Image — Comparison -->
-			<section class="mb-8 sm:mb-12 bg-brand-bg border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 transition-all duration-300">
-				<h3 class="text-xl sm:text-2xl font-black mb-6 text-black tracking-tight">Code Screenshot Tools Compared</h3>
+			<section
+				class="mb-8 sm:mb-12 bg-brand-bg border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 transition-all duration-300"
+			>
+				<h3 class="text-xl sm:text-2xl font-black mb-6 text-black tracking-tight">
+					Code Screenshot Tools Compared
+				</h3>
 				<div class="overflow-x-auto">
 					<table class="w-full text-left border-collapse text-sm">
 						<thead>
@@ -2774,15 +2768,12 @@
 					</div>
 				</div>
 			</section>
-
 		</div>
 
 		<!-- First Generation Prompt -->
 		{#if showFirstGenerationPrompt}
 			<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-				<div
-					class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl"
-				>
+				<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
 					<!-- Modal Header -->
 					<div
 						class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
@@ -2819,7 +2810,11 @@
 						<div class="space-y-3">
 							<a
 								href="/signup?redirect=/tools/code-to-image"
-								on:click={() => analytics.track('tool_signup_click', { tool_name: 'code_to_image', cta_location: 'free_tier_card' })}
+								on:click={() =>
+									analytics.track('tool_signup_click', {
+										tool_name: 'code_to_image',
+										cta_location: 'free_tier_card'
+									})}
 								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Create Free Account
@@ -2843,9 +2838,7 @@
 				class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
 				style="margin-top: 0px;"
 			>
-				<div
-					class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl"
-				>
+				<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
 					<!-- Modal Header -->
 					<div
 						class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
@@ -2888,7 +2881,11 @@
 						<div class="space-y-3">
 							<a
 								href="/signup?redirect=/tools/code-to-image"
-								on:click={() => analytics.track('tool_signup_click', { tool_name: 'code_to_image', cta_location: 'limit_reached_modal' })}
+								on:click={() =>
+									analytics.track('tool_signup_click', {
+										tool_name: 'code_to_image',
+										cta_location: 'limit_reached_modal'
+									})}
 								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								Sign Up Free
@@ -2912,11 +2909,31 @@
 		<section class="mb-12 max-w-5xl mx-auto px-4">
 			<h3 class="text-xl font-black mb-4 text-black uppercase text-center">Related Tools</h3>
 			<div class="flex flex-wrap gap-3 justify-center">
-				<a href="/tools/html-to-png" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">HTML to PNG</a>
-				<a href="/tools/url-to-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">URL to Image</a>
-				<a href="/tools/og-image-generator" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">OG Image Generator</a>
-				<a href="/tools/markdown" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Markdown to Image</a>
-				<a href="/compare" class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all">Compare Tools</a>
+				<a
+					href="/tools/html-to-png"
+					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+					>HTML to PNG</a
+				>
+				<a
+					href="/tools/url-to-image-generator"
+					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+					>URL to Image</a
+				>
+				<a
+					href="/tools/og-image-generator"
+					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+					>OG Image Generator</a
+				>
+				<a
+					href="/tools/markdown"
+					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+					>Markdown to Image</a
+				>
+				<a
+					href="/compare"
+					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
+					>Compare Tools</a
+				>
 			</div>
 		</section>
 
@@ -2924,7 +2941,6 @@
 	</main>
 	<Toast />
 	<StickySignupBar bind:this={stickyBar} toolName="code_to_image" />
-
 </section>
 
 <style>
