@@ -24,7 +24,7 @@
 			color: 'bg-brand-accent',
 			iconBg: 'bg-white',
 			iconColor: 'text-black',
-			items: ['render.completed', 'render.failed', 'experiment.winner'],
+			items: ['render.completed', 'render.failed', 'batch.completed'],
 			cols: 'xl:col-span-4'
 		},
 		{

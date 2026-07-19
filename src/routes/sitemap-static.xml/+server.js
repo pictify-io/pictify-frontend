@@ -12,8 +12,6 @@ export async function GET() {
 		{ path: '/', priority: '1.0', changefreq: 'daily' },
 		{ path: '/pricing', priority: '0.9', changefreq: 'weekly' },
 		{ path: '/tools', priority: '0.9', changefreq: 'daily' },
-		{ path: '/dynamic-images', priority: '0.7', changefreq: 'weekly' },
-		{ path: '/email-personalization', priority: '0.7', changefreq: 'weekly' },
 		{ path: '/templates', priority: '0.9', changefreq: 'daily' },
 		{ path: '/compare', priority: '0.8', changefreq: 'weekly' },
 		{ path: '/glossary', priority: '0.8', changefreq: 'weekly' },
