@@ -143,6 +143,33 @@
 				<span>Brand Assets</span>
 			</a>
 
+			<!-- Workflows -->
+			<a
+				href="/dashboard/workflows"
+				aria-current={isActive(currentPath, '/dashboard/workflows') ? 'page' : undefined}
+				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+					{isActive(currentPath, '/dashboard/workflows')
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
+					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+			>
+				<svg
+					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/workflows')
+						? 'text-gray-900'
+						: 'text-gray-500 group-hover:text-gray-900'}"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2.5"
+						d="M13 10V3L4 14h7v7l9-11h-7z"
+					/>
+				</svg>
+				<span>Workflows</span>
+			</a>
+
 			<!-- ═══ MEDIA Section ═══ -->
 			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
 				Media
