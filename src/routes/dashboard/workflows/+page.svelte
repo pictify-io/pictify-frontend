@@ -144,20 +144,12 @@
 			Popular use cases
 		</span>
 		{#each PACKS as pack (pack.id)}
-			{#if pack.comingSoon}
-				<span
-					class="px-3 py-1.5 bg-gray-100 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-gray-300 cursor-not-allowed"
-				>
-					{pack.label} · soon
-				</span>
-			{:else}
-				<a
-					href="/dashboard/workflows/new?pack={pack.id}"
-					class="px-3 py-1.5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
-				>
-					{pack.label}
-				</a>
-			{/if}
+			<a
+				href="/dashboard/workflows/new?pack={pack.id}"
+				class="px-3 py-1.5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+			>
+				{pack.label}
+			</a>
 		{/each}
 	</div>
 

@@ -3,11 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import {
-		CERTIFICATE_DESIGNS,
-		SAMPLE_ROW,
-		fillDesignHtml
-	} from '$lib/workflows/certificate-pack.js';
+	import { fillDesignHtml } from '$lib/workflows/certificate-pack.js';
+	import { getPack } from '$lib/workflows/packs.js';
 	import { parseCsv, MAX_ROWS } from '$lib/workflows/csv.js';
 	import { createTemplate, getTemplates, getTemplateById } from '../../../../api/template';
 	import {
@@ -18,8 +15,20 @@
 	} from '../../../../api/workflow';
 	import { analytics } from '$lib/analytics.js';
 
-	// ?pack=certificates only preselects the sample section (harmless deep-link).
-	const preselectSamples = $page.url.searchParams.get('pack') === 'certificates';
+	// ?pack=<id> only picks which designs to show and which template-step
+	// section comes first (harmless deep-link). Certificates is the default.
+	const packParam = $page.url.searchParams.get('pack');
+	const selectedPack = getPack(packParam) || getPack('certificates');
+	const isCustomPack = !!selectedPack.custom;
+	const packDesigns = selectedPack.designs || [];
+	const packSampleRow = selectedPack.sampleRow || {};
+	const packNounTitle = selectedPack.nounSingular.replace(/(^|\s)[a-z]/g, (c) => c.toUpperCase());
+	const preselectSamples = !!packParam && !isCustomPack && packDesigns.length > 0;
+	const sectionOrder = isCustomPack
+		? { custom: 0, templates: 1, samples: 2 }
+		: preselectSamples
+		? { samples: 0, templates: 1, custom: 2 }
+		: { templates: 0, samples: 1, custom: 2 };
 
 	const CSV_STEPS = [
 		{ key: 'source', label: 'Source' },
@@ -297,9 +306,12 @@
 				previewError: '',
 				delivery: {
 					...wizard.delivery,
-					subject: variables.includes('organizationName')
-						? 'Your document from {{organizationName}}'
-						: 'Your document'
+					subject:
+						fromSample && selectedPack.defaultSubject
+							? selectedPack.defaultSubject
+							: variables.includes('organizationName')
+							? 'Your document from {{organizationName}}'
+							: 'Your document'
 				}
 			};
 			hookMapping = {};
@@ -315,7 +327,7 @@
 		sampleError = '';
 		try {
 			const response = await createTemplate({
-				name: `Certificate — ${design.name}`,
+				name: `${packNounTitle} — ${design.name}`,
 				html: design.html,
 				width: design.width,
 				height: design.height,
@@ -331,6 +343,54 @@
 			sampleError = error?.message || 'Failed to create the sample template.';
 		} finally {
 			seedingId = '';
+		}
+	}
+
+	// ── Step 2: bring your own HTML ──────────────────────────────────────
+	const customHtmlPlaceholder = [
+		'<h1>Hello {{recipientName}}</h1>',
+		'<p>Thanks for joining {{eventName}}.</p>'
+	].join('\n');
+
+	let customHtml = '';
+	let customWidth = 1600;
+	let customHeight = 1200;
+	let customCreating = false;
+	let customError = '';
+
+	$: customVariables = parseHtmlVariables(customHtml);
+
+	async function createCustomTemplate() {
+		if (customCreating || selectingUid) return;
+		customError = '';
+		if (!customHtml.trim()) {
+			customError = 'Paste your HTML first.';
+			return;
+		}
+		const width = Math.round(Number(customWidth));
+		const height = Math.round(Number(customHeight));
+		if (!width || !height || width < 1 || height < 1) {
+			customError = 'Enter a valid width and height in pixels.';
+			return;
+		}
+		customCreating = true;
+		try {
+			const response = await createTemplate({
+				name: 'Custom HTML template',
+				html: customHtml,
+				width,
+				height,
+				engine: 'html',
+				variableDefinitions: customVariables.map((name) => ({ name, type: 'text' }))
+			});
+			const template = response?.template;
+			if (!template?.uid) throw new Error('Failed to create the template.');
+			templates = [template, ...templates];
+			await selectTemplate(template);
+		} catch (error) {
+			customError = error?.message || 'Failed to create the template.';
+		} finally {
+			customCreating = false;
 		}
 	}
 
@@ -370,7 +430,15 @@
 			'teacher',
 			'director',
 			'issuedby'
-		]
+		],
+		attendeeName: ['attendeename', 'attendee', 'name', 'fullname', 'guest', 'participant'],
+		guestName: ['guestname', 'guest', 'name', 'fullname', 'attendee'],
+		eventName: ['eventname', 'event', 'conference', 'festival', 'occasion', 'show'],
+		role: ['role', 'jobtitle', 'title', 'position', 'designation'],
+		company: ['company', 'organization', 'organisation', 'employer', 'org', 'team'],
+		tableNumber: ['tablenumber', 'table', 'tableno', 'seat', 'seating'],
+		ticketNumber: ['ticketnumber', 'ticket', 'ticketno', 'ticketid', 'serial', 'number'],
+		venue: ['venue', 'location', 'place', 'address', 'hall']
 	};
 
 	function normalize(value) {
@@ -495,7 +563,7 @@
 	}
 
 	function sampleValueFor(variable) {
-		if (SAMPLE_ROW[variable] != null) return SAMPLE_ROW[variable];
+		if (packSampleRow[variable] != null) return packSampleRow[variable];
 		const norm = normalize(variable);
 		if (norm.includes('email')) return 'ada@example.com';
 		if (norm.includes('date')) return 'June 12, 2026';
@@ -642,7 +710,9 @@
 				delivery.subject = wizard.delivery.subject;
 				delivery.bodyText = wizard.delivery.bodyText;
 			}
-			const packType = wizard.fromSample ? 'certificates' : 'custom';
+			// The backend only knows 'certificates' | 'custom' — other packs run as custom.
+			const packType =
+				wizard.fromSample && selectedPack.id === 'certificates' ? 'certificates' : 'custom';
 			const response = await createWorkflowRun({
 				packType,
 				templateUid: wizard.templateUid,
@@ -654,6 +724,7 @@
 			if (!uid) throw new Error('The run was created but no run id was returned.');
 			analytics.track?.('workflow_run_started', {
 				packType,
+				pack: selectedPack.id,
 				rows: wizard.rows.length,
 				templateUid: wizard.templateUid,
 				delivery: delivery.method
@@ -1008,8 +1079,8 @@
 	<!-- ─── STEP 2: TEMPLATE ─────────────────────────────────────────── -->
 	{#if currentKey === 'template'}
 		<div class="flex flex-col gap-10 mb-8">
-			<!-- Workspace templates (primary path) -->
-			<div style="order: {preselectSamples ? 1 : 0}">
+			<!-- Workspace templates -->
+			<div style="order: {sectionOrder.templates}">
 				<div class="flex items-center gap-3 mb-6">
 					<h2
 						class="text-sm font-black text-black uppercase tracking-widest flex items-center gap-3"
@@ -1114,65 +1185,154 @@
 				{/if}
 			</div>
 
-			<!-- Samples (secondary path) -->
-			<div style="order: {preselectSamples ? 0 : 1}">
+			<!-- Samples -->
+			{#if packDesigns.length}
+				<div style="order: {sectionOrder.samples}">
+					<div class="flex items-center gap-3 mb-2">
+						<h2
+							class="text-sm font-black text-black uppercase tracking-widest flex items-center gap-3"
+						>
+							<span class="w-3 h-3 bg-data-violet rounded-sm border-[2px] border-black" />
+							Start from a sample
+						</h2>
+					</div>
+					<p class="text-xs font-bold text-gray-500 mb-6">
+						{packNounTitle} designs — one click creates a template in your workspace.
+					</p>
+
+					{#if sampleError}
+						<div
+							class="bg-brand-danger/10 border-[3px] border-brand-danger rounded-xl p-4 mb-6 text-sm font-bold text-brand-danger"
+						>
+							{sampleError}
+						</div>
+					{/if}
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+						{#each packDesigns as design (design.id)}
+							<div
+								class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md overflow-hidden"
+							>
+								<!-- Thumbnail: scaled iframe of the real design -->
+								<div
+									class="border-b-[3px] border-black relative overflow-hidden bg-gray-100"
+									style="aspect-ratio: {design.width} / {design.height};"
+									bind:clientWidth={thumbWidth}
+								>
+									<iframe
+										title="{design.name} sample preview"
+										srcdoc={fillDesignHtml(design.html, packSampleRow)}
+										sandbox=""
+										scrolling="no"
+										loading="lazy"
+										class="pointer-events-none select-none border-0 origin-top-left"
+										style="width: {design.width}px; height: {design.height}px; transform: scale({thumbWidth /
+											design.width});"
+									/>
+								</div>
+								<div class="p-5">
+									<h3 class="text-base font-black text-black uppercase tracking-wide">
+										{design.name}
+									</h3>
+									<p class="text-xs font-bold text-gray-500 mt-1 leading-relaxed">
+										{design.description}
+									</p>
+									<button
+										on:click={() => createSample(design)}
+										disabled={!!seedingId || !!selectingUid}
+										class="mt-4 inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										{seedingId === design.id ? 'Creating…' : 'Use this sample'}
+									</button>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			<!-- Bring your own HTML -->
+			<div style="order: {sectionOrder.custom}">
 				<div class="flex items-center gap-3 mb-2">
 					<h2
 						class="text-sm font-black text-black uppercase tracking-widest flex items-center gap-3"
 					>
-						<span class="w-3 h-3 bg-data-violet rounded-sm border-[2px] border-black" />
-						Start from a sample
+						<span class="w-3 h-3 bg-data-green rounded-sm border-[2px] border-black" />
+						Bring your own HTML
 					</h2>
 				</div>
 				<p class="text-xs font-bold text-gray-500 mb-6">
-					Certificate designs — one click creates a template in your workspace.
+					Paste an HTML document with {'{{variables}}'} — one click creates a template in your workspace.
 				</p>
 
-				{#if sampleError}
+				{#if customError}
 					<div
 						class="bg-brand-danger/10 border-[3px] border-brand-danger rounded-xl p-4 mb-6 text-sm font-bold text-brand-danger"
 					>
-						{sampleError}
+						{customError}
 					</div>
 				{/if}
 
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-					{#each CERTIFICATE_DESIGNS as design (design.id)}
-						<div
-							class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md overflow-hidden"
-						>
-							<!-- Thumbnail: scaled iframe of the real design -->
-							<div
-								class="aspect-[4/3] border-b-[3px] border-black relative overflow-hidden bg-gray-100"
-								bind:clientWidth={thumbWidth}
-							>
-								<iframe
-									title="{design.name} sample preview"
-									srcdoc={fillDesignHtml(design.html, SAMPLE_ROW)}
-									sandbox=""
-									scrolling="no"
-									loading="lazy"
-									class="pointer-events-none select-none border-0 origin-top-left"
-									style="width: 1600px; height: 1200px; transform: scale({thumbWidth / 1600});"
-								/>
-							</div>
-							<div class="p-5">
-								<h3 class="text-base font-black text-black uppercase tracking-wide">
-									{design.name}
-								</h3>
-								<p class="text-xs font-bold text-gray-500 mt-1 leading-relaxed">
-									{design.description}
-								</p>
-								<button
-									on:click={() => createSample(design)}
-									disabled={!!seedingId || !!selectingUid}
-									class="mt-4 inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+				<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-6">
+					<textarea
+						bind:value={customHtml}
+						rows="10"
+						placeholder={customHtmlPlaceholder}
+						class="w-full rounded-xl border-[3px] border-black p-4 font-mono text-xs text-black bg-gray-50 focus:outline-none focus:shadow-brutal-md focus:bg-white transition-all resize-y"
+					/>
+					{#if customVariables.length}
+						<div class="flex items-center gap-2 flex-wrap mt-4">
+							<span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+								Detected variables
+							</span>
+							{#each customVariables as variable (variable)}
+								<span
+									class="px-2.5 py-1 bg-brand-accent/20 text-black text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black"
 								>
-									{seedingId === design.id ? 'Creating…' : 'Use this sample'}
-								</button>
-							</div>
+									{variable}
+								</span>
+							{/each}
 						</div>
-					{/each}
+					{/if}
+					<div class="flex flex-col sm:flex-row sm:items-end gap-4 mt-4">
+						<div>
+							<label
+								for="custom-width"
+								class="block text-xs font-black text-black uppercase tracking-widest mb-2"
+							>
+								Width (px)
+							</label>
+							<input
+								id="custom-width"
+								type="number"
+								min="1"
+								bind:value={customWidth}
+								class="w-32 rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
+							/>
+						</div>
+						<div>
+							<label
+								for="custom-height"
+								class="block text-xs font-black text-black uppercase tracking-widest mb-2"
+							>
+								Height (px)
+							</label>
+							<input
+								id="custom-height"
+								type="number"
+								min="1"
+								bind:value={customHeight}
+								class="w-32 rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
+							/>
+						</div>
+						<button
+							on:click={createCustomTemplate}
+							disabled={customCreating || !!selectingUid}
+							class="sm:ml-auto inline-flex items-center gap-2 bg-black text-white px-5 py-3 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{customCreating ? 'Creating…' : 'Create template'}
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
