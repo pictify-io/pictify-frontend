@@ -249,8 +249,7 @@
 			<div
 				role="button"
 				tabindex="0"
-				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm sm:hover:shadow-brutal-md hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 overflow-hidden flex flex-col
-					{template.hasDynamicLink ? 'border-data-purple ring-2 ring-data-purple/30' : 'border-gray-900'}"
+				class="template-card group relative bg-white rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm sm:hover:shadow-brutal-md hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 overflow-hidden flex flex-col"
 				on:click={() => handleTemplateClick(template)}
 				on:keydown={(e) => {
 					if (e.key === 'Enter') handleTemplateClick(template);
@@ -258,8 +257,7 @@
 			>
 				<!-- Card Header / Tab -->
 				<div
-					class="h-7 sm:h-8 border-b-[2px] sm:border-b-[3px] flex items-center justify-between px-2 sm:px-3
-					{template.hasDynamicLink ? 'bg-data-purple/10 border-data-purple' : 'bg-gray-100 border-gray-900'}"
+					class="h-7 sm:h-8 border-b-[2px] sm:border-b-[3px] bg-gray-100 border-gray-900 flex items-center justify-between px-2 sm:px-3"
 				>
 					<div class="flex items-center gap-1 sm:gap-1.5">
 						<div
@@ -273,21 +271,6 @@
 						/>
 					</div>
 					<div class="flex items-center gap-2">
-						{#if template.hasDynamicLink}
-							<span
-								class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-data-purple text-white uppercase tracking-wider rounded border border-gray-900 flex items-center gap-0.5"
-							>
-								<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2.5"
-										d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-									/></svg
-								>
-								LIVE
-							</span>
-						{/if}
 						{#if template.outputFormat === 'pdf'}
 							<span
 								class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-brand-danger text-white uppercase tracking-wider rounded border border-gray-900"

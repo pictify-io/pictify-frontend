@@ -25,7 +25,8 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 2,
 			title: 'Set your API key as an env variable',
-			description: 'Your agent needs this to authenticate with Pictify. Add it to your shell profile so it persists.',
+			description:
+				'Your agent needs this to authenticate with Pictify. Add it to your shell profile so it persists.',
 			href: null,
 			cta: null,
 			color: '#ff6b6b',
@@ -37,7 +38,8 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 3,
 			title: 'Install Pictify skills',
-			description: 'Add Pictify image generation skills to Claude Code, Cursor, or Windsurf with a single command.',
+			description:
+				'Add Pictify image generation skills to Claude Code, Cursor, or Windsurf with a single command.',
 			href: null,
 			cta: null,
 			color: '#a78bfa',
@@ -49,21 +51,23 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 4,
 			title: 'Generate your first image',
-			description: 'Paste this prompt into your AI agent to generate your first image with Pictify.',
+			description:
+				'Paste this prompt into your AI agent to generate your first image with Pictify.',
 			href: null,
 			cta: null,
 			color: '#4ade80',
 			icon: 'chat',
 			completedCheck: 'hasImages',
 			code: null,
-			samplePrompt: 'Generate a 1200x630 image with a dark background and the text "Hello World" centered in white. Use Pictify.'
+			samplePrompt:
+				'Generate a 1200x630 image with a dark background and the text "Hello World" centered in white. Use Pictify.'
 		}
 	],
 	'api-integration': [
 		{
 			number: 1,
 			title: 'Get your API key',
-			description: 'You\'ll need this to authenticate API requests from your backend.',
+			description: "You'll need this to authenticate API requests from your backend.",
 			href: '/dashboard/api-token',
 			cta: 'Generate Key',
 			color: '#ffc480',
@@ -86,8 +90,9 @@ export const GETTING_STARTED_STEPS = {
 		},
 		{
 			number: 3,
-			title: 'Create a template for dynamic images',
-			description: 'Templates let you swap variables (name, title, price) on each render. Open the editor to build one.',
+			title: 'Create a template with variables',
+			description:
+				'Templates let you swap variables (name, title, price) on each render. Open the editor to build one.',
 			href: '/template-workspace/create',
 			cta: 'Open Editor',
 			color: '#4ade80',
@@ -100,7 +105,7 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 1,
 			title: 'Get your API key',
-			description: 'You\'ll paste this into your automation tool to connect it with Pictify.',
+			description: "You'll paste this into your automation tool to connect it with Pictify.",
 			href: '/dashboard/api-token',
 			cta: 'Generate Key',
 			color: '#ffc480',
@@ -128,8 +133,14 @@ export const GETTING_STARTED_STEPS = {
 							{ text: 'Create a new Zap and pick your trigger (e.g. new row in Google Sheets)' },
 							{ text: 'Add an action, search "Webhooks by Zapier", choose POST' },
 							{ text: 'Set the URL', code: '{{BACKEND_URL}}/images' },
-							{ text: 'Add these headers', code: 'Authorization: Bearer {{API_KEY}}\nContent-Type: application/json' },
-							{ text: 'Set the body to your HTML payload', code: '{"html": "<div>Your HTML here</div>"}' },
+							{
+								text: 'Add these headers',
+								code: 'Authorization: Bearer {{API_KEY}}\nContent-Type: application/json'
+							},
+							{
+								text: 'Set the body to your HTML payload',
+								code: '{"html": "<div>Your HTML here</div>"}'
+							},
 							{ text: 'Test & turn on your Zap' }
 						]
 					},
@@ -140,8 +151,14 @@ export const GETTING_STARTED_STEPS = {
 							{ text: 'Create a new scenario and add your trigger module' },
 							{ text: 'Add an HTTP module, choose "Make a request"' },
 							{ text: 'Set Method to POST and the URL', code: '{{BACKEND_URL}}/images' },
-							{ text: 'Add these headers', code: 'Authorization: Bearer {{API_KEY}}\nContent-Type: application/json' },
-							{ text: 'Set Body type to Raw with this content', code: '{"html": "<div>Your HTML here</div>"}' },
+							{
+								text: 'Add these headers',
+								code: 'Authorization: Bearer {{API_KEY}}\nContent-Type: application/json'
+							},
+							{
+								text: 'Set Body type to Raw with this content',
+								code: '{"html": "<div>Your HTML here</div>"}'
+							},
 							{ text: 'Run once to test, then activate the scenario' }
 						]
 					},
@@ -152,8 +169,14 @@ export const GETTING_STARTED_STEPS = {
 							{ text: 'Add your trigger node (e.g. Webhook, Cron, Google Sheets)' },
 							{ text: 'Add an HTTP Request node' },
 							{ text: 'Set Method to POST and the URL', code: '{{BACKEND_URL}}/images' },
-							{ text: 'Set Authentication to Header Auth', code: 'Name: Authorization\nValue: Bearer {{API_KEY}}' },
-							{ text: 'Set Body Content Type to JSON with this body', code: '{"html": "<div>Your HTML here</div>"}' },
+							{
+								text: 'Set Authentication to Header Auth',
+								code: 'Name: Authorization\nValue: Bearer {{API_KEY}}'
+							},
+							{
+								text: 'Set Body Content Type to JSON with this body',
+								code: '{"html": "<div>Your HTML here</div>"}'
+							},
 							{ text: 'Execute the workflow to test' }
 						]
 					}
@@ -162,8 +185,9 @@ export const GETTING_STARTED_STEPS = {
 		},
 		{
 			number: 3,
-			title: 'Create a template for dynamic images',
-			description: 'Want to swap text/images on each render? Build a template with variables in the editor.',
+			title: 'Create a template with variables',
+			description:
+				'Want to swap text/images on each render? Build a template with variables in the editor.',
 			href: '/template-workspace/create',
 			cta: 'Open Editor',
 			color: '#4ade80',
@@ -176,7 +200,7 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 1,
 			title: 'Create your first template',
-			description: 'Open the drag-and-drop editor to design a reusable image template.',
+			description: 'Open the template editor to design a reusable image template.',
 			href: '/template-workspace/create',
 			cta: 'Open Editor',
 			color: '#ffc480',
@@ -187,7 +211,8 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 2,
 			title: 'Add variables',
-			description: 'Select any text or image in your template and mark it as a variable. This lets you swap content on each render.',
+			description:
+				'Select any text or image in your template and mark it as a variable. This lets you swap content on each render.',
 			href: null,
 			cta: null,
 			color: '#ff6b6b',
@@ -198,7 +223,8 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 3,
 			title: 'Render your template',
-			description: 'Generate an image from your template — try it right from the template page or use bulk render with a CSV.',
+			description:
+				'Generate an image from your template — try it right from the template page or run a workflow with a CSV.',
 			href: null,
 			cta: null,
 			color: '#4ade80',
@@ -211,7 +237,7 @@ export const GETTING_STARTED_STEPS = {
 		{
 			number: 1,
 			title: 'Open the template editor',
-			description: 'Build a reusable template with the drag-and-drop editor.',
+			description: 'Build a reusable template in the HTML editor.',
 			href: '/template-workspace/create',
 			cta: 'Open Editor',
 			color: '#ff6b6b',
@@ -247,53 +273,21 @@ export function getCurlExample(apiKey) {
 
 // Quick action definitions (id → action metadata)
 const ACTIONS = {
-	bulk_render: {
-		id: 'bulk_render',
-		label: 'Bulk Render',
-		desc: 'Generate 100s of images from a CSV',
-		href: '/dashboard/template',
+	run_workflow: {
+		id: 'run_workflow',
+		label: 'Run Workflow',
+		desc: 'Render at scale from a CSV or webhook',
+		href: '/dashboard/workflows/new',
 		icon: 'batch',
 		color: '#ff6b6b'
 	},
-	live_links: {
-		id: 'live_links',
-		label: 'Live Links',
-		desc: 'Live images that update via URL params',
-		href: '/dashboard/template',
-		icon: 'link',
-		color: '#3b82f6'
-	},
-	ab_test: {
-		id: 'ab_test',
-		label: 'A/B Test',
-		desc: 'Test image variants to find the best',
-		href: '/dashboard/experiments/create?type=ab_test',
-		icon: 'chart',
-		color: '#f59e0b'
-	},
-	smart_links: {
-		id: 'smart_links',
-		label: 'Smart Links',
-		desc: 'Route viewers to the best-performing link',
-		href: '/dashboard/experiments/create?type=smart_link',
-		icon: 'shield',
-		color: '#4ade80'
-	},
-	scheduled: {
-		id: 'scheduled',
-		label: 'Scheduled',
-		desc: 'Auto-swap images on a schedule',
-		href: '/dashboard/experiments/create?type=scheduled',
-		icon: 'clock',
-		color: '#a78bfa'
-	},
-	auto_optimize: {
-		id: 'auto_optimize',
-		label: 'Auto-Optimize',
-		desc: 'Enable on any A/B test to auto-pick winners',
-		href: '/dashboard/experiments/create',
+	view_workflows: {
+		id: 'view_workflows',
+		label: 'Workflows',
+		desc: 'Monitor your workflow runs & outputs',
+		href: '/dashboard/workflows',
 		icon: 'lightning',
-		color: '#a855f7'
+		color: '#a78bfa'
 	},
 	api_playground: {
 		id: 'api_playground',
@@ -321,114 +315,23 @@ const ACTIONS = {
 	}
 };
 
-const DEFAULT_ACTIONS = [
-	'bulk_render',
-	'live_links',
-	'ab_test',
-	'smart_links',
-	'scheduled',
-	'auto_optimize'
-];
+const DEFAULT_ACTIONS = ['create_template', 'run_workflow', 'view_workflows', 'api_playground'];
 
-// Which 6 quick actions to show per use case (ordered by relevance)
+// Which quick actions to show per use case (ordered by relevance)
 export const QUICK_ACTION_PRESETS = {
-	'social-media': [
-		'create_template',
-		'ab_test',
-		'scheduled',
-		'bulk_render',
-		'smart_links',
-		'live_links'
-	],
-	'email-marketing': [
-		'create_template',
-		'ab_test',
-		'bulk_render',
-		'live_links',
-		'smart_links',
-		'scheduled'
-	],
-	'e-commerce': [
-		'create_template',
-		'bulk_render',
-		'ab_test',
-		'live_links',
-		'smart_links',
-		'scheduled'
-	],
-	'dashboard-reporting': [
-		'api_playground',
-		'api_keys',
-		'live_links',
-		'bulk_render',
-		'create_template',
-		'scheduled'
-	],
-	certificates: [
-		'create_template',
-		'bulk_render',
-		'live_links',
-		'api_playground',
-		'api_keys',
-		'ab_test'
-	],
-	'personalized-images': [
-		'api_playground',
-		'api_keys',
-		'bulk_render',
-		'live_links',
-		'create_template',
-		'ab_test'
-	],
-	'content-marketing': [
-		'create_template',
-		'ab_test',
-		'smart_links',
-		'bulk_render',
-		'scheduled',
-		'live_links'
-	],
+	'social-media': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
+	'email-marketing': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
+	'e-commerce': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
+	'dashboard-reporting': ['api_playground', 'api_keys', 'run_workflow', 'create_template'],
+	certificates: ['create_template', 'run_workflow', 'api_playground', 'api_keys'],
+	'personalized-images': ['api_playground', 'api_keys', 'run_workflow', 'create_template'],
+	'content-marketing': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
 	// Engineer-centric intents
-	'ai-agent': [
-		'api_keys',
-		'api_playground',
-		'create_template',
-		'bulk_render',
-		'live_links',
-		'ab_test'
-	],
-	'api-integration': [
-		'api_keys',
-		'api_playground',
-		'create_template',
-		'bulk_render',
-		'live_links',
-		'ab_test'
-	],
-	'no-code': [
-		'create_template',
-		'bulk_render',
-		'live_links',
-		'ab_test',
-		'scheduled',
-		'smart_links'
-	],
-	'template-builder': [
-		'create_template',
-		'bulk_render',
-		'live_links',
-		'ab_test',
-		'api_playground',
-		'api_keys'
-	],
-	exploring: [
-		'create_template',
-		'api_playground',
-		'bulk_render',
-		'live_links',
-		'ab_test',
-		'smart_links'
-	]
+	'ai-agent': ['api_keys', 'api_playground', 'create_template', 'run_workflow'],
+	'api-integration': ['api_keys', 'api_playground', 'create_template', 'run_workflow'],
+	'no-code': ['create_template', 'run_workflow', 'view_workflows', 'api_keys'],
+	'template-builder': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
+	exploring: ['create_template', 'api_playground', 'run_workflow', 'api_keys']
 };
 
 // Personalized hero copy per use case / intent
@@ -464,7 +367,8 @@ export const WELCOME_MESSAGES = {
 	// Engineer-centric intents
 	'ai-agent': {
 		title: 'Give your AI agent the power of images.',
-		subtitle: 'Connect Pictify to your agent via MCP or REST and let it generate visuals autonomously.'
+		subtitle:
+			'Connect Pictify to your agent via MCP or REST and let it generate visuals autonomously.'
 	},
 	'api-integration': {
 		title: 'Generate images from your codebase.',
@@ -472,7 +376,7 @@ export const WELCOME_MESSAGES = {
 	},
 	'no-code': {
 		title: 'Beautiful images, zero code.',
-		subtitle: 'Design in the editor, bulk-generate from CSV, and share live links — no coding required.'
+		subtitle: 'Design in the editor and run workflows from a CSV — no coding required.'
 	},
 	'template-builder': {
 		title: 'Design once, render thousands.',
@@ -480,7 +384,8 @@ export const WELCOME_MESSAGES = {
 	},
 	exploring: {
 		title: 'Welcome to Pictify.',
-		subtitle: 'Explore templates, try the editor, and see what programmatic image generation can do.'
+		subtitle:
+			'Explore templates, try the editor, and see what programmatic image generation can do.'
 	}
 };
 
@@ -524,8 +429,8 @@ export const EMPTY_STATE_MESSAGES = {
 	},
 	'personalized-images': {
 		heading: 'No personalized templates yet',
-		subtitle: 'Create your first template to start generating dynamic images.',
-		cta: 'Create Dynamic Template'
+		subtitle: 'Create your first template to start generating personalized images.',
+		cta: 'Create Template'
 	},
 	'content-marketing': {
 		heading: 'No content templates yet',

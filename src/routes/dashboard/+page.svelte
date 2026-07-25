@@ -313,10 +313,8 @@
 			nudges = evaluateNudges(
 				{
 					templateCount: totalTemplates,
-					experimentCount: 0, // We don't fetch this separately — nudge will fire conservatively
 					integrationMode: onb.personalization?.integrationMode || null,
 					hasApiKey: completedStepIds.includes('get_api_key'),
-					hasTracking: completedStepIds.includes('install_tracking'),
 					hasBulkRendered: false
 				},
 				getDismissedNudges()
@@ -1096,7 +1094,7 @@
 									</p>
 									<p class="text-sm font-bold text-gray-500 mb-6 max-w-sm">
 										{emptyMsg?.subtitle ||
-											'Create your first template to start generating automated images and GIFs.'}
+											'Create your first template to start generating automated images and PDFs.'}
 									</p>
 									<a
 										href="/dashboard/template/create"

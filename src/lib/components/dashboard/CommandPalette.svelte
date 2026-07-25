@@ -34,6 +34,13 @@
 		},
 		{
 			type: 'nav',
+			label: 'Workflows',
+			description: 'Run templates at scale via CSV or webhook',
+			path: '/dashboard/workflows',
+			keywords: 'workflows runs csv webhook batch bulk render scale'
+		},
+		{
+			type: 'nav',
 			label: 'Images',
 			description: 'Generated images library',
 			path: '/dashboard/media/images',
@@ -117,6 +124,13 @@
 			description: 'Start building a new HTML template',
 			path: '/template-workspace/html/create?engine=html',
 			keywords: 'create new template start build html'
+		},
+		{
+			type: 'action',
+			label: 'Run a Workflow',
+			description: 'Render a template from CSV rows or a webhook',
+			path: '/dashboard/workflows/new',
+			keywords: 'run workflow new csv webhook batch bulk render generate'
 		},
 		{
 			type: 'action',

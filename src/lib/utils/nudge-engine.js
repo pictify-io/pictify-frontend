@@ -7,37 +7,20 @@
 
 const NUDGES = [
 	{
-		id: 'suggest-experiment',
-		priority: 1,
-		condition: (ctx) => ctx.templateCount >= 3 && ctx.experimentCount === 0,
-		message:
-			"You've created {templateCount} templates — try A/B testing to find which performs best.",
-		cta: 'Create Experiment',
-		href: '/dashboard/experiments/create?type=ab_test'
-	},
-	{
 		id: 'suggest-api-key',
-		priority: 2,
+		priority: 1,
 		condition: (ctx) => ctx.integrationMode === 'api' && !ctx.hasApiKey,
 		message: 'Get your API key to start generating images programmatically.',
 		cta: 'Get API Key',
 		href: '/dashboard/api-token'
 	},
 	{
-		id: 'suggest-tracking',
-		priority: 3,
-		condition: (ctx) => ctx.experimentCount > 0 && !ctx.hasTracking,
-		message: 'Install the tracking script to measure experiment performance.',
-		cta: 'Install Tracking',
-		href: '/dashboard/install'
-	},
-	{
-		id: 'suggest-bulk-render',
-		priority: 4,
+		id: 'suggest-workflow',
+		priority: 2,
 		condition: (ctx) => ctx.templateCount >= 1 && !ctx.hasBulkRendered,
-		message: 'Generate images at scale — try bulk rendering from a CSV or API.',
-		cta: 'Try Bulk Render',
-		href: '/dashboard/template'
+		message: 'Generate images at scale — run a workflow from a CSV or webhook.',
+		cta: 'Run a Workflow',
+		href: '/dashboard/workflows/new'
 	}
 ];
 
@@ -45,11 +28,9 @@ const NUDGES = [
  * Evaluate nudges against current user context
  * @param {Object} context - User state context
  * @param {number} context.templateCount - Number of templates
- * @param {number} context.experimentCount - Number of experiments
  * @param {string|null} context.integrationMode - 'editor' | 'api' | 'both' | null
  * @param {boolean} context.hasApiKey - Whether user has an API key
- * @param {boolean} context.hasTracking - Whether tracking is installed
- * @param {boolean} context.hasBulkRendered - Whether user has done bulk rendering
+ * @param {boolean} context.hasBulkRendered - Whether user has run a workflow / bulk render
  * @param {string[]} dismissedIds - IDs of dismissed nudges
  * @returns {Array} Up to 2 applicable nudges, sorted by priority
  */

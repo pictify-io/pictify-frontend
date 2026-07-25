@@ -11,8 +11,6 @@
 	} from '../../../store/template.store';
 	import TemplateList from '$lib/components/dashboard/template/TemplateList.svelte';
 	import EmptyTemplate from '$lib/components/dashboard/template/EmptyTemplate.svelte';
-	import TemplateTypeSelector from '$lib/components/editor/TemplateTypeSelector.svelte';
-	import EnginePicker from '$lib/components/editor/html/EnginePicker.svelte';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { FeatureUpgradePrompt } from '$lib/components/plg';
 	import {
@@ -34,9 +32,6 @@
 	let searchTimeout;
 	let currentPlan = '';
 	let formatFilter = 'all'; // Backend-driven filter: 'all', 'image', 'pdf'
-	let dynamicFilter = false; // Filter for templates with dynamic links
-	let showTemplateTypeSelector = false;
-	let showEnginePicker = false;
 	let showTemplateLimitPrompt = false;
 
 	// Template limit checking
@@ -76,29 +71,7 @@
 			await getTemplatesAction({
 				page: 1,
 				limit: 12,
-				outputFormat: newFilter,
-				hasDynamicLink: dynamicFilter || undefined
-			});
-		}
-
-		isLoading = false;
-	};
-
-	// Handle dynamic filter change
-	const handleDynamicFilterChange = async () => {
-		const newDynamicFilter = !dynamicFilter;
-		dynamicFilter = newDynamicFilter;
-		isLoading = true;
-
-		// Reset to page 1 when filter changes
-		if (searchQuery) {
-			await searchTemplatesAction(searchQuery, { page: 1, limit: 12 });
-		} else {
-			await getTemplatesAction({
-				page: 1,
-				limit: 12,
-				outputFormat: formatFilter,
-				hasDynamicLink: newDynamicFilter || undefined
+				outputFormat: newFilter
 			});
 		}
 
@@ -111,40 +84,8 @@
 			showTemplateLimitPrompt = true;
 			return;
 		}
-		// Two-stage create flow:
-		//   (1) pick engine — Canvas (fabric) or HTML
-		//   (2) if Canvas, pick image/pdf format (existing flow)
-		// HTML path jumps straight into the HTML editor.
-		showEnginePicker = true;
-	};
-
-	const handleEngineSelect = (event) => {
-		showEnginePicker = false;
-		if (event.detail.engine === 'html') {
-			goto('/template-workspace/html/create?engine=html');
-		} else {
-			// Canvas → existing format selector
-			showTemplateTypeSelector = true;
-		}
-	};
-
-	const handleCloseEnginePicker = () => {
-		showEnginePicker = false;
-	};
-
-	const handleFormatSelect = (event) => {
-		const { outputFormat } = event.detail;
-		showTemplateTypeSelector = false;
-
-		if (outputFormat === 'pdf') {
-			goto('/template-workspace/pdf/create');
-		} else {
-			goto('/template-workspace/image/create');
-		}
-	};
-
-	const handleCloseSelector = () => {
-		showTemplateTypeSelector = false;
+		// Canvas engine retired (2026-07): jump straight into the HTML editor.
+		goto('/template-workspace/html/create?engine=html');
 	};
 
 	const handlePageChange = async (event) => {
@@ -157,8 +98,7 @@
 			await getTemplatesAction({
 				page: newPage,
 				limit: 12,
-				outputFormat: formatFilter,
-				hasDynamicLink: dynamicFilter || undefined
+				outputFormat: formatFilter
 			});
 		}
 
@@ -343,45 +283,6 @@
 					>
 					PDF
 				</button>
-
-				<div class="hidden sm:block w-[1px] h-6 bg-gray-300 mx-1" />
-
-				<!-- Live Link Filter -->
-				<button
-					on:click={handleDynamicFilterChange}
-					class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
-						{dynamicFilter
-						? 'bg-data-purple text-white shadow-[3px_3px_0_0_#6b21a8] border-data-purple'
-						: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
-				>
-					<svg
-						class="w-4 h-4 {dynamicFilter ? 'text-white' : 'text-data-purple'}"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-						/></svg
-					>
-					Live Links
-					{#if dynamicFilter}
-						<svg
-							class="w-4 h-4 text-white ml-1"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M5 13l4 4L19 7"
-							/></svg
-						>
-					{/if}
-				</button>
 			</div>
 			{#if isLoading}
 				<!-- Skeleton grid — 6 cards matching the real template card shape -->
@@ -463,14 +364,6 @@
 			{/if}
 		</div>
 	</div>
-
-	{#if showEnginePicker}
-		<EnginePicker mode="modal" on:select={handleEngineSelect} on:close={handleCloseEnginePicker} />
-	{/if}
-
-	{#if showTemplateTypeSelector}
-		<TemplateTypeSelector on:select={handleFormatSelect} on:close={handleCloseSelector} />
-	{/if}
 
 	{#if showTemplateLimitPrompt && templateUpgradePrompt}
 		<FeatureUpgradePrompt
