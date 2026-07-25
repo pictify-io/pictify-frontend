@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
-	import { listWorkflowRuns } from '../../../api/workflow';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { listWorkflowRuns, listWorkflowHooks } from '../../../api/workflow';
 	import { PACKS, getPack } from '$lib/workflows/packs.js';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { analytics } from '$lib/analytics.js';
@@ -8,6 +9,34 @@
 	let isLoading = true;
 	let loadError = '';
 	let runs = [];
+	let hooks = [];
+	let copiedHookUid = null;
+
+	$: activeHooks = hooks.filter((hook) => hook.active);
+
+	function hookUrl(hook) {
+		return hook?.path ? `${PUBLIC_BACKEND_URL}${hook.path}` : hook?.url || '';
+	}
+
+	async function copyHookUrl(hook) {
+		try {
+			await navigator.clipboard.writeText(hookUrl(hook));
+			copiedHookUid = hook.uid;
+			setTimeout(() => (copiedHookUid = null), 1500);
+		} catch (error) {
+			/* ignore */
+		}
+	}
+
+	async function loadHooks() {
+		try {
+			const response = await listWorkflowHooks();
+			hooks = response?.hooks || [];
+		} catch (error) {
+			// Non-blocking — the webhooks section just stays hidden.
+			hooks = [];
+		}
+	}
 
 	function timeAgo(dateStr) {
 		if (!dateStr) return '';
@@ -56,6 +85,7 @@
 	onMount(() => {
 		analytics.page('Workflows');
 		loadRuns();
+		loadHooks();
 	});
 </script>
 
@@ -130,6 +160,53 @@
 			{/if}
 		{/each}
 	</div>
+
+	<!-- Webhooks -->
+	{#if activeHooks.length > 0}
+		<div class="flex items-center gap-3 mb-6">
+			<h2
+				class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
+			>
+				<span class="w-3 h-3 bg-brand-accent rounded-sm border-[2px] border-black" />
+				Webhooks
+			</h2>
+		</div>
+		<div class="space-y-4 mb-10 sm:mb-14">
+			{#each activeHooks as hook (hook.uid)}
+				<div
+					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4"
+				>
+					<div
+						class="w-12 h-12 bg-data-violet/20 rounded-xl border-[2px] border-black flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
+					>
+						<svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5m7.5-2.344a4 4 0 015.656 0l.086.086a4 4 0 010 5.656l-1.5 1.5m-7.5-9.5l3-3a4 4 0 015.656 5.656l-1.5 1.5"
+							/>
+						</svg>
+					</div>
+					<div class="flex-1 min-w-0">
+						<h3 class="text-base font-black text-black truncate">
+							{hook.name || 'Webhook'}
+						</h3>
+						<p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
+							Template {hook.templateUid}
+							&middot; {hook.stats?.received ?? 0} received &middot; {hook.stats?.rendered ?? 0} rendered
+						</p>
+					</div>
+					<button
+						on:click={() => copyHookUrl(hook)}
+						class="inline-flex items-center gap-2 bg-brand-accent text-black px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wide border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all self-start sm:self-auto"
+					>
+						{copiedHookUid === hook.uid ? 'Copied!' : 'Copy URL'}
+					</button>
+				</div>
+			{/each}
+		</div>
+	{/if}
 
 	<!-- Past Runs -->
 	<div class="flex items-center gap-3 mb-6">

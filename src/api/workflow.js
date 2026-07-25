@@ -44,4 +44,30 @@ const previewWorkflow = async (payload) => {
 	return response;
 };
 
-export { createWorkflowRun, getWorkflowRun, listWorkflowRuns, previewWorkflow };
+/**
+ * Create a workflow webhook hook.
+ * @param {Object} payload - { name, templateUid, columnMapping, delivery }
+ * @returns {Promise<Object>} - { hook: { uid, path, url, ... } }
+ */
+const createWorkflowHook = async (payload) => {
+	const response = await backend.post('/workflow/hooks', payload);
+	return response;
+};
+
+/**
+ * List workflow webhook hooks with stats.
+ * @returns {Promise<Object>} - { hooks: [...] }
+ */
+const listWorkflowHooks = async () => {
+	const response = await backend.get('/workflow/hooks');
+	return response;
+};
+
+export {
+	createWorkflowRun,
+	getWorkflowRun,
+	listWorkflowRuns,
+	previewWorkflow,
+	createWorkflowHook,
+	listWorkflowHooks
+};

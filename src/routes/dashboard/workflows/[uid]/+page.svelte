@@ -1,16 +1,72 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import { getWorkflowRun } from '../../../../api/workflow';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getWorkflowRun, createWorkflowHook } from '../../../../api/workflow';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { analytics } from '$lib/analytics.js';
 
 	const ACTIVE_STATUSES = ['pending', 'queued', 'processing', 'running'];
+	const DELIVERY_KEYS = ['method', 'emailColumn', 'subject', 'fromName', 'bodyText'];
 
 	let run = null;
 	let isLoading = true;
 	let loadError = '';
 	let pollTimer = null;
+
+	let hook = null;
+	let hookCreating = false;
+	let hookError = '';
+	let hookCopied = false;
+
+	$: hookUrl = hook?.path ? `${PUBLIC_BACKEND_URL}${hook.path}` : '';
+	$: sampleRow = buildSampleRow(run?.columnMapping);
+	$: curlExample = hookUrl
+		? `curl -X POST ${hookUrl} -H 'Content-Type: application/json' -d '${JSON.stringify(
+				sampleRow
+		  )}'`
+		: '';
+
+	function buildSampleRow(columnMapping) {
+		const columns = Object.values(columnMapping || {});
+		if (columns.length === 0) return { name: 'Ada Lovelace' };
+		return columns.reduce((acc, column) => ({ ...acc, [column]: '...' }), {});
+	}
+
+	async function createHook() {
+		if (!run || hookCreating) return;
+		hookCreating = true;
+		hookError = '';
+		try {
+			const delivery = DELIVERY_KEYS.reduce((acc, key) => {
+				if (run.delivery?.[key] != null) acc[key] = run.delivery[key];
+				return acc;
+			}, {});
+			const response = await createWorkflowHook({
+				name: `Run ${run.uid} webhook`,
+				templateUid: run.templateUid,
+				columnMapping: run.columnMapping || {},
+				delivery
+			});
+			hook = response?.hook || null;
+			if (!hook) hookError = 'Failed to create webhook';
+			else analytics.track('Workflow Hook Created', { runUid: run.uid });
+		} catch (error) {
+			hookError = error?.message || 'Failed to create webhook';
+		} finally {
+			hookCreating = false;
+		}
+	}
+
+	async function copyHookUrl() {
+		try {
+			await navigator.clipboard.writeText(hookUrl);
+			hookCopied = true;
+			setTimeout(() => (hookCopied = false), 1500);
+		} catch (error) {
+			/* ignore */
+		}
+	}
 
 	$: uid = $page.params.uid;
 	$: counts = run?.counts || { total: 0, rendered: 0, delivered: 0, failed: 0 };
@@ -262,6 +318,66 @@
 					Every rendered file is listed in the table below — use the view link on each row to open
 					or download it.
 				</p>
+			</div>
+		{/if}
+
+		<!-- Automate this: webhook card -->
+		{#if run.status === 'completed'}
+			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg p-6 mb-10">
+				<div class="flex items-center gap-3 mb-2">
+					<div
+						class="w-10 h-10 bg-data-violet rounded-xl border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
+					>
+						<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5m7.5-2.344a4 4 0 015.656 0l.086.086a4 4 0 010 5.656l-1.5 1.5m-7.5-9.5l3-3a4 4 0 015.656 5.656l-1.5 1.5"
+							/>
+						</svg>
+					</div>
+					<h3 class="text-sm font-black text-black uppercase tracking-widest">
+						Automate this: create webhook
+					</h3>
+				</div>
+				<p class="text-xs font-bold text-gray-600 mb-4">
+					Get a permanent URL with this run's template, mapping, and delivery baked in — POST one
+					row of JSON and it renders (and delivers) automatically.
+				</p>
+				{#if !hook}
+					<button
+						on:click={createHook}
+						disabled={hookCreating}
+						class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-60"
+					>
+						{hookCreating ? 'Creating...' : 'Create webhook'}
+					</button>
+					{#if hookError}
+						<p class="text-xs font-bold text-brand-danger mt-3">{hookError}</p>
+					{/if}
+				{:else}
+					<div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+						<code
+							class="flex-1 min-w-0 truncate bg-gray-100 border-[2px] border-black rounded-lg px-3 py-2 text-xs font-bold text-black"
+						>
+							{hookUrl}
+						</code>
+						<button
+							on:click={copyHookUrl}
+							class="inline-flex items-center gap-2 bg-brand-accent text-black px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wide border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex-shrink-0"
+						>
+							{hookCopied ? 'Copied!' : 'Copy URL'}
+						</button>
+					</div>
+					<div class="overflow-x-auto">
+						<code
+							class="block whitespace-nowrap bg-black text-data-green rounded-lg px-3 py-2 text-[11px] font-bold"
+						>
+							{curlExample}
+						</code>
+					</div>
+				{/if}
 			</div>
 		{/if}
 
