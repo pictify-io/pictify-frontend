@@ -1,7 +1,8 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import {
 		CERTIFICATE_DESIGNS,
 		SAMPLE_ROW,
@@ -9,18 +10,32 @@
 	} from '$lib/workflows/certificate-pack.js';
 	import { parseCsv, MAX_ROWS } from '$lib/workflows/csv.js';
 	import { createTemplate, getTemplates, getTemplateById } from '../../../../api/template';
-	import { createWorkflowRun, previewWorkflow } from '../../../../api/workflow';
+	import {
+		createWorkflowRun,
+		previewWorkflow,
+		createWorkflowHook,
+		listWorkflowHooks
+	} from '../../../../api/workflow';
 	import { analytics } from '$lib/analytics.js';
 
 	// ?pack=certificates only preselects the sample section (harmless deep-link).
 	const preselectSamples = $page.url.searchParams.get('pack') === 'certificates';
 
-	const STEPS = [
-		{ id: 1, label: 'Data' },
-		{ id: 2, label: 'Template' },
-		{ id: 3, label: 'Mapping' },
-		{ id: 4, label: 'Preview' },
-		{ id: 5, label: 'Deliver' }
+	const CSV_STEPS = [
+		{ key: 'source', label: 'Source' },
+		{ key: 'data', label: 'Data' },
+		{ key: 'template', label: 'Template' },
+		{ key: 'mapping', label: 'Mapping' },
+		{ key: 'preview', label: 'Preview' },
+		{ key: 'deliver', label: 'Deliver' }
+	];
+
+	const WEBHOOK_STEPS = [
+		{ key: 'source', label: 'Source' },
+		{ key: 'template', label: 'Template' },
+		{ key: 'fields', label: 'Fields' },
+		{ key: 'hookDeliver', label: 'Delivery' },
+		{ key: 'done', label: 'Done' }
 	];
 
 	function variableLabel(variable) {
@@ -61,6 +76,7 @@
 	};
 
 	let step = 1;
+	let source = '';
 	let pasteText = '';
 	let dragActive = false;
 	let dataError = '';
@@ -68,14 +84,54 @@
 	let runError = '';
 	let fileInput;
 
+	// ── Webhook-mode state ───────────────────────────────────────────────
+	let hookMapping = {};
+	let hookName = '';
+	let hookDelivery = {
+		method: 'download',
+		emailKey: 'email',
+		subject: 'Your document',
+		bodyText: 'Your document is attached below.'
+	};
+	let createdHook = null;
+	let hookCreatedKey = '';
+	let hookCreating = false;
+	let hookCreateError = '';
+	let hookCopied = false;
+	let hookStats = null;
+	let hookPollTimer = null;
+	let testSending = false;
+	let testError = '';
+	let testResult = null;
+
+	// ── Step definitions driven by source ────────────────────────────────
+	$: steps = source === 'webhook' ? WEBHOOK_STEPS : CSV_STEPS;
+	$: currentKey = steps[Math.min(step, steps.length) - 1].key;
+
 	// ── Step validity ────────────────────────────────────────────────────
-	$: step1Valid = wizard.rows.length > 0 && wizard.headers.length > 0;
-	$: step2Valid = step1Valid && !!wizard.templateUid;
-	$: step3Valid = step2Valid && wizard.variables.every((v) => !!wizard.mapping[v]);
-	$: step4Valid = step3Valid && wizard.previews.length > 0 && !wizard.previewError;
-	$: step5Valid =
-		step4Valid && (wizard.delivery.method === 'download' || !!wizard.delivery.emailColumn);
-	$: stepValidity = [true, step1Valid, step2Valid, step3Valid, step4Valid, step5Valid];
+	$: dataValid = wizard.rows.length > 0 && wizard.headers.length > 0;
+	$: templateValid = !!wizard.templateUid;
+	$: mappingValid = templateValid && wizard.variables.every((v) => !!wizard.mapping[v]);
+	$: previewValid = mappingValid && wizard.previews.length > 0 && !wizard.previewError;
+	$: deliverValid =
+		previewValid && (wizard.delivery.method === 'download' || !!wizard.delivery.emailColumn);
+	$: fieldsValid = templateValid && wizard.variables.every((v) => !!(hookMapping[v] || '').trim());
+	$: hookDeliverValid =
+		fieldsValid &&
+		!!hookName.trim() &&
+		(hookDelivery.method === 'download' || !!hookDelivery.emailKey.trim());
+	$: validity = {
+		source: !!source,
+		data: dataValid,
+		template: templateValid,
+		mapping: mappingValid,
+		preview: previewValid,
+		deliver: deliverValid,
+		fields: fieldsValid,
+		hookDeliver: hookDeliverValid,
+		done: !!createdHook
+	};
+	$: stepValidity = [true, ...steps.map((s) => validity[s.key])];
 
 	$: emptyValueRowCount = wizard.rows.filter((row) =>
 		wizard.variables.some((v) => wizard.mapping[v] && !row[wizard.mapping[v]])
@@ -93,9 +149,14 @@
 	function gotoStep(target) {
 		if (!canEnterStep(target)) return;
 		step = target;
-		if (step === 3) prefillMapping();
-		if (step === 4) loadPreviews();
-		if (step === 5) prefillEmailColumn();
+		const key = steps[step - 1].key;
+		if (key === 'mapping') prefillMapping();
+		if (key === 'preview') loadPreviews();
+		if (key === 'deliver') prefillEmailColumn();
+		if (key === 'fields') prefillHookMapping();
+		if (key === 'hookDeliver' && !hookName) hookName = `${wizard.templateName} hook`;
+		if (key === 'done') createHook();
+		if (key !== 'done') stopHookPolling();
 	}
 
 	function nextStep() {
@@ -103,7 +164,13 @@
 	}
 
 	function prevStep() {
-		if (step > 1) step = step - 1;
+		if (step > 1) gotoStep(step - 1);
+	}
+
+	// ── Step 1: source ───────────────────────────────────────────────────
+	function selectSource(value) {
+		if (source === value) return;
+		source = value;
 	}
 
 	// ── Step 1: CSV data ─────────────────────────────────────────────────
@@ -235,6 +302,8 @@
 						: 'Your document'
 				}
 			};
+			hookMapping = {};
+			hookName = `${wizard.templateName} hook`;
 		} finally {
 			selectingUid = '';
 		}
@@ -404,8 +473,166 @@
 		wizard = { ...wizard, delivery: { ...wizard.delivery, ...patch } };
 	}
 
+	// Shared delivery UI works on the CSV run delivery or the webhook delivery.
+	$: activeDelivery = source === 'webhook' ? hookDelivery : wizard.delivery;
+
+	function setActiveDelivery(patch) {
+		if (source === 'webhook') hookDelivery = { ...hookDelivery, ...patch };
+		else setDelivery(patch);
+	}
+
+	// ── Webhook flow: fields, delivery, done ─────────────────────────────
+	function prefillHookMapping() {
+		const mapping = { ...hookMapping };
+		for (const variable of wizard.variables) {
+			if (!mapping[variable]) mapping[variable] = variable;
+		}
+		hookMapping = mapping;
+	}
+
+	function setHookKey(variable, value) {
+		hookMapping = { ...hookMapping, [variable]: value };
+	}
+
+	function sampleValueFor(variable) {
+		if (SAMPLE_ROW[variable] != null) return SAMPLE_ROW[variable];
+		const norm = normalize(variable);
+		if (norm.includes('email')) return 'ada@example.com';
+		if (norm.includes('date')) return 'June 12, 2026';
+		if (norm.includes('name')) return 'Ada Lovelace';
+		return 'Sample value';
+	}
+
+	function buildHookPayload(columnMapping, delivery) {
+		const payload = {};
+		for (const [variable, key] of Object.entries(columnMapping)) {
+			payload[key] = sampleValueFor(variable);
+		}
+		const emailKey = delivery.method === 'email' ? delivery.emailKey.trim() : '';
+		if (emailKey && payload[emailKey] == null) payload[emailKey] = 'ada@example.com';
+		return payload;
+	}
+
+	$: hookColumnMapping = wizard.variables.reduce((acc, variable) => {
+		acc[variable] = (hookMapping[variable] || variable).trim();
+		return acc;
+	}, {});
+	$: hookRequestKey = JSON.stringify({
+		templateUid: wizard.templateUid,
+		columnMapping: hookColumnMapping,
+		delivery: hookDelivery,
+		name: hookName
+	});
+	$: hookUrl = createdHook?.path ? `${PUBLIC_BACKEND_URL}${createdHook.path}` : '';
+	$: hookPayload = buildHookPayload(hookColumnMapping, hookDelivery);
+	$: hookCurl = hookUrl
+		? `curl -X POST ${hookUrl} -H 'Content-Type: application/json' -d '${JSON.stringify(
+				hookPayload
+		  )}'`
+		: '';
+	$: hookReceived = hookStats?.received || 0;
+	$: hookRendered = hookStats?.rendered || 0;
+	$: testUrl =
+		testResult?.url || testResult?.image?.url || testResult?.item?.url || testResult?.render?.url;
+
+	async function createHook() {
+		if (hookCreating) return;
+		if (createdHook && hookCreatedKey === hookRequestKey) {
+			startHookPolling();
+			return;
+		}
+		hookCreating = true;
+		hookCreateError = '';
+		createdHook = null;
+		hookStats = null;
+		testResult = null;
+		testError = '';
+		try {
+			const delivery = { method: hookDelivery.method };
+			if (hookDelivery.method === 'email') {
+				delivery.emailColumn = hookDelivery.emailKey.trim();
+				delivery.subject = hookDelivery.subject;
+				delivery.bodyText = hookDelivery.bodyText;
+			}
+			const response = await createWorkflowHook({
+				name: hookName.trim(),
+				templateUid: wizard.templateUid,
+				columnMapping: hookColumnMapping,
+				delivery
+			});
+			createdHook = response?.hook || null;
+			if (!createdHook) throw new Error('The webhook was created but no details were returned.');
+			hookCreatedKey = hookRequestKey;
+			analytics.track?.('Workflow Hook Created', {
+				source: 'wizard',
+				templateUid: wizard.templateUid,
+				delivery: delivery.method
+			});
+			startHookPolling();
+		} catch (error) {
+			hookCreateError = error?.message || 'Failed to create the webhook. Please try again.';
+		} finally {
+			hookCreating = false;
+		}
+	}
+
+	function startHookPolling() {
+		stopHookPolling();
+		pollHookStats();
+	}
+
+	function stopHookPolling() {
+		clearTimeout(hookPollTimer);
+		hookPollTimer = null;
+	}
+
+	async function pollHookStats() {
+		if (!createdHook?.uid) return;
+		try {
+			const response = await listWorkflowHooks();
+			const match = (response?.hooks || []).find((h) => h.uid === createdHook.uid);
+			if (match) hookStats = match.stats || null;
+		} catch (error) {
+			/* keep polling */
+		}
+		hookPollTimer = setTimeout(pollHookStats, 3000);
+	}
+
+	async function copyHookUrl() {
+		try {
+			await navigator.clipboard.writeText(hookUrl);
+			hookCopied = true;
+			setTimeout(() => (hookCopied = false), 1500);
+		} catch (error) {
+			/* ignore */
+		}
+	}
+
+	async function sendTestEvent() {
+		if (!hookUrl || testSending) return;
+		testSending = true;
+		testError = '';
+		testResult = null;
+		try {
+			const response = await fetch(hookUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(hookPayload)
+			});
+			const data = await response.json().catch(() => null);
+			if (!response.ok) {
+				throw new Error(data?.message || `The webhook returned ${response.status}.`);
+			}
+			testResult = data || {};
+		} catch (error) {
+			testError = error?.message || 'Failed to send the test event.';
+		} finally {
+			testSending = false;
+		}
+	}
+
 	async function startRun() {
-		if (!step5Valid || isRunning) return;
+		if (!deliverValid || isRunning) return;
 		isRunning = true;
 		runError = '';
 		try {
@@ -441,6 +668,10 @@
 	onMount(() => {
 		analytics.page('Workflows New Run');
 		loadTemplates();
+	});
+
+	onDestroy(() => {
+		stopHookPolling();
 	});
 </script>
 
@@ -480,28 +711,28 @@
 	<!-- Progress Indicator -->
 	<div class="mb-10 overflow-x-auto pb-2">
 		<div class="flex items-stretch gap-2 sm:gap-3 min-w-max">
-			{#each STEPS as s, i}
+			{#each steps as s, i (s.key)}
 				<button
-					on:click={() => gotoStep(s.id)}
-					disabled={!canEnterStep(s.id)}
+					on:click={() => gotoStep(i + 1)}
+					disabled={!canEnterStep(i + 1)}
 					class="flex items-center gap-3 px-4 py-3 rounded-xl border-[3px] transition-all duration-200
-						{step === s.id
+						{step === i + 1
 						? 'bg-brand-accent border-black shadow-brutal-md text-black'
-						: canEnterStep(s.id)
+						: canEnterStep(i + 1)
 						? 'bg-white border-black shadow-brutal-sm text-black hover:shadow-brutal-md hover:-translate-y-0.5'
 						: 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'}"
 				>
 					<span
 						class="w-7 h-7 rounded-lg border-[2px] flex items-center justify-center text-xs font-black flex-shrink-0
-							{stepValidity[s.id] && step !== s.id
+							{stepValidity[i + 1] && step !== i + 1
 							? 'bg-data-green border-black text-black'
-							: step === s.id
+							: step === i + 1
 							? 'bg-black border-black text-white'
-							: canEnterStep(s.id)
+							: canEnterStep(i + 1)
 							? 'bg-white border-black text-black'
 							: 'bg-gray-200 border-gray-300 text-gray-400'}"
 					>
-						{#if stepValidity[s.id] && step !== s.id}
+						{#if stepValidity[i + 1] && step !== i + 1}
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									stroke-linecap="round"
@@ -511,12 +742,12 @@
 								/>
 							</svg>
 						{:else}
-							{s.id}
+							{i + 1}
 						{/if}
 					</span>
 					<span class="text-xs font-black uppercase tracking-widest">{s.label}</span>
 				</button>
-				{#if i < STEPS.length - 1}
+				{#if i < steps.length - 1}
 					<div class="flex items-center">
 						<div class="w-4 sm:w-6 h-[3px] bg-black" />
 					</div>
@@ -525,8 +756,99 @@
 		</div>
 	</div>
 
-	<!-- ─── STEP 1: DATA ─────────────────────────────────────────────── -->
-	{#if step === 1}
+	<!-- ─── STEP: SOURCE ─────────────────────────────────────────────── -->
+	{#if currentKey === 'source'}
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+			<!-- CSV option -->
+			<button
+				on:click={() => selectSource('csv')}
+				class="text-left bg-white rounded-2xl border-[3px] p-6 transition-all duration-200
+					{source === 'csv'
+					? 'border-black shadow-brutal-2xl -translate-y-1'
+					: 'border-black shadow-brutal-md hover:shadow-brutal-xl hover:-translate-y-1'}"
+			>
+				<div class="flex items-start justify-between">
+					<div
+						class="w-12 h-12 bg-brand-accent/20 rounded-xl border-[3px] border-black shadow-brutal-sm flex items-center justify-center mb-4"
+					>
+						<svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+							/>
+						</svg>
+					</div>
+					{#if source === 'csv'}
+						<span
+							class="w-7 h-7 bg-data-green rounded-lg border-[2px] border-black flex items-center justify-center"
+						>
+							<svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+						</span>
+					{/if}
+				</div>
+				<h3 class="text-base font-black text-black uppercase tracking-wide">
+					Upload a spreadsheet
+				</h3>
+				<p class="text-xs font-bold text-gray-500 mt-1 leading-relaxed">
+					Upload or paste a CSV and render every row in a one-time batch run.
+				</p>
+			</button>
+
+			<!-- Webhook option -->
+			<button
+				on:click={() => selectSource('webhook')}
+				class="text-left bg-white rounded-2xl border-[3px] p-6 transition-all duration-200
+					{source === 'webhook'
+					? 'border-black shadow-brutal-2xl -translate-y-1'
+					: 'border-black shadow-brutal-md hover:shadow-brutal-xl hover:-translate-y-1'}"
+			>
+				<div class="flex items-start justify-between">
+					<div
+						class="w-12 h-12 bg-data-violet/20 rounded-xl border-[3px] border-black shadow-brutal-sm flex items-center justify-center mb-4"
+					>
+						<svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5m7.5-2.344a4 4 0 015.656 0l.086.086a4 4 0 010 5.656l-1.5 1.5m-7.5-9.5l3-3a4 4 0 015.656 5.656l-1.5 1.5"
+							/>
+						</svg>
+					</div>
+					{#if source === 'webhook'}
+						<span
+							class="w-7 h-7 bg-data-green rounded-lg border-[2px] border-black flex items-center justify-center"
+						>
+							<svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+						</span>
+					{/if}
+				</div>
+				<h3 class="text-base font-black text-black uppercase tracking-wide">Connect a webhook</h3>
+				<p class="text-xs font-bold text-gray-500 mt-1 leading-relaxed">
+					Your systems send rows one at a time — LMS completions, form submissions, Zapier or n8n.
+				</p>
+			</button>
+		</div>
+	{/if}
+
+	<!-- ─── STEP: DATA (CSV) ─────────────────────────────────────────── -->
+	{#if currentKey === 'data'}
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 			<!-- Upload -->
 			<div
@@ -615,7 +937,7 @@
 			</div>
 		{/if}
 
-		{#if step1Valid}
+		{#if dataValid}
 			<div
 				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden mb-8"
 			>
@@ -684,7 +1006,7 @@
 	{/if}
 
 	<!-- ─── STEP 2: TEMPLATE ─────────────────────────────────────────── -->
-	{#if step === 2}
+	{#if currentKey === 'template'}
 		<div class="flex flex-col gap-10 mb-8">
 			<!-- Workspace templates (primary path) -->
 			<div style="order: {preselectSamples ? 1 : 0}">
@@ -857,7 +1179,7 @@
 	{/if}
 
 	<!-- ─── STEP 3: MAPPING ──────────────────────────────────────────── -->
-	{#if step === 3}
+	{#if currentKey === 'mapping'}
 		<div
 			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden mb-8"
 		>
@@ -903,7 +1225,7 @@
 			</div>
 		</div>
 
-		{#if !step3Valid}
+		{#if !mappingValid}
 			<div
 				class="bg-brand-accent/20 border-[3px] border-black rounded-xl p-4 mb-8 text-xs font-black text-black uppercase tracking-wide"
 			>
@@ -921,7 +1243,7 @@
 	{/if}
 
 	<!-- ─── STEP 4: PREVIEW ──────────────────────────────────────────── -->
-	{#if step === 4}
+	{#if currentKey === 'preview'}
 		{#if wizard.previewLoading}
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
 				{#each Array(Math.min(3, wizard.rows.length)) as _}
@@ -998,14 +1320,69 @@
 		{/if}
 	{/if}
 
+	<!-- ─── STEP: FIELDS (WEBHOOK) ───────────────────────────────────── -->
+	{#if currentKey === 'fields'}
+		<div
+			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden mb-8"
+		>
+			<div class="p-5 border-b-[3px] border-black bg-gray-50">
+				<span class="text-sm font-black text-black uppercase tracking-widest">
+					Map template fields to JSON keys
+				</span>
+				<p class="text-xs font-bold text-gray-500 mt-1">
+					Keys of the JSON object your system will POST.
+				</p>
+			</div>
+			<div class="p-6 space-y-4">
+				{#each wizard.variables as variable (variable)}
+					<div
+						class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 pb-4 border-b-[2px] border-gray-100 last:border-b-0 last:pb-0"
+					>
+						<div class="sm:w-56 flex items-center gap-2">
+							<span
+								class="w-2 h-2 rounded-full border border-black {(
+									hookMapping[variable] || ''
+								).trim()
+									? 'bg-data-green'
+									: 'bg-brand-danger'}"
+							/>
+							<span class="text-xs font-black text-black uppercase tracking-widest">
+								{variableLabel(variable)}
+							</span>
+						</div>
+						<input
+							type="text"
+							value={hookMapping[variable] || ''}
+							placeholder={variable}
+							on:input={(e) => setHookKey(variable, e.target.value)}
+							class="flex-1 rounded-xl border-[3px] border-black px-4 py-3 text-sm font-mono font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
+						/>
+					</div>
+				{:else}
+					<p class="text-xs font-black text-gray-500 uppercase tracking-wide">
+						This template has no variables — every event will render the same file.
+					</p>
+				{/each}
+			</div>
+		</div>
+
+		{#if !fieldsValid}
+			<div
+				class="bg-brand-accent/20 border-[3px] border-black rounded-xl p-4 mb-8 text-xs font-black text-black uppercase tracking-wide"
+			>
+				Give every field a JSON key to continue.
+			</div>
+		{/if}
+	{/if}
+
 	<!-- ─── STEP 5: DELIVER + RUN ────────────────────────────────────── -->
-	{#if step === 5}
+	{#if currentKey === 'deliver' || currentKey === 'hookDeliver'}
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
 			<!-- Download option -->
 			<button
-				on:click={() => setDelivery({ method: 'download' })}
+				on:click={() => setActiveDelivery({ method: 'download' })}
 				class="text-left bg-white rounded-2xl border-[3px] p-6 transition-all duration-200
-					{wizard.delivery.method === 'download'
+					{activeDelivery.method === 'download'
 					? 'border-black shadow-brutal-2xl -translate-y-1'
 					: 'border-black shadow-brutal-md hover:shadow-brutal-xl hover:-translate-y-1'}"
 			>
@@ -1022,7 +1399,7 @@
 							/>
 						</svg>
 					</div>
-					{#if wizard.delivery.method === 'download'}
+					{#if activeDelivery.method === 'download'}
 						<span
 							class="w-7 h-7 bg-data-green rounded-lg border-[2px] border-black flex items-center justify-center"
 						>
@@ -1039,15 +1416,17 @@
 				</div>
 				<h3 class="text-base font-black text-black uppercase tracking-wide">Download links</h3>
 				<p class="text-xs font-bold text-gray-500 mt-1 leading-relaxed">
-					Render every file and get a link for each one on the run page.
+					{source === 'webhook'
+						? 'Render each incoming event and collect the file links on the workflows page.'
+						: 'Render every file and get a link for each one on the run page.'}
 				</p>
 			</button>
 
 			<!-- Email option -->
 			<button
-				on:click={() => setDelivery({ method: 'email' })}
+				on:click={() => setActiveDelivery({ method: 'email' })}
 				class="text-left bg-white rounded-2xl border-[3px] p-6 transition-all duration-200
-					{wizard.delivery.method === 'email'
+					{activeDelivery.method === 'email'
 					? 'border-black shadow-brutal-2xl -translate-y-1'
 					: 'border-black shadow-brutal-md hover:shadow-brutal-xl hover:-translate-y-1'}"
 			>
@@ -1064,7 +1443,7 @@
 							/>
 						</svg>
 					</div>
-					{#if wizard.delivery.method === 'email'}
+					{#if activeDelivery.method === 'email'}
 						<span
 							class="w-7 h-7 bg-data-green rounded-lg border-[2px] border-black flex items-center justify-center"
 						>
@@ -1088,7 +1467,7 @@
 			</button>
 		</div>
 
-		{#if wizard.delivery.method === 'email'}
+		{#if activeDelivery.method === 'email'}
 			<div
 				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8 space-y-5"
 			>
@@ -1097,19 +1476,33 @@
 						for="email-column"
 						class="block text-xs font-black text-black uppercase tracking-widest mb-2"
 					>
-						Email column
+						{source === 'webhook' ? 'Email key' : 'Email column'}
 					</label>
-					<select
-						id="email-column"
-						value={wizard.delivery.emailColumn}
-						on:change={(e) => setDelivery({ emailColumn: e.target.value })}
-						class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
-					>
-						<option value="">— Select the column with email addresses —</option>
-						{#each wizard.headers as header}
-							<option value={header}>{header}</option>
-						{/each}
-					</select>
+					{#if source === 'webhook'}
+						<input
+							id="email-column"
+							type="text"
+							value={hookDelivery.emailKey}
+							placeholder="email"
+							on:input={(e) => setActiveDelivery({ emailKey: e.target.value })}
+							class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-mono font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
+						/>
+						<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
+							Key of the JSON object that holds the recipient's email address.
+						</p>
+					{:else}
+						<select
+							id="email-column"
+							value={wizard.delivery.emailColumn}
+							on:change={(e) => setDelivery({ emailColumn: e.target.value })}
+							class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
+						>
+							<option value="">— Select the column with email addresses —</option>
+							{#each wizard.headers as header}
+								<option value={header}>{header}</option>
+							{/each}
+						</select>
+					{/if}
 				</div>
 				<div>
 					<label
@@ -1121,8 +1514,8 @@
 					<input
 						id="email-subject"
 						type="text"
-						value={wizard.delivery.subject}
-						on:input={(e) => setDelivery({ subject: e.target.value })}
+						value={activeDelivery.subject}
+						on:input={(e) => setActiveDelivery({ subject: e.target.value })}
 						class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 					/>
 					<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
@@ -1139,15 +1532,36 @@
 					<textarea
 						id="email-body"
 						rows="3"
-						value={wizard.delivery.bodyText}
-						on:input={(e) => setDelivery({ bodyText: e.target.value })}
+						value={activeDelivery.bodyText}
+						on:input={(e) => setActiveDelivery({ bodyText: e.target.value })}
 						class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all resize-none"
 					/>
 				</div>
 			</div>
 		{/if}
 
-		{#if runError}
+		{#if source === 'webhook'}
+			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8">
+				<label
+					for="hook-name"
+					class="block text-xs font-black text-black uppercase tracking-widest mb-2"
+				>
+					Webhook name
+				</label>
+				<input
+					id="hook-name"
+					type="text"
+					bind:value={hookName}
+					placeholder="{wizard.templateName} hook"
+					class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
+				/>
+				<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
+					So you can recognize this webhook later on the workflows page.
+				</p>
+			</div>
+		{/if}
+
+		{#if runError && source !== 'webhook'}
 			<div
 				class="bg-brand-danger/10 border-[3px] border-brand-danger rounded-xl p-4 mb-6 text-sm font-bold text-brand-danger"
 			>
@@ -1155,41 +1569,216 @@
 			</div>
 		{/if}
 
-		<div
-			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6"
-		>
-			<div>
-				<p class="text-sm font-black text-black uppercase tracking-widest">Ready to run</p>
-				<p class="text-xs font-bold text-gray-500 mt-1">
-					{wizard.rows.length}
-					{wizard.rows.length === 1 ? 'file' : 'files'} &middot; {wizard.templateName} template &middot;
-					{wizard.delivery.method === 'email' ? 'emailed to recipients' : 'download links'}
+		{#if source !== 'webhook'}
+			<div
+				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6"
+			>
+				<div>
+					<p class="text-sm font-black text-black uppercase tracking-widest">Ready to run</p>
+					<p class="text-xs font-bold text-gray-500 mt-1">
+						{wizard.rows.length}
+						{wizard.rows.length === 1 ? 'file' : 'files'} &middot; {wizard.templateName} template &middot;
+						{wizard.delivery.method === 'email' ? 'emailed to recipients' : 'download links'}
+					</p>
+				</div>
+				<button
+					on:click={startRun}
+					disabled={!deliverValid || isRunning}
+					class="group flex items-center justify-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-8 py-4 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-xl disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+				>
+					<span class="text-white font-black text-lg uppercase tracking-wide">
+						{isRunning
+							? 'Starting…'
+							: `Run ${wizard.rows.length} ${wizard.rows.length === 1 ? 'file' : 'files'}`}
+					</span>
+					<div
+						class="w-9 h-9 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
+					>
+						<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="3"
+								d="M13 10V3L4 14h7v7l9-11h-7z"
+							/>
+						</svg>
+					</div>
+				</button>
+			</div>
+		{/if}
+	{/if}
+
+	<!-- ─── STEP: DONE (WEBHOOK) ─────────────────────────────────────── -->
+	{#if currentKey === 'done'}
+		{#if hookCreating}
+			<div
+				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-8 mb-8 text-center"
+			>
+				<p class="text-sm font-black text-black uppercase tracking-widest">
+					Creating your webhook&hellip;
 				</p>
 			</div>
-			<button
-				on:click={startRun}
-				disabled={!step5Valid || isRunning}
-				class="group flex items-center justify-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-8 py-4 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-xl disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+		{:else if hookCreateError}
+			<div
+				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg p-8 text-center flex flex-col items-center mb-8"
 			>
-				<span class="text-white font-black text-lg uppercase tracking-wide">
-					{isRunning
-						? 'Starting…'
-						: `Run ${wizard.rows.length} ${wizard.rows.length === 1 ? 'file' : 'files'}`}
-				</span>
-				<div
-					class="w-9 h-9 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
+				<p class="text-sm font-black text-black uppercase tracking-wider mb-2">
+					Webhook creation failed
+				</p>
+				<p class="text-xs font-bold text-gray-500 mb-6 max-w-sm">{hookCreateError}</p>
+				<button
+					on:click={createHook}
+					class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 				>
-					<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="3"
-							d="M13 10V3L4 14h7v7l9-11h-7z"
-						/>
-					</svg>
+					Retry
+				</button>
+			</div>
+		{:else if createdHook}
+			<!-- Webhook URL + curl -->
+			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8">
+				<div class="flex items-center gap-3 mb-2">
+					<div
+						class="w-10 h-10 bg-data-green rounded-xl border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
+					>
+						<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="3"
+								d="M5 13l4 4L19 7"
+							/>
+						</svg>
+					</div>
+					<h3 class="text-sm font-black text-black uppercase tracking-widest">
+						Your webhook is live
+					</h3>
 				</div>
-			</button>
-		</div>
+				<p class="text-xs font-bold text-gray-600 mb-4">
+					POST one row of JSON to this URL and it renders (and delivers) automatically.
+				</p>
+				<div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+					<code
+						class="flex-1 min-w-0 truncate bg-gray-100 border-[2px] border-black rounded-lg px-3 py-2 text-xs font-bold text-black"
+					>
+						{hookUrl}
+					</code>
+					<button
+						on:click={copyHookUrl}
+						class="inline-flex items-center gap-2 bg-brand-accent text-black px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wide border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex-shrink-0"
+					>
+						{hookCopied ? 'Copied!' : 'Copy URL'}
+					</button>
+				</div>
+				<div class="overflow-x-auto">
+					<code
+						class="block whitespace-nowrap bg-black text-data-green rounded-lg px-3 py-2 text-[11px] font-bold"
+					>
+						{hookCurl}
+					</code>
+				</div>
+			</div>
+
+			<!-- Send a test event -->
+			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8">
+				<h3 class="text-sm font-black text-black uppercase tracking-widest mb-2">
+					Send a test event
+				</h3>
+				<p class="text-xs font-bold text-gray-600 mb-4">
+					Fires the sample payload above at your webhook straight from this browser.
+				</p>
+				<button
+					on:click={sendTestEvent}
+					disabled={testSending}
+					class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-60"
+				>
+					{testSending ? 'Sending…' : 'Send a test event'}
+				</button>
+				{#if testError}
+					<p class="text-xs font-bold text-brand-danger mt-3">{testError}</p>
+				{/if}
+				{#if testResult}
+					{#if testUrl}
+						<div class="mt-5 flex flex-col sm:flex-row sm:items-start gap-4">
+							<div
+								class="w-full sm:w-64 aspect-[4/3] bg-gray-100 rounded-xl border-[3px] border-black overflow-hidden flex-shrink-0"
+							>
+								<img src={testUrl} alt="Test render" class="w-full h-full object-cover" />
+							</div>
+							<div class="min-w-0">
+								<p class="text-xs font-black text-black uppercase tracking-widest mb-2">
+									Rendered file
+								</p>
+								<a
+									href={testUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="block truncate text-xs font-bold text-black underline hover:text-brand-danger"
+								>
+									{testUrl}
+								</a>
+							</div>
+						</div>
+					{:else}
+						<div class="mt-5 overflow-x-auto">
+							<code
+								class="block whitespace-pre bg-gray-100 border-[2px] border-black rounded-lg px-3 py-2 text-[11px] font-bold text-black"
+							>
+								{JSON.stringify(testResult, null, 2)}
+							</code>
+						</div>
+					{/if}
+				{/if}
+			</div>
+
+			<!-- Waiting for first event -->
+			{#if hookReceived > 0}
+				<div
+					class="bg-data-green/20 rounded-2xl border-[3px] border-black shadow-brutal-lg p-6 mb-8"
+				>
+					<div class="flex items-center gap-3 mb-2">
+						<span class="w-3 h-3 bg-data-green rounded-full border-[2px] border-black" />
+						<h3 class="text-sm font-black text-black uppercase tracking-widest">
+							Your webhook is receiving events
+						</h3>
+					</div>
+					<p class="text-xs font-bold text-gray-700 mb-4">
+						{hookReceived}
+						{hookReceived === 1 ? 'event' : 'events'} received &middot; {hookRendered}
+						{hookRendered === 1 ? 'file' : 'files'} rendered
+					</p>
+					<a
+						href="/dashboard/workflows"
+						class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+					>
+						Go to workflows
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M17 8l4 4m0 0l-4 4m4-4H3"
+							/>
+						</svg>
+					</a>
+				</div>
+			{:else}
+				<div
+					class="bg-white rounded-2xl border-[3px] border-black border-dashed p-6 mb-8 flex items-center gap-4"
+				>
+					<span
+						class="w-3 h-3 bg-brand-accent rounded-full border-[2px] border-black animate-pulse flex-shrink-0"
+					/>
+					<div>
+						<p class="text-sm font-black text-black uppercase tracking-widest">
+							Waiting for your first event&hellip;
+						</p>
+						<p class="text-xs font-bold text-gray-500 mt-1">
+							We check every few seconds. Send a test event above or wire this URL into your system.
+						</p>
+					</div>
+				</div>
+			{/if}
+		{/if}
 	{/if}
 
 	<!-- Back / Next navigation -->
@@ -1209,13 +1798,13 @@
 			</svg>
 			Back
 		</button>
-		{#if step < 5}
+		{#if step < steps.length}
 			<button
 				on:click={nextStep}
 				disabled={!stepValidity[step]}
 				class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-brutal-md disabled:hover:translate-x-0 disabled:hover:translate-y-0"
 			>
-				Next
+				{steps[step]?.key === 'done' ? 'Create webhook' : 'Next'}
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
