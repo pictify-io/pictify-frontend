@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	export let activeMode = 'render'; // 'render' | 'bulk' | 'dynamic'
+	export let activeMode = 'render'; // 'render' | 'bulk' (workflow)
 	export let uid = '';
 
 	const modes = [
@@ -14,22 +14,14 @@
 		},
 		{
 			id: 'bulk',
-			label: 'Bulk',
+			label: 'Workflow',
 			color: '#ff6b6b',
-			href: (uid) => `/dashboard/template/${uid}/bulk-render`
-		},
-		{
-			id: 'dynamic',
-			label: 'Live',
-			color: '#3b82f6',
-			href: (uid) => `/dashboard/template/${uid}/dynamic`
+			href: (uid) => `/dashboard/workflows/new`
 		}
 	];
 </script>
 
-<div
-	class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
->
+<div class="flex bg-gray-100 p-1.5 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg">
 	{#each modes as mode}
 		{#if mode.disabled}
 			<button

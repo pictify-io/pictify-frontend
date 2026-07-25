@@ -386,7 +386,7 @@
 				<!-- Footer Info -->
 				<div
 					class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 border-t-[2px] sm:border-t-[3px] bg-white flex-1 flex flex-col justify-between
-				{template.hasDynamicLink ? 'border-data-purple' : 'border-gray-900'}"
+				border-gray-900"
 				>
 					<div>
 						<h3
@@ -397,29 +397,7 @@
 						</h3>
 
 						<div class="flex flex-wrap gap-1.5 sm:gap-2">
-							<!-- Live Link Tag -->
-							{#if template.hasDynamicLink}
-								<div
-									class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-data-purple/20 border border-data-purple rounded text-[9px] sm:text-[10px] font-bold uppercase text-[#7c3aed] tracking-wide"
-								>
-									<svg
-										class="w-2.5 h-2.5 sm:w-3 sm:h-3"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-										/></svg
-									>
-									<span class="flex items-center gap-1">
-										Live
-										<span class="w-1.5 h-1.5 bg-data-purple rounded-full animate-pulse" />
-									</span>
-								</div>
-							{/if}
+							<!-- Live links deprecated (2026-07) -->
 
 							<!-- Date Tag -->
 							<div
@@ -467,11 +445,11 @@
 				<!-- Footer Action Bar -->
 				<div
 					class="grid grid-cols-3 border-t-[2px] sm:border-t-[3px]
-				{template.hasDynamicLink ? 'border-data-purple' : 'border-gray-900'}"
+				border-gray-900"
 				>
 					<button
 						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-data-teal hover:bg-data-teal/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
-						{template.hasDynamicLink ? 'border-data-purple' : 'border-gray-900'}"
+						border-gray-900"
 						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
 						title="Render with variables"
 						aria-label="Render with variables"
@@ -494,10 +472,10 @@
 					</button>
 					<button
 						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-brand-danger hover:bg-brand-danger/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
-						{template.hasDynamicLink ? 'border-data-purple' : 'border-gray-900'}"
-						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/bulk-render`)}
-						title="Batch render from CSV"
-						aria-label="Batch render from CSV"
+						border-gray-900"
+						on:click|stopPropagation={() => goto(`/dashboard/workflows/new`)}
+						title="Run a workflow with this template"
+						aria-label="Run a workflow with this template"
 					>
 						<svg
 							class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
@@ -511,57 +489,10 @@
 								d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
 							/></svg
 						>
-						<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider">Bulk</span
+						<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider"
+							>Workflow</span
 						>
 					</button>
-					{#if template.hasDynamicLink}
-						<button
-							class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-data-purple bg-data-purple/10 hover:bg-data-purple/20 transition-all duration-150"
-							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
-							title="View live link"
-							aria-label="View live link"
-						>
-							<svg
-								class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-								/></svg
-							>
-							<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider"
-								>Live</span
-							>
-							<span class="w-1.5 h-1.5 bg-data-purple rounded-full animate-pulse" />
-						</button>
-					{:else}
-						<button
-							class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-data-blue hover:bg-data-blue/10 transition-all duration-150"
-							on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/dynamic`)}
-							title="Deploy as live link"
-							aria-label="Deploy as live link"
-						>
-							<svg
-								class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								/></svg
-							>
-							<span class="hidden sm:inline text-[10px] font-bold uppercase tracking-wider"
-								>Live</span
-							>
-						</button>
-					{/if}
 				</div>
 			</div>
 		{/each}
