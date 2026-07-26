@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Laptop density: the type/spacing scale is tuned for large displays and reads
+ * "zoomed in" on typical laptops. Tailwind sizes are rem-based, so scaling the
+ * root font-size scales text AND spacing proportionally, app-wide. Pixel-based
+ * details (3px borders, brutal shadows) intentionally keep their weight. */
+@media (max-width: 1680px) {
+	html {
+		font-size: 15px;
+	}
+}
+@media (max-width: 1440px) {
+	html {
+		font-size: 14px;
+	}
+}
+
 /* Respect prefers-reduced-motion globally. Users who request reduced motion get
  * near-instant transitions/animations across the whole app (marketing + dashboard)
  * instead of carousels, shimmers, bounces, and reveal choreography. Essential,
