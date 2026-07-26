@@ -162,15 +162,15 @@
 					><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z" /></svg
 				>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Image Generation API</span
+					>Document Workflows</span
 				>
 			</div>
 
 			<!-- Headline -->
 			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
-				Generate Images From Data.<br />
+				Turn Spreadsheets Into<br />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
-					One API Call
+					Branded Documents
 					<!-- Scribble Underline -->
 					<svg
 						class="absolute w-full h-4 sm:h-5 -bottom-2 sm:-bottom-3 left-0 text-black z-[-1] opacity-20"
@@ -179,21 +179,22 @@
 					>
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
 					</svg>
-				</span>.
+				</span>, Delivered.
 			</h1>
 
 			<!-- Subheadline -->
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium mb-10">
-				Replace edge-case Puppeteer scripts, hacks, and rendering microservices with a single
-				endpoint. Template + JSON in, pixel-perfect image out in &lt;200ms.
+				Upload a spreadsheet or point a webhook — every row becomes a branded certificate, badge or
+				report, rendered and delivered. Plus a rendering API for developers.
 			</p>
 
 			<!-- CTAs -->
 			<div class="flex flex-col items-center justify-center gap-4">
 				<div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
 					<SignUpButton
-						text="Start Building Free"
+						text="Start Free"
 						location="hero"
+						href="/signup"
 						class="w-full sm:w-auto bg-brand-danger text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider text-center"
 					/>
 
@@ -346,8 +347,12 @@
 							class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 						>
 							<div class="px-5 flex gap-2 h-full items-center py-4">
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-[2px] border-gray-900" />
+								<div
+									class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900"
+								/>
+								<div
+									class="w-3.5 h-3.5 rounded-full bg-brand-accent border-[2px] border-gray-900"
+								/>
 								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-[2px] border-gray-900" />
 							</div>
 							<div
@@ -398,7 +403,8 @@
 
 								<!-- The Rendered Image -->
 								{#if imageSrc}
-									<img loading="lazy"
+									<img
+										loading="lazy"
 										src={imageSrc}
 										alt="Live Pictify Demo"
 										class="w-full h-full object-contain rounded border-[3px] border-gray-900 shadow-brutal-2xl transition-opacity duration-300 relative z-10 bg-white"
@@ -431,7 +437,10 @@
 										<div
 											class="px-5 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs rounded border-[3px] border-gray-900 shadow-[4px_4px_0_0_#4ade80] animate-pulse flex items-center gap-2"
 										>
-											<svg class="w-4 h-4 animate-spin text-data-green" fill="none" viewBox="0 24 24"
+											<svg
+												class="w-4 h-4 animate-spin text-data-green"
+												fill="none"
+												viewBox="0 24 24"
 												><circle
 													class="opacity-25"
 													cx="12"

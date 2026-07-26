@@ -54,8 +54,8 @@
 				</span>
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				Three steps. One API call. Under 200ms. <br class="hidden md:block" />
-				Here's the entire workflow.
+				Template in. CSV or webhook data in. <br class="hidden md:block" />
+				Rendered documents out — delivered.
 			</p>
 		</div>
 
@@ -92,9 +92,10 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Drag-and-drop canvas. Add <span class="bg-blue-100 px-1 border-b-2 border-blue-300"
-							>variables</span
-						>, conditions, and formatting rules. Save and you're ready to render.
+						Design your certificate, badge or ticket on the canvas — or bring your own HTML. Add <span
+							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
+						>
+						and you're ready to run.
 						{#if activeStep === 0 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
@@ -122,14 +123,15 @@
 						>
 							2
 						</div>
-						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Send Your Data</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Add Your Data</h3>
 					</div>
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Just send raw data. The template's logic handles the rest. <span
-							class="bg-red-100 px-1 border-b-2 border-red-300">200ms later</span
-						>, your visual is ready.
+						Upload a CSV or point a webhook at your workflow. <span
+							class="bg-red-100 px-1 border-b-2 border-red-300">Every row</span
+						>
+						and event becomes a render job.
 						{#if activeStep === 1 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
@@ -157,12 +159,13 @@
 						>
 							3
 						</div>
-						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Get Your Output</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Rendered & Delivered</h3>
 					</div>
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Get a URL to share, embed, or download. PNG, JPG, WebP, GIF, or PDF.
+						Every document is emailed to its recipient or ready to download. PNG, JPG, WebP, GIF, or
+						PDF.
 						{#if activeStep === 2 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
@@ -271,8 +274,12 @@
 									</div>
 									<div class="text-white opacity-90">
 										{`{`}
-										<div class="pl-4"><span class="text-brand-accent">"template"</span>: "promo",</div>
-										<div class="pl-4"><span class="text-brand-accent">"variables"</span>: {`{`}</div>
+										<div class="pl-4">
+											<span class="text-brand-accent">"template"</span>: "promo",
+										</div>
+										<div class="pl-4">
+											<span class="text-brand-accent">"variables"</span>: {`{`}
+										</div>
 										<div class="pl-8">"product": "Nike Air",</div>
 										<div class="pl-8">"price": <span class="text-data-green">129</span>,</div>
 										<div class="pl-8">"inStock": <span class="text-data-green">true</span></div>
@@ -297,7 +304,8 @@
 								<div
 									class="relative w-[400px] bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden transform transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1"
 								>
-									<img loading="lazy"
+									<img
+										loading="lazy"
 										src="https://res.cloudinary.com/diroilukd/image/upload/v1709358454/P_jeay4c.png"
 										alt="Example of a generated image output from Pictify API"
 										class="w-full h-auto object-cover border-b-[3px] border-gray-900"

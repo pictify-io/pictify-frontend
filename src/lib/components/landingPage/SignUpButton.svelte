@@ -4,6 +4,7 @@
 	export let text = 'Start For Free';
 	export let variant = 'primary'; // primary or secondary
 	export let location = 'landing_page';
+	export let href = '/login';
 	let className = '';
 	export { className as class };
 
@@ -12,7 +13,7 @@
 			cta_text: text,
 			location: location
 		});
-		goto('/login');
+		goto(href);
 	}
 </script>
 

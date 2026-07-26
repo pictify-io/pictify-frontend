@@ -69,6 +69,7 @@
 		{
 			category: 'Automation',
 			features: [
+				{ label: 'Workflow runs (CSV & webhook)', feature: null, allPlans: true },
 				{ label: 'Batch Rendering', feature: FEATURES.BATCH_RENDER },
 				{ label: 'Items per Batch', feature: FEATURES.BATCH_ITEMS_PER_REQUEST },
 				{ label: 'Webhooks', feature: FEATURES.WEBHOOKS }
@@ -105,6 +106,12 @@
 	const comparisonPlans = [PLANS.STARTER, PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
 
 	const FAQs = [
+		{
+			question: 'What counts as a render?',
+			answer:
+				'Each generated document or image counts as one render. It works the same everywhere: one API call, one CSV row, or one webhook event each produce one render. A workflow run over a 500-row CSV uses 500 renders.',
+			isOpened: false
+		},
 		{
 			question: 'What happens if I exceed the monthly limit?',
 			answer: `All paid plans can enable <strong>overage billing</strong> to keep rendering beyond their limit. Basic: ${formatOverageRate(

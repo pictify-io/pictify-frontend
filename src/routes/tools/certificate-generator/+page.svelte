@@ -505,6 +505,42 @@
 		<!-- Generation Limit Banner -->
 		<GenerationLimitBanner toolName="certificate_generator" />
 
+		<!-- Bulk Workflow Upsell -->
+		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
+			<div
+				class="bg-brand-accent border-[3px] border-black shadow-brutal-xl rounded-xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
+			>
+				<div class="flex-1">
+					<div
+						class="inline-flex items-center gap-2 px-3 py-1 bg-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-3 shadow-brutal-sm"
+					>
+						<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M13 10V3L4 14h7v7l9-11h-7z"
+							/></svg
+						>
+						Bulk
+					</div>
+					<h2 class="text-lg sm:text-xl font-black text-black tracking-tight mb-1">
+						Need certificates for a whole list?
+					</h2>
+					<p class="text-sm sm:text-base font-bold text-gray-800">
+						Upload a CSV and email every recipient automatically. Or trigger it by webhook — issue a
+						certificate the moment your LMS reports a completion.
+					</p>
+				</div>
+				<a
+					href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew%3Fpack%3Dcertificates"
+					class="flex-shrink-0 px-6 py-3 bg-black text-white border-[3px] border-black font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-center"
+				>
+					Start a Bulk Run →
+				</a>
+			</div>
+		</div>
+
 		<!-- Template Gallery -->
 		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
 			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">

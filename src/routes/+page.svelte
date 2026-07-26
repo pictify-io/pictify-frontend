@@ -47,20 +47,23 @@
 </script>
 
 <svelte:head>
-	<title>Pictify — Image Generation API for Developers</title>
+	<title>Pictify — Turn Spreadsheets into Branded Documents, Delivered</title>
 	<meta
 		name="description"
-		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available."
+		content="Upload a CSV or point a webhook — every row becomes a branded certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers. Free tier available."
 	/>
 	<meta
 		name="keywords"
-		content="image generation API, dynamic image API, template image rendering, OG image generator, social card API, replace puppeteer, image automation API, programmatic image generation, Pictify.io"
+		content="certificate generator, event badge generator, bulk document generation, CSV to certificates, webhook document automation, personalized email delivery, image generation API, template rendering, Pictify.io"
 	/>
 	<meta name="author" content="Pictify.io" />
-	<meta property="og:title" content="Pictify — Image Generation API for Developers" />
+	<meta
+		property="og:title"
+		content="Pictify — Turn Spreadsheets into Branded Documents, Delivered"
+	/>
 	<meta
 		property="og:description"
-		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
+		content="Upload a CSV or point a webhook — every row becomes a branded certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta property="og:url" content="https://pictify.io" />
@@ -68,10 +71,13 @@
 	<meta property="og:site_name" content="Pictify.io" />
 	<meta property="og:locale" content="en_US" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Pictify — Image Generation API for Developers" />
+	<meta
+		name="twitter:title"
+		content="Pictify — Turn Spreadsheets into Branded Documents, Delivered"
+	/>
 	<meta
 		name="twitter:description"
-		content="Generate images from templates and data with one API call. Replace your Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime."
+		content="Upload a CSV or point a webhook — every row becomes a branded certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta name="twitter:site" content="@pictify_io" />
@@ -83,16 +89,15 @@
 		url: 'https://pictify.io',
 		image: 'https://media.pictify.io/v3g37-1775406808141.png',
 		description:
-			'Generate images from templates and data with one API call. Replace Puppeteer scripts and rendering microservices. <200ms response, 99.9% uptime. Free tier available.',
+			'Turn spreadsheets into branded documents. Upload a CSV or point a webhook — every row becomes a certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers.',
 		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
 		operatingSystem: 'Web',
 		featureList: [
-			'HTML and URL to image rendering',
-			'Expression engine with 50+ functions',
-			'REST API with <200ms latency',
-			'Webhooks and storage connectors',
-			'PDF and GIF generation',
-			'Batch image generation'
+			'Workflows with CSV upload and per-workflow webhooks',
+			'HTML document templates',
+			'Per-recipient email delivery',
+			'Batch rendering',
+			'REST API and SDKs'
 		],
 		offers: {
 			'@type': 'Offer',

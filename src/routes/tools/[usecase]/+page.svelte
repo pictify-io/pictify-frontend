@@ -786,19 +786,27 @@
 									</p>
 								</div>
 
-								<div class="flex flex-wrap gap-4">
+								<div class="flex flex-col gap-3">
+									<div class="flex flex-wrap gap-4">
+										<a
+											href="/signup"
+											class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-brand-danger hover:text-gray-900 transition-colors"
+										>
+											Get API Key
+										</a>
+										<a
+											href="https://docs.pictify.io"
+											target="_blank"
+											class="px-6 py-3 bg-white text-gray-900 font-bold border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors"
+										>
+											Read Docs
+										</a>
+									</div>
 									<a
 										href="/signup"
-										class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-brand-danger hover:text-gray-900 transition-colors"
+										class="w-fit text-sm font-black text-gray-900 underline decoration-4 decoration-brand-accent underline-offset-4 hover:text-brand-danger transition-colors"
 									>
-										Get API Key
-									</a>
-									<a
-										href="https://docs.pictify.io"
-										target="_blank"
-										class="px-6 py-3 bg-white text-gray-900 font-bold border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors"
-									>
-										Read Docs
+										Generate in bulk with Workflows →
 									</a>
 								</div>
 							</div>

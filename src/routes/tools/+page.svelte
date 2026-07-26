@@ -82,6 +82,13 @@
 
 	const tools = [
 		{
+			name: 'Workflow Runs',
+			description:
+				'Turn a spreadsheet or webhook into branded certificates, badges, tickets — rendered and delivered.',
+			url: '/signup',
+			icon: 'fa-solid fa-bolt'
+		},
+		{
 			name: 'HTML to Image',
 			description: 'Convert HTML & CSS to PNG, JPG, or WebP — free converter with API access.',
 			url: '/tools/html-to-image',

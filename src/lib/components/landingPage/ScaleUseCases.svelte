@@ -115,8 +115,8 @@
 				.
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				OG images, social cards, product visuals, email headers: every team builds these
-				eventually. We did it right so you don't have to.
+				Certificates, event badges, wedding place cards, numbered tickets — or bring your own HTML
+				via the API. One template, one CSV, done.
 			</p>
 		</div>
 
@@ -152,7 +152,7 @@
 							>
 						</div>
 						<h3 class="text-2xl md:text-3xl font-black text-gray-900 leading-tight drop-shadow-sm">
-							Infinite Variations
+							Certificates & Badges
 						</h3>
 					</div>
 				</div>
@@ -268,7 +268,8 @@
 									class="absolute w-full h-full left-0 top-0 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden flex flex-col justify-end p-2.5 md:p-3 bg-black transition-all duration-300 hover:scale-[1.05] group-hover:shadow-brutal-2xl {rotate} {zIndex} {translateX} hover:!z-20 origin-bottom"
 								>
 									<div class="absolute inset-0 pointer-events-none">
-										<img loading="lazy"
+										<img
+											loading="lazy"
 											src={variant.bgImg}
 											alt="abstract"
 											class="w-full h-full object-cover filter grayscale contrast-125 opacity-70"
@@ -290,7 +291,8 @@
 											{variant.title}
 										</h2>
 										<div class="flex items-center gap-1.5">
-											<img loading="lazy"
+											<img
+												loading="lazy"
 												src={variant.author.img}
 												alt="author"
 												class="w-4 h-4 md:w-5 md:h-5 bg-white border border-white shadow-[1px_1px_0_0_rgba(255,255,255,0.5)] rounded-none"
@@ -332,7 +334,7 @@
 							>
 						</div>
 						<h3 class="text-3xl md:text-3xl font-black leading-tight text-gray-900 drop-shadow-sm">
-							Dynamic Retail
+							Tickets & Place Cards
 						</h3>
 					</div>
 				</div>
@@ -365,7 +367,8 @@
 							<div
 								class="w-[100px] md:w-[130px] relative z-10 h-full flex flex-col justify-center items-center"
 							>
-								<img loading="lazy"
+								<img
+									loading="lazy"
 									src={variant.image}
 									alt="product"
 									class="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500"
@@ -402,12 +405,12 @@
 									/></svg
 								>
 							</div>
-							<h3 class="text-3xl md:text-4xl font-black text-gray-900">Email Headers</h3>
+							<h3 class="text-3xl md:text-4xl font-black text-gray-900">Delivered by Email</h3>
 						</div>
 
 						<p class="text-base md:text-lg text-gray-800 font-medium mb-8 max-w-sm">
-							Pass customer data to instantly render personalized loyalty cards, greetings, and
-							dynamic rewards.
+							Every CSV row or webhook event renders a personalized document and lands in each
+							recipient's inbox automatically.
 						</p>
 
 						<div class="flex flex-col gap-3">
