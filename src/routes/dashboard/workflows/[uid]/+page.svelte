@@ -142,7 +142,7 @@
 			</a>
 			<div class="flex items-center gap-4 flex-wrap">
 				<h1
-					class="text-3xl sm:text-4xl md:text-5xl font-black text-black tracking-tighter leading-[0.95]"
+					class="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-tighter leading-[0.95]"
 				>
 					Workflow run.
 				</h1>
@@ -159,11 +159,13 @@
 		</div>
 		<a
 			href="/dashboard/workflows/new"
-			class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 py-3 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 self-start"
+			class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 lg:px-5 py-3 lg:py-2.5 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 self-start"
 		>
-			<span class="text-white font-black text-base uppercase tracking-wide">Run another</span>
+			<span class="text-white font-black text-base lg:text-sm uppercase tracking-wide"
+				>Run another</span
+			>
 			<div
-				class="w-8 h-8 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
+				class="w-8 h-8 lg:w-7 lg:h-7 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
 			>
 				<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -194,7 +196,7 @@
 					isLoading = true;
 					fetchRun();
 				}}
-				class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+				class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 			>
 				Retry
 			</button>
@@ -234,7 +236,9 @@
 					>
 						Total
 					</div>
-					<div class="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none">
+					<div
+						class="text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-tighter leading-none"
+					>
 						{counts.total}
 					</div>
 				</div>
@@ -251,7 +255,9 @@
 					>
 						Rendered
 					</div>
-					<div class="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none">
+					<div
+						class="text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-tighter leading-none"
+					>
 						{counts.rendered}
 					</div>
 				</div>
@@ -268,7 +274,9 @@
 					>
 						Delivered
 					</div>
-					<div class="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none">
+					<div
+						class="text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-tighter leading-none"
+					>
 						{counts.delivered}
 					</div>
 				</div>
@@ -285,7 +293,9 @@
 					>
 						Failed
 					</div>
-					<div class="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none">
+					<div
+						class="text-4xl md:text-5xl lg:text-4xl font-black text-white tracking-tighter leading-none"
+					>
 						{counts.failed}
 					</div>
 				</div>
@@ -349,7 +359,7 @@
 					<button
 						on:click={createHook}
 						disabled={hookCreating}
-						class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-60"
+						class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-60"
 					>
 						{hookCreating ? 'Creating...' : 'Create webhook'}
 					</button>

@@ -461,7 +461,7 @@
 						</div>
 
 						<button
-							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
+							class="relative z-10 px-10 lg:px-8 py-4 lg:py-3 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
 								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = false)}
@@ -469,7 +469,7 @@
 							Monthly
 						</button>
 						<button
-							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
+							class="relative z-10 px-10 lg:px-8 py-4 lg:py-3 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
 								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = true)}
@@ -722,7 +722,7 @@
 							</ul>
 
 							<button
-								class="w-full py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
+								class="w-full py-4 lg:py-3 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
 								{isPopular
 									? 'bg-brand-accent text-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
 									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'}"
@@ -885,7 +885,7 @@
 						</p>
 						<a
 							href="mailto:support@pictify.io"
-							class="inline-flex items-center gap-3 mt-4 px-8 py-5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg uppercase tracking-widest"
+							class="inline-flex items-center gap-3 mt-4 px-8 lg:px-6 py-5 lg:py-3.5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg lg:text-base uppercase tracking-widest"
 						>
 							<span>Contact Sales</span>
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"

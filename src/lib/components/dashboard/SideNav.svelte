@@ -61,7 +61,7 @@
 				aria-current={isActive(currentPath, '/dashboard') && currentPath === '/dashboard'
 					? 'page'
 					: undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard'
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -93,7 +93,7 @@
 			<a
 				href="/dashboard/template"
 				aria-current={isActive(currentPath, '/dashboard/template') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/template')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -120,7 +120,7 @@
 			<a
 				href="/dashboard/brand-assets"
 				aria-current={isActive(currentPath, '/dashboard/brand-assets') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/brand-assets')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -147,7 +147,7 @@
 			<a
 				href="/dashboard/workflows"
 				aria-current={isActive(currentPath, '/dashboard/workflows') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/workflows')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -178,7 +178,7 @@
 			<a
 				href="/dashboard/media/images"
 				aria-current={$page.url.pathname === '/dashboard/media/images' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/media/images'
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -204,7 +204,7 @@
 			<a
 				href="/dashboard/media/gifs"
 				aria-current={$page.url.pathname === '/dashboard/media/gifs' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/media/gifs'
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -230,7 +230,7 @@
 			<a
 				href="/dashboard/media/pdfs"
 				aria-current={$page.url.pathname === '/dashboard/media/pdfs' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{$page.url.pathname === '/dashboard/media/pdfs'
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -262,7 +262,7 @@
 			<a
 				href="/dashboard/analytics"
 				aria-current={isActive(currentPath, '/dashboard/analytics') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/analytics')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -289,7 +289,7 @@
 			<a
 				href="/dashboard/activity-logs"
 				aria-current={isActive(currentPath, '/dashboard/activity-logs') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/activity-logs')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -321,7 +321,7 @@
 			<a
 				href="/dashboard/api-playground"
 				aria-current={isActive(currentPath, '/dashboard/api-playground') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/api-playground')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -348,7 +348,7 @@
 			<a
 				href="/dashboard/api-token"
 				aria-current={isActive(currentPath, '/dashboard/api-token') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/api-token')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -375,7 +375,7 @@
 			<a
 				href="/dashboard/integrations"
 				aria-current={isActive(currentPath, '/dashboard/integrations') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/integrations')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -406,7 +406,7 @@
 				<a
 					href="/dashboard/team"
 					aria-current={isActive(currentPath, '/dashboard/team') ? 'page' : undefined}
-					class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+					class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 						{isActive(currentPath, '/dashboard/team')
 						? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 						: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -441,7 +441,7 @@
 			<a
 				href="/dashboard/billing"
 				aria-current={isActive(currentPath, '/dashboard/billing') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/billing')
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
@@ -524,7 +524,7 @@
 		{#if !isPaidPlan}
 			<a
 				href="/dashboard/billing"
-				class="w-full group relative flex items-center justify-center px-4 py-3 mb-3 text-xs font-black text-white bg-brand-danger uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="w-full group relative flex items-center justify-center px-4 py-3 lg:py-2.5 mb-3 text-xs font-black text-white bg-brand-danger uppercase tracking-wide rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -541,7 +541,7 @@
 		<!-- Logout Button -->
 		<button
 			on:click={logout}
-			class="w-full group flex items-center justify-center px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide rounded-xl border-[3px] border-transparent hover:bg-gray-100 hover:text-red-600 hover:border-gray-200 transition-all duration-200"
+			class="w-full group flex items-center justify-center px-4 py-3 lg:py-2.5 text-xs font-bold text-gray-500 uppercase tracking-wide rounded-xl border-[3px] border-transparent hover:bg-gray-100 hover:text-red-600 hover:border-gray-200 transition-all duration-200"
 		>
 			<svg
 				class="w-4 h-4 mr-2 group-hover:text-red-600 transition-colors"

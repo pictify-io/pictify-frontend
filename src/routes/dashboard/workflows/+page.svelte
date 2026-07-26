@@ -109,7 +109,7 @@
 				<span class="text-xs font-black text-black uppercase tracking-widest">Workflows</span>
 			</div>
 			<h1
-				class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]"
+				class="text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black text-black tracking-tighter leading-[0.9]"
 			>
 				Workflows
 			</h1>
@@ -120,11 +120,12 @@
 		</div>
 		<a
 			href="/dashboard/workflows/new"
-			class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 py-3 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 self-start"
+			class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 lg:px-5 py-3 lg:py-2.5 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 self-start"
 		>
-			<span class="text-white font-black text-base uppercase tracking-wide">New Run</span>
+			<span class="text-white font-black text-base lg:text-sm uppercase tracking-wide">New Run</span
+			>
 			<div
-				class="w-8 h-8 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
+				class="w-8 h-8 lg:w-7 lg:h-7 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
 			>
 				<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -223,7 +224,7 @@
 			<p class="text-sm font-black text-black uppercase tracking-wider mb-4">{loadError}</p>
 			<button
 				on:click={loadRuns}
-				class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+				class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 			>
 				Retry
 			</button>
@@ -251,7 +252,7 @@
 			</p>
 			<a
 				href="/dashboard/workflows/new"
-				class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide hover:bg-gray-800 transition-colors"
+				class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide hover:bg-gray-800 transition-colors"
 			>
 				Start a run
 			</a>

@@ -773,7 +773,7 @@
 			Workflows
 		</a>
 		<h1
-			class="text-3xl sm:text-4xl md:text-5xl font-black text-black tracking-tighter leading-[0.95]"
+			class="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-tighter leading-[0.95]"
 		>
 			New run.
 		</h1>
@@ -786,7 +786,7 @@
 				<button
 					on:click={() => gotoStep(i + 1)}
 					disabled={!canEnterStep(i + 1)}
-					class="flex items-center gap-3 px-4 py-3 rounded-xl border-[3px] transition-all duration-200
+					class="flex items-center gap-3 lg:gap-2.5 px-4 lg:px-3 py-3 lg:py-2 rounded-xl border-[3px] transition-all duration-200
 						{step === i + 1
 						? 'bg-brand-accent border-black shadow-brutal-md text-black'
 						: canEnterStep(i + 1)
@@ -794,7 +794,7 @@
 						: 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'}"
 				>
 					<span
-						class="w-7 h-7 rounded-lg border-[2px] flex items-center justify-center text-xs font-black flex-shrink-0
+						class="w-7 h-7 lg:w-6 lg:h-6 rounded-lg border-[2px] flex items-center justify-center text-xs font-black flex-shrink-0
 							{stepValidity[i + 1] && step !== i + 1
 							? 'bg-data-green border-black text-black'
 							: step === i + 1
@@ -1108,7 +1108,7 @@
 						</p>
 						<button
 							on:click={loadTemplates}
-							class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+							class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 						>
 							Retry
 						</button>
@@ -1328,7 +1328,7 @@
 						<button
 							on:click={createCustomTemplate}
 							disabled={customCreating || !!selectingUid}
-							class="sm:ml-auto inline-flex items-center gap-2 bg-black text-white px-5 py-3 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+							class="sm:ml-auto inline-flex items-center gap-2 bg-black text-white px-5 py-3 lg:py-2.5 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{customCreating ? 'Creating…' : 'Create template'}
 						</button>
@@ -1445,7 +1445,7 @@
 				<p class="text-xs font-bold text-gray-500 mb-6 max-w-sm">{wizard.previewError}</p>
 				<button
 					on:click={loadPreviews}
-					class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+					class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 				>
 					Retry
 				</button>
@@ -1744,15 +1744,15 @@
 				<button
 					on:click={startRun}
 					disabled={!deliverValid || isRunning}
-					class="group flex items-center justify-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-8 py-4 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-xl disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+					class="group flex items-center justify-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-8 lg:px-6 py-4 lg:py-3 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-xl disabled:hover:translate-x-0 disabled:hover:translate-y-0"
 				>
-					<span class="text-white font-black text-lg uppercase tracking-wide">
+					<span class="text-white font-black text-lg lg:text-base uppercase tracking-wide">
 						{isRunning
 							? 'Starting…'
 							: `Run ${wizard.rows.length} ${wizard.rows.length === 1 ? 'file' : 'files'}`}
 					</span>
 					<div
-						class="w-9 h-9 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
+						class="w-9 h-9 lg:w-8 lg:h-8 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
 					>
 						<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -1788,7 +1788,7 @@
 				<p class="text-xs font-bold text-gray-500 mb-6 max-w-sm">{hookCreateError}</p>
 				<button
 					on:click={createHook}
-					class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+					class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 				>
 					Retry
 				</button>
@@ -1849,7 +1849,7 @@
 				<button
 					on:click={sendTestEvent}
 					disabled={testSending}
-					class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-60"
+					class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-60"
 				>
 					{testSending ? 'Sending…' : 'Send a test event'}
 				</button>
@@ -1908,7 +1908,7 @@
 					</p>
 					<a
 						href="/dashboard/workflows"
-						class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+						class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
 					>
 						Go to workflows
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1946,7 +1946,7 @@
 		<button
 			on:click={prevStep}
 			disabled={step === 1}
-			class="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-brutal-md disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+			class="inline-flex items-center gap-2 bg-white text-black px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-brutal-md disabled:hover:translate-x-0 disabled:hover:translate-y-0"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path
@@ -1962,7 +1962,7 @@
 			<button
 				on:click={nextStep}
 				disabled={!stepValidity[step]}
-				class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide border-[3px] border-black shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-brutal-md disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+				class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-brutal-md disabled:hover:translate-x-0 disabled:hover:translate-y-0"
 			>
 				{steps[step]?.key === 'done' ? 'Create webhook' : 'Next'}
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -20,9 +20,7 @@
 				class="relative bg-white rounded-2xl border-[3px] border-gray-900 overflow-hidden shadow-[6px_6px_0_0_#ffc480] sm:shadow-2xl"
 			>
 				<!-- Terminal Header / Window Controls -->
-				<div
-					class="h-12 bg-gray-50 border-b-[3px] border-gray-900 flex items-center px-6"
-				>
+				<div class="h-12 bg-gray-50 border-b-[3px] border-gray-900 flex items-center px-6">
 					<div class="flex gap-2">
 						<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
 						<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
@@ -43,8 +41,16 @@
 						<div
 							class="inline-block px-4 py-1.5 rounded-full border-[2px] border-gray-900 bg-data-green shadow-brutal-sm mb-8 transform -rotate-2"
 						>
-							<span class="text-gray-900 text-sm font-bold uppercase tracking-wider flex items-center gap-2"
-								><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+							<span
+								class="text-gray-900 text-sm font-bold uppercase tracking-wider flex items-center gap-2"
+								><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2.5"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/></svg
+								>
 								Free Tier Available</span
 							>
 						</div>
@@ -63,7 +69,7 @@
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
 							<SignUpButton
-								class="w-full sm:w-auto px-8 py-4 bg-brand-accent text-gray-900 font-bold text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
+								class="w-full sm:w-auto px-8 lg:px-6 py-4 lg:py-3 bg-brand-accent text-gray-900 font-bold text-lg lg:text-base rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all uppercase tracking-wide relative overflow-hidden after:absolute after:inset-0 after:bg-white/20 after:translate-x-[-100%] after:animate-[shimmer_2s_infinite]"
 								text="Start Building Free"
 								location="cta_section"
 							/>
@@ -71,7 +77,7 @@
 							<a
 								href="https://docs.pictify.io"
 								target="_blank"
-								class="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-black text-lg uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all flex items-center justify-center gap-2 group"
+								class="w-full sm:w-auto px-8 lg:px-6 py-4 lg:py-3 bg-white text-gray-900 font-black text-lg lg:text-base uppercase tracking-wider rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all flex items-center justify-center gap-2 group"
 								on:click={() =>
 									analytics.trackOutboundLink({
 										url: 'https://docs.pictify.io',
@@ -102,25 +108,19 @@
 
 						<!-- Mini FAQ -->
 						<div class="grid sm:grid-cols-3 gap-5 text-left max-w-3xl mx-auto">
-							<div
-								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md"
-							>
+							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">
 								<h4 class="font-black text-gray-900 text-base mb-2">How long to integrate?</h4>
 								<p class="text-sm text-gray-600 font-medium">
 									Most teams integrate in under 2 hours. One endpoint, JSON in, image out.
 								</p>
 							</div>
-							<div
-								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md"
-							>
+							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">
 								<h4 class="font-black text-gray-900 text-base mb-2">What about my data?</h4>
 								<p class="text-sm text-gray-600 font-medium">
 									Your data is never stored. We render and return. That's it.
 								</p>
 							</div>
-							<div
-								class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md"
-							>
+							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">
 								<h4 class="font-black text-gray-900 text-base mb-2">Can I cancel anytime?</h4>
 								<p class="text-sm text-gray-600 font-medium">
 									Yes. No contracts, no commitments. Cancel with one click.
