@@ -84,6 +84,10 @@
 		}
 	};
 
+	// Output format — shared by the CSV run and webhook flows (previews stay PNG)
+	const OUTPUT_FORMATS = ['png', 'jpg', 'pdf'];
+	let outputFormat = 'png';
+
 	let step = 1;
 	let source = '';
 	let pasteText = '';
@@ -588,6 +592,7 @@
 	$: hookRequestKey = JSON.stringify({
 		templateUid: wizard.templateUid,
 		columnMapping: hookColumnMapping,
+		outputFormat,
 		delivery: hookDelivery,
 		name: hookName
 	});
@@ -626,6 +631,7 @@
 				name: hookName.trim(),
 				templateUid: wizard.templateUid,
 				columnMapping: hookColumnMapping,
+				outputFormat,
 				delivery
 			});
 			createdHook = response?.hook || null;
@@ -634,6 +640,7 @@
 			analytics.track?.('Workflow Hook Created', {
 				source: 'wizard',
 				templateUid: wizard.templateUid,
+				outputFormat,
 				delivery: delivery.method
 			});
 			startHookPolling();
@@ -718,6 +725,7 @@
 				templateUid: wizard.templateUid,
 				rows: wizard.rows,
 				columnMapping: wizard.mapping,
+				outputFormat,
 				delivery
 			});
 			const uid = response?.run?.uid;
@@ -727,6 +735,7 @@
 				pack: selectedPack.id,
 				rows: wizard.rows.length,
 				templateUid: wizard.templateUid,
+				outputFormat,
 				delivery: delivery.method
 			});
 			goto(`/dashboard/workflows/${uid}`);
@@ -1627,6 +1636,31 @@
 			</button>
 		</div>
 
+		<!-- Output format -->
+		<div
+			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-4"
+		>
+			<div class="flex-1">
+				<p class="text-xs font-black text-black uppercase tracking-widest">Output format</p>
+				<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
+					Previews are shown as PNG.
+				</p>
+			</div>
+			<div class="flex items-center gap-2">
+				{#each OUTPUT_FORMATS as format}
+					<button
+						on:click={() => (outputFormat = format)}
+						class="px-4 py-2 rounded-lg border-[3px] border-black text-xs font-black uppercase tracking-widest transition-all duration-150
+							{outputFormat === format
+							? 'bg-black text-white shadow-brutal-sm'
+							: 'bg-white text-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
+					>
+						{format}
+					</button>
+				{/each}
+			</div>
+		</div>
+
 		{#if activeDelivery.method === 'email'}
 			<div
 				class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8 space-y-5"
@@ -1738,6 +1772,7 @@
 					<p class="text-xs font-bold text-gray-500 mt-1">
 						{wizard.rows.length}
 						{wizard.rows.length === 1 ? 'file' : 'files'} &middot; {wizard.templateName} template &middot;
+						{outputFormat.toUpperCase()} &middot;
 						{wizard.delivery.method === 'email' ? 'emailed to recipients' : 'download links'}
 					</p>
 				</div>

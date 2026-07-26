@@ -154,6 +154,11 @@
 					>
 						{run.status}
 					</span>
+					<span
+						class="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border-[3px] border-black bg-white text-black"
+					>
+						{run.outputFormat || 'png'}
+					</span>
 				{/if}
 			</div>
 		</div>

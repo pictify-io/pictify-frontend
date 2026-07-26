@@ -187,6 +187,7 @@
 						</h3>
 						<p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
 							Template {hook.templateUid}
+							&middot; {hook.outputFormat || 'png'}
 							&middot; {hook.stats?.received ?? 0} received &middot; {hook.stats?.rendered ?? 0} rendered
 						</p>
 					</div>
@@ -289,6 +290,11 @@
 						</p>
 					</div>
 					<div class="flex items-center gap-3">
+						<span
+							class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black bg-white text-black"
+						>
+							{run.outputFormat || 'png'}
+						</span>
 						<span
 							class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black {statusStyle(
 								run.status
