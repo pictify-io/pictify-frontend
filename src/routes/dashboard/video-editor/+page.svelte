@@ -9,14 +9,18 @@
 		getVideoProject,
 		renderVideoProject
 	} from '../../../api/videoProjects';
+	import { uploadBrandAsset } from '../../../api/brand-assets';
 
 	// ── Editor state ─────────────────────────────────────────────────────
-	const US = 1000000; // microseconds per second
-
 	let canvasEl;
+	let canvasWrapEl;
 	let timelineEl;
+	let railEl;
+	let propsEl;
 	let editor = null; // handle from mountVideoEditor
 	let timelinePanel = null; // handle from mountTimelinePanel
+	let toolRail = null; // handle from mountToolRail
+	let propertiesPanel = null; // handle from mountPropertiesPanel
 	let mountError = '';
 	let isBooting = true;
 
@@ -29,8 +33,6 @@
 	let lastClips = null;
 	let lastTracks = null;
 
-	let selectedClipIds = [];
-
 	let isSaving = false;
 	let saveMessage = '';
 	let isRendering = false;
@@ -38,9 +40,9 @@
 	let renderUrl = '';
 
 	// Resizable timeline dock
-	const TIMELINE_MIN_HEIGHT = 200;
+	const TIMELINE_MIN_HEIGHT = 180;
 	const TIMELINE_MAX_HEIGHT = 520;
-	let timelineHeight = 300;
+	let timelineHeight = 280;
 	let resizePointerId = null;
 	let resizeStartY = 0;
 	let resizeStartHeight = 0;
@@ -60,6 +62,41 @@
 
 	const endTimelineResize = () => {
 		resizePointerId = null;
+	};
+
+	// ── Canvas re-fit ────────────────────────────────────────────────────
+	// The Pixi renderer keeps its mount-time pixel size; observe the canvas
+	// container and re-fit whenever panels or the timeline dock change it.
+	let resizeObserver = null;
+	let resizeRaf = 0;
+
+	const observeCanvasResize = () => {
+		if (typeof ResizeObserver === 'undefined' || !canvasWrapEl) return;
+		resizeObserver = new ResizeObserver(() => {
+			if (!editor) return;
+			cancelAnimationFrame(resizeRaf);
+			resizeRaf = requestAnimationFrame(() => editor.resize());
+		});
+		resizeObserver.observe(canvasWrapEl);
+	};
+
+	// ── Media upload (tool rail callback) ────────────────────────────────
+	// Images go through Pictify's existing brand-assets upload (S3-backed,
+	// persistent URL). Video/audio have no upload endpoint yet.
+	// TODO(backend): add a video/audio media upload endpoint; until then those
+	// files become session-local object URLs (they will not survive a reload
+	// or a server-side render).
+	const uploadMedia = async (file) => {
+		if (file.type.startsWith('image/')) {
+			try {
+				const response = await uploadBrandAsset(file, { type: 'image', name: file.name });
+				const url = response?.asset?.url;
+				if (url) return { url, persistent: true };
+			} catch (error) {
+				// Fall through to a session-local object URL (plan limits, size…).
+			}
+		}
+		return { url: URL.createObjectURL(file), persistent: false };
 	};
 
 	// ── Mount ────────────────────────────────────────────────────────────
@@ -87,15 +124,13 @@
 				project: projectJson,
 				onState: (state) => {
 					// Any change to the clip/track graph after boot marks the
-					// project dirty (drag, trim, split, reorder, undo, redo, …).
+					// project dirty (drag, trim, split, reorder, undo, redo,
+					// panel edits, property edits, …).
 					if (trackDirty && (state.clips !== lastClips || state.tracks !== lastTracks)) {
 						markDirty();
 					}
 					lastClips = state.clips;
 					lastTracks = state.tracks;
-				},
-				onSelection: (selected) => {
-					selectedClipIds = (selected || []).map((clip) => clip.id);
 				},
 				onError: (message) => {
 					mountError = message;
@@ -113,6 +148,21 @@
 				core: editor.core,
 				studio: editor.studio
 			});
+
+			// Studio side panels — left tool rail + right properties panel,
+			// bound to the same core/studio (shared selection store).
+			const { mountToolRail, mountPropertiesPanel } = await import('$lib/video/studioHost.js');
+			toolRail = mountToolRail(railEl, {
+				core: editor.core,
+				studio: editor.studio,
+				uploadMedia
+			});
+			propertiesPanel = mountPropertiesPanel(propsEl, {
+				core: editor.core,
+				studio: editor.studio
+			});
+
+			observeCanvasResize();
 		} catch (error) {
 			mountError = error?.message || 'The video editor failed to start.';
 		} finally {
@@ -121,6 +171,10 @@
 	});
 
 	onDestroy(() => {
+		if (resizeObserver) resizeObserver.disconnect();
+		cancelAnimationFrame(resizeRaf);
+		if (toolRail) toolRail.destroy();
+		if (propertiesPanel) propertiesPanel.destroy();
 		if (timelinePanel) timelinePanel.destroy();
 		if (editor) editor.destroy();
 	});
@@ -128,36 +182,6 @@
 	const markDirty = () => {
 		isDirty = true;
 		saveMessage = '';
-	};
-
-	// ── Toolbar actions ──────────────────────────────────────────────────
-	const addText = async () => {
-		if (!editor) return;
-		await editor.addText('Your text here');
-		markDirty();
-	};
-
-	const addImage = async () => {
-		if (!editor) return;
-		const src = window.prompt('Image URL');
-		if (!src) return;
-		await editor.addImage(src);
-		markDirty();
-	};
-
-	const addVideo = async () => {
-		if (!editor) return;
-		const src = window.prompt('Video URL (mp4)');
-		if (!src) return;
-		await editor.addVideo(src);
-		markDirty();
-	};
-
-	const deleteSelected = () => {
-		if (!editor || !selectedClipIds.length) return;
-		editor.removeClips(selectedClipIds);
-		selectedClipIds = [];
-		markDirty();
 	};
 
 	// ── Persistence ──────────────────────────────────────────────────────
@@ -214,25 +238,26 @@
 	<title>Video editor - Pictify.io</title>
 </svelte:head>
 
-<section
-	class="h-[calc(100vh-7rem)] min-h-[520px] flex flex-col rounded-xl overflow-hidden border border-gray-800 bg-[#101014] text-gray-100"
->
-	<!-- Header -->
-	<header class="flex items-center gap-3 px-4 py-2.5 border-b border-gray-800 bg-[#16161c]">
+<div class="h-screen w-full flex flex-col overflow-hidden bg-[#101014] text-gray-100">
+	<!-- Slim top bar -->
+	<header class="shrink-0 flex items-center gap-3 px-4 h-12 border-b border-gray-800 bg-[#16161c]">
 		<a
 			href="/dashboard"
-			class="text-xs font-black text-gray-500 uppercase tracking-widest hover:text-white transition-colors"
+			class="text-xs font-black text-gray-500 uppercase tracking-widest hover:text-white transition-colors whitespace-nowrap"
 		>
 			&larr; Dashboard
 		</a>
 		<input
-			class="flex-1 min-w-0 bg-transparent text-sm font-bold text-white outline-none border-b border-transparent focus:border-gray-600 px-1 py-0.5"
+			class="flex-1 min-w-0 max-w-md bg-transparent text-sm font-bold text-white outline-none border-b border-transparent focus:border-gray-600 px-1 py-0.5"
 			bind:value={projectName}
 			on:input={markDirty}
 			aria-label="Project name"
 		/>
+		<div class="flex-1" />
 		{#if saveMessage}
 			<span class="text-xs text-gray-400">{saveMessage}</span>
+		{:else if isDirty}
+			<span class="text-xs text-gray-500">Unsaved changes</span>
 		{/if}
 		<button
 			class="text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-800 disabled:opacity-50 transition-colors"
@@ -267,29 +292,13 @@
 		</div>
 	{/if}
 
-	<!-- Main: toolbar + canvas -->
+	<!-- Studio: tool rail | canvas | properties -->
 	<div class="flex-1 min-h-0 flex">
-		<!-- Left toolbar -->
-		<aside class="w-40 shrink-0 border-r border-gray-800 bg-[#141419] p-3 flex flex-col gap-2">
-			<span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Add</span>
-			<button class="editor-tool" on:click={addText} disabled={isBooting}>+ Text</button>
-			<button class="editor-tool" on:click={addImage} disabled={isBooting}>+ Image</button>
-			<button class="editor-tool" on:click={addVideo} disabled={isBooting}>+ Video</button>
-			<span class="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-3">Edit</span>
-			<button class="editor-tool" on:click={() => editor?.undo()} disabled={isBooting}>Undo</button>
-			<button class="editor-tool" on:click={() => editor?.redo()} disabled={isBooting}>Redo</button>
-			<button
-				class="editor-tool text-red-400 disabled:text-gray-600"
-				on:click={deleteSelected}
-				disabled={!selectedClipIds.length}
-			>
-				Delete clip
-			</button>
-		</aside>
+		<!-- Left tool rail + panel drawer (React island, self-sized) -->
+		<div bind:this={railEl} class="h-full shrink-0" />
 
-		<!-- Canvas (overflow-hidden: the Pixi canvas keeps its mount-time pixel
-		     size, so clip it when the timeline dock is resized taller) -->
-		<div class="flex-1 min-w-0 relative overflow-hidden bg-[#101014]">
+		<!-- Canvas (overflow-hidden + ResizeObserver re-fit) -->
+		<div bind:this={canvasWrapEl} class="flex-1 min-w-0 relative overflow-hidden bg-[#101014]">
 			{#if isBooting}
 				<div class="absolute inset-0 flex items-center justify-center text-sm text-gray-500">
 					Starting the editor…
@@ -297,9 +306,12 @@
 			{/if}
 			<canvas bind:this={canvasEl} class="w-full h-full block" />
 		</div>
+
+		<!-- Right properties panel (React island) -->
+		<div bind:this={propsEl} class="h-full w-72 shrink-0 border-l border-gray-800 bg-[#101014]" />
 	</div>
 
-	<!-- Timeline dock (vendored OpenVideo timeline, React island) -->
+	<!-- Timeline dock (vendored OpenVideo timeline, React island, full width) -->
 	<footer class="shrink-0 bg-[#101014]">
 		<!-- Resize handle -->
 		<div
@@ -320,22 +332,47 @@
 			{/if}
 		</div>
 	</footer>
-</section>
+</div>
 
 <style>
-	.editor-tool {
-		text-align: left;
-		font-size: 0.75rem;
-		font-weight: 700;
-		padding: 0.375rem 0.5rem;
-		border-radius: 0.25rem;
-		border: 1px solid rgb(55 65 81);
-		transition: background-color 120ms ease;
+	/* Primitive styling for the vendored studio panels (React islands render
+	   into plain divs, so these must be global). */
+	:global(.ov-slider) {
+		-webkit-appearance: none;
+		appearance: none;
+		height: 4px;
+		border-radius: 9999px;
+		background: #27272a;
+		outline: none;
+		cursor: pointer;
 	}
-	.editor-tool:hover:not(:disabled) {
-		background-color: rgb(31 41 55);
+	:global(.ov-slider::-webkit-slider-thumb) {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 12px;
+		height: 12px;
+		border-radius: 9999px;
+		background: #facc15;
+		border: none;
+		cursor: pointer;
 	}
-	.editor-tool:disabled {
-		opacity: 0.5;
+	:global(.ov-slider::-moz-range-thumb) {
+		width: 12px;
+		height: 12px;
+		border-radius: 9999px;
+		background: #facc15;
+		border: none;
+		cursor: pointer;
+	}
+	:global(.ov-scroll) {
+		scrollbar-width: thin;
+		scrollbar-color: #3f3f46 transparent;
+	}
+	:global(.ov-scroll::-webkit-scrollbar) {
+		width: 6px;
+	}
+	:global(.ov-scroll::-webkit-scrollbar-thumb) {
+		background: #3f3f46;
+		border-radius: 9999px;
 	}
 </style>

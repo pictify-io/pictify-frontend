@@ -172,6 +172,22 @@ export const mountVideoEditor = async (canvasEl, options = {}) => {
 		/** Client-side export support (WebCodecs). Server render works regardless. */
 		isClientExportSupported: () => Compositor.isSupported(),
 
+		/**
+		 * Re-fit the Pixi renderer + artboard to the canvas container's current
+		 * size. The engine auto-handles window resizes (Pixi `resizeTo` on the
+		 * canvas parent) but not container-only resizes (panel drawer toggles,
+		 * timeline dock drags) — call this from a ResizeObserver for those.
+		 * NOTE: studio.setSize() is NOT this — it changes the composition
+		 * (artboard) dimensions, not the viewport.
+		 */
+		resize: () => {
+			try {
+				studio.updateArtboardLayout();
+			} catch (error) {
+				// Best-effort: an in-flight render tick can reject a resize.
+			}
+		},
+
 		destroy: () => {
 			if (unsubscribe) unsubscribe();
 			selectionEvents.forEach((event) => studio.off?.(event, selectionHandler));
