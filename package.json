@@ -48,6 +48,8 @@
 		"@lezer/html": "^1.3.10",
 		"@lezer/javascript": "^1.4.18",
 		"@lezer/lr": "^1.4.0",
+		"@openvideo/core": "^1.3.2",
+		"@openvideo/engine-pixi": "^1.3.2",
 		"@remotion/player": "^4.0.499",
 		"codemirror": "^6.0.2",
 		"dompurify": "^3.3.1",
