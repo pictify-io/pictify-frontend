@@ -1,18 +1,15 @@
 <script>
-	import { onDestroy, tick } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import {
 		createVideoTemplate,
 		updateVideoTemplate,
-		previewVideoTemplateFrame,
 		renderVideoTemplate
 	} from '../../../api/videoTemplates';
 	import { analytics } from '$lib/analytics.js';
 
 	// Pass a saved template to edit it; leave null for a fresh one.
 	export let template = null;
-	// A still returned by the AI generate endpoint — shown immediately.
-	export let initialPreviewUrl = '';
 
 	const STARTER_TSX = `import {
   AbsoluteFill,
@@ -80,7 +77,11 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 	let compileErrors = [];
 
 	$: durationInFrames = Math.max(1, Math.round(Number(durationSeconds) * Number(fps)) || 1);
-	$: lines = tsx.split('\n');
+	$: lineNumbers = tsx.split('\n').map((_, i) => i + 1);
+	$: maxFrame = Math.max(0, durationInFrames - 1);
+	$: widthN = Math.max(1, Math.round(Number(width)) || 1);
+	$: heightN = Math.max(1, Math.round(Number(height)) || 1);
+	$: isPortrait = heightN > widthN;
 
 	// ── Code editor (textarea + gutter) ──────────────────────────────────
 	let editorEl;
@@ -101,7 +102,84 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		el.selectionStart = el.selectionEnd = start + 2;
 	}
 
-	// ── Variables form (auto-built from schemaJson) ──────────────────────
+	// ── Live player (React island, browser-only) ─────────────────────────
+	let playerHost = null;
+	let playerEl;
+	let playerStatus = 'loading'; // loading | compiling | live | error
+	let hostReady = false;
+	let applyTimer = null;
+	let currentFrame = 0;
+	let liveFields = null;
+
+	onMount(async () => {
+		try {
+			playerHost = await import('$lib/video/playerHost.js');
+		} catch (error) {
+			playerStatus = 'error';
+			compileErrors = ['Failed to load the live player. Reload the page and try again.'];
+			return;
+		}
+		applyCode();
+		hostReady = true;
+	});
+
+	function applyCode() {
+		if (!playerHost || !playerEl) return;
+		playerStatus = 'compiling';
+		const ok = playerHost.mountVideoPlayer(playerEl, {
+			tsx,
+			inputProps: variablesPayload(),
+			width: widthN,
+			height: heightN,
+			fps: Math.max(1, Math.round(Number(fps)) || 30),
+			durationInFrames,
+			onError: handlePlayerError,
+			onSchema: handleSchema,
+			onFrame: handleFrame
+		});
+		if (ok) {
+			playerStatus = 'live';
+			compileErrors = [];
+		}
+	}
+
+	function handlePlayerError(message) {
+		playerStatus = 'error';
+		compileErrors = [message];
+	}
+
+	function handleSchema(fields) {
+		if (JSON.stringify(fields) !== JSON.stringify(liveFields)) liveFields = fields;
+	}
+
+	function handleFrame(frame) {
+		currentFrame = frame;
+	}
+
+	function scheduleApply(delay) {
+		if (!hostReady) return;
+		playerStatus = 'compiling';
+		clearTimeout(applyTimer);
+		applyTimer = setTimeout(applyCode, delay);
+	}
+
+	// Debounced live recompile on code edits…
+	$: scheduleCodeApply(tsx);
+	function scheduleCodeApply() {
+		scheduleApply(800);
+	}
+
+	// …and a fast remount when the composition settings change.
+	$: scheduleSettingsApply(widthN, heightN, fps, durationInFrames);
+	function scheduleSettingsApply() {
+		scheduleApply(300);
+	}
+
+	function applyProps() {
+		scheduleApply(150);
+	}
+
+	// ── Props form (auto-built from the live schema) ─────────────────────
 	function toField(fieldName, def) {
 		const meta = def && typeof def === 'object' ? def : {};
 		let fallback = '';
@@ -131,7 +209,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 	}
 
 	let variables = {};
-	$: schemaFields = parseSchema(schemaJson);
+	$: schemaFields = liveFields ?? parseSchema(schemaJson);
 	$: syncVariables(schemaFields);
 
 	function syncVariables(fields) {
@@ -147,7 +225,9 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		const out = {};
 		for (const field of schemaFields) {
 			const value = variables[field.name];
-			out[field.name] = field.type === 'number' ? Number(value) || 0 : value;
+			if (field.type === 'number') out[field.name] = Number(value) || 0;
+			else if (field.type === 'boolean') out[field.name] = Boolean(value);
+			else out[field.name] = value;
 		}
 		return out;
 	}
@@ -169,10 +249,17 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		if (saving) return;
 		saveError = '';
 		compileErrors = [];
-		const widthN = Math.round(Number(width));
-		const heightN = Math.round(Number(height));
-		const fpsN = Math.round(Number(fps));
-		if (!widthN || !heightN || widthN < 1 || heightN < 1 || !fpsN || fpsN < 1) {
+		const widthValue = Math.round(Number(width));
+		const heightValue = Math.round(Number(height));
+		const fpsValue = Math.round(Number(fps));
+		if (
+			!widthValue ||
+			!heightValue ||
+			widthValue < 1 ||
+			heightValue < 1 ||
+			!fpsValue ||
+			fpsValue < 1
+		) {
 			saveError = 'Enter a valid width, height and fps.';
 			return;
 		}
@@ -185,9 +272,9 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 			const payload = {
 				name: name.trim() || 'Untitled video template',
 				tsx,
-				width: widthN,
-				height: heightN,
-				fps: fpsN,
+				width: widthValue,
+				height: heightValue,
+				fps: fpsValue,
 				durationInFrames,
 				status: publish ? 'published' : status
 			};
@@ -215,36 +302,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		}
 	}
 
-	// ── Frame preview ────────────────────────────────────────────────────
-	let frame = 0;
-	let previewUrl = initialPreviewUrl || '';
-	let previewLoading = false;
-	let previewError = '';
-
-	$: maxFrame = Math.max(0, durationInFrames - 1);
-	$: if (frame > maxFrame) frame = maxFrame;
-
-	async function previewFrame() {
-		if (!uid || previewLoading) return;
-		previewLoading = true;
-		previewError = '';
-		compileErrors = [];
-		try {
-			const response = await previewVideoTemplateFrame(uid, {
-				variables: variablesPayload(),
-				frame
-			});
-			previewUrl = response?.url || '';
-			if (!previewUrl) throw new Error('The preview finished but no image was returned.');
-		} catch (error) {
-			if (error?.status === 422) compileErrors = extractCompileErrors(error);
-			else previewError = error?.message || 'Failed to render the preview frame.';
-		} finally {
-			previewLoading = false;
-		}
-	}
-
-	// ── Test render (mp4, slow) ──────────────────────────────────────────
+	// ── Final render (mp4, slow, server-side truth) ──────────────────────
 	let rendering = false;
 	let renderUrl = '';
 	let renderError = '';
@@ -276,6 +334,8 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 
 	onDestroy(() => {
 		if (renderTimer) clearInterval(renderTimer);
+		clearTimeout(applyTimer);
+		if (playerHost && playerEl) playerHost.unmount(playerEl);
 	});
 
 	function variableLabel(variable) {
@@ -283,6 +343,14 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 			.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
 			.replace(/^./, (c) => c.toUpperCase());
 	}
+
+	const STATUS_CHIPS = {
+		loading: { label: 'Loading player…', classes: 'bg-gray-200 text-gray-700' },
+		compiling: { label: 'Compiling…', classes: 'bg-brand-accent text-black' },
+		live: { label: 'Live', classes: 'bg-data-green text-black' },
+		error: { label: 'Error', classes: 'bg-brand-danger text-white' }
+	};
+	$: statusChip = STATUS_CHIPS[playerStatus] || STATUS_CHIPS.loading;
 </script>
 
 <section class="min-h-full pb-12 relative z-0">
@@ -383,8 +451,8 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 						class="h-[520px] py-4 pl-3 pr-2 text-right font-mono text-xs leading-5 text-gray-500 bg-gray-900 select-none overflow-hidden shrink-0"
 						aria-hidden="true"
 					>
-						{#each lines as _, i}
-							<div>{i + 1}</div>
+						{#each lineNumbers as lineNumber}
+							<div>{lineNumber}</div>
 						{/each}
 					</div>
 					<textarea
@@ -401,7 +469,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 				<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-3">
 					Export a default component + an <span class="font-mono normal-case"
 						>export const schema</span
-					> — Tab inserts spaces.
+					> — edits go live automatically. Tab inserts spaces.
 				</p>
 			</div>
 
@@ -494,15 +562,56 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 			</div>
 		</div>
 
-		<!-- ─── RIGHT: preview panel ─────────────────────────────────── -->
+		<!-- ─── RIGHT: studio panel ──────────────────────────────────── -->
 		<div class="space-y-6">
-			<!-- Variables -->
+			<!-- Live player -->
+			<div
+				class="bg-gray-950 rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden"
+				data-testid="studio-panel"
+			>
+				<div class="flex items-center justify-between gap-3 px-5 py-3 bg-gray-900">
+					<h2
+						class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-3"
+					>
+						<span class="w-3 h-3 bg-brand-accent rounded-sm border-[2px] border-black" />
+						Live preview
+					</h2>
+					<span
+						data-testid="player-status"
+						class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black {statusChip.classes}"
+					>
+						{statusChip.label}
+					</span>
+				</div>
+				<div class="studio-checkerboard border-y-[3px] border-black p-4 flex justify-center">
+					<div
+						bind:this={playerEl}
+						data-testid="player-root"
+						class="mx-auto rounded-lg overflow-hidden bg-black"
+						style={isPortrait
+							? `aspect-ratio: ${widthN} / ${heightN}; height: min(60vh, 540px); max-width: 100%;`
+							: `aspect-ratio: ${widthN} / ${heightN}; width: 100%; max-height: 540px;`}
+					/>
+				</div>
+				<div class="flex items-center justify-between px-5 py-3 bg-gray-900">
+					<span class="font-mono text-xs font-bold text-gray-400" data-testid="frame-readout">
+						Frame {currentFrame} / {maxFrame}
+					</span>
+					<span class="font-mono text-xs font-bold text-gray-400">
+						{(currentFrame / Math.max(1, Number(fps))).toFixed(2)}s / {(
+							durationInFrames / Math.max(1, Number(fps))
+						).toFixed(2)}s · {widthN}×{heightN}
+					</span>
+				</div>
+			</div>
+
+			<!-- Props -->
 			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6">
 				<h2
 					class="text-sm font-black text-black uppercase tracking-widest mb-4 flex items-center gap-3"
 				>
 					<span class="w-3 h-3 bg-data-green rounded-sm border-[2px] border-black" />
-					Variables
+					Props
 				</h2>
 				{#if schemaFields.length}
 					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -519,6 +628,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 										id={'vt-var-' + field.name}
 										type="number"
 										bind:value={variables[field.name]}
+										on:input={applyProps}
 										class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 									/>
 								{:else if field.type === 'color'}
@@ -527,100 +637,60 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 											id={'vt-var-' + field.name}
 											type="color"
 											bind:value={variables[field.name]}
+											on:input={applyProps}
 											class="w-12 h-11 rounded-xl border-[3px] border-black bg-white p-1 cursor-pointer flex-shrink-0"
 										/>
 										<input
 											type="text"
 											aria-label={field.name + ' hex value'}
 											bind:value={variables[field.name]}
+											on:input={applyProps}
 											class="flex-1 min-w-0 rounded-xl border-[3px] border-black px-4 py-2.5 text-sm font-mono font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 										/>
 									</div>
+								{:else if field.type === 'boolean'}
+									<label
+										class="inline-flex items-center gap-3 rounded-xl border-[3px] border-black px-4 py-3 bg-white cursor-pointer"
+									>
+										<input
+											id={'vt-var-' + field.name}
+											type="checkbox"
+											bind:checked={variables[field.name]}
+											on:change={applyProps}
+											class="w-5 h-5 accent-black"
+										/>
+										<span class="text-sm font-bold text-black">Enabled</span>
+									</label>
 								{:else}
 									<input
 										id={'vt-var-' + field.name}
 										type="text"
 										bind:value={variables[field.name]}
+										on:input={applyProps}
 										class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 									/>
 								{/if}
 							</div>
 						{/each}
 					</div>
+					<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-4">
+						Edits update the player live — the same values are sent to the final render.
+					</p>
 				{:else}
 					<p class="text-xs font-bold text-gray-500">
-						{uid
-							? 'This template has no schema variables yet — add an "export const schema" and save.'
-							: 'Save the template and the variables form will be built from your schema.'}
+						Add an <span class="font-mono">export const schema</span> to your scene and the props form
+						is built automatically.
 					</p>
 				{/if}
 			</div>
 
-			<!-- Frame preview -->
-			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6">
-				<h2
-					class="text-sm font-black text-black uppercase tracking-widest mb-4 flex items-center gap-3"
-				>
-					<span class="w-3 h-3 bg-brand-accent rounded-sm border-[2px] border-black" />
-					Frame preview
-				</h2>
-				<label for="vt-frame" class="block text-xs font-black text-black uppercase tracking-widest">
-					Frame {frame} / {maxFrame}
-					<span class="text-gray-500">· {(frame / Math.max(1, Number(fps))).toFixed(2)}s</span>
-				</label>
-				<input
-					id="vt-frame"
-					type="range"
-					min="0"
-					max={maxFrame}
-					step="1"
-					bind:value={frame}
-					class="w-full mt-2 accent-black"
-				/>
-				<button
-					on:click={previewFrame}
-					disabled={!uid || previewLoading}
-					class="mt-3 inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					{previewLoading ? 'Rendering frame…' : 'Preview frame'}
-				</button>
-				{#if !uid}
-					<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">
-						Save the template first to preview frames.
-					</p>
-				{/if}
-
-				{#if previewError}
-					<div
-						class="bg-brand-danger/10 border-[3px] border-brand-danger rounded-xl p-4 mt-4 text-sm font-bold text-brand-danger"
-					>
-						{previewError}
-					</div>
-				{/if}
-
-				{#if previewLoading}
-					<div
-						class="mt-4 mx-auto w-full max-w-[280px] rounded-xl border-[3px] border-black bg-gray-200 animate-pulse"
-						style="aspect-ratio: {Math.max(1, Number(width))} / {Math.max(1, Number(height))};"
-					/>
-				{:else if previewUrl}
-					<div class="mt-4 flex justify-center bg-gray-50 rounded-xl border-[3px] border-black p-3">
-						<img
-							src={previewUrl}
-							alt="Rendered frame preview"
-							class="max-h-[420px] w-auto max-w-full rounded-lg"
-						/>
-					</div>
-				{/if}
-			</div>
-
-			<!-- Test render -->
+			<!-- Final render -->
 			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6">
 				<h2
 					class="text-sm font-black text-black uppercase tracking-widest mb-4 flex items-center gap-3"
 				>
 					<span class="w-3 h-3 bg-data-violet rounded-sm border-[2px] border-black" />
-					Test render
+					Final render
 				</h2>
 				<button
 					on:click={renderVideo}
@@ -645,12 +715,17 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 						</svg>
 						Rendering… {renderElapsed}s (up to ~3 min)
 					{:else}
-						Render test video
+						Render final MP4
 					{/if}
 				</button>
 				<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">
-					Renders the full mp4 with the variables above — this one is slow.
+					Server render with the props above — the source of truth for the final MP4.
 				</p>
+				{#if !uid}
+					<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">
+						Save the template first to render the final MP4.
+					</p>
+				{/if}
 
 				{#if renderError}
 					<div
@@ -672,3 +747,11 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		</div>
 	</div>
 </section>
+
+<style>
+	.studio-checkerboard {
+		background-color: #0a0a0a;
+		background-image: repeating-conic-gradient(#1c1c1c 0% 25%, #101010 0% 50%);
+		background-size: 24px 24px;
+	}
+</style>

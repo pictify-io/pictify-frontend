@@ -6,7 +6,6 @@
 	import { analytics } from '$lib/analytics.js';
 
 	let template = null;
-	let initialPreviewUrl = '';
 	let isLoading = true;
 	let loadError = '';
 
@@ -19,11 +18,10 @@
 			const response = await getVideoTemplate(uid);
 			template = response?.template || null;
 			if (!template) throw new Error('Video template not found.');
-			// The AI generate flow stashes the first still here before routing.
+			// The AI generate flow stashes a server still here before routing —
+			// the live player compiles the TSX directly now, so just clean up.
 			try {
-				const key = `pictify:video-template-preview:${uid}`;
-				initialPreviewUrl = sessionStorage.getItem(key) || '';
-				sessionStorage.removeItem(key);
+				sessionStorage.removeItem(`pictify:video-template-preview:${uid}`);
 			} catch (error) {
 				/* ignore */
 			}
@@ -48,7 +46,7 @@
 	<section class="min-h-full pb-12 pt-4">
 		<div class="h-10 w-72 bg-gray-200 rounded animate-pulse mb-8" />
 		<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-			{#each Array(2) as _}
+			{#each [0, 1] as skeleton (skeleton)}
 				<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-6">
 					<div class="h-5 w-1/3 bg-gray-200 rounded animate-pulse mb-4" />
 					<div class="h-64 bg-gray-100 rounded-xl animate-pulse" />
@@ -80,6 +78,6 @@
 	</section>
 {:else}
 	{#key template.uid}
-		<VideoTemplateEditor {template} {initialPreviewUrl} />
+		<VideoTemplateEditor {template} />
 	{/key}
 {/if}
