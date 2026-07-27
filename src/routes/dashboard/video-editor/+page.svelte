@@ -12,10 +12,11 @@
 
 	// ── Editor state ─────────────────────────────────────────────────────
 	const US = 1000000; // microseconds per second
-	const PIXELS_PER_SECOND = 40;
 
 	let canvasEl;
+	let timelineEl;
 	let editor = null; // handle from mountVideoEditor
+	let timelinePanel = null; // handle from mountTimelinePanel
 	let mountError = '';
 	let isBooting = true;
 
@@ -23,12 +24,10 @@
 	let projectName = 'Untitled video';
 	let isDirty = false;
 
-	// Engine store mirror (updated via onState)
-	let currentTime = 0;
-	let isPlaying = false;
-	let tracks = [];
-	let clips = {};
-	let settings = { width: 1080, height: 1920, fps: 30, duration: 30 * US };
+	// Edit tracking (references change only when the document changes)
+	let trackDirty = false;
+	let lastClips = null;
+	let lastTracks = null;
 
 	let selectedClipIds = [];
 
@@ -38,21 +37,30 @@
 	let renderMessage = '';
 	let renderUrl = '';
 
-	$: durationUs = Math.max(
-		settings?.duration || 0,
-		...Object.values(clips || {}).map((clip) => clip?.timing?.display?.to || 0),
-		1
-	);
+	// Resizable timeline dock
+	const TIMELINE_MIN_HEIGHT = 200;
+	const TIMELINE_MAX_HEIGHT = 520;
+	let timelineHeight = 300;
+	let resizePointerId = null;
+	let resizeStartY = 0;
+	let resizeStartHeight = 0;
 
-	const formatTime = (us) => {
-		const totalSeconds = Math.max(0, us) / US;
-		const minutes = Math.floor(totalSeconds / 60);
-		const seconds = totalSeconds - minutes * 60;
-		return `${minutes}:${seconds.toFixed(1).padStart(4, '0')}`;
+	const startTimelineResize = (event) => {
+		resizePointerId = event.pointerId;
+		resizeStartY = event.clientY;
+		resizeStartHeight = timelineHeight;
+		event.currentTarget.setPointerCapture(event.pointerId);
 	};
 
-	const trackClips = (track) =>
-		(track?.clipIds || []).map((id) => clips[id]).filter((clip) => clip && clip.timing?.display);
+	const moveTimelineResize = (event) => {
+		if (resizePointerId === null) return;
+		const next = resizeStartHeight + (resizeStartY - event.clientY);
+		timelineHeight = Math.min(TIMELINE_MAX_HEIGHT, Math.max(TIMELINE_MIN_HEIGHT, next));
+	};
+
+	const endTimelineResize = () => {
+		resizePointerId = null;
+	};
 
 	// ── Mount ────────────────────────────────────────────────────────────
 	onMount(async () => {
@@ -73,16 +81,18 @@
 		}
 
 		try {
-			// Browser-only engine — never import at module top level (SSR).
+			// Browser-only engines — never import at module top level (SSR).
 			const { mountVideoEditor } = await import('$lib/video/editorHost.js');
 			editor = await mountVideoEditor(canvasEl, {
 				project: projectJson,
 				onState: (state) => {
-					currentTime = state.currentTime || 0;
-					isPlaying = !!state.isPlaying;
-					tracks = state.tracks || [];
-					clips = state.clips || {};
-					settings = state.settings || settings;
+					// Any change to the clip/track graph after boot marks the
+					// project dirty (drag, trim, split, reorder, undo, redo, …).
+					if (trackDirty && (state.clips !== lastClips || state.tracks !== lastTracks)) {
+						markDirty();
+					}
+					lastClips = state.clips;
+					lastTracks = state.tracks;
 				},
 				onSelection: (selected) => {
 					selectedClipIds = (selected || []).map((clip) => clip.id);
@@ -90,6 +100,18 @@
 				onError: (message) => {
 					mountError = message;
 				}
+			});
+			trackDirty = true;
+
+			// Dev-only hook for QA tooling (headless browser assertions).
+			if (import.meta.env.DEV) window.__videoEditor = editor;
+
+			// The vendored OpenVideo timeline panel — a React island bound to
+			// the SAME core/studio pair the canvas uses.
+			const { mountTimelinePanel } = await import('$lib/video/timelineHost.js');
+			timelinePanel = mountTimelinePanel(timelineEl, {
+				core: editor.core,
+				studio: editor.studio
 			});
 		} catch (error) {
 			mountError = error?.message || 'The video editor failed to start.';
@@ -99,6 +121,7 @@
 	});
 
 	onDestroy(() => {
+		if (timelinePanel) timelinePanel.destroy();
 		if (editor) editor.destroy();
 	});
 
@@ -135,20 +158,6 @@
 		editor.removeClips(selectedClipIds);
 		selectedClipIds = [];
 		markDirty();
-	};
-
-	const togglePlayback = () => {
-		if (editor) editor.toggle();
-	};
-
-	const seekTo = (us) => {
-		if (editor) editor.seek(Math.min(Math.max(0, us), durationUs));
-	};
-
-	const handleRulerClick = (event) => {
-		const rect = event.currentTarget.getBoundingClientRect();
-		const seconds = (event.clientX - rect.left) / PIXELS_PER_SECOND;
-		seekTo(seconds * US);
 	};
 
 	// ── Persistence ──────────────────────────────────────────────────────
@@ -278,8 +287,9 @@
 			</button>
 		</aside>
 
-		<!-- Canvas -->
-		<div class="flex-1 min-w-0 relative bg-[#101014]">
+		<!-- Canvas (overflow-hidden: the Pixi canvas keeps its mount-time pixel
+		     size, so clip it when the timeline dock is resized taller) -->
+		<div class="flex-1 min-w-0 relative overflow-hidden bg-[#101014]">
 			{#if isBooting}
 				<div class="absolute inset-0 flex items-center justify-center text-sm text-gray-500">
 					Starting the editor…
@@ -289,86 +299,25 @@
 		</div>
 	</div>
 
-	<!-- Transport + timeline -->
-	<footer class="shrink-0 border-t border-gray-800 bg-[#141419]">
-		<div class="flex items-center gap-3 px-4 py-2 border-b border-gray-800">
-			<button
-				class="w-8 h-8 rounded-full bg-white text-black font-black text-xs flex items-center justify-center hover:bg-gray-200 transition-colors"
-				on:click={togglePlayback}
-				aria-label={isPlaying ? 'Pause' : 'Play'}
-			>
-				{isPlaying ? '❚❚' : '▶'}
-			</button>
-			<span class="text-xs font-mono text-gray-400 tabular-nums">
-				{formatTime(currentTime)} / {formatTime(durationUs)}
-			</span>
-			<span class="text-[10px] text-gray-600 ml-auto">
-				{settings.width}×{settings.height} · {settings.fps} fps
-			</span>
-		</div>
-
-		<!-- Minimal timeline strip (placeholder for the full canvas timeline) -->
-		<div class="h-36 overflow-auto">
-			<div
-				class="relative min-w-full"
-				style={`width: ${Math.ceil((durationUs / US) * PIXELS_PER_SECOND) + 80}px`}
-			>
-				<!-- Ruler -->
-				<button
-					type="button"
-					class="block w-full h-5 relative border-b border-gray-800 bg-[#101014] cursor-pointer text-left"
-					on:click={handleRulerClick}
-					aria-label="Seek"
-				>
-					{#each Array.from({ length: Math.ceil(durationUs / US) + 1 }, (v, i) => i) as second}
-						<span
-							class="absolute top-0 h-full border-l border-gray-800 text-[9px] text-gray-600 pl-1 select-none"
-							style={`left: ${second * PIXELS_PER_SECOND}px`}
-						>
-							{second}s
-						</span>
-					{/each}
-				</button>
-
-				<!-- Tracks -->
-				{#each tracks as track (track.id)}
-					<div class="relative h-9 border-b border-gray-800/60">
-						<span
-							class="sticky left-0 z-10 inline-block text-[9px] font-black uppercase tracking-widest text-gray-600 px-1"
-						>
-							{track.name || track.type}
-						</span>
-						{#each trackClips(track) as clip (clip.id)}
-							<div
-								class={`absolute top-1 bottom-1 rounded border text-[10px] px-1.5 flex items-center overflow-hidden whitespace-nowrap select-none ${
-									selectedClipIds.includes(clip.id)
-										? 'border-yellow-400 bg-yellow-400/20 text-yellow-200'
-										: 'border-gray-700 bg-gray-800 text-gray-300'
-								}`}
-								style={`left: ${
-									(clip.timing.display.from / US) * PIXELS_PER_SECOND
-								}px; width: ${Math.max(
-									8,
-									((clip.timing.display.to - clip.timing.display.from) / US) * PIXELS_PER_SECOND
-								)}px`}
-								title={clip.name || clip.type}
-							>
-								{clip.name || clip.text || clip.type}
-							</div>
-						{/each}
-					</div>
-				{:else}
-					<div class="px-4 py-6 text-xs text-gray-600">
-						The timeline is empty — add text, an image, or a video to get started.
-					</div>
-				{/each}
-
-				<!-- Playhead -->
-				<div
-					class="absolute top-0 bottom-0 w-px bg-yellow-400 pointer-events-none"
-					style={`left: ${(currentTime / US) * PIXELS_PER_SECOND}px`}
-				/>
-			</div>
+	<!-- Timeline dock (vendored OpenVideo timeline, React island) -->
+	<footer class="shrink-0 bg-[#101014]">
+		<!-- Resize handle -->
+		<div
+			class="h-1.5 cursor-row-resize bg-[#141419] hover:bg-yellow-400/40 transition-colors touch-none"
+			role="separator"
+			aria-orientation="horizontal"
+			aria-label="Resize timeline"
+			on:pointerdown={startTimelineResize}
+			on:pointermove={moveTimelineResize}
+			on:pointerup={endTimelineResize}
+			on:pointercancel={endTimelineResize}
+		/>
+		<div bind:this={timelineEl} class="w-full" style={`height: ${timelineHeight}px`}>
+			{#if isBooting}
+				<div class="h-full flex items-center justify-center text-xs text-gray-600">
+					Loading the timeline…
+				</div>
+			{/if}
 		</div>
 	</footer>
 </section>

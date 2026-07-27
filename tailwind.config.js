@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	// jsx/tsx: the vendored React timeline island (src/lib/video/vendor).
+	content: ['./src/**/*.{html,js,svelte,ts,jsx,tsx}'],
 	theme: {
 		extend: {
 			fontFamily: {
@@ -8,16 +9,22 @@ export default {
 				heading: ['DynaPuff', 'Inter', 'sans-serif'],
 				// Code face used by the HTML editor, CodeMirror panes, and API snippets.
 				// Falls back through the Apple/Windows/Linux mono stack.
-				mono: [
-					'JetBrains Mono',
-					'ui-monospace',
-					'SFMono-Regular',
-					'Menlo',
-					'Consolas',
-					'monospace'
-				]
+				mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 			},
 			colors: {
+				// Semantic tokens used by the vendored OpenVideo timeline island
+				// (src/lib/video/vendor/openvideo-timeline). Upstream is a shadcn
+				// app on Tailwind v4 CSS variables; here they are fixed dark-editor
+				// values matching the /dashboard/video-editor chrome. No other
+				// part of the site uses these names.
+				background: '#101014',
+				foreground: '#f4f4f5',
+				muted: { DEFAULT: '#1c1c22', foreground: '#9ca3af' },
+				accent: { DEFAULT: '#26262e', foreground: '#fafafa' },
+				popover: { DEFAULT: '#16161c', foreground: '#e4e4e7' },
+				primary: { DEFAULT: '#facc15', foreground: '#101014' },
+				destructive: '#f87171',
+				border: '#27272a',
 				brand: {
 					bg: '#FFFDF8',
 					accent: '#ffc480',
