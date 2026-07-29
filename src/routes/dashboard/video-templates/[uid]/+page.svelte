@@ -1,83 +1,62 @@
 <script>
+	/**
+	 * Router. A video template's uid is one address; how you edit it depends on
+	 * how it was authored. Fetch the template, then hand off:
+	 *
+	 *   kind 'timeline' → /studio  (the visual editor, the default)
+	 *   kind 'tsx'      → /code    (Code mode, advanced)
+	 *
+	 * Redirecting here rather than in a `+page.js` load keeps the request on the
+	 * client, where the session cookie and the shared store already live.
+	 */
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import VideoTemplateEditor from '$lib/components/dashboard/VideoTemplateEditor.svelte';
+	import { goto } from '$app/navigation';
 	import { getVideoTemplate } from '../../../../api/videoTemplates';
 	import { analytics } from '$lib/analytics.js';
 
-	let template = null;
-	let isLoading = true;
 	let loadError = '';
 
-	$: uid = $page.params.uid;
-
-	async function load() {
-		isLoading = true;
-		loadError = '';
+	onMount(async () => {
+		const { uid } = $page.params;
 		try {
 			const response = await getVideoTemplate(uid);
-			template = response?.template || null;
-			if (!template) throw new Error('Video template not found.');
-			// The AI generate flow stashes a server still here before routing —
-			// the live player compiles the TSX directly now, so just clean up.
-			try {
-				sessionStorage.removeItem(`pictify:video-template-preview:${uid}`);
-			} catch (error) {
-				/* ignore */
-			}
+			const template = response?.template;
+			if (!template) throw new Error('This video template no longer exists.');
+			analytics.page('Video Template Open');
+			const destination = template.kind === 'tsx' ? 'code' : 'studio';
+			await goto(`/dashboard/video-templates/${uid}/${destination}`, { replaceState: true });
 		} catch (error) {
-			loadError = error?.message || 'Failed to load the video template.';
-		} finally {
-			isLoading = false;
+			loadError = error?.message || 'Failed to open this video template.';
 		}
-	}
-
-	onMount(() => {
-		analytics.page('Video Template Editor');
-		load();
 	});
 </script>
 
 <svelte:head>
-	<title>{template?.name || 'Video template'} - Pictify.io</title>
+	<title>Opening video template - Pictify.io</title>
 </svelte:head>
 
-{#if isLoading}
-	<section class="min-h-full pb-12 pt-4">
-		<div class="h-10 w-72 bg-gray-200 rounded animate-pulse mb-8" />
-		<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-			{#each [0, 1] as skeleton (skeleton)}
-				<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-6">
-					<div class="h-5 w-1/3 bg-gray-200 rounded animate-pulse mb-4" />
-					<div class="h-64 bg-gray-100 rounded-xl animate-pulse" />
-				</div>
-			{/each}
-		</div>
-	</section>
-{:else if loadError}
-	<section class="min-h-full pb-12 pt-8">
+<section class="min-h-full pb-12 pt-8">
+	{#if loadError}
 		<div
-			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg p-8 text-center flex flex-col items-center"
+			class="mx-auto max-w-md rounded-2xl border-[3px] border-black bg-white p-8 text-center shadow-brutal-lg"
 		>
-			<p class="text-sm font-black text-black uppercase tracking-wider mb-4">{loadError}</p>
-			<div class="flex items-center gap-3">
-				<button
-					on:click={load}
-					class="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
-				>
-					Retry
-				</button>
-				<a
-					href="/dashboard/video-templates"
-					class="inline-flex items-center gap-2 bg-white text-black px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-100 transition-colors"
-				>
-					Back to list
-				</a>
-			</div>
+			<p class="text-sm font-black uppercase tracking-wider text-black">{loadError}</p>
+			<a
+				href="/dashboard/video-templates"
+				class="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-black px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-800"
+			>
+				Back to video templates
+			</a>
 		</div>
-	</section>
-{:else}
-	{#key template.uid}
-		<VideoTemplateEditor {template} />
-	{/key}
-{/if}
+	{:else}
+		<div class="mx-auto max-w-md text-center">
+			<div
+				class="mx-auto h-10 w-10 animate-pulse rounded-xl border-[3px] border-black bg-brand-accent shadow-brutal-sm"
+			></div>
+			<p class="mt-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+				Opening your template
+			</p>
+		</div>
+	{/if}
+</section>

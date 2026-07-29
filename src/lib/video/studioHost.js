@@ -1,7 +1,7 @@
 /**
  * React islands that host the vendored OpenVideo studio panels
  * (src/lib/video/vendor/openvideo-studio): the left tool rail (Text / Media /
- * Audio / Shapes) and the right properties panel at /dashboard/video-editor.
+ * Audio / Shapes) and the right properties panel at /dashboard/video-templates/[uid]/studio.
  * Browser-only — always import this module dynamically from onMount, never at
  * the top level of a component that may run in SSR (same contract as
  * editorHost.js / timelineHost.js).
@@ -48,12 +48,16 @@ const mountIsland = (el, element) => {
  * @param {Object} options.core - The @openvideo/core instance from editorHost.
  * @param {Object} options.studio - The engine-pixi Studio instance from editorHost.
  * @param {Function} [options.uploadMedia] - async (File) => { url, persistent }
+ * @param {Function} [options.onClipStyleChange] - (clipId) => void, fired after a
+ *   vendored panel mutates a clip's style (the gradient editor). The studio
+ *   store only republishes on a selection change, so the Svelte side needs this
+ *   to re-read the clip and re-run variable detection.
  * @returns {{ destroy: () => void }}
  */
-export const mountToolRail = (el, { core, studio, uploadMedia }) => {
+export const mountToolRail = (el, { core, studio, uploadMedia, onClipStyleChange }) => {
 	if (!core) throw new Error('mountToolRail requires the editor core instance.');
 	setEditorContext({ core, studio: studio || null });
-	setHostCallbacks({ uploadMedia });
+	setHostCallbacks({ uploadMedia, onClipStyleChange });
 	return mountIsland(el, React.createElement(ToolRail));
 };
 

@@ -1,7 +1,7 @@
 /**
  * Browser-only host for the OpenVideo engine (@openvideo/core +
- * @openvideo/engine-pixi, both MIT) that powers the timeline video editor at
- * /dashboard/video-editor. Follows the same mount-function contract as
+ * @openvideo/engine-pixi, both MIT) that powers the timeline video studio at
+ * /dashboard/video-templates/[uid]/studio. Follows the same mount-function contract as
  * playerHost.js — always import this module dynamically from onMount, never
  * at the top level of a component that may run in SSR.
  *
@@ -12,7 +12,7 @@
  *
  * The editor document is a plain-JSON scene graph (IProject:
  * { settings, tracks, clips }) — exportProject()/importProject() round-trip
- * it, the backend persists it verbatim (POST/PUT /video/projects), and the
+ * it, the backend persists it verbatim on VideoTemplate.projectJson, and the
  * exact same JSON is what a server render consumes (@openvideo/video-renderer).
  */
 import { Core, CoreConfig, BrowserMetadataProvider } from '@openvideo/core';
@@ -111,7 +111,14 @@ export const mountVideoEditor = async (canvasEl, options = {}) => {
 				isPlaying: state.isPlaying,
 				tracks: state.tracks,
 				clips: state.clips,
-				settings: state.settings
+				settings: state.settings,
+				// Undo/redo availability. Derived from the store's own stacks
+				// rather than the Studio's `history:changed` event, which does not
+				// fire reliably — verified in the dev harness: after an undo the
+				// store read history=0/future=1 while the event still reported
+				// canUndo=true, canRedo=false.
+				canUndo: (state.history?.length || 0) > 0,
+				canRedo: (state.future?.length || 0) > 0
 			});
 		unsubscribe = core.store.subscribe(push);
 		push(core.store.getState());

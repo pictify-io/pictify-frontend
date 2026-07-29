@@ -312,10 +312,18 @@ const ACTIONS = {
 		href: '/dashboard/template/create',
 		icon: 'plus',
 		color: '#ec4899'
+	},
+	create_video: {
+		id: 'create_video',
+		label: 'New Video',
+		desc: 'Build a video template with variables',
+		href: '/dashboard/video-templates/new',
+		icon: 'video',
+		color: '#ffc480'
 	}
 };
 
-const DEFAULT_ACTIONS = ['create_template', 'run_workflow', 'view_workflows', 'api_playground'];
+const DEFAULT_ACTIONS = ['create_template', 'create_video', 'run_workflow', 'view_workflows'];
 
 // Which quick actions to show per use case (ordered by relevance)
 export const QUICK_ACTION_PRESETS = {

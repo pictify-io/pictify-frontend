@@ -1,7 +1,7 @@
 /**
  * React island that hosts the vendored OpenVideo timeline panel
  * (src/lib/video/vendor/openvideo-timeline) under the editor canvas at
- * /dashboard/video-editor. Browser-only — always import this module
+ * /dashboard/video-templates/[uid]/studio. Browser-only — always import this module
  * dynamically from onMount, never at the top level of a component that may
  * run in SSR (same contract as playerHost.js / editorHost.js).
  *

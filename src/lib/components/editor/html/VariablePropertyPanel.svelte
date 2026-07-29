@@ -26,9 +26,23 @@
 	/** @type {string[]} — all variable names, for duplicate validation */
 	export let allNames = [];
 
+	/**
+	 * Type vocabulary. Defaults to the HTML template set; the video studio
+	 * passes its own (no array/object/chart/table — they mean nothing on a
+	 * timeline) so both editors share this inspector instead of forking it.
+	 * @type {Array<{value: string, label: string, short?: string}>}
+	 */
+	export let types = null;
+	/**
+	 * The raw-HTML escape hatch only exists for HTML templates. On a canvas
+	 * there is no markup to inject, so the video studio hides the row.
+	 * @type {boolean}
+	 */
+	export let showRawHtml = true;
+
 	const dispatch = createEventDispatcher();
 
-	const TYPES = [
+	const DEFAULT_TYPES = [
 		{ value: 'text', label: 'Text', short: 'Text' },
 		{ value: 'image', label: 'Image URL', short: 'Img' },
 		{ value: 'color', label: 'Color', short: 'Color' },
@@ -37,6 +51,13 @@
 		{ value: 'chart', label: 'Chart', short: 'Chart' },
 		{ value: 'table', label: 'Table', short: 'Table' }
 	];
+
+	// `short` is optional on a caller-supplied list — fall back to the label so
+	// a partial descriptor still renders a readable button.
+	$: TYPES = (types?.length ? types : DEFAULT_TYPES).map((t) => ({
+		...t,
+		short: t.short || t.label
+	}));
 
 	// JSON-typed variables need a parseable textarea. We keep the draft's
 	// canonical value as a parsed object/array but edit via raw text so the
@@ -290,7 +311,10 @@
 			<div class="space-y-1">
 				<label class="block text-[10px] font-black uppercase tracking-widest text-gray-900"
 					>Type</label>
-				<div class="grid grid-cols-7 gap-1">
+				<div
+						class="grid gap-1"
+						style={`grid-template-columns: repeat(${Math.min(TYPES.length, 7)}, minmax(0, 1fr))`}
+					>
 					{#each TYPES as t}
 						<button
 							type="button"
@@ -388,7 +412,9 @@
 					/>
 				</label>
 
-				<!-- Raw HTML — danger treatment when ON -->
+				<!-- Raw HTML — danger treatment when ON. HTML templates only:
+				     a timeline has no markup to inject into. -->
+				{#if showRawHtml}
 				<label
 					class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-[2px] px-3 py-2 transition-all
 						{draft.allowRawHtml
@@ -421,6 +447,7 @@
 						Use <code class="text-[#c88a3b]">{'{{{' + draft.name + '}}}'}</code> in the
 						template to render this variable's value as raw HTML.
 					</p>
+				{/if}
 				{/if}
 			</div>
 		</div>

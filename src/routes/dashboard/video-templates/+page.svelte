@@ -1,12 +1,21 @@
 <script>
+	/**
+	 * Video templates — one list, both authoring kinds.
+	 *
+	 * Every card leads somewhere real: Open goes to the editor that matches how
+	 * the template was authored, Render goes to the fill-and-render page. The
+	 * AI prompt that used to sit at the top of this page moved to /new, where
+	 * it belongs alongside the other two ways to start.
+	 */
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { getVideoTemplates, generateVideoTemplate } from '../../../api/videoTemplates';
+	import { getVideoTemplates, deleteVideoTemplate } from '../../../api/videoTemplates';
 	import { analytics } from '$lib/analytics.js';
 
 	let isLoading = true;
 	let loadError = '';
 	let templates = [];
+	let deletingUid = '';
+	let actionError = '';
 
 	async function loadTemplates() {
 		isLoading = true;
@@ -27,63 +36,28 @@
 		return `${Math.round(seconds * 10) / 10}s`;
 	}
 
-	// ── AI generation ────────────────────────────────────────────────────
-	const PRESETS = [
-		{ label: '9:16', width: 1080, height: 1920 },
-		{ label: '1:1', width: 1080, height: 1080 },
-		{ label: '16:9', width: 1920, height: 1080 }
-	];
+	const editorPath = (template) =>
+		`/dashboard/video-templates/${template.uid}/${template.kind === 'tsx' ? 'code' : 'studio'}`;
 
-	let prompt = '';
-	let brandColor = '#FACC15';
-	let preset = PRESETS[0];
-	let genDuration = 6;
-	let generating = false;
-	let genError = '';
-
-	async function generate() {
-		if (generating) return;
-		genError = '';
-		if (!prompt.trim()) {
-			genError = 'Describe the video you want first.';
+	async function remove(template) {
+		if (deletingUid) return;
+		if (
+			!confirm(
+				`Delete "${template.name || 'Untitled'}"?\n\nAnything rendering it through the API or a workflow will start failing. This can't be undone.`
+			)
+		) {
 			return;
 		}
-		const durationSeconds = Math.round(Number(genDuration));
-		if (!durationSeconds || durationSeconds < 1) {
-			genError = 'Enter a valid duration in seconds.';
-			return;
-		}
-		generating = true;
+		deletingUid = template.uid;
+		actionError = '';
 		try {
-			const response = await generateVideoTemplate({
-				prompt: prompt.trim(),
-				brandColor,
-				width: preset.width,
-				height: preset.height,
-				durationSeconds
-			});
-			const template = response?.template;
-			if (!template?.uid)
-				throw new Error('The template was generated but no details were returned.');
-			analytics.track?.('Video Template Generated', {
-				uid: template.uid,
-				preset: preset.label,
-				durationSeconds
-			});
-			if (response?.previewUrl) {
-				try {
-					sessionStorage.setItem(
-						`pictify:video-template-preview:${template.uid}`,
-						response.previewUrl
-					);
-				} catch (error) {
-					/* ignore */
-				}
-			}
-			goto(`/dashboard/video-templates/${template.uid}`);
+			await deleteVideoTemplate(template.uid);
+			templates = templates.filter((t) => t.uid !== template.uid);
+			analytics.track?.('Video Template Deleted', { uid: template.uid });
 		} catch (error) {
-			genError = error?.message || 'Failed to generate the template. Please try again.';
-			generating = false;
+			actionError = error?.message || 'Could not delete that template.';
+		} finally {
+			deletingUid = '';
 		}
 	}
 
@@ -97,259 +71,202 @@
 	<title>Video templates - Pictify.io</title>
 </svelte:head>
 
-<section class="min-h-full pb-12 relative z-0">
-	<!-- Background Pattern -->
+<section class="relative z-0 min-h-full pb-12">
 	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none -z-10"
-	/>
+		class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] opacity-70 [background-size:20px_20px]"
+	></div>
 
 	<!-- Header -->
-	<div class="pt-4 mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+	<div class="mb-8 flex flex-col gap-4 pt-4 sm:flex-row sm:items-end sm:justify-between">
 		<div>
 			<h1
-				class="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-tighter leading-[0.95]"
+				class="text-3xl font-black leading-[0.95] tracking-tighter text-black sm:text-4xl md:text-5xl lg:text-4xl"
 			>
 				Video templates.
 			</h1>
-			<p class="text-sm font-bold text-gray-500 mt-2 max-w-lg">
-				Remotion-style scenes with variables — write the TSX yourself or let AI direct it.
+			<p class="mt-2 max-w-lg text-sm font-bold text-gray-500">
+				Build a video once with variables, then render it per row, per customer, per API call.
 			</p>
 		</div>
 		<a
 			href="/dashboard/video-templates/new"
-			class="inline-flex items-center gap-2 bg-black text-white px-5 py-3 lg:py-2.5 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors self-start sm:self-auto"
+			class="inline-flex items-center gap-2 self-start rounded-xl border-[3px] border-black bg-black px-5 py-3 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-800 sm:self-auto lg:py-2.5"
 		>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2.5"
-					d="M12 4v16m8-8H4"
-				/>
+			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
 			</svg>
-			New Video Template
+			New video template
 		</a>
 	</div>
 
-	<!-- Generate with AI -->
-	<div class="bg-brand-accent/10 rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-10">
-		<div class="flex items-center gap-3 mb-4">
-			<div
-				class="w-10 h-10 bg-brand-accent rounded-xl border-[3px] border-black shadow-brutal-sm flex items-center justify-center rotate-3"
-			>
-				<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-					/>
-				</svg>
-			</div>
-			<div>
-				<h2 class="text-sm font-black text-black uppercase tracking-widest">Generate with AI</h2>
-				<p class="text-xs font-bold text-gray-500">
-					Describe the scene — we write the TSX, you tweak it in the editor.
-				</p>
-			</div>
-		</div>
-
-		{#if genError}
-			<div
-				class="bg-brand-danger/10 border-[3px] border-brand-danger rounded-xl p-4 mb-4 text-sm font-bold text-brand-danger"
-			>
-				{genError}
-			</div>
-		{/if}
-
-		<textarea
-			bind:value={prompt}
-			rows="3"
-			disabled={generating}
-			placeholder="A product launch teaser: bold headline slides in, price tag pops with a spring, confetti at the end…"
-			class="w-full rounded-xl border-[3px] border-black p-4 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all resize-y disabled:opacity-60"
-		/>
-
-		<div class="flex flex-col lg:flex-row lg:items-end gap-4 mt-4">
-			<div>
-				<span class="block text-xs font-black text-black uppercase tracking-widest mb-2">
-					Format
-				</span>
-				<div class="flex items-center gap-2">
-					{#each PRESETS as p (p.label)}
-						<button
-							on:click={() => (preset = p)}
-							disabled={generating}
-							class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest border-[3px] border-black transition-all
-								{preset.label === p.label
-								? 'bg-black text-white shadow-brutal-sm'
-								: 'bg-white text-black hover:bg-gray-100'}"
-						>
-							{p.label}
-						</button>
-					{/each}
-				</div>
-			</div>
-			<div>
-				<label
-					for="gen-brand-color"
-					class="block text-xs font-black text-black uppercase tracking-widest mb-2"
-				>
-					Brand color
-				</label>
-				<div class="flex gap-2">
-					<input
-						id="gen-brand-color"
-						type="color"
-						bind:value={brandColor}
-						disabled={generating}
-						class="w-12 h-11 rounded-xl border-[3px] border-black bg-white p-1 cursor-pointer"
-					/>
-					<input
-						type="text"
-						aria-label="Brand color hex value"
-						bind:value={brandColor}
-						disabled={generating}
-						class="w-28 rounded-xl border-[3px] border-black px-4 py-2.5 text-sm font-mono font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
-					/>
-				</div>
-			</div>
-			<div>
-				<label
-					for="gen-duration"
-					class="block text-xs font-black text-black uppercase tracking-widest mb-2"
-				>
-					Seconds
-				</label>
-				<input
-					id="gen-duration"
-					type="number"
-					min="1"
-					max="30"
-					bind:value={genDuration}
-					disabled={generating}
-					class="w-24 rounded-xl border-[3px] border-black px-4 py-2.5 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
-				/>
-			</div>
-			<button
-				on:click={generate}
-				disabled={generating}
-				class="lg:ml-auto inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black shadow-brutal-md hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-			>
-				{#if generating}
-					<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-						<circle
-							class="opacity-25"
-							cx="12"
-							cy="12"
-							r="10"
-							stroke="currentColor"
-							stroke-width="4"
-						/>
-						<path
-							class="opacity-75"
-							fill="currentColor"
-							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-						/>
-					</svg>
-					Directing your scene… ~30s
-				{:else}
-					Generate with AI
-				{/if}
+	{#if actionError}
+		<div
+			class="mb-6 flex items-center gap-3 rounded-xl border-[3px] border-brand-danger bg-brand-danger/10 p-4 text-sm font-bold text-brand-danger"
+			role="alert"
+		>
+			<span class="flex-1">{actionError}</span>
+			<button on:click={() => (actionError = '')} class="text-xs font-black uppercase">
+				Dismiss
 			</button>
 		</div>
-	</div>
-
-	<!-- Templates list -->
-	<div class="flex items-center gap-3 mb-6">
-		<h2 class="text-sm font-black text-black uppercase tracking-widest flex items-center gap-3">
-			<span class="w-3 h-3 bg-data-violet rounded-sm border-[2px] border-black" />
-			Your video templates
-		</h2>
-	</div>
+	{/if}
 
 	{#if isLoading}
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-			{#each Array(3) as _}
-				<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-5">
-					<div class="h-5 w-2/3 bg-gray-200 rounded animate-pulse mb-4" />
-					<div class="h-4 w-1/2 bg-gray-100 rounded animate-pulse" />
+		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+			{#each Array(3) as _, i (i)}
+				<div class="rounded-2xl border-[3px] border-black bg-white p-5 shadow-brutal-md">
+					<div class="mb-4 h-32 animate-pulse rounded-xl bg-gray-100"></div>
+					<div class="mb-3 h-5 w-2/3 animate-pulse rounded bg-gray-200"></div>
+					<div class="h-4 w-1/2 animate-pulse rounded bg-gray-100"></div>
 				</div>
 			{/each}
 		</div>
 	{:else if loadError}
 		<div
-			class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg p-8 text-center flex flex-col items-center"
+			class="flex flex-col items-center rounded-2xl border-[3px] border-black bg-white p-8 text-center shadow-brutal-lg"
 		>
-			<p class="text-sm font-black text-black uppercase tracking-wider mb-4">{loadError}</p>
+			<p class="mb-4 text-sm font-black uppercase tracking-wider text-black">{loadError}</p>
 			<button
 				on:click={loadTemplates}
-				class="inline-flex items-center gap-2 bg-black text-white px-6 lg:px-5 py-3 lg:py-2.5 rounded-xl font-black text-sm lg:text-xs uppercase tracking-wide border-[3px] border-black hover:bg-gray-800 transition-colors"
+				class="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-black px-6 py-3 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-gray-800 lg:px-5 lg:py-2.5 lg:text-xs"
 			>
 				Retry
 			</button>
 		</div>
 	{:else if templates.length === 0}
+		<!-- Empty state teaches the loop, not just "nothing here" -->
 		<div
-			class="bg-white rounded-2xl border-[3px] border-black border-dashed p-10 text-center flex flex-col items-center"
+			class="flex flex-col items-center rounded-2xl border-[3px] border-dashed border-black bg-white p-10 text-center"
 		>
-			<p class="text-lg font-black text-black mb-2">No video templates yet</p>
-			<p class="text-sm font-bold text-gray-500 max-w-sm">
-				Start from scratch with
-				<a
-					href="/dashboard/video-templates/new"
-					class="underline text-black hover:text-brand-danger"
-				>
-					a new template
-				</a>
-				— or describe one above and let AI direct it.
+			<div
+				class="mb-4 flex h-14 w-14 rotate-3 items-center justify-center rounded-xl border-[3px] border-black bg-brand-accent shadow-brutal-sm"
+			>
+				<i class="fa fa-clapperboard text-xl text-black" aria-hidden="true"></i>
+			</div>
+			<p class="mb-2 text-lg font-black text-black">No video templates yet</p>
+			<p class="mb-6 max-w-md text-sm font-bold text-gray-500">
+				A video template is a scene with
+				<code class="rounded border-[2px] border-black bg-gray-50 px-1 font-mono text-xs">
+					{'{{'}variables{'}}'}
+				</code>
+				in it. Build it once in the studio, then render a personalised copy for every row of a CSV
+				or every call to the API.
 			</p>
+			<a
+				href="/dashboard/video-templates/new"
+				class="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-black px-6 py-3 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-800"
+			>
+				Build your first video
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2.5"
+						d="M17 8l4 4m0 0l-4 4m4-4H3"
+					/>
+				</svg>
+			</a>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each templates as template (template.uid)}
 				<div
-					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md hover:shadow-brutal-xl hover:-translate-y-1 transition-all duration-200 p-5 flex flex-col"
+					class="flex flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-brutal-md transition-all duration-200 hover:-translate-y-1 hover:shadow-brutal-xl"
 				>
-					<div class="flex items-start justify-between gap-3">
-						<h3 class="text-base font-black text-black truncate">
-							{template.name || 'Untitled video template'}
-						</h3>
-						<span
-							class="px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black flex-shrink-0
-								{template.status === 'published' ? 'bg-data-green text-black' : 'bg-gray-100 text-gray-700'}"
-						>
-							{template.status || 'draft'}
-						</span>
-					</div>
-					<div class="flex items-center gap-2 mt-3 flex-wrap">
-						<span
-							class="px-2.5 py-1 bg-gray-100 text-gray-700 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black"
-						>
-							{template.width}&times;{template.height}
-						</span>
-						{#if durationLabel(template)}
-							<span
-								class="px-2.5 py-1 bg-brand-accent/20 text-black text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black"
-							>
-								{durationLabel(template)} @ {template.fps}fps
-							</span>
-						{/if}
-					</div>
+					<!-- Poster. Without one, every card looked identical. -->
 					<a
-						href="/dashboard/video-templates/{template.uid}"
-						class="mt-5 self-start inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest border-[3px] border-black hover:bg-gray-800 transition-colors"
+						href={editorPath(template)}
+						class="relative block aspect-video overflow-hidden border-b-[3px] border-black bg-gray-950 focus-brutal"
+						aria-label="Open {template.name || 'Untitled video template'}"
 					>
-						Open
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2.5"
-								d="M17 8l4 4m0 0l-4 4m4-4H3"
+						{#if template.posterUrl}
+							<img
+								src={template.posterUrl}
+								alt=""
+								loading="lazy"
+								class="h-full w-full object-contain"
 							/>
-						</svg>
+						{:else}
+							<div class="flex h-full w-full items-center justify-center">
+								<i class="fa fa-film text-2xl text-gray-700" aria-hidden="true"></i>
+							</div>
+						{/if}
+						<span
+							class="absolute left-2 top-2 rounded-full border-[2px] border-black px-2 py-0.5 text-[9px] font-black uppercase tracking-widest
+								{template.kind === 'tsx' ? 'bg-data-violet text-black' : 'bg-brand-accent text-black'}"
+						>
+							{template.kind === 'tsx' ? 'Code' : 'Studio'}
+						</span>
 					</a>
+
+					<div class="flex flex-1 flex-col p-5">
+						<div class="flex items-start justify-between gap-3">
+							<h2 class="truncate text-base font-black text-black" title={template.name}>
+								{template.name || 'Untitled video template'}
+							</h2>
+							<span
+								class="flex-shrink-0 rounded-full border-[2px] border-black px-2.5 py-1 text-[10px] font-black uppercase tracking-widest
+									{template.status === 'published'
+									? 'bg-data-green text-black'
+									: 'bg-gray-100 text-gray-700'}"
+							>
+								{template.status || 'draft'}
+							</span>
+						</div>
+
+						<div class="mt-3 flex flex-wrap items-center gap-2">
+							<span
+								class="rounded-full border-[2px] border-black bg-gray-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-gray-700"
+							>
+								{template.width}&times;{template.height}
+							</span>
+							{#if durationLabel(template)}
+								<span
+									class="rounded-full border-[2px] border-black bg-brand-accent/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-black"
+								>
+									{durationLabel(template)} @ {template.fps}fps
+								</span>
+							{/if}
+							{#if template.variableDefinitions?.length}
+								<span
+									class="rounded-full border-[2px] border-black bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-gray-700"
+									title={template.variableDefinitions.map((v) => v.name).join(', ')}
+								>
+									{template.variableDefinitions.length} var{template.variableDefinitions.length ===
+									1
+										? ''
+										: 's'}
+								</span>
+							{/if}
+						</div>
+
+						<div class="mt-5 flex flex-wrap items-center gap-2 pt-1">
+							<a
+								href={editorPath(template)}
+								class="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-black px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-800"
+							>
+								Edit
+							</a>
+							<a
+								href="/dashboard/video-templates/{template.uid}/render"
+								class="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-brand-accent px-4 py-2 text-[10px] font-black uppercase tracking-widest text-black shadow-brutal-sm transition-all hover:-translate-y-0.5 hover:shadow-brutal-md"
+							>
+								Render
+							</a>
+							<button
+								on:click={() => remove(template)}
+								disabled={deletingUid === template.uid}
+								aria-label="Delete {template.name || 'this template'}"
+								class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg border-[2px] border-black bg-white text-gray-500 transition-all hover:bg-brand-danger hover:text-white disabled:opacity-50 focus-brutal"
+							>
+								{#if deletingUid === template.uid}
+									<i class="fa fa-spinner fa-spin text-[10px]" aria-hidden="true"></i>
+								{:else}
+									<i class="fa fa-trash text-[10px]" aria-hidden="true"></i>
+								{/if}
+							</button>
+						</div>
+					</div>
 				</div>
 			{/each}
 		</div>

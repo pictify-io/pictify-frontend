@@ -70,7 +70,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 			: 5;
 	let tsx = template?.tsx || STARTER_TSX;
 	let status = template?.status || 'draft';
-	let schemaJson = template?.schemaJson ?? template?.schema ?? null;
+	let schemaJson = template?.variableDefinitions ?? template?.schemaJson ?? template?.schema ?? null;
 
 	let saving = '';
 	let saveError = '';
@@ -180,12 +180,23 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 	}
 
 	// ── Props form (auto-built from the live schema) ─────────────────────
+	// One descriptor shape across the whole product: { name, type, defaultValue,
+	// description, validation }. The live player's schema dialect uses `default`
+	// and the legacy `string` type, so normalize both here rather than letting
+	// two vocabularies reach the backend.
 	function toField(fieldName, def) {
 		const meta = def && typeof def === 'object' ? def : {};
 		let fallback = '';
-		if (meta.default !== undefined) fallback = meta.default;
-		else if (meta.defaultValue !== undefined) fallback = meta.defaultValue;
-		return { name: fieldName, type: meta.type || 'string', default: fallback };
+		if (meta.defaultValue !== undefined) fallback = meta.defaultValue;
+		else if (meta.default !== undefined) fallback = meta.default;
+		const rawType = meta.type || 'text';
+		return {
+			name: fieldName,
+			type: rawType === 'string' ? 'text' : rawType,
+			defaultValue: fallback,
+			description: typeof meta.description === 'string' ? meta.description : '',
+			validation: { required: Boolean(meta.validation?.required) }
+		};
 	}
 
 	function parseSchema(raw) {
@@ -216,7 +227,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		const next = {};
 		for (const field of fields) {
 			next[field.name] =
-				variables[field.name] !== undefined ? variables[field.name] : field.default;
+				variables[field.name] !== undefined ? variables[field.name] : field.defaultValue;
 		}
 		variables = next;
 	}
@@ -271,7 +282,11 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 		try {
 			const payload = {
 				name: name.trim() || 'Untitled video template',
+				kind: 'tsx',
 				tsx,
+				// The live player already parsed the scene's schema — send it so
+				// the backend doesn't have to re-derive it from the source.
+				variableDefinitions: schemaFields,
 				width: widthValue,
 				height: heightValue,
 				fps: fpsValue,
@@ -284,7 +299,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 			const saved = response?.template;
 			if (!saved?.uid) throw new Error('The template was saved but no details were returned.');
 			status = saved.status || payload.status;
-			schemaJson = saved.schemaJson ?? saved.schema ?? schemaJson;
+			schemaJson = saved.variableDefinitions ?? saved.schemaJson ?? schemaJson;
 			analytics.track?.('Video Template Saved', {
 				uid: saved.uid,
 				published: publish,
@@ -292,7 +307,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 			});
 			if (!uid) {
 				uid = saved.uid;
-				goto(`/dashboard/video-templates/${saved.uid}`, { replaceState: true });
+				goto(`/dashboard/video-templates/${saved.uid}/code`, { replaceState: true });
 			}
 		} catch (error) {
 			if (error?.status === 422) compileErrors = extractCompileErrors(error);
