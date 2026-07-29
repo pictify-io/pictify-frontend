@@ -17,13 +17,6 @@ import { Button, ScrollArea, cn } from "../ui";
 import { RiDeleteBinLine, RiFileCopyLine } from "../icons";
 import { getPropertiesForType, PropertyKey } from "./property-registry";
 import { readGradient, gradientStyle } from "../../../gradients";
-import {
-  buildAnimation,
-  readAnimation,
-  withAnimationMeta,
-  DEFAULT_IN_FRACTION,
-  DEFAULT_OUT_FRACTION,
-} from "../../../animations";
 import { getHostCallbacks } from "../runtime";
 import { useEphemeralClip } from "./use-ephemeral-clip";
 import { getFontByPostScriptName } from "../font-utils";
@@ -164,34 +157,6 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
             onFontSizeChange={(val) => handleStyleUpdate({ fontSize: val })}
             textAlign={(style.textAlign || style.align || "center") as "left" | "center" | "right"}
             onTextAlignChange={(val) => handleStyleUpdate({ textAlign: val, align: val })}
-          />
-        );
-      }
-
-      case "animation": {
-        const stored = readAnimation(coreClip);
-        const meta = coreClip?.metadata?.pictify?.animation || {};
-        return (
-          <Properties.AnimationProperty
-            key={key}
-            inPreset={stored.inPreset}
-            outPreset={stored.outPreset}
-            emphasisPreset={stored.emphasisPreset}
-            inFraction={meta.inFraction ?? DEFAULT_IN_FRACTION}
-            outFraction={meta.outFraction ?? DEFAULT_OUT_FRACTION}
-            onChange={(next) => {
-              const timing = coreClip?.timing?.display || {};
-              const durationUs = Math.max(0, (timing.to ?? 0) - (timing.from ?? 0));
-              const animation = buildAnimation(next, durationUs);
-              // The engine stores only composed keyframes, so the preset choice
-              // is mirrored into metadata (read-modify-write — variable
-              // bindings live on the same object).
-              handleUpdate({
-                animation: animation ?? null,
-                metadata: withAnimationMeta(coreClip, next),
-              });
-              getHostCallbacks().onClipStyleChange?.(clip.id);
-            }}
           />
         );
       }
