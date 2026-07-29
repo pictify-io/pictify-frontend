@@ -29,10 +29,66 @@ export function useEditorHotkeys({ timelineCanvas, setZoomLevel }: UseEditorHotk
       core.playback.toggle();
     });
 
-    // Split
-    hotkeys("command+b, ctrl+b", (event, handler) => {
+    // Split. The context menu advertises ⌘K; ⌘B stays bound because it was the
+    // original binding and is in people's fingers.
+    hotkeys("command+b, ctrl+b, command+k, ctrl+k", (event, handler) => {
       event.preventDefault();
       core.clip.split(currentTimeUs);
+    });
+
+    // Duplicate (⌘D) — same behaviour as the context menu: clone the selection
+    // at the playhead, preserving relative offsets, and select the clones.
+    hotkeys("command+d, ctrl+d", (event) => {
+      event.preventDefault();
+      const { clips, selectedIds: ids } = projectStore.getState();
+      if (ids.length === 0) return;
+
+      const source = ids
+        .map((id) => clips[id])
+        .filter(Boolean)
+        .map((clip) => JSON.parse(JSON.stringify(clip)));
+      if (source.length === 0) return;
+
+      const currentTime = core.store.getState().currentTime;
+      const earliestFrom = Math.min(...source.map((c: AnyClip) => c.timing?.display?.from ?? 0));
+
+      const newClips = source.map((clip: AnyClip) => {
+        const offsetFromStart = (clip.timing?.display?.from ?? 0) - earliestFrom;
+        const newFrom = currentTime + offsetFromStart;
+        const duration = clip.timing?.duration ?? 0;
+        return {
+          ...clip,
+          id: nanoid(),
+          timing: {
+            ...clip.timing,
+            display: { ...clip.timing?.display, from: newFrom, to: newFrom + duration },
+          },
+        };
+      });
+
+      Promise.all(newClips.map((clip: AnyClip) => core.clip.add(clip))).then(() => {
+        projectStore.getState().select(newClips.map((c: AnyClip) => c.id));
+      });
+    });
+
+    // Lock / unlock (⌘L)
+    hotkeys("command+l, ctrl+l", (event) => {
+      event.preventDefault();
+      const { clips, selectedIds: ids } = projectStore.getState();
+      ids.forEach((id) => {
+        const clip = clips[id];
+        if (clip) core.clip.update(id, { locked: !clip.locked });
+      });
+    });
+
+    // Mute / unmute (⌘⇧M)
+    hotkeys("command+shift+m, ctrl+shift+m", (event) => {
+      event.preventDefault();
+      const { clips, selectedIds: ids } = projectStore.getState();
+      ids.forEach((id) => {
+        const clip = clips[id];
+        if (clip) core.clip.update(id, { muted: !(clip as any).muted });
+      });
     });
 
     // Delete
@@ -236,7 +292,10 @@ export function useEditorHotkeys({ timelineCanvas, setZoomLevel }: UseEditorHotk
 
     return () => {
       hotkeys.unbind("space");
-      hotkeys.unbind("command+b, ctrl+b");
+      hotkeys.unbind("command+b, ctrl+b, command+k, ctrl+k");
+      hotkeys.unbind("command+d, ctrl+d");
+      hotkeys.unbind("command+l, ctrl+l");
+      hotkeys.unbind("command+shift+m, ctrl+shift+m");
       hotkeys.unbind("backspace, delete");
       hotkeys.unbind("command+a, ctrl+a");
       hotkeys.unbind("command+c, ctrl+c");
