@@ -36,7 +36,12 @@ const listWorkflowRuns = async () => {
 
 /**
  * Render a single preview for one row.
- * @param {Object} payload - { templateUid, row, columnMapping }
+ *
+ * `outputFormat` is REQUIRED for a video template: the backend validates the
+ * template/format pairing and rejects a video template asked for png with
+ * 400 output_format_mismatch.
+ *
+ * @param {Object} payload - { templateUid, row, columnMapping, outputFormat }
  * @returns {Promise<Object>} - { url }
  */
 const previewWorkflow = async (payload) => {
