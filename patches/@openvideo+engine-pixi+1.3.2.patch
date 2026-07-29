@@ -1,5 +1,5 @@
 diff --git a/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js b/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js
-index 64b7a98..227e46a 100644
+index 64b7a98..ef007bb 100644
 --- a/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js
 +++ b/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js
 @@ -76215,6 +76215,7 @@ class lD extends Ft {
@@ -190,7 +190,7 @@ index 64b7a98..227e46a 100644
        speed: e.style?.speed,
        scale: e.style?.scale,
        density: e.style?.density
-@@ -89254,6 +89352,30 @@ class Ire extends z2 {
+@@ -89254,6 +89352,38 @@ class Ire extends z2 {
      };
      this.logger.info("Compositor add clip", i);
      const n = await e.clone();
@@ -205,6 +205,14 @@ index 64b7a98..227e46a 100644
 +     * so they can be rebuilt on the clone without reaching into internals.
 +     */
 +    try {
++      /* Identity. clone() mints a fresh id, but the JSON id is what every
++       * cross-clip reference uses — a Transition clip's fromClipId/toClipId are
++       * resolved against sprite.id at render time. Losing it meant the lookup
++       * found nothing and transitions silently rendered as a hard cut. Carry
++       * identity across the clone alongside the animation state below. */
++      if (e.id != null) n.id = e.id;
++      if (e.name != null) n.name = e.name;
++      if (e.metadata != null) n.metadata = e.metadata;
 +      if (Array.isArray(e.animations) && e.animations.length > 0 && typeof n.addAnimation == "function") {
 +        typeof n.clearAnimations == "function" && n.clearAnimations();
 +        for (const _a of e.animations) {
