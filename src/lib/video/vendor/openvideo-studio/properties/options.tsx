@@ -23,6 +23,13 @@ import {
 import { useSliderThrottle } from "./use-slider-throttle";
 import { getGroupedFonts } from "../font-utils";
 import {
+  IN_PRESETS,
+  OUT_PRESETS,
+  EMPHASIS_PRESETS,
+  DEFAULT_IN_FRACTION,
+  DEFAULT_OUT_FRACTION,
+} from "../../../animations";
+import {
   GRADIENT_PRESETS,
   GRADIENT_TYPES,
   MAX_GRADIENT_STOPS,
@@ -823,6 +830,111 @@ export function TextStyleProperty({ style, onStyleChange }: TextStylePropertyPro
           </Row>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Animation (Pictify) ──────────────────────────────────────────────────
+//
+// The engine ships 51 entrance and 51 exit presets and exposed none of them.
+// It gives a clip ONE animation slot, so an In and an Out selection are
+// composed into a single keyframe map (see src/lib/video/animations.js).
+//
+// Emphasis presets loop over the whole clip, so they are mutually exclusive
+// with In/Out rather than a third dropdown you can combine.
+
+interface AnimationPropertyProps {
+  inPreset: string;
+  outPreset: string;
+  emphasisPreset: string;
+  inFraction: number;
+  outFraction: number;
+  onChange: (next: {
+    inPreset: string;
+    outPreset: string;
+    emphasisPreset: string;
+    inFraction: number;
+    outFraction: number;
+  }) => void;
+}
+
+export function AnimationProperty({
+  inPreset,
+  outPreset,
+  emphasisPreset,
+  inFraction,
+  outFraction,
+  onChange,
+}: AnimationPropertyProps) {
+  const none = { value: "", label: "None" };
+  const current = { inPreset, outPreset, emphasisPreset, inFraction, outFraction };
+
+  const { localValue: localIn, handleChange: onIn, handleCommit: commitIn } = useSliderThrottle(
+    Math.round((inFraction ?? DEFAULT_IN_FRACTION) * 100),
+    (v) => onChange({ ...current, inFraction: v / 100 })
+  );
+  const { localValue: localOut, handleChange: onOut, handleCommit: commitOut } = useSliderThrottle(
+    Math.round((outFraction ?? DEFAULT_OUT_FRACTION) * 100),
+    (v) => onChange({ ...current, outFraction: v / 100 })
+  );
+
+  const emphasisOn = !!emphasisPreset;
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Animate" />
+
+      <div className="flex flex-col py-1">
+        <Row label="In">
+          <Select
+            value={inPreset}
+            onValueChange={(v) => onChange({ ...current, inPreset: v, emphasisPreset: "" })}
+            options={[none, ...IN_PRESETS()]}
+            disabled={emphasisOn}
+          />
+        </Row>
+        {!!inPreset && !emphasisOn && (
+          <Row label="In length">
+            <Slider value={localIn} min={5} max={90} step={5} onChange={onIn} onCommit={commitIn} />
+            <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+              {localIn}%
+            </span>
+          </Row>
+        )}
+
+        <Row label="Out">
+          <Select
+            value={outPreset}
+            onValueChange={(v) => onChange({ ...current, outPreset: v, emphasisPreset: "" })}
+            options={[none, ...OUT_PRESETS()]}
+            disabled={emphasisOn}
+          />
+        </Row>
+        {!!outPreset && !emphasisOn && (
+          <Row label="Out length">
+            <Slider value={localOut} min={5} max={90} step={5} onChange={onOut} onCommit={commitOut} />
+            <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+              {localOut}%
+            </span>
+          </Row>
+        )}
+
+        <Row label="Loop">
+          <Select
+            value={emphasisPreset}
+            onValueChange={(v) =>
+              onChange({ ...current, emphasisPreset: v, inPreset: "", outPreset: "" })
+            }
+            options={[none, ...EMPHASIS_PRESETS()]}
+          />
+        </Row>
+      </div>
+
+      <p className="pt-1 text-[10px] leading-snug text-muted-foreground/80">
+        {emphasisOn
+          ? "A loop animation runs for the whole clip, so it replaces In and Out."
+          : "In and Out share the clip: the entrance plays first, then it rests, then the exit."}
+      </p>
     </div>
   );
 }
