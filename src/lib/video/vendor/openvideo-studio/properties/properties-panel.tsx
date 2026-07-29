@@ -17,6 +17,7 @@ import { Button, ScrollArea, cn } from "../ui";
 import { RiDeleteBinLine, RiFileCopyLine } from "../icons";
 import { getPropertiesForType, PropertyKey } from "./property-registry";
 import { readGradient, gradientStyle } from "../../../gradients";
+import { alignPatch, distributePatches, orderPatches } from "../../../arrange";
 import {
   previousClip,
   incomingTransition,
@@ -84,6 +85,32 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
   };
 
   const propertyKeys = getPropertiesForType(clip.type);
+
+  // Arrange operates on a SET of clips, so it is defined once and used by both
+  // the single-clip panel and the multi-select panel.
+  const composition = (projectStore.getState() as any).settings || {};
+
+  const applyAlign = (clips: any[], alignment: string) => {
+    for (const c of clips) {
+      const patch = alignPatch(c, alignment, composition);
+      if (patch) core.clip.update(c.id, { transform: { ...c.transform, ...patch } });
+    }
+  };
+
+  const applyDistribute = (clips: any[], axis: "x" | "y") => {
+    for (const { id, patch } of distributePatches(clips, axis)) {
+      const target = clips.find((c) => c.id === id);
+      if (target) core.clip.update(id, { transform: { ...target.transform, ...patch } });
+    }
+  };
+
+  const applyOrder = (clips: any[], op: string) => {
+    const all = Object.values((projectStore.getState() as any).clips || {});
+    for (const { id, zIndex } of orderPatches(clips, all as any[], op)) {
+      const target = clips.find((c) => c.id === id);
+      if (target) core.clip.update(id, { transform: { ...target.transform, zIndex } });
+    }
+  };
 
   const renderProperty = (key: PropertyKey) => {
     switch (key) {
@@ -178,6 +205,17 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
           />
         );
       }
+
+      case "arrange":
+        return (
+          <Properties.ArrangeProperty
+            key={key}
+            count={1}
+            onAlign={(id) => applyAlign([coreClip], id)}
+            onDistribute={(axis) => applyDistribute([coreClip], axis)}
+            onOrder={(op) => applyOrder([coreClip], op)}
+          />
+        );
 
       case "transition": {
         const prev = previousClip(allClips, allTracks, coreClip);
@@ -292,6 +330,100 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
   return <div className="flex flex-col gap-1 py-2">{propertyKeys.map(renderProperty)}</div>;
 }
 
+/**
+ * What you get with several clips selected.
+ *
+ * This used to say "select a single clip to edit its properties", which is
+ * exactly backwards: aligning and stacking are the things you want when more
+ * than one clip is selected. Per-clip properties still need a single selection,
+ * so this offers what genuinely applies to a set.
+ */
+function MultiSelectPanel({ clips }: { clips: any[] }) {
+  const storeClips = useStore(projectStore, (s: any) => s.clips);
+  const composition = useStore(projectStore, (s: any) => s.settings);
+
+  // Read through the store so positions are current after each operation —
+  // the selection snapshot goes stale as soon as the first clip moves.
+  const live = () => clips.map((c) => storeClips[c.id]).filter(Boolean);
+
+  const applyAlign = (alignment: string) => {
+    for (const c of live()) {
+      const patch = alignPatch(c, alignment, composition);
+      if (patch) core.clip.update(c.id, { transform: { ...c.transform, ...patch } });
+    }
+  };
+  const applyDistribute = (axis: "x" | "y") => {
+    const current = live();
+    for (const { id, patch } of distributePatches(current, axis)) {
+      const target = current.find((c: any) => c.id === id);
+      if (target) core.clip.update(id, { transform: { ...target.transform, ...patch } });
+    }
+  };
+  const applyOrder = (op: string) => {
+    const current = live();
+    const all = Object.values(storeClips || {});
+    for (const { id, zIndex } of orderPatches(current, all as any[], op)) {
+      const target = current.find((c: any) => c.id === id);
+      if (target) core.clip.update(id, { transform: { ...target.transform, zIndex } });
+    }
+  };
+
+  const setOpacityAll = (value: number) => {
+    for (const c of live()) {
+      core.clip.update(c.id, { transform: { ...c.transform, opacity: value } });
+    }
+  };
+
+  const ids = clips.map((c) => c.id);
+  const first = live()[0];
+
+  return (
+    <ScrollArea className="h-full bg-background">
+      <div className="flex items-center justify-between border-b border-border/50 px-3 py-2.5">
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-foreground">{clips.length} clips selected</span>
+          <span className="text-[10px] text-muted-foreground/70">
+            Align, order and opacity apply to all of them
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground"
+            title="Duplicate"
+            onClick={() => core.clip.duplicate(ids)}
+          >
+            <RiFileCopyLine className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground"
+            title="Delete"
+            onClick={() => core.clip.remove(ids)}
+          >
+            <RiDeleteBinLine className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1 py-2">
+        <Properties.ArrangeProperty
+          count={clips.length}
+          onAlign={applyAlign}
+          onDistribute={applyDistribute}
+          onOrder={applyOrder}
+        />
+        <Properties.OpacityProperty
+          value={first?.transform?.opacity ?? 1}
+          onChange={setOpacityAll}
+        />
+      </div>
+    </ScrollArea>
+  );
+}
+
 export default function PropertiesPanel() {
   const selectedClips = useStudioStore((s) => s.selectedClips);
 
@@ -307,16 +439,7 @@ export default function PropertiesPanel() {
   }
 
   if (selectedClips.length > 1) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 bg-background px-6 text-center">
-        <span className="text-sm font-medium text-foreground">
-          {selectedClips.length} clips selected
-        </span>
-        <span className="text-[11px] text-muted-foreground/70">
-          Select a single clip to edit its properties.
-        </span>
-      </div>
-    );
+    return <MultiSelectPanel clips={selectedClips as any[]} />;
   }
 
   const clip = selectedClips[0] as any;

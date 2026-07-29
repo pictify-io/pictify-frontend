@@ -22,6 +22,7 @@ import {
 } from "../icons";
 import { useSliderThrottle } from "./use-slider-throttle";
 import { getGroupedFonts } from "../font-utils";
+import { ALIGNMENTS, ORDER_OPS } from "../../../arrange";
 import {
   TRANSITION_OPTIONS,
   DEFAULT_TRANSITION_US,
@@ -1001,6 +1002,76 @@ export function TransitionProperty({
       <p className="pt-1 text-[10px] leading-snug text-muted-foreground/80">
         Blends from the previous clip on this track, centred on the cut.
       </p>
+    </div>
+  );
+}
+
+// ── Arrange (Pictify) ────────────────────────────────────────────────────
+//
+// Align, distribute and stacking order. Works for one clip or several — with a
+// multi-selection the panel used to say "select a single clip", which is
+// exactly when you most want to align things to each other.
+//
+// Alignment targets the artboard, so "align left" means the same thing however
+// many clips are selected. Distribute needs three.
+
+interface ArrangePropertyProps {
+  count: number;
+  onAlign: (id: string) => void;
+  onDistribute: (axis: "x" | "y") => void;
+  onOrder: (id: string) => void;
+}
+
+export function ArrangeProperty({ count, onAlign, onDistribute, onOrder }: ArrangePropertyProps) {
+  const canDistribute = count >= 3;
+  const btn =
+    "flex h-7 flex-1 items-center justify-center rounded border border-border bg-muted/60 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-accent hover:text-foreground disabled:opacity-40 disabled:hover:bg-muted/60";
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Arrange" />
+
+      <div className="flex flex-col gap-1.5 py-1">
+        <div className="flex gap-1">
+          {ALIGNMENTS.filter((a) => a.axis === "x").map((a) => (
+            <button key={a.id} className={btn} title={a.label} onClick={() => onAlign(a.id)}>
+              <i className={`fa ${a.icon} text-[11px]`} aria-hidden="true" />
+            </button>
+          ))}
+          <button
+            className={btn}
+            title={canDistribute ? "Distribute horizontally" : "Select 3 or more clips to distribute"}
+            disabled={!canDistribute}
+            onClick={() => onDistribute("x")}
+          >
+            <i className="fa fa-arrows-left-right text-[11px]" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="flex gap-1">
+          {ALIGNMENTS.filter((a) => a.axis === "y").map((a) => (
+            <button key={a.id} className={btn} title={a.label} onClick={() => onAlign(a.id)}>
+              <i className={`fa ${a.icon} text-[11px]`} aria-hidden="true" />
+            </button>
+          ))}
+          <button
+            className={btn}
+            title={canDistribute ? "Distribute vertically" : "Select 3 or more clips to distribute"}
+            disabled={!canDistribute}
+            onClick={() => onDistribute("y")}
+          >
+            <i className="fa fa-arrows-up-down text-[11px]" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="mt-1 flex gap-1">
+          {ORDER_OPS.map((o) => (
+            <button key={o.id} className={btn} title={o.label} onClick={() => onOrder(o.id)}>
+              <i className={`fa ${o.icon} text-[11px]`} aria-hidden="true" />
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
