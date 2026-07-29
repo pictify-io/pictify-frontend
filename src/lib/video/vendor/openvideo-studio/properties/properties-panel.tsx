@@ -161,6 +161,18 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
         );
       }
 
+      case "textStyle":
+        return (
+          <Properties.TextStyleProperty
+            key={key}
+            style={style}
+            onStyleChange={(patch) => {
+              handleStyleUpdate(patch);
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
       case "textColor":
         return (
           <Properties.TextColorProperty

@@ -678,3 +678,151 @@ export function GradientProperty({
     </div>
   );
 }
+
+// ── Text style (Pictify) ─────────────────────────────────────────────────
+//
+// The engine's TextStyleJSON carries stroke, shadow, lineHeight, letterSpacing,
+// textCase and a text background; the vendored panel exposed none of them. The
+// background is the urgent one: the "Simple Badge" text preset SETS
+// style.background, after which the user had no control to edit or remove it.
+//
+// Every value here is a plain style key, so it round-trips through the
+// serializer and renders identically on the server.
+
+const TEXT_CASE_OPTIONS = [
+  { value: "none", label: "As typed" },
+  { value: "uppercase", label: "UPPERCASE" },
+  { value: "lowercase", label: "lowercase" },
+  { value: "title", label: "Title Case" },
+];
+
+interface TextStylePropertyProps {
+  style: Record<string, any>;
+  onStyleChange: (patch: Record<string, any>) => void;
+}
+
+export function TextStyleProperty({ style, onStyleChange }: TextStylePropertyProps) {
+  const stroke = style.stroke || null;
+  const shadow = style.shadow || null;
+  const background = style.background || null;
+
+  const { localValue: localSpacing, handleChange: onSpacing, handleCommit: commitSpacing } =
+    useSliderThrottle(Number(style.letterSpacing ?? 0), (v) => onStyleChange({ letterSpacing: v }));
+  const { localValue: localLine, handleChange: onLine, handleCommit: commitLine } =
+    useSliderThrottle(Math.round(Number(style.lineHeight ?? 1) * 100), (v) =>
+      onStyleChange({ lineHeight: v / 100 })
+    );
+
+  // Nested style objects must be written whole — the engine merges one level.
+  const patchStroke = (patch: Record<string, any>) =>
+    onStyleChange({ stroke: { color: "#000000", width: 2, ...(stroke || {}), ...patch } });
+  const patchShadow = (patch: Record<string, any>) =>
+    onStyleChange({
+      shadow: { color: "#000000", alpha: 0.5, blur: 4, offsetX: 0, offsetY: 2, ...(shadow || {}), ...patch },
+    });
+  const patchBackground = (patch: Record<string, any>) =>
+    onStyleChange({
+      background: {
+        color: "#000000",
+        opacity: 1,
+        borderRadius: 4,
+        paddingX: 8,
+        paddingY: 4,
+        ...(background || {}),
+        ...patch,
+      },
+    });
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Text Style" />
+
+      <div className="flex flex-col py-1">
+        <Row label="Case">
+          <Select
+            value={style.textCase || "none"}
+            onValueChange={(v) => onStyleChange({ textCase: v })}
+            options={TEXT_CASE_OPTIONS}
+          />
+        </Row>
+        <Row label="Line height">
+          <Slider value={localLine} min={50} max={300} step={5} onChange={onLine} onCommit={commitLine} />
+          <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+            {localLine}%
+          </span>
+        </Row>
+        <Row label="Letter sp.">
+          <Slider value={localSpacing} min={-10} max={40} step={1} onChange={onSpacing} onCommit={commitSpacing} />
+          <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+            {localSpacing}
+          </span>
+        </Row>
+      </div>
+
+      <SectionHeader
+        title="Stroke"
+        hasContent={!!stroke}
+        onAdd={() => patchStroke({})}
+        onRemove={() => onStyleChange({ stroke: null })}
+      />
+      {stroke && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField color={stroke.color || "#000000"} onChange={(v) => patchStroke({ color: v })} />
+          </Row>
+          <Row label="Width">
+            <NumberInput
+              value={Number(stroke.width ?? 2)}
+              onChange={(v) => patchStroke({ width: Math.max(0, v) })}
+            />
+          </Row>
+        </div>
+      )}
+
+      <SectionHeader
+        title="Shadow"
+        hasContent={!!shadow}
+        onAdd={() => patchShadow({})}
+        onRemove={() => onStyleChange({ shadow: null })}
+      />
+      {shadow && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField color={shadow.color || "#000000"} onChange={(v) => patchShadow({ color: v })} />
+          </Row>
+          <Row label="Offset">
+            <NumberInput value={Number(shadow.offsetX ?? 0)} onChange={(v) => patchShadow({ offsetX: v })} aria-label="Shadow X" />
+            <NumberInput value={Number(shadow.offsetY ?? 2)} onChange={(v) => patchShadow({ offsetY: v })} aria-label="Shadow Y" />
+          </Row>
+          <Row label="Blur">
+            <NumberInput value={Number(shadow.blur ?? 4)} onChange={(v) => patchShadow({ blur: Math.max(0, v) })} />
+          </Row>
+        </div>
+      )}
+
+      <SectionHeader
+        title="Background"
+        hasContent={!!background}
+        onAdd={() => patchBackground({})}
+        onRemove={() => onStyleChange({ background: null })}
+      />
+      {background && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField color={background.color || "#000000"} onChange={(v) => patchBackground({ color: v })} />
+          </Row>
+          <Row label="Radius">
+            <NumberInput
+              value={Number(background.borderRadius ?? 4)}
+              onChange={(v) => patchBackground({ borderRadius: Math.max(0, v) })}
+            />
+          </Row>
+          <Row label="Padding">
+            <NumberInput value={Number(background.paddingX ?? 8)} onChange={(v) => patchBackground({ paddingX: Math.max(0, v) })} aria-label="Padding X" />
+            <NumberInput value={Number(background.paddingY ?? 4)} onChange={(v) => patchBackground({ paddingY: Math.max(0, v) })} aria-label="Padding Y" />
+          </Row>
+        </div>
+      )}
+    </div>
+  );
+}

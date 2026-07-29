@@ -247,6 +247,9 @@
 			});
 			trackDirty = true;
 
+			// Dev-only handles for /dev/studio-preview: the selection store lives in
+			// the vendored React runtime, so a harness session cannot reach it
+			// without this.
 			if (import.meta.env.DEV) window.__videoEditor = editor;
 
 			const { mountTimelinePanel } = await import('$lib/video/timelineHost.js');
@@ -278,6 +281,7 @@
 			// The vendored panels keep selection in a zustand store. Subscribe so
 			// the Svelte side (bindings panel) sees the same selection.
 			studioRuntime = await import('$lib/video/vendor/openvideo-studio/runtime');
+			if (import.meta.env.DEV) window.__studioRuntime = studioRuntime;
 			const readSelection = (state) => {
 				selectedClip = state?.selectedClips?.length === 1 ? state.selectedClips[0] : null;
 			};

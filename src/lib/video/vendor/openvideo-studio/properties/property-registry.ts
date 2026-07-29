@@ -15,6 +15,7 @@ export type PropertyKey =
   | "fill"
   | "textGroup"
   | "textColor"
+  | "textStyle"
   | "volume"
   | "timing";
 
@@ -22,7 +23,7 @@ export type PropertyKey =
 export const PROPERTY_REGISTRY: Record<string, PropertyKey[]> = {
   Image: ["transform", "opacity", "timing"],
   Video: ["transform", "opacity", "volume", "timing"],
-  Text: ["textGroup", "textColor", "transform", "opacity", "timing"],
+  Text: ["textGroup", "textColor", "textStyle", "transform", "opacity", "timing"],
   Audio: ["volume", "timing"],
   Shape: ["transform", "fill", "opacity", "timing"],
   // Backdrop is the engine's only gradient-capable primitive. Without an entry
