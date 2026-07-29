@@ -142,6 +142,38 @@ const uploadVideoMedia = async (file, { purpose, templateUid } = {}) => {
 	return response;
 };
 
+/**
+ * The user's uploaded footage and audio, newest first.
+ *
+ * Uploads used to be fire-and-forget: the file reached S3 and the URL worked
+ * forever, but nothing wrote it down, so reopening the studio showed an empty
+ * Media panel and the same clip got uploaded again.
+ *
+ * @param {Object} [options]
+ * @param {'video'|'audio'|'image'} [options.kind] - filter to one kind
+ * @param {number} [options.limit] - capped at 200 by the backend
+ * @returns {Promise<Array>} - [{ uid, kind, name, url, mimeType, bytes, createdAt }]
+ */
+const listVideoMedia = async ({ kind, limit } = {}) => {
+	const params = new URLSearchParams();
+	if (kind) params.set('kind', kind);
+	if (limit) params.set('limit', String(limit));
+	const query = params.toString();
+	const response = await backend.get(`/video/media${query ? `?${query}` : ''}`);
+	return response?.media || [];
+};
+
+/**
+ * Remove an item from the library.
+ *
+ * Soft delete: the S3 object stays. Templates reference media by URL, so
+ * destroying the file would break videos the user already made — including
+ * ones they can't see from the studio, like a scheduled workflow's.
+ *
+ * @param {string} uid
+ */
+const deleteVideoMedia = async (uid) => backend.delete(`/video/media/${uid}`);
+
 export {
 	createVideoTemplate,
 	updateVideoTemplate,
@@ -152,5 +184,7 @@ export {
 	previewVideoTemplateFrame,
 	renderVideoTemplate,
 	generateVideoTemplate,
-	uploadVideoMedia
+	uploadVideoMedia,
+	listVideoMedia,
+	deleteVideoMedia
 };

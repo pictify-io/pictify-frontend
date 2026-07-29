@@ -3,58 +3,32 @@
  * src/components/editor/media-panel/panel/music.tsx. License: OpenVideo
  * License (free tier, accepted 2026-07-27) — see LICENSE at the root of this
  * directory. Local changes: the stock-music browser is replaced by the
- * user's own audio uploads (host uploadMedia callback); clip-add payload kept
- * from upstream; shadcn UI replaced by ./ui; click-to-add.
+ * user's own audio library (see use-media-library); clip-add payload kept
+ * from upstream; shadcn UI replaced by ./ui; click-to-add; remove.
  */
-import { useRef, useState } from "react";
-import { core, getHostCallbacks } from "../runtime";
+import { useRef } from "react";
+import { core } from "../runtime";
 import { ScrollArea } from "../ui";
-import { RiMusic2Line, RiUploadCloud2Line } from "../icons";
-import { useMediaLibrary, kindForFile, MediaItem } from "../media-store";
+import { RiMusic2Line, RiUploadCloud2Line, RiDeleteBinLine } from "../icons";
+import { useMediaLibrary, MediaItem, MediaKind, formatBytes } from "../media-store";
+import { useMediaHydration, useMediaUpload, useMediaRemove } from "../use-media-library";
 
-let audioIdCounter = 0;
+const acceptsAudio = (kind: MediaKind) => kind === "audio";
 
 export default function PanelAudio() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState("");
+  const { loading, error: loadError } = useMediaHydration();
+  const { upload, isUploading, error: uploadError } = useMediaUpload(acceptsAudio);
+  const { remove, error: removeError } = useMediaRemove();
   // Select the stable array, filter during render (a selector that filters
   // would return a fresh array every getSnapshot → React infinite loop).
   const allItems = useMediaLibrary((s) => s.items);
-  const addItem = useMediaLibrary((s) => s.addItem);
   const items = allItems.filter((i) => i.kind === "audio");
+  const error = uploadError || removeError || loadError;
 
   const handleFiles = async (files: FileList | null) => {
-    if (!files?.length) return;
-    setError("");
-    setIsUploading(true);
-    try {
-      for (const file of Array.from(files)) {
-        if (kindForFile(file) !== "audio") continue;
-        const upload = getHostCallbacks().uploadMedia;
-        let url = "";
-        let persistent = false;
-        if (upload) {
-          const result = await upload(file);
-          url = result.url;
-          persistent = result.persistent;
-        } else {
-          url = URL.createObjectURL(file);
-        }
-        addItem({
-          id: `audio_${Date.now()}_${audioIdCounter++}`,
-          kind: "audio",
-          name: file.name,
-          url,
-          persistent,
-        });
-      }
-    } catch (err: any) {
-      setError(err?.message || "Upload failed.");
-    } finally {
-      setIsUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
+    await upload(files);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const addItemToTimeline = async (item: MediaItem) => {
@@ -93,7 +67,16 @@ export default function PanelAudio() {
       </div>
 
       <ScrollArea className="flex-1 px-3">
-        {items.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col gap-1.5 pb-4">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="h-9 animate-pulse rounded border border-border bg-muted/60"
+              />
+            ))}
+          </div>
+        ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
             <RiMusic2Line size={28} className="opacity-50" />
             <span className="text-xs">No audio yet — upload a track</span>
@@ -101,23 +84,54 @@ export default function PanelAudio() {
         ) : (
           <div className="flex flex-col gap-1.5 pb-4">
             {items.map((item) => (
-              <button
+              // Row is a div, not a button: the remove control is a real button
+              // and nesting one inside another is invalid HTML that never fires.
+              <div
                 key={item.id}
-                className="group flex items-center gap-2 rounded border border-border bg-muted/60 px-2 py-2 text-left transition-colors hover:border-primary/50 hover:bg-accent"
-                onClick={() => addItemToTimeline(item)}
-                title={`Add ${item.name}`}
+                className="group flex items-center gap-2 rounded border border-border bg-muted/60 px-2 py-2 transition-colors hover:border-primary/50 hover:bg-accent"
               >
-                <RiMusic2Line size={16} className="shrink-0 text-muted-foreground" />
-                <span className="min-w-0 flex-1 truncate text-xs text-foreground">{item.name}</span>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left"
+                  onClick={() => addItemToTimeline(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      addItemToTimeline(item);
+                    }
+                  }}
+                  title={`Add ${item.name}`}
+                >
+                  <RiMusic2Line size={16} className="shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 flex-1 truncate text-xs text-foreground">
+                    {item.name}
+                  </span>
+                  {item.bytes ? (
+                    <span className="shrink-0 text-[9px] tabular-nums text-muted-foreground">
+                      {formatBytes(item.bytes)}
+                    </span>
+                  ) : null}
+                </div>
                 {!item.persistent && (
                   <span
-                    className="rounded bg-black/50 px-1 text-[8px] font-bold uppercase text-yellow-300"
-                    title="Stored in this browser session only"
+                    className="shrink-0 rounded bg-black/50 px-1 text-[8px] font-bold uppercase text-yellow-300"
+                    title="This upload failed — the file works while this tab is open, but not after a reload or in an export"
                   >
                     local
                   </span>
                 )}
-              </button>
+                {item.persistent && item.source !== "brand" && (
+                  <button
+                    className="shrink-0 rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus:opacity-100 group-hover:opacity-100"
+                    onClick={() => remove(item)}
+                    title={`Remove ${item.name} from your library (videos already using it keep working)`}
+                    aria-label={`Remove ${item.name}`}
+                  >
+                    <RiDeleteBinLine size={12} />
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         )}

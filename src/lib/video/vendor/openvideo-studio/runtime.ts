@@ -21,10 +21,32 @@ export interface HostCallbacks {
   onClipStyleChange?: (clipId: string) => void;
   /**
    * Upload a media file and resolve to a persistent URL. Implemented by the
-   * Svelte page (Pictify brand-assets upload for images; object-URL fallback
-   * for kinds the backend cannot store yet).
+   * Svelte page: images go to brand assets, video and audio to the video media
+   * library. Falls back to an object URL only when the upload fails, which is
+   * what `persistent: false` reports.
    */
-  uploadMedia?: (file: File) => Promise<{ url: string; persistent: boolean }>;
+  uploadMedia?: (
+    file: File
+  ) => Promise<{ url: string; persistent: boolean; uid?: string; bytes?: number }>;
+  /**
+   * Load the user's saved media. Called once on mount; the panels render a
+   * loading state until it resolves.
+   */
+  loadMedia?: () => Promise<
+    Array<{
+      uid?: string;
+      kind: "image" | "video" | "audio";
+      name: string;
+      url: string;
+      bytes?: number;
+      source?: "brand" | "library";
+    }>
+  >;
+  /**
+   * Remove an item from the library. Soft delete server-side: clips already
+   * placed on a timeline keep working, because the file itself stays.
+   */
+  deleteMedia?: (uid: string) => Promise<void>;
 }
 
 let hostCallbacks: HostCallbacks = {};

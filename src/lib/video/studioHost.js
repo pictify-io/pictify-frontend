@@ -14,6 +14,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { setEditorContext, setHostCallbacks } from './vendor/openvideo-studio/runtime';
+import { resetMediaLibrary } from './vendor/openvideo-studio/use-media-library';
 import ToolRail from './vendor/openvideo-studio/rail';
 import PropertiesPanel from './vendor/openvideo-studio/properties/properties-panel';
 
@@ -47,18 +48,34 @@ const mountIsland = (el, element) => {
  * @param {Object} options
  * @param {Object} options.core - The @openvideo/core instance from editorHost.
  * @param {Object} options.studio - The engine-pixi Studio instance from editorHost.
- * @param {Function} [options.uploadMedia] - async (File) => { url, persistent }
+ * @param {Function} [options.uploadMedia] - async (File) => { url, persistent, uid?, bytes? }
+ * @param {Function} [options.loadMedia] - async () => MediaItem[], the user's saved
+ *   media. Called once on mount to fill the library.
+ * @param {Function} [options.deleteMedia] - async (uid) => void
  * @param {Function} [options.onClipStyleChange] - (clipId) => void, fired after a
  *   vendored panel mutates a clip's style (the gradient editor). The studio
  *   store only republishes on a selection change, so the Svelte side needs this
  *   to re-read the clip and re-run variable detection.
  * @returns {{ destroy: () => void }}
  */
-export const mountToolRail = (el, { core, studio, uploadMedia, onClipStyleChange }) => {
+export const mountToolRail = (
+	el,
+	{ core, studio, uploadMedia, loadMedia, deleteMedia, onClipStyleChange }
+) => {
 	if (!core) throw new Error('mountToolRail requires the editor core instance.');
 	setEditorContext({ core, studio: studio || null });
-	setHostCallbacks({ uploadMedia, onClipStyleChange });
-	return mountIsland(el, React.createElement(ToolRail));
+	setHostCallbacks({ uploadMedia, loadMedia, deleteMedia, onClipStyleChange });
+	const island = mountIsland(el, React.createElement(ToolRail));
+	return {
+		destroy: () => {
+			island.destroy();
+			// The media library is a module-level store, so it outlives this
+			// mount. Clearing it means the next studio picks up assets added
+			// elsewhere (the image editor's brand kit) instead of showing a list
+			// that is only correct until someone uploads a logo in another tab.
+			resetMediaLibrary();
+		}
+	};
 };
 
 /**

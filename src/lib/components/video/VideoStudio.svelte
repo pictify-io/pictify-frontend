@@ -27,9 +27,11 @@
 		createVideoTemplate,
 		updateVideoTemplate,
 		renderVideoTemplate,
-		uploadVideoMedia
+		uploadVideoMedia,
+		listVideoMedia,
+		deleteVideoMedia
 	} from '../../../api/videoTemplates';
-	import { uploadBrandAsset } from '../../../api/brand-assets';
+	import { uploadBrandAsset, getBrandAssets } from '../../../api/brand-assets';
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
 	import ClipBindingsPanel from './ClipBindingsPanel.svelte';
 	import {
@@ -196,12 +198,18 @@
 			if (file.type.startsWith('image/')) {
 				const response = await uploadBrandAsset(file, { type: 'image', name: file.name });
 				const url = response?.asset?.url;
-				if (url) return { url, persistent: true };
+				if (url) return { url, persistent: true, uid: response.asset.uid, bytes: file.size };
 				throw new Error('The upload returned no URL.');
 			}
 			const response = await uploadVideoMedia(file);
 			const url = response?.media?.url;
-			if (url) return { url, persistent: true };
+			if (url)
+				return {
+					url,
+					persistent: true,
+					uid: response.media.uid || undefined,
+					bytes: response.media.bytes
+				};
 			throw new Error('The upload returned no URL.');
 		} catch (error) {
 			// Fall back to a session-local URL so the user can keep working, but
@@ -211,6 +219,67 @@
 				`${file.name} could not be uploaded. It will work in this session but not after a reload.`;
 			return { url: URL.createObjectURL(file), persistent: false };
 		}
+	};
+
+	// ── Media library ────────────────────────────────────────────────────
+	// The panels used to start empty on every mount, so a user re-uploaded the
+	// same logo each session. Two sources feed one library:
+	//
+	//   brand assets  — logos, icons and imagery, shared with the image editor.
+	//                   Shown here but NOT deletable from the studio: removing
+	//                   your logo while making a video is never the intent.
+	//   video media   — footage and audio uploaded for the timeline.
+	//
+	// Image kinds worth offering. 'font' and 'color' are brand assets too but
+	// are not things you drop on a canvas.
+	const BRAND_IMAGE_TYPES = ['logo', 'image', 'icon'];
+
+	const loadMedia = async () => {
+		// Settled, not all: a failure on one source should not empty the other.
+		// Losing your footage list because the brand endpoint was slow would be
+		// a worse bug than the one this whole feature fixes.
+		const [brand, library] = await Promise.allSettled([
+			getBrandAssets({ limit: 100 }),
+			listVideoMedia({ limit: 200 })
+		]);
+
+		const items = [];
+		if (brand.status === 'fulfilled') {
+			for (const asset of brand.value?.assets || []) {
+				if (!asset?.url || !BRAND_IMAGE_TYPES.includes(asset.type)) continue;
+				items.push({
+					uid: asset.uid,
+					kind: 'image',
+					name: asset.name || 'Brand image',
+					url: asset.url,
+					bytes: asset.size,
+					source: 'brand'
+				});
+			}
+		}
+		if (library.status === 'fulfilled') {
+			for (const item of library.value || []) {
+				if (!item?.url) continue;
+				items.push({
+					uid: item.uid,
+					kind: item.kind,
+					name: item.name || item.kind,
+					url: item.url,
+					bytes: item.bytes,
+					source: 'library'
+				});
+			}
+		}
+		if (brand.status === 'rejected' && library.status === 'rejected') {
+			throw new Error('Your media library could not be loaded.');
+		}
+		return items;
+	};
+
+	// Named mediaUid, not uid: `uid` at this scope is the TEMPLATE's, and a
+	// shadowed name here is one careless edit away from deleting the wrong thing.
+	const deleteMedia = async (mediaUid) => {
+		await deleteVideoMedia(mediaUid);
 	};
 
 	// ── Mount ────────────────────────────────────────────────────────────
@@ -263,6 +332,8 @@
 				core: editor.core,
 				studio: editor.studio,
 				uploadMedia,
+				loadMedia,
+				deleteMedia,
 				// The vendored gradient editor mutates a clip's style directly; the
 				// studio store only republishes on a SELECTION change, so it tells us
 				// when to re-read the clip and re-detect variables.

@@ -44,6 +44,24 @@
 	let ready = false;
 	let runtime = null;
 
+	// What the stub library serves. A brand item (not deletable from the studio)
+	// and two library items, so both branches of the remove control are visible.
+	// Data URLs, not real files: the harness has no backend and a broken <img>
+	// would look like a hydration failure.
+	const swatch = (hex) =>
+		`data:image/svg+xml;utf8,${encodeURIComponent(
+			`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="${hex}"/></svg>`
+		)}`;
+	const stubMedia = [
+		{ uid: 'brand_1', kind: 'image', name: 'logo.svg', url: swatch('#ffc480'), bytes: 4096, source: 'brand' },
+		{ uid: 'lib_1', kind: 'image', name: 'hero-shot.png', url: swatch('#3b82f6'), bytes: 284_000, source: 'library' },
+		{ uid: 'lib_2', kind: 'video', name: 'b-roll.mp4', url: '', bytes: 18_400_000, source: 'library' },
+		{ uid: 'lib_3', kind: 'audio', name: 'bed-loop.mp3', url: '', bytes: 3_200_000, source: 'library' }
+	];
+	let deletedMedia = [];
+	// Both panels call the hydration hook; the count proves they share one request.
+	let loadMediaCalls = 0;
+
 	onMount(async () => {
 		if (!dev || full) return;
 		try {
@@ -55,10 +73,24 @@
 				onError: (m) => (error = m)
 			});
 			const { mountToolRail, mountPropertiesPanel } = await import('$lib/video/studioHost.js');
+			// Stub library. `?media=slow` delays the response so the loading
+			// skeletons can be looked at; `?media=fail` exercises the error path.
+			// Without either, hydration resolves immediately like a warm cache.
+			const mediaMode = $page.url.searchParams.get('media') || '';
 			rail = mountToolRail(railEl, {
 				core: editor.core,
 				studio: editor.studio,
-				uploadMedia: async (file) => ({ url: URL.createObjectURL(file), persistent: false })
+				uploadMedia: async (file) => ({ url: URL.createObjectURL(file), persistent: false }),
+				loadMedia: async () => {
+					loadMediaCalls += 1;
+					if (mediaMode === 'slow') await new Promise((r) => setTimeout(r, 2500));
+					if (mediaMode === 'fail') throw new Error('Your media library could not be loaded.');
+					return stubMedia;
+				},
+				deleteMedia: async (mediaUid) => {
+					if (mediaMode === 'deletefail') throw new Error('Delete failed — try again.');
+					deletedMedia = [...deletedMedia, mediaUid];
+				}
 			});
 			props = mountPropertiesPanel(propsEl, { core: editor.core, studio: editor.studio });
 
@@ -90,7 +122,7 @@
 
 
 			// Dev harness: expose the pieces so a browser session can poke at them.
-			window.__studio = { editor, runtime };
+			window.__studio = { editor, runtime, deletedMedia: () => deletedMedia, loadMediaCalls: () => loadMediaCalls };
 			ready = true;
 		} catch (e) {
 			error = e?.message || String(e);
