@@ -23,6 +23,11 @@ import {
 import { useSliderThrottle } from "./use-slider-throttle";
 import { getGroupedFonts } from "../font-utils";
 import {
+  TRANSITION_OPTIONS,
+  DEFAULT_TRANSITION_US,
+  toSeconds,
+} from "../../../transitions";
+import {
   IN_PRESETS,
   OUT_PRESETS,
   EMPHASIS_PRESETS,
@@ -934,6 +939,67 @@ export function AnimationProperty({
         {emphasisOn
           ? "A loop animation runs for the whole clip, so it replaces In and Out."
           : "In and Out share the clip: the entrance plays first, then it rests, then the exit."}
+      </p>
+    </div>
+  );
+}
+
+// ── Transition (Pictify) ─────────────────────────────────────────────────
+//
+// The engine ships 68 transitions and exposed none of them. A transition is its
+// own clip joining two others, so it is authored here on the INCOMING clip:
+// "what plays as this clip arrives".
+
+interface TransitionPropertyProps {
+  transitionKey: string;
+  durationUs: number;
+  hasPrevious: boolean;
+  onChange: (next: { transitionKey: string; durationUs: number }) => void;
+}
+
+export function TransitionProperty({
+  transitionKey,
+  durationUs,
+  hasPrevious,
+  onChange,
+}: TransitionPropertyProps) {
+  const seconds = toSeconds(durationUs || DEFAULT_TRANSITION_US);
+
+  if (!hasPrevious) {
+    return (
+      <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+        <SectionTitle title="Transition" />
+        <p className="pb-1 text-[10px] leading-snug text-muted-foreground/80">
+          A transition blends this clip with the one before it. This is the first clip on its
+          track, so there is nothing to blend from.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Transition" />
+      <div className="flex flex-col py-1">
+        <Row label="In">
+          <Select
+            value={transitionKey || ""}
+            onValueChange={(v) => onChange({ transitionKey: v, durationUs })}
+            options={[{ value: "", label: "None (cut)" }, ...TRANSITION_OPTIONS()]}
+          />
+        </Row>
+        {!!transitionKey && (
+          <Row label="Length">
+            <NumberInput
+              value={seconds}
+              onChange={(v) => onChange({ transitionKey, durationUs: Math.max(0.1, v) * 1_000_000 })}
+            />
+            <span className="shrink-0 text-[10px] text-muted-foreground">sec</span>
+          </Row>
+        )}
+      </div>
+      <p className="pt-1 text-[10px] leading-snug text-muted-foreground/80">
+        Blends from the previous clip on this track, centred on the cut.
       </p>
     </div>
   );

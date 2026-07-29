@@ -17,16 +17,17 @@ export type PropertyKey =
   | "textColor"
   | "textStyle"
   | "animation"
+  | "transition"
   | "volume"
   | "timing";
 
 // Property configuration for each clip type
 export const PROPERTY_REGISTRY: Record<string, PropertyKey[]> = {
-  Image: ["transform", "animation", "opacity", "timing"],
-  Video: ["transform", "animation", "opacity", "volume", "timing"],
-  Text: ["textGroup", "textColor", "textStyle", "transform", "animation", "opacity", "timing"],
+  Image: ["transform", "animation", "transition", "opacity", "timing"],
+  Video: ["transform", "animation", "transition", "opacity", "volume", "timing"],
+  Text: ["textGroup", "textColor", "textStyle", "transform", "animation", "transition", "opacity", "timing"],
   Audio: ["volume", "timing"],
-  Shape: ["transform", "fill", "animation", "opacity", "timing"],
+  Shape: ["transform", "fill", "animation", "transition", "opacity", "timing"],
   // Backdrop is the engine's only gradient-capable primitive. Without an entry
   // here getPropertiesForType falls through to the default set and the clip
   // gets no colour controls at all.

@@ -18,6 +18,12 @@ import { RiDeleteBinLine, RiFileCopyLine } from "../icons";
 import { getPropertiesForType, PropertyKey } from "./property-registry";
 import { readGradient, gradientStyle } from "../../../gradients";
 import {
+  previousClip,
+  incomingTransition,
+  createTransitionClip,
+  DEFAULT_TRANSITION_US,
+} from "../../../transitions";
+import {
   buildAnimation,
   readAnimation,
   withAnimationMeta,
@@ -31,6 +37,11 @@ import * as Properties from "./options";
 
 function PropertiesPanelContent({ clip }: { clip: any }) {
   const coreClipBase = useStore(projectStore, (s: any) => (clip?.id ? s.clips[clip.id] : null));
+  // A transition is a SEPARATE clip, so subscribing only to the selected clip
+  // leaves the control showing "None (cut)" after one is added. Subscribe to the
+  // clip and track maps so the section reflects the document.
+  const allClips = useStore(projectStore, (s: any) => s.clips);
+  const allTracks = useStore(projectStore, (s: any) => s.tracks);
   const coreClip = useEphemeralClip(clip?.id || "", coreClipBase ?? clip) as any;
 
   if (!coreClip) return null;
@@ -164,6 +175,35 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
             onFontSizeChange={(val) => handleStyleUpdate({ fontSize: val })}
             textAlign={(style.textAlign || style.align || "center") as "left" | "center" | "right"}
             onTextAlignChange={(val) => handleStyleUpdate({ textAlign: val, align: val })}
+          />
+        );
+      }
+
+      case "transition": {
+        const prev = previousClip(allClips, allTracks, coreClip);
+        const existing = incomingTransition(allClips, coreClip);
+        return (
+          <Properties.TransitionProperty
+            key={key}
+            transitionKey={existing?.transitionKey || ""}
+            durationUs={existing?.timing?.duration ?? DEFAULT_TRANSITION_US}
+            hasPrevious={!!prev}
+            onChange={({ transitionKey, durationUs }) => {
+              // A transition is its own clip, so changing it means
+              // remove-then-add rather than a property write.
+              if (existing) core.clip.remove([existing.id]);
+              if (transitionKey && prev) {
+                core.clip.add(
+                  createTransitionClip({
+                    fromClip: prev,
+                    toClip: coreClip,
+                    key: transitionKey,
+                    durationUs,
+                  }) as any
+                );
+              }
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
           />
         );
       }
