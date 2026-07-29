@@ -22,6 +22,15 @@ import {
 } from "../icons";
 import { useSliderThrottle } from "./use-slider-throttle";
 import { getGroupedFonts } from "../font-utils";
+import {
+  GRADIENT_PRESETS,
+  GRADIENT_TYPES,
+  MAX_GRADIENT_STOPS,
+  MIN_GRADIENT_STOPS,
+  gradientCss,
+  parseGradientFill,
+  toGradientFill,
+} from "../../../gradients";
 
 const GROUPED_FONTS = getGroupedFonts();
 
@@ -213,6 +222,9 @@ export function TextColorProperty({
 
 // ── Fill (shapes) ────────────────────────────────────────────────────────
 
+// A shape's fill is EITHER a solid hex string or a CSS gradient string. The
+// patched engine reads both from the same `style.fill`, so switching mode is
+// just a different string — no extra style key to be dropped on deserialize.
 export function FillProperty({
   color,
   onColorChange,
@@ -220,13 +232,147 @@ export function FillProperty({
   color: string;
   onColorChange: (color: string) => void;
 }) {
+  const parsed = parseGradientFill(color);
+  const isGradient = Boolean(parsed);
+  const current = parsed ?? {
+    type: "linear",
+    angle: 180,
+    colors: [color || "#3b82f6", "#0000ff"],
+  };
+
+  const {
+    localValue: localAngle,
+    handleChange: onAngleChange,
+    handleCommit: commitAngle,
+  } = useSliderThrottle(current.angle, (value) =>
+    onColorChange(toGradientFill({ ...current, angle: value }))
+  );
+
+  const setGradient = (next: { type: string; angle: number; colors: string[] }) =>
+    onColorChange(toGradientFill(next));
+
+  const setStop = (index: number, value: string) => {
+    const colors = [...current.colors];
+    colors[index] = value;
+    setGradient({ ...current, colors });
+  };
+
   return (
     <div className="flex flex-col">
       <SectionTitle title="Fill" />
+
       <div className="flex flex-col py-1">
-        <Row label="Color">
-          <ColorField color={color || "#3b82f6"} onChange={onColorChange} className="w-full" />
+        <Row label="Type">
+          <Select
+            value={isGradient ? "gradient" : "solid"}
+            onValueChange={(mode) =>
+              mode === "gradient"
+                ? setGradient(current)
+                : // Collapse back to the first stop so the shape keeps its look.
+                  onColorChange(current.colors[0] || "#3b82f6")
+            }
+            options={[
+              { value: "solid", label: "Solid" },
+              { value: "gradient", label: "Gradient" },
+            ]}
+          />
         </Row>
+
+        {!isGradient && (
+          <Row label="Color">
+            <ColorField color={color || "#3b82f6"} onChange={onColorChange} className="w-full" />
+          </Row>
+        )}
+
+        {isGradient && (
+          <>
+            <div
+              className="my-2 h-10 w-full rounded border border-border"
+              style={{ backgroundImage: toGradientFill({ ...current, angle: localAngle }) }}
+            />
+            <Row label="Style">
+              <Select
+                value={current.type}
+                onValueChange={(type) => setGradient({ ...current, type })}
+                options={GRADIENT_TYPES}
+              />
+            </Row>
+            {current.type !== "radial" && (
+              <Row label="Angle">
+                <Slider
+                  value={localAngle}
+                  min={0}
+                  max={360}
+                  step={1}
+                  onChange={onAngleChange}
+                  onCommit={commitAngle}
+                />
+                <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+                  {Math.round(localAngle)}°
+                </span>
+              </Row>
+            )}
+            {current.colors.map((stop, index) => (
+              <Row
+                key={index}
+                label={index === 0 ? "From" : index === current.colors.length - 1 ? "To" : `Stop ${index + 1}`}
+              >
+                <ColorField color={stop} onChange={(value) => setStop(index, value)} />
+                {current.colors.length > MIN_GRADIENT_STOPS && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 shrink-0 text-muted-foreground"
+                    onClick={() =>
+                      setGradient({
+                        ...current,
+                        colors: current.colors.filter((_, i) => i !== index),
+                      })
+                    }
+                    title="Remove this stop"
+                  >
+                    <RiSubtractLine size={14} />
+                  </Button>
+                )}
+              </Row>
+            ))}
+            {current.colors.length < MAX_GRADIENT_STOPS && (
+              <Button
+                variant="ghost"
+                className="mt-1 h-7 w-full text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+                onClick={() =>
+                  setGradient({
+                    ...current,
+                    colors: [...current.colors, current.colors[current.colors.length - 1]],
+                  })
+                }
+              >
+                <RiAddLine size={14} className="mr-1" />
+                Add stop
+              </Button>
+            )}
+            <div className="mt-2 grid grid-cols-4 gap-1.5">
+              {GRADIENT_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() =>
+                    setGradient({ type: "linear", angle: preset.angle, colors: [...preset.colors] })
+                  }
+                  title={preset.name}
+                  className="h-6 w-full rounded-sm border border-border transition-transform hover:scale-105"
+                  style={{
+                    backgroundImage: gradientCss({
+                      type: "linear",
+                      angle: preset.angle,
+                      colors: preset.colors,
+                    }),
+                    backgroundColor: preset.id === "scrim" ? "#4b5563" : undefined,
+                  }}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -372,6 +518,162 @@ export function TimingProperty({
             aria-label="Duration seconds"
           />
         </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Gradient (Backdrop clips) ────────────────────────────────────────────
+//
+// Written for Pictify. The engine's only gradient primitive is a Backdrop, so
+// this section owns everything about how one looks: type, stop colours, and —
+// for linear — the angle.
+//
+// The angle is stored inside `gradientType` as "linear:<deg>" rather than as
+// its own style key, because BackdropClip rebuilds `style` from a fixed key
+// list on every deserialize and would drop anything else. See src/lib/video/
+// gradients.js.
+
+interface GradientPropertyProps {
+  type: string;
+  angle: number;
+  colors: string[];
+  boundStops?: Record<number, string>;
+  onChange: (next: { type: string; angle: number; colors: string[] }) => void;
+}
+
+export function GradientProperty({
+  type,
+  angle,
+  colors,
+  boundStops = {},
+  onChange,
+}: GradientPropertyProps) {
+  const {
+    localValue: localAngle,
+    handleChange: onAngleChange,
+    handleCommit: commitAngle,
+  } = useSliderThrottle(angle, (value) => onChange({ type, angle: value, colors }));
+
+  const setColor = (index: number, color: string) => {
+    const next = [...colors];
+    next[index] = color;
+    onChange({ type, angle, colors: next });
+  };
+
+  const addStop = () => {
+    if (colors.length >= MAX_GRADIENT_STOPS) return;
+    onChange({ type, angle, colors: [...colors, colors[colors.length - 1] || "#ffffff"] });
+  };
+
+  const removeStop = (index: number) => {
+    if (colors.length <= MIN_GRADIENT_STOPS) return;
+    onChange({ type, angle, colors: colors.filter((_, i) => i !== index) });
+  };
+
+  return (
+    <div className="border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Gradient" />
+
+      <div
+        className="mb-3 h-12 w-full rounded border border-border"
+        style={{ backgroundImage: gradientCss({ type, angle: localAngle, colors }) }}
+      />
+
+      <div className="space-y-1">
+        <Row label="Type">
+          <Select
+            value={type}
+            onValueChange={(value) => onChange({ type: value, angle, colors })}
+            options={GRADIENT_TYPES}
+          />
+        </Row>
+
+        {type !== "radial" && (
+          <Row label="Angle">
+            <Slider
+              value={localAngle}
+              min={0}
+              max={360}
+              step={1}
+              onChange={onAngleChange}
+              onCommit={commitAngle}
+            />
+            <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+              {Math.round(localAngle)}°
+            </span>
+          </Row>
+        )}
+      </div>
+
+      <div className="mt-2 space-y-1">
+        {colors.map((color, index) => {
+          const bound = boundStops[index];
+          return (
+            <Row key={index} label={index === 0 ? "From" : index === colors.length - 1 ? "To" : `Stop ${index + 1}`}>
+              {bound ? (
+                // A bound stop is driven by a variable at render time, so
+                // editing the colour here would be a lie.
+                <span
+                  className="flex-1 truncate rounded border border-primary/60 bg-accent px-2 py-1 font-mono text-[10px] text-primary"
+                  title={`Set by the "${bound}" variable at render time`}
+                >
+                  {bound}
+                </span>
+              ) : (
+                <ColorField color={color} onChange={(value) => setColor(index, value)} />
+              )}
+              {colors.length > MIN_GRADIENT_STOPS && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 shrink-0 text-muted-foreground"
+                  onClick={() => removeStop(index)}
+                  title="Remove this stop"
+                >
+                  <RiSubtractLine size={14} />
+                </Button>
+              )}
+            </Row>
+          );
+        })}
+      </div>
+
+      {colors.length < MAX_GRADIENT_STOPS && (
+        <Button
+          variant="ghost"
+          className="mt-1 h-7 w-full text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+          onClick={addStop}
+        >
+          <RiAddLine size={14} className="mr-1" />
+          Add stop
+        </Button>
+      )}
+
+      <div className="mt-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Presets
+        </span>
+        <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+          {GRADIENT_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() =>
+                onChange({ type: "linear", angle: preset.angle, colors: [...preset.colors] })
+              }
+              title={preset.name}
+              className="h-6 w-full rounded-sm border border-border transition-transform hover:scale-105"
+              style={{
+                backgroundImage: gradientCss({
+                  type: "linear",
+                  angle: preset.angle,
+                  colors: preset.colors,
+                }),
+                backgroundColor: preset.id === "scrim" ? "#4b5563" : undefined,
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

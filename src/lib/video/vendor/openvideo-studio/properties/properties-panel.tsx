@@ -16,6 +16,8 @@ import { core, projectStore, useStudioStore } from "../runtime";
 import { Button, ScrollArea, cn } from "../ui";
 import { RiDeleteBinLine, RiFileCopyLine } from "../icons";
 import { getPropertiesForType, PropertyKey } from "./property-registry";
+import { readGradient, gradientStyle } from "../../../gradients";
+import { getHostCallbacks } from "../runtime";
 import { useEphemeralClip } from "./use-ephemeral-clip";
 import { getFontByPostScriptName } from "../font-utils";
 import * as Properties from "./options";
@@ -67,6 +69,32 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
 
   const renderProperty = (key: PropertyKey) => {
     switch (key) {
+      case "gradient": {
+        const current = readGradient(coreClip);
+        // Stops driven by a variable are shown as read-only chips: the value
+        // is decided at render time, so a colour picker here would be a lie.
+        const bindings = coreClip?.metadata?.pictify?.bindings || [];
+        const boundStops: Record<number, string> = {};
+        for (const binding of bindings) {
+          const match = /^style\.colors\.(\d+)$/.exec(binding?.target || "");
+          if (match) boundStops[Number(match[1])] = binding.variable;
+        }
+        return (
+          <Properties.GradientProperty
+            key={key}
+            type={current.type}
+            angle={current.angle}
+            colors={current.colors}
+            boundStops={boundStops}
+            onChange={(next) => {
+              handleUpdate({ style: { ...(coreClip?.style || {}), ...gradientStyle(next) } });
+              // The Svelte side owns the variables panel and the dirty flag.
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+      }
+
       case "transform":
         return (
           <Properties.TransformProperty

@@ -1,0 +1,192 @@
+diff --git a/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js b/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js
+index 64b7a98..990704e 100644
+--- a/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js
++++ b/node_modules/@openvideo/engine-pixi/dist/index-DXt_Sx7A.js
+@@ -76215,6 +76215,7 @@ class lD extends Ft {
+     }
+     const { textOnlyContainer: a, words: l } = this._buildWordObjects(o), c = this._applyStrokeFilter();
+     this._applyShadowFilter(a), this.pixiTextContainer.addChild(a);
++
+     const { spaceWidth: u, measuredTextHeight: h } = await this._measureSpaceAndHeight();
+     this._spaceWidth = u;
+     const d = this.originalOpts.lineHeight ?? 1, f = s.fontSize ?? 40, p = f * d;
+@@ -76271,6 +76272,15 @@ class lD extends Ft {
+     ) : e;
+   }
+   _buildTextStyles() {
++    /* pictify-gradient-patch-v1 */
++    // Text is drawn as bitmap glyphs, so a real gradient fill would span one
++    // glyph cell of the font atlas and every letter would come out the last
++    // stop. Degrade to the first stop instead: a wrong-but-stable solid colour
++    // beats per-letter garbage, and the studio hides the control for text.
++    const _tg = __pictifyParseGradient(this.originalOpts?.color);
++    if (_tg) {
++      this.originalOpts = { ...this.originalOpts, color: _tg.colors[0] };
++    }
+     const e = this.createStyleFromOpts(this.originalOpts), {
+       wordWrap: t,
+       wordWrapWidth: i,
+@@ -78717,13 +78727,26 @@ class kh extends Ft {
+     return this._meta;
+   }
+   drawShape() {
++    /* pictify-gradient-patch-v1 */
+     const e = this.style;
+     if (this.graphics.clear(), this.drawRectangle(e), e.fill) {
+-      const t = this.hexToNumber(e.fill);
+-      this.graphics.fill({
+-        color: t,
+-        alpha: e.fillOpacity ?? 1
+-      });
++      const _grad = __pictifyParseGradient(e.fill);
++      if (_grad) {
++        const _tex = __pictifyGradientTexture(_grad, this.width, this.height);
++        const _mat = new ne();
++        _mat.translate(-this.width / 2, -this.height / 2);
++        this.graphics.fill({
++          texture: _tex,
++          matrix: _mat,
++          alpha: e.fillOpacity ?? 1
++        });
++      } else {
++        const t = this.hexToNumber(e.fill);
++        this.graphics.fill({
++          color: t,
++          alpha: e.fillOpacity ?? 1
++        });
++      }
+     }
+     if (e.stroke) {
+       const t = this.hexToNumber(e.stroke.color);
+@@ -78828,6 +78851,61 @@ class kh extends Ft {
+     return Ft.deserializeBaseProperties(t, e), t;
+   }
+ }
++/* pictify-gradient-patch-v1 — shared CSS-gradient helpers.
++ * A gradient is carried as a CSS string so it survives the per-clip style
++ * whitelists (ShapeClip and BackdropClip both rebuild `style` from a fixed key
++ * list on deserialize, so a bespoke descriptor key is silently dropped).
++ */
++function __pictifyParseGradient(value) {
++  if (typeof value !== "string") return null;
++  const text = value.trim();
++  const isRadial = text.startsWith("radial-gradient(");
++  if (!isRadial && !text.startsWith("linear-gradient(")) return null;
++  const inner = text.slice(text.indexOf("(") + 1, text.lastIndexOf(")"));
++  // Split on commas that are not inside a function call, so rgba() survives.
++  const parts = [];
++  let depth = 0, current = "";
++  for (const ch of inner) {
++    if (ch === "(") depth++;
++    if (ch === ")") depth--;
++    if (ch === "," && depth === 0) { parts.push(current.trim()); current = ""; }
++    else current += ch;
++  }
++  if (current.trim()) parts.push(current.trim());
++  let angle = 180;
++  if (parts.length && /^-?[\d.]+deg$/.test(parts[0])) angle = parseFloat(parts.shift());
++  else if (parts.length && /^(circle|ellipse|at )/.test(parts[0])) parts.shift();
++  const colors = parts.filter(Boolean);
++  if (colors.length < 2) return null;
++  return { type: isRadial ? "radial" : "linear", angle, colors };
++}
++
++function __pictifyGradientTexture(grad, width, height) {
++  const canvas = document.createElement("canvas");
++  canvas.width = Math.max(1, Math.ceil(width));
++  canvas.height = Math.max(1, Math.ceil(height));
++  const ctx = canvas.getContext("2d");
++  const w = canvas.width, h = canvas.height;
++  let paint;
++  if (grad.type === "radial") {
++    paint = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) / 2);
++  } else {
++    const rad = (((grad.angle % 360) + 360) % 360) * Math.PI / 180;
++    const dx = Math.sin(rad), dy = -Math.cos(rad);
++    const half = (Math.abs(w * dx) + Math.abs(h * dy)) / 2;
++    paint = ctx.createLinearGradient(
++      w / 2 - dx * half, h / 2 - dy * half,
++      w / 2 + dx * half, h / 2 + dy * half
++    );
++  }
++  grad.colors.forEach((color, index) => {
++    paint.addColorStop(index / Math.max(1, grad.colors.length - 1), color);
++  });
++  ctx.fillStyle = paint;
++  ctx.fillRect(0, 0, w, h);
++  return K.from(canvas);
++}
++
+ class Ih extends Ft {
+   type = "Backdrop";
+   backdropType;
+@@ -78853,6 +78931,8 @@ class Ih extends Ft {
+       backdropType: e.backdropType,
+       colors: e.colors ?? ["#6A5AF9", "#B14EFF", "#FF7A7A"],
+       gradientType: e.gradientType ?? "linear",
++      gradientAngle: e.gradientAngle ?? 180,
++      gradientOffsets: e.gradientOffsets ?? null,
+       speed: e.speed ?? 1,
+       scale: e.scale ?? 1,
+       density: e.density ?? 8
+@@ -78878,6 +78958,7 @@ class Ih extends Ft {
+    * Rebuilds the static structure of the backdrop based on current styles.
+    */
+   rebuildBackdrop() {
++    /* pictify-gradient-patch-v1 */
+     this.container.removeChildren(), this.bgGraphics = null, this.meshContainer = null, this.meshCircles = [], this.blobsContainer = null, this.blobCircles = [], this.noiseSprite = null;
+     const e = this.style, t = e.backdropType || this.backdropType;
+     this.backdropType = t;
+@@ -78885,21 +78966,36 @@ class Ih extends Ft {
+     if (t === "solid")
+       this.bgGraphics = new Ae(), this.bgGraphics.rect(0, 0, this.width, this.height).fill({ color: n[0] }), this.container.addChild(this.bgGraphics);
+     else if (t === "gradient")
+-      if ((e.gradientType ?? "linear") === "radial") {
++      if (String(e.gradientType ?? "linear").startsWith("radial")) {
+         const o = document.createElement("canvas");
+         o.width = Math.max(1, Math.ceil(this.width)), o.height = Math.max(1, Math.ceil(this.height));
+         const a = o.getContext("2d"), l = this.width / 2, c = this.height / 2, u = Math.min(this.width, this.height) / 2, h = a.createRadialGradient(l, c, 0, l, c, u);
++        const _off = Array.isArray(e.gradientOffsets) ? e.gradientOffsets : null;
+         i.forEach((p, m) => {
+-          h.addColorStop(m / Math.max(1, i.length - 1), p);
++          h.addColorStop(_off?.[m] ?? m / Math.max(1, i.length - 1), p);
+         }), a.fillStyle = h, a.fillRect(0, 0, this.width, this.height);
+         const d = K.from(o), f = new Ve(d);
+         this.container.addChild(f);
+       } else {
+-        this.bgGraphics = new Ae();
+-        const o = new Wt(0, 0, this.width, this.height);
+-        n.forEach((a, l) => {
+-          o.addColorStop(l / Math.max(1, n.length - 1), a);
+-        }), this.bgGraphics.rect(0, 0, this.width, this.height).fill(o), this.container.addChild(this.bgGraphics);
++        const _o = document.createElement("canvas");
++        _o.width = Math.max(1, Math.ceil(this.width)), _o.height = Math.max(1, Math.ceil(this.height));
++        const _c2 = _o.getContext("2d"),
++          _w = _o.width, _h = _o.height,
++          _rawType = String(e.gradientType ?? "linear"),
++          _typeAngle = _rawType.includes(":") ? Number(_rawType.split(":")[1]) : NaN,
++          _deg = Number.isFinite(_typeAngle) ? _typeAngle : Number(e.gradientAngle ?? 180),
++          _ang = (((_deg % 360) + 360) % 360) * Math.PI / 180,
++          _dx = Math.sin(_ang), _dy = -Math.cos(_ang),
++          _half = (Math.abs(_w * _dx) + Math.abs(_h * _dy)) / 2,
++          _cx = _w / 2, _cy = _h / 2,
++          _g2 = _c2.createLinearGradient(_cx - _dx * _half, _cy - _dy * _half, _cx + _dx * _half, _cy + _dy * _half),
++          _offL = Array.isArray(e.gradientOffsets) ? e.gradientOffsets : null;
++        i.forEach((_col, _idx) => {
++          _g2.addColorStop(Math.min(1, Math.max(0, _offL?.[_idx] ?? _idx / Math.max(1, i.length - 1))), _col);
++        });
++        _c2.fillStyle = _g2, _c2.fillRect(0, 0, _w, _h);
++        const _spr = new Ve(K.from(_o));
++        this.container.addChild(_spr);
+       }
+     else if (t === "meshGradient") {
+       this.bgGraphics = new Ae(), this.bgGraphics.rect(0, 0, this.width, this.height).fill({ color: n[0] }), this.container.addChild(this.bgGraphics), this.meshContainer = new ge(), this.meshContainer.label = "MeshContainer";
+@@ -79045,6 +79141,8 @@ class Ih extends Ft {
+       height: e.transform?.height,
+       colors: e.style?.colors,
+       gradientType: e.style?.gradientType,
++      gradientAngle: e.style?.gradientAngle,
++      gradientOffsets: e.style?.gradientOffsets,
+       speed: e.style?.speed,
+       scale: e.style?.scale,
+       density: e.style?.density

@@ -14,6 +14,12 @@ export { core, projectStore, useStudioStore, setEditorContext } from "../openvid
 
 export interface HostCallbacks {
   /**
+   * Fired after a vendored panel mutates a clip's style. The studio store only
+   * republishes on a SELECTION change, so the Svelte side needs a nudge to
+   * re-read the clip (gradient stop bindings, the dirty flag).
+   */
+  onClipStyleChange?: (clipId: string) => void;
+  /**
    * Upload a media file and resolve to a persistent URL. Implemented by the
    * Svelte page (Pictify brand-assets upload for images; object-URL fallback
    * for kinds the backend cannot store yet).
