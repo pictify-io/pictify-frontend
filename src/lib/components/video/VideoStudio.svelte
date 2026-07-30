@@ -1406,7 +1406,7 @@
 					height={template?.height || 1920}
 					fps={template?.fps || 30}
 					durationInFrames={template?.durationInFrames || 150}
-					showCode={showCodePane}
+					showPane={showCodePane}
 					on:change={onCodeChange}
 					on:schema={onCodeSchema}
 				/>
@@ -1589,8 +1589,8 @@
 					<div class="px-3 py-3">
 						<h3 class="mb-1 text-xs font-semibold text-foreground">Composition</h3>
 						<p class="mb-3 text-[11px] leading-snug text-muted-foreground">
-							This template is a Remotion scene. Its layout lives in the code, and its
-							inputs are on the Variables tab.
+							This template is a Remotion scene. Describe changes in Chat, set its
+							inputs on the Variables tab, and drag its beats under the preview.
 						</p>
 						<label class="flex items-center gap-2 text-xs text-muted-foreground">
 							<input
@@ -1598,7 +1598,7 @@
 								bind:checked={showCodePane}
 								class="h-3.5 w-3.5 rounded border-border bg-muted text-primary focus:ring-1 focus:ring-primary"
 							/>
-							Show the code pane
+							Show the side pane
 						</label>
 					</div>
 				{/if}

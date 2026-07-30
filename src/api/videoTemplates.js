@@ -117,6 +117,26 @@ const generateVideoTemplate = async (payload) => {
 };
 
 /**
+ * Rewrite a Remotion composition from a natural-language instruction.
+ *
+ * The CURRENT source is sent, not the saved one: the studio compiles live, so
+ * what is on screen is usually ahead of the last save.
+ *
+ * The result is compile-gated server-side, so a rewrite that does not build
+ * comes back 422 with the compiler's own errors instead of replacing working
+ * code with broken code.
+ *
+ * @param {Object} payload - { tsx, instruction, width, height, fps, durationInFrames }
+ * @returns {Promise<{tsx: string, schemaJson: Array, changed: boolean}>}
+ *   422 { errors: [...] } — the rewrite did not compile
+ *   402 { code: 'quota_exceeded' } · 503 { code: 'ai_unavailable' }
+ */
+const editVideoTemplateCode = async (payload) => {
+	const response = await backend.post('/video/templates/edit', payload);
+	return response;
+};
+
+/**
  * Copy a template. The natural way to make a variant — a seasonal cut, or a
  * safe copy before an edit you are not sure about.
  *
@@ -202,6 +222,7 @@ export {
 	previewVideoTemplateFrame,
 	renderVideoTemplate,
 	generateVideoTemplate,
+	editVideoTemplateCode,
 	duplicateVideoTemplate,
 	uploadVideoMedia,
 	listVideoMedia,

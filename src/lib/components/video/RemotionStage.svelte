@@ -21,6 +21,8 @@
 	 */
 	import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
 	import { parseSequences, retimeSequence, toTimelineBars } from '$lib/video/sequence-timing.js';
+	import { editVideoTemplateCode } from '../../../api/videoTemplates';
+	import RemotionChat from './RemotionChat.svelte';
 
 	/** The composition source. */
 	export let tsx = '';
@@ -30,8 +32,14 @@
 	export let height = 1920;
 	export let fps = 30;
 	export let durationInFrames = 150;
-	/** Hidden when the studio is showing its Variables tab instead. */
-	export let showCode = true;
+	/**
+	 * The side pane. Chat is the default surface — most people editing a video
+	 * template are not here to read React, and opening on source made the editor
+	 * look like a developer tool that happens to render video. The code is one
+	 * tab away, not gone.
+	 */
+	export let showPane = true;
+	let pane = 'chat'; // chat | code
 
 	const dispatch = createEventDispatcher();
 
@@ -72,6 +80,91 @@
 	$: editableBars = bars.filter((b) => b.editable).length;
 
 	let dragging = null;
+
+	// ── AI edit ──────────────────────────────────────────────────────────
+	let messages = [];
+	let editing = false;
+
+	const SUGGESTIONS = [
+		'Make the intro shorter',
+		'Use a darker background and brighter text',
+		'Add an outro beat with the logo'
+	];
+	// The source as it was before the last AI edit. Holding it is the whole
+	// safety net: a rewrite the user dislikes is one click from being undone,
+	// which matters more than a diff view when the player already shows the
+	// result immediately.
+	let sourceBeforeEdit = null;
+
+	async function runEdit(event) {
+		const ask = String(event?.detail?.instruction || '').trim();
+		if (!ask || editing) return;
+		editing = true;
+		messages = [...messages, { role: 'user', text: ask }];
+		const previous = tsx;
+
+		try {
+			const result = await editVideoTemplateCode({
+				tsx,
+				instruction: ask,
+				width: Math.round(width) || 1080,
+				height: Math.round(height) || 1920,
+				fps: Math.round(fps) || 30,
+				durationInFrames: Math.round(durationInFrames) || 150
+			});
+
+			if (result?.changed && result.tsx) {
+				// Only the newest edit is revertable: the button restores one step,
+				// so offering it on older turns would promise a history that is not
+				// kept.
+				messages = messages.map((m) => ({ ...m, revertable: false }));
+				sourceBeforeEdit = previous;
+				tsx = result.tsx;
+				dispatch('change', { tsx });
+				messages = [
+					...messages,
+					{ role: 'assistant', text: 'Done — the preview is updated.', status: 'applied', revertable: true }
+				];
+			} else {
+				messages = [
+					...messages,
+					{
+						role: 'assistant',
+						text: 'That is already how the scene works, so nothing changed.',
+						status: 'nochange'
+					}
+				];
+			}
+		} catch (error) {
+			const errors = error?.body?.errors || error?.errors;
+			messages = [
+				...messages,
+				{
+					role: 'assistant',
+					// The composition is untouched on this path: the compile gate runs
+					// server-side, so a rewrite that does not build never arrives.
+					text: Array.isArray(errors) && errors.length
+						? 'That edit would not compile, so the scene is unchanged.'
+						: error?.message || 'The edit failed. Try rephrasing it.',
+					status: 'error',
+					errors: Array.isArray(errors) ? errors : []
+				}
+			];
+		} finally {
+			editing = false;
+		}
+	}
+
+	function revertEdit() {
+		if (sourceBeforeEdit === null) return;
+		tsx = sourceBeforeEdit;
+		sourceBeforeEdit = null;
+		dispatch('change', { tsx });
+		messages = [
+			...messages.map((m) => ({ ...m, revertable: false })),
+			{ role: 'assistant', text: 'Reverted to the previous version.', status: 'nochange' }
+		];
+	}
 
 	const startDrag = (event, bar, mode) => {
 		if (!bar.editable) return;
@@ -208,19 +301,26 @@
 </script>
 
 <div class="flex h-full min-h-0 w-full">
-	{#if showCode}
+	{#if showPane}
 		<!--
-			Code on the left, preview on the right: the same reading order as the
-			tool rail it replaces, so the studio's shape does not change when the
-			template kind does.
+			Chat first, code behind a tab. The composition is edited by describing
+			the change; the source is there for anyone who wants it, but it is no
+			longer the first thing the editor puts in front of you.
 		-->
 		<div class="flex min-h-0 w-[42%] max-w-[560px] flex-col border-r-[3px] border-black bg-gray-950">
-			<div class="flex shrink-0 items-center justify-between px-3 py-2">
-				<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">
-					Composition
-				</span>
+			<div class="flex shrink-0 items-center gap-1 border-b border-gray-800 px-2 py-1.5">
+				{#each [['chat', 'Chat'], ['code', 'Code']] as [id, label] (id)}
+					<button
+						type="button"
+						on:click={() => (pane = id)}
+						class="rounded px-2 py-1 text-[10px] font-black uppercase tracking-widest transition-colors
+							{pane === id ? 'bg-gray-800 text-brand-accent' : 'text-gray-500 hover:text-gray-300'}"
+					>
+						{label}
+					</button>
+				{/each}
 				<span
-					class="rounded px-1.5 py-0.5 text-[10px] font-black uppercase tracking-widest
+					class="ml-auto rounded px-1.5 py-0.5 text-[10px] font-black uppercase tracking-widest
 						{status === 'live'
 						? 'bg-brand-success/15 text-brand-success'
 						: status === 'error'
@@ -231,37 +331,47 @@
 				</span>
 			</div>
 
-			<div class="flex min-h-0 flex-1">
-				<!-- Line numbers scroll with the textarea rather than in their own box. -->
-				<div
-					bind:this={gutterEl}
-					class="ov-gutter shrink-0 overflow-hidden bg-gray-900 py-3 pl-3 pr-2 text-right font-mono text-[11px] leading-[1.55] text-gray-600"
-					aria-hidden="true"
-				>
-					{#each Array(lineCount) as _, i (i)}
-						<div>{i + 1}</div>
-					{/each}
+			{#if pane === 'chat'}
+				<RemotionChat
+					{messages}
+					busy={editing}
+					suggestions={SUGGESTIONS}
+					on:send={runEdit}
+					on:revert={revertEdit}
+				/>
+			{:else}
+				<div class="flex min-h-0 flex-1">
+					<!-- Line numbers scroll with the textarea rather than in their own box. -->
+					<div
+						bind:this={gutterEl}
+						class="ov-gutter shrink-0 overflow-hidden bg-gray-900 py-3 pl-3 pr-2 text-right font-mono text-[11px] leading-[1.55] text-gray-600"
+						aria-hidden="true"
+					>
+						{#each Array(lineCount) as _, i (i)}
+							<div>{i + 1}</div>
+						{/each}
+					</div>
+					<textarea
+						bind:this={editorEl}
+						value={tsx}
+						on:input={onInput}
+						on:scroll={syncGutter}
+						on:keydown={handleKeydown}
+						spellcheck="false"
+						autocomplete="off"
+						autocapitalize="off"
+						aria-label="Composition source"
+						class="ov-code min-h-0 flex-1 resize-none bg-gray-950 py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55] text-gray-100 outline-none"
+					></textarea>
 				</div>
-				<textarea
-					bind:this={editorEl}
-					value={tsx}
-					on:input={onInput}
-					on:scroll={syncGutter}
-					on:keydown={handleKeydown}
-					spellcheck="false"
-					autocomplete="off"
-					autocapitalize="off"
-					aria-label="Composition source"
-					class="ov-code min-h-0 flex-1 resize-none bg-gray-950 py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55] text-gray-100 outline-none"
-				></textarea>
-			</div>
 
-			{#if compileErrors.length}
-				<div class="max-h-40 shrink-0 overflow-y-auto border-t-[3px] border-black bg-brand-danger/10 p-3">
-					{#each compileErrors as error (error)}
-						<p class="font-mono text-[11px] leading-snug text-brand-danger">{error}</p>
-					{/each}
-				</div>
+				{#if compileErrors.length}
+					<div class="max-h-40 shrink-0 overflow-y-auto border-t-[3px] border-black bg-brand-danger/10 p-3">
+						{#each compileErrors as error (error)}
+							<p class="font-mono text-[11px] leading-snug text-brand-danger">{error}</p>
+						{/each}
+					</div>
+				{/if}
 			{/if}
 		</div>
 	{/if}
