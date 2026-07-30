@@ -22,10 +22,15 @@
 	let stickyBar;
 
 	// ── Experiments (PostHog feature flags; default 'control', resolved once flags load) ──
-	// tool-signup-cta-v2:       post-generation signup CTA — control | inline-value-prop | sticky-bar
-	// url-tool-capture-flow-v1: capture affordance         — control | guided-capture | auto-capture
+	// tool-signup-cta-v2: post-generation signup CTA — control | inline-value-prop | sticky-bar
+	//
+	// url-tool-capture-flow-v1 CONCLUDED 2026-07-29 — 'auto-capture' shipped to 100% and the
+	// behaviour below is now unconditional. Won on both the rageclick primary (7.6% vs 10.3%
+	// control over 48d) and the generation guardrail (53.5% vs 18.0%, 3.0x, above control every
+	// single day). 'guided-capture' retired as dominated. Flag archived post-deploy — do not
+	// reintroduce the read; the legacy control path (gating on iframeElement, which is truthy on
+	// mount, so the button looked clickable before any preview existed) was the #1 rageclick driver.
 	let ctaVariant = 'control';
-	let captureVariant = 'control';
 	let userInitiatedLoad = false;
 	let hasAutoCaptured = false;
 
@@ -33,23 +38,14 @@
 		if (!browser) return;
 		try {
 			ctaVariant = posthog.getFeatureFlag?.('tool-signup-cta-v2') || 'control';
-			captureVariant = posthog.getFeatureFlag?.('url-tool-capture-flow-v1') || 'control';
 		} catch {
 			ctaVariant = 'control';
-			captureVariant = 'control';
 		}
 	}
 
-	// Capture-button enable logic differs by capture-flow arm. CONTROL keeps the legacy
-	// (buggy) check: iframeElement is truthy on mount, so the button LOOKS clickable before
-	// any preview exists — the verified #1 rageclick driver. Treatment arms gate on the real
-	// precondition (a preview must actually be loaded).
-	$: captureDisabled =
-		captureVariant === 'control'
-			? !url || !iframeElement || isImageGenerating
-			: !url || !isPreviewLoaded || isImageGenerating;
+	// Capture is enabled only once a preview has actually loaded — the real precondition.
+	$: captureDisabled = !url || !isPreviewLoaded || isImageGenerating;
 
-	// auto-capture arm: fire ONE capture automatically after a user-initiated preview load.
 	function handleLoadPreviewClick() {
 		userInitiatedLoad = true;
 		loadPreview();
@@ -463,10 +459,9 @@
 		isPreviewLoaded = true;
 		isIframeReady = true;
 
-		const treatment = captureVariant === 'guided-capture' || captureVariant === 'auto-capture';
 		// Bring the now-enabled Capture control into view — only after a user-initiated load
 		// (never on the prefill experiment's silent auto-load).
-		if (treatment && userInitiatedLoad) {
+		if (userInitiatedLoad) {
 			tick().then(() => {
 				try {
 					document
@@ -478,10 +473,9 @@
 			});
 		}
 
-		// auto-capture: one automatic capture after a user-initiated preview load, with a
-		// settle delay, never on prefill, and reserving guest quota so we don't burn the last one.
+		// One automatic capture after a user-initiated preview load, with a settle delay, never
+		// on prefill, and reserving guest quota so we don't burn the last one.
 		if (
-			captureVariant === 'auto-capture' &&
 			userInitiatedLoad &&
 			!hasAutoCaptured &&
 			!isImageGenerating &&
@@ -625,8 +619,13 @@
 		isImageGenerating = false;
 	}
 
-	function copyToClipboard(text) {
+	function copyToClipboard(text, contentType = 'image_url') {
 		navigator.clipboard.writeText(text).then(() => {
+			analytics.trackCopy({
+				content_type: contentType,
+				context: 'tool_result',
+				tool_name: 'url_to_image_generator'
+			});
 			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
 		});
 	}
@@ -832,7 +831,7 @@
 						</div>
 					</div>
 
-					{#if captureVariant !== 'control' && url}
+					{#if url}
 						{#if isLoading}
 							<p class="mt-3 text-sm font-bold text-gray-500 flex items-center gap-2">
 								<span
@@ -1060,7 +1059,7 @@
 							Rendering...
 						{:else}
 							<span
-								>{captureVariant === 'auto-capture' && hasAutoCaptured ? 'Re-capture' : 'Capture'}
+								>{hasAutoCaptured ? 'Re-capture' : 'Capture'}
 								{fileFormat.toUpperCase()}</span
 							>
 							<svg
@@ -1110,6 +1109,12 @@
 						<a
 							href={imageUrl}
 							download="pictify-screenshot.{fileFormat}"
+							on:click={() =>
+								analytics.trackDownload({
+									content_type: 'image',
+									format: fileFormat,
+									tool_name: 'url_to_image_generator'
+								})}
 							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1176,7 +1181,7 @@
 						<span class="text-xs text-gray-500 font-mono">— updates as you change settings</span>
 					</div>
 					<button
-						on:click={() => copyToClipboard(liveCurlSnippet)}
+						on:click={() => copyToClipboard(liveCurlSnippet, 'code')}
 						class="px-3 py-1 bg-brand-accent text-black border-[2px] border-brand-accent font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
 					>
 						Copy
