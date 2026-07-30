@@ -34,6 +34,7 @@
 	import { uploadBrandAsset, getBrandAssets } from '../../../api/brand-assets';
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
 	import InlineTextEditor from './InlineTextEditor.svelte';
+	import RemotionStage from './RemotionStage.svelte';
 	import ClipBindingsPanel from './ClipBindingsPanel.svelte';
 	import {
 		detectReferences,
@@ -86,6 +87,54 @@
 	 * @type {Array|null}
 	 */
 	export let starterClips = null;
+
+	/*
+	 * ── Two kinds, one editor ─────────────────────────────────────────────
+	 *
+	 * `timeline` is a scene graph the Pixi canvas edits as clips. `tsx` is a
+	 * Remotion composition: React code, which cannot be represented as clips and
+	 * so gets a live player and a code pane instead of the canvas and the
+	 * timeline. Everything around them — the name field, variables, saving,
+	 * rendering — is the same either way.
+	 *
+	 * They used to be separate editors on separate routes, so anything that
+	 * produced a Remotion template (AI generation, and the MCP server) landed
+	 * outside the studio and reopened outside it forever after.
+	 */
+	$: isCode = (template?.kind || 'timeline') === 'tsx';
+
+	// ── Remotion (kind: 'tsx') ───────────────────────────────────────────
+	let tsxSource = template?.tsx || '';
+	let showCodePane = true;
+
+	const onCodeChange = (event) => {
+		tsxSource = event.detail.tsx;
+		markDirty();
+	};
+
+	/*
+	 * The running composition reports what it can be parameterised by. Trust it
+	 * over whatever was saved: the code is the source of truth, and a field the
+	 * author just added should appear in Variables without a save first.
+	 *
+	 * Existing definitions win on the fields they already describe, so a default
+	 * value or a description someone typed is not overwritten by the schema's
+	 * bare declaration on every recompile.
+	 */
+	const onCodeSchema = (event) => {
+		const fields = event.detail.fields;
+		if (!Array.isArray(fields) || !fields.length) return;
+		const byName = new Map(variableDefinitions.map((v) => [v.name, v]));
+		const next = fields.map((field) => ({
+			...makeDefinition(field.name, field.type || 'text'),
+			...(byName.get(field.name) || {}),
+			name: field.name
+		}));
+		if (JSON.stringify(next) !== JSON.stringify(variableDefinitions)) {
+			variableDefinitions = next;
+			markDirty();
+		}
+	};
 
 	// ── Element refs ─────────────────────────────────────────────────────
 	let canvasEl;
@@ -303,6 +352,12 @@
 	// ── Mount ────────────────────────────────────────────────────────────
 	onMount(async () => {
 		analytics.page('Video Studio');
+		// A Remotion template has no scene graph, so none of the engine, the
+		// timeline or the clip panels apply. RemotionStage mounts its own player.
+		if (isCode) {
+			isBooting = false;
+			return;
+		}
 		try {
 			// Browser-only engines — never import at module top level (SSR).
 			const { mountVideoEditor } = await import('$lib/video/editorHost.js');
@@ -865,11 +920,64 @@
 		});
 	}
 
+	/**
+	 * Save a Remotion template.
+	 *
+	 * Sends `tsx` where the timeline path sends `projectJson`; the backend routes
+	 * on `kind` and validates the source by compiling it, so a composition that
+	 * does not build comes back 422 with real errors rather than being stored
+	 * broken.
+	 *
+	 * No poster is generated. snapshotThumbnail renders a scene graph through the
+	 * Pixi engine, which a Remotion composition does not have — the player is the
+	 * only thing that can draw it, and grabbing a frame out of it on every save
+	 * would cost more than a thumbnail is worth.
+	 */
+	async function persistCode({ publish = false, silent = false, deferNavigation = false } = {}) {
+		try {
+			const payload = {
+				name: name.trim() || 'Untitled video',
+				kind: 'tsx',
+				tsx: tsxSource,
+				variableDefinitions,
+				width: Math.round(template?.width || 1080),
+				height: Math.round(template?.height || 1920),
+				fps: Math.round(template?.fps || 30),
+				durationInFrames: Math.round(template?.durationInFrames || 150),
+				status: publish ? 'published' : status
+			};
+
+			const response = uid
+				? await updateVideoTemplate(uid, payload)
+				: await createVideoTemplate(payload);
+			const saved = response?.template;
+			if (saved?.uid) uid = saved.uid;
+			if (saved?.status) status = saved.status;
+
+			isDirty = false;
+			if (!silent) saveMessage = publish ? 'Published' : 'Saved';
+			if (!deferNavigation) await adoptPermanentUrl();
+			return saved || null;
+		} catch (error) {
+			// 422 carries per-error compile messages; anything else is a message.
+			const errors = error?.body?.errors || error?.errors;
+			saveError = Array.isArray(errors)
+				? errors.join('  ')
+				: error?.message || 'Could not save this template.';
+			return null;
+		} finally {
+			isSaving = false;
+		}
+	}
+
 	async function persist({ publish = false, silent = false, deferNavigation = false } = {}) {
-		if (!editor || isSaving) return null;
+		// `editor` is the Pixi engine and only exists for a timeline template.
+		if ((!editor && !isCode) || isSaving) return null;
 		isSaving = true;
 		saveError = '';
 		if (!silent) saveMessage = '';
+
+		if (isCode) return persistCode({ publish, silent, deferNavigation });
 
 		try {
 			const projectJson = documentToSave();
@@ -1212,6 +1320,26 @@
 
 	<!-- ── Studio: rail | stage | panel ──────────────────────────────── -->
 	<div class="flex min-h-0 flex-1">
+		{#if isCode}
+			<!--
+				A Remotion composition has no clips, so the rail's tools (text, media,
+				shapes) have nothing to author and the Pixi canvas has nothing to draw.
+				The stage brings its own code pane and live player.
+			-->
+			<div class="min-w-0 flex-1 {STAGE} {Z.canvas}">
+				<RemotionStage
+					bind:tsx={tsxSource}
+					inputProps={filling ? resolveValues(variableDefinitions, testValues) : {}}
+					width={template?.width || 1080}
+					height={template?.height || 1920}
+					fps={template?.fps || 30}
+					durationInFrames={template?.durationInFrames || 150}
+					showCode={showCodePane}
+					on:change={onCodeChange}
+					on:schema={onCodeSchema}
+				/>
+			</div>
+		{:else}
 		<div bind:this={railEl} class="h-full shrink-0 border-r-[3px] border-black"></div>
 
 		<div bind:this={canvasWrapEl} class="relative min-w-0 flex-1 overflow-hidden {STAGE} {Z.canvas}">
@@ -1339,6 +1467,7 @@
 				</div>
 			{/if}
 		</div>
+		{/if}
 
 		<!-- Right panel: clip properties + variables -->
 		<aside
@@ -1384,13 +1513,32 @@
 				class="ov-scroll min-h-0 flex-1 overflow-y-auto"
 				class:hidden={activeTab !== 'properties'}
 			>
-				<div bind:this={propsEl}></div>
+				{#if isCode}
+					<div class="px-3 py-3">
+						<h3 class="mb-1 text-xs font-semibold text-foreground">Composition</h3>
+						<p class="mb-3 text-[11px] leading-snug text-muted-foreground">
+							This template is a Remotion scene. Its layout lives in the code, and its
+							inputs are on the Variables tab.
+						</p>
+						<label class="flex items-center gap-2 text-xs text-muted-foreground">
+							<input
+								type="checkbox"
+								bind:checked={showCodePane}
+								class="h-3.5 w-3.5 rounded border-border bg-muted text-primary focus:ring-1 focus:ring-primary"
+							/>
+							Show the code pane
+						</label>
+					</div>
+				{/if}
+				<div bind:this={propsEl} class:hidden={isCode}></div>
+				{#if !isCode}
 				<ClipBindingsPanel
 					clip={selectedClip}
 					{variableDefinitions}
 					on:bind={onBind}
 					on:createAndBind={onCreateAndBind}
 				/>
+				{/if}
 			</div>
 
 			<div class="min-h-0 flex-1" class:hidden={activeTab !== 'variables'}>
@@ -1411,6 +1559,9 @@
 	</div>
 
 	<!-- ── Timeline dock ─────────────────────────────────────────────── -->
+	<!-- Clip-only: a Remotion composition has no tracks, and the player brings
+	     its own transport. -->
+	{#if !isCode}
 	<footer class="shrink-0 {STAGE} {Z.dock}">
 		<div
 			class="h-1.5 cursor-row-resize touch-none bg-gray-900 transition-colors hover:bg-brand-accent"
@@ -1436,6 +1587,7 @@
 			{/if}
 		</div>
 	</footer>
+	{/if}
 </div>
 
 <style>

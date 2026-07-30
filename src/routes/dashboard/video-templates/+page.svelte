@@ -41,8 +41,9 @@
 		return `${Math.round(seconds * 10) / 10}s`;
 	}
 
-	const editorPath = (template) =>
-		`/dashboard/video-templates/${template.uid}/${template.kind === 'tsx' ? 'code' : 'studio'}`;
+	// One editor for both kinds. The studio hosts a Remotion player and code pane
+	// for kind: 'tsx', so there is no longer a second door to send anyone through.
+	const editorPath = (template) => `/dashboard/video-templates/${template.uid}/studio`;
 
 	async function remove(template) {
 		if (deletingUid) return;

@@ -17,11 +17,10 @@
 			const response = await getVideoTemplate(uid);
 			template = response?.template || null;
 			if (!template) throw new Error('This video template no longer exists.');
-			if (template.kind === 'tsx') {
-				// Wrong door — Code-mode templates have no timeline document.
-				window.location.replace(`/dashboard/video-templates/${uid}/code`);
-				return;
-			}
+			// Both kinds open here. This used to bounce kind: 'tsx' to /code, which
+			// is what sent every AI- and MCP-generated template out of the studio and
+			// kept it out. /code now redirects back here, so the bounce would also
+			// be an infinite loop.
 		} catch (error) {
 			loadError = error?.message || 'Failed to open this video template.';
 		} finally {

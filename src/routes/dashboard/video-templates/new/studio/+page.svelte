@@ -16,12 +16,15 @@
 	import { page } from '$app/stores';
 	import VideoStudio from '$lib/components/video/VideoStudio.svelte';
 	import { buildStarterClips, starterById, starterDurationUs } from '$lib/video/starters.js';
+	import { STARTER_TSX } from '$lib/video/starter-tsx.js';
 
 	const int = (value, fallback) => {
 		const parsed = Math.round(Number(value));
 		return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 	};
 
+	// ?kind=tsx starts a new Remotion composition instead of a timeline scene.
+	$: kind = $page.url.searchParams.get('kind') === 'tsx' ? 'tsx' : 'timeline';
 	$: starter = starterById($page.url.searchParams.get('starter') || '');
 	$: width = int($page.url.searchParams.get('w'), 1080);
 	$: height = int($page.url.searchParams.get('h'), 1920);
@@ -37,8 +40,9 @@
 		// A starter names itself, so a list of saved templates does not fill up
 		// with "Untitled video" rows the user has to open to tell apart.
 		name: $page.url.searchParams.get('name') || starter?.name || 'Untitled video',
-		kind: 'timeline',
+		kind,
 		projectJson: null,
+		tsx: kind === 'tsx' ? STARTER_TSX : undefined,
 		variableDefinitions: [],
 		width,
 		height,

@@ -94,7 +94,9 @@
 				uid: template.uid,
 				format: format.label
 			});
-			goto(`/dashboard/video-templates/${template.uid}/code`);
+			// The studio opens Remotion templates directly now, so a generated
+			// scene lands in the same editor as everything else.
+			goto(`/dashboard/video-templates/${template.uid}/studio`);
 		} catch (error) {
 			genError = error?.message || 'Generation failed. Try rephrasing your prompt.';
 			generating = false;
