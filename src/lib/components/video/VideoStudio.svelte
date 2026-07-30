@@ -33,6 +33,7 @@
 	} from '../../../api/videoTemplates';
 	import { uploadBrandAsset, getBrandAssets } from '../../../api/brand-assets';
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
+	import InlineTextEditor from './InlineTextEditor.svelte';
 	import ClipBindingsPanel from './ClipBindingsPanel.svelte';
 	import {
 		detectReferences,
@@ -51,6 +52,7 @@
 		makeDefinition,
 		TOKEN_RE
 	} from '$lib/video/variables.js';
+	import { isInlineEditable } from '$lib/video/inline-text.js';
 	import {
 		STAGE,
 		PANEL,
@@ -130,6 +132,12 @@
 
 	// ── Selection ────────────────────────────────────────────────────────
 	let selectedClip = null;
+
+	// ── Inline text editing ──────────────────────────────────────────────
+	// The clip whose text is being typed on the canvas, or null. The engine
+	// fires clip:dblclick for Text and Caption clips only, so this is never set
+	// for a clip that could not be edited this way.
+	let editingTextClip = null;
 
 	// ── History ──────────────────────────────────────────────────────────
 	// Derived from the engine store's own history/future stacks (pushed through
@@ -316,6 +324,19 @@
 			});
 			trackDirty = true;
 
+			// Double-clicking text on the canvas opens the inline editor. The
+			// engine only fires this for Text and Caption clips, and only on two
+			// pointer-downs under 350ms on the same clip, so it cannot collide
+			// with a normal select-then-drag.
+			editor.studio.on('clip:dblclick', ({ clip }) => {
+				if (!isInlineEditable(clip)) return;
+				// Re-read from the store: the event payload is the clip as it was
+				// when the pointer went down, and a stale `text` would be written
+				// straight back on commit, silently reverting an edit made in the
+				// properties panel a moment earlier.
+				editingTextClip = editor.core.store.getState().clips?.[clip.id] || clip;
+			});
+
 			// Dev-only handles for /dev/studio-preview: the selection store lives in
 			// the vendored React runtime, so a harness session cannot reach it
 			// without this.
@@ -352,7 +373,12 @@
 			// The vendored panels keep selection in a zustand store. Subscribe so
 			// the Svelte side (bindings panel) sees the same selection.
 			studioRuntime = await import('$lib/video/vendor/openvideo-studio/runtime');
-			if (import.meta.env.DEV) window.__studioRuntime = studioRuntime;
+			if (import.meta.env.DEV) {
+				window.__studioRuntime = studioRuntime;
+				// The engine handles, for /dev/studio-preview. Inline text editing needs
+				// the Studio instance to verify sprite visibility against real pixels.
+				window.__videoEditor = editor;
+			}
 			const readSelection = (state) => {
 				selectedClip = state?.selectedClips?.length === 1 ? state.selectedClips[0] : null;
 			};
@@ -1135,6 +1161,24 @@
 				</div>
 			{/if}
 			<canvas bind:this={canvasEl} class="block h-full w-full"></canvas>
+
+			<!--
+				Inline text editor, positioned over the clip it edits. Keyed on the
+				clip id so double-clicking a different clip while one is open
+				remounts rather than reusing a box still holding the old text.
+			-->
+			{#if editingTextClip && editor}
+				{#key editingTextClip.id}
+					<InlineTextEditor
+						studio={editor.studio}
+						core={editor.core}
+						clip={editingTextClip}
+						{canvasEl}
+						wrapperEl={canvasWrapEl}
+						on:close={() => (editingTextClip = null)}
+					/>
+				{/key}
+			{/if}
 
 			<!-- Render result / progress, floating over the stage -->
 			{#if isExporting || renderUrl || exportError}
