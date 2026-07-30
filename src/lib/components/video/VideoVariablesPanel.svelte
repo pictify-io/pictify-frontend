@@ -37,6 +37,12 @@
 	export let autoAdded = [];
 	/** @type {Object} — { name: { tokens: number, bindings: number } } */
 	export let usage = {};
+	/**
+	 * A Remotion composition renders with these values continuously — there is no
+	 * preview mode to enter, so the copy below must not point at a button that is
+	 * not there for this kind of template.
+	 */
+	export let alwaysLive = false;
 	/** @type {boolean} — is fill-values preview mode on */
 	export let filling = false;
 
@@ -396,6 +402,9 @@
 				{#if filling}
 					<span class="font-black uppercase tracking-widest text-brand-accent">Previewing</span>
 					these values on the canvas. Your template still holds the tokens.
+				{:else if alwaysLive}
+					<span class={LABEL}>Preview values</span> — shown in the player as you type, and
+					prefilled when you render.
 				{:else}
 					<span class={LABEL}>Preview values</span> — used by
 					<span class="font-black text-gray-200">Preview</span> and prefilled when you render.

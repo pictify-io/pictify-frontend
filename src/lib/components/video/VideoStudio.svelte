@@ -107,6 +107,19 @@
 	let tsxSource = template?.tsx || '';
 	let showCodePane = true;
 
+	/*
+	 * A composition reads its values as inputProps, so for kind: 'tsx' they are
+	 * ALWAYS live — there is no authored document to substitute tokens into and
+	 * nothing to switch between.
+	 *
+	 * This used to be gated on `filling`, the timeline's preview mode, which
+	 * meant values never reached the player at all: startFilling() returns early
+	 * without a Pixi engine, so `filling` could never become true for a
+	 * composition and inputProps stayed permanently empty. Adding a variable and
+	 * typing a value did nothing.
+	 */
+	$: previewValues = isCode ? resolveValues(variableDefinitions, testValues) : {};
+
 	const onCodeChange = (event) => {
 		tsxSource = event.detail.tsx;
 		markDirty();
@@ -125,15 +138,37 @@
 		const fields = event.detail.fields;
 		if (!Array.isArray(fields) || !fields.length) return;
 		const byName = new Map(variableDefinitions.map((v) => [v.name, v]));
+
+		// Schema fields first, in the order the composition declares them.
 		const next = fields.map((field) => ({
 			...makeDefinition(field.name, field.type || 'text'),
 			...(byName.get(field.name) || {}),
 			name: field.name
 		}));
+
+		// Then anything declared by hand that the schema does not mention.
+		//
+		// Dropping these — which is what mapping over `fields` alone did — DELETED
+		// a variable the user had just added, on the next recompile. That fires
+		// 800ms after any code edit and again on mount, so a new variable appeared
+		// and then silently vanished. Keeping it is also the honest reading: a
+		// value the composition ignores is a no-op, whereas losing a declaration
+		// loses the default and description typed with it.
+		const declared = new Set(next.map((v) => v.name));
+		for (const definition of variableDefinitions) {
+			if (!declared.has(definition.name)) next.push(definition);
+		}
+
 		if (JSON.stringify(next) !== JSON.stringify(variableDefinitions)) {
 			variableDefinitions = next;
 			markDirty();
 		}
+
+		// A field the composition declares IS used by it — the panel's usage line
+		// otherwise reads "not used in this video yet" beside a variable that is
+		// visibly driving the player, because computeUsage scans clips for tokens
+		// and bindings and a composition has neither.
+		usage = Object.fromEntries(fields.map((f) => [f.name, { tokens: 1, bindings: 0 }]));
 	};
 
 	// ── Element refs ─────────────────────────────────────────────────────
@@ -1230,6 +1265,13 @@
 			</span>
 		{/if}
 
+		<!--
+			Timeline-only. A composition already renders with its values, so there is
+			no state to toggle into; leaving the button here would be a control that
+			does nothing, which is what it did before this branch existed
+			(startFilling returns early with no Pixi engine).
+		-->
+		{#if !isCode}
 		<button
 			type="button"
 			on:click={toggleFilling}
@@ -1247,6 +1289,15 @@
 			<i class="fa {filling ? 'fa-eye-slash' : 'fa-eye'} text-[10px]" aria-hidden="true"></i>
 			{filling ? 'Exit preview' : 'Preview'}
 		</button>
+		{:else if variableCount > 0}
+			<span
+				class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-gray-800 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-300"
+				title="A Remotion scene always renders with your values, so there is nothing to toggle"
+			>
+				<i class="fa fa-eye text-[10px]" aria-hidden="true"></i>
+				Values live
+			</span>
+		{/if}
 
 		<button
 			type="button"
@@ -1329,7 +1380,7 @@
 			<div class="min-w-0 flex-1 {STAGE} {Z.canvas}">
 				<RemotionStage
 					bind:tsx={tsxSource}
-					inputProps={filling ? resolveValues(variableDefinitions, testValues) : {}}
+					inputProps={previewValues}
 					width={template?.width || 1080}
 					height={template?.height || 1920}
 					fps={template?.fps || 30}
@@ -1543,6 +1594,7 @@
 
 			<div class="min-h-0 flex-1" class:hidden={activeTab !== 'variables'}>
 				<VideoVariablesPanel
+					alwaysLive={isCode}
 					bind:variableDefinitions
 					bind:testValues
 					{autoAdded}
