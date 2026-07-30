@@ -57,15 +57,26 @@ export const readEventStream = async (response, onEvent) => {
 	const decoder = new TextDecoder();
 	let buffer = '';
 
-	while (true) {
-		const { done, value } = await reader.read();
-		if (done) break;
-		// `stream: true` so a multi-byte character split across chunks is not
-		// decoded as two replacement characters.
-		buffer += decoder.decode(value, { stream: true });
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			// `stream: true` so a multi-byte character split across chunks is not
+			// decoded as two replacement characters.
+			buffer += decoder.decode(value, { stream: true });
 
-		const { events, rest } = drainFrames(buffer);
-		buffer = rest;
-		for (const { event, data } of events) onEvent(event, data);
+			const { events, rest } = drainFrames(buffer);
+			buffer = rest;
+			for (const { event, data } of events) onEvent(event, data);
+		}
+	} finally {
+		/*
+		 * Release the connection even when a handler throws or the caller gives
+		 * up. An abandoned reader leaves the socket open until the server closes
+		 * it, and these streams run for ten to fifteen seconds — a handful of
+		 * them exhausts the browser's six-connections-per-host budget and every
+		 * later request to the API queues behind them.
+		 */
+		reader.cancel?.().catch(() => {});
 	}
 };

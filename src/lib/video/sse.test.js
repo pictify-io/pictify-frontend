@@ -19,16 +19,17 @@ const frame = (event, data) => `event: ${event}\ndata: ${JSON.stringify(data)}\n
 const responseOf = (chunks) => {
 	const encoder = new TextEncoder();
 	let i = 0;
-	return {
-		body: {
-			getReader: () => ({
-				read: async () =>
-					i < chunks.length
-						? { done: false, value: encoder.encode(chunks[i++]) }
-						: { done: true, value: undefined }
-			})
+	const reader = {
+		cancelled: false,
+		read: async () =>
+			i < chunks.length
+				? { done: false, value: encoder.encode(chunks[i++]) }
+				: { done: true, value: undefined },
+		cancel: async () => {
+			reader.cancelled = true;
 		}
 	};
+	return { body: { getReader: () => reader }, reader };
 };
 
 const collect = async (chunks) => {
@@ -36,6 +37,25 @@ const collect = async (chunks) => {
 	await readEventStream(responseOf(chunks), (event, data) => seen.push([event, data]));
 	return seen;
 };
+
+test('the reader is released when the stream ends', async () => {
+	// An abandoned reader holds the socket until the server closes it, and these
+	// streams run for ten to fifteen seconds. A few leaked ones exhaust the
+	// browser's per-host connection budget and every later API call queues.
+	const response = responseOf([frame('done', { tsx: 'x' })]);
+	await readEventStream(response, () => {});
+	assert.equal(response.reader.cancelled, true);
+});
+
+test('the reader is released even when a handler throws', async () => {
+	const response = responseOf([frame('status', { stage: 'a' })]);
+	await assert.rejects(() =>
+		readEventStream(response, () => {
+			throw new Error('handler blew up');
+		})
+	);
+	assert.equal(response.reader.cancelled, true);
+});
 
 // ── drainFrames ──────────────────────────────────────────────────────────
 
