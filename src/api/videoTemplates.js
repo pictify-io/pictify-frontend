@@ -117,6 +117,24 @@ const generateVideoTemplate = async (payload) => {
 };
 
 /**
+ * Copy a template. The natural way to make a variant — a seasonal cut, or a
+ * safe copy before an edit you are not sure about.
+ *
+ * The copy is always a draft, whatever the source was: a duplicate is by
+ * definition unreviewed, and inheriting `published` would put an unedited copy
+ * straight into whatever consumes published templates.
+ *
+ * @param {string} uid
+ * @param {Object} [options]
+ * @param {string} [options.name] - defaults to "<source name> (copy)"
+ * @returns {Promise<Object>} - { template }
+ */
+const duplicateVideoTemplate = async (uid, { name } = {}) => {
+	const response = await backend.post(`/video/templates/${uid}/duplicate`, name ? { name } : {});
+	return response;
+};
+
+/**
  * Upload footage or audio for the timeline studio.
  *
  * The studio must never persist a blob: URL — it dies on reload and a server
@@ -184,6 +202,7 @@ export {
 	previewVideoTemplateFrame,
 	renderVideoTemplate,
 	generateVideoTemplate,
+	duplicateVideoTemplate,
 	uploadVideoMedia,
 	listVideoMedia,
 	deleteVideoMedia

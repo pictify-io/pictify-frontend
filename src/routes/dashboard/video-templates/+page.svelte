@@ -8,13 +8,18 @@
 	 * it belongs alongside the other two ways to start.
 	 */
 	import { onMount } from 'svelte';
-	import { getVideoTemplates, deleteVideoTemplate } from '../../../api/videoTemplates';
+	import {
+		getVideoTemplates,
+		deleteVideoTemplate,
+		duplicateVideoTemplate
+	} from '../../../api/videoTemplates';
 	import { analytics } from '$lib/analytics.js';
 
 	let isLoading = true;
 	let loadError = '';
 	let templates = [];
 	let deletingUid = '';
+	let duplicatingUid = '';
 	let actionError = '';
 
 	async function loadTemplates() {
@@ -58,6 +63,25 @@
 			actionError = error?.message || 'Could not delete that template.';
 		} finally {
 			deletingUid = '';
+		}
+	}
+
+	async function duplicate(template) {
+		if (duplicatingUid) return;
+		duplicatingUid = template.uid;
+		actionError = '';
+		try {
+			const { template: copy } = await duplicateVideoTemplate(template.uid);
+			// Insert next to the original rather than reloading the list: the copy
+			// belongs beside the thing it came from, and a full refetch would jump
+			// the page back to the top.
+			const at = templates.findIndex((t) => t.uid === template.uid);
+			templates = [...templates.slice(0, at + 1), copy, ...templates.slice(at + 1)];
+			analytics.track?.('Video Template Duplicated', { from: template.uid, to: copy.uid });
+		} catch (error) {
+			actionError = error?.message || 'Could not duplicate that template.';
+		} finally {
+			duplicatingUid = '';
 		}
 	}
 
@@ -254,10 +278,23 @@
 								Render
 							</a>
 							<button
+								on:click={() => duplicate(template)}
+								disabled={duplicatingUid === template.uid}
+								aria-label="Duplicate {template.name || 'this template'}"
+								title="Make a copy"
+								class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg border-[2px] border-black bg-white text-gray-500 transition-all hover:bg-brand-accent hover:text-black disabled:opacity-50 focus-brutal"
+							>
+								{#if duplicatingUid === template.uid}
+									<i class="fa fa-spinner fa-spin text-[10px]" aria-hidden="true"></i>
+								{:else}
+									<i class="fa fa-clone text-[10px]" aria-hidden="true"></i>
+								{/if}
+							</button>
+							<button
 								on:click={() => remove(template)}
 								disabled={deletingUid === template.uid}
 								aria-label="Delete {template.name || 'this template'}"
-								class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg border-[2px] border-black bg-white text-gray-500 transition-all hover:bg-brand-danger hover:text-white disabled:opacity-50 focus-brutal"
+								class="inline-flex h-8 w-8 items-center justify-center rounded-lg border-[2px] border-black bg-white text-gray-500 transition-all hover:bg-brand-danger hover:text-white disabled:opacity-50 focus-brutal"
 							>
 								{#if deletingUid === template.uid}
 									<i class="fa fa-spinner fa-spin text-[10px]" aria-hidden="true"></i>

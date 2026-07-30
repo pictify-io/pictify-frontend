@@ -11,6 +11,27 @@
 	import { goto } from '$app/navigation';
 	import { generateVideoTemplate } from '../../../../api/videoTemplates';
 	import { analytics } from '$lib/analytics.js';
+	import { STARTERS, buildStarterClips } from '$lib/video/starters.js';
+	import { readGradient, gradientCss } from '$lib/video/gradients.js';
+
+	/**
+	 * The swatch for a starter card, read back from the scene the card actually
+	 * opens rather than stored alongside it. A hand-kept preview colour drifts
+	 * the first time someone retunes a gradient, and a card that lies about what
+	 * it opens is worse than no card.
+	 */
+	function starterSwatch(id) {
+		const clips = buildStarterClips(id, { width: 1080, height: 1920 }) || [];
+		const backdrop = clips.find((clip) => clip.type === 'Backdrop');
+		if (backdrop) {
+			const gradient = readGradient(backdrop);
+			if (gradient) return gradientCss(gradient);
+		}
+		// Starters meant to sit over footage have no backdrop — show the plate
+		// colour of their first shape so the card is not blank.
+		const shape = clips.find((clip) => clip.type === 'Shape');
+		return shape?.style?.fill || '#0f172a';
+	}
 
 	const FORMATS = [
 		{ label: '9:16', hint: 'Reels, Shorts, TikTok', width: 1080, height: 1920 },
@@ -29,14 +50,19 @@
 	let generating = false;
 	let genError = '';
 
-	function openStudio() {
+	function openStudio(starterId) {
 		const params = new URLSearchParams({
 			w: String(format.width),
 			h: String(format.height),
 			fps: '30'
 		});
 		if (name.trim()) params.set('name', name.trim());
-		analytics.track?.('Video Template Created', { via: 'studio', format: format.label });
+		if (starterId) params.set('starter', starterId);
+		analytics.track?.('Video Template Created', {
+			via: starterId ? 'starter' : 'studio',
+			format: format.label,
+			starter: starterId || null
+		});
 		goto(`/dashboard/video-templates/new/studio?${params.toString()}`);
 	}
 
@@ -160,10 +186,62 @@
 		</div>
 	</div>
 
+	<!-- Start from a scene: the fastest path, and the one that teaches the loop -->
+	<div class="mb-8">
+		<div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+			<h2 class="text-sm font-black uppercase tracking-widest text-black">Start from a scene</h2>
+			<p class="text-xs font-bold text-gray-500">
+				Every scene already has
+				<code class="rounded border-[2px] border-black bg-gray-50 px-1 font-mono text-[10px]">
+					{'{{'}variables{'}}'}
+				</code>
+				in it — edit the words, then render one per row.
+			</p>
+		</div>
+
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{#each STARTERS as starter (starter.id)}
+				<button
+					on:click={() => openStudio(starter.id)}
+					class="group flex flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-white text-left shadow-brutal-md transition-all duration-200 hover:-translate-y-1 hover:shadow-brutal-xl focus-brutal"
+				>
+					<span
+						class="flex h-24 items-center justify-center border-b-[3px] border-black"
+						style="background-image:{starterSwatch(starter.id)}; background-color:{starterSwatch(
+							starter.id
+						)};"
+						aria-hidden="true"
+					>
+						<span
+							class="rounded-lg border-[2px] border-black bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-black"
+						>
+							{format.label}
+						</span>
+					</span>
+					<span class="flex flex-1 flex-col p-4">
+						<span class="text-sm font-black tracking-tight text-black">{starter.name}</span>
+						<span class="mt-1 text-xs font-bold leading-snug text-gray-600">
+							{starter.description}
+						</span>
+						<span class="mt-3 flex flex-wrap gap-1">
+							{#each starter.tokens as token (token)}
+								<span
+									class="rounded-md border-[2px] border-black bg-gray-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-gray-700"
+								>
+									{token}
+								</span>
+							{/each}
+						</span>
+					</span>
+				</button>
+			{/each}
+		</div>
+	</div>
+
 	<!-- Authoring modes -->
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 		<!-- Studio: the default, given the most weight -->
-		<button on:click={openStudio} class="{CARD} lg:col-span-2 !bg-brand-accent/15 shadow-brutal-2xl">
+		<button on:click={() => openStudio()} class="{CARD} lg:col-span-2 !bg-brand-accent/15 shadow-brutal-2xl">
 			<div class="flex items-start justify-between gap-4">
 				<div
 					class="flex h-12 w-12 flex-shrink-0 rotate-3 items-center justify-center rounded-xl border-[3px] border-black bg-brand-accent shadow-brutal-sm"

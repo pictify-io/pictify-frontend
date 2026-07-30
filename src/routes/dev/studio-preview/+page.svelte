@@ -19,8 +19,14 @@
 	import { dev } from '$app/environment';
 	import { page } from '$app/stores';
 	import VideoStudio from '$lib/components/video/VideoStudio.svelte';
+	import { buildStarterClips, starterById } from '$lib/video/starters.js';
 
 	$: full = $page.url.searchParams.get('full') === '1';
+	// ?starter=<id> with ?full=1 previews a seeded scene without a backend.
+	$: harnessStarter = starterById($page.url.searchParams.get('starter') || '');
+	$: harnessStarterClips = harnessStarter
+		? buildStarterClips(harnessStarter.id, { width: 1080, height: 1920 })
+		: null;
 
 	const draft = {
 		uid: null,
@@ -145,7 +151,7 @@
 {#if !dev}
 	<p>Not available.</p>
 {:else if full}
-	<VideoStudio template={draft} />
+	<VideoStudio template={draft} starterClips={harnessStarterClips} />
 {:else}
 	<div class="flex h-screen w-full flex-col bg-gray-950 text-gray-100">
 		<header class="flex h-10 shrink-0 items-center gap-3 border-b-[3px] border-black bg-gray-900 px-3">

@@ -77,6 +77,16 @@
 	 */
 	export let template = null;
 
+	/**
+	 * Clips to seed a brand-new template with — a starter scene. Added through
+	 * core.clip.add after the engine mounts, which is the same door the Text and
+	 * Shapes panels use, so a starter cannot be more wrong than a hand-built
+	 * scene. Ignored when the template already has a document: re-seeding a saved
+	 * template would duplicate every clip on reload.
+	 * @type {Array|null}
+	 */
+	export let starterClips = null;
+
 	// ── Element refs ─────────────────────────────────────────────────────
 	let canvasEl;
 	let canvasWrapEl;
@@ -322,6 +332,29 @@
 					mountError = message;
 				}
 			});
+			// Seed the starter BEFORE tracking dirty state, so an untouched starter
+			// does not immediately read as unsaved changes — the user has not
+			// edited anything yet. Saving still captures it, because save reads
+			// the document rather than the dirty flag.
+			if (starterClips?.length && !template?.projectJson) {
+				for (const clip of starterClips) {
+					try {
+						editor.core.clip.add(structuredClone(clip));
+					} catch (error) {
+						// One bad clip should cost its own layer, not the whole scene.
+						console.error('Starter clip rejected:', error);
+					}
+				}
+				await tick();
+
+
+				// Declare the starter's {{tokens}} straight away, so the Variables
+				// tab is populated the moment the studio opens instead of only
+				// after the user's first edit. runDetect, not scheduleDetect: the
+				// debounce exists for typing, and there is nothing to debounce here.
+				runDetect();
+			}
+
 			trackDirty = true;
 
 			// Double-clicking text on the canvas opens the inline editor. The
@@ -386,6 +419,38 @@
 			readSelection(studioRuntime.useStudioStore.getState());
 
 			observeCanvasResize();
+
+			// Park the playhead where the whole starter scene is on screen.
+			//
+			// Starters stagger their clips, which is what makes them read as video
+			// rather than a still. But the playhead starts at 0, so the first thing
+			// the user sees is a headline alone on an empty artboard and the scene
+			// looks half-loaded. Seeking past the last entrance shows the
+			// composition as designed.
+			//
+			// This has to run AFTER mountTimelinePanel — that panel resets the
+			// playhead to 0 as it initialises, so seeking any earlier looks like it
+			// worked (currentTime reads back correctly for a moment) and is then
+			// silently undone.
+			if (starterClips?.length && !template?.projectJson) {
+				const lastEntrance = starterClips.reduce(
+					(latest, clip) => Math.max(latest, clip.timing?.display?.from ?? 0),
+					0
+				);
+				if (lastEntrance > 0) {
+					try {
+						// transport.seek, not `studio.currentTime = x`: the setter moves
+						// the playhead without telling the transport UI, so the canvas
+						// showed 0.7s while the readout still said 00:00.
+						await editor.studio.transport.seek(lastEntrance + 200_000);
+					} catch (error) {
+						// Cosmetic. A scene that opens on frame 0 is worse-looking, not
+						// broken, and is not worth failing the mount over.
+						console.error('Could not seek to the starter scene:', error);
+					}
+				}
+			}
+
 			runDetect();
 
 			const { isClientExportSupported } = await import('$lib/video/exportHost.js');
