@@ -20,6 +20,7 @@
 	 * typing it.
 	 */
 	import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
+	import { parseSequences, retimeSequence, toTimelineBars } from '$lib/video/sequence-timing.js';
 
 	/** The composition source. */
 	export let tsx = '';
@@ -55,6 +56,65 @@
 	 * is height-bound, a 16:9 embed is width-bound. Pinning the wrong one either
 	 * overflows the stage or leaves the video tiny in the middle of it.
 	 */
+	/*
+	 * Beats the composition declares as <Sequence>, as draggable bars.
+	 *
+	 * This is the only part of a Remotion scene that can be edited from a UI
+	 * without deciding what the author meant: `from` and `durationInFrames` are
+	 * plain numbers with an obvious visual meaning. Everything else — the
+	 * interpolations, the springs — is arithmetic on the frame and has no
+	 * timeline representation to drag.
+	 *
+	 * A composition with no sequences simply gets no track, rather than an empty
+	 * one implying it should have beats.
+	 */
+	$: bars = toTimelineBars(parseSequences(tsx), durationInFrames);
+	$: editableBars = bars.filter((b) => b.editable).length;
+
+	let dragging = null;
+
+	const startDrag = (event, bar, mode) => {
+		if (!bar.editable) return;
+		event.preventDefault();
+		event.stopPropagation();
+		const track = event.currentTarget.closest('.ovs-track');
+		if (!track) return;
+		dragging = {
+			index: bar.index,
+			mode,
+			trackWidth: track.getBoundingClientRect().width,
+			startX: event.clientX,
+			from: bar.from ?? 0,
+			duration: bar.durationInFrames ?? 1
+		};
+		window.addEventListener('pointermove', onDrag);
+		window.addEventListener('pointerup', endDrag, { once: true });
+	};
+
+	const onDrag = (event) => {
+		if (!dragging) return;
+		const total = Math.max(1, Math.round(durationInFrames) || 1);
+		// Pixels to frames through the track's own width, so the mapping holds at
+		// any panel size.
+		const deltaFrames = ((event.clientX - dragging.startX) / dragging.trackWidth) * total;
+		const timing =
+			dragging.mode === 'move'
+				? { from: dragging.from + deltaFrames }
+				: { durationInFrames: dragging.duration + deltaFrames };
+		// Rewrites the source on every move so the player follows the drag. The
+		// stage already debounces recompiles, so this does not thrash.
+		const next = retimeSequence(tsx, dragging.index, timing);
+		if (next !== tsx) {
+			tsx = next;
+			dispatch('change', { tsx });
+		}
+	};
+
+	const endDrag = () => {
+		dragging = null;
+		window.removeEventListener('pointermove', onDrag);
+	};
+
 	$: isPortrait = (Number(height) || 1920) >= (Number(width) || 1080);
 	$: playerStyle = `aspect-ratio: ${Math.max(1, Math.round(width) || 1080)} / ${Math.max(1, Math.round(height) || 1920)}; ${
 		isPortrait ? 'height: 100%; max-width: 100%;' : 'width: 100%; max-height: 100%;'
@@ -141,6 +201,7 @@
 	});
 
 	onDestroy(() => {
+		window.removeEventListener('pointermove', onDrag);
 		clearTimeout(applyTimer);
 		if (playerHost && playerEl) playerHost.unmount(playerEl);
 	});
@@ -205,13 +266,72 @@
 		</div>
 	{/if}
 
-	<div class="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-gray-950 p-4">
-		<div
-			bind:this={playerEl}
-			data-testid="player-root"
-			class="overflow-hidden rounded-lg bg-black"
-			style={playerStyle}
-		></div>
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-gray-950">
+		<div class="flex min-h-0 flex-1 items-center justify-center p-4">
+			<div
+				bind:this={playerEl}
+				data-testid="player-root"
+				class="overflow-hidden rounded-lg bg-black"
+				style={playerStyle}
+			></div>
+		</div>
+
+		{#if bars.length}
+			<!--
+				The beats this composition declares, as bars you can drag. Only these
+				two numbers are safely editable from a UI; the rest of a Remotion
+				scene is arithmetic on the frame with no timeline representation.
+			-->
+			<div class="shrink-0 border-t-[3px] border-black bg-gray-900 px-3 py-2" data-testid="sequence-track">
+				<div class="mb-1.5 flex items-baseline justify-between">
+					<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+						Beats
+					</span>
+					<span class="text-[10px] font-bold text-gray-500">
+						{#if editableBars === bars.length}
+							Drag to retime
+						{:else}
+							{editableBars} of {bars.length} draggable — the rest use computed timing
+						{/if}
+					</span>
+				</div>
+
+				<div class="ovs-track relative w-full">
+					{#each bars as bar (bar.index)}
+						<div
+							class="relative mb-1 h-6 w-full"
+							style="padding-left: {bar.depth * 10}px"
+							title={bar.editable
+								? `${bar.label || 'Beat'} — frames ${bar.start} to ${bar.start + bar.length}`
+								: `${bar.label || 'Beat'} — computed timing, edit it in the code`}
+						>
+							<div
+								role={bar.editable ? 'button' : 'presentation'}
+								tabindex={bar.editable ? 0 : -1}
+								on:pointerdown={(e) => startDrag(e, bar, 'move')}
+								class="absolute top-0 flex h-6 items-center rounded border-[2px] px-1.5 text-[10px] font-bold
+									{bar.editable
+									? 'cursor-grab border-black bg-brand-accent text-black active:cursor-grabbing'
+									: 'cursor-not-allowed border-gray-700 bg-gray-800 text-gray-400'}"
+								style="left: {bar.left * 100}%; width: max(28px, {bar.width * 100}%);"
+							>
+								<span class="truncate">{bar.label || `Beat ${bar.index + 1}`}</span>
+								{#if bar.editable}
+									<!-- Right edge resizes duration; the body moves the start. -->
+									<span
+										role="button"
+										tabindex="-1"
+										aria-label="Resize {bar.label || 'beat'}"
+										on:pointerdown|stopPropagation={(e) => startDrag(e, bar, 'resize')}
+										class="absolute inset-y-0 right-0 w-2 cursor-ew-resize rounded-r bg-black/25 hover:bg-black/45"
+									></span>
+								{/if}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>
 
