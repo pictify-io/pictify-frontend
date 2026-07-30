@@ -93,10 +93,32 @@ const fieldsFromZod = (schema) => {
 	return Object.entries(shape).map(([name, type]) => {
 		const { node, fallback } = unwrapZod(type);
 		const typeName = node?._def?.typeName;
+		const describe = node?._def?.description || node?.description;
+		/*
+		 * zod has no colour or image type, so a composition declares intent with
+		 * .describe('color') / .describe('image'). That is the only way a string
+		 * field can ask for a swatch instead of a text box, and the generator is
+		 * told to use it.
+		 */
+		const described = /^(color|colour|image|video|audio)$/i.exec(String(describe || '').trim());
+
 		let fieldType = 'string';
 		if (typeName === 'ZodNumber') fieldType = 'number';
 		else if (typeName === 'ZodBoolean') fieldType = 'boolean';
+		else if (typeName === 'ZodEnum') fieldType = 'text';
+		else if (described) fieldType = described[1].toLowerCase().replace('colour', 'color');
 		else if (looksLikeColor(name, fallback)) fieldType = 'color';
+
+		/*
+		 * Everything below used to be discarded, so `z.number().min(8).max(200)`
+		 * and `z.enum([...])` arrived at the panel indistinguishable from a bare
+		 * string and rendered as a text box. The bounds and the choices are the
+		 * whole difference between a no-code control and a typed field.
+		 */
+		const checks = node?._def?.checks || [];
+		const min = checks.find((c) => c.kind === 'min')?.value;
+		const max = checks.find((c) => c.kind === 'max')?.value;
+		const enumValues = typeName === 'ZodEnum' ? node?._def?.values : null;
 		const value =
 			fallback !== undefined
 				? fallback
@@ -105,11 +127,25 @@ const fieldsFromZod = (schema) => {
 				: fieldType === 'boolean'
 				? false
 				: '';
-		return { name, type: fieldType, default: value };
+		return {
+			name,
+			type: fieldType,
+			default: value,
+			...(min !== undefined ? { min } : {}),
+			...(max !== undefined ? { max } : {}),
+			...(Array.isArray(enumValues) && enumValues.length ? { options: enumValues } : {}),
+			...(describe && !described ? { description: describe } : {})
+		};
 	});
 };
 
-const KNOWN_TYPES = ['string', 'number', 'boolean', 'color', 'image'];
+// Kept in step with VideoTemplate.VARIABLE_TYPES, so a composition can declare
+// any type the rest of the product already persists and renders.
+const KNOWN_TYPES = ['string', 'text', 'number', 'boolean', 'color', 'image', 'video', 'audio'];
+
+// Control metadata a plain-object schema may carry. Passed through verbatim —
+// control-spec.js decides what any of it means, so the parser stays a parser.
+const CONTROL_KEYS = ['min', 'max', 'step', 'options', 'group', 'label', 'description'];
 
 const fieldsFromPlainObject = (schema) =>
 	Object.entries(schema)
@@ -127,7 +163,11 @@ const fieldsFromPlainObject = (schema) =>
 					? false
 					: '';
 			if (type === 'string' && looksLikeColor(name, fallback)) type = 'color';
-			return { name, type, default: fallback };
+			const extras = {};
+			for (const key of CONTROL_KEYS) {
+				if (def[key] !== undefined) extras[key] = def[key];
+			}
+			return { name, type, default: fallback, ...extras };
 		});
 
 const extractSchemaFields = (schema) => {

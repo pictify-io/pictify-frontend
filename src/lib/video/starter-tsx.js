@@ -19,11 +19,20 @@ export const STARTER_TSX = `import {
 } from 'remotion';
 
 export const schema = {
-  title: { type: 'string', default: 'Hello from Pictify' },
-  accentColor: { type: 'color', default: '#FACC15' }
+  title: { type: 'text', default: 'Hello from Pictify', group: 'Copy' },
+  fontSize: { type: 'number', default: 120, min: 32, max: 220, group: 'Copy' },
+  align: { type: 'text', default: 'center', options: ['left', 'center', 'right'], group: 'Copy' },
+  accentColor: { type: 'color', default: '#FACC15', group: 'Brand' },
+  backgroundColor: { type: 'color', default: '#111111', group: 'Brand' }
 };
 
-export default function Scene({ title = 'Hello from Pictify', accentColor = '#FACC15' }) {
+export default function Scene({
+  title = 'Hello from Pictify',
+  fontSize = 120,
+  align = 'center',
+  accentColor = '#FACC15',
+  backgroundColor = '#111111'
+}) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
@@ -35,7 +44,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: '#111111',
+        backgroundColor,
         justifyContent: 'center',
         alignItems: 'center',
         opacity: fadeOut
@@ -44,9 +53,9 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
       <h1
         style={{
           color: accentColor,
-          fontSize: 120,
+          fontSize,
           fontFamily: 'Arial, sans-serif',
-          textAlign: 'center',
+          textAlign: align,
           transform: 'scale(' + pop + ')'
         }}
       >

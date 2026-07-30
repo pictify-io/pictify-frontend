@@ -140,11 +140,32 @@
 		const byName = new Map(variableDefinitions.map((v) => [v.name, v]));
 
 		// Schema fields first, in the order the composition declares them.
-		const next = fields.map((field) => ({
-			...makeDefinition(field.name, field.type || 'text'),
-			...(byName.get(field.name) || {}),
-			name: field.name
-		}));
+		//
+		// The control metadata (min/max/step/options/group) has to come across or
+		// the panel cannot render anything better than a text box: a slider with
+		// no bounds falls back to a name-based guess, and a field with choices
+		// renders as free text. It is applied AFTER the existing definition
+		// because it comes from the code, which is authoritative for structure —
+		// while defaultValue and description stay the user's if they set one.
+		const next = fields.map((field) => {
+			const existing = byName.get(field.name) || {};
+			const control = {};
+			for (const key of ['min', 'max', 'step', 'options', 'group', 'label']) {
+				if (field[key] !== undefined) control[key] = field[key];
+			}
+			return {
+				...makeDefinition(field.name, field.type || 'text'),
+				// The composition's own default is what the player renders with, so
+				// it is also what the panel should show as the placeholder.
+				...(field.default !== undefined && field.default !== ''
+					? { defaultValue: field.default }
+					: {}),
+				...(field.description ? { description: field.description } : {}),
+				...existing,
+				...control,
+				name: field.name
+			};
+		});
 
 		// Then anything declared by hand that the schema does not mention.
 		//

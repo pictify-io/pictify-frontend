@@ -19,6 +19,7 @@
 	import { createEventDispatcher, tick } from 'svelte';
 	import { sampleAll } from '$lib/utils/sample-variable-generator';
 	import VariablePropertyPanel from '../editor/html/VariablePropertyPanel.svelte';
+	import { controlFor } from '$lib/video/control-spec.js';
 	import { humanizeName, VARIABLE_TYPES } from '$lib/video/variables.js';
 	import {
 		HEADING,
@@ -192,6 +193,29 @@
 		if (!filling) dispatch('startFilling');
 	}
 
+	/*
+	 * A <input type="color"> only accepts #rrggbb. Anything else — a named
+	 * colour, rgb(), an empty field before the user has typed — makes the swatch
+	 * silently show black, which reads as "the value is black" rather than "there
+	 * is no value". The text field beside it stays authoritative for those.
+	 */
+	const colorValue = (value) => {
+		const raw = String(value ?? '').trim();
+		if (/^#[0-9a-f]{6}$/i.test(raw)) return raw;
+		const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(raw);
+		if (short) return `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}`;
+		return '#000000';
+	};
+
+	/** A range input with a non-numeric value jumps to its midpoint; clamp instead. */
+	const numberValue = (value, ctl) => {
+		const n = Number(value);
+		if (!Number.isFinite(n)) return ctl.min;
+		return Math.min(ctl.max, Math.max(ctl.min, n));
+	};
+
+	const truthy = (value) => value === true || value === 'true' || value === 1 || value === '1';
+
 	function setTestValue(name, value) {
 		testValues = { ...testValues, [name]: value };
 		emitChange();
@@ -322,6 +346,7 @@
 			<div class="space-y-1.5">
 				{#each filtered as { v, i } (v.name + i)}
 					{@const used = usageLabel(v.name)}
+					{@const ctl = controlFor(v)}
 					<div
 						bind:this={rowEls[i]}
 						role="button"
@@ -371,17 +396,109 @@
 							></i>
 						</div>
 
+						<!--
+							The control matches what the variable IS. Everything used to be a
+							text box, so a colour meant typing a hex you could not see and a
+							font size meant typing a number with no sense of range.
+							control-spec.js decides which control from the declared type plus
+							whatever bounds or choices the schema carries.
+						-->
 						<div class="mt-1.5 flex items-center gap-2">
-							<input
-								type="text"
-								value={testValues[v.name] ?? ''}
-								on:click|stopPropagation
-								on:keydown|stopPropagation
-								on:input={(e) => setTestValue(v.name, e.target.value)}
-								placeholder={v.defaultValue || humanizeName(v.name)}
-								aria-label="Preview value for {v.name}"
-								class="{INPUT_COMPACT} flex-1"
-							/>
+							{#if ctl.control === 'color'}
+								<input
+									type="color"
+									value={colorValue(testValues[v.name] ?? v.defaultValue)}
+									on:click|stopPropagation
+									on:input={(e) => setTestValue(v.name, e.target.value)}
+									aria-label="Preview value for {v.name}"
+									class="h-7 w-9 shrink-0 cursor-pointer rounded border-[2px] border-black bg-transparent p-0.5"
+								/>
+								<input
+									type="text"
+									value={testValues[v.name] ?? ''}
+									on:click|stopPropagation
+									on:keydown|stopPropagation
+									on:input={(e) => setTestValue(v.name, e.target.value)}
+									placeholder={v.defaultValue || '#000000'}
+									aria-label="Preview value for {v.name} as hex"
+									class="{INPUT_COMPACT} min-w-0 flex-1 font-mono"
+								/>
+							{:else if ctl.control === 'slider'}
+								<input
+									type="range"
+									min={ctl.min}
+									max={ctl.max}
+									step={ctl.step}
+									value={numberValue(testValues[v.name] ?? v.defaultValue, ctl)}
+									on:click|stopPropagation
+									on:input={(e) => setTestValue(v.name, Number(e.target.value))}
+									aria-label="Preview value for {v.name}"
+									class="h-7 min-w-0 flex-1 accent-brand-accent"
+								/>
+								<span class="w-12 shrink-0 text-right font-mono text-[10px] text-gray-400">
+									{numberValue(testValues[v.name] ?? v.defaultValue, ctl)}
+								</span>
+							{:else if ctl.control === 'select'}
+								<select
+									value={testValues[v.name] ?? v.defaultValue ?? ''}
+									on:click|stopPropagation
+									on:change={(e) => setTestValue(v.name, e.target.value)}
+									aria-label="Preview value for {v.name}"
+									class="{INPUT_COMPACT} flex-1"
+								>
+									{#each ctl.options as option (option.value)}
+										<option value={option.value}>{option.label}</option>
+									{/each}
+								</select>
+							{:else if ctl.control === 'toggle'}
+								<label class="flex flex-1 items-center gap-2 text-[11px] text-gray-300">
+									<input
+										type="checkbox"
+										checked={truthy(testValues[v.name] ?? v.defaultValue)}
+										on:click|stopPropagation
+										on:change={(e) => setTestValue(v.name, e.target.checked)}
+										aria-label="Preview value for {v.name}"
+										class="h-4 w-4 rounded border-[2px] border-black accent-brand-accent"
+									/>
+									{truthy(testValues[v.name] ?? v.defaultValue) ? 'On' : 'Off'}
+								</label>
+							{:else if ctl.control === 'textarea'}
+								<textarea
+									rows="3"
+									value={testValues[v.name] ?? ''}
+									on:click|stopPropagation
+									on:keydown|stopPropagation
+									on:input={(e) => setTestValue(v.name, e.target.value)}
+									placeholder={v.defaultValue || humanizeName(v.name)}
+									aria-label="Preview value for {v.name}"
+									class="{INPUT_COMPACT} flex-1 resize-y leading-snug"
+								></textarea>
+							{:else}
+								<input
+									type={ctl.control === 'number' ? 'number' : 'text'}
+									value={testValues[v.name] ?? ''}
+									on:click|stopPropagation
+									on:keydown|stopPropagation
+									on:input={(e) =>
+										setTestValue(
+											v.name,
+											ctl.control === 'number' ? Number(e.target.value) : e.target.value
+										)}
+									placeholder={v.defaultValue || humanizeName(v.name)}
+									aria-label="Preview value for {v.name}"
+									class="{INPUT_COMPACT} min-w-0 flex-1"
+								/>
+								{#if ctl.control === 'media'}
+									<button
+										type="button"
+										on:click|stopPropagation={() => dispatch('pickMedia', { name: v.name, accept: ctl.accept })}
+										title="Choose from your {ctl.accept} library"
+										class="shrink-0 rounded border-[2px] border-black bg-gray-800 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-gray-100 hover:bg-gray-700"
+									>
+										Pick
+									</button>
+								{/if}
+							{/if}
 						</div>
 
 						<!-- Where it's used. A variable declared but never referenced
