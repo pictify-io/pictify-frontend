@@ -20,6 +20,8 @@ import {
   RiAlignRight,
   RiSubtractLine,
 } from "../icons";
+import { MotionPicker } from "./motion-picker";
+import "./motion-picker.css";
 import { useSliderThrottle } from "./use-slider-throttle";
 import { getGroupedFonts } from "../font-utils";
 import { ALIGNMENTS, ORDER_OPS } from "../../../arrange";
@@ -892,10 +894,11 @@ export function AnimationProperty({
 
       <div className="flex flex-col py-1">
         <Row label="In">
-          <Select
+          <MotionPicker
+            ariaLabel="Animation in"
             value={inPreset}
-            onValueChange={(v) => onChange({ ...current, inPreset: v, emphasisPreset: "" })}
-            options={[none, ...IN_PRESETS()]}
+            options={IN_PRESETS()}
+            onChange={(v) => onChange({ ...current, inPreset: v, emphasisPreset: "" })}
             disabled={emphasisOn}
           />
         </Row>
@@ -909,10 +912,11 @@ export function AnimationProperty({
         )}
 
         <Row label="Out">
-          <Select
+          <MotionPicker
+            ariaLabel="Animation out"
             value={outPreset}
-            onValueChange={(v) => onChange({ ...current, outPreset: v, emphasisPreset: "" })}
-            options={[none, ...OUT_PRESETS()]}
+            options={OUT_PRESETS()}
+            onChange={(v) => onChange({ ...current, outPreset: v, emphasisPreset: "" })}
             disabled={emphasisOn}
           />
         </Row>
@@ -926,17 +930,18 @@ export function AnimationProperty({
         )}
 
         <Row label="Loop">
-          <Select
+          <MotionPicker
+            ariaLabel="Loop animation"
             value={emphasisPreset}
-            onValueChange={(v) =>
+            options={EMPHASIS_PRESETS()}
+            onChange={(v) =>
               onChange({ ...current, emphasisPreset: v, inPreset: "", outPreset: "" })
             }
-            options={[none, ...EMPHASIS_PRESETS()]}
           />
         </Row>
       </div>
 
-      <p className="pt-1 text-[10px] leading-snug text-muted-foreground/80">
+      <p className="pt-1 text-[11px] leading-snug text-muted-foreground">
         {emphasisOn
           ? "A loop animation runs for the whole clip, so it replaces In and Out."
           : "In and Out share the clip: the entrance plays first, then it rests, then the exit."}
@@ -970,7 +975,7 @@ export function TransitionProperty({
     return (
       <div className="flex flex-col border-b border-border/50 px-3 pb-3">
         <SectionTitle title="Transition" />
-        <p className="pb-1 text-[10px] leading-snug text-muted-foreground/80">
+        <p className="pb-1 text-[11px] leading-snug text-muted-foreground">
           A transition blends this clip with the one before it. This is the first clip on its
           track, so there is nothing to blend from.
         </p>
@@ -983,10 +988,12 @@ export function TransitionProperty({
       <SectionTitle title="Transition" />
       <div className="flex flex-col py-1">
         <Row label="In">
-          <Select
+          <MotionPicker
+            ariaLabel="Transition in"
             value={transitionKey || ""}
-            onValueChange={(v) => onChange({ transitionKey: v, durationUs })}
-            options={[{ value: "", label: "None (cut)" }, ...TRANSITION_OPTIONS()]}
+            options={TRANSITION_OPTIONS()}
+            onChange={(v) => onChange({ transitionKey: v, durationUs })}
+            noneLabel="None (cut)"
           />
         </Row>
         {!!transitionKey && (
@@ -999,7 +1006,7 @@ export function TransitionProperty({
           </Row>
         )}
       </div>
-      <p className="pt-1 text-[10px] leading-snug text-muted-foreground/80">
+      <p className="pt-1 text-[11px] leading-snug text-muted-foreground">
         Blends from the previous clip on this track, centred on the cut.
       </p>
     </div>

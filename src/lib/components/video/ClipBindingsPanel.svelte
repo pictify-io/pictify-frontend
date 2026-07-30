@@ -9,10 +9,18 @@
 	 * Lives under the Properties tab, below the vendored OpenVideo property
 	 * panel, so "what this clip is" and "what about it is variable" read as one
 	 * column instead of two places to look.
+	 *
+	 * ── Why this borrows the vendored panel's control vocabulary ───────────
+	 *
+	 * It used to wear the app's brutal tokens: 3px black rules, `rounded-lg`
+	 * `border-[2px]` selects at 31px against the vendored panel's 25px hairline
+	 * controls directly above. Scrolling one column crossed a visible seam, which
+	 * reads as two half-finished panels rather than one. The editor's right column
+	 * is a single surface, so it speaks a single vocabulary; brand-accent still
+	 * marks a bound field, which is what the accent is for.
 	 */
 	import { createEventDispatcher } from 'svelte';
 	import { bindingTargetsForClip, bindingFor, humanizeName } from '$lib/video/variables.js';
-	import { HEADING, LABEL, TEXT_MUTED, TEXT_FAINT, BUTTON_COMPACT } from '$lib/video/studio-ui.js';
 
 	/** @type {Object|null} — the selected clip, or null */
 	export let clip = null;
@@ -43,9 +51,9 @@
 </script>
 
 {#if clip && targets.length}
-	<div class="border-t-[3px] border-black px-3 py-3">
-		<h3 class="{HEADING} mb-1">Variable bindings</h3>
-		<p class="mb-3 text-[10px] font-bold leading-snug {TEXT_MUTED}">
+	<div class="border-t border-border/50 px-3 py-3">
+		<h3 class="mb-1 text-xs font-semibold text-foreground">Variable bindings</h3>
+		<p class="mb-3 text-[11px] leading-snug text-muted-foreground">
 			Bind a field to a variable and each render can set it.
 		</p>
 
@@ -56,21 +64,24 @@
 				<div>
 					<label
 						for="bind-{target.target}"
-						class="{LABEL} mb-1 flex items-center justify-between gap-2"
+						class="mb-1 flex items-center justify-between gap-2 text-xs text-muted-foreground"
 					>
 						<span>{target.label}</span>
 						{#if bound}
-							<span class="text-brand-accent">Bound</span>
+							<span class="text-[10px] font-semibold uppercase tracking-wider text-primary">
+								Bound
+							</span>
 						{/if}
 					</label>
 					<select
 						id="bind-{target.target}"
 						value={bound?.variable || ''}
 						on:change={(e) => onSelect(target, e)}
-						class="w-full rounded-lg border-[2px] px-2 py-1.5 font-mono text-xs font-bold transition-all focus:outline-none focus-brutal
+						class="h-7 w-full rounded border bg-muted/60 px-1.5 font-mono text-xs transition-colors
+							focus:outline-none focus-visible:ring-1 focus-visible:ring-primary
 							{bound
-							? 'border-brand-accent bg-gray-800 text-brand-accent'
-							: 'border-black bg-gray-950 text-gray-300'}"
+							? 'border-primary/60 text-primary'
+							: 'border-border text-foreground hover:border-primary/50'}"
 					>
 						<option value="">Not bound</option>
 						{#each candidates as name (name)}
@@ -82,11 +93,11 @@
 						<option value="__create__">+ New {target.typeFor(clip?.type)} variable…</option>
 					</select>
 					{#if bound && !names.includes(bound.variable)}
-						<p class="mt-1 text-[9px] font-black uppercase tracking-widest text-brand-danger">
+						<p class="mt-1 text-[11px] leading-snug text-destructive">
 							{bound.variable} no longer exists
 						</p>
 					{:else if bound && !candidates.includes(bound.variable)}
-						<p class="mt-1 text-[9px] font-black uppercase tracking-widest text-brand-accent">
+						<p class="mt-1 text-[11px] leading-snug text-primary">
 							{bound.variable} is not a {target.typeFor(clip?.type)} variable
 						</p>
 					{/if}
@@ -95,25 +106,25 @@
 		</div>
 
 		{#if names.length === 0}
-			<p class="mt-3 text-[10px] font-bold leading-snug {TEXT_FAINT}">
+			<p class="mt-3 text-[11px] leading-snug text-muted-foreground">
 				No variables declared yet. Pick "New … variable" above and one gets created, bound, and
 				named after the field.
 			</p>
 		{/if}
 	</div>
 {:else if clip}
-	<div class="border-t-[3px] border-black px-3 py-3">
-		<p class="text-[10px] font-bold {TEXT_FAINT}">
+	<div class="border-t border-border/50 px-3 py-3">
+		<p class="text-[11px] leading-snug text-muted-foreground">
 			A {String(clip.type || 'clip').toLowerCase()} clip has no bindable fields. Put
-			<code class="rounded border-[1.5px] border-black bg-gray-900 px-1 font-mono text-brand-accent"
+			<code class="rounded border border-border bg-muted px-1 font-mono text-primary"
 				>{'{{'}name{'}}'}</code
 			>
 			in its text instead.
 		</p>
 	</div>
 {:else}
-	<div class="border-t-[3px] border-black px-3 py-3">
-		<p class="text-[10px] font-bold {TEXT_FAINT}">
+	<div class="border-t border-border/50 px-3 py-3">
+		<p class="text-[11px] leading-snug text-muted-foreground">
 			Select a clip on the canvas or the timeline to bind its fields to variables.
 		</p>
 	</div>

@@ -41,9 +41,13 @@ const CATEGORY_ORDER = [
 const label = (name) => name.replace(/^./, (c) => c.toUpperCase());
 
 /**
- * Catalog as flat {value,label} options, grouped by category in a sensible
- * order. Only transitions the Pixi engine implements are offered — the catalog
- * also carries entries for other providers, which would render nothing.
+ * Catalog as flat {value,label,category} options, ordered by category. Only
+ * transitions the Pixi engine implements are offered — the catalog also carries
+ * entries for other providers, which would render nothing.
+ *
+ * The category rides along because the picker groups by it. It used to be
+ * dropped after sorting, which meant the UI could only ever show one flat list
+ * of 68 even though the catalog knew better.
  */
 export const TRANSITION_OPTIONS = () => {
 	const supported = (TRANSITION_CATALOG || []).filter(
@@ -52,7 +56,7 @@ export const TRANSITION_OPTIONS = () => {
 	const byCategory = new Map();
 	for (const t of supported) {
 		const list = byCategory.get(t.category) || [];
-		list.push({ value: t.key, label: t.name || label(t.key) });
+		list.push({ value: t.key, label: t.name || label(t.key), category: t.category });
 		byCategory.set(t.category, list);
 	}
 	const ordered = [];
