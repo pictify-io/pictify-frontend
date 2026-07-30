@@ -21,7 +21,7 @@
 	 */
 	import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
 	import { parseSequences, retimeSequence, toTimelineBars } from '$lib/video/sequence-timing.js';
-	import { editVideoTemplateCode } from '../../../api/videoTemplates';
+	import { editVideoTemplateCodeStream } from '../../../api/videoTemplates';
 	import RemotionChat from './RemotionChat.svelte';
 
 	/** The composition source. */
@@ -84,6 +84,20 @@
 	// ── AI edit ──────────────────────────────────────────────────────────
 	let messages = [];
 	let editing = false;
+	/** What the edit is doing right now, shown in the pending turn. */
+	let progress = '';
+
+	/*
+	 * Stage names are translated here rather than sent as prose from the server,
+	 * so the wording is a UI decision and the protocol stays a protocol.
+	 */
+	const PROGRESS_TEXT = {
+		generating: 'Reading the scene…',
+		regenerating: 'Trying again…',
+		writing: 'Writing the new scene…',
+		compiling: 'Checking it builds…',
+		retrying: 'That did not compile — fixing it…'
+	};
 
 	const SUGGESTIONS = [
 		'Make the intro shorter',
@@ -104,14 +118,32 @@
 		const previous = tsx;
 
 		try {
-			const result = await editVideoTemplateCode({
-				tsx,
-				instruction: ask,
-				width: Math.round(width) || 1080,
-				height: Math.round(height) || 1920,
-				fps: Math.round(fps) || 30,
-				durationInFrames: Math.round(durationInFrames) || 150
-			});
+			const result = await editVideoTemplateCodeStream(
+				{
+					tsx,
+					instruction: ask,
+					width: Math.round(width) || 1080,
+					height: Math.round(height) || 1920,
+					fps: Math.round(fps) || 30,
+					durationInFrames: Math.round(durationInFrames) || 150
+				},
+				(stage, data) => {
+					progress = PROGRESS_TEXT[stage] || '';
+					// The retry is the stage most worth seeing: without it, a second
+					// attempt is indistinguishable from the request hanging.
+					if (stage === 'retrying' && data?.errors?.length) {
+						messages = [
+							...messages,
+							{
+								role: 'assistant',
+								text: 'The first attempt did not compile. Fixing it…',
+								status: 'nochange',
+								errors: data.errors
+							}
+						];
+					}
+				}
+			);
 
 			if (result?.changed && result.tsx) {
 				// Only the newest edit is revertable: the button restores one step,
@@ -152,6 +184,7 @@
 			];
 		} finally {
 			editing = false;
+			progress = '';
 		}
 	}
 
@@ -335,6 +368,7 @@
 				<RemotionChat
 					{messages}
 					busy={editing}
+					{progress}
 					suggestions={SUGGESTIONS}
 					on:send={runEdit}
 					on:revert={revertEdit}

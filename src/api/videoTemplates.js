@@ -1,4 +1,6 @@
 import backend from '../service/backend';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
+import { readEventStream } from '$lib/video/sse.js';
 
 /**
  * Video templates API — ONE noun for video, discriminated by `kind`.
@@ -137,6 +139,60 @@ const editVideoTemplateCode = async (payload) => {
 };
 
 /**
+ * The same edit, streamed, so the caller can report progress.
+ *
+ * Written against fetch rather than EventSource because EventSource can only
+ * issue GET requests, and the composition source is far too large for a query
+ * string. The response is parsed as SSE frames from the body stream.
+ *
+ * @param {Object} payload - as editVideoTemplateCode
+ * @param {(stage: string, data: Object) => void} onProgress
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<{tsx: string, schemaJson: Array, changed: boolean}>}
+ */
+const editVideoTemplateCodeStream = async (payload, onProgress = () => {}, signal) => {
+	const response = await fetch(`${PUBLIC_BACKEND_URL}/video/templates/edit/stream`, {
+		method: 'POST',
+		credentials: 'include',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload),
+		signal
+	});
+
+	// Quota, auth and misconfiguration all answer with ordinary JSON before the
+	// stream starts, so they are read as JSON rather than parsed as frames.
+	if (!response.ok || !response.body) {
+		let message = 'The edit failed. Try rephrasing it.';
+		try {
+			const body = await response.json();
+			message = body?.message || message;
+		} catch {
+			// A non-JSON error body is not worth surfacing verbatim.
+		}
+		const error = new Error(message);
+		error.status = response.status;
+		throw error;
+	}
+
+	let result = null;
+	let failure = null;
+
+	await readEventStream(response, (event, data) => {
+		if (event === 'status') onProgress(data.stage, data);
+		else if (event === 'done') result = data;
+		else if (event === 'failed') failure = data;
+	});
+
+	if (failure) {
+		const error = new Error('That edit would not compile.');
+		error.errors = failure.errors || [];
+		throw error;
+	}
+	if (!result) throw new Error('The edit ended without returning a scene.');
+	return result;
+};
+
+/**
  * Copy a template. The natural way to make a variant — a seasonal cut, or a
  * safe copy before an edit you are not sure about.
  *
@@ -223,6 +279,7 @@ export {
 	renderVideoTemplate,
 	generateVideoTemplate,
 	editVideoTemplateCode,
+	editVideoTemplateCodeStream,
 	duplicateVideoTemplate,
 	uploadVideoMedia,
 	listVideoMedia,

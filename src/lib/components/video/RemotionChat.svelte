@@ -22,6 +22,8 @@
 	 */
 	export let messages = [];
 	export let busy = false;
+	/** What the running edit is doing, streamed from the server. */
+	export let progress = '';
 	/** Shown once, before anyone has asked for anything. */
 	export let suggestions = [];
 
@@ -131,7 +133,12 @@
 		{#if busy}
 			<div class="flex items-center gap-2 px-1 py-1 text-[11px] text-gray-400">
 				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-accent"></span>
-				Rewriting the scene…
+				<!--
+					The live stage, not a fixed label. An edit takes eight to fifteen
+					seconds and "working…" for all of them tells the user nothing about
+					whether it is nearly done or has just started over.
+				-->
+				{progress || 'Rewriting the scene…'}
 			</div>
 		{/if}
 	</div>
