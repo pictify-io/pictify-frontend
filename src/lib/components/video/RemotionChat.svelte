@@ -15,7 +15,7 @@
 	 * since an instruction that compiled to the same scene looks identical to one
 	 * that silently failed.
 	 */
-	import { createEventDispatcher, tick } from 'svelte';
+	import { afterUpdate, createEventDispatcher } from 'svelte';
 
 	/**
 	 * @type {Array<{role: 'user'|'assistant', text: string, status?: 'applied'|'nochange'|'error', errors?: string[], revertable?: boolean}>}
@@ -53,11 +53,32 @@
 
 	// Follow the conversation as it grows, so the newest turn is never below the
 	// fold at the moment it arrives.
-	$: if (messages.length && listEl) {
-		tick().then(() => {
-			listEl.scrollTop = listEl.scrollHeight;
-		});
-	}
+	/*
+	 * Follow the conversation as it grows, so the newest turn is never below the
+	 * fold at the moment it arrives.
+	 *
+	 * afterUpdate, NOT a reactive statement. This was:
+	 *
+	 *     $: if (messages.length && listEl) {
+	 *       tick().then(() => { listEl.scrollTop = listEl.scrollHeight; });
+	 *     }
+	 *
+	 * and it froze the tab on the first message. tick() schedules an update; the
+	 * reactive block re-runs on that update and calls tick() again, and the
+	 * cycle never settles. The whole page locks with no console error, which is
+	 * why it looked like a network problem: the fetch had been issued, so the
+	 * preflight went out, and then the main thread stopped so the browser never
+	 * sent the POST.
+	 *
+	 * afterUpdate runs after the DOM is written and does not schedule anything,
+	 * so there is nothing to re-enter.
+	 */
+	let lastScrolled = 0;
+	afterUpdate(() => {
+		if (!listEl || messages.length === lastScrolled) return;
+		lastScrolled = messages.length;
+		listEl.scrollTop = listEl.scrollHeight;
+	});
 </script>
 
 <div class="flex h-full min-h-0 flex-col bg-gray-950">
