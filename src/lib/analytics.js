@@ -390,6 +390,97 @@ export const analytics = {
 		});
 	},
 
+	// ============================================
+	// Buying signals (sales motion)
+	//
+	// These feed the weekly product-led-sales review: accounts tripping a signal
+	// get contacted. See pictify-ideas/sales-motion-plan-2026-07.md §4.1 for the
+	// signal → play mapping. Keep property names stable — the PostHog cohorts
+	// query them directly.
+	// ============================================
+
+	/**
+	 * A list was loaded into the run wizard. Fires before the run is started, so
+	 * it also catches people who bring a big list and then bail — a strong signal.
+	 * @param {Object} params - { source, row_count, total_rows, truncated, header_count }
+	 */
+	trackWorkflowRowsLoaded: (params = {}) => {
+		analytics.track('workflow_rows_loaded', {
+			source: params.source, // 'csv_file' | 'paste' | 'sample'
+			row_count: params.row_count,
+			total_rows: params.total_rows, // pre-truncation count, when known
+			truncated: !!params.truncated, // true = they had MORE rows than we accept
+			header_count: params.header_count
+		});
+	},
+
+	/**
+	 * A run finished (terminal status observed by the client).
+	 * @param {Object} params - { run_uid, pack, row_count, rendered, delivered, failed, status, delivery_method, output_format, duration_seconds }
+	 */
+	trackWorkflowRunCompleted: (params = {}) => {
+		analytics.track('workflow_run_completed', {
+			run_uid: params.run_uid,
+			pack: params.pack,
+			row_count: params.row_count,
+			rendered: params.rendered,
+			delivered: params.delivered,
+			failed: params.failed,
+			status: params.status,
+			delivery_method: params.delivery_method,
+			output_format: params.output_format,
+			duration_seconds: params.duration_seconds
+		});
+	},
+
+	/**
+	 * A plan cap blocked something the user actively tried to do. P0 sales signal:
+	 * intent + volume + a wall, all at once.
+	 * @param {Object} params - { context, attempted_rows, code, status }
+	 */
+	trackCapHit: (params = {}) => {
+		analytics.track('run_cap_hit', {
+			context: params.context, // 'workflow_run' | 'render' | ...
+			attempted_rows: params.attempted_rows,
+			code: params.code, // backend code, e.g. 'quota_exceeded'
+			status: params.status // HTTP status that carried it
+		});
+	},
+
+	/**
+	 * Any upgrade path was triggered (banner, modal, quota wall, feature gate).
+	 * Fired centrally from the upgrade store so every route is covered.
+	 * @param {Object} params - { context, direct_checkout }
+	 */
+	trackUpgradePromptTriggered: (params = {}) => {
+		analytics.track('upgrade_prompt_triggered', {
+			context: params.context,
+			direct_checkout: !!params.direct_checkout
+		});
+	},
+
+	/**
+	 * A brand asset was added. Proxy for the "multiple brand kits" agency signal
+	 * until BrandKit exists as a first-class object.
+	 * @param {Object} params - { asset_type, asset_count }
+	 */
+	trackBrandAssetCreated: (params = {}) => {
+		analytics.track('brand_asset_created', {
+			asset_type: params.asset_type, // 'image' | 'color' | 'font' | ...
+			asset_count: params.asset_count // total after this one
+		});
+	},
+
+	/**
+	 * A teammate was invited — the team-plan trigger.
+	 * @param {Object} params - { team_uid }
+	 */
+	trackTeamInviteSent: (params = {}) => {
+		analytics.track('team_invite_sent', {
+			team_uid: params.team_uid
+		});
+	},
+
 	/**
 	 * Track tool opened (free tool page).
 	 * Waits for PostHog feature flags to resolve so experiment variants
@@ -604,12 +695,13 @@ export const analytics = {
 
 	/**
 	 * Track copy action (API key, code, URL)
-	 * @param {Object} params - { content_type, context }
+	 * @param {Object} params - { content_type, context, tool_name }
 	 */
 	trackCopy: (params = {}) => {
 		analytics.track('content_copied', {
-			content_type: params.content_type, // 'api_key', 'code', 'url'
-			context: params.context
+			content_type: params.content_type, // 'api_key', 'code', 'image_url'
+			context: params.context,
+			tool_name: params.tool_name
 		});
 	},
 

@@ -14,6 +14,7 @@
 		resendInvitationAction
 	} from '../../../../store/team.store';
 	import { toast } from '../../../../store/toast.store';
+	import { analytics } from '$lib/analytics.js';
 	import { formatRelativeDate } from '$lib/utils/format.js';
 
 	let loading = true;
@@ -56,6 +57,7 @@
 
 		try {
 			await createInvitationAction($currentTeam.uid, inviteEmail.trim());
+			analytics.trackTeamInviteSent({ team_uid: $currentTeam.uid });
 			toast.set({ message: 'Invitation sent successfully', type: 'success', duration: 2000 });
 			inviteEmail = '';
 		} catch (err) {

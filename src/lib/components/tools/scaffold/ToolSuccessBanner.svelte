@@ -12,10 +12,22 @@
 	 *
 	 * See plan: docs/plans/2026-04-15-002-refactor-tool-scaffold-plan.md
 	 */
+	import { analytics } from '$lib/analytics.js';
+
 	export let imageUrl = '';
 	export let imageAlt = 'Generated result';
 	export let heading = 'Success! Here is your image';
 	export let downloadFileName = 'pictify-result.png';
+	/** Fires content_downloaded on the Download click — the guest-value guardrail metric. */
+	export let toolName = '';
+
+	function trackDownload() {
+		analytics.trackDownload({
+			content_type: 'image',
+			format: downloadFileName.split('.').pop() || 'png',
+			tool_name: toolName
+		});
+	}
 </script>
 
 <div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
@@ -38,6 +50,7 @@
 			<a
 				href={imageUrl}
 				download={downloadFileName}
+				on:click={trackDownload}
 				class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"

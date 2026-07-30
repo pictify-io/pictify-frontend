@@ -8,6 +8,10 @@
 	import { parseCsv, MAX_ROWS } from '$lib/workflows/csv.js';
 	import { createTemplate, getTemplates, getTemplateById } from '../../../../api/template';
 	import {
+		getVideoTemplates,
+		getVideoTemplate
+	} from '../../../../api/videoTemplates';
+	import {
 		createWorkflowRun,
 		previewWorkflow,
 		createWorkflowHook,
@@ -85,7 +89,11 @@
 	};
 
 	// Output format — shared by the CSV run and webhook flows (previews stay PNG)
-	const OUTPUT_FORMATS = ['png', 'jpg', 'pdf'];
+	// A video template renders mp4; an image template renders png/jpg/pdf.
+	// The backend rejects a mismatched pairing, so the picker only ever offers
+	// the formats the selected template can actually produce.
+	const IMAGE_OUTPUT_FORMATS = ['png', 'jpg', 'pdf'];
+	const VIDEO_OUTPUT_FORMATS = ['mp4'];
 	let outputFormat = 'png';
 
 	let step = 1;
@@ -124,6 +132,9 @@
 	// ── Step validity ────────────────────────────────────────────────────
 	$: dataValid = wizard.rows.length > 0 && wizard.headers.length > 0;
 	$: templateValid = !!wizard.templateUid;
+	$: selectedTemplate = templates.find((t) => t.uid === wizard.templateUid) || null;
+	$: isVideoWorkflow = !!selectedTemplate?.isVideo;
+	$: outputFormats = formatsFor(selectedTemplate);
 	$: mappingValid = templateValid && wizard.variables.every((v) => !!wizard.mapping[v]);
 	$: previewValid = mappingValid && wizard.previews.length > 0 && !wizard.previewError;
 	$: deliverValid =
@@ -187,7 +198,7 @@
 	}
 
 	// ── Step 1: CSV data ─────────────────────────────────────────────────
-	function applyCsvText(text, fileName = '') {
+	function applyCsvText(text, fileName = '', loadSource = 'csv_file') {
 		dataError = '';
 		try {
 			const result = parseCsv(text);
@@ -195,6 +206,15 @@
 				dataError = 'Could not find a header row plus at least one data row in that CSV.';
 				return;
 			}
+			// Buying signal: fires on load, not on run — so a big list that never
+			// gets run still surfaces in the weekly sales review.
+			analytics.trackWorkflowRowsLoaded({
+				source: loadSource,
+				row_count: result.rows.length,
+				total_rows: result.totalRows,
+				truncated: result.truncated,
+				header_count: result.headers.length
+			});
 			wizard = {
 				...wizard,
 				fileName,
@@ -236,7 +256,7 @@
 			dataError = 'Paste some CSV data first.';
 			return;
 		}
-		applyCsvText(pasteText, '');
+		applyCsvText(pasteText, '', 'paste');
 	}
 
 	// ── Step 2: template selection ───────────────────────────────────────
@@ -262,19 +282,31 @@
 		return (template?.variableDefinitions || []).map((d) => d?.name).filter(Boolean);
 	}
 
+	const formatsFor = (template) =>
+		template?.isVideo ? VIDEO_OUTPUT_FORMATS : IMAGE_OUTPUT_FORMATS;
+
 	function variableCount(template) {
 		const defs = definitionNames(template);
+		if (template?.isVideo) return defs.length;
 		return defs.length || parseHtmlVariables(template?.html).length;
 	}
 
 	async function loadTemplates() {
 		templatesLoading = true;
 		templatesError = '';
-		const response = await getTemplates({ limit: 50 });
-		if (!response) {
+		// Both template kinds are workflow-able: the engine renders whichever one
+		// the uid resolves to. Video templates are tagged so the picker, the
+		// format switch and the preview can treat them correctly.
+		const [imageResponse, videoResponse] = await Promise.all([
+			getTemplates({ limit: 50 }),
+			getVideoTemplates().catch(() => null)
+		]);
+		if (!imageResponse) {
 			templatesError = 'Failed to load your templates.';
 		} else {
-			templates = (response.templates || []).filter((t) => t.engine === 'html');
+			const images = (imageResponse.templates || []).filter((t) => t.engine === 'html');
+			const videos = (videoResponse?.templates || []).map((t) => ({ ...t, isVideo: true }));
+			templates = [...images, ...videos];
 		}
 		templatesLoading = false;
 	}
@@ -283,6 +315,10 @@
 		// The list API omits variableDefinitions — fetch the full template when needed.
 		let names = definitionNames(template);
 		if (names.length) return names;
+		if (template.isVideo) {
+			const full = await getVideoTemplate(template.uid);
+			return definitionNames(full?.template);
+		}
 		const response = await getTemplateById(template.uid);
 		const full = response?.template;
 		if (full) {
@@ -319,6 +355,8 @@
 				}
 			};
 			hookMapping = {};
+			// Snap the output format to something this template can produce.
+			if (!formatsFor(template).includes(outputFormat)) outputFormat = formatsFor(template)[0];
 			hookName = `${wizard.templateName} hook`;
 		} finally {
 			selectingUid = '';
@@ -499,7 +537,7 @@
 	}
 
 	// ── Step 4: previews ─────────────────────────────────────────────────
-	$: previewKey = `${wizard.templateUid}::${JSON.stringify(wizard.mapping)}::${wizard.rows.length}`;
+	$: previewKey = `${wizard.templateUid}::${JSON.stringify(wizard.mapping)}::${wizard.rows.length}::${outputFormat}`;
 
 	async function loadPreviews() {
 		if (wizard.previewLoading) return;
@@ -511,7 +549,12 @@
 			const sampleRows = wizard.rows.slice(0, 3);
 			const results = await Promise.all(
 				sampleRows.map((row) =>
-					previewWorkflow({ templateUid: wizard.templateUid, row, columnMapping: wizard.mapping })
+					previewWorkflow({
+						templateUid: wizard.templateUid,
+						row,
+						columnMapping: wizard.mapping,
+						outputFormat
+					})
 				)
 			);
 			wizard = {
@@ -734,12 +777,24 @@
 				packType,
 				pack: selectedPack.id,
 				rows: wizard.rows.length,
+				row_count: wizard.rows.length,
 				templateUid: wizard.templateUid,
 				outputFormat,
 				delivery: delivery.method
 			});
 			goto(`/dashboard/workflows/${uid}`);
 		} catch (error) {
+			// Buying signal: a plan cap blocked a run the user actively tried to start.
+			// Matched on the backend code, not the status — the workflow route answers
+			// 402 while the render quota guard answers 429.
+			if (error?.data?.code === 'quota_exceeded' || error?.status === 402) {
+				analytics.trackCapHit({
+					context: 'workflow_run',
+					attempted_rows: wizard.rows.length,
+					code: error?.data?.code || 'quota_exceeded',
+					status: error?.status
+				});
+			}
 			runError = error?.message || 'Failed to start the run. Please try again.';
 			isRunning = false;
 		}
@@ -1171,6 +1226,13 @@
 									{/if}
 								</div>
 								<div class="flex items-center gap-2 mt-3 flex-wrap">
+									{#if template.isVideo}
+										<span
+											class="px-2.5 py-1 bg-data-violet text-black text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black"
+										>
+											Video
+										</span>
+									{/if}
 									<span
 										class="px-2.5 py-1 bg-gray-100 text-gray-700 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black"
 									>
@@ -1466,11 +1528,21 @@
 						class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg overflow-hidden"
 					>
 						<div class="aspect-[4/3] bg-gray-100 overflow-hidden">
-							<img
-								src={preview.url}
-								alt="Preview for {preview.name}"
-								class="w-full h-full object-cover"
-							/>
+							{#if isVideoWorkflow}
+								<!-- svelte-ignore a11y-media-has-caption -->
+								<video
+									src={preview.url}
+									controls
+									preload="metadata"
+									class="w-full h-full object-contain bg-black"
+								></video>
+							{:else}
+								<img
+									src={preview.url}
+									alt="Preview for {preview.name}"
+									class="w-full h-full object-cover"
+								/>
+							{/if}
 						</div>
 						<div class="p-4 border-t-[3px] border-black flex items-center justify-between gap-2">
 							<span class="text-sm font-black text-black truncate">{preview.name}</span>
@@ -1643,11 +1715,15 @@
 			<div class="flex-1">
 				<p class="text-xs font-black text-black uppercase tracking-widest">Output format</p>
 				<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
-					Previews are shown as PNG.
+					{#if isVideoWorkflow}
+						Video renders one row at a time, so a large run takes a while.
+					{:else}
+						Previews are shown as PNG.
+					{/if}
 				</p>
 			</div>
 			<div class="flex items-center gap-2">
-				{#each OUTPUT_FORMATS as format}
+				{#each outputFormats as format}
 					<button
 						on:click={() => (outputFormat = format)}
 						class="px-4 py-2 rounded-lg border-[3px] border-black text-xs font-black uppercase tracking-widest transition-all duration-150

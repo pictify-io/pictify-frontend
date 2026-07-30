@@ -440,14 +440,24 @@
 		}
 	}
 
-	function copyToClipboard(text) {
+	function copyToClipboard(text, contentType = 'image_url') {
 		navigator.clipboard.writeText(text).then(() => {
+			analytics.trackCopy({
+				content_type: contentType,
+				context: 'tool_result',
+				tool_name: 'linkedin_banner_generator'
+			});
 			toast.set({ message: 'Copied to clipboard!', duration: 1500 });
 		});
 	}
 
 	function downloadBanner() {
 		if (!imageUrl) return;
+		analytics.trackDownload({
+			content_type: 'image',
+			format: 'png',
+			tool_name: 'linkedin_banner_generator'
+		});
 		const link = document.createElement('a');
 		link.href = imageUrl;
 		link.download = 'linkedin-banner.png';

@@ -144,10 +144,15 @@
 	];
 
 	// Add copyToClipboard function
-	function copyToClipboard(text) {
+	function copyToClipboard(text, contentType = 'image_url') {
 		navigator.clipboard
 			.writeText(text)
 			.then(() => {
+				analytics.trackCopy({
+					content_type: contentType,
+					context: 'tool_result',
+					tool_name: `html_to_${format}`
+				});
 				toast.set({ message: 'URL copied to clipboard! 🔗', type: 'success', duration: 2000 });
 			})
 			.catch(() => {
@@ -1195,6 +1200,12 @@
 								href={imageUrl}
 								download
 								target="_blank"
+								on:click={() =>
+									analytics.trackDownload({
+										content_type: 'image',
+										format,
+										tool_name: `html_to_${format}`
+									})}
 								class="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border-[2px] border-black font-black uppercase text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"

@@ -794,8 +794,13 @@
 		}
 	}
 
-	function copyToClipboard(text) {
+	function copyToClipboard(text, contentType = 'image_url') {
 		navigator.clipboard.writeText(text).then(() => {
+			analytics.trackCopy({
+				content_type: contentType,
+				context: 'tool_result',
+				tool_name: 'code_to_image'
+			});
 			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
 		});
 	}

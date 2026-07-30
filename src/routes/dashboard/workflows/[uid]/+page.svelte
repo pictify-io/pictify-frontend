@@ -83,11 +83,37 @@
 		return 'bg-gray-100 text-gray-700 border-gray-400';
 	}
 
+	// Buying signal: fire once per run when we first observe a terminal status.
+	// Guarded so neither the 2s poll nor a page revisit can double-count.
+	let completionTracked = false;
+
+	function trackCompletionOnce() {
+		if (completionTracked || !run || ACTIVE_STATUSES.includes(run.status)) return;
+		completionTracked = true;
+		const runCounts = run.counts || {};
+		const startedAt = run.createdAt ? new Date(run.createdAt).getTime() : null;
+		const finishedAt = run.completedAt ? new Date(run.completedAt).getTime() : null;
+		analytics.trackWorkflowRunCompleted({
+			run_uid: run.uid,
+			pack: run.packType,
+			row_count: runCounts.total,
+			rendered: runCounts.rendered,
+			delivered: runCounts.delivered,
+			failed: runCounts.failed,
+			status: run.status,
+			delivery_method: run.delivery?.method,
+			output_format: run.outputFormat,
+			duration_seconds:
+				startedAt && finishedAt ? Math.round((finishedAt - startedAt) / 1000) : undefined
+		});
+	}
+
 	async function fetchRun() {
 		try {
 			const response = await getWorkflowRun(uid);
 			run = response?.run || null;
 			loadError = run ? '' : 'Run not found.';
+			trackCompletionOnce();
 		} catch (error) {
 			loadError = error?.message || 'Failed to load this run.';
 		} finally {
