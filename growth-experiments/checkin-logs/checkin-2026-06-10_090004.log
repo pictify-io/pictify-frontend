@@ -1,0 +1,51 @@
+=== Pictify experiment weekly check-in: Wed Jun 10 09:00:04 IST 2026 ===
+# Weekly Check-In — Pictify Growth Experiments (2026-06-10, 6 days of data, START 2026-06-04)
+
+## 🚦 Guardrail status — no same-day kill required
+
+The one hard same-day kill rule (`url-tool-capture-flow-v1` treatment `gen_pct` below control) is **NOT breached** — both treatment arms are above control cumulatively and auto-capture beat control on `gen_pct` every single day. Guided-capture dipped below control on day 1 only (6.3% vs 26.9%) and recovered from 06-05 onward.
+
+## 1. url-tool-capture-flow-v1 (374736) — THE powered read
+
+| variant | opened | rage_pct | gen_pct (guardrail) |
+|---|---|---|---|
+| control | 146 | 8.9% (13) | 17.8% |
+| guided-capture | 80 | **5.0%** (4) ✅ | 22.5% ✅ |
+| auto-capture | 64 | **12.5%** (8) ⚠️ | **56.3%** ✅✅ |
+
+- **Guided-capture**: primary moving the right way (−44% relative rage) with gen_pct above control. But not yet significant (z≈1.1) — flagged traffic was 290 openers vs ~575 projected, and rageclicks are running far below the 180/wk base assumption.
+- **Auto-capture**: rage rate is *above* control (n.s.), but gen_pct is **3.2×** control — it's converting opens to generations dramatically better. Not a kill (the kill rule is the guardrail, which held), but the rage trend deserves a look at session replays.
+- **Decision: keep running ~1 more week, re-read ~2026-06-17.** The "powered in a week" assumption didn't hold at actual traffic.
+
+## 2. tool-signup-cta-v2 (374737) — directional
+
+| variant | gens | signup clicks | click/gen | signups |
+|---|---|---|---|---|
+| control | 31 | 5 | 16.1% | 2 |
+| inline-value-prop | 22 | 10 | **45.5%** | **5** |
+| sticky-bar | 27 | 8 | 29.6% | 2 |
+
+- **inline-value-prop leading** on both CTR and signups; per playbook do not finalize at week 1.
+- ⚠️ **Guardrail is BLIND, not breached**: `content_downloaded` fired **0 times site-wide** in 6 days, `content_copied` once — these events aren't actually firing. Cannibalization can't be assessed until that's fixed.
+- **Decision: keep running** + **action this week: fix `content_copied`/`content_downloaded` instrumentation** on the tool page.
+
+## 3. welcome-experiment-a (374738) — assignment health: ❌ FAIL
+
+- signups **23** | `assigned_welcome` **5** | `assigned_control` **12** → **assigned_welcome/signups = 21.7%**, far from the ~50% pass criterion.
+- Two distinct problems: (a) **6/23 signups never fired `welcome_assigned` at all** (74% coverage), (b) among the assigned, the split skews 5 vs 12 (~p 0.07 binomial — suspicious but small-N).
+- What *does* work: redirect lands — all 5 welcome-arm users fired `welcome_viewed`.
+- ⚠️ Skip guardrail: `welcome_skipped` 4/5 viewers (80%) — very high, but N=5 so informational only. `curl_ok` = 1.
+- **Decision: debug the flag-await/assignment path before trusting anything** (per playbook: don't trust reads until assignment ≈50%). Keep the flag running while debugging. Not a kill — this is post-signup and week-1.
+
+## 4. Sequenced experiments — **NOT ready to launch**
+
+`onboarding-value-first-skip` (374739), `dashboard-checklist-value-first` (374740), `verify-copy-v1` (374741) are all gated on welcome-experiment-a showing healthy ~50% assignment. **It doesn't (21.7%)** → all three stay held. Nothing launched.
+
+## Recommended actions (priority order)
+1. **Debug welcome-experiment-a assignment** — why do 26% of signups never get `welcome_assigned`, and why the 5v12 skew? This also unblocks the three sequenced launches.
+2. **Fix `content_copied`/`content_downloaded` events** on the tool page — the CTA experiment's cannibalization guardrail is currently unreadable.
+3. **Watch auto-capture rageclicks** (replays on `/tools/url-to-image-generator`) — gen_pct is spectacular but rage trending above control.
+4. Re-run this check-in **~2026-06-17** for the url-tool significance call.
+
+`experiments.csv` updated with `result_week1` + `decision` for all three live rows (CSV re-parsed clean, 22 cols intact; not committed). The API key was never printed or written anywhere.
+=== done: Wed Jun 10 09:03:12 IST 2026 ===
