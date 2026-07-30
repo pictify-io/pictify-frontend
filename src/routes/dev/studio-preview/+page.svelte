@@ -20,6 +20,7 @@
 	import { page } from '$app/stores';
 	import VideoStudio from '$lib/components/video/VideoStudio.svelte';
 	import { buildStarterClips, starterById } from '$lib/video/starters.js';
+	import { STARTER_TSX } from '$lib/video/starter-tsx.js';
 
 	$: full = $page.url.searchParams.get('full') === '1';
 	// ?starter=<id> with ?full=1 previews a seeded scene without a backend.
@@ -28,10 +29,15 @@
 		? buildStarterClips(harnessStarter.id, { width: 1080, height: 1920 })
 		: null;
 
-	const draft = {
+	// ?kind=tsx renders a Remotion template, so the chat and player can be
+	// exercised without a login.
+	$: harnessKind = $page.url.searchParams.get('kind') === 'tsx' ? 'tsx' : 'timeline';
+
+	$: draft = {
 		uid: null,
 		name: 'Harness draft',
-		kind: 'timeline',
+		kind: harnessKind,
+		tsx: harnessKind === 'tsx' ? STARTER_TSX : undefined,
 		projectJson: null,
 		variableDefinitions: [],
 		width: 1080,
