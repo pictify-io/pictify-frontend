@@ -1,0 +1,247 @@
+/*
+ * Hover previews for the effects picker (written for Pictify).
+ *
+ * The engine's own thumbnails point at a CDN that answers 403, so every tile
+ * would otherwise be an empty box with a label. Each tile instead animates the
+ * CHARACTER of its effect over a sample swatch: colour shift, jitter, blur,
+ * pulse, warp. Family assignment lives in src/lib/video/effect-preview.js.
+ *
+ * Animations run ONLY while the tile is hovered or focused (`.ovfx-playing`).
+ * Fifty-one looping animations in a scrolling grid is a space heater, and it
+ * makes the panel impossible to read.
+ *
+ * Same conventions as motion-picker.css, which does this for transitions.
+ */
+
+.ovfx-preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* A swatch with enough hue range that a colour shift is visible, and enough
+     structure that a warp or blur has something to bend. */
+  background:
+    linear-gradient(135deg, #f97316 0%, #ec4899 45%, #6366f1 100%);
+}
+
+/* Stripes give warps, scanlines and pixelation something to act on: a flat
+   gradient bends invisibly. */
+.ovfx-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.22) 0 3px,
+    rgba(255, 255, 255, 0) 3px 9px
+  );
+  opacity: 0.7;
+}
+
+/*
+ * Everything below is inert until `.ovfx-playing` is added. The rules are
+ * written as `.ovfx-playing.ovfx-<family>` rather than on `:hover` directly so
+ * keyboard focus gets the same preview, which is how the motion picker behaves.
+ */
+
+.ovfx-playing.ovfx-color {
+  animation: ovfx-color 1.6s ease-in-out infinite;
+}
+.ovfx-playing.ovfx-glitch {
+  animation: ovfx-glitch 0.5s steps(2, end) infinite;
+}
+.ovfx-playing.ovfx-blur {
+  animation: ovfx-blur 1.6s ease-in-out infinite;
+}
+.ovfx-playing.ovfx-pixel {
+  animation: ovfx-pixel 1.2s steps(4, end) infinite;
+}
+.ovfx-playing.ovfx-flash {
+  animation: ovfx-flash 0.9s ease-in-out infinite;
+}
+.ovfx-playing.ovfx-zoom {
+  animation: ovfx-zoom 1.5s ease-in-out infinite;
+}
+.ovfx-playing.ovfx-warp {
+  animation: ovfx-warp 1.8s ease-in-out infinite;
+}
+.ovfx-playing.ovfx-spin {
+  animation: ovfx-spin 2s linear infinite;
+}
+.ovfx-playing.ovfx-fade {
+  animation: ovfx-fade 1.6s ease-in-out infinite;
+}
+/* Mask effects darken from the edges, so the swatch itself does not move. */
+.ovfx-playing.ovfx-mask::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  animation: ovfx-mask 1.8s ease-in-out infinite;
+}
+
+@keyframes ovfx-color {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: invert(1) hue-rotate(120deg);
+  }
+}
+
+@keyframes ovfx-glitch {
+  0%,
+  100% {
+    transform: translateX(0);
+    filter: none;
+  }
+  25% {
+    transform: translateX(-6%);
+    filter: drop-shadow(3px 0 rgba(255, 0, 0, 0.85)) drop-shadow(-3px 0 rgba(0, 255, 255, 0.85));
+  }
+  75% {
+    transform: translateX(5%);
+    filter: drop-shadow(-4px 0 rgba(255, 0, 0, 0.85)) drop-shadow(4px 0 rgba(0, 255, 255, 0.85));
+  }
+}
+
+@keyframes ovfx-blur {
+  0%,
+  100% {
+    filter: blur(0);
+  }
+  50% {
+    filter: blur(4px);
+  }
+}
+
+@keyframes ovfx-pixel {
+  0%,
+  100% {
+    filter: contrast(1) saturate(1);
+    transform: scale(1);
+  }
+  50% {
+    /* CSS cannot pixelate, so this fakes the read: chunky steps() timing plus a
+       hard contrast push, which is what pixelation looks like at a glance. */
+    filter: contrast(2.4) saturate(1.8);
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ovfx-flash {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  45% {
+    filter: brightness(2.1);
+  }
+  60% {
+    filter: brightness(0.55);
+  }
+}
+
+@keyframes ovfx-zoom {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.28);
+  }
+}
+
+@keyframes ovfx-warp {
+  0%,
+  100% {
+    transform: skewX(0) skewY(0);
+  }
+  33% {
+    transform: skewX(-9deg) skewY(3deg);
+  }
+  66% {
+    transform: skewX(8deg) skewY(-3deg);
+  }
+}
+
+@keyframes ovfx-spin {
+  from {
+    transform: rotate(0) scale(1.35);
+  }
+  to {
+    transform: rotate(360deg) scale(1.35);
+  }
+}
+
+@keyframes ovfx-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes ovfx-mask {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.9);
+  }
+  50% {
+    box-shadow: inset 0 0 26px 12px rgba(0, 0, 0, 0.9);
+  }
+}
+
+/*
+ * Reduced motion is not optional. The preview still has to distinguish one
+ * family from the next, so instead of animating, each family holds its most
+ * characteristic FRAME. A user who asked for less motion still gets a picker
+ * they can choose from.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ovfx-playing.ovfx-color,
+  .ovfx-playing.ovfx-glitch,
+  .ovfx-playing.ovfx-blur,
+  .ovfx-playing.ovfx-pixel,
+  .ovfx-playing.ovfx-flash,
+  .ovfx-playing.ovfx-zoom,
+  .ovfx-playing.ovfx-warp,
+  .ovfx-playing.ovfx-spin,
+  .ovfx-playing.ovfx-fade,
+  .ovfx-playing.ovfx-mask::before {
+    animation: none;
+  }
+  .ovfx-playing.ovfx-color {
+    filter: invert(1) hue-rotate(120deg);
+  }
+  .ovfx-playing.ovfx-glitch {
+    filter: drop-shadow(3px 0 rgba(255, 0, 0, 0.85)) drop-shadow(-3px 0 rgba(0, 255, 255, 0.85));
+  }
+  .ovfx-playing.ovfx-blur {
+    filter: blur(4px);
+  }
+  .ovfx-playing.ovfx-pixel {
+    filter: contrast(2.4) saturate(1.8);
+  }
+  .ovfx-playing.ovfx-flash {
+    filter: brightness(2.1);
+  }
+  .ovfx-playing.ovfx-zoom {
+    transform: scale(1.28);
+  }
+  .ovfx-playing.ovfx-warp {
+    transform: skewX(-9deg) skewY(3deg);
+  }
+  .ovfx-playing.ovfx-spin {
+    transform: rotate(28deg) scale(1.35);
+  }
+  .ovfx-playing.ovfx-fade {
+    opacity: 0.35;
+  }
+  .ovfx-playing.ovfx-mask::before {
+    box-shadow: inset 0 0 26px 12px rgba(0, 0, 0, 0.9);
+  }
+}

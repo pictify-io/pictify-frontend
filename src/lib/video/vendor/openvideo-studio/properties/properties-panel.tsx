@@ -31,6 +31,36 @@ import {
   DEFAULT_IN_FRACTION,
   DEFAULT_OUT_FRACTION,
 } from "../../../animations";
+import {
+  effectParamSpecs,
+  readEffectValues,
+  effectValuePatch,
+  resetEffectValues,
+} from "../../../effects";
+import ScenePanel from "./scene-panel";
+import {
+  readSpeed,
+  speedPatch,
+  SPEED_PRESETS,
+  MIN_SPEED,
+  MAX_SPEED,
+} from "../../../clip-speed";
+import {
+  readStroke,
+  strokePatch,
+  readShadow,
+  shadowPatch,
+  readCornerRadius,
+  cornerRadiusPatch,
+  maxCornerRadius,
+  readFlip,
+  flipPatch,
+  readSpacing,
+  spacingPatch,
+  readFade,
+  fadePatch,
+  fadeMaxMs,
+} from "../../../clip-style";
 import { getHostCallbacks } from "../runtime";
 import { useEphemeralClip } from "./use-ephemeral-clip";
 import { getFontByPostScriptName } from "../font-utils";
@@ -295,6 +325,153 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
           />
         );
 
+      case "stroke":
+        return (
+          <Properties.StrokeProperty
+            key={key}
+            stroke={readStroke(coreClip)}
+            onChange={(changes) => {
+              handleStyleUpdate(strokePatch(readStroke(coreClip), changes));
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "shadow":
+        return (
+          <Properties.ShadowProperty
+            key={key}
+            shadow={readShadow(coreClip)}
+            onChange={(changes) => {
+              handleStyleUpdate(shadowPatch(readShadow(coreClip), changes));
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "cornerRadius":
+        return (
+          <Properties.CornerRadiusProperty
+            key={key}
+            value={readCornerRadius(coreClip)}
+            max={maxCornerRadius(coreClip)}
+            onChange={(val) => {
+              handleStyleUpdate(cornerRadiusPatch(val, coreClip));
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "flip":
+        return (
+          <Properties.FlipProperty
+            key={key}
+            flip={readFlip(coreClip)}
+            onToggle={(axis) => {
+              // flip lives on the transform, not the style.
+              handleTransformUpdate(flipPatch(coreClip, axis));
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "spacing": {
+        const spacing = readSpacing(coreClip);
+        return (
+          <Properties.SpacingProperty
+            key={key}
+            lineHeight={spacing.lineHeight}
+            letterSpacing={spacing.letterSpacing}
+            onChange={(changes) => {
+              handleStyleUpdate(spacingPatch(changes));
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+      }
+
+      case "effectConfig": {
+        const specs = effectParamSpecs(coreClip.effectKey);
+        return (
+          <Properties.EffectConfigProperty
+            key={key}
+            specs={specs}
+            values={readEffectValues(coreClip, specs)}
+            onChange={(name, value) => {
+              const patch = effectValuePatch(coreClip, specs, name, value);
+              if (patch) handleUpdate(patch);
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+            onReset={() => {
+              handleUpdate(resetEffectValues());
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+      }
+
+      case "captionColors":
+        return (
+          <Properties.CaptionColorsProperty
+            key={key}
+            colors={coreClip.caption?.colors || {}}
+            onChange={(colors) => {
+              // The caption bag is read-modify-write: `words` lives on the same
+              // object and dropping it would erase the timings.
+              handleUpdate({ caption: { ...(coreClip.caption || {}), colors } });
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "captionLayout":
+        return (
+          <Properties.CaptionLayoutProperty
+            key={key}
+            wordsPerLine={coreClip.wordsPerLine === "single" ? "single" : "multiple"}
+            onChange={(wordsPerLine) => {
+              handleUpdate({ wordsPerLine });
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "speed":
+        return (
+          <Properties.SpeedProperty
+            key={key}
+            speed={readSpeed(coreClip)}
+            presets={SPEED_PRESETS}
+            min={MIN_SPEED}
+            max={MAX_SPEED}
+            onChange={(value) => {
+              // Retiming rewrites the whole timing object, so it goes through
+              // handleUpdate rather than a style write.
+              const patch = speedPatch(coreClip, value);
+              if (patch) handleUpdate(patch);
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "fade": {
+        const fade = readFade(coreClip);
+        return (
+          <Properties.FadeProperty
+            key={key}
+            inMs={fade.inMs}
+            outMs={fade.outMs}
+            maxMs={fadeMaxMs(coreClip)}
+            onChange={(which, ms) => {
+              // fadePatch returns a whole timing object, so it goes through
+              // handleUpdate rather than handleStyleUpdate.
+              handleUpdate(fadePatch(coreClip, which, ms));
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+      }
+
       case "timing": {
         const timing = coreClip.timing || {};
         const display = timing.display || { from: 0, to: 5_000_000 };
@@ -427,15 +604,12 @@ function MultiSelectPanel({ clips }: { clips: any[] }) {
 export default function PropertiesPanel() {
   const selectedClips = useStudioStore((s) => s.selectedClips);
 
+  // No selection is not an empty state: it is when the composition's OWN
+  // settings — canvas size, frame rate, export quality — are the only thing
+  // there is to edit. Showing "nothing selected" here wasted the one moment
+  // those controls have somewhere obvious to live.
   if (selectedClips.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 bg-background px-6 text-center">
-        <span className="text-xs font-semibold text-muted-foreground">Nothing selected</span>
-        <span className="text-[11px] leading-relaxed text-muted-foreground/70">
-          Select a clip on the canvas or the timeline to edit its properties.
-        </span>
-      </div>
-    );
+    return <ScenePanel />;
   }
 
   if (selectedClips.length > 1) {

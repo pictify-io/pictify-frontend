@@ -26,8 +26,57 @@
 	// ?starter=<id> with ?full=1 previews a seeded scene without a backend.
 	$: harnessStarter = starterById($page.url.searchParams.get('starter') || '');
 	$: harnessStarterClips = harnessStarter
-		? buildStarterClips(harnessStarter.id, { width: 1080, height: 1920 })
+		? withProbeClip(buildStarterClips(harnessStarter.id, { width: 1080, height: 1920 }))
 		: null;
+
+	/*
+	 * ?probe=image adds an Image clip to the seeded scene.
+	 *
+	 * Several properties — flip, shadow, corner radius — only apply to Image and
+	 * Video clips, and every starter scene is built from Text and Shape. Without
+	 * this there is no way to look at those controls working, because the media
+	 * library needs a backend the harness deliberately does not have.
+	 *
+	 * A base64 PNG rather than an SVG data URL: an `image/svg+xml` source is
+	 * added to the document without complaint and then silently never draws,
+	 * because the texture loader picks its parser by media type and has none for
+	 * SVG. The clip is there, the canvas is empty, and nothing is logged.
+	 *
+	 * The artwork is deliberately asymmetric — a red disc up and left, a blue
+	 * block down and right — so a flip on either axis is unmistakable.
+	 */
+	const PROBE_IMAGE =
+		'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAz0lEQVR4nO3QsQ3CUBAEUTfjTtwJ5TsgRQgJOrDv8+88J3mCzXfe8np/vnfeQh+gJwB9gJ4A9AF6UwDPbQuPDk0FGAnvDjEMMBPfESEMkBHeESIEUBHfBUEAMr4DwiHAFfE0ggAd4kkEAQQQQAABBBBAAAEEgBGIeAHOAK5CoOJDANUIZLwAUYAqBDp+CCATgo6eAphFoINTAP6BoENLALK3PvayCSCAAAIIIIAAAggggAACCCCAAAIIIIAAAgggQDMAYgLQB+gJQB+gd3uAH2KIxxCtroNxAAAAAElFTkSuQmCC';
+
+	const withProbeClip = (clips) => {
+		if (!clips || $page.url.searchParams.get('probe') !== 'image') return clips;
+		return [
+			...clips,
+			{
+				type: 'Image',
+				name: 'Probe image',
+				src: PROBE_IMAGE,
+				timing: {
+					display: { from: 0, to: 6_000_000 },
+					trim: { from: 0, to: 6_000_000 },
+					duration: 6_000_000,
+					playbackRate: 1
+				},
+				transform: {
+					x: 240,
+					y: 300,
+					width: 600,
+					height: 600,
+					angle: 0,
+					opacity: 1,
+					zIndex: 9
+				},
+				style: {},
+				metadata: {},
+				locked: false
+			}
+		];
+	};
 
 	// ?kind=tsx renders a Remotion template, so the chat and player can be
 	// exercised without a login.

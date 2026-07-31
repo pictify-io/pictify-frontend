@@ -49,6 +49,22 @@ const compositorFor = async (projectJson) => {
 		bitrate: settings.bitrate || 8_000_000,
 		backgroundColor: settings.backgroundColor || '#000000'
 	});
+
+	/*
+	 * Start the Pixi application BEFORE loading the document.
+	 *
+	 * `loadFromJSON` is what constructs the clips, and a text clip needs a Pixi
+	 * renderer at construction time to lay its glyphs out. Built without one it
+	 * throws on the first frame:
+	 *
+	 *   BaseTextClip: No renderer. Provide one via constructor or setRenderer()
+	 *
+	 * which surfaces as an export that dies partway with no file. `snapshot()`
+	 * initialises on demand and so appeared to work, which is why thumbnails
+	 * were fine while the export was not — the failure only showed on documents
+	 * containing text, and every real template has text.
+	 */
+	await compositor.initPixiApp();
 	await compositor.loadFromJSON(projectJson);
 	return compositor;
 };

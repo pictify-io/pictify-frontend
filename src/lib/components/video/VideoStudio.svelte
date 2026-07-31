@@ -29,7 +29,9 @@
 		renderVideoTemplate,
 		uploadVideoMedia,
 		listVideoMedia,
-		deleteVideoMedia
+		deleteVideoMedia,
+		transcribeMedia,
+		searchStockAssets
 	} from '../../../api/videoTemplates';
 	import { uploadBrandAsset, getBrandAssets } from '../../../api/brand-assets';
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
@@ -54,6 +56,8 @@
 		TOKEN_RE
 	} from '$lib/video/variables.js';
 	import { isInlineEditable } from '$lib/video/inline-text.js';
+	import { checkComposition } from '$lib/video/composition-check.js';
+	import SafeAreaOverlay from './SafeAreaOverlay.svelte';
 	import {
 		STAGE,
 		PANEL,
@@ -195,6 +199,9 @@
 	// ── Element refs ─────────────────────────────────────────────────────
 	let canvasEl;
 	let canvasWrapEl;
+	/** Safe-area guides are opt-in: useful for checking, noisy for working. */
+	let showSafeAreas = false;
+	let compositionSettings = { width: 1080, height: 1920 };
 	let timelineEl;
 	let railEl;
 	let propsEl;
@@ -426,6 +433,15 @@
 				onState: (state) => {
 					canUndo = state.canUndo;
 					canRedo = state.canRedo;
+					// Track the canvas size so the safe-area guides follow a change
+					// made in the composition panel rather than staying on the size
+					// the studio opened with.
+					if (state.settings?.width && state.settings?.height) {
+						compositionSettings = {
+							width: state.settings.width,
+							height: state.settings.height
+						};
+					}
 					if (trackDirty && (state.clips !== lastClips || state.tracks !== lastTracks)) {
 						if (!suppressDirty) {
 							markDirty();
@@ -499,6 +515,8 @@
 				uploadMedia,
 				loadMedia,
 				deleteMedia,
+				transcribe: transcribeMedia,
+				searchStock: searchStockAssets,
 				// The vendored gradient editor mutates a clip's style directly; the
 				// studio store only republishes on a SELECTION change, so it tells us
 				// when to re-read the clip and re-detect variables.
@@ -1130,6 +1148,20 @@
 			const authored = documentToSave();
 			const filled = applyVariables(authored, testValues, variableDefinitions);
 
+			/*
+			 * Refuse a render that would come out blank.
+			 *
+			 * Checked on the FILLED document, because a variable binding can move a
+			 * clip out of the window, and before either export path: the browser
+			 * one never reaches the server, and on the server path this saves a
+			 * two-minute wait to be told the same thing.
+			 */
+			const composition = checkComposition(filled);
+			if (composition.blank) {
+				exportError = composition.message;
+				return;
+			}
+
 			if (clientExportSupported) {
 				exportStage = 'Rendering in your browser';
 				const { exportProjectToBlob } = await import('$lib/video/exportHost.js');
@@ -1208,7 +1240,7 @@
 			{filling ? 'bg-brand-accent' : 'bg-gray-900'} {Z.dock}"
 	>
 		<a
-			href="/dashboard/video-templates"
+			href="/dashboard/template?type=video"
 			class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all focus-brutal
 				{filling
 				? 'bg-black/10 text-black hover:bg-black/20'
@@ -1426,6 +1458,27 @@
 				</div>
 			{/if}
 			<canvas bind:this={canvasEl} class="block h-full w-full"></canvas>
+
+			{#if showSafeAreas && !isBooting}
+				<SafeAreaOverlay
+					host={canvasWrapEl}
+					compositionWidth={compositionSettings.width}
+					compositionHeight={compositionSettings.height}
+				/>
+			{/if}
+
+			<!-- Off by default: guides are for checking a layout, not for working
+			     inside all day. -->
+			<button
+				type="button"
+				on:click={() => (showSafeAreas = !showSafeAreas)}
+				aria-pressed={showSafeAreas}
+				title="Show where Reels, TikTok and YouTube put their own interface over your video"
+				class="absolute bottom-2 right-2 z-30 rounded border-[2px] border-black px-2 py-1 text-[9px] font-black uppercase tracking-widest transition-colors
+					{showSafeAreas ? 'bg-brand-accent text-black' : 'bg-gray-900/90 text-gray-300 hover:text-white'}"
+			>
+				Safe areas
+			</button>
 
 			<!--
 				Inline text editor, positioned over the clip it edits. Keyed on the

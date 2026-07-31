@@ -47,6 +47,27 @@ export interface HostCallbacks {
    * placed on a timeline keep working, because the file itself stays.
    */
   deleteMedia?: (uid: string) => Promise<void>;
+  /**
+   * Transcribe a media URL into word timings, for caption clips.
+   *
+   * The URL has to be publicly reachable: the transcription service fetches it
+   * directly rather than streaming it through our server, which is what keeps a
+   * 200MB source video off the API box.
+   */
+  transcribe?: (
+    url: string
+  ) => Promise<{ words: Array<{ text: string; from: number; to: number }>; text: string }>;
+  /**
+   * Search stock images or videos. Proxied server-side so the provider key is
+   * never shipped to the browser. Rejects with a `code` of `stock_unavailable`
+   * when the server has no key configured, which the panel shows as a setup
+   * message rather than as a failure.
+   */
+  searchStock?: (
+    kind: "image" | "video",
+    query: string,
+    page?: number
+  ) => Promise<{ items: Array<any>; pagination: { hasMore: boolean; page: number } }>;
 }
 
 let hostCallbacks: HostCallbacks = {};

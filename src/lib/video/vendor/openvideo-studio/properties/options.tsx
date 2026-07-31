@@ -12,6 +12,7 @@
  * The TimingProperty section is written for Pictify (start / duration in
  * seconds over timing.display microseconds).
  */
+import * as React from "react";
 import { Button, ColorField, Input, NumberInput, Select, Slider, cn } from "../ui";
 import {
   RiAddLine,
@@ -46,6 +47,17 @@ import {
   parseGradientFill,
   toGradientFill,
 } from "../../../gradients";
+import {
+  DEFAULT_STROKE,
+  DEFAULT_SHADOW,
+  STROKE_WIDTH_MAX,
+  SHADOW_BLUR_MAX,
+  LINE_HEIGHT_MIN,
+  LINE_HEIGHT_MAX,
+  LETTER_SPACING_MIN,
+  LETTER_SPACING_MAX,
+} from "../../../clip-style";
+import { paramLabel } from "../../../effect-params";
 
 const GROUPED_FONTS = getGroupedFonts();
 
@@ -1078,6 +1090,599 @@ export function ArrangeProperty({ count, onAlign, onDistribute, onOrder }: Arran
             </button>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Stroke ───────────────────────────────────────────────────────────────
+
+// Optional sections use SectionHeader's +/- affordance rather than a checkbox,
+// because "no stroke" and "a stroke of width 0" have to look different: the
+// first hides the controls, the second would leave a row of dead sliders.
+
+export function StrokeProperty({
+  stroke,
+  onChange,
+}: {
+  stroke: { color: string; width: number } | null;
+  onChange: (changes: { color?: string; width?: number } | null) => void;
+}) {
+  const active = !!stroke;
+  const width = useSliderThrottle(stroke?.width ?? DEFAULT_STROKE.width, (val) =>
+    onChange({ width: val }),
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionHeader
+        title="Stroke"
+        hasContent={active}
+        onAdd={() => onChange({})}
+        onRemove={() => onChange(null)}
+      />
+      {active && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField
+              color={stroke.color}
+              onChange={(color) => onChange({ color })}
+              className="w-full"
+            />
+          </Row>
+          <Row label="Width">
+            <Slider
+              value={width.localValue}
+              max={STROKE_WIDTH_MAX}
+              onChange={width.handleChange}
+              onCommit={width.handleCommit}
+            />
+            <NumberInput
+              value={width.localValue}
+              onChange={width.handleDirectSet}
+              className="w-12 shrink-0 text-center"
+              aria-label="Stroke width"
+            />
+          </Row>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Shadow ───────────────────────────────────────────────────────────────
+
+export function ShadowProperty({
+  shadow,
+  onChange,
+}: {
+  shadow: { color: string; alpha: number; blur: number; offsetX: number; offsetY: number } | null;
+  onChange: (
+    changes: {
+      color?: string;
+      alpha?: number;
+      blur?: number;
+      offsetX?: number;
+      offsetY?: number;
+    } | null,
+  ) => void;
+}) {
+  const active = !!shadow;
+  const blur = useSliderThrottle(shadow?.blur ?? DEFAULT_SHADOW.blur, (val) =>
+    onChange({ blur: val }),
+  );
+  // Alpha is stored 0–1 but shown as a percentage, matching Opacity above.
+  const alpha = useSliderThrottle(
+    Math.round((shadow?.alpha ?? DEFAULT_SHADOW.alpha) * 100),
+    (pct) => onChange({ alpha: pct / 100 }),
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionHeader
+        title="Shadow"
+        hasContent={active}
+        onAdd={() => onChange({})}
+        onRemove={() => onChange(null)}
+      />
+      {active && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField
+              color={shadow.color}
+              onChange={(color) => onChange({ color })}
+              className="w-full"
+            />
+          </Row>
+          <Row label="Opacity">
+            <Slider
+              value={alpha.localValue}
+              max={100}
+              onChange={alpha.handleChange}
+              onCommit={alpha.handleCommit}
+            />
+            <NumberInput
+              value={alpha.localValue}
+              onChange={alpha.handleDirectSet}
+              className="w-12 shrink-0 text-center"
+              aria-label="Shadow opacity percent"
+            />
+          </Row>
+          <Row label="Blur">
+            <Slider
+              value={blur.localValue}
+              max={SHADOW_BLUR_MAX}
+              onChange={blur.handleChange}
+              onCommit={blur.handleCommit}
+            />
+            <NumberInput
+              value={blur.localValue}
+              onChange={blur.handleDirectSet}
+              className="w-12 shrink-0 text-center"
+              aria-label="Shadow blur"
+            />
+          </Row>
+          <Row label="Offset">
+            <NumberInput
+              value={Math.round(shadow.offsetX)}
+              onChange={(val) => onChange({ offsetX: val })}
+              aria-label="Shadow offset X"
+            />
+            <NumberInput
+              value={Math.round(shadow.offsetY)}
+              onChange={(val) => onChange({ offsetY: val })}
+              aria-label="Shadow offset Y"
+            />
+          </Row>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Corner radius ────────────────────────────────────────────────────────
+
+export function CornerRadiusProperty({
+  value,
+  max,
+  onChange,
+}: {
+  value: number;
+  max: number;
+  onChange: (val: number) => void;
+}) {
+  const radius = useSliderThrottle(value, onChange);
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Corner Radius" />
+      <div className="flex flex-col py-1">
+        <Row label="Radius">
+          {/* The ceiling is half the clip's shorter side: past that the corners
+              have eaten the shape and the slider would keep moving with nothing
+              changing on the canvas. */}
+          <Slider
+            value={radius.localValue}
+            max={max}
+            onChange={radius.handleChange}
+            onCommit={radius.handleCommit}
+          />
+          <NumberInput
+            value={radius.localValue}
+            onChange={radius.handleDirectSet}
+            className="w-12 shrink-0 text-center"
+            aria-label="Corner radius"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Flip ─────────────────────────────────────────────────────────────────
+
+export function FlipProperty({
+  flip,
+  onToggle,
+}: {
+  flip: { x: boolean; y: boolean };
+  onToggle: (axis: "x" | "y") => void;
+}) {
+  const btn = (on: boolean) =>
+    cn(
+      "flex h-7 flex-1 items-center justify-center gap-1.5 rounded border text-[11px] transition-colors",
+      on
+        ? "border-primary/60 bg-primary/15 text-foreground"
+        : "border-border bg-muted/60 text-muted-foreground hover:border-primary/50 hover:bg-accent hover:text-foreground",
+    );
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Flip" />
+      <div className="flex gap-1 py-1">
+        <button
+          type="button"
+          className={btn(flip.x)}
+          aria-pressed={flip.x}
+          onClick={() => onToggle("x")}
+        >
+          <i className="fa fa-arrows-left-right" aria-hidden="true" />
+          Horizontal
+        </button>
+        <button
+          type="button"
+          className={btn(flip.y)}
+          aria-pressed={flip.y}
+          onClick={() => onToggle("y")}
+        >
+          <i className="fa fa-arrows-up-down" aria-hidden="true" />
+          Vertical
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Text spacing ─────────────────────────────────────────────────────────
+
+export function SpacingProperty({
+  lineHeight,
+  letterSpacing,
+  onChange,
+}: {
+  lineHeight: number;
+  letterSpacing: number;
+  onChange: (changes: { lineHeight?: number; letterSpacing?: number }) => void;
+}) {
+  // Line height is a multiplier (1.2 = normal), letter spacing is pixels. The
+  // slider works in integers, so line height is scaled by ten and back.
+  const line = useSliderThrottle(Math.round(lineHeight * 10), (val) =>
+    onChange({ lineHeight: val / 10 }),
+  );
+  const letter = useSliderThrottle(letterSpacing, (val) => onChange({ letterSpacing: val }));
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Spacing" />
+      <div className="flex flex-col py-1">
+        <Row label="Line height">
+          <Slider
+            value={line.localValue}
+            min={LINE_HEIGHT_MIN * 10}
+            max={LINE_HEIGHT_MAX * 10}
+            onChange={line.handleChange}
+            onCommit={line.handleCommit}
+          />
+          <NumberInput
+            value={line.localValue / 10}
+            onChange={(val) => line.handleDirectSet(Math.round(val * 10))}
+            className="w-12 shrink-0 text-center"
+            aria-label="Line height"
+          />
+        </Row>
+        <Row label="Letter">
+          <Slider
+            value={letter.localValue}
+            min={LETTER_SPACING_MIN}
+            max={LETTER_SPACING_MAX}
+            onChange={letter.handleChange}
+            onCommit={letter.handleCommit}
+          />
+          <NumberInput
+            value={letter.localValue}
+            onChange={letter.handleDirectSet}
+            className="w-12 shrink-0 text-center"
+            aria-label="Letter spacing"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Fades ────────────────────────────────────────────────────────────────
+
+export function FadeProperty({
+  inMs,
+  outMs,
+  maxMs,
+  onChange,
+}: {
+  inMs: number;
+  outMs: number;
+  maxMs: number;
+  onChange: (which: "in" | "out", ms: number) => void;
+}) {
+  const fadeIn = useSliderThrottle(inMs, (val) => onChange("in", val));
+  const fadeOut = useSliderThrottle(outMs, (val) => onChange("out", val));
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Fade" />
+      <div className="flex flex-col py-1">
+        {/* Milliseconds, not the microseconds the timeline uses. The two sit one
+            key apart on the same timing object, so the label is load-bearing. */}
+        <Row label="In (ms)">
+          <Slider
+            value={fadeIn.localValue}
+            max={maxMs}
+            step={50}
+            onChange={fadeIn.handleChange}
+            onCommit={fadeIn.handleCommit}
+          />
+          <NumberInput
+            value={fadeIn.localValue}
+            onChange={fadeIn.handleDirectSet}
+            className="w-14 shrink-0 text-center"
+            aria-label="Fade in milliseconds"
+          />
+        </Row>
+        <Row label="Out (ms)">
+          <Slider
+            value={fadeOut.localValue}
+            max={maxMs}
+            step={50}
+            onChange={fadeOut.handleChange}
+            onCommit={fadeOut.handleCommit}
+          />
+          <NumberInput
+            value={fadeOut.localValue}
+            onChange={fadeOut.handleDirectSet}
+            className="w-14 shrink-0 text-center"
+            aria-label="Fade out milliseconds"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Effect configuration ─────────────────────────────────────────────────
+
+// The controls here are derived from the shader's own uniforms, so this
+// component knows nothing about any particular effect. See ../../../effects.js.
+
+export function EffectConfigProperty({
+  specs,
+  values,
+  onChange,
+  onReset,
+}: {
+  specs: Array<{ name: string; kind: string; value: any; min?: number; max?: number; step?: number }>;
+  values: Record<string, any>;
+  onChange: (name: string, value: any) => void;
+  onReset: () => void;
+}) {
+  if (!specs.length) {
+    return (
+      <div className="flex flex-col">
+        <SectionTitle title="Effect" />
+        <p className="py-1 text-[11px] leading-snug text-muted-foreground">
+          This effect has no settings to adjust. Trim it on the timeline to change how long it runs.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between py-2">
+        <span className="text-xs font-semibold text-foreground">Effect</span>
+        <button
+          type="button"
+          onClick={onReset}
+          title="Put every setting back to the effect's default"
+          className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="flex flex-col py-1">
+        {specs.map((spec) => {
+          const value = values[spec.name];
+          const label = paramLabel(spec.name);
+
+          if (spec.kind === "number") {
+            return (
+              <Row key={spec.name} label={label}>
+                <Slider
+                  value={Number(value) || 0}
+                  min={spec.min}
+                  max={spec.max}
+                  step={spec.step}
+                  onChange={(val) => onChange(spec.name, val)}
+                />
+                <NumberInput
+                  value={Number(value) || 0}
+                  onChange={(val) => onChange(spec.name, val)}
+                  className="w-14 shrink-0 text-center"
+                  aria-label={label}
+                />
+              </Row>
+            );
+          }
+
+          if (spec.kind === "boolean") {
+            return (
+              <Row key={spec.name} label={label}>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={Boolean(value)}
+                  aria-label={label}
+                  onClick={() => onChange(spec.name, !value)}
+                  className={cn(
+                    "h-7 w-full rounded border text-[11px] font-semibold transition-colors",
+                    value
+                      ? "border-primary/60 bg-primary/15 text-foreground"
+                      : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {value ? "On" : "Off"}
+                </button>
+              </Row>
+            );
+          }
+
+          if (spec.kind === "color") {
+            return (
+              <Row key={spec.name} label={label}>
+                <ColorField
+                  color={String(value || "#ffffff")}
+                  onChange={(val) => onChange(spec.name, val)}
+                  className="w-full"
+                />
+              </Row>
+            );
+          }
+
+          // vec2 — an x/y pair, most often a centre point.
+          return (
+            <Row key={spec.name} label={label}>
+              <NumberInput
+                value={Number(value?.[0]) || 0}
+                onChange={(val) => onChange(spec.name, [val, Number(value?.[1]) || 0])}
+                aria-label={`${label} X`}
+              />
+              <NumberInput
+                value={Number(value?.[1]) || 0}
+                onChange={(val) => onChange(spec.name, [Number(value?.[0]) || 0, val])}
+                aria-label={`${label} Y`}
+              />
+            </Row>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Captions ─────────────────────────────────────────────────────────────
+
+export function CaptionColorsProperty({
+  colors,
+  onChange,
+}: {
+  colors: { active?: { color?: string } | null; future?: { color?: string } | null };
+  onChange: (next: any) => void;
+}) {
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Caption Colors" />
+      <div className="flex flex-col py-1">
+        {/* Spoken and upcoming are the only two that read at a glance; the
+            engine also supports a keyword colour, which needs words tagged as
+            keywords and so has nothing to control until that exists. */}
+        <Row label="Spoken">
+          <ColorField
+            color={colors?.active?.color || "#ffc480"}
+            onChange={(val) => onChange({ ...colors, active: { ...(colors?.active || {}), color: val } })}
+            className="w-full"
+          />
+        </Row>
+        <Row label="Upcoming">
+          <ColorField
+            color={colors?.future?.color || "#cbd5e1"}
+            onChange={(val) => onChange({ ...colors, future: { ...(colors?.future || {}), color: val } })}
+            className="w-full"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+export function CaptionLayoutProperty({
+  wordsPerLine,
+  onChange,
+}: {
+  wordsPerLine: "single" | "multiple";
+  onChange: (value: "single" | "multiple") => void;
+}) {
+  const option = (value: "single" | "multiple", label: string, hint: string) => (
+    <button
+      type="button"
+      onClick={() => onChange(value)}
+      title={hint}
+      className={cn(
+        "flex-1 rounded border px-2 py-1.5 text-[11px] font-semibold transition-colors",
+        wordsPerLine === value
+          ? "border-primary/60 bg-primary/15 text-foreground"
+          : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Caption Layout" />
+      <div className="flex gap-1 py-1">
+        {option("multiple", "Phrase", "Show the whole phrase and highlight each word as it is said")}
+        {option("single", "One word", "Show only the word being said")}
+      </div>
+    </div>
+  );
+}
+
+// ── Speed ────────────────────────────────────────────────────────────────
+
+export function SpeedProperty({
+  speed,
+  presets,
+  min,
+  max,
+  onChange,
+}: {
+  speed: number;
+  presets: number[];
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Speed" />
+      <div className="flex gap-1 py-1">
+        {presets.map((preset) => (
+          <button
+            key={preset}
+            type="button"
+            onClick={() => onChange(preset)}
+            className={cn(
+              "flex-1 rounded border px-1 py-1.5 text-[11px] font-semibold transition-colors",
+              Math.abs(speed - preset) < 0.001
+                ? "border-primary/60 bg-primary/15 text-foreground"
+                : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {preset}×
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-col py-1">
+        <Row label="Rate">
+          <Slider
+            value={speed}
+            min={min}
+            max={max}
+            step={0.05}
+            onChange={onChange}
+          />
+          <NumberInput
+            value={speed}
+            onChange={onChange}
+            className="w-14 shrink-0 text-center"
+            aria-label="Playback speed"
+          />
+        </Row>
+        {/* Retiming shortens or lengthens the clip on the timeline, which is
+            not obvious until it happens to a carefully placed clip. */}
+        <p className="pt-1 text-[10px] leading-snug text-muted-foreground">
+          Changing speed resizes the clip on the timeline.
+        </p>
       </div>
     </div>
   );

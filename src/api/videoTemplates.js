@@ -268,6 +268,36 @@ const listVideoMedia = async ({ kind, limit } = {}) => {
  */
 const deleteVideoMedia = async (uid) => backend.delete(`/video/media/${uid}`);
 
+/**
+ * Word-level transcription for caption clips.
+ *
+ * The URL must be publicly reachable: the transcription service fetches it
+ * itself rather than streaming through our backend, which is what keeps a
+ * 200MB source video off the API box.
+ *
+ * @param {string} url
+ * @returns {Promise<{words: Array<{text: string, from: number, to: number}>, text: string, durationUs: number}>}
+ *   `from`/`to` are MICROSECONDS from the start of the media, matching the
+ *   engine's clip timings.
+ */
+const transcribeMedia = async (url) => backend.post('/video/transcribe', { url });
+
+/**
+ * Stock photo or video search.
+ *
+ * Proxied by the backend so the provider key stays server-side. Throws with
+ * `code: 'stock_unavailable'` when no key is configured, which the panel shows
+ * as a setup message rather than as a failure.
+ *
+ * @param {'image'|'video'} kind
+ * @param {string} query
+ * @param {number} [page]
+ */
+const searchStockAssets = async (kind, query, page = 1) => {
+	const params = new URLSearchParams({ query, page: String(page) });
+	return backend.get(`/video/stock/${kind === 'video' ? 'videos' : 'images'}?${params}`);
+};
+
 export {
 	createVideoTemplate,
 	updateVideoTemplate,
@@ -283,5 +313,7 @@ export {
 	duplicateVideoTemplate,
 	uploadVideoMedia,
 	listVideoMedia,
-	deleteVideoMedia
+	deleteVideoMedia,
+	transcribeMedia,
+	searchStockAssets
 };

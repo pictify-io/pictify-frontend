@@ -56,15 +56,42 @@ const mountIsland = (el, element) => {
  *   vendored panel mutates a clip's style (the gradient editor). The studio
  *   store only republishes on a selection change, so the Svelte side needs this
  *   to re-read the clip and re-run variable detection.
+ * @param {Function} [options.transcribe] - async (url) => { words, text }, for
+ *   the captions panel.
+ * @param {Function} [options.searchStock] - async (kind, query, page) =>
+ *   { items, pagination }, for the stock panel.
  * @returns {{ destroy: () => void }}
  */
 export const mountToolRail = (
 	el,
-	{ core, studio, uploadMedia, loadMedia, deleteMedia, onClipStyleChange }
+	{
+		core,
+		studio,
+		uploadMedia,
+		loadMedia,
+		deleteMedia,
+		onClipStyleChange,
+		transcribe,
+		searchStock
+	}
 ) => {
 	if (!core) throw new Error('mountToolRail requires the editor core instance.');
 	setEditorContext({ core, studio: studio || null });
-	setHostCallbacks({ uploadMedia, loadMedia, deleteMedia, onClipStyleChange });
+	/*
+	 * Forwarded key by key rather than by spreading `options`, so the core and
+	 * studio instances do not end up in the callback bag. That means every new
+	 * callback has to be added HERE as well as to the caller — a panel whose
+	 * callback is missing silently shows its "not available" state, which reads
+	 * as a deliberate feature flag rather than as a dropped wire.
+	 */
+	setHostCallbacks({
+		uploadMedia,
+		loadMedia,
+		deleteMedia,
+		onClipStyleChange,
+		transcribe,
+		searchStock
+	});
 	const island = mountIsland(el, React.createElement(ToolRail));
 	return {
 		destroy: () => {
