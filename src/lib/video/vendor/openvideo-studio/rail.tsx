@@ -31,8 +31,9 @@ import PanelShapes from "./panels/shapes-panel";
 import PanelEffects from "./panels/effects-panel";
 import PanelCaptions from "./panels/captions-panel";
 import PanelStock from "./panels/stock-panel";
+import PanelTranscript from "./panels/transcript-panel";
 
-export type Tab = "text" | "media" | "stock" | "audio" | "shapes" | "effects" | "captions";
+export type Tab = "text" | "media" | "stock" | "audio" | "shapes" | "effects" | "captions" | "transcript";
 
 const tabs: { key: Tab; label: string; icon: React.ComponentType<any> }[] = [
   { key: "text", label: "Text", icon: RiTBoxLine },
@@ -42,6 +43,7 @@ const tabs: { key: Tab; label: string; icon: React.ComponentType<any> }[] = [
   { key: "shapes", label: "Shapes", icon: RiShapesLine },
   { key: "effects", label: "Effects", icon: RiMagicLine },
   { key: "captions", label: "Captions", icon: RiClosedCaptioningLine },
+  { key: "transcript", label: "Transcript", icon: RiTBoxLine },
 ];
 
 interface ToolPanelStore {
@@ -70,6 +72,7 @@ const PANEL_COMPONENTS: Record<Tab, React.ComponentType> = {
   shapes: PanelShapes,
   effects: PanelEffects,
   captions: PanelCaptions,
+  transcript: PanelTranscript,
 };
 
 export default function ToolRail() {
