@@ -19,6 +19,7 @@ import { useStudioStore } from "./runtime";
 import { projectStore, core } from "./runtime";
 import Playhead from "./playhead";
 import { useEditorHotkeys } from "./use-editor-hotkeys";
+import KeyframeLane from "./keyframe-lane";
 import { Audio, Image, Text, Video, Caption, Helper, Track, Transition, Backdrop } from "./items";
 import PreviewTrackItem from "./items/preview-drag-item";
 import { useTimelineOffsetX } from "./hooks";
@@ -400,6 +401,11 @@ const Timeline = () => {
           onScroll={onRulerScroll}
         />
         <Playhead scale={scale} scrollLeft={scrollLeft} />
+
+        {/* Keyframes for the selected clip, on the real time axis. */}
+        <div className="relative">
+          <KeyframeLane scale={scale} scrollLeft={scrollLeft} />
+        </div>
 
         {/* Container for Tracks and Canvas */}
         <div className="flex flex-1 min-h-0 overflow-hidden">

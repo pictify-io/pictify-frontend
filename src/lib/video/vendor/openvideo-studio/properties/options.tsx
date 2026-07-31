@@ -1837,25 +1837,16 @@ export function KeyframesProperty({
                   />
                 </div>
 
-                {/* The track. Markers sit at their stop; the playhead line shows
-                    where a change would land. */}
-                <div className="relative h-4 rounded bg-muted/60">
-                  <span
-                    className="absolute top-0 h-full w-px bg-primary/70"
-                    style={{ left: `${playhead * 100}%` }}
-                    aria-hidden="true"
-                  />
-                  {stops.map((frame) => (
-                    <button
-                      key={frame.at}
-                      type="button"
-                      onClick={() => onRemoveStop(frame.at)}
-                      title={`Keyframe at ${Math.round(frame.at * 100)}% — click to remove`}
-                      style={{ left: `${frame.at * 100}%` }}
-                      className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] border border-black bg-brand-accent transition-transform hover:scale-125"
-                    />
-                  ))}
-                </div>
+                {/*
+                  No track here. The markers live on the TIMELINE, at the real
+                  scale and under the clip they animate — a second strip at a
+                  different scale in a side panel was two time axes disagreeing
+                  with each other. This panel owns the VALUE at the playhead.
+                */}
+                <p className="text-[10px] text-muted-foreground">
+                  {stops.length} keyframe{stops.length === 1 ? "" : "s"} · editing at{" "}
+                  {Math.round(playhead * 100)}%
+                </p>
               </div>
             );
           })}
