@@ -22,6 +22,7 @@ import {
 	setKeyframe,
 	removeKeyframe,
 	removeStop,
+	moveStop,
 	valueAt,
 	animatedProps,
 	seedProperty
@@ -195,6 +196,50 @@ test('a whole stop can be removed', () => {
 	let frames = setKeyframe([], 0, 'opacity', 0);
 	frames = setKeyframe(frames, 1, 'opacity', 1);
 	assert.deepEqual(removeStop(frames, 0).map((f) => f.at), [1]);
+});
+
+// ── Moving a stop ────────────────────────────────────────────────────────
+
+test('a stop moves to a new time, carrying its properties', () => {
+	const frames = setKeyframe(setKeyframe([], 0, 'opacity', 0), 1, 'opacity', 1);
+	const moved = moveStop(frames, 1, 0.5);
+	assert.deepEqual(moved.map((f) => f.at), [0, 0.5]);
+	assert.equal(moved[1].props.opacity, 1);
+});
+
+test('moving onto another stop merges them, dragged one winning', () => {
+	// Refusing the drop leaves the marker against an invisible wall: the stop
+	// it collides with may be on another property row and off screen.
+	let frames = setKeyframe([], 0, 'opacity', 0);
+	frames = setKeyframe(frames, 0.5, 'scale', 2);
+	frames = setKeyframe(frames, 0.5, 'opacity', 0.9);
+	const moved = moveStop(frames, 0, 0.5);
+	assert.equal(moved.length, 1);
+	assert.equal(moved[0].props.scale, 2, 'the stayer keeps what the mover lacks');
+	assert.equal(moved[0].props.opacity, 0, 'the mover wins on a shared property');
+});
+
+test('a move outside the clip is clamped, not dropped', () => {
+	const frames = setKeyframe(setKeyframe([], 0, 'opacity', 0), 0.5, 'opacity', 1);
+	assert.equal(moveStop(frames, 0.5, 9).map((f) => f.at).includes(1), true);
+	assert.equal(moveStop(frames, 0.5, -9).map((f) => f.at).includes(0), true);
+});
+
+test('moving a stop onto itself changes nothing', () => {
+	const frames = setKeyframe([], 0.5, 'opacity', 1);
+	assert.deepEqual(moveStop(frames, 0.5, 0.5), frames);
+});
+
+test('moving a stop that does not exist is a no-op', () => {
+	const frames = setKeyframe([], 0, 'opacity', 1);
+	assert.deepEqual(moveStop(frames, 0.7, 0.2), frames);
+});
+
+test('moving does not mutate the previous list', () => {
+	// One undo entry per drag depends on the caller holding the old value.
+	const frames = setKeyframe(setKeyframe([], 0, 'opacity', 0), 1, 'opacity', 1);
+	moveStop(frames, 1, 0.5);
+	assert.deepEqual(frames.map((f) => f.at), [0, 1]);
 });
 
 // ── Interpolation ────────────────────────────────────────────────────────

@@ -203,6 +203,42 @@ export const removeStop = (frames, at) => {
 };
 
 /**
+ * Move one stop to a new time.
+ *
+ * Dragging a keyframe ONTO another merges them, with the dragged one winning
+ * on any property they share. Refusing the drop instead would leave the marker
+ * stuck against an invisible wall — the stops it collides with are on other
+ * property rows and may not even be on screen.
+ *
+ * @param {Array} frames
+ * @param {number} fromAt - the stop being moved, 0..1
+ * @param {number} toAt - where it lands, 0..1
+ */
+export const moveStop = (frames, fromAt, toAt) => {
+	const source = toStop(fromAt);
+	const target = toStop(clamp(toAt, 0, 1));
+	if (source === target) return frames || [];
+
+	const moving = (frames || []).find((frame) => toStop(frame.at) === source);
+	if (!moving) return frames || [];
+
+	const rest = (frames || []).filter((frame) => toStop(frame.at) !== source);
+	const existing = rest.find((frame) => toStop(frame.at) === target);
+
+	const out = rest
+		.filter((frame) => toStop(frame.at) !== target)
+		.map((frame) => ({ at: frame.at, props: { ...frame.props } }));
+
+	out.push({
+		at: fromStop(target),
+		// The dragged stop wins, so landing on another does what it looks like.
+		props: { ...(existing?.props || {}), ...moving.props }
+	});
+
+	return out.sort((a, b) => a.at - b.at);
+};
+
+/**
  * A property's value at an arbitrary point, linearly interpolated.
  *
  * Used to show what the clip is doing at the playhead, and to seed a new
