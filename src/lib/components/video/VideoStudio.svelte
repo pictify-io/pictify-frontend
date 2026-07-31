@@ -57,6 +57,7 @@
 	} from '$lib/video/variables.js';
 	import { isInlineEditable } from '$lib/video/inline-text.js';
 	import { checkComposition } from '$lib/video/composition-check.js';
+	import { overflowingClips, fitPatch } from '$lib/video/text-fit.js';
 	import SafeAreaOverlay from './SafeAreaOverlay.svelte';
 	import {
 		STAGE,
@@ -202,6 +203,65 @@
 	/** Safe-area guides are opt-in: useful for checking, noisy for working. */
 	let showSafeAreas = false;
 	let compositionSettings = { width: 1080, height: 1920 };
+
+	/**
+	 * Text clips whose value runs outside its box at the current test values.
+	 *
+	 * Recomputed on every value change, which is the point: a template looks
+	 * fine against the placeholder and breaks against row 400, and this is the
+	 * only place the studio can say so before the render.
+	 *
+	 * @type {Array<{clipId: string, name: string, text: string}>}
+	 */
+	let overflowing = [];
+
+	const recomputeOverflow = () => {
+		if (!editor || isCode) {
+			overflowing = [];
+			return;
+		}
+		try {
+			const filled = applyVariables(
+				editor.exportProject(),
+				testValues,
+				variableDefinitions
+			);
+			overflowing = overflowingClips(filled);
+		} catch (error) {
+			// A warning is a nicety; never let it break the editor.
+			overflowing = [];
+		}
+	};
+
+	/*
+	 * Re-check whenever the values or the declarations change.
+	 *
+	 * Reactive rather than hooked to one handler: values reach `testValues` from
+	 * the panel's own fields, from Sample, and from a rename, and wiring each
+	 * one separately is how a warning ends up stale exactly when it matters.
+	 *
+	 * Synchronous on purpose. This is the pattern that froze the tab once
+	 * before — a `$:` block that called tick() re-entered forever — so there is
+	 * no scheduling here at all. `overflowing` is not read by this block, so
+	 * assigning it cannot retrigger it.
+	 */
+	$: if (editor && !isCode) {
+		void testValues;
+		void variableDefinitions;
+		recomputeOverflow();
+	}
+
+	/** Set a clip to shrink-to-fit — the answer almost every time. */
+	const fixOverflow = (event) => {
+		const clipId = event?.detail?.clipId;
+		if (!clipId || !editor) return;
+		const clip = editor.core.store.getState().clips?.[clipId];
+		if (!clip) return;
+		const patch = fitPatch(clip, 'shrink');
+		if (patch) editor.core.clip.update(clipId, patch);
+		markDirty();
+		recomputeOverflow();
+	};
 	let timelineEl;
 	let railEl;
 	let propsEl;
@@ -1674,6 +1734,8 @@
 					{autoAdded}
 					{usage}
 					{filling}
+					{overflowing}
+					on:fixOverflow={fixOverflow}
 					on:change={onVariablesChange}
 					on:ackAutoAdded={onAckAutoAdded}
 					on:rename={onVariableRename}

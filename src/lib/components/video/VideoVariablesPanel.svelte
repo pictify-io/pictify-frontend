@@ -44,6 +44,13 @@
 	 * not there for this kind of template.
 	 */
 	export let alwaysLive = false;
+	/**
+	 * Text clips that run outside their box at the current test values, from
+	 * text-fit.js. Computed by the studio, which is the side that holds the
+	 * document; this panel only renders the warning and offers the fix.
+	 * @type {Array<{clipId: string, name: string, text: string}>}
+	 */
+	export let overflowing = [];
 	/** @type {boolean} — is fill-values preview mode on */
 	export let filling = false;
 
@@ -233,6 +240,47 @@
 </script>
 
 <div class="flex h-full w-full flex-col">
+	<!--
+		Which values break the layout.
+
+		The whole problem with a template is that it is designed against one
+		placeholder and rendered against a thousand real values, and the studio
+		only ever shows one set. This is the cheapest way to close that gap: with
+		the current test values applied, say which text runs outside its box —
+		and offer the fix, since "set this clip to shrink" is the answer almost
+		every time.
+	-->
+	{#if overflowing.length}
+		<div class="shrink-0 border-b-[3px] border-black bg-brand-danger/10 px-3 py-2.5">
+			<p class="text-[11px] font-black uppercase tracking-wider text-brand-danger">
+				{overflowing.length} value{overflowing.length === 1 ? '' : 's'} too long
+			</p>
+			<p class="mt-1 text-[10px] leading-snug {TEXT_FAINT}">
+				These run outside their box at the current values, and will be cut off in the render.
+			</p>
+			<div class="mt-2 flex flex-col gap-1">
+				{#each overflowing as item (item.clipId)}
+					<button
+						type="button"
+						on:click={() => dispatch('fixOverflow', item)}
+						title="Set this text to shrink so it always fits"
+						class="flex items-center justify-between gap-2 rounded border border-brand-danger/40 bg-gray-900/60 px-2 py-1.5 text-left transition-colors hover:border-brand-danger"
+					>
+						<span class="min-w-0">
+							<span class="block truncate text-[11px] font-bold text-gray-100">{item.name}</span>
+							<span class="block truncate text-[10px] {TEXT_FAINT}">{item.text}</span>
+						</span>
+						<span
+							class="shrink-0 text-[9px] font-black uppercase tracking-widest text-brand-danger"
+						>
+							Shrink
+						</span>
+					</button>
+				{/each}
+			</div>
+		</div>
+	{/if}
+
 	<!-- Toolbar -->
 	<div class="shrink-0 border-b-[3px] border-black bg-gray-800/60 px-3 py-3">
 		<div class="flex items-center justify-between gap-2">
