@@ -30,8 +30,19 @@ export const NORMAL_FONT_SIZE = 16;
 export const SMALL_FONT_SIZE = 12;
 
 // Dynamic timeline offset values
-export const TIMELINE_OFFSET_X_SMALL = 8;
-export const TIMELINE_OFFSET_X_LARGE = 16;
+/*
+ * The left gutter, and therefore the width of the label column.
+ *
+ * Everything that maps time to pixels derives from this — the ruler, the
+ * playhead, the spacer before the tracks canvas, the keyframe lane and
+ * getFitZoomLevel — so widening it moves the whole timeline right together and
+ * nothing has to be adjusted to match.
+ *
+ * It was 16px, which is a margin rather than a column: keyframe property names
+ * had nowhere to go and collided with a marker at 0%.
+ */
+export const TIMELINE_OFFSET_X_SMALL = 64;
+export const TIMELINE_OFFSET_X_LARGE = 96;
 
 // Timeline item selection styling
 export const TIMELINE_SELECTED_BORDER_COLOR = "rgba(24, 163, 222, 0.5)";

@@ -83,17 +83,16 @@ const KeyframeLane = ({
           style={{ top: row * LANE_HEIGHT, height: LANE_HEIGHT }}
         >
           {/*
-            The property name.
+            The property name, in the timeline's label column.
 
-            There is no left gutter to put this in — the timeline's offset is
-            about ten pixels, not a label column — so the chip floats over the
-            start of the lane with its own background. A keyframe at 0% sits
-            under it, which is why the chip is behind the markers rather than
-            over them: the marker stays clickable and the label stays readable.
+            The column is the gutter every time-to-pixel calculation already
+            offsets by (TIMELINE_OFFSET_X_LARGE), so a label sitting inside it
+            can never collide with a marker: the earliest possible marker, at
+            0%, starts where the column ends.
           */}
           <span
-            className="pointer-events-none absolute z-0 rounded-sm bg-background/85 px-1 py-px text-[9px] font-bold uppercase tracking-wider text-muted-foreground"
-            style={{ left: 2, top: 5 }}
+            className="pointer-events-none absolute truncate pr-2 text-right text-[9px] font-bold uppercase tracking-wider text-muted-foreground"
+            style={{ left: 0, top: 5, width: timelineOffsetX }}
           >
             {spec.label}
           </span>
