@@ -31,6 +31,7 @@ export type PropertyKey =
   | "captionLayout"
   | "speed"
   | "textFit"
+  | "keyframes"
   | "timing";
 
 /*
@@ -69,11 +70,11 @@ export const PROPERTY_REGISTRY: Record<string, PropertyKey[]> = {
    * exist in the engine's serialization types and neither is applied by
    * engine-pixi 1.3.2; see src/lib/video/clip-speed.js for the measurement.
    */
-  Image: ["transform", "flip", "arrange", "animation", "transition", "opacity", "cornerRadius", "stroke", "shadow", "timing"],
-  Video: ["transform", "flip", "arrange", "animation", "transition", "opacity", "cornerRadius", "stroke", "shadow", "volume", "fade", "speed", "timing"],
-  Text: ["textGroup", "textColor", "textStyle", "spacing", "textFit", "transform", "arrange", "animation", "transition", "opacity", "timing"],
+  Image: ["transform", "flip", "arrange", "animation", "keyframes", "transition", "opacity", "cornerRadius", "stroke", "shadow", "timing"],
+  Video: ["transform", "flip", "arrange", "animation", "keyframes", "transition", "opacity", "cornerRadius", "stroke", "shadow", "volume", "fade", "speed", "timing"],
+  Text: ["textGroup", "textColor", "textStyle", "spacing", "textFit", "transform", "arrange", "animation", "keyframes", "transition", "opacity", "timing"],
   Audio: ["volume", "fade", "speed", "timing"],
-  Shape: ["transform", "fill", "arrange", "animation", "transition", "opacity", "cornerRadius", "stroke", "timing"],
+  Shape: ["transform", "fill", "arrange", "animation", "keyframes", "transition", "opacity", "cornerRadius", "stroke", "timing"],
   /*
    * An Effect clip has no transform: it is a shader applied to everything
    * beneath it, so it has no position or size of its own. Its whole

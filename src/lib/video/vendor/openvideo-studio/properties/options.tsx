@@ -1730,3 +1730,157 @@ export function TextFitProperty({
     </div>
   );
 }
+
+// ── Keyframes ────────────────────────────────────────────────────────────
+
+/*
+ * Hand-authored keyframes.
+ *
+ * A row per animated property, with markers along a track. Editing happens at
+ * the PLAYHEAD: move the playhead, change a value, and a keyframe is written
+ * there. That is how every editor that does this works, and it avoids a
+ * separate "add keyframe at time X" affordance that nobody would find.
+ *
+ * The engine gives a clip ONE animation slot, so this and the preset picker are
+ * mutually exclusive. That is said out loud rather than silently discarding
+ * whichever the user picked first.
+ */
+
+export function KeyframesProperty({
+  frames,
+  props,
+  playhead,
+  hasPreset,
+  onSeed,
+  onSet,
+  onRemoveStop,
+  onRemoveProp,
+  onClear,
+  valueAt,
+}: {
+  frames: Array<{ at: number; props: Record<string, number> }>;
+  props: Array<{ name: string; label: string; min: number; max: number; step: number; neutral: number }>;
+  playhead: number;
+  hasPreset: boolean;
+  onSeed: (prop: string) => void;
+  onSet: (prop: string, value: number) => void;
+  onRemoveStop: (at: number) => void;
+  onRemoveProp: (prop: string) => void;
+  onClear: () => void;
+  valueAt: (prop: string, at: number) => number;
+}) {
+  const animated = props.filter((spec) =>
+    frames.some((frame) => frame.props[spec.name] !== undefined)
+  );
+  const available = props.filter((spec) => !animated.includes(spec));
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between py-2">
+        <span className="text-xs font-semibold text-foreground">Keyframes</span>
+        {animated.length > 0 && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {hasPreset && (
+        // Said before anything is edited, because the preset is lost the moment
+        // the first keyframe is written.
+        <p className="mb-1 rounded border border-brand-accent/40 bg-brand-accent/10 px-2 py-1.5 text-[10px] leading-snug text-foreground">
+          This clip uses an animation preset. Adding a keyframe replaces it —
+          a clip can only have one animation.
+        </p>
+      )}
+
+      {animated.length === 0 ? (
+        <p className="py-1 text-[11px] leading-snug text-muted-foreground">
+          Animate a property by hand. Move the playhead, then change the value.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2 py-1">
+          {animated.map((spec) => {
+            const current = valueAt(spec.name, playhead);
+            const stops = frames.filter((f) => f.props[spec.name] !== undefined);
+            return (
+              <div key={spec.name} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{spec.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => onRemoveProp(spec.name)}
+                    title={`Stop animating ${spec.label.toLowerCase()}`}
+                    className="text-[10px] text-muted-foreground transition-colors hover:text-destructive"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <Slider
+                    value={current}
+                    min={spec.min}
+                    max={spec.max}
+                    step={spec.step}
+                    onChange={(val) => onSet(spec.name, val)}
+                  />
+                  <NumberInput
+                    value={Math.round(current * 100) / 100}
+                    onChange={(val) => onSet(spec.name, val)}
+                    className="w-14 shrink-0 text-center"
+                    aria-label={`${spec.label} at playhead`}
+                  />
+                </div>
+
+                {/* The track. Markers sit at their stop; the playhead line shows
+                    where a change would land. */}
+                <div className="relative h-4 rounded bg-muted/60">
+                  <span
+                    className="absolute top-0 h-full w-px bg-primary/70"
+                    style={{ left: `${playhead * 100}%` }}
+                    aria-hidden="true"
+                  />
+                  {stops.map((frame) => (
+                    <button
+                      key={frame.at}
+                      type="button"
+                      onClick={() => onRemoveStop(frame.at)}
+                      title={`Keyframe at ${Math.round(frame.at * 100)}% — click to remove`}
+                      style={{ left: `${frame.at * 100}%` }}
+                      className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] border border-black bg-brand-accent transition-transform hover:scale-125"
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {available.length > 0 && (
+        <div className="flex flex-col pt-1">
+          <span className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            Animate
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {available.map((spec) => (
+              <button
+                key={spec.name}
+                type="button"
+                onClick={() => onSeed(spec.name)}
+                className="rounded border border-border bg-muted/60 px-2 py-1 text-[10px] font-semibold text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                + {spec.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -47,6 +47,17 @@ import {
 } from "../../../clip-speed";
 import { FIT_MODES, readFit, fitPatch } from "../../../text-fit";
 import {
+  KEYFRAME_PROPS,
+  readKeyframes,
+  writeKeyframes,
+  setKeyframe,
+  removeKeyframe,
+  removeStop,
+  valueAt as keyframeValueAt,
+  seedProperty,
+  hasPreset as clipHasPreset,
+} from "../../../keyframes";
+import {
   readStroke,
   strokePatch,
   readShadow,
@@ -75,6 +86,19 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
   const allClips = useStore(projectStore, (s: any) => s.clips);
   const allTracks = useStore(projectStore, (s: any) => s.tracks);
   const coreClip = useEphemeralClip(clip?.id || "", coreClipBase ?? clip) as any;
+  /*
+   * The playhead, BUCKETED to 50ms.
+   *
+   * Subscribing to the raw value re-renders this whole panel on every frame
+   * during playback, 30 to 60 times a second, to move one line a few pixels.
+   * Zustand only re-renders when the SELECTED value changes, so selecting a
+   * bucket caps that at 20/sec. The exact time is read imperatively at the
+   * moment a keyframe is written, so nothing is written at 50ms resolution.
+   */
+  const playheadBucket = useStore(projectStore, (s: any) =>
+    Math.round((s.currentTime || 0) / 50_000)
+  );
+  const currentTime = playheadBucket * 50_000;
 
   if (!coreClip) return null;
   const style = coreClip?.style || {};
@@ -436,6 +460,49 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
             }}
           />
         );
+
+      case "keyframes": {
+        const timing = coreClip.timing?.display || {};
+        const from = Number(timing.from) || 0;
+        const to = Number(timing.to) || 0;
+        const span = to - from;
+        // The playhead as a fraction of THIS clip, which is the coordinate the
+        // engine's keyframe stops are in. Outside the clip it pins to an edge
+        // rather than going negative.
+        const playhead =
+          span > 0 ? Math.min(1, Math.max(0, (currentTime - from) / span)) : 0;
+        // Exact, unbucketed, for the moment a value is committed.
+        const playheadNow = () => {
+          const now = Number((projectStore.getState() as any).currentTime) || 0;
+          return span > 0 ? Math.min(1, Math.max(0, (now - from) / span)) : 0;
+        };
+
+        const frames = readKeyframes(coreClip);
+        const commit = (next: any) => {
+          handleUpdate({ animations: writeKeyframes(next, span) ?? [] });
+          getHostCallbacks().onClipStyleChange?.(clip.id);
+        };
+
+        return (
+          <Properties.KeyframesProperty
+            key={key}
+            frames={frames}
+            props={KEYFRAME_PROPS}
+            playhead={playhead}
+            hasPreset={clipHasPreset(coreClip)}
+            valueAt={(prop, at) => keyframeValueAt(frames, prop, at)}
+            onSeed={(prop) => commit(seedProperty(frames, prop))}
+            // Editing writes a keyframe AT THE PLAYHEAD, which is how every
+            // editor that does this works.
+            onSet={(prop, value) => commit(setKeyframe(frames, playheadNow(), prop, value))}
+            onRemoveStop={(at) => commit(removeStop(frames, at))}
+            onRemoveProp={(prop) =>
+              commit(frames.reduce((acc: any, f: any) => removeKeyframe(acc, f.at, prop), frames))
+            }
+            onClear={() => commit([])}
+          />
+        );
+      }
 
       case "textFit":
         return (
