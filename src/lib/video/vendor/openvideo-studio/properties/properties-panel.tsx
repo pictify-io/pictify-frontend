@@ -45,6 +45,7 @@ import {
   MIN_SPEED,
   MAX_SPEED,
 } from "../../../clip-speed";
+import { FIT_MODES, readFit, fitPatch } from "../../../text-fit";
 import {
   readStroke,
   strokePatch,
@@ -431,6 +432,20 @@ function PropertiesPanelContent({ clip }: { clip: any }) {
             wordsPerLine={coreClip.wordsPerLine === "single" ? "single" : "multiple"}
             onChange={(wordsPerLine) => {
               handleUpdate({ wordsPerLine });
+              getHostCallbacks().onClipStyleChange?.(clip.id);
+            }}
+          />
+        );
+
+      case "textFit":
+        return (
+          <Properties.TextFitProperty
+            key={key}
+            mode={readFit(coreClip)}
+            modes={FIT_MODES}
+            onChange={(mode) => {
+              const patch = fitPatch(coreClip, mode);
+              if (patch) handleUpdate(patch);
               getHostCallbacks().onClipStyleChange?.(clip.id);
             }}
           />

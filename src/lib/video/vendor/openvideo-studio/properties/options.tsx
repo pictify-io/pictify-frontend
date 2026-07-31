@@ -1687,3 +1687,46 @@ export function SpeedProperty({
     </div>
   );
 }
+
+// ── Text fit ─────────────────────────────────────────────────────────────
+
+// What happens when a variable's real value is longer than the design assumed.
+// This is the failure that shows up at scale rather than in the editor, so the
+// hint on each mode says what it does to the LAYOUT, not what it does to text.
+
+export function TextFitProperty({
+  mode,
+  modes,
+  onChange,
+}: {
+  mode: string;
+  modes: Array<{ id: string; label: string; hint: string }>;
+  onChange: (mode: string) => void;
+}) {
+  const current = modes.find((m) => m.id === mode) || modes[0];
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="If the text is too long" />
+      <div className="grid grid-cols-2 gap-1 py-1">
+        {modes.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            title={option.hint}
+            onClick={() => onChange(option.id)}
+            className={cn(
+              "rounded border px-2 py-1.5 text-[11px] font-semibold transition-colors",
+              mode === option.id
+                ? "border-primary/60 bg-primary/15 text-foreground"
+                : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <p className="pt-1 text-[10px] leading-snug text-muted-foreground">{current.hint}</p>
+    </div>
+  );
+}

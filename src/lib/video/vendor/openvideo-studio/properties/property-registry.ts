@@ -30,6 +30,7 @@ export type PropertyKey =
   | "captionColors"
   | "captionLayout"
   | "speed"
+  | "textFit"
   | "timing";
 
 /*
@@ -70,7 +71,7 @@ export const PROPERTY_REGISTRY: Record<string, PropertyKey[]> = {
    */
   Image: ["transform", "flip", "arrange", "animation", "transition", "opacity", "cornerRadius", "stroke", "shadow", "timing"],
   Video: ["transform", "flip", "arrange", "animation", "transition", "opacity", "cornerRadius", "stroke", "shadow", "volume", "fade", "speed", "timing"],
-  Text: ["textGroup", "textColor", "textStyle", "spacing", "transform", "arrange", "animation", "transition", "opacity", "timing"],
+  Text: ["textGroup", "textColor", "textStyle", "spacing", "textFit", "transform", "arrange", "animation", "transition", "opacity", "timing"],
   Audio: ["volume", "fade", "speed", "timing"],
   Shape: ["transform", "fill", "arrange", "animation", "transition", "opacity", "cornerRadius", "stroke", "timing"],
   /*
@@ -86,7 +87,7 @@ export const PROPERTY_REGISTRY: Record<string, PropertyKey[]> = {
    * or `shadow` entry — the engine skips both for Caption exactly as it does
    * for Text, and TextStyleProperty already provides them.
    */
-  Caption: ["captionColors", "captionLayout", "textColor", "textStyle", "spacing", "transform", "arrange", "animation", "opacity", "timing"],
+  Caption: ["captionColors", "captionLayout", "textColor", "textStyle", "spacing", "textFit", "transform", "arrange", "animation", "opacity", "timing"],
   // Backdrop is the engine's only gradient-capable primitive. Without an entry
   // here getPropertiesForType falls through to the default set and the clip
   // gets no colour controls at all.

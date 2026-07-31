@@ -27,6 +27,8 @@
  *      image variable's `defaultValue` doubles as its design-time placeholder.
  */
 
+import { applyFit } from './text-fit.js';
+
 // Token names must be valid identifiers — the same rule VARIABLE_NAME_RE
 // enforces below. A looser token pattern would let {{2024total}} be detected
 // but never declarable, so it would render as a literal brace pair forever.
@@ -457,8 +459,21 @@ export const applyVariables = (projectJson, values = {}, definitions = []) => {
 	for (const clip of clipList(next)) {
 		if (!clip || typeof clip !== 'object') continue;
 		const built = buildClipPatch(clip, resolved);
-		if (!built) continue;
-		Object.assign(clip, built.patch);
+		if (built) Object.assign(clip, built.patch);
+
+		/*
+		 * Fit the substituted text to its box.
+		 *
+		 * Runs on every clip, not just the ones that changed: a clip can inherit
+		 * a long value through a binding rather than a token, and a template
+		 * whose author set "shrink" expects it to hold either way.
+		 *
+		 * This happens HERE, at substitution, so the browser export and the
+		 * server render — which share no measurement code — bake in the same
+		 * answer. See text-fit.js.
+		 */
+		const fitted = applyFit(clip);
+		if (fitted) Object.assign(clip, fitted);
 	}
 
 	if (typeof next?.settings?.backgroundColor === 'string') {
