@@ -49,7 +49,20 @@ const Header = ({
   const fps = useStore(projectStore, (s) => s.settings.fps);
   const { selectedClip, isLocked, handleDuplicate, handleDelete } = useClipActions();
 
+  /*
+   * A split only means something when the playhead is strictly INSIDE the clip.
+   * At either edge the engine produces a zero-length piece or nothing at all,
+   * so the button was a dead click with no explanation — the context menu has
+   * always guarded this, the toolbar did not.
+   */
+  const canSplit = (() => {
+    const display = selectedClip?.timing?.display;
+    if (!display) return false;
+    return currentTimeUs > display.from && currentTimeUs < display.to;
+  })();
+
   const handleSplit = () => {
+    if (!canSplit) return;
     core.clip.split(currentTimeUs);
   };
 
@@ -109,15 +122,33 @@ const Header = ({
               onClick={handleDelete}
               variant={"ghost"}
               className="flex items-center gap-1 px-2"
+              title={
+                isLocked
+                  ? "This clip is locked"
+                  : selectedClip
+                    ? "Delete clip (Backspace)"
+                    : "Select a clip to delete it"
+              }
+              aria-label="Delete clip"
             >
               <RiDeleteBinLine size={14} />
             </Button>
 
             <Button
-              disabled={!selectedClip || isLocked}
+              disabled={!selectedClip || isLocked || !canSplit}
               onClick={handleSplit}
               variant={"ghost"}
               className="flex items-center gap-1 px-2"
+              title={
+                !selectedClip
+                  ? "Select a clip to split it"
+                  : isLocked
+                    ? "This clip is locked"
+                    : canSplit
+                      ? "Split at the playhead (Cmd/Ctrl+B)"
+                      : "Move the playhead inside the clip to split it"
+              }
+              aria-label="Split clip at the playhead"
             >
               <RiSplitCellsHorizontal size={15} />
             </Button>
@@ -126,11 +157,15 @@ const Header = ({
               onClick={handleDuplicate}
               variant={"ghost"}
               className="flex items-center gap-1 px-2"
+              title={selectedClip ? "Duplicate clip (Cmd/Ctrl+D)" : "Select a clip to duplicate it"}
+              aria-label="Duplicate clip"
             >
               <RiFileCopyLine size={15} />
             </Button>
             <Button
               onClick={handleSnapshot}
+              title="Download the current frame as a PNG"
+              aria-label="Download current frame"
               variant={"ghost"}
               className="flex items-center gap-1 px-2"
             >
