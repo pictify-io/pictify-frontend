@@ -51,6 +51,18 @@ test('labels a beat from its first child component', () => {
 	assert.equal(found[1].label, 'Outro');
 });
 
+test('layout="none" beats are read and retimed like any other', () => {
+	// layout="none" is now required in generated scenes: without it Sequence
+	// renders its own AbsoluteFill and overrides the parent's centring, dropping
+	// everything to the top-left. The parser must not care.
+	const src = '<Sequence name="Intro" from={0} durationInFrames={45} layout="none"><A /></Sequence>';
+	const [beat] = parseSequences(src);
+	assert.equal(beat.label, 'Intro');
+	assert.equal(beat.editable, true);
+	assert.match(retimeSequence(src, 0, { from: 30 }), /from=\{30\}/);
+	assert.match(retimeSequence(src, 0, { from: 30 }), /layout="none"/, 'the attribute survives');
+});
+
 test('an explicit name attribute wins over the child', () => {
 	const src = `<Sequence name="Intro beat" from={0} durationInFrames={30}><Title /></Sequence>`;
 	assert.equal(parseSequences(src)[0].label, 'Intro beat');
