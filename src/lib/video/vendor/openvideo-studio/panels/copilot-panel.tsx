@@ -44,6 +44,11 @@ type Turn = {
   errors?: string[];
 };
 
+/** Enough rounds for a multi-step request; few enough that a loop cannot run away. */
+const MAX_ROUNDS = 6;
+/** A hard ceiling on edits per request, so a misread instruction cannot rewrite the scene. */
+const MAX_OPERATIONS = 30;
+
 const SUGGESTIONS = [
   "Make the title bigger and move it up",
   "Change the accent colour to orange",
@@ -70,6 +75,117 @@ export default function CopilotPanel() {
     lastCount.current = turns.length;
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [turns.length]);
+
+  /**
+   * Carry out one batch of operations, reporting what could not be done.
+   *
+   * Failures are collected rather than thrown: the agent needs to SEE that a
+   * transition had nothing before it, so the next round can do something else.
+   * Throwing would end the run on the first imperfect step.
+   */
+  const applyOperations = async (operations: any[]) => {
+    const failures: string[] = [];
+    for (const operation of operations) {
+      const state: any = projectStore.getState();
+
+      if (operation.op === "add") {
+        core.clip.add({ id: generateId(), ...operation.clip } as any);
+      } else if (operation.op === "remove") {
+        core.clip.remove([operation.clipId]);
+      } else if (operation.op === "animate") {
+        // Resolved here because composing presets into keyframes needs the
+        // engine's preset registry, which the pure tool module cannot import.
+        const clip = state.clips[operation.clipId];
+        const display = clip?.timing?.display || {};
+        const durationUs = Math.max(0, (display.to ?? 0) - (display.from ?? 0));
+        const selection = {
+          inPreset: operation.inPreset,
+          outPreset: operation.outPreset,
+          emphasisPreset: "",
+        };
+        core.clip.update(operation.clipId, {
+          animations: buildAnimation(selection, durationUs) ?? [],
+          metadata: withAnimationMeta(clip, selection),
+        });
+      } else if (operation.op === "transition") {
+        // A transition is its own clip joining a PAIR, so it needs the track
+        // order to find what comes before.
+        const clip = state.clips[operation.clipId];
+        const previous = previousClip(state.clips, state.tracks, clip);
+        if (!previous) {
+          failures.push("add_transition: nothing before that clip to blend from.");
+        } else {
+          const existing = incomingTransition(state.clips, clip);
+          if (existing) core.clip.remove([existing.id]);
+          core.clip.add(
+            createTransitionClip({
+              fromClip: previous,
+              toClip: clip,
+              key: operation.transitionKey,
+              durationUs: operation.durationUs,
+            }) as any
+          );
+        }
+      } else if (operation.op === "stock") {
+        // The only operation that needs the network.
+        const search = getHostCallbacks().searchStock;
+        if (!search) {
+          failures.push("add_stock: stock search is not available.");
+          continue;
+        }
+        try {
+          const found = await search(operation.kind, operation.query, 1);
+          const item = found?.items?.[0];
+          if (!item) {
+            failures.push(`add_stock: nothing found for "${operation.query}".`);
+            continue;
+          }
+          const settings = state.settings || {};
+          const compW = settings.width || 1080;
+          const compH = settings.height || 1920;
+          // Fit inside the canvas without distorting: stretching stock
+          // footage to the frame is the most obvious way a video looks wrong.
+          const ratio = (item.width || compW) / (item.height || compH);
+          let w = compW;
+          let h = Math.round(w / ratio);
+          if (h > compH) {
+            h = compH;
+            w = Math.round(h * ratio);
+          }
+          const span = Math.max(1, operation.durationUs);
+          core.clip.add({
+            id: generateId(),
+            type: operation.kind === "video" ? "Video" : "Image",
+            name: item.name || "Stock",
+            src: item.url,
+            timing: {
+              display: { from: operation.fromUs, to: operation.fromUs + span },
+              trim: { from: 0, to: span },
+              duration: span,
+              playbackRate: 1,
+            },
+            transform: {
+              x: Math.round((compW - w) / 2),
+              y: Math.round((compH - h) / 2),
+              width: w,
+              height: h,
+              angle: 0,
+              opacity: 1,
+              zIndex: 1,
+            },
+            style: {},
+            metadata: { stock: item.credit || null },
+            locked: false,
+          } as any);
+        } catch (cause: any) {
+          failures.push(`add_stock: ${cause?.message || "search failed"}.`);
+        }
+      } else {
+        core.clip.update(operation.clipId, operation.patch);
+      }
+      }
+    return failures;
+  };
 
   const send = async (text?: string) => {
     const instruction = String(text ?? draft).trim();
@@ -101,153 +217,107 @@ export default function CopilotPanel() {
         transitions: TRANSITION_OPTIONS().map((option: any) => option.value),
       };
 
+      /*
+       * The agent loop: act, LOOK at what happened, decide what is next.
+       *
+       * A single round can only ever do what the model guessed from the opening
+       * state. Real requests are not like that — "make this feel like a trailer"
+       * is several edits, and whether the third is needed depends on how the
+       * second turned out. So each round is handed the document AS IT NOW IS,
+       * plus what the last round actually managed and what it could not.
+       *
+       * It ends when the model stops asking for anything, when a round achieves
+       * nothing, or when the budget runs out. The middle case is the one that
+       * matters: a model repeating a call that keeps failing would otherwise
+       * spin until the user gave up.
+       */
       const history: Array<{ role: string; content: string }> = [];
-      let operations: any[] = [];
-      let errors: any[] = [];
+      const failures: string[] = [];
+      let totalOperations = 0;
       let message = "";
+      let stopped = "";
 
-      // Bounded: a model that keeps looking things up instead of acting would
-      // otherwise loop until the user gives up. Three rounds is enough for
-      // "look up an effect, look up a preset, then act".
-      for (let round = 0; round < 3; round += 1) {
-        const reply = await plan(describeDocument(document), toolSchema(), instruction, history);
+      for (let round = 0; round < MAX_ROUNDS; round += 1) {
+        const live: any = projectStore.getState();
+        const reply = await plan(describeDocument(live), toolSchema(), instruction, history);
         message = reply.message || message;
 
-        // Validated against the LIVE document, not the snapshot sent to the
-        // model: the user may have moved something while it was thinking.
-        const planned = planToolCalls(
-          projectStore.getState() as any,
-          reply.calls || [],
-          vocabulary
-        );
+        if (!reply.calls?.length) {
+          // An empty call list is how the model says it is finished.
+          break;
+        }
 
+        // Validated against the LIVE document each round, not the snapshot the
+        // model was given: its own last round moved things.
+        const planned = planToolCalls(projectStore.getState() as any, reply.calls, vocabulary);
         const lookups = planned.operations.filter((op: any) => op.op === "query");
-        operations = planned.operations.filter((op: any) => op.op !== "query");
-        errors = planned.errors;
+        const mutations = planned.operations.filter((op: any) => op.op !== "query");
 
-        // Anything to apply, or nothing left to look up: stop asking.
-        if (!lookups.length || operations.length) break;
+        for (const error of planned.errors) failures.push(`${error.name}: ${error.error}`);
 
         const answers = lookups.map((lookup: any) => {
-          const found = searchCatalogue(vocabulary[lookup.list as keyof typeof vocabulary], lookup.query);
+          const found = searchCatalogue(
+            vocabulary[lookup.list as keyof typeof vocabulary],
+            lookup.query
+          );
           return `${lookup.list} matching "${lookup.query}" (${found.total} total): ${found.names.join(", ")}`;
         });
-        history.push({ role: "assistant", content: JSON.stringify({ calls: reply.calls }) });
-        history.push({ role: "user", content: answers.join("\n") });
-      }
 
-      const failures = errors.map((e) => `${e.name}: ${e.error}`);
+        const applyFailures = mutations.length ? await applyOperations(mutations) : [];
+        for (const failure of applyFailures) failures.push(failure);
+        totalOperations += mutations.length;
 
-      for (const operation of operations) {
-        const state: any = projectStore.getState();
-
-        if (operation.op === "add") {
-          core.clip.add({ id: generateId(), ...operation.clip } as any);
-        } else if (operation.op === "remove") {
-          core.clip.remove([operation.clipId]);
-        } else if (operation.op === "animate") {
-          // Resolved here because composing presets into keyframes needs the
-          // engine's preset registry, which the pure tool module cannot import.
-          const clip = state.clips[operation.clipId];
-          const display = clip?.timing?.display || {};
-          const durationUs = Math.max(0, (display.to ?? 0) - (display.from ?? 0));
-          const selection = {
-            inPreset: operation.inPreset,
-            outPreset: operation.outPreset,
-            emphasisPreset: "",
-          };
-          core.clip.update(operation.clipId, {
-            animations: buildAnimation(selection, durationUs) ?? [],
-            metadata: withAnimationMeta(clip, selection),
-          });
-        } else if (operation.op === "transition") {
-          // A transition is its own clip joining a PAIR, so it needs the track
-          // order to find what comes before.
-          const clip = state.clips[operation.clipId];
-          const previous = previousClip(state.clips, state.tracks, clip);
-          if (!previous) {
-            failures.push("add_transition: nothing before that clip to blend from.");
-          } else {
-            const existing = incomingTransition(state.clips, clip);
-            if (existing) core.clip.remove([existing.id]);
-            core.clip.add(
-              createTransitionClip({
-                fromClip: previous,
-                toClip: clip,
-                key: operation.transitionKey,
-                durationUs: operation.durationUs,
-              }) as any
-            );
-          }
-        } else if (operation.op === "stock") {
-          // The only operation that needs the network.
-          const search = getHostCallbacks().searchStock;
-          if (!search) {
-            failures.push("add_stock: stock search is not available.");
-            continue;
-          }
-          try {
-            const found = await search(operation.kind, operation.query, 1);
-            const item = found?.items?.[0];
-            if (!item) {
-              failures.push(`add_stock: nothing found for "${operation.query}".`);
-              continue;
-            }
-            const settings = state.settings || {};
-            const compW = settings.width || 1080;
-            const compH = settings.height || 1920;
-            // Fit inside the canvas without distorting: stretching stock
-            // footage to the frame is the most obvious way a video looks wrong.
-            const ratio = (item.width || compW) / (item.height || compH);
-            let w = compW;
-            let h = Math.round(w / ratio);
-            if (h > compH) {
-              h = compH;
-              w = Math.round(h * ratio);
-            }
-            const span = Math.max(1, operation.durationUs);
-            core.clip.add({
-              id: generateId(),
-              type: operation.kind === "video" ? "Video" : "Image",
-              name: item.name || "Stock",
-              src: item.url,
-              timing: {
-                display: { from: operation.fromUs, to: operation.fromUs + span },
-                trim: { from: 0, to: span },
-                duration: span,
-                playbackRate: 1,
-              },
-              transform: {
-                x: Math.round((compW - w) / 2),
-                y: Math.round((compH - h) / 2),
-                width: w,
-                height: h,
-                angle: 0,
-                opacity: 1,
-                zIndex: 1,
-              },
-              style: {},
-              metadata: { stock: item.credit || null },
-              locked: false,
-            } as any);
-          } catch (cause: any) {
-            failures.push(`add_stock: ${cause?.message || "search failed"}.`);
-          }
-        } else {
-          core.clip.update(operation.clipId, operation.patch);
+        if (mutations.length) {
+          // Each step lands in the transcript as it happens, so a run that
+          // takes four rounds does not look like a hang.
+          const step = summarizeOperations(mutations);
+          setTurns((prev) => [...prev, { role: "assistant", text: `${round + 1}. ${step}` }]);
+          getHostCallbacks().onClipStyleChange?.(mutations[0].clipId || "");
         }
+
+        // A round that neither looked anything up nor changed anything is not
+        // going to do better on the next attempt.
+        if (!lookups.length && !mutations.length) {
+          stopped = "It could not carry that out.";
+          break;
+        }
+        if (totalOperations >= MAX_OPERATIONS) {
+          stopped = "Stopped after a lot of changes — check the result before asking for more.";
+          break;
+        }
+        if (round === MAX_ROUNDS - 1) {
+          stopped = "Stopped after several rounds. Ask again to continue.";
+        }
+
+        // What it did, what it could not, and where things now stand.
+        history.push({ role: "assistant", content: JSON.stringify({ calls: reply.calls }) });
+        history.push({
+          role: "user",
+          content: [
+            answers.join("\n"),
+            mutations.length ? `Applied: ${summarizeOperations(mutations)}` : "",
+            applyFailures.length ? `Failed: ${applyFailures.join("; ")}` : "",
+            `Scene now: ${JSON.stringify(describeDocument(projectStore.getState() as any))}`,
+            "Continue if the request is not finished. Return an empty calls list when it is done.",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        });
       }
 
-      const summary = summarizeOperations(operations);
+      const summary =
+        totalOperations > 0
+          ? `Done — ${totalOperations} change${totalOperations === 1 ? "" : "s"}.`
+          : "Nothing changed.";
+
       setTurns((prev) => [
         ...prev,
         {
           role: "assistant",
-          text: message ? `${message} ${summary}` : summary,
+          text: [message, summary, stopped].filter(Boolean).join(" "),
           errors: failures,
         },
       ]);
-      if (operations.length) getHostCallbacks().onClipStyleChange?.(operations[0].clipId || "");
     } catch (cause: any) {
       setTurns((prev) => [
         ...prev,
