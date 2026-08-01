@@ -21,6 +21,7 @@
 import React from "react";
 import { generateId } from "@openvideo/core";
 import { core, projectStore, getHostCallbacks } from "../runtime";
+import { useMediaLibrary } from "../media-store";
 import { ScrollArea } from "../ui";
 import {
   describeDocument,
@@ -28,6 +29,7 @@ import {
   planToolCalls,
   summarizeOperations,
   searchCatalogue,
+  describeMedia,
 } from "../../../agent-tools";
 import { EFFECT_OPTIONS } from "../../../effects";
 import { IN_PRESETS, OUT_PRESETS, buildAnimation, withAnimationMeta } from "../../../animations";
@@ -83,6 +85,59 @@ export default function CopilotPanel() {
    * transition had nothing before it, so the next round can do something else.
    * Throwing would end the run on the first imperfect step.
    */
+  /**
+   * Drop a media item onto the canvas, fitted rather than stretched.
+   *
+   * Shared by add_stock and add_media: the only difference between them is
+   * where the item came from, and stretching footage to the frame is the most
+   * obvious way a video looks wrong either way.
+   */
+  const placeMedia = (item: any, operation: any, state: any, failures: string[]) => {
+    const settings = state.settings || {};
+    const compW = settings.width || 1080;
+    const compH = settings.height || 1920;
+    const isVideo = operation.kind === "video" || item.kind === "video";
+
+    const ratio = (item.width || compW) / (item.height || compH);
+    let w = compW;
+    let h = Math.round(w / ratio);
+    if (h > compH) {
+      h = compH;
+      w = Math.round(h * ratio);
+    }
+
+    if (!item.url) {
+      failures.push(`add_media: "${item.name}" has no usable file.`);
+      return;
+    }
+
+    const span = Math.max(1, operation.durationUs);
+    core.clip.add({
+      id: generateId(),
+      type: isVideo ? "Video" : item.kind === "audio" ? "Audio" : "Image",
+      name: item.name || "Media",
+      src: item.url,
+      timing: {
+        display: { from: operation.fromUs, to: operation.fromUs + span },
+        trim: { from: 0, to: span },
+        duration: span,
+        playbackRate: 1,
+      },
+      transform: {
+        x: Math.round((compW - w) / 2),
+        y: Math.round((compH - h) / 2),
+        width: w,
+        height: h,
+        angle: 0,
+        opacity: 1,
+        zIndex: 1,
+      },
+      style: {},
+      metadata: item.credit ? { stock: item.credit } : {},
+      locked: false,
+    } as any);
+  };
+
   const applyOperations = async (operations: any[]) => {
     const failures: string[] = [];
     for (const operation of operations) {
@@ -239,7 +294,20 @@ export default function CopilotPanel() {
 
       for (let round = 0; round < MAX_ROUNDS; round += 1) {
         const live: any = projectStore.getState();
-        const reply = await plan(describeDocument(live), toolSchema(), instruction, history);
+        /*
+         * The user's own media travels with the scene.
+         *
+         * Without it the agent has no idea a logo is already uploaded, and
+         * answers "add our logo" with a stock search for the word "logo" —
+         * which returns somebody else's.
+         */
+        const library = useMediaLibrary.getState().items || [];
+        const reply = await plan(
+          { ...describeDocument(live), media: describeMedia(library) },
+          toolSchema(),
+          instruction,
+          history
+        );
         message = reply.message || message;
 
         if (!reply.calls?.length) {

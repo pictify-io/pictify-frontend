@@ -18,7 +18,8 @@ import {
 	planToolCalls,
 	describeDocument,
 	summarizeOperations,
-	searchCatalogue
+	searchCatalogue,
+	describeMedia
 } from './agent-tools.js';
 
 const S = 1_000_000;
@@ -361,6 +362,93 @@ test('a shape gets a fill even when none was given', () => {
 		call('add_shape', { x: 0.5, y: 0.5, width: 0.5, height: 0.1, fill: 'blueish' })
 	]);
 	assert.match(operations[0].clip.style.fill, /^#[0-9a-f]{6}$/i);
+});
+
+// ── Knowing what a clip IS ───────────────────────────────────────────────
+
+test('a clip reports its media, animation, effect and layer', () => {
+	// Without these the model reasons about anonymous rectangles: it cannot tell
+	// which Image already shows the logo, cannot see a clip is already animated
+	// before adding a second animation, and cannot name an effect to replace it.
+	const rich = {
+		settings: { width: 1080, height: 1920, duration: 6 * S },
+		clips: {
+			i1: {
+				id: 'i1', type: 'Image', src: 'https://cdn.example.com/logo.png?sig=abc',
+				transform: { x: 0, y: 0, width: 540, height: 540, zIndex: 7 },
+				timing: { display: { from: 0, to: 3 * S } },
+				metadata: { pictify: { animation: { inPreset: 'fadeIn' } } }
+			},
+			e1: {
+				id: 'e1', type: 'Effect', effectKey: 'oldFilm',
+				transform: { zIndex: 900 }, timing: { display: { from: 0, to: 6 * S } }
+			}
+		}
+	};
+	const [image, effect] = describeDocument(rich).clips;
+	assert.equal(image.media, 'logo.png', 'the signed-URL noise is stripped');
+	assert.equal(image.layer, 7);
+	assert.deepEqual(image.animation, { in: 'fadeIn', out: undefined, emphasis: undefined });
+	assert.equal(effect.effectKey, 'oldFilm');
+});
+
+test('hand-authored keyframes are summarised, not dumped', () => {
+	const doc2 = {
+		settings: { width: 1080, height: 1920 },
+		clips: {
+			t: {
+				id: 't', type: 'Text', transform: { x: 0, y: 0, width: 10, height: 10 },
+				timing: { display: { from: 0, to: S } },
+				animations: [{ type: 'keyframes', params: { '0%': { opacity: 0 }, '100%': { opacity: 1, scale: 1.2 } } }]
+			}
+		}
+	};
+	const [clip] = describeDocument(doc2).clips;
+	assert.deepEqual(clip.keyframes.at, ['0%', '100%']);
+	assert.deepEqual(clip.keyframes.animating.sort(), ['opacity', 'scale']);
+});
+
+test('an embedded data URL is named rather than pasted', () => {
+	// A base64 image would otherwise be the entire prompt.
+	const doc2 = {
+		settings: { width: 1080, height: 1920 },
+		clips: { i: { id: 'i', type: 'Image', src: 'data:image/png;base64,AAAA', transform: { x: 0, y: 0, width: 1, height: 1 }, timing: { display: { from: 0, to: 1 } } } }
+	};
+	assert.equal(describeDocument(doc2).clips[0].media, 'embedded');
+});
+
+test('quiet defaults stay out of the description', () => {
+	// Every key costs tokens on every turn; only what differs is worth saying.
+	const [clip] = describeDocument(doc()).clips;
+	assert.equal(clip.speed, undefined);
+	assert.equal(clip.fades, undefined);
+	assert.equal(clip.locked, undefined);
+	assert.equal(clip.flipped, undefined);
+});
+
+// ── The user's own media ─────────────────────────────────────────────────
+
+test('the media library is described by name, not by id', () => {
+	// Uids are not stable across sessions, and the name is what a user says.
+	const described = describeMedia([{ uid: 'x1', kind: 'image', name: 'logo.png', source: 'brand' }]);
+	assert.deepEqual(described, [{ name: 'logo.png', kind: 'image', source: 'brand' }]);
+});
+
+test('the media list is capped and survives being empty', () => {
+	const many = Array.from({ length: 100 }, (_, i) => ({ name: `f${i}`, kind: 'image' }));
+	assert.equal(describeMedia(many, 5).length, 5);
+	assert.deepEqual(describeMedia(null), []);
+});
+
+test('add_media resolves to a library lookup, not a document change', () => {
+	const { operations } = planToolCalls(doc(), [call('add_media', { name: 'logo.png', durationS: 3 })]);
+	assert.equal(operations[0].op, 'media');
+	assert.equal(operations[0].name, 'logo.png');
+	assert.equal(operations[0].durationUs, 3 * S);
+});
+
+test('add_media without a name is refused', () => {
+	assert.equal(planToolCalls(doc(), [call('add_media', { name: '  ' })]).errors.length, 1);
 });
 
 // ── Discovery ────────────────────────────────────────────────────────────

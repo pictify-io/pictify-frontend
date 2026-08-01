@@ -54,35 +54,127 @@ export const describeDocument = (projectJson) => {
 	const settings = projectJson?.settings || {};
 	const width = settings.width || 1080;
 	const height = settings.height || 1920;
+	const frac = (value, extent) => Math.round((value / extent) * 100) / 100;
+	const secs = (us) => Math.round((us / SECOND) * 10) / 10;
 
 	const clips = Object.values(projectJson?.clips || {}).map((clip) => {
 		const t = clip.transform || {};
 		const d = clip.timing?.display || {};
+		const style = clip.style || {};
+
 		const entry = {
 			id: clip.id,
 			type: clip.type,
 			name: clip.name || clip.type,
-			startS: Math.round(((d.from || 0) / SECOND) * 10) / 10,
-			durationS: Math.round((((d.to || 0) - (d.from || 0)) / SECOND) * 10) / 10
+			startS: secs(d.from || 0),
+			durationS: secs((d.to || 0) - (d.from || 0))
 		};
+
 		if (Number.isFinite(t.x)) {
-			entry.x = Math.round((t.x / width) * 100) / 100;
-			entry.y = Math.round((t.y / height) * 100) / 100;
-			entry.width = Math.round((t.width / width) * 100) / 100;
-			entry.height = Math.round((t.height / height) * 100) / 100;
+			entry.x = frac(t.x, width);
+			entry.y = frac(t.y, height);
+			entry.width = frac(t.width, width);
+			entry.height = frac(t.height, height);
+			// Layering, because it decides what covers what — and an Effect below
+			// its content renders nothing at all.
+			if (Number.isFinite(t.zIndex)) entry.layer = t.zIndex;
+			if (t.flip?.x || t.flip?.y) entry.flipped = true;
+			if (Number.isFinite(t.opacity) && t.opacity !== 1) entry.opacity = t.opacity;
 		}
+
 		if (typeof clip.text === 'string') entry.text = clip.text;
-		if (clip.style?.color) entry.color = clip.style.color;
-		if (clip.style?.fill) entry.fill = clip.style.fill;
+		if (style.color) entry.color = style.color;
+		if (style.fill) entry.fill = style.fill;
+		// Font size as a fraction of the shorter side, matching what add_text takes.
+		if (Number.isFinite(style.fontSize)) {
+			entry.size = Math.round((style.fontSize / Math.min(width, height)) * 1000) / 1000;
+		}
+		if (style.stroke?.width > 0) entry.outlined = true;
+		if (style.shadow) entry.shadowed = true;
+
+		/*
+		 * What a clip IS, not just where it sits.
+		 *
+		 * Without these the model is reasoning about anonymous rectangles: it
+		 * cannot tell an Image from the one already showing the logo, cannot see
+		 * that a clip is already animated before adding a second animation, and
+		 * cannot know an Effect's key well enough to replace it.
+		 */
+		if (typeof clip.src === 'string' && clip.src) {
+			// Truncated: a signed S3 URL is hundreds of characters of noise, and
+			// what matters is that there IS media and roughly which.
+			entry.media = clip.src.startsWith('data:')
+				? 'embedded'
+				: clip.src.split('/').pop().split('?')[0].slice(0, 48);
+		}
+		if (clip.effectKey) entry.effectKey = clip.effectKey;
+		if (clip.transitionKey) entry.transitionKey = clip.transitionKey;
+
+		// Animation: the preset names if it came from a preset, otherwise a
+		// summary of the hand-authored keyframes.
+		const preset = clip.metadata?.pictify?.animation;
+		if (preset?.inPreset || preset?.outPreset || preset?.emphasisPreset) {
+			entry.animation = {
+				in: preset.inPreset || undefined,
+				out: preset.outPreset || undefined,
+				emphasis: preset.emphasisPreset || undefined
+			};
+		} else if (clip.animations?.[0]?.params) {
+			const params = clip.animations[0].params;
+			const stops = Object.keys(params);
+			const props = new Set();
+			for (const stop of Object.values(params)) {
+				for (const prop of Object.keys(stop || {})) props.add(prop);
+			}
+			entry.keyframes = { at: stops, animating: [...props] };
+		}
+
+		if (clip.type === 'Caption' && Array.isArray(clip.caption?.words)) {
+			entry.words = clip.caption.words.length;
+		}
+		if (Number.isFinite(clip.timing?.playbackRate) && clip.timing.playbackRate !== 1) {
+			entry.speed = clip.timing.playbackRate;
+		}
+		if (clip.timing?.fadeIn?.duration || clip.timing?.fadeOut?.duration) {
+			entry.fades = {
+				inMs: clip.timing.fadeIn?.duration || 0,
+				outMs: clip.timing.fadeOut?.duration || 0
+			};
+		}
+		if (clip.metadata?.pictify?.fit) entry.textFit = clip.metadata.pictify.fit;
+		if (Number.isFinite(clip.volume) && clip.volume !== 1) entry.volume = clip.volume;
+		if (clip.locked) entry.locked = true;
+
 		return entry;
 	});
 
 	return {
 		canvas: { width, height, fps: settings.fps || 30 },
-		durationS: Math.round(((settings.duration || 0) / SECOND) * 10) / 10,
+		durationS: secs(settings.duration || 0),
+		background: settings.backgroundColor || undefined,
 		clips
 	};
 };
+
+/**
+ * The user's own media, so the agent can reach for it before searching stock.
+ *
+ * Without this it has no idea a logo has already been uploaded, and answers
+ * "add our logo" with a stock search for the word "logo" — which returns
+ * somebody else's.
+ *
+ * @param {Array<{uid?: string, kind: string, name: string, url: string}>} library
+ */
+export const describeMedia = (library, limit = 30) =>
+	(library || [])
+		.slice(0, limit)
+		.map((item) => ({
+			// The agent references media by NAME, since uids are not stable across
+			// sessions and the name is what the user would say out loud.
+			name: item.name,
+			kind: item.kind,
+			source: item.source || 'library'
+		}));
 
 /**
  * What the model is allowed to name.
@@ -382,6 +474,23 @@ export const TOOLS = [
 			op: 'stock',
 			kind: args.kind,
 			query: args.query.trim(),
+			fromUs: toUs(args.startS ?? 0),
+			durationUs: toUs(args.durationS ?? 5)
+		})
+	},
+	{
+		name: 'add_media',
+		description:
+			"Place one of the user's own uploaded media items, by the name shown in the media list. Prefer this over add_stock when something suitable is already uploaded.",
+		params: { name: 'string', startS: 'number', durationS: 'number' },
+		validate: (doc, args) => {
+			if (typeof args.name !== 'string' || !args.name.trim()) return 'name is required.';
+			return null;
+		},
+		// Resolved by the caller, which holds the media library.
+		apply: (doc, args) => ({
+			op: 'media',
+			name: args.name.trim(),
 			fromUs: toUs(args.startS ?? 0),
 			durationUs: toUs(args.durationS ?? 5)
 		})
