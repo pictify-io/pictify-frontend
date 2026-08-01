@@ -334,6 +334,13 @@
 	// ── Export ───────────────────────────────────────────────────────────
 	let clientExportSupported = false;
 	let isExporting = false;
+	// What the Render button will produce. GIF renders server-side (WebCodecs
+	// cannot encode it); MP4 keeps the in-browser fast path when available.
+	let exportFormat = 'mp4';
+	// What the LAST render produced — the result card renders a <video> or an
+	// <img> based on this, not on the current toggle, which the user may have
+	// flipped since.
+	let renderedFormat = 'mp4';
 	let exportProgress = 0;
 	let exportStage = '';
 	let exportError = '';
@@ -1192,7 +1199,8 @@
 	 * and is the fallback here when the browser can't encode.
 	 */
 	async function exportVideo() {
-		if (isExporting || !editor) return;
+		if (isExporting) return;
+		if (!editor && !isCode) return;
 		exportError = '';
 		renderUrl = '';
 		exportProgress = 0;
@@ -1204,57 +1212,78 @@
 			return;
 		}
 
+		// GIF always renders server-side: WebCodecs encodes h264, not GIF, and
+		// the server's video engine does GIF natively (tsx) or via palette
+		// conversion (timeline). MP4 keeps the in-browser fast path.
+		const wantsGif = exportFormat === 'gif';
+
 		isExporting = true;
 		exportController = new AbortController();
 		try {
-			const authored = documentToSave();
-			const filled = applyVariables(authored, testValues, variableDefinitions);
+			if (!isCode) {
+				const authored = documentToSave();
+				const filled = applyVariables(authored, testValues, variableDefinitions);
+
+				/*
+				 * Refuse a render that would come out blank.
+				 *
+				 * Checked on the FILLED document, because a variable binding can move a
+				 * clip out of the window, and before either export path: the browser
+				 * one never reaches the server, and on the server path this saves a
+				 * two-minute wait to be told the same thing.
+				 */
+				const composition = checkComposition(filled);
+				if (composition.blank) {
+					exportError = composition.message;
+					return;
+				}
+
+				if (clientExportSupported && !wantsGif) {
+					exportStage = 'Rendering in your browser';
+					const { exportProjectToBlob } = await import('$lib/video/exportHost.js');
+					const blob = await exportProjectToBlob(filled, {
+						onProgress: (value) => (exportProgress = value),
+						signal: exportController.signal
+					});
+
+					exportStage = 'Uploading';
+					const file = new File([blob], `${(name || 'video').replace(/[^\w.-]+/g, '-')}.mp4`, {
+						type: 'video/mp4'
+					});
+					const response = await uploadVideoMedia(file, { purpose: 'render', templateUid: uid });
+					renderUrl = response?.media?.url || '';
+					renderedFormat = 'mp4';
+					if (!renderUrl) throw new Error('The render finished but the upload returned no URL.');
+					analytics.track?.('Video Template Rendered', { uid, via: 'client', format: 'mp4' });
+					return;
+				}
+			}
 
 			/*
-			 * Refuse a render that would come out blank.
-			 *
-			 * Checked on the FILLED document, because a variable binding can move a
-			 * clip out of the window, and before either export path: the browser
-			 * one never reaches the server, and on the server path this saves a
-			 * two-minute wait to be told the same thing.
+			 * Server render — both template kinds, both formats. This is also the
+			 * ONLY render path for code (tsx) templates: they have no scene graph
+			 * for the browser engine, so an earlier version's `!editor` guard made
+			 * this button silently do nothing in code mode.
 			 */
-			const composition = checkComposition(filled);
-			if (composition.blank) {
-				exportError = composition.message;
-				return;
-			}
-
-			if (clientExportSupported) {
-				exportStage = 'Rendering in your browser';
-				const { exportProjectToBlob } = await import('$lib/video/exportHost.js');
-				const blob = await exportProjectToBlob(filled, {
-					onProgress: (value) => (exportProgress = value),
-					signal: exportController.signal
-				});
-
-				exportStage = 'Uploading';
-				const file = new File([blob], `${(name || 'video').replace(/[^\w.-]+/g, '-')}.mp4`, {
-					type: 'video/mp4'
-				});
-				const response = await uploadVideoMedia(file, { purpose: 'render', templateUid: uid });
-				renderUrl = response?.media?.url || '';
-				if (!renderUrl) throw new Error('The render finished but the upload returned no URL.');
-				analytics.track?.('Video Template Rendered', { uid, via: 'client' });
-			} else {
-				// No WebCodecs — the server has to do it, which needs a saved template.
-				exportStage = 'Rendering on the server';
-				// Defer the URL swap: navigating to /[uid]/studio remounts this
-				// component, and the render would be lost mid-flight.
-				const wasNew = !uid;
-				const savedUid =
-					uid && !isDirty ? uid : await save({ silent: true, deferNavigation: true });
-				if (!savedUid) throw new Error(saveError || 'Save the template before rendering.');
-				const response = await renderVideoTemplate(savedUid, { variables: testValues });
-				renderUrl = response?.url || '';
-				if (!renderUrl) throw new Error('The render finished but returned no URL.');
-				analytics.track?.('Video Template Rendered', { uid: savedUid, via: 'server' });
-				if (wasNew) pendingUrlAdoption = true;
-			}
+			exportStage = wantsGif ? 'Rendering GIF on the server' : 'Rendering on the server';
+			// Defer the URL swap: navigating to /[uid]/studio remounts this
+			// component, and the render would be lost mid-flight.
+			const wasNew = !uid;
+			const savedUid = uid && !isDirty ? uid : await save({ silent: true, deferNavigation: true });
+			if (!savedUid) throw new Error(saveError || 'Save the template before rendering.');
+			const response = await renderVideoTemplate(savedUid, {
+				variables: testValues,
+				format: exportFormat
+			});
+			renderUrl = response?.url || '';
+			renderedFormat = response?.format || exportFormat;
+			if (!renderUrl) throw new Error('The render finished but returned no URL.');
+			analytics.track?.('Video Template Rendered', {
+				uid: savedUid,
+				via: 'server',
+				format: renderedFormat
+			});
+			if (wasNew) pendingUrlAdoption = true;
 		} catch (error) {
 			if (error?.name === 'AbortError') {
 				exportError = '';
@@ -1424,6 +1453,32 @@
 			{isSaving ? 'Saving…' : isDirty || !uid ? 'Save' : 'Saved'}
 		</button>
 
+		<!-- Output format, joined to the Render button it configures -->
+		<div
+			class="inline-flex overflow-hidden rounded-lg border-[2px] border-black"
+			role="group"
+			aria-label="Render output format"
+		>
+			{#each ['mp4', 'gif'] as option}
+				<button
+					type="button"
+					on:click={() => (exportFormat = option)}
+					disabled={isExporting}
+					aria-pressed={exportFormat === option}
+					title={option === 'gif'
+						? 'Animated GIF — renders on the server, capped at 15fps for shareable file sizes'
+						: 'MP4 video'}
+					class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors
+						{exportFormat === option
+						? 'bg-brand-accent text-black'
+						: 'bg-gray-900 text-gray-400 hover:text-white'}
+						{option === 'mp4' ? 'border-r-[2px] border-black' : ''}"
+				>
+					{option}
+				</button>
+			{/each}
+		</div>
+
 		<button
 			type="button"
 			on:click={exportVideo}
@@ -1435,7 +1490,7 @@
 				{Math.round(exportProgress * 100)}%
 			{:else}
 				<i class="fa fa-film text-[10px]" aria-hidden="true"></i>
-				Render MP4
+				Render {exportFormat.toUpperCase()}
 			{/if}
 		</button>
 	</header>
@@ -1580,7 +1635,7 @@
 								></div>
 							</div>
 							<p class="mt-2 text-[10px] font-bold {TEXT_MUTED}">
-								{clientExportSupported
+								{exportStage.includes('browser')
 									? 'Rendering on your machine — keep this tab open.'
 									: 'Rendering on the server. This can take a few minutes.'}
 							</p>
@@ -1609,7 +1664,7 @@
 						{:else}
 							<div class="flex items-center justify-between gap-3">
 								<p class="text-xs font-black uppercase tracking-widest text-data-green">
-									Your video is ready
+									Your {renderedFormat === 'gif' ? 'GIF' : 'video'} is ready
 								</p>
 								<button
 									type="button"
@@ -1620,12 +1675,22 @@
 									<i class="fa fa-xmark text-[10px]" aria-hidden="true"></i>
 								</button>
 							</div>
-							<!-- svelte-ignore a11y-media-has-caption -->
-							<video
-								controls
-								src={renderUrl}
-								class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black"
-							></video>
+							{#if renderedFormat === 'gif'}
+								<!-- A GIF is an image: <video> refuses to play it, and an <img>
+								     autoplays it, which is the whole point of the format. -->
+								<img
+									src={renderUrl}
+									alt="Rendered GIF"
+									class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black object-contain"
+								/>
+							{:else}
+								<!-- svelte-ignore a11y-media-has-caption -->
+								<video
+									controls
+									src={renderUrl}
+									class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black"
+								></video>
+							{/if}
 							<div class="mt-3 flex flex-wrap items-center gap-2">
 								<a
 									href={renderUrl}
