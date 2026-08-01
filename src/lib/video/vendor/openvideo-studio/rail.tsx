@@ -32,10 +32,14 @@ import PanelEffects from "./panels/effects-panel";
 import PanelCaptions from "./panels/captions-panel";
 import PanelStock from "./panels/stock-panel";
 import PanelTranscript from "./panels/transcript-panel";
+import PanelCopilot from "./panels/copilot-panel";
 
-export type Tab = "text" | "media" | "stock" | "audio" | "shapes" | "effects" | "captions" | "transcript";
+export type Tab = "text" | "media" | "stock" | "audio" | "shapes" | "effects" | "captions" | "transcript" | "copilot";
 
 const tabs: { key: Tab; label: string; icon: React.ComponentType<any> }[] = [
+  // First: it is the fastest way to change anything, and a tool nobody
+  // finds is a tool nobody uses.
+  { key: "copilot", label: "Copilot", icon: RiMagicLine },
   { key: "text", label: "Text", icon: RiTBoxLine },
   { key: "media", label: "Media", icon: RiImage2Line },
   { key: "stock", label: "Stock", icon: RiSearchLine },
@@ -73,6 +77,7 @@ const PANEL_COMPONENTS: Record<Tab, React.ComponentType> = {
   effects: PanelEffects,
   captions: PanelCaptions,
   transcript: PanelTranscript,
+  copilot: PanelCopilot,
 };
 
 export default function ToolRail() {

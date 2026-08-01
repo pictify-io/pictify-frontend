@@ -68,6 +68,16 @@ export interface HostCallbacks {
     query: string,
     page?: number
   ) => Promise<{ items: Array<any>; pagination: { hasMore: boolean; page: number } }>;
+  /**
+   * Ask the copilot what to change. Returns TOOL CALLS, never a document — the
+   * panel validates each against the live scene before applying it, so a
+   * hallucinated clip id costs one operation rather than the scene.
+   */
+  planAgentEdit?: (
+    document: object,
+    tools: Array<any>,
+    instruction: string
+  ) => Promise<{ message: string; calls: Array<{ name: string; args: object }> }>;
 }
 
 let hostCallbacks: HostCallbacks = {};

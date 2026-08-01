@@ -31,7 +31,8 @@
 		listVideoMedia,
 		deleteVideoMedia,
 		transcribeMedia,
-		searchStockAssets
+		searchStockAssets,
+		planAgentEdit
 	} from '../../../api/videoTemplates';
 	import { uploadBrandAsset, getBrandAssets } from '../../../api/brand-assets';
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
@@ -577,6 +578,7 @@
 				deleteMedia,
 				transcribe: transcribeMedia,
 				searchStock: searchStockAssets,
+				planAgentEdit,
 				// The vendored gradient editor mutates a clip's style directly; the
 				// studio store only republishes on a SELECTION change, so it tells us
 				// when to re-read the clip and re-detect variables.

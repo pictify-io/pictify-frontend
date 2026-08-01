@@ -293,6 +293,21 @@ const transcribeMedia = async (url) => backend.post('/video/transcribe', { url }
  * @param {string} query
  * @param {number} [page]
  */
+/**
+ * Ask the timeline copilot what to change.
+ *
+ * Returns TOOL CALLS, not a document. The caller validates every call against
+ * the live scene before applying it (src/lib/video/agent-tools.js), so a
+ * hallucinated clip id costs one operation rather than the scene.
+ *
+ * @param {object} document - describeDocument() output
+ * @param {Array} tools - toolSchema() output
+ * @param {string} instruction
+ * @returns {Promise<{message: string, calls: Array<{name: string, args: object}>}>}
+ */
+const planAgentEdit = async (document, tools, instruction) =>
+	backend.post('/video/templates/agent', { document, tools, instruction });
+
 const searchStockAssets = async (kind, query, page = 1) => {
 	const params = new URLSearchParams({ query, page: String(page) });
 	return backend.get(`/video/stock/${kind === 'video' ? 'videos' : 'images'}?${params}`);
@@ -315,5 +330,6 @@ export {
 	listVideoMedia,
 	deleteVideoMedia,
 	transcribeMedia,
-	searchStockAssets
+	searchStockAssets,
+	planAgentEdit
 };
