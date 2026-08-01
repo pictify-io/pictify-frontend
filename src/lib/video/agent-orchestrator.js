@@ -27,8 +27,13 @@
  */
 export const classifyRequest = (instruction, describedDoc) => {
 	const text = String(instruction || '').toLowerCase();
+	// The restyle family (revamp, rework…) is generative too: "revamp the video
+	// with coding-themed footage" is dozens of operations that deserve a brief,
+	// not a colour tweak. "update" stays out — "update the title" is one call.
 	const generativeVerb =
-		/\b(create|make|generate|build|design|produce|put together|come up with)\b/.test(text);
+		/\b(create|make|generate|build|design|produce|put together|come up with|revamp|redesign|restyle|rework|refresh|transform)\b/.test(
+			text
+		);
 	const compositionNoun =
 		/\b(video|template|scene|composition|intro|outro|promo|ad|advert|trailer|reel|story|slideshow|announcement|teaser)\b/.test(
 			text
@@ -43,14 +48,18 @@ export const classifyRequest = (instruction, describedDoc) => {
 /**
  * How much work a request may spend.
  *
- * Generation is legitimately dozens of operations — background, media per
- * beat, text per beat, scrims, animations, transitions. An edit that reaches
- * thirty operations has misread the request and is rewriting the scene.
+ * ROUNDS are the real budget: the loop ends when the model returns no calls,
+ * and each reply is capped at 25 calls server-side, so rounds bound the total
+ * on their own. The operations ceiling is a runaway BACKSTOP at that natural
+ * limit, not a pacing device — an earlier version stopped a legitimate
+ * 43-operation restyle mid-flight at 30, which read as the copilot giving up.
+ * The protections against a misread request are the per-call validators and
+ * the one-click per-run undo, not a small number here.
  */
 export const budgetFor = (kind) =>
 	kind === 'generate'
-		? { rounds: 8, operations: 60 }
-		: { rounds: 6, operations: 30 };
+		? { rounds: 8, operations: 200 }
+		: { rounds: 6, operations: 150 };
 
 /**
  * The feedback message a round sends back to the model.

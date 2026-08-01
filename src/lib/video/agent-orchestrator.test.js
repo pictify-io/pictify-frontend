@@ -47,9 +47,19 @@ test('nothing crashes on garbage', () => {
 	assert.equal(classifyRequest(null, {}), 'edit');
 });
 
-test('generation gets a real budget, edits stay on the old one', () => {
-	assert.deepEqual(budgetFor('generate'), { rounds: 8, operations: 60 });
-	assert.deepEqual(budgetFor('edit'), { rounds: 6, operations: 30 });
+test('rounds are the budget; the operations ceiling is only a runaway backstop', () => {
+	// Each reply is capped at 25 calls server-side, so the ceiling must sit AT
+	// rounds x 25, not below it — an earlier, smaller ceiling stopped a
+	// legitimate 43-operation restyle mid-flight.
+	assert.deepEqual(budgetFor('generate'), { rounds: 8, operations: 200 });
+	assert.deepEqual(budgetFor('edit'), { rounds: 6, operations: 150 });
+});
+
+test('restyle verbs are generative — they deserve a brief and the full budget', () => {
+	assert.equal(classifyRequest('Revamp the video with coding-themed footage', fullScene), 'generate');
+	assert.equal(classifyRequest('redesign this template around our brand', fullScene), 'generate');
+	// ...but "update" stays an edit verb: "update the title" is one call.
+	assert.equal(classifyRequest('update the title to say Hello', fullScene), 'edit');
 });
 
 test('a round report always carries the scene and the stop instruction', () => {
