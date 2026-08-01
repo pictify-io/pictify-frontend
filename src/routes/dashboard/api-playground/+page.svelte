@@ -66,7 +66,7 @@
 		preset: 'A4',
 		title: ''
 	};
-	let videoRenderParams = { templateUid: '', variables: '{}' };
+	let videoRenderParams = { templateUid: '', variables: '{}', format: 'mp4' };
 	let videoVariablesParams = { uid: '' };
 	let videoGenerateParams = {
 		prompt: 'A bold 8 second product launch teaser for a developer tool called ShipFast',
@@ -81,7 +81,7 @@
 	let hasTriedToFetchTokens = false;
 	let unsubscribe = () => {};
 	let copiedCurl = false;
-	let expandedCategory = 'Image Generation'; // Default expanded category
+	let expandedCategory = 'HTML Rendering'; // Default expanded category
 
 	// Maximize state for CodeMirror editors
 	let maximizeImageHtml = false;
@@ -770,7 +770,8 @@
 						throw new Error('Video template UID is required');
 					}
 					data = await backend.post(`/video/templates/${videoRenderParams.templateUid}/render`, {
-						variables: JSON.parse(videoRenderParams.variables || '{}')
+						variables: JSON.parse(videoRenderParams.variables || '{}'),
+						format: videoRenderParams.format || 'mp4'
 					});
 					break;
 
@@ -1129,9 +1130,12 @@
 			path: `/video/templates/${videoRenderParams.templateUid || ':uid'}/render`,
 			payload: (() => {
 				try {
-					return { variables: JSON.parse(videoRenderParams.variables || '{}') };
+					return {
+						variables: JSON.parse(videoRenderParams.variables || '{}'),
+						format: videoRenderParams.format || 'mp4'
+					};
 				} catch {
-					return { variables: {} };
+					return { variables: {}, format: videoRenderParams.format || 'mp4' };
 				}
 			})(),
 			requiresAuth: true
@@ -1158,37 +1162,41 @@
 		}
 	];
 
-	// Endpoint categories for organization
+	/*
+	 * Endpoint categories, organised by PRODUCT rather than by verb.
+	 *
+	 * An earlier layout split image templates across three groups (Management /
+	 * Rendering / Utilities) while video got one coherent group — so the same
+	 * kind of work lived in one place for video and three for images. Now each
+	 * group is one product surface: what you can do with it, top to bottom,
+	 * with the one-off HTML renders first because they are the simplest call
+	 * and the natural first request to try.
+	 */
 	const endpointCategories = [
 		{
-			name: 'Image Generation',
+			name: 'HTML Rendering',
 			endpoints: [
 				{ id: 'image', path: '/image', method: 'POST', label: 'HTML to Image' },
 				{ id: 'gif', path: '/gif', method: 'POST', label: 'HTML to GIF' }
 			]
 		},
 		{
-			name: 'Template Management',
+			name: 'Image Templates',
 			endpoints: [
 				{ id: 'create-template', path: '/templates', method: 'POST', label: 'Create Template' },
 				{ id: 'get-template', path: '/templates/:uid', method: 'GET', label: 'Get Template' },
-				{
-					id: 'delete-template',
-					path: '/templates/:uid',
-					method: 'DELETE',
-					label: 'Delete Template'
-				},
 				{
 					id: 'search-templates',
 					path: '/templates/search',
 					method: 'GET',
 					label: 'Search Templates'
-				}
-			]
-		},
-		{
-			name: 'Template Rendering',
-			endpoints: [
+				},
+				{
+					id: 'get-variables',
+					path: '/templates/:uid/variables',
+					method: 'GET',
+					label: 'Get Variables'
+				},
 				{
 					id: 'render-template',
 					path: '/templates/:uid/render',
@@ -1196,16 +1204,27 @@
 					label: 'Render Template'
 				},
 				{
+					id: 'delete-template',
+					path: '/templates/:uid',
+					method: 'DELETE',
+					label: 'Delete Template'
+				}
+			]
+		},
+		{
+			name: 'Batch Rendering',
+			endpoints: [
+				{
 					id: 'batch-render',
 					path: '/templates/:uid/batch-render',
 					method: 'POST',
-					label: 'Batch Render'
+					label: 'Batch Render (Rows)'
 				},
 				{
 					id: 'batch-render-csv',
 					path: '/templates/:uid/batch-render',
 					method: 'POST',
-					label: 'Batch Render (CSV Mode)'
+					label: 'Batch Render (CSV)'
 				},
 				{
 					id: 'batch-status',
@@ -1218,17 +1237,6 @@
 					path: '/templates/batch/:batchId/cancel',
 					method: 'POST',
 					label: 'Cancel Batch'
-				}
-			]
-		},
-		{
-			name: 'Template Utilities',
-			endpoints: [
-				{
-					id: 'get-variables',
-					path: '/templates/:uid/variables',
-					method: 'GET',
-					label: 'Get Variables'
 				}
 			]
 		},
@@ -1250,16 +1258,16 @@
 			endpoints: [
 				{ id: 'video-list', path: '/video/templates', method: 'GET', label: 'List Video Templates' },
 				{
-					id: 'video-render',
-					path: '/video/templates/:uid/render',
-					method: 'POST',
-					label: 'Render Video (MP4)'
-				},
-				{
 					id: 'video-variables',
 					path: '/video/templates/:uid/variables',
 					method: 'GET',
 					label: 'Get Video Variables'
+				},
+				{
+					id: 'video-render',
+					path: '/video/templates/:uid/render',
+					method: 'POST',
+					label: 'Render Video (MP4 / GIF)'
 				},
 				{
 					id: 'video-generate',
@@ -1294,7 +1302,7 @@
 			'pdf-presets': 'List the available page size presets',
 			'video-list': 'List your video templates with their UIDs',
 			'video-render':
-				'Render a video template to MP4 with variables. Renders take up to a few minutes — the request waits for the file URL.',
+				'Render a video template with variables — MP4, or an animated GIF (15fps, palette-optimised). Renders take up to a few minutes; the request waits for the file URL.',
 			'video-variables': 'Get a video template’s variable definitions',
 			'video-generate':
 				'Generate a new video template from a prompt — an AI motion brief, compiled scene code and a visual review, returned as a draft template'
@@ -2814,8 +2822,20 @@
 										/>
 									</div>
 									<p class="text-[10px] text-gray-500 mt-1">
-										Renders take up to a few minutes; the request waits and returns the MP4 URL.
+										Renders take up to a few minutes; the request waits and returns the file URL.
 									</p>
+								</div>
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Output Format</label
+									>
+									<select
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+										bind:value={videoRenderParams.format}
+									>
+										<option value="mp4">MP4 video</option>
+										<option value="gif">Animated GIF (15fps, palette-optimised)</option>
+									</select>
 								</div>
 							</div>
 						{:else if selectedEndpoint === 'video-variables'}
