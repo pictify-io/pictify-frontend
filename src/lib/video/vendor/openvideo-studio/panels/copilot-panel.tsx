@@ -40,7 +40,16 @@ import {
 } from "../../../agent-orchestrator";
 import { critiqueScene } from "../../../scene-critic";
 import { EFFECT_OPTIONS } from "../../../effects";
-import { IN_PRESETS, OUT_PRESETS, buildAnimation, withAnimationMeta } from "../../../animations";
+import {
+  IN_PRESETS,
+  OUT_PRESETS,
+  EMPHASIS_PRESETS,
+  buildAnimation,
+  withAnimationMeta,
+} from "../../../animations";
+import { buildCaptionClips } from "../../../captions";
+import { getGroupedFonts } from "../font-utils";
+import { fontManager } from "@openvideo/engine-pixi";
 import {
   TRANSITION_OPTIONS,
   previousClip,
@@ -201,6 +210,75 @@ export default function CopilotPanel() {
         } else {
           isolate("add_media", () => placeMedia(item, operation, state, failures));
         }
+      } else if (operation.op === "font") {
+        /*
+         * Resolved here because a font is a FILE: the engine has to load it
+         * before the style points at it, or the clip paints the fallback font
+         * forever. Family matched case-insensitively — the validator already
+         * checked it against the same list this resolves from.
+         */
+        const clip = state.clips[operation.clipId];
+        if (!clip) {
+          failures.push(`set_font: clip ${operation.clipId} no longer exists.`);
+          continue;
+        }
+        const family = String(operation.family || "").toLowerCase();
+        const target = getGroupedFonts().find(
+          (entry: any) => entry.family.toLowerCase() === family
+        );
+        if (!target) {
+          failures.push(`set_font: no font family called "${operation.family}".`);
+          continue;
+        }
+        try {
+          await fontManager.addFont({
+            name: target.mainFont.postScriptName,
+            url: target.mainFont.url,
+          });
+          core.clip.update(operation.clipId, {
+            style: {
+              ...(clip.style || {}),
+              fontFamily: target.mainFont.postScriptName,
+              fontUrl: target.mainFont.url,
+            },
+          });
+        } catch (cause: any) {
+          failures.push(`set_font: ${cause?.message || "the font could not be loaded"}.`);
+        }
+      } else if (operation.op === "captions") {
+        // Resolved here because the panel owns the transcription service.
+        // Mirrors the captions panel's own generate flow exactly.
+        const transcribe = getHostCallbacks().transcribe;
+        if (!transcribe) {
+          failures.push("add_captions: captioning is not available in this editor.");
+          continue;
+        }
+        const clip = state.clips[operation.clipId];
+        if (!clip) {
+          failures.push(`add_captions: clip ${operation.clipId} no longer exists.`);
+          continue;
+        }
+        try {
+          const result = await transcribe(clip.src);
+          const captions = buildCaptionClips(result.words, {
+            composition: {
+              width: state.settings?.width || 1080,
+              height: state.settings?.height || 1920,
+            },
+            // Captions line up against the clip where it actually sits.
+            offsetUs: clip.timing?.display?.from ?? 0,
+            mediaId: clip.id,
+          });
+          if (!captions.length) {
+            failures.push("add_captions: no speech was found in that clip.");
+            continue;
+          }
+          for (const caption of captions) {
+            isolate("add_captions", () => core.clip.add({ id: generateId(), ...caption } as any));
+          }
+        } catch (cause: any) {
+          failures.push(`add_captions: ${cause?.message || "transcription failed"}.`);
+        }
       } else if (operation.op === "animate") {
         // Resolved here because composing presets into keyframes needs the
         // engine's preset registry, which the pure tool module cannot import.
@@ -214,7 +292,7 @@ export default function CopilotPanel() {
         const selection = {
           inPreset: operation.inPreset,
           outPreset: operation.outPreset,
-          emphasisPreset: "",
+          emphasisPreset: operation.emphasisPreset || "",
         };
         isolate("set_animation", () =>
           core.clip.update(operation.clipId, {
@@ -381,7 +459,12 @@ export default function CopilotPanel() {
       const vocabulary = {
         effects: EFFECT_OPTIONS().map((option: any) => option.value),
         animations: [...IN_PRESETS(), ...OUT_PRESETS()].map((option: any) => option.value),
+        // Separate from entrance/exit on purpose: the two validate different
+        // parameters, and merged lists let an emphasis preset pass as an
+        // entrance.
+        emphasis: EMPHASIS_PRESETS().map((option: any) => option.value),
         transitions: TRANSITION_OPTIONS().map((option: any) => option.value),
+        fonts: getGroupedFonts().map((font: any) => font.family),
       };
 
       /*
@@ -468,7 +551,12 @@ export default function CopilotPanel() {
             vocabulary[lookup.list as keyof typeof vocabulary],
             lookup.query
           );
-          return `${lookup.list} matching "${lookup.query}" (${found.total} total): ${found.names.join(", ")}`;
+          const line = `${lookup.list} matching "${lookup.query}" (${found.total} total): ${found.names.join(", ")}`;
+          if (lookup.list !== "animations") return line;
+          // Emphasis presets ride along on animation lookups, labelled so the
+          // model puts them in emphasisPreset rather than in inPreset.
+          const looping = searchCatalogue(vocabulary.emphasis, lookup.query, 10);
+          return `${line}\nemphasis (looping) presets, for emphasisPreset only: ${looping.names.join(", ")}`;
         });
 
         const applyFailures = mutations.length ? await applyOperations(mutations) : [];

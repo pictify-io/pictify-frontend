@@ -589,3 +589,181 @@ test('the settings and media ops read as a sentence', () => {
 	assert.match(summarizeOperations([{ op: 'settings' }]), /Adjusted the scene/);
 	assert.match(summarizeOperations([{ op: 'media' }]), /Placed 1 media item/);
 });
+
+// ── Tier 1+2 tools ───────────────────────────────────────────────────────
+// The gaps a good video actually uses: gradient scrims, emphasis motion,
+// typography, sound, Ken Burns, captions, speed, trim, canvas aspect.
+
+const richDoc = () => {
+	const base = doc();
+	base.clips.v1 = {
+		id: 'v1',
+		type: 'Video',
+		name: 'Footage',
+		src: 'https://cdn.example.com/clip.mp4',
+		transform: { x: 0, y: 0, width: 1080, height: 1920, angle: 0, opacity: 1, zIndex: 1 },
+		timing: {
+			display: { from: 0, to: 4 * S },
+			trim: { from: 0, to: 4 * S },
+			duration: 4 * S,
+			playbackRate: 1
+		},
+		style: {},
+		metadata: { pictify: { animation: { inPreset: 'fadeIn' } } }
+	};
+	return base;
+};
+
+test('add_shape with gradientTo writes a CSS gradient into the fill string', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('add_shape', {
+			x: 0.5, y: 0.8, width: 1, height: 0.4,
+			fill: '#00000000', gradientTo: '#000000cc',
+			startS: 0, durationS: 5
+		})
+	]);
+	const clip = operations[0].clip;
+	assert.equal(clip.style.fill, 'linear-gradient(180deg, #00000000, #000000cc)');
+	assert.equal(clip.name, 'Gradient');
+});
+
+test('add_shape gradientAngle steers the gradient; garbage angle falls back to 180', () => {
+	const angled = planToolCalls(doc(), [
+		call('add_shape', { x: 0.5, y: 0.5, width: 1, height: 1, fill: '#111111', gradientTo: '#222222', gradientAngle: 90 })
+	]);
+	assert.match(angled.operations[0].clip.style.fill, /^linear-gradient\(90deg/);
+	const garbage = planToolCalls(doc(), [
+		call('add_shape', { x: 0.5, y: 0.5, width: 1, height: 1, fill: '#111111', gradientTo: '#222222', gradientAngle: 'up' })
+	]);
+	assert.match(garbage.operations[0].clip.style.fill, /^linear-gradient\(180deg/);
+});
+
+test('add_shape opacity lands on the transform; a bad gradientTo is refused', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('add_shape', { x: 0.5, y: 0.5, width: 1, height: 1, fill: '#111111', opacity: 0.6 })
+	]);
+	assert.equal(operations[0].clip.transform.opacity, 0.6);
+	const { errors } = planToolCalls(doc(), [
+		call('add_shape', { x: 0.5, y: 0.5, width: 1, height: 1, fill: '#111111', gradientTo: 'dark' })
+	]);
+	assert.match(errors[0].error, /gradientTo must be a hex/);
+});
+
+test('set_animation accepts an emphasis preset, validated against its OWN list', () => {
+	const vocabulary = { animations: ['fadeIn'], emphasis: ['pulse'] };
+	const ok = planToolCalls(doc(), [call('set_animation', { clipId: 't1', emphasisPreset: 'pulse' })], vocabulary);
+	assert.equal(ok.operations[0].emphasisPreset, 'pulse');
+	// An entrance preset cannot sneak into the emphasis slot.
+	const wrong = planToolCalls(doc(), [call('set_animation', { clipId: 't1', emphasisPreset: 'fadeIn' })], vocabulary);
+	assert.match(wrong.errors[0].error, /No emphasis animation called fadeIn/);
+});
+
+test('set_font resolves to a caller op and checks the family list', () => {
+	const vocabulary = { fonts: ['Inter', 'Playfair Display'] };
+	const { operations } = planToolCalls(doc(), [
+		call('set_font', { clipId: 't1', family: 'Playfair Display' })
+	], vocabulary);
+	assert.deepEqual(operations[0], {
+		tool: 'set_font', op: 'font', clipId: 't1', family: 'Playfair Display'
+	});
+	const { errors } = planToolCalls(doc(), [
+		call('set_font', { clipId: 't1', family: 'Comic Sans' })
+	], vocabulary);
+	assert.match(errors[0].error, /No font called Comic Sans/);
+});
+
+test('set_font refuses clips that have no font', () => {
+	const { errors } = planToolCalls(doc(), [call('set_font', { clipId: 's1', family: 'Inter' })]);
+	assert.match(errors[0].error, /Shape clips have no font/);
+});
+
+test('set_volume writes the top-level volume, clamped, and only for things that make sound', () => {
+	const { operations } = planToolCalls(richDoc(), [call('set_volume', { clipId: 'v1', volume: 3 })]);
+	assert.deepEqual(operations[0].patch, { volume: 1 });
+	const { errors } = planToolCalls(doc(), [call('set_volume', { clipId: 't1', volume: 0.5 })]);
+	assert.match(errors[0].error, /Text clips make no sound/);
+});
+
+test('ken_burns push_in writes two keyframe stops scaling up', () => {
+	const { operations } = planToolCalls(richDoc(), [
+		call('ken_burns', { clipId: 'v1', move: 'push_in' })
+	]);
+	const animation = operations[0].patch.animations[0];
+	assert.equal(animation.type, 'keyframes');
+	assert.equal(animation.params['0%'].scale, 1);
+	assert.equal(animation.params['100%'].scale, 1.06);
+	assert.equal(animation.options.duration, 4 * S);
+});
+
+test('ken_burns pans hold a fixed zoom so the frame edge never shows', () => {
+	const { operations } = planToolCalls(richDoc(), [
+		call('ken_burns', { clipId: 'v1', move: 'pan_left', strength: 'strong' })
+	]);
+	const params = operations[0].patch.animations[0].params;
+	assert.equal(params['0%'].scale, params['100%'].scale);
+	assert.ok(params['100%'].x < 0, 'pan_left drifts left');
+});
+
+test('ken_burns strips the preset metadata it replaces', () => {
+	const { operations } = planToolCalls(richDoc(), [
+		call('ken_burns', { clipId: 'v1', move: 'pull_out' })
+	]);
+	assert.equal(operations[0].patch.metadata.pictify.animation, undefined);
+});
+
+test('ken_burns refuses text and unknown moves', () => {
+	const text = planToolCalls(doc(), [call('ken_burns', { clipId: 't1', move: 'push_in' })]);
+	assert.match(text.errors[0].error, /for media, not Text/);
+	const move = planToolCalls(richDoc(), [call('ken_burns', { clipId: 'v1', move: 'spin' })]);
+	assert.match(move.errors[0].error, /move must be/);
+});
+
+test('add_captions resolves to a caller op, and only for reachable media', () => {
+	const { operations } = planToolCalls(richDoc(), [call('add_captions', { clipId: 'v1' })]);
+	assert.deepEqual(operations[0], { tool: 'add_captions', op: 'captions', clipId: 'v1' });
+
+	const local = richDoc();
+	local.clips.v1.src = 'blob:http://localhost/abc';
+	const { errors } = planToolCalls(local, [call('add_captions', { clipId: 'v1' })]);
+	assert.match(errors[0].error, /has not finished uploading/);
+});
+
+test('set_speed rescales the display window around a fixed start', () => {
+	const { operations } = planToolCalls(richDoc(), [call('set_speed', { clipId: 'v1', speed: 2 })]);
+	const timing = operations[0].patch.timing;
+	assert.equal(timing.playbackRate, 2);
+	assert.deepEqual(timing.display, { from: 0, to: 2 * S }, '4s at 2x takes 2s of timeline');
+});
+
+test('set_trim picks the source window without moving the clip on the timeline', () => {
+	const { operations } = planToolCalls(richDoc(), [
+		call('set_trim', { clipId: 'v1', sourceStartS: 3 })
+	]);
+	const timing = operations[0].patch.timing;
+	assert.deepEqual(timing.trim, { from: 3 * S, to: 7 * S }, '4s timeline span from 3s in');
+	assert.deepEqual(timing.display, { from: 0, to: 4 * S }, 'timeline position untouched');
+});
+
+test('set_trim accounts for playback rate — a 2x clip eats source twice as fast', () => {
+	const fast = richDoc();
+	fast.clips.v1.timing.playbackRate = 2;
+	const { operations } = planToolCalls(fast, [call('set_trim', { clipId: 'v1', sourceStartS: 1 })]);
+	assert.deepEqual(operations[0].patch.timing.trim, { from: 1 * S, to: 9 * S });
+});
+
+test('set_canvas_size maps preset names to real dimensions and rejects others', () => {
+	const { operations } = planToolCalls(doc(), [call('set_canvas_size', { aspect: 'landscape' })]);
+	assert.deepEqual(operations[0].patch, { width: 1920, height: 1080 });
+	const { errors } = planToolCalls(doc(), [call('set_canvas_size', { aspect: 'imax' })]);
+	assert.match(errors[0].error, /aspect must be one of/);
+});
+
+test('list_fonts is a query op like the other discovery tools', () => {
+	const { operations } = planToolCalls(doc(), [call('list_fonts', { query: 'serif' })]);
+	assert.deepEqual(operations[0], { tool: 'list_fonts', op: 'query', list: 'fonts', query: 'serif' });
+});
+
+test('the font and caption ops read as a sentence', () => {
+	assert.match(summarizeOperations([{ op: 'font' }]), /Changed 1 font/);
+	assert.match(summarizeOperations([{ op: 'captions' }]), /Captioned 1 clip/);
+});

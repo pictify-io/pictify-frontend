@@ -30,6 +30,10 @@
 
 import { createEffectClip } from './effect-params.js';
 import { fadePatch } from './clip-style.js';
+import { speedPatch, MIN_SPEED, MAX_SPEED } from './clip-speed.js';
+import { writeKeyframes } from './keyframes.js';
+import { toGradientFill } from './gradients.js';
+import { ASPECT_PRESETS } from './scene-settings.js';
 
 const SECOND = 1_000_000;
 
@@ -189,7 +193,13 @@ export const describeMedia = (library, limit = 30) =>
  * model guessing "sparkle" as an effect fails validation every time; a model
  * handed the real 51 names picks one that exists.
  *
- * @typedef {{effects?: string[], animations?: string[], transitions?: string[]}} Vocabulary
+ * `animations` is entrance/exit presets; `emphasis` is the looping presets
+ * (pulse, wiggle…), kept separate because the two are validated for different
+ * parameters and merging them would let an emphasis preset pass as an
+ * entrance. `fonts` is family names ("Inter"), not PostScript names — the
+ * family is what a person would say, and the caller resolves the file.
+ *
+ * @typedef {{effects?: string[], animations?: string[], emphasis?: string[], transitions?: string[], fonts?: string[]}} Vocabulary
  */
 
 /**
@@ -262,6 +272,14 @@ export const TOOLS = [
 		params: { query: 'string, e.g. "wipe" or "zoom"' },
 		validate: () => null,
 		apply: (doc, args) => ({ op: 'query', list: 'transitions', query: String(args.query || '') })
+	},
+	{
+		name: 'list_fonts',
+		description:
+			'Look up available font families by keyword before using set_font. Returns real family names.',
+		params: { query: 'string, e.g. "serif" or "mono" — empty lists popular ones' },
+		validate: () => null,
+		apply: (doc, args) => ({ op: 'query', list: 'fonts', query: String(args.query || '') })
 	},
 	{
 		name: 'set_text',
@@ -546,8 +564,13 @@ export const TOOLS = [
 	{
 		name: 'set_animation',
 		description:
-			'Give a clip an entrance and/or exit animation, by preset name from the list.',
-		params: { clipId: 'string', inPreset: 'string or empty', outPreset: 'string or empty' },
+			'Give a clip an entrance, exit and/or looping emphasis animation, by preset name from the list.',
+		params: {
+			clipId: 'string',
+			inPreset: 'string or empty',
+			outPreset: 'string or empty',
+			emphasisPreset: 'string or empty — a looping animation like a pulse'
+		},
 		validate: (doc, args, vocabulary) => {
 			if (!doc.clips?.[args.clipId]) return `No clip with id ${args.clipId}.`;
 			for (const key of ['inPreset', 'outPreset']) {
@@ -555,7 +578,13 @@ export const TOOLS = [
 				if (value && !inVocabulary(vocabulary?.animations, value))
 					return `No animation called ${value}.`;
 			}
-			if (!args.inPreset && !args.outPreset) return 'Give at least one preset.';
+			// Checked against its OWN list: an emphasis preset loops for the whole
+			// clip, and letting one pass as an entrance (or the reverse) produces
+			// motion nobody asked for.
+			if (args.emphasisPreset && !inVocabulary(vocabulary?.emphasis, args.emphasisPreset))
+				return `No emphasis animation called ${args.emphasisPreset}.`;
+			if (!args.inPreset && !args.outPreset && !args.emphasisPreset)
+				return 'Give at least one preset.';
 			return null;
 		},
 		// Resolved by the caller: composing presets into keyframes needs the
@@ -564,7 +593,8 @@ export const TOOLS = [
 			op: 'animate',
 			clipId: args.clipId,
 			inPreset: args.inPreset || '',
-			outPreset: args.outPreset || ''
+			outPreset: args.outPreset || '',
+			emphasisPreset: args.emphasisPreset || ''
 		})
 	},
 	{
@@ -627,13 +657,17 @@ export const TOOLS = [
 	},
 	{
 		name: 'add_shape',
-		description: 'Add a coloured rectangle. Geometry is fractions of the canvas.',
+		description:
+			'Add a rectangle — solid, or a gradient when gradientTo is given. A transparent-to-dark gradient behind text is the standard scrim over video. Geometry is fractions of the canvas. Hex colours may carry alpha (#00000000 is fully transparent).',
 		params: {
 			x: 'number 0-1',
 			y: 'number 0-1',
 			width: 'number 0-1',
 			height: 'number 0-1',
 			fill: 'string hex',
+			gradientTo: 'string hex or empty — makes the fill a gradient from fill to this',
+			gradientAngle: 'number degrees, default 180 (top to bottom)',
+			opacity: 'number 0-1, default 1',
 			radius: 'number 0-1',
 			startS: 'number',
 			durationS: 'number'
@@ -644,6 +678,8 @@ export const TOOLS = [
 			}
 			if (Number(args.width) <= 0 || Number(args.height) <= 0)
 				return 'width and height must be greater than zero.';
+			if (args.gradientTo && !/^#[0-9a-f]{3,8}$/i.test(String(args.gradientTo)))
+				return 'gradientTo must be a hex value.';
 			return null;
 		},
 		apply: (doc, args) => {
@@ -652,11 +688,25 @@ export const TOOLS = [
 			const span = Math.max(1, toUs(args.durationS ?? 5));
 			const w = Math.max(1, toPx(clampFraction(args.width), width));
 			const h = Math.max(1, toPx(clampFraction(args.height), height));
+			const base = /^#[0-9a-f]{3,8}$/i.test(String(args.fill || '')) ? args.fill : '#3b82f6';
+			/*
+			 * A gradient rides IN the fill string as CSS — the one representation
+			 * ShapeClip round-trips, because it rebuilds `style` from a fixed key
+			 * list on deserialize and would drop any separate descriptor key.
+			 * toGradientFill owns the format.
+			 */
+			const fill = args.gradientTo
+				? toGradientFill({
+						type: 'linear',
+						angle: Number.isFinite(Number(args.gradientAngle)) ? Number(args.gradientAngle) : 180,
+						colors: [base, args.gradientTo]
+					})
+				: base;
 			return {
 				op: 'add',
 				clip: {
 					type: 'Shape',
-					name: 'Shape',
+					name: args.gradientTo ? 'Gradient' : 'Shape',
 					shapeType: 'rectangle',
 					src: 'shape://rectangle',
 					timing: {
@@ -673,11 +723,11 @@ export const TOOLS = [
 						width: w,
 						height: h,
 						angle: 0,
-						opacity: 1,
+						opacity: args.opacity !== undefined ? clampFraction(args.opacity) : 1,
 						zIndex: 2
 					},
 					style: {
-						fill: /^#[0-9a-f]{3,8}$/i.test(String(args.fill || '')) ? args.fill : '#3b82f6',
+						fill,
 						fillOpacity: 1,
 						borderRadius: Math.round(clampFraction(args.radius ?? 0) * Math.min(w, h))
 					},
@@ -748,6 +798,195 @@ export const TOOLS = [
 				}
 			};
 		}
+	},
+	{
+		name: 'set_font',
+		description:
+			'Set a text clip’s font, by family name from list_fonts. One display family plus one body family is plenty for a whole video.',
+		params: { clipId: 'string', family: 'string, e.g. "Playfair Display"' },
+		validate: (doc, args, vocabulary) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Text' && clip.type !== 'Caption') return `${clip.type} clips have no font.`;
+			if (typeof args.family !== 'string' || !args.family.trim()) return 'family is required.';
+			if (!inVocabulary(vocabulary?.fonts, args.family)) return `No font called ${args.family}.`;
+			return null;
+		},
+		// Resolved by the caller: a font is a FILE, and applying one means
+		// loading it into the engine's font manager before the style points at
+		// it — pointing first paints the fallback font forever.
+		apply: (doc, args) => ({ op: 'font', clipId: args.clipId, family: args.family.trim() })
+	},
+	{
+		name: 'set_volume',
+		description: 'Set how loud a video or audio clip plays, 0 (muted) to 1 (full).',
+		params: { clipId: 'string', volume: 'number 0-1' },
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Video' && clip.type !== 'Audio')
+				return `${clip.type} clips make no sound.`;
+			if (num(args.volume) === null) return 'volume must be a number.';
+			return null;
+		},
+		// Top-level on the clip, not in style: that is where the engine's own
+		// volume control writes it.
+		apply: (doc, args) => ({
+			op: 'update',
+			clipId: args.clipId,
+			patch: { volume: clampFraction(args.volume) }
+		})
+	},
+	{
+		name: 'ken_burns',
+		description:
+			'Give a full-frame video or image slow, continuous motion — the standard way to keep a still from sitting dead. Replaces any animation preset on the clip.',
+		params: {
+			clipId: 'string',
+			move: 'push_in, pull_out, pan_left or pan_right',
+			strength: 'subtle, medium or strong — default subtle'
+		},
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Video' && clip.type !== 'Image' && clip.type !== 'Backdrop')
+				return `ken_burns is for media, not ${clip.type} clips.`;
+			if (!['push_in', 'pull_out', 'pan_left', 'pan_right'].includes(args.move))
+				return 'move must be push_in, pull_out, pan_left or pan_right.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			const display = clip.timing?.display || {};
+			const durationUs = Math.max(1, (display.to || 0) - (display.from || 0));
+			/*
+			 * Deliberately gentle numbers. Ken Burns reads as production value at
+			 * 6% and as a screensaver at 30% — and every move keeps enough scale
+			 * that the frame edges never show.
+			 */
+			const strength = { subtle: 1, medium: 2, strong: 3 }[args.strength] || 1;
+			const zoom = 1 + 0.06 * strength;
+			const drift = Math.round((Number(clip.transform?.width) || 1080) * 0.03 * strength);
+
+			const frames =
+				args.move === 'push_in'
+					? [
+							{ at: 0, props: { scale: 1 } },
+							{ at: 1, props: { scale: zoom } }
+						]
+					: args.move === 'pull_out'
+						? [
+								{ at: 0, props: { scale: zoom } },
+								{ at: 1, props: { scale: 1 } }
+							]
+						: [
+								// Pans hold a fixed zoom so the drifting edge never
+								// exposes the background behind the media.
+								{ at: 0, props: { scale: zoom, x: 0 } },
+								{ at: 1, props: { scale: zoom, x: args.move === 'pan_left' ? -drift : drift } }
+							];
+
+			/*
+			 * The engine gives a clip ONE animation slot, so this replaces any
+			 * preset — and the preset's metadata flag has to go with it, or the
+			 * clip reports having a preset it no longer plays.
+			 */
+			const pictify = { ...(clip.metadata?.pictify || {}) };
+			delete pictify.animation;
+			return {
+				op: 'update',
+				clipId: args.clipId,
+				patch: {
+					animations: writeKeyframes(frames, durationUs),
+					metadata: { ...(clip.metadata || {}), pictify }
+				}
+			};
+		}
+	},
+	{
+		name: 'add_captions',
+		description:
+			'Transcribe the speech in a video or audio clip and add word-timed caption clips. Use once per spoken clip.',
+		params: { clipId: 'string — the clip whose speech to caption' },
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Video' && clip.type !== 'Audio')
+				return `${clip.type} clips have no speech to caption.`;
+			// The transcription service fetches the file itself, so a blob: or
+			// data: URL from an unfinished upload cannot be captioned.
+			if (!/^https?:\/\//.test(String(clip.src || '')))
+				return 'That clip has not finished uploading, so it cannot be transcribed yet.';
+			return null;
+		},
+		// Resolved by the caller, which owns the transcription service.
+		apply: (doc, args) => ({ op: 'captions', clipId: args.clipId })
+	},
+	{
+		name: 'set_speed',
+		description: `Play a video or audio clip faster or slower, ${MIN_SPEED}x to ${MAX_SPEED}x. The clip's length on the timeline rescales to match.`,
+		params: { clipId: 'string', speed: 'number, 1 is normal — 0.5 is half speed' },
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Video' && clip.type !== 'Audio')
+				return `${clip.type} clips have no playback speed.`;
+			if (num(args.speed) === null || Number(args.speed) <= 0)
+				return 'speed must be a number greater than zero.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			// speedPatch owns the retiming: the display window rescales around a
+			// fixed start, and 1x -> 2x -> 1x returns the original length.
+			return { op: 'update', clipId: args.clipId, patch: speedPatch(clip, Number(args.speed)) };
+		}
+	},
+	{
+		name: 'set_trim',
+		description:
+			'Choose where in the SOURCE file a video or audio clip starts playing, in seconds. The clip keeps its place and length on the timeline; only which part of the footage plays changes.',
+		params: { clipId: 'string', sourceStartS: 'number — seconds into the source file' },
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Video' && clip.type !== 'Audio')
+				return `${clip.type} clips have no source to trim.`;
+			if (num(args.sourceStartS) === null || Number(args.sourceStartS) < 0)
+				return 'sourceStartS must be a number, zero or more.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			const timing = clip.timing || {};
+			const display = timing.display || {};
+			const from = toUs(args.sourceStartS);
+			// The amount of SOURCE the clip consumes: its timeline span scaled by
+			// how fast it plays. A 4s window at 2x eats 8s of footage.
+			const rate = Number(timing.playbackRate) > 0 ? Number(timing.playbackRate) : 1;
+			const span = Math.max(1, Math.round(((display.to || 0) - (display.from || 0)) * rate));
+			return {
+				op: 'update',
+				clipId: args.clipId,
+				patch: {
+					// The whole timing object: core.clip.update merges one level deep.
+					timing: { ...timing, trim: { from, to: from + span } }
+				}
+			};
+		}
+	},
+	{
+		name: 'set_canvas_size',
+		description: `Change the canvas aspect: ${ASPECT_PRESETS.map((p) => `${p.id} (${p.ratio})`).join(', ')}. Existing clips keep their pixel positions, so change this FIRST, before placing anything.`,
+		params: { aspect: `string: ${ASPECT_PRESETS.map((p) => p.id).join(', ')}` },
+		validate: (doc, args) =>
+			ASPECT_PRESETS.some((preset) => preset.id === args.aspect)
+				? null
+				: `aspect must be one of: ${ASPECT_PRESETS.map((p) => p.id).join(', ')}.`,
+		apply: (doc, args) => {
+			const preset = ASPECT_PRESETS.find((entry) => entry.id === args.aspect);
+			return { op: 'settings', patch: { width: preset.width, height: preset.height } };
+		}
 	}
 ];
 
@@ -813,6 +1052,8 @@ export const summarizeOperations = (operations) => {
 	if (counts.transition) parts.push(`added ${counts.transition} transition${counts.transition === 1 ? '' : 's'}`);
 	if (counts.stock) parts.push(`added ${counts.stock} stock clip${counts.stock === 1 ? '' : 's'}`);
 	if (counts.media) parts.push(`placed ${counts.media} media item${counts.media === 1 ? '' : 's'}`);
+	if (counts.font) parts.push(`changed ${counts.font} font${counts.font === 1 ? '' : 's'}`);
+	if (counts.captions) parts.push(`captioned ${counts.captions} clip${counts.captions === 1 ? '' : 's'}`);
 	if (counts.settings) parts.push(`adjusted the scene`);
 	return `${parts.join(', ').replace(/^./, (c) => c.toUpperCase())}.`;
 };

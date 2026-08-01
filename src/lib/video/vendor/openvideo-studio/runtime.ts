@@ -89,7 +89,13 @@ export interface HostCallbacks {
       phase?: "design" | "execute" | "review";
       brief?: string;
       findings?: string[];
-      vocabulary?: { effects?: string[]; animations?: string[]; transitions?: string[] };
+      vocabulary?: {
+        effects?: string[];
+        animations?: string[];
+        emphasis?: string[];
+        transitions?: string[];
+        fonts?: string[];
+      };
     }
   ) => Promise<{ message?: string; calls?: Array<{ name: string; args: object }>; brief?: string }>;
 }
