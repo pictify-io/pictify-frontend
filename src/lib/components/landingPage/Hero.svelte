@@ -167,7 +167,9 @@
 			</div>
 
 			<!-- Headline -->
-			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
+			<h1
+				class="text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-gray-900 mb-5 lg:mb-4 leading-[1.1]"
+			>
 				Turn Spreadsheets Into<br />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					Branded Documents
@@ -183,7 +185,7 @@
 			</h1>
 
 			<!-- Subheadline -->
-			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium mb-10">
+			<p class="text-lg lg:text-base xl:text-lg text-gray-700 max-w-2xl mx-auto font-medium mb-8 lg:mb-6">
 				Upload a spreadsheet or point a webhook — every row becomes a branded certificate, badge or
 				report, rendered and delivered. Plus a rendering API for developers.
 			</p>
@@ -245,7 +247,7 @@
 		<!-- ============================================== -->
 		<!-- V4 CREATIVE: SPLIT PANE INTERACTIVE DEMO       -->
 		<!-- ============================================== -->
-		<div class="mt-16 sm:mt-24 w-full relative z-10 max-w-6xl mx-auto">
+		<div class="mt-12 sm:mt-16 lg:mt-12 w-full relative z-10 max-w-6xl mx-auto">
 			<div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center lg:items-stretch">
 				<!-- Left Side: Interactive Inputs (Floating White Card) -->
 				<div class="w-full lg:w-[42%] flex flex-col justify-center relative">
@@ -255,20 +257,20 @@
 					/>
 
 					<div
-						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 sm:p-10 relative z-10 flex flex-col h-full group"
+						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl p-6 sm:p-8 lg:p-6 xl:p-8 relative z-10 flex flex-col h-full group"
 					>
 						<!-- Quirky Floating Label -->
 						<div
 							class="absolute -top-4 -right-4 bg-brand-accent border-[3px] border-gray-900 rounded-xl px-4 py-1.5 shadow-brutal-lg transform rotate-6 group-hover:-rotate-3 transition-transform duration-300"
 						>
 							<span class="text-xs font-black uppercase text-gray-900 whitespace-nowrap"
-								>Edit JSON</span
+								>Row 1 of 240</span
 							>
 						</div>
 
-						<h3 class="text-2xl font-black text-gray-900 mb-2">Data Payload</h3>
+						<h3 class="text-2xl font-black text-gray-900 mb-2">Spreadsheet Row</h3>
 						<p class="text-sm text-gray-600 font-medium mb-8">
-							Changes re-render the image instantly via API.
+							Every row becomes its own document. Edit one to see it re-render.
 						</p>
 
 						<div class="mt-auto w-full flex flex-col gap-5">
@@ -356,8 +358,8 @@
 								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-[2px] border-gray-900" />
 							</div>
 							<div
-								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate cursor-pointer hover:bg-gray-50 transition-colors"
-								title="Open API Endpoint"
+								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate"
+								title="Row 1 of 240 — rendered and emailed"
 							>
 								<svg
 									class="w-4 h-4 shrink-0 text-[#1f2937]"
@@ -368,10 +370,14 @@
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="3"
-										d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 									/></svg
 								>
-								https://api.pictify.io/render/hero
+								<span class="truncate">certificate-row-1.pdf &rarr; ada@acme.com</span>
+								<span
+									class="ml-auto shrink-0 px-2 py-0.5 rounded bg-data-green border-[2px] border-gray-900 text-[9px] font-black uppercase tracking-wider"
+									>Delivered</span
+								>
 							</div>
 						</div>
 

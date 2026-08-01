@@ -231,7 +231,7 @@
 				</div>
 
 				<h1
-					class="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter mb-4 uppercase leading-none"
+					class="text-4xl sm:text-5xl md:text-6xl 2xl:text-7xl font-black tracking-tighter mb-4 uppercase leading-none"
 				>
 					Free Tools for<br />Programmatic Media
 				</h1>

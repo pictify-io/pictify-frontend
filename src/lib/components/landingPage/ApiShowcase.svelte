@@ -106,7 +106,7 @@ const image = await pictify.render({
 	});
 </script>
 
-<section class="w-full py-20 md:py-32 bg-brand-bg relative overflow-hidden">
+<section class="w-full py-16 md:py-20 2xl:py-32 bg-brand-bg relative overflow-hidden">
 	<!-- Decorative Background Elements -->
 	<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"></div>
 	<div
@@ -127,7 +127,7 @@ const image = await pictify.render({
 					<span class="text-sm font-black text-white uppercase tracking-wider">Developer-First</span>
 				</div>
 
-				<h2 class="text-5xl md:text-6xl lg:text-7xl font-black text-black leading-[1.1] mb-6">
+				<h2 class="text-4xl md:text-5xl 2xl:text-6xl lg:text-7xl font-black text-black leading-[1.1] mb-6">
 					Developer-First API.<br />
 					<span class="relative inline-block mt-2">
 						5 Minutes to Integrate

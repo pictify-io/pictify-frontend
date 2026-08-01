@@ -9,7 +9,6 @@
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
 	import MidSectionCta from '$lib/components/landingPage/MidSectionCta.svelte';
 	import IntegrationsEcosystem from '$lib/components/landingPage/IntegrationsEcosystem.svelte';
-	import ResponsiveShowcase from '$lib/components/landingPage/ResponsiveShowcase.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { analytics } from '$lib/analytics.js';
@@ -132,11 +131,12 @@
 	<ApiShowcase />
 	<SectionSeparator icon="hash" />
 
-	<!-- 6. Responsive Image API -->
-	<ResponsiveShowcase />
-	<SectionSeparator icon="bolt" />
+	<!-- Responsive Image API section retired from the homepage (2026-08): it sold
+		 "one template → Instagram/Twitter/LinkedIn/YouTube sizes", which is the
+		 pre-pivot social-image story and dilutes the document-workflow message.
+		 The component is untouched on disk if it's wanted on a dedicated page. -->
 
-	<!-- 7. Infrastructure & Integrations -->
+	<!-- 6. Infrastructure & Integrations -->
 	<IntegrationsEcosystem />
 	<SectionSeparator icon="arrow" />
 

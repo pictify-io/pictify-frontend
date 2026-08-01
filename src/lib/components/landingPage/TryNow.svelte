@@ -3,7 +3,7 @@
 	import { analytics } from '$lib/analytics.js';
 </script>
 
-<section class="w-full py-24 md:py-32 bg-brand-bg border-t-[3px] border-gray-900 overflow-hidden">
+<section class="w-full py-16 md:py-20 2xl:py-32 bg-brand-bg border-t-[3px] border-gray-900 overflow-hidden">
 	<div class="max-w-6xl mx-auto px-4">
 		<!-- The Monolith CTA Card -->
 		<div class="relative group">
@@ -56,7 +56,7 @@
 						</div>
 
 						<h2
-							class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight"
+							class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight"
 						>
 							Render Your First Image <br class="md:hidden" />
 							<span class="text-brand-danger">in Under 5 Minutes</span>

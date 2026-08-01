@@ -83,7 +83,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-16 md:py-20 2xl:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -100,7 +100,7 @@
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Header -->
 		<div class="text-center mb-24 relative max-w-4xl mx-auto">
-			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
+			<h2 class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template. <br />
 				<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
 					Million Variations

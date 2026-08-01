@@ -141,12 +141,12 @@
 				<span class="text-xs font-black text-black uppercase tracking-widest">Analytics</span>
 			</div>
 			<h1
-				class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]"
+				class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-black tracking-tighter leading-[0.9]"
 			>
-				Image Analytics
+				Delivery Analytics
 			</h1>
 			<p class="mt-3 text-sm font-bold text-gray-500 uppercase tracking-wider">
-				Deep insights into your shared image performance
+				Delivery and view performance for every asset you render
 			</p>
 		</div>
 
@@ -277,7 +277,7 @@
 						>
 						<p class="text-[10px] text-gray-500 font-bold mt-0.5 uppercase tracking-wide">
 							{chartMode === 'views'
-								? 'Daily views across all shared images'
+								? 'Daily views across all rendered assets'
 								: 'Daily bandwidth consumption'}
 						</p>
 					</div>
@@ -422,7 +422,7 @@
 							No traffic in this period
 						</p>
 						<p class="text-xs font-bold text-gray-500 mt-1">
-							Share your images to start seeing analytics
+							Render an image or run a workflow to start seeing analytics
 						</p>
 					</div>
 				{/if}
@@ -870,7 +870,7 @@
 						</div>
 						<p class="text-lg font-black text-black mb-2">No tracked images yet</p>
 						<p class="text-sm font-bold text-gray-500 max-w-sm mx-auto">
-							Share your generated images to start tracking their performance.
+							Render from a template or run a workflow to start tracking performance.
 						</p>
 					</div>
 				{/if}

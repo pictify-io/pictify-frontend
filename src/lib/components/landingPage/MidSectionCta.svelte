@@ -3,7 +3,7 @@
 </script>
 
 <section
-	class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
+	class="w-full py-16 md:py-20 2xl:py-32 bg-brand-bg relative overflow-hidden border-y-[3px] border-gray-900"
 >
 	<!-- Background Pattern -->
 	<div
@@ -45,7 +45,7 @@
 					</div>
 
 					<h2
-						class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-8 leading-[1.1] max-w-2xl"
+						class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl lg:text-7xl font-black text-gray-900 mb-8 leading-[1.1] max-w-2xl"
 					>
 						Get your API key in <br class="hidden sm:block" />
 						<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">

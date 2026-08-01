@@ -24,7 +24,7 @@
 	});
 </script>
 
-<section class="w-full py-24 md:py-32 bg-brand-bg relative">
+<section class="w-full py-16 md:py-20 2xl:py-32 bg-brand-bg relative">
 	<!-- Decorative Background Elements -->
 	<div
 		class="absolute top-20 right-0 w-64 h-64 bg-brand-accent/20 rounded-full blur-3xl -z-10 pointer-events-none"
@@ -40,7 +40,7 @@
 			>
 				<span class="text-sm font-bold text-white uppercase tracking-wider">How It Works</span>
 			</div>
-			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
+			<h2 class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				From Data to <br />
 				<span class="relative inline-block text-brand-danger">
 					Pixel-Perfect Output

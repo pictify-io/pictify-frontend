@@ -10,7 +10,7 @@
 	let isHovering = false;
 </script>
 
-<section class="w-full py-24 md:py-32 bg-brand-bg relative overflow-hidden border-b-[3px] border-gray-900">
+<section class="w-full py-16 md:py-20 2xl:py-32 bg-brand-bg relative overflow-hidden border-b-[3px] border-gray-900">
 	<!-- Background Pattern from Integrations/Experiments -->
 	<div
 		class="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -22,7 +22,7 @@
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<div class="text-center mb-16 max-w-3xl mx-auto relative">
-			<h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
+			<h2 class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				One Template.<br />
 				<span class="relative inline-block text-data-blue">
 					Every Platform.

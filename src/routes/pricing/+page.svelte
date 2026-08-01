@@ -420,7 +420,7 @@
 					</div>
 
 					<h1
-						class="text-5xl md:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
+						class="text-4xl md:text-5xl 2xl:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
 					>
 						Simple, transparent <br />
 						<span class="relative inline-block text-brand-danger mt-1">
