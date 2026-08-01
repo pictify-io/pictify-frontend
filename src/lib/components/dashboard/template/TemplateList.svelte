@@ -27,7 +27,10 @@
 		// Fabric templates fall back to the existing outputFormat
 		// branch (image vs pdf).
 		let url;
-		if (template.engine === 'html') {
+		if (template.isVideoTemplate) {
+			// Video templates are a separate model with their own studio.
+			url = `/dashboard/video-templates/${template.uid}`;
+		} else if (template.engine === 'html') {
 			url = `/template-workspace/html/${template.uid}`;
 		} else {
 			const formatPath = template.outputFormat === 'pdf' ? 'pdf' : 'image';
@@ -271,7 +274,13 @@
 						/>
 					</div>
 					<div class="flex items-center gap-2">
-						{#if template.outputFormat === 'pdf'}
+						{#if template.isVideoTemplate}
+							<span
+								class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-gray-900 text-white uppercase tracking-wider rounded border border-gray-900"
+							>
+								VIDEO
+							</span>
+						{:else if template.outputFormat === 'pdf'}
 							<span
 								class="px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold font-mono bg-brand-danger text-white uppercase tracking-wider rounded border border-gray-900"
 							>
@@ -425,15 +434,21 @@
 					</div>
 				</div>
 
-				<!-- Footer Action Bar -->
+				<!-- Footer Action Bar — one column per button, or the last cell
+				     renders as an empty stripe with a divider against nothing -->
 				<div
-					class="grid grid-cols-3 border-t-[2px] sm:border-t-[3px]
+					class="grid grid-cols-2 border-t-[2px] sm:border-t-[3px]
 				border-gray-900"
 				>
 					<button
 						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-data-teal hover:bg-data-teal/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
 						border-gray-900"
-						on:click|stopPropagation={() => goto(`/dashboard/template/${template.uid}/render`)}
+						on:click|stopPropagation={() =>
+							goto(
+								template.isVideoTemplate
+									? `/dashboard/video-templates/${template.uid}/render`
+									: `/dashboard/template/${template.uid}/render`
+							)}
 						title="Render with variables"
 						aria-label="Render with variables"
 					>
@@ -454,9 +469,9 @@
 						>
 					</button>
 					<button
-						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-brand-danger hover:bg-brand-danger/10 transition-all duration-150 border-r-[2px] sm:border-r-[3px]
-						border-gray-900"
-						on:click|stopPropagation={() => goto(`/dashboard/workflows/new`)}
+						class="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 py-2.5 sm:py-3 text-gray-500 hover:text-brand-danger hover:bg-brand-danger/10 transition-all duration-150"
+						on:click|stopPropagation={() =>
+							goto(`/dashboard/workflows/new?template=${template.uid}`)}
 						title="Run a workflow with this template"
 						aria-label="Run a workflow with this template"
 					>
