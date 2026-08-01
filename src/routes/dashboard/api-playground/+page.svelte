@@ -21,6 +21,7 @@
 		cancelBatchJob
 	} from '../../../api/template';
 	import backend from '../../../service/backend';
+	import { getVideoTemplates } from '../../../api/videoTemplates';
 	import { createShareResult } from '../../../api/public-templates.js';
 	import { onMount, onDestroy } from 'svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
@@ -93,14 +94,34 @@
 	// User templates for dropdown
 	let userTemplates = [];
 	let loadingTemplates = false;
+	// Video templates for their own dropdown — a different model on a
+	// different endpoint, so TemplateSelector (hard-wired to the HTML
+	// template API) cannot serve them.
+	let videoTemplateOptions = [];
+	let loadingVideoTemplates = false;
 	let manualTemplateInput = {
 		'get-template': false,
 		'delete-template': false,
 		'render-template': false,
 		'batch-render': false,
 		'batch-render-csv': false,
-		'get-variables': false
+		'get-variables': false,
+		'video-render': false,
+		'video-variables': false
 	};
+
+	async function fetchVideoTemplateOptions() {
+		if (!isUserLoggedIn) return;
+		loadingVideoTemplates = true;
+		try {
+			const result = await getVideoTemplates();
+			if (result?.templates) videoTemplateOptions = result.templates;
+		} catch (error) {
+			/* the manual UID input still works */
+		} finally {
+			loadingVideoTemplates = false;
+		}
+	}
 
 	// Fetch user templates
 	async function fetchUserTemplates() {
@@ -147,6 +168,9 @@
 			// Fetch templates when user is logged in
 			if (isUserLoggedIn && userTemplates.length === 0) {
 				fetchUserTemplates();
+			}
+			if (isUserLoggedIn && videoTemplateOptions.length === 0) {
+				fetchVideoTemplateOptions();
 			}
 		});
 	});
@@ -2800,16 +2824,53 @@
 						{:else if selectedEndpoint === 'video-render'}
 							<div class="space-y-4">
 								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Video Template UID</label
+								<div class="flex items-center justify-between mb-2">
+									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
+										>Video Template</label
 									>
+									<button
+										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
+										on:click={() =>
+											(manualTemplateInput['video-render'] = !manualTemplateInput['video-render'])}
+									>
+										{manualTemplateInput['video-render'] ? 'Select from list' : 'Enter manually'}
+										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M8 9l4 4-4 4m5-4h3"
+											/>
+										</svg>
+									</button>
+								</div>
+								{#if manualTemplateInput['video-render']}
 									<input
 										type="text"
 										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
 										bind:value={videoRenderParams.templateUid}
-										placeholder="Use List Video Templates to find a UID"
+										placeholder="Enter video template UID"
 									/>
-								</div>
+								{:else}
+									<select
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+										bind:value={videoRenderParams.templateUid}
+									>
+										<option value="" disabled selected>
+											{loadingVideoTemplates
+												? 'Loading video templates…'
+												: videoTemplateOptions.length
+												? 'Select a video template...'
+												: 'No video templates yet — create one in the studio'}
+										</option>
+										{#each videoTemplateOptions as option}
+											<option value={option.uid}>
+												{option.name || 'Untitled'} ({option.kind === 'tsx' ? 'code' : 'timeline'})
+											</option>
+										{/each}
+									</select>
+								{/if}
+							</div>
 								<div>
 									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
 										>Variables (JSON)</label
@@ -2840,15 +2901,52 @@
 							</div>
 						{:else if selectedEndpoint === 'video-variables'}
 							<div>
-								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-									>Video Template UID</label
-								>
-								<input
-									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-									bind:value={videoVariablesParams.uid}
-									placeholder="Use List Video Templates to find a UID"
-								/>
+								<div class="flex items-center justify-between mb-2">
+									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
+										>Video Template</label
+									>
+									<button
+										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
+										on:click={() =>
+											(manualTemplateInput['video-variables'] = !manualTemplateInput['video-variables'])}
+									>
+										{manualTemplateInput['video-variables'] ? 'Select from list' : 'Enter manually'}
+										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M8 9l4 4-4 4m5-4h3"
+											/>
+										</svg>
+									</button>
+								</div>
+								{#if manualTemplateInput['video-variables']}
+									<input
+										type="text"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+										bind:value={videoVariablesParams.uid}
+										placeholder="Enter video template UID"
+									/>
+								{:else}
+									<select
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+										bind:value={videoVariablesParams.uid}
+									>
+										<option value="" disabled selected>
+											{loadingVideoTemplates
+												? 'Loading video templates…'
+												: videoTemplateOptions.length
+												? 'Select a video template...'
+												: 'No video templates yet — create one in the studio'}
+										</option>
+										{#each videoTemplateOptions as option}
+											<option value={option.uid}>
+												{option.name || 'Untitled'} ({option.kind === 'tsx' ? 'code' : 'timeline'})
+											</option>
+										{/each}
+									</select>
+								{/if}
 							</div>
 						{:else if selectedEndpoint === 'video-generate'}
 							<div class="space-y-4">
