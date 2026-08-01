@@ -84,7 +84,7 @@ export const comparisons = [
 			aiTemplates: { pictify: 5, competitor: 1 },
 			dynamicLinks: { pictify: 5, competitor: 2 },
 			mediaManagement: { pictify: 2, competitor: 5 },
-			videoProcessing: { pictify: 2, competitor: 5 },
+			videoProcessing: { pictify: 3, competitor: 5 },
 			cdnDelivery: { pictify: 5, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 4 },
 			abTesting: { pictify: 5, competitor: 1 },
@@ -275,7 +275,6 @@ export const comparisons = [
 		competitorAdvantages: [
 			'Built-in social scheduling',
 			'More social media focused UX',
-			'Video generation support',
 			'More marketing integrations out-of-box'
 		],
 		bestFor: {
@@ -427,7 +426,6 @@ export const comparisons = [
 			'More affordable pricing at every tier'
 		],
 		competitorAdvantages: [
-			'Video generation support',
 			'More native integrations (Airtable, Zapier)',
 			'Established since 2019',
 			'Priority rendering queues'
@@ -451,7 +449,7 @@ export const comparisons = [
 			templateEditor: { pictify: 5, competitor: 4 },
 			aiTemplates: { pictify: 5, competitor: 2 },
 			dynamicLinks: { pictify: 5, competitor: 2 },
-			videoGeneration: { pictify: 2, competitor: 5 },
+			videoGeneration: { pictify: 4, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
 			multiPagePdf: { pictify: 5, competitor: 4 },
 			pricing: { pictify: 5, competitor: 3 },
@@ -481,7 +479,7 @@ export const comparisons = [
 			},
 			{
 				q: 'Does Pictify support video generation?',
-				a: 'Pictify focuses on images, GIFs, and PDFs. For video, Bannerbear has an advantage. If you need both images and video from the same product, Bannerbear or Placid are better fits.'
+				a: 'Yes. Pictify renders MP4 video from templates over the same API as images and PDFs — build a template in the timeline studio or generate one from a prompt with AI, then render it with variables per request. Video, images, GIFs and PDFs all come from one product and one API token.'
 			},
 			{
 				q: 'Can Pictify connect to live data?',
@@ -1857,77 +1855,6 @@ export const comparisons = [
 		]
 	},
 	{
-		slug: 'pictify-vs-htmlcsstoimage',
-		title: 'Pictify vs Hcti.io',
-		competitor: 'Hcti.io',
-		competitorDescription: 'Simple HTML/CSS to image conversion API',
-		metaDescription:
-			'Compare Pictify and Hcti.io (htmlcsstoimage) for image generation. API features, pricing, and capabilities.',
-		tldr: 'Hcti.io is a straightforward HTML to image API. Pictify adds AI template generation, visual editing, Dynamic Links for real-time data, and background removal.',
-		advantages: [
-			'Visual canvas editor (Canva-like drag-and-drop)',
-			'AI Copilot generates templates from prompts',
-			'Dynamic Links with auto-refresh from data sources',
-			'Background removal built-in',
-			'QR code generation with custom styling',
-			'Multi-page PDF support',
-			'Cloud storage integration (S3, GCS, Cloudinary)',
-			'More affordable pricing',
-			'Built-in A/B testing, smart links, and scheduled experiments'
-		],
-		competitorAdvantages: [
-			'Very simple API',
-			'Established service (since 2018)',
-			'Straightforward pricing',
-			'Good documentation',
-			'Lightweight integration'
-		],
-		bestFor: {
-			pictify: 'Teams wanting AI templates, visual editing, and dynamic data-driven images',
-			competitor: 'Developers who only need basic HTML to image API'
-		},
-		pricing: {
-			pictify: { free: '50 images/mo', basic: '$15/mo', pro: '$39/mo', business: '$199/mo' },
-			competitor: { free: '50 images/mo', starter: '$14/mo', pro: '$69/mo', growth: '$149/mo' }
-		},
-		features: {
-			htmlToImage: { pictify: 5, competitor: 5 },
-			templateEditor: { pictify: 5, competitor: 1 },
-			aiTemplates: { pictify: 5, competitor: 1 },
-			dynamicLinks: { pictify: 5, competitor: 1 },
-			backgroundRemoval: { pictify: 5, competitor: 1 },
-			cdnDelivery: { pictify: 5, competitor: 4 },
-			pricing: { pictify: 5, competitor: 4 },
-			abTesting: { pictify: 5, competitor: 0 },
-			smartLinks: { pictify: 5, competitor: 0 },
-			scheduledExperiments: { pictify: 5, competitor: 0 },
-			experimentAnalytics: { pictify: 5, competitor: 0 }
-		},
-		migration: {
-			difficulty: 'Easy',
-			timeEstimate: '30 minutes - 1 hour',
-			steps: [
-				'Use AI Copilot to recreate templates',
-				'Set up Dynamic Links for data',
-				'Update API integration'
-			]
-		},
-		faqs: [
-			{
-				q: 'Does Pictify have AI template generation?',
-				a: 'Yes! AI Copilot generates complete templates from text prompts.'
-			},
-			{
-				q: 'Can Pictify connect to live data?',
-				a: 'Yes—Dynamic Links auto-refresh images from any API or data source.'
-			},
-			{
-				q: 'Is rendering quality the same?',
-				a: 'Both use Chromium for rendering, so output quality is identical.'
-			}
-		]
-	},
-	{
 		slug: 'pictify-vs-ogshot',
 		title: 'Pictify vs OGShot',
 		competitor: 'OGShot',
@@ -2442,7 +2369,6 @@ export const comparisons = [
 		competitorAdvantages: [
 			'Import directly from Canva and Figma',
 			'No-code integrations with 1000+ apps',
-			'Video generation support',
 			'Bring your own storage (S3, R2)',
 			'More app integrations out-of-box'
 		],
@@ -2464,7 +2390,7 @@ export const comparisons = [
 			dynamicLinks: { pictify: 5, competitor: 3 },
 			noCodeIntegrations: { pictify: 4, competitor: 5 },
 			backgroundRemoval: { pictify: 5, competitor: 2 },
-			videoGeneration: { pictify: 2, competitor: 4 },
+			videoGeneration: { pictify: 4, competitor: 4 },
 			pricing: { pictify: 5, competitor: 4 },
 			abTesting: { pictify: 5, competitor: 1 },
 			smartLinks: { pictify: 5, competitor: 0 },

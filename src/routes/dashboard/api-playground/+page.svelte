@@ -43,8 +43,38 @@
 		'gif',
 		'render-template',
 		'batch-render',
-		'batch-render-csv'
+		'batch-render-csv',
+		'pdf-render',
+		'pdf-multi-page',
+		'video-render',
+		'video-generate'
 	];
+
+	/*
+	 * PDF and video parameters.
+	 *
+	 * These endpoints predate their appearance here — the MCP server has called
+	 * /pdf/render since it shipped, and video templates render over the same
+	 * Bearer token as everything else — but the playground never showed them,
+	 * so developers evaluating the API concluded PDFs and video were
+	 * dashboard-only.
+	 */
+	let pdfRenderParams = { templateUid: '', variables: '{}', preset: 'A4', title: '' };
+	let pdfMultiPageParams = {
+		templateUid: '',
+		pages: '[\n  { "name": "Page one" },\n  { "name": "Page two" }\n]',
+		preset: 'A4',
+		title: ''
+	};
+	let videoRenderParams = { templateUid: '', variables: '{}' };
+	let videoVariablesParams = { uid: '' };
+	let videoGenerateParams = {
+		prompt: 'A bold 8 second product launch teaser for a developer tool called ShipFast',
+		width: 1080,
+		height: 1080,
+		durationSeconds: 8,
+		brandColor: ''
+	};
 	$: requiresEmailVerification =
 		generationEndpoints.includes(selectedEndpoint) && isEmailVerified === false;
 
@@ -690,6 +720,81 @@
 					}
 					data = await getTemplateVariables(getVariablesParams.uid);
 					break;
+
+				// PDF Generation
+				case 'pdf-render':
+					if (!pdfRenderParams.templateUid) {
+						throw new Error('Template UID is required');
+					}
+					data = await backend.post('/pdf/render', {
+						templateUid: pdfRenderParams.templateUid,
+						variables: JSON.parse(pdfRenderParams.variables || '{}'),
+						options: {
+							preset: pdfRenderParams.preset || 'A4',
+							...(pdfRenderParams.title ? { title: pdfRenderParams.title } : {})
+						}
+					});
+					break;
+
+				case 'pdf-multi-page':
+					if (!pdfMultiPageParams.templateUid) {
+						throw new Error('Template UID is required');
+					}
+					{
+						const pages = JSON.parse(pdfMultiPageParams.pages || '[]');
+						if (!Array.isArray(pages) || !pages.length) {
+							throw new Error('pages must be a non-empty JSON array of variable objects');
+						}
+						data = await backend.post('/pdf/multi-page', {
+							templateUid: pdfMultiPageParams.templateUid,
+							pages,
+							options: {
+								preset: pdfMultiPageParams.preset || 'A4',
+								...(pdfMultiPageParams.title ? { title: pdfMultiPageParams.title } : {})
+							}
+						});
+					}
+					break;
+
+				case 'pdf-presets':
+					data = await backend.get('/pdf/presets');
+					break;
+
+				// Video Templates
+				case 'video-list':
+					data = await backend.get('/video/templates');
+					break;
+
+				case 'video-render':
+					if (!videoRenderParams.templateUid) {
+						throw new Error('Video template UID is required');
+					}
+					data = await backend.post(`/video/templates/${videoRenderParams.templateUid}/render`, {
+						variables: JSON.parse(videoRenderParams.variables || '{}')
+					});
+					break;
+
+				case 'video-variables':
+					if (!videoVariablesParams.uid) {
+						throw new Error('Video template UID is required');
+					}
+					data = await backend.get(`/video/templates/${videoVariablesParams.uid}/variables`);
+					break;
+
+				case 'video-generate':
+					if (!videoGenerateParams.prompt?.trim()) {
+						throw new Error('A prompt is required');
+					}
+					data = await backend.post('/video/templates/generate', {
+						prompt: videoGenerateParams.prompt,
+						width: Number(videoGenerateParams.width) || 1080,
+						height: Number(videoGenerateParams.height) || 1080,
+						durationSeconds: Number(videoGenerateParams.durationSeconds) || 8,
+						...(videoGenerateParams.brandColor
+							? { brandColor: videoGenerateParams.brandColor }
+							: {})
+					});
+					break;
 			}
 
 			response = data;
@@ -964,6 +1069,92 @@
 			path: `/templates/${getVariablesParams.uid || ':uid'}/variables`,
 			payload: null,
 			requiresAuth: true
+		},
+		// PDF Generation
+		{
+			id: 'pdf-render',
+			method: 'POST',
+			path: '/pdf/render',
+			payload: (() => {
+				try {
+					return {
+						templateUid: pdfRenderParams.templateUid || 'TEMPLATE_UID',
+						variables: JSON.parse(pdfRenderParams.variables || '{}'),
+						options: {
+							preset: pdfRenderParams.preset || 'A4',
+							...(pdfRenderParams.title ? { title: pdfRenderParams.title } : {})
+						}
+					};
+				} catch {
+					return { templateUid: pdfRenderParams.templateUid || 'TEMPLATE_UID' };
+				}
+			})(),
+			requiresAuth: true
+		},
+		{
+			id: 'pdf-multi-page',
+			method: 'POST',
+			path: '/pdf/multi-page',
+			payload: (() => {
+				try {
+					return {
+						templateUid: pdfMultiPageParams.templateUid || 'TEMPLATE_UID',
+						pages: JSON.parse(pdfMultiPageParams.pages || '[]'),
+						options: { preset: pdfMultiPageParams.preset || 'A4' }
+					};
+				} catch {
+					return { templateUid: pdfMultiPageParams.templateUid || 'TEMPLATE_UID' };
+				}
+			})(),
+			requiresAuth: true
+		},
+		{
+			id: 'pdf-presets',
+			method: 'GET',
+			path: '/pdf/presets',
+			payload: null,
+			requiresAuth: true
+		},
+		// Video Templates
+		{
+			id: 'video-list',
+			method: 'GET',
+			path: '/video/templates',
+			payload: null,
+			requiresAuth: true
+		},
+		{
+			id: 'video-render',
+			method: 'POST',
+			path: `/video/templates/${videoRenderParams.templateUid || ':uid'}/render`,
+			payload: (() => {
+				try {
+					return { variables: JSON.parse(videoRenderParams.variables || '{}') };
+				} catch {
+					return { variables: {} };
+				}
+			})(),
+			requiresAuth: true
+		},
+		{
+			id: 'video-variables',
+			method: 'GET',
+			path: `/video/templates/${videoVariablesParams.uid || ':uid'}/variables`,
+			payload: null,
+			requiresAuth: true
+		},
+		{
+			id: 'video-generate',
+			method: 'POST',
+			path: '/video/templates/generate',
+			payload: {
+				prompt: videoGenerateParams.prompt,
+				width: Number(videoGenerateParams.width) || 1080,
+				height: Number(videoGenerateParams.height) || 1080,
+				durationSeconds: Number(videoGenerateParams.durationSeconds) || 8,
+				...(videoGenerateParams.brandColor ? { brandColor: videoGenerateParams.brandColor } : {})
+			},
+			requiresAuth: true
 		}
 	];
 
@@ -1040,6 +1231,43 @@
 					label: 'Get Variables'
 				}
 			]
+		},
+		{
+			name: 'PDF Generation',
+			endpoints: [
+				{ id: 'pdf-render', path: '/pdf/render', method: 'POST', label: 'Template to PDF' },
+				{
+					id: 'pdf-multi-page',
+					path: '/pdf/multi-page',
+					method: 'POST',
+					label: 'Multi-page PDF'
+				},
+				{ id: 'pdf-presets', path: '/pdf/presets', method: 'GET', label: 'Page Presets' }
+			]
+		},
+		{
+			name: 'Video Templates',
+			endpoints: [
+				{ id: 'video-list', path: '/video/templates', method: 'GET', label: 'List Video Templates' },
+				{
+					id: 'video-render',
+					path: '/video/templates/:uid/render',
+					method: 'POST',
+					label: 'Render Video (MP4)'
+				},
+				{
+					id: 'video-variables',
+					path: '/video/templates/:uid/variables',
+					method: 'GET',
+					label: 'Get Video Variables'
+				},
+				{
+					id: 'video-generate',
+					path: '/video/templates/generate',
+					method: 'POST',
+					label: 'AI Generate Template'
+				}
+			]
 		}
 	];
 
@@ -1059,7 +1287,17 @@
 				'Batch render using CSV URL with column mappings (unified endpoint, CSV mode)',
 			'batch-status': 'Check batch job status and results',
 			'cancel-batch': 'Cancel a running batch job',
-			'get-variables': 'Get template variable definitions'
+			'get-variables': 'Get template variable definitions',
+			'pdf-render': 'Render an HTML template as a single-page PDF (A4, Letter and more)',
+			'pdf-multi-page':
+				'Render one PDF with a page per variable set — certificates or reports as a single document',
+			'pdf-presets': 'List the available page size presets',
+			'video-list': 'List your video templates with their UIDs',
+			'video-render':
+				'Render a video template to MP4 with variables. Renders take up to a few minutes — the request waits for the file URL.',
+			'video-variables': 'Get a video template’s variable definitions',
+			'video-generate':
+				'Generate a new video template from a prompt — an AI motion brief, compiled scene code and a visual review, returned as a draft template'
 		};
 		return descriptions[selectedEndpoint] || '';
 	})();
@@ -2457,6 +2695,208 @@
 										on:change={(e) => selectTemplate('get-variables', e.detail.uid)}
 									/>
 								{/if}
+							</div>
+						{:else if selectedEndpoint === 'pdf-render'}
+							<div class="space-y-4">
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Template</label
+									>
+									<TemplateSelector
+										bind:value={pdfRenderParams.templateUid}
+										placeholder="Select a template..."
+									/>
+								</div>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Page Preset</label
+										>
+										<select
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+											bind:value={pdfRenderParams.preset}
+										>
+											{#each ['A4', 'A3', 'A5', 'Letter', 'Legal', 'Tabloid'] as preset}
+												<option value={preset}>{preset}</option>
+											{/each}
+										</select>
+									</div>
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Document Title (optional)</label
+										>
+										<input
+											type="text"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+											bind:value={pdfRenderParams.title}
+											placeholder="Defaults to the template name"
+										/>
+									</div>
+								</div>
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Variables (JSON)</label
+									>
+									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+										<CodeMirror
+											bind:value={pdfRenderParams.variables}
+											lang={json()}
+											styles={{ '&': { height: '120px', fontSize: '13px' } }}
+										/>
+									</div>
+								</div>
+							</div>
+						{:else if selectedEndpoint === 'pdf-multi-page'}
+							<div class="space-y-4">
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Template</label
+									>
+									<TemplateSelector
+										bind:value={pdfMultiPageParams.templateUid}
+										placeholder="Select a template..."
+									/>
+								</div>
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Page Preset</label
+									>
+									<select
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+										bind:value={pdfMultiPageParams.preset}
+									>
+										{#each ['A4', 'A3', 'A5', 'Letter', 'Legal', 'Tabloid'] as preset}
+											<option value={preset}>{preset}</option>
+										{/each}
+									</select>
+								</div>
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Pages — one variable object per page (JSON array)</label
+									>
+									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+										<CodeMirror
+											bind:value={pdfMultiPageParams.pages}
+											lang={json()}
+											styles={{ '&': { height: '160px', fontSize: '13px' } }}
+										/>
+									</div>
+								</div>
+							</div>
+						{:else if selectedEndpoint === 'pdf-presets' || selectedEndpoint === 'video-list'}
+							<p class="text-sm font-bold text-gray-500">
+								No parameters — send the request to see the response.
+							</p>
+						{:else if selectedEndpoint === 'video-render'}
+							<div class="space-y-4">
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Video Template UID</label
+									>
+									<input
+										type="text"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+										bind:value={videoRenderParams.templateUid}
+										placeholder="Use List Video Templates to find a UID"
+									/>
+								</div>
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Variables (JSON)</label
+									>
+									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
+										<CodeMirror
+											bind:value={videoRenderParams.variables}
+											lang={json()}
+											styles={{ '&': { height: '120px', fontSize: '13px' } }}
+										/>
+									</div>
+									<p class="text-[10px] text-gray-500 mt-1">
+										Renders take up to a few minutes; the request waits and returns the MP4 URL.
+									</p>
+								</div>
+							</div>
+						{:else if selectedEndpoint === 'video-variables'}
+							<div>
+								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+									>Video Template UID</label
+								>
+								<input
+									type="text"
+									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+									bind:value={videoVariablesParams.uid}
+									placeholder="Use List Video Templates to find a UID"
+								/>
+							</div>
+						{:else if selectedEndpoint === 'video-generate'}
+							<div class="space-y-4">
+								<div>
+									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+										>Prompt</label
+									>
+									<textarea
+										rows="3"
+										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all resize-none"
+										bind:value={videoGenerateParams.prompt}
+										placeholder="Describe the video to design"
+									></textarea>
+								</div>
+								<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Width</label
+										>
+										<input
+											type="number"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+											bind:value={videoGenerateParams.width}
+										/>
+									</div>
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Height</label
+										>
+										<input
+											type="number"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+											bind:value={videoGenerateParams.height}
+										/>
+									</div>
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Seconds</label
+										>
+										<input
+											type="number"
+											min="1"
+											max="60"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+											bind:value={videoGenerateParams.durationSeconds}
+										/>
+									</div>
+									<div>
+										<label
+											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
+											>Brand Color</label
+										>
+										<input
+											type="text"
+											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+											bind:value={videoGenerateParams.brandColor}
+											placeholder="#ff5533 (optional)"
+										/>
+									</div>
+								</div>
+								<p class="text-[10px] text-gray-500">
+									Generation designs a motion brief, writes the scene code, renders frames and
+									reviews them — expect 30-60 seconds. The response is a draft template with a
+									preview URL.
+								</p>
 							</div>
 						{:else if selectedEndpoint === 'gif'}
 							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
