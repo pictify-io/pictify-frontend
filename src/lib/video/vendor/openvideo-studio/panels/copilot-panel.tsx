@@ -130,8 +130,8 @@ export default function CopilotPanel() {
     }
 
     const span = Math.max(1, operation.durationUs);
-    core.clip.add({
-      id: generateId(),
+    return core.clip.add({
+      id: operation.id || generateId(),
       type: isVideo ? "Video" : item.kind === "audio" ? "Audio" : "Image",
       name: item.name || "Media",
       src: item.url,
@@ -168,9 +168,14 @@ export default function CopilotPanel() {
      * A failure that costs one operation and reports itself is recoverable; one
      * that abandons the batch silently is what makes a scene look broken.
      */
-    const isolate = (label: string, work: () => void) => {
+    /*
+     * Awaited, not fire-and-forget: core.clip.add is async, and the next
+     * operation's validation may reference the clip this one creates (the
+     * model names its own ids now). An unawaited add makes that a race.
+     */
+    const isolate = async (label: string, work: () => unknown) => {
       try {
-        work();
+        await work();
       } catch (cause: any) {
         failures.push(`${label}: ${cause?.message || "the engine refused that change"}`);
       }
@@ -179,15 +184,24 @@ export default function CopilotPanel() {
       const state: any = projectStore.getState();
 
       if (operation.op === "add") {
-        isolate(operation.tool || "add", () =>
+        await isolate(operation.tool || "add", () =>
+          // The model's own id (inside operation.clip) wins over the generated
+          // one — that is what lets it style the clip later this turn.
           core.clip.add({ id: generateId(), ...operation.clip } as any)
         );
       } else if (operation.op === "remove") {
-        isolate("delete_clip", () => core.clip.remove([operation.clipId]));
+        await isolate("delete_clip", () => core.clip.remove([operation.clipId]));
       } else if (operation.op === "settings") {
-        // Scene-level: background colour, total duration. The engine merges
-        // the patch into settings itself.
-        isolate("scene settings", () => core.project.updateSettings(operation.patch));
+        /*
+         * Scene-level: background colour, duration, canvas size. On the STORE
+         * STATE, not core.project — ProjectStore is state & actions merged,
+         * and core.project carries only new/export/import. Calling it there
+         * throws "updateSettings is not a function", which is exactly what an
+         * earlier version did.
+         */
+        await isolate("scene settings", () =>
+          (projectStore.getState() as any).updateSettings(operation.patch)
+        );
       } else if (operation.op === "media") {
         /*
          * Resolved here because the panel holds the media library. Matched by
@@ -208,7 +222,7 @@ export default function CopilotPanel() {
             `add_media: nothing in the library called "${operation.name}".${known ? ` It has: ${known}.` : ""}`
           );
         } else {
-          isolate("add_media", () => placeMedia(item, operation, state, failures));
+          await isolate("add_media", () => placeMedia(item, operation, state, failures));
         }
       } else if (operation.op === "font") {
         /*
@@ -274,7 +288,7 @@ export default function CopilotPanel() {
             continue;
           }
           for (const caption of captions) {
-            isolate("add_captions", () => core.clip.add({ id: generateId(), ...caption } as any));
+            await isolate("add_captions", () => core.clip.add({ id: generateId(), ...caption } as any));
           }
         } catch (cause: any) {
           failures.push(`add_captions: ${cause?.message || "transcription failed"}.`);
@@ -294,7 +308,7 @@ export default function CopilotPanel() {
           outPreset: operation.outPreset,
           emphasisPreset: operation.emphasisPreset || "",
         };
-        isolate("set_animation", () =>
+        await isolate("set_animation", () =>
           core.clip.update(operation.clipId, {
             animations: buildAnimation(selection, durationUs) ?? [],
             metadata: withAnimationMeta(clip, selection),
@@ -308,7 +322,7 @@ export default function CopilotPanel() {
         if (!previous) {
           failures.push("add_transition: nothing before that clip to blend from.");
         } else {
-          isolate("add_transition", () => {
+          await isolate("add_transition", () => {
             const existing = incomingTransition(state.clips, clip);
             if (existing) core.clip.remove([existing.id]);
             core.clip.add(
@@ -348,8 +362,8 @@ export default function CopilotPanel() {
             w = Math.round(h * ratio);
           }
           const span = Math.max(1, operation.durationUs);
-          core.clip.add({
-            id: generateId(),
+          await core.clip.add({
+            id: operation.id || generateId(),
             type: operation.kind === "video" ? "Video" : "Image",
             name: item.name || "Stock",
             src: item.url,
@@ -385,7 +399,7 @@ export default function CopilotPanel() {
         if (!state.clips[operation.clipId]) {
           failures.push(`${operation.tool || "update"}: clip ${operation.clipId} no longer exists.`);
         } else {
-          isolate(operation.tool || "update", () =>
+          await isolate(operation.tool || "update", () =>
             core.clip.update(operation.clipId, operation.patch)
           );
         }
@@ -527,6 +541,53 @@ export default function CopilotPanel() {
       let message = "";
       let stopped = "";
 
+      /*
+       * One call at a time, each validated against the document AS IT IS at
+       * that moment. The model names its own ids on add tools ("title") and
+       * styles those clips later in the SAME turn — batch-upfront validation
+       * rejected every one of those references as "no clip with id", because
+       * the add had not happened yet when the whole batch was checked.
+       */
+      const runCalls = async (calls: any[]) => {
+        const answers: string[] = [];
+        const problems: string[] = [];
+        const applied: any[] = [];
+        let lookupCount = 0;
+
+        for (const item of calls) {
+          const planned = planToolCalls(projectStore.getState() as any, [item], vocabulary);
+          for (const error of planned.errors) problems.push(`${error.name}: ${error.error}`);
+          const operation = planned.operations[0];
+          if (!operation) continue;
+
+          if (operation.op === "query") {
+            lookupCount += 1;
+            const found = searchCatalogue(
+              vocabulary[operation.list as keyof typeof vocabulary],
+              operation.query
+            );
+            const line = `${operation.list} matching "${operation.query}" (${found.total} total): ${found.names.join(", ")}`;
+            if (operation.list === "animations") {
+              // Emphasis presets ride along on animation lookups, labelled so
+              // the model puts them in emphasisPreset rather than in inPreset.
+              const looping = searchCatalogue(vocabulary.emphasis, operation.query, 10);
+              answers.push(
+                `${line}\nemphasis (looping) presets, for emphasisPreset only: ${looping.names.join(", ")}`
+              );
+            } else {
+              answers.push(line);
+            }
+            continue;
+          }
+
+          const failuresHere = await applyOperations([operation]);
+          problems.push(...failuresHere);
+          if (!failuresHere.length) applied.push(operation);
+        }
+
+        return { answers, problems, applied, lookupCount };
+      };
+
       for (let round = 0; round < budget.rounds; round += 1) {
         const reply = await plan(described(), toolSchema(), instruction, history, { brief });
         message = reply.message || message;
@@ -536,45 +597,21 @@ export default function CopilotPanel() {
           break;
         }
 
-        // Validated against the LIVE document each round, not the snapshot the
-        // model was given: its own last round moved things.
-        const planned = planToolCalls(projectStore.getState() as any, reply.calls, vocabulary);
-        const lookups = planned.operations.filter((op: any) => op.op === "query");
-        const mutations = planned.operations.filter((op: any) => op.op !== "query");
+        const { answers, problems, applied, lookupCount } = await runCalls(reply.calls);
+        failures.push(...problems);
+        totalOperations += applied.length;
 
-        const roundFailures = planned.errors.map(
-          (error: any) => `${error.name}: ${error.error}`
-        );
-
-        const answers = lookups.map((lookup: any) => {
-          const found = searchCatalogue(
-            vocabulary[lookup.list as keyof typeof vocabulary],
-            lookup.query
-          );
-          const line = `${lookup.list} matching "${lookup.query}" (${found.total} total): ${found.names.join(", ")}`;
-          if (lookup.list !== "animations") return line;
-          // Emphasis presets ride along on animation lookups, labelled so the
-          // model puts them in emphasisPreset rather than in inPreset.
-          const looping = searchCatalogue(vocabulary.emphasis, lookup.query, 10);
-          return `${line}\nemphasis (looping) presets, for emphasisPreset only: ${looping.names.join(", ")}`;
-        });
-
-        const applyFailures = mutations.length ? await applyOperations(mutations) : [];
-        roundFailures.push(...applyFailures);
-        failures.push(...roundFailures);
-        totalOperations += mutations.length;
-
-        if (mutations.length) {
+        if (applied.length) {
           // Each step lands in the transcript as it happens, so a run that
           // takes four rounds does not look like a hang.
-          const step = summarizeOperations(mutations);
+          const step = summarizeOperations(applied);
           setTurns((prev) => [...prev, { role: "assistant", text: `${round + 1}. ${step}` }]);
-          getHostCallbacks().onClipStyleChange?.(mutations[0].clipId || "");
+          getHostCallbacks().onClipStyleChange?.(applied[0].clipId || "");
         }
 
         // A round that neither looked anything up nor changed anything is not
         // going to do better on the next attempt.
-        if (!lookups.length && !mutations.length) {
+        if (!lookupCount && !applied.length) {
           stopped = "It could not carry that out.";
           break;
         }
@@ -593,8 +630,8 @@ export default function CopilotPanel() {
           role: "user",
           content: roundReport({
             answers,
-            applied: mutations.length ? summarizeOperations(mutations) : "",
-            failures: roundFailures,
+            applied: applied.length ? summarizeOperations(applied) : "",
+            failures: problems,
             scene: described(),
           }),
         });
@@ -617,18 +654,15 @@ export default function CopilotPanel() {
             findings,
           });
           if (reviewed.calls?.length) {
-            const planned = planToolCalls(projectStore.getState() as any, reviewed.calls, vocabulary);
-            const fixes = planned.operations.filter((op: any) => op.op !== "query");
-            for (const error of planned.errors) failures.push(`${error.name}: ${error.error}`);
-            if (fixes.length) {
-              const fixFailures = await applyOperations(fixes);
-              failures.push(...fixFailures);
-              totalOperations += fixes.length;
+            const { problems, applied } = await runCalls(reviewed.calls);
+            failures.push(...problems);
+            totalOperations += applied.length;
+            if (applied.length) {
               setTurns((prev) => [
                 ...prev,
-                { role: "assistant", text: `Review: ${summarizeOperations(fixes)}` },
+                { role: "assistant", text: `Review: ${summarizeOperations(applied)}` },
               ]);
-              getHostCallbacks().onClipStyleChange?.(fixes[0]?.clipId || "");
+              getHostCallbacks().onClipStyleChange?.(applied[0]?.clipId || "");
             }
           }
         } catch {

@@ -767,3 +767,65 @@ test('the font and caption ops read as a sentence', () => {
 	assert.match(summarizeOperations([{ op: 'font' }]), /Changed 1 font/);
 	assert.match(summarizeOperations([{ op: 'captions' }]), /Captioned 1 clip/);
 });
+
+// ── Model-chosen ids ─────────────────────────────────────────────────────
+// The add tools return no id, so a model composing a scene in one turn had
+// no way to style what it just created — it invented "text_1" and every
+// follow-up failed. Now it NAMES the clip and the caller applies calls one
+// at a time, so the reference is real by the time it is validated.
+
+test('add_text and add_shape carry the model’s id into the clip payload', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('add_text', { id: 'title', text: 'Hi', x: 0.5, y: 0.2 }),
+		call('add_shape', { id: 'scrim', x: 0.5, y: 0.8, width: 1, height: 0.3, fill: '#000000' })
+	]);
+	assert.equal(operations[0].clip.id, 'title');
+	assert.equal(operations[1].clip.id, 'scrim');
+});
+
+test('add_effect, add_stock and add_media carry the id too', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('add_effect', { id: 'fx1', effectKey: 'vignette' }),
+		call('add_stock', { id: 'bg1', kind: 'video', query: 'coffee' }),
+		call('add_media', { id: 'logo1', name: 'logo.png' })
+	]);
+	assert.equal(operations[0].clip.id, 'fx1');
+	assert.equal(operations[1].id, 'bg1');
+	assert.equal(operations[2].id, 'logo1');
+});
+
+test('an id that already exists is refused, so a reused name cannot clobber a clip', () => {
+	const { errors } = planToolCalls(doc(), [
+		call('add_text', { id: 't1', text: 'Hi', x: 0.5, y: 0.2 })
+	]);
+	assert.match(errors[0].error, /already exists/);
+});
+
+test('a malformed id is refused rather than passed to the engine', () => {
+	const { errors } = planToolCalls(doc(), [
+		call('add_text', { id: 'has spaces!', text: 'Hi', x: 0.5, y: 0.2 })
+	]);
+	assert.match(errors[0].error, /letters, numbers, dashes or underscores/);
+});
+
+test('no id still works — the caller generates one', () => {
+	const { operations, errors } = planToolCalls(doc(), [
+		call('add_text', { text: 'Hi', x: 0.5, y: 0.2 })
+	]);
+	assert.equal(errors.length, 0);
+	assert.equal(operations[0].clip.id, undefined);
+});
+
+test('sequential per-call planning lets a follow-up see the freshly added clip', () => {
+	// This is the caller's contract: plan ONE call, apply it, then plan the
+	// next against the updated document. Simulated here by inserting the added
+	// clip before planning the styling call — the way the panel's live store
+	// does between applies.
+	const live = doc();
+	const first = planToolCalls(live, [call('add_text', { id: 'headline', text: 'Hi', x: 0.5, y: 0.2 })]);
+	assert.equal(first.errors.length, 0);
+	live.clips.headline = { id: 'headline', ...first.operations[0].clip };
+	const second = planToolCalls(live, [call('set_font', { clipId: 'headline', family: 'Inter' })], { fonts: ['Inter'] });
+	assert.equal(second.errors.length, 0);
+	assert.equal(second.operations[0].clipId, 'headline');
+});

@@ -60,7 +60,10 @@ export default function ScenePanel({
 
   const apply = (changes: any) => {
     const patch = settingsPatch(settings, changes);
-    if (Object.keys(patch).length) core.project.updateSettings(patch);
+    // On the STORE STATE, not core.project: ProjectStore merges state and
+    // actions, while core.project carries only new/export/import — calling
+    // updateSettings there throws.
+    if (Object.keys(patch).length) (projectStore.getState() as any).updateSettings(patch);
   };
 
   const durationUs = Number(rawSettings?.duration) || 0;

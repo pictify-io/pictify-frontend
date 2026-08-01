@@ -235,6 +235,27 @@ const inVocabulary = (values, name) =>
 	!values?.length || values.includes(name);
 
 /**
+ * A model-chosen id for a clip it is about to add.
+ *
+ * The add tools return no id, so a model composing a scene in one turn had no
+ * way to style what it just created — it invented ids like "text_1" and every
+ * follow-up call failed. Letting it NAME the clip closes that loop: add with
+ * id "title", then set_font on "title" in the same turn. The caller applies
+ * calls one at a time against the live document, so by the time the styling
+ * call is validated the clip is real.
+ */
+const ID_PATTERN = /^[A-Za-z0-9_-]{1,40}$/;
+const idProblem = (doc, id) => {
+	if (id === undefined || id === null || id === '') return null;
+	if (typeof id !== 'string' || !ID_PATTERN.test(id))
+		return 'id must be 1-40 letters, numbers, dashes or underscores.';
+	if (doc.clips?.[id]) return `A clip with id ${id} already exists — pick another.`;
+	return null;
+};
+
+const ID_PARAM = 'string, optional — an id you choose, so later calls in this turn can address the new clip';
+
+/**
  * The tools, in the order they appear to the model.
  *
  * Each declares its parameters for the schema the model is given, a `validate`
@@ -543,22 +564,25 @@ export const TOOLS = [
 		name: 'add_effect',
 		description:
 			'Apply a visual effect over the whole frame for a stretch of time. Use one of the listed effect keys.',
-		params: { effectKey: 'string', startS: 'number', durationS: 'number' },
+		params: { effectKey: 'string', startS: 'number', durationS: 'number', id: ID_PARAM },
 		validate: (doc, args, vocabulary) => {
 			if (typeof args.effectKey !== 'string' || !args.effectKey) return 'effectKey is required.';
 			if (!inVocabulary(vocabulary?.effects, args.effectKey))
 				return `No effect called ${args.effectKey}.`;
-			return null;
+			return idProblem(doc, args.id);
 		},
 		apply: (doc, args) => ({
 			op: 'add',
 			// createEffectClip owns the z-index that puts an effect ABOVE the
 			// content it shades — below it, the effect renders nothing at all.
-			clip: createEffectClip({
-				key: args.effectKey,
-				fromUs: toUs(args.startS ?? 0),
-				durationUs: toUs(args.durationS ?? 3)
-			})
+			clip: {
+				...(args.id ? { id: args.id } : {}),
+				...createEffectClip({
+					key: args.effectKey,
+					fromUs: toUs(args.startS ?? 0),
+					durationUs: toUs(args.durationS ?? 3)
+				})
+			}
 		})
 	},
 	{
@@ -622,11 +646,11 @@ export const TOOLS = [
 		name: 'add_stock',
 		description:
 			'Search the stock library and place the first good match. kind is "image" or "video".',
-		params: { kind: 'image or video', query: 'string', startS: 'number', durationS: 'number' },
+		params: { kind: 'image or video', query: 'string', startS: 'number', durationS: 'number', id: ID_PARAM },
 		validate: (doc, args) => {
 			if (args.kind !== 'image' && args.kind !== 'video') return 'kind must be image or video.';
 			if (typeof args.query !== 'string' || !args.query.trim()) return 'query is required.';
-			return null;
+			return idProblem(doc, args.id);
 		},
 		// The only tool that needs the network. Resolved by the caller, which
 		// owns the stock client; planning stays synchronous and pure.
@@ -635,24 +659,26 @@ export const TOOLS = [
 			kind: args.kind,
 			query: args.query.trim(),
 			fromUs: toUs(args.startS ?? 0),
-			durationUs: toUs(args.durationS ?? 5)
+			durationUs: toUs(args.durationS ?? 5),
+			id: args.id || ''
 		})
 	},
 	{
 		name: 'add_media',
 		description:
 			"Place one of the user's own uploaded media items, by the name shown in the media list. Prefer this over add_stock when something suitable is already uploaded.",
-		params: { name: 'string', startS: 'number', durationS: 'number' },
+		params: { name: 'string', startS: 'number', durationS: 'number', id: ID_PARAM },
 		validate: (doc, args) => {
 			if (typeof args.name !== 'string' || !args.name.trim()) return 'name is required.';
-			return null;
+			return idProblem(doc, args.id);
 		},
 		// Resolved by the caller, which holds the media library.
 		apply: (doc, args) => ({
 			op: 'media',
 			name: args.name.trim(),
 			fromUs: toUs(args.startS ?? 0),
-			durationUs: toUs(args.durationS ?? 5)
+			durationUs: toUs(args.durationS ?? 5),
+			id: args.id || ''
 		})
 	},
 	{
@@ -670,7 +696,8 @@ export const TOOLS = [
 			opacity: 'number 0-1, default 1',
 			radius: 'number 0-1',
 			startS: 'number',
-			durationS: 'number'
+			durationS: 'number',
+			id: ID_PARAM
 		},
 		validate: (doc, args) => {
 			for (const key of ['x', 'y', 'width', 'height']) {
@@ -680,7 +707,7 @@ export const TOOLS = [
 				return 'width and height must be greater than zero.';
 			if (args.gradientTo && !/^#[0-9a-f]{3,8}$/i.test(String(args.gradientTo)))
 				return 'gradientTo must be a hex value.';
-			return null;
+			return idProblem(doc, args.id);
 		},
 		apply: (doc, args) => {
 			const { width = 1080, height = 1920 } = doc.settings || {};
@@ -705,6 +732,7 @@ export const TOOLS = [
 			return {
 				op: 'add',
 				clip: {
+					...(args.id ? { id: args.id } : {}),
 					type: 'Shape',
 					name: args.gradientTo ? 'Gradient' : 'Shape',
 					shapeType: 'rectangle',
@@ -748,12 +776,13 @@ export const TOOLS = [
 			size: 'number 0-1',
 			color: 'string hex',
 			startS: 'number',
-			durationS: 'number'
+			durationS: 'number',
+			id: ID_PARAM
 		},
 		validate: (doc, args) => {
 			if (typeof args.text !== 'string' || !args.text.trim()) return 'text is required.';
 			if (num(args.x) === null || num(args.y) === null) return 'x and y must be numbers.';
-			return null;
+			return idProblem(doc, args.id);
 		},
 		apply: (doc, args) => {
 			const { width = 1080, height = 1920 } = doc.settings || {};
@@ -769,6 +798,7 @@ export const TOOLS = [
 			return {
 				op: 'add',
 				clip: {
+					...(args.id ? { id: args.id } : {}),
 					type: 'Text',
 					name: args.text.slice(0, 24) || 'Text',
 					text: args.text,
