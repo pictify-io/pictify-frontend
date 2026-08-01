@@ -52,7 +52,7 @@
 					Try again
 				</button>
 				<a
-					href="/dashboard/video-templates"
+					href="/dashboard/template?type=video"
 					class="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-gray-800 px-5 py-2.5 text-xs font-black uppercase tracking-widest text-gray-100 transition-all hover:bg-gray-700 focus-brutal"
 				>
 					Back to templates

@@ -377,7 +377,7 @@ export default function Scene({ title = 'Hello from Pictify', accentColor = '#FA
 	<!-- Header -->
 	<div class="pt-4 mb-8">
 		<a
-			href="/dashboard/video-templates"
+			href="/dashboard/template?type=video"
 			class="inline-flex items-center gap-2 text-xs font-black text-gray-500 uppercase tracking-widest hover:text-black transition-colors mb-4"
 		>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

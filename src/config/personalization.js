@@ -453,7 +453,8 @@ export const PRIMARY_CTA = {
 	'email-marketing': { label: 'Create Email Banner', href: '/dashboard/template/create' },
 	'e-commerce': { label: 'Create Product Visual', href: '/dashboard/template/create' },
 	'dashboard-reporting': { label: 'Create Report Visual', href: '/dashboard/template/create' },
-	certificates: { label: 'Create Certificate', href: '/dashboard/template/create' },
+	// The certificate wedge is a batch job now: the win is a delivered run, not a saved template.
+	certificates: { label: 'Start a run', href: '/dashboard/workflows/new' },
 	'personalized-images': { label: 'Try API Playground', href: '/dashboard/api-playground' },
 	'content-marketing': { label: 'Create Blog Image', href: '/dashboard/template/create' },
 	// Engineer-centric intents

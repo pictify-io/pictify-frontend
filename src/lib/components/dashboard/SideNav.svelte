@@ -170,32 +170,9 @@
 				<span>Workflows</span>
 			</a>
 
-			<!-- Video Templates -->
-			<a
-				href="/dashboard/video-templates"
-				aria-current={isActive(currentPath, '/dashboard/video-templates') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/video-templates')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/video-templates')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-					/>
-				</svg>
-				<span>Video Templates</span>
-			</a>
+			<!-- Video templates are no longer a separate nav item — they live in
+				 Templates behind the "Video" filter. The /dashboard/video-templates
+				 routes stay live so the studio and existing deep links keep working. -->
 
 			<!-- ═══ MEDIA Section ═══ -->
 			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
@@ -278,6 +255,32 @@
 					/>
 				</svg>
 				<span>PDFs</span>
+			</a>
+
+			<a
+				href="/dashboard/media/videos"
+				aria-current={$page.url.pathname === '/dashboard/media/videos' ? 'page' : undefined}
+				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
+					{$page.url.pathname === '/dashboard/media/videos'
+					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
+					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+			>
+				<svg
+					class="w-5 h-5 mr-3 {$page.url.pathname === '/dashboard/media/videos'
+						? 'text-gray-900'
+						: 'text-gray-500 group-hover:text-gray-900'}"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2.5"
+						d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+					/>
+				</svg>
+				<span>Videos</span>
 			</a>
 
 			<!-- ═══ ANALYTICS Section ═══ -->

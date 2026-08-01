@@ -43,7 +43,7 @@
 		>
 			<p class="text-sm font-black uppercase tracking-wider text-black">{loadError}</p>
 			<a
-				href="/dashboard/video-templates"
+				href="/dashboard/template?type=video"
 				class="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-black px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-800"
 			>
 				Back to video templates

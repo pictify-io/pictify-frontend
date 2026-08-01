@@ -16,6 +16,8 @@
 		personalization
 	} from '../../store/onboarding.store';
 	import { fetchAuditLogs } from '../../api/audit';
+	import { getWorkflowStats, listWorkflowRuns } from '../../api/workflow';
+	import RecentRuns from '$lib/components/dashboard/RecentRuns.svelte';
 	import { getTemplates } from '../../api/template';
 	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 	import { getApiToken, createApiToken } from '../../api/user';
@@ -42,15 +44,28 @@
 	let recentLogs = [];
 	let recentTemplates = [];
 	let totalTemplates = 0;
-	let cdnTimeRange = '30d';
+	let workflowStats = { totalRuns: 0, documentsRendered: 0, documentsDelivered: 0 };
+	let recentRuns = [];
+
+	// Last 14 days for the compact sparkline. dailyStats is oldest-first.
+	$: sparkStats = ($cdnStore.dailyStats || []).slice(-14);
+	$: sparkMax = sparkStats.reduce((max, d) => Math.max(max, d.hits || 0), 0);
+	// The sparkline shows shape; this gives it a magnitude.
+	$: spark14Total = sparkStats.reduce((sum, d) => sum + (d.hits || 0), 0);
+	// Prior 14-day window, for a like-for-like trend. Null when there isn't a
+	// full previous window to compare against, so we never show a fake +100%.
+	$: prev14Stats = ($cdnStore.dailyStats || []).slice(-28, -14);
+	$: prev14Total = prev14Stats.reduce((sum, d) => sum + (d.hits || 0), 0);
+	$: trendPct =
+		prev14Stats.length > 0 && prev14Total > 0
+			? Math.round(((spark14Total - prev14Total) / prev14Total) * 100)
+			: null;
+
 	let nudges = [];
 	let starterPreviews = {}; // templateId → { name, svgHtml }
 	let userApiKey = '';
 
 	// Filtered daily stats based on time range
-	$: filteredDailyStats = getFilteredStats($cdnStore.dailyStats, cdnTimeRange);
-	$: rawMax = Math.max(...filteredDailyStats.map((d) => d.hits), 0);
-	$: chartMax = rawMax === 0 ? 4 : Math.ceil(rawMax / 4) * 4;
 	$: planName = PLAN_DISPLAY_NAMES[$plgStatus.plan] || 'Starter';
 	$: teamName = $currentTeam?.name || 'My Workspace';
 	$: memberCount = $teamStore?.members?.length || 1;
@@ -84,19 +99,6 @@
 		}
 	}
 
-	function getFilteredStats(dailyStats, range) {
-		if (!dailyStats || !dailyStats.length) return [];
-		const now = new Date();
-		let daysBack = 30;
-		if (range === '7d') daysBack = 7;
-		else if (range === '90d') daysBack = 90;
-
-		const cutoff = new Date(now);
-		cutoff.setDate(cutoff.getDate() - daysBack);
-		const cutoffStr = cutoff.toISOString().split('T')[0];
-
-		return dailyStats.filter((d) => d.date >= cutoffStr);
-	}
 
 	function formatBytes(bytes) {
 		if (bytes === 0) return '0 B';
@@ -284,12 +286,16 @@
 
 		try {
 			// Fetch data in parallel
-			const [cdnData, logsData, templatesData, apiTokenData] = await Promise.all([
+			const [cdnData, logsData, templatesData, apiTokenData, wfStats, runsData] = await Promise.all([
 				initCdnAnalytics(),
 				fetchAuditLogs({ limit: 8 }).catch(() => ({ logs: [] })),
 				getTemplates({ page: 1, limit: 6, sort: 'newest' }).catch(() => null),
-				getApiToken().catch(() => null)
+				getApiToken().catch(() => null),
+				getWorkflowStats(),
+				listWorkflowRuns().catch(() => ({ runs: [] }))
 			]);
+			workflowStats = wfStats;
+			recentRuns = (runsData?.runs || []).slice(0, 6);
 
 			// Extract API key for getting started guide, auto-create if none exists
 			if (apiTokenData?.apiTokens?.length) {
@@ -353,7 +359,7 @@
 			</div>
 			{#if welcomeMsg && totalTemplates === 0}
 				<h1
-					class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]"
+					class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-black tracking-tighter leading-[0.95]"
 				>
 					{welcomeMsg.title}
 				</h1>
@@ -362,7 +368,7 @@
 				</p>
 			{:else}
 				<h1
-					class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tighter leading-[0.9]"
+					class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-black tracking-tighter leading-[0.95]"
 				>
 					Welcome back.
 				</h1>
@@ -371,11 +377,11 @@
 
 		<div class="flex items-center gap-4">
 			<a
-				href={primaryCTA?.href || '/dashboard/template/create'}
+				href={primaryCTA?.href || '/dashboard/workflows/new'}
 				class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
 			>
 				<span class="text-white font-black text-lg uppercase tracking-wide"
-					>{primaryCTA?.label || 'Create Template'}</span
+					>{primaryCTA?.label || 'Start a run'}</span
 				>
 				<div
 					class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
@@ -536,7 +542,7 @@
 				</h2>
 			</div>
 
-			<!-- Analytics Layout: Top row aggregated metrics, bottom row split chart & top templates -->
+			<!-- Analytics Layout: top row aggregated metrics, then chart + quick actions -->
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<!-- Aggregated Metric: Views -->
 				<div
@@ -594,12 +600,15 @@
 						<div
 							class="text-[10px] md:text-xs font-black text-black/70 uppercase tracking-widest mb-2"
 						>
-							Shared Links
+							Workflow Runs
 						</div>
 						<div
 							class="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter leading-none"
 						>
-							{$cdnStore.totalAssets}
+							{formatNumber(workflowStats.totalRuns)}
+						</div>
+						<div class="text-[10px] font-bold text-black/50 mt-2 uppercase tracking-wider">
+							{formatNumber(workflowStats.documentsDelivered)} delivered
 						</div>
 					</div>
 				</div>
@@ -609,235 +618,97 @@
 		<!-- Main Split -->
 		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mb-12 items-start">
 			<!-- ROW 1: Chart + Quick Actions -->
-			<div class="lg:col-span-8 flex flex-col h-full">
-				<!-- Image Delivery Chart -->
+			<!-- Render activity — compact. The full chart, referrers and countries
+				 live at /dashboard/analytics; duplicating them here buried the run
+				 loop under the old image-API product. -->
+			<div class="lg:col-span-8 flex flex-col lg:self-stretch">
+				<!-- Heading sits OUTSIDE the card, matching Quick Actions and Recent
+					 runs, so all three section titles share one baseline. -->
+				<div class="flex items-center justify-between mb-6 gap-4 min-h-[38px]">
+					<h2
+						class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
+					>
+						<span class="w-3 h-3 bg-data-blue rounded-sm border-[2px] border-black rotate-45" />
+						Render activity
+					</h2>
+					<a
+						href="/dashboard/analytics"
+						class="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest border-[3px] border-black shadow-brutal-sm hover:shadow-brutal-md hover:-translate-y-0.5 transition-all focus-brutal"
+					>
+						View analytics
+						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+						</svg>
+					</a>
+				</div>
+
 				<div
-					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden flex flex-col h-full"
+					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-5 md:p-6 flex-1 flex items-center"
 				>
-					<!-- Chart Header -->
-					<div
-						class="flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 border-b-[3px] border-black bg-gray-50 flex-shrink-0"
-					>
-						<div class="flex items-center gap-3">
-							<div
-								class="w-3 h-3 rounded-full bg-brand-danger border border-black shadow-[1px_1px_0_0_#1f2937]"
-							/>
-							<div
-								class="w-3 h-3 rounded-full bg-brand-accent border border-black shadow-[1px_1px_0_0_#1f2937]"
-							/>
-							<div
-								class="w-3 h-3 rounded-full bg-data-green border border-black shadow-[1px_1px_0_0_#1f2937]"
-							/>
-							<div class="ml-2">
-								<span class="text-sm font-black text-black uppercase tracking-widest"
-									>Image Delivery</span
+					<div class="flex items-center gap-6 lg:gap-8 w-full">
+						<div class="shrink-0 flex flex-col gap-5">
+							<div>
+								<div
+									class="text-3xl font-black text-black tracking-tighter leading-none tabular-nums"
 								>
-								<p class="text-[10px] text-gray-500 font-bold mt-0.5 uppercase tracking-wide">
-									Daily views on your shared images
-								</p>
-							</div>
-						</div>
-						<div class="flex items-center gap-2 mt-4 sm:mt-0">
-							{#each ['7d', '30d', '90d'] as range}
-								<button
-									on:click={() => (cdnTimeRange = range)}
-									class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md border-[2px] transition-all duration-200
-										{cdnTimeRange === range
-										? 'bg-black text-white border-black shadow-brutal-accent-sm'
-										: 'bg-white text-black border-black hover:shadow-brutal-sm hover:-translate-y-0.5'}"
-								>
-									{range}
-								</button>
-							{/each}
-						</div>
-					</div>
-
-					<!-- Chart Body -->
-					<div
-						class="p-5 sm:p-8 flex-1 flex flex-col min-h-[300px] sm:min-h-[400px] relative bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"
-					>
-						{#if filteredDailyStats.length > 0}
-							<!-- Chart Area (Grid + Bars) -->
-							<div class="relative flex-1 flex flex-col">
-								<!-- Y-Axis Grid Lines & Labels -->
-								<div class="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
-									{#each [1, 0.75, 0.5, 0.25, 0] as tick}
-										<div
-											class="w-full border-t-[2px] {tick === 0
-												? 'border-black'
-												: 'border-dashed border-gray-300'} flex-1 relative flex items-start justify-end"
-											style={tick === 0 ? 'flex-grow: 0; border-top-style: solid;' : ''}
-										>
-											<!-- Tick Label -->
-											{#if tick !== 0}
-												<div
-													class="absolute -top-[10px] right-0 translate-x-4 sm:translate-x-6 bg-white px-2 py-0.5 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider border-[2px] border-black shadow-brutal-sm rounded-md pointer-events-auto"
-												>
-													{formatNumber(chartMax * tick)}
-												</div>
-											{/if}
-										</div>
-									{/each}
+									{formatNumber($cdnStore.totalHits)}
 								</div>
-
-								<!-- Bars Area -->
-								<div class="absolute inset-0 flex items-end gap-[2px] sm:gap-1 z-10 pr-12 sm:pr-16">
-									{#each filteredDailyStats as stat}
-										<!-- The Bar wrapper -->
-										<div
-											class="flex-1 h-full flex flex-col justify-end group cursor-pointer relative"
-										>
-											<!-- Brutalist Tooltip -->
-											<div
-												class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-30 translate-y-2 group-hover:translate-y-0 hidden sm:block"
-											>
-												<div
-													class="bg-black text-white px-3 py-2 rounded-xl border-[2px] border-black font-black shadow-brutal-accent whitespace-nowrap flex flex-col items-center"
-												>
-													<span
-														class="text-[10px] text-gray-400 uppercase tracking-widest leading-none mb-1.5"
-														>{new Date(stat.date).toLocaleDateString('en-US', {
-															month: 'short',
-															day: 'numeric',
-															timeZone: 'UTC'
-														})}</span
-													>
-													<span class="text-sm leading-none"
-														>{formatNumber(stat.hits)}
-														<span class="text-gray-400 font-bold ml-1">views</span></span
-													>
-												</div>
-											</div>
-
-											<!-- The Bar -->
-											<div
-												class="w-full bg-[#c4b5fd] border-[2px] border-b-0 border-black rounded-t-sm transition-all duration-300 group-hover:bg-data-violet group-hover:-translate-y-1 relative overflow-hidden"
-												style="height: {Math.max((stat.hits / chartMax) * 100, 1)}%"
-											>
-												<!-- Grid pattern overlay inside the bar for texture -->
-												<div
-													class="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(0,0,0,0.15)_25%,rgba(0,0,0,0.15)_50%,transparent_50%,transparent_75%,rgba(0,0,0,0.15)_75%,rgba(0,0,0,0.15)_100%)] [background-size:6px_6px] opacity-0 group-hover:opacity-100 transition-opacity"
-												/>
-												<!-- White top edge highlight -->
-												<div class="w-full h-1 bg-white/40 border-b border-black/20" />
-											</div>
-										</div>
-									{/each}
+								<div class="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1.5">
+									Views all time
 								</div>
 							</div>
 
-							<!-- X-Axis Labels (Dates) -->
-							<div class="flex justify-between items-center mt-3 z-10 px-1 pr-12 sm:pr-16">
-								<div
-									class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
-								>
-									{new Date(filteredDailyStats[0].date).toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric',
-										timeZone: 'UTC'
-									})}
+							<div class="pt-5 border-t-[3px] border-black">
+								<div class="flex items-baseline gap-2">
+									<span
+										class="text-3xl font-black text-black tracking-tighter leading-none tabular-nums"
+									>
+										{formatNumber(spark14Total)}
+									</span>
+									{#if trendPct !== null}
+										<span
+											class="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black tabular-nums {trendPct >=
+											0
+												? 'bg-data-green text-black'
+												: 'bg-brand-danger/20 text-black'}"
+										>
+											{trendPct >= 0 ? '+' : ''}{trendPct}%
+										</span>
+									{/if}
 								</div>
-								<div
-									class="bg-white rounded-md border-[2px] border-black shadow-brutal-sm px-2 py-1 text-[10px] font-black text-black uppercase tracking-widest"
-								>
-									{new Date(
-										filteredDailyStats[filteredDailyStats.length - 1].date
-									).toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric',
-										timeZone: 'UTC'
-									})}
+								<div class="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1.5">
+									Last 14 days
 								</div>
+							</div>
+						</div>
+
+						<!-- Sparkline: last 14 days of delivery, drawn from the same
+							 dailyStats the analytics page uses. -->
+						{#if sparkStats.length > 1}
+							<div class="flex-1 flex items-end gap-[3px] h-14 lg:h-20" aria-hidden="true">
+								{#each sparkStats as day}
+									<div
+										class="flex-1 bg-data-blue border-[1.5px] border-black rounded-sm min-h-[3px] transition-all duration-200"
+										style="height: {sparkMax > 0 ? Math.max(6, (day.hits / sparkMax) * 100) : 6}%"
+										title="{day.date}: {day.hits} views"
+									/>
+								{/each}
+							</div>
+							<div class="shrink-0 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+								14d
 							</div>
 						{:else}
-							<div
-								class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-white/50"
-							>
-								<div
-									class="w-16 h-16 bg-white rounded-2xl border-[3px] border-black flex items-center justify-center mb-4 shadow-brutal-lg rotate-3"
-								>
-									<svg
-										class="w-8 h-8 text-black"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2.5"
-											d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-										/>
-									</svg>
-								</div>
-								<p class="text-sm font-black text-black uppercase tracking-wider">
-									No traffic in this period
-								</p>
-							</div>
+							<p class="flex-1 text-xs font-bold text-gray-500">
+								No render traffic yet. Assets you render through a template or the API show up here.
+							</p>
 						{/if}
 					</div>
-
-					<!-- Top Referrers + Countries Side by Side -->
-					{#if $cdnStore.topReferrers.length > 0 || $cdnStore.topCountries.length > 0}
-						<div
-							class="grid grid-cols-1 sm:grid-cols-2 gap-0 border-t-[3px] border-black bg-white flex-shrink-0"
-						>
-							{#if $cdnStore.topReferrers.length > 0}
-								<div class="p-5 sm:p-6 border-b-[3px] border-black sm:border-b-0 sm:border-r-[3px]">
-									<h4
-										class="text-[10px] font-black text-black uppercase tracking-widest mb-4 flex items-center gap-2"
-									>
-										<div class="w-2 h-2 bg-brand-accent border-[2px] border-black rounded-sm" />
-										Top Referrers
-									</h4>
-									<div class="space-y-2">
-										{#each $cdnStore.topReferrers.slice(0, 5) as ref}
-											<div class="flex items-center justify-between text-xs group">
-												<span
-													class="font-bold text-gray-600 truncate max-w-[150px] lg:max-w-[180px] group-hover:text-black transition-colors"
-													>{ref.referrer || 'Direct'}</span
-												>
-												<span
-													class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937] group-hover:-translate-y-0.5 group-hover:shadow-brutal-sm transition-all"
-													>{formatNumber(ref.hits)}</span
-												>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-							{#if $cdnStore.topCountries.length > 0}
-								<div class="p-5 sm:p-6">
-									<h4
-										class="text-[10px] font-black text-black uppercase tracking-widest mb-4 flex items-center gap-2"
-									>
-										<div class="w-2 h-2 bg-data-green border-[2px] border-black rounded-sm" />
-										Top Countries
-									</h4>
-									<div class="space-y-2">
-										{#each $cdnStore.topCountries.slice(0, 5) as country}
-											<div class="flex items-center justify-between text-xs group">
-												<span
-													class="font-bold text-gray-600 truncate max-w-[150px] lg:max-w-[180px] group-hover:text-black transition-colors"
-													>{country.country}</span
-												>
-												<span
-													class="font-black text-black bg-gray-100 px-2 py-0.5 rounded border-[2px] border-black shadow-[1px_1px_0_0_#1f2937] group-hover:-translate-y-0.5 group-hover:shadow-brutal-sm transition-all"
-													>{formatNumber(country.hits)}</span
-												>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-						</div>
-					{/if}
 				</div>
 			</div>
-			<div class="lg:col-span-4 flex flex-col justify-center">
+			<div class="lg:col-span-4 flex flex-col lg:self-stretch">
 				<!-- Quick Actions — Feature Discovery (personalized order) -->
-				<div class="flex flex-col mb-0">
-					<div class="flex items-center justify-between mb-6">
+				<div class="flex flex-col flex-1">
+					<div class="flex items-center justify-between mb-6 min-h-[38px]">
 						<h2
 							class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
 						>
@@ -956,288 +827,14 @@
 				</div>
 			</div>
 
-			<!-- ROW 2: Continue Working + Top Templates -->
-			<div class="lg:col-span-8 flex flex-col h-full">
-				<!-- Continue Working Section -->
-				<div class="flex-1 flex flex-col mb-0">
-					<div class="flex items-center justify-between mb-6">
-						<h2
-							class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
-						>
-							<span class="w-3 h-3 bg-data-green rounded-sm border-[2px] border-black rotate-45" />
-							Continue Working
-						</h2>
-						{#if recentTemplates.length > 0}
-							<a
-								href="/dashboard/template"
-								class="text-xs font-black text-brand-danger uppercase tracking-wider hover:text-data-red flex items-center gap-1 group"
-							>
-								View all templates
-								<svg
-									class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2.5"
-										d="M17 8l4 4m0 0l-4 4m4-4H3"
-									/></svg
-								>
-							</a>
-						{/if}
-					</div>
-
-					<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-						{#if recentTemplates.length > 0}
-							{#each recentTemplates.slice(0, 4) as template}
-								<a
-									href="/dashboard/template/{template.uid}"
-									class="group bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex flex-col h-full"
-								>
-									<div
-										class="aspect-video bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:12px_12px] border-b-[3px] border-black relative overflow-hidden flex-shrink-0"
-									>
-										{#if template.thumbnail}
-											<img
-												loading="lazy"
-												src={template.thumbnail}
-												alt={template.name}
-												class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-											/>
-										{:else if template.engine === 'html' && template.html}
-											<!-- HTML templates never cache a backend thumbnail —
-											     render a live miniature via the shared shadow-
-											     DOM component instead of the blank placeholder. -->
-											<div class="w-full h-full flex items-center justify-center">
-												<SnippetThumbnail
-													body={template.html}
-													cardWidth={320}
-													cardHeight={180}
-													naturalWidth={template.width || 1080}
-													naturalHeight={template.height || 1080}
-												/>
-											</div>
-										{:else}
-											<div
-												class="w-full h-full flex items-center justify-center bg-gray-50 group-hover:bg-brand-accent/10 transition-colors"
-											>
-												<svg
-													class="w-8 h-8 text-gray-400 group-hover:text-brand-accent transition-colors"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2.5"
-														d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
-													/>
-												</svg>
-											</div>
-										{/if}
-										<!-- Overlay Action -->
-										<div
-											class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-										>
-											<div
-												class="bg-brand-accent text-black text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full border-[2px] border-black transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
-											>
-												Open Editor
-											</div>
-										</div>
-									</div>
-									<div class="p-4 md:p-5 flex-1 flex flex-col justify-center">
-										<h4 class="text-base font-black text-black truncate mb-1">
-											{template.name || 'Untitled'}
-										</h4>
-										<div
-											class="flex items-center gap-2 text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest"
-										>
-											{#if template.outputFormat}
-												<span
-													class="px-2 py-0.5 bg-gray-100 rounded border border-gray-200 text-gray-700"
-													>{template.outputFormat}</span
-												>
-											{/if}
-											<span
-												>{template.updatedAt
-													? timeAgo(template.updatedAt)
-													: template.createdAt
-													? timeAgo(template.createdAt)
-													: ''}</span
-											>
-										</div>
-									</div>
-								</a>
-							{/each}
-						{:else}
-							<!-- Empty State (personalized or generic) -->
-							<div class="col-span-full">
-								<div
-									class="bg-white rounded-2xl border-[3px] border-black border-dashed p-12 text-center flex flex-col items-center justify-center"
-								>
-									<div
-										class="w-16 h-16 bg-gray-100 rounded-2xl border-[3px] border-gray-300 flex items-center justify-center mb-4 transform -rotate-3"
-									>
-										<svg
-											class="w-8 h-8 text-gray-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
-											/>
-										</svg>
-									</div>
-									<p class="text-lg font-black text-black mb-2">
-										{emptyMsg?.heading || 'No templates yet'}
-									</p>
-									<p class="text-sm font-bold text-gray-500 mb-6 max-w-sm">
-										{emptyMsg?.subtitle ||
-											'Create your first template to start generating automated images and PDFs.'}
-									</p>
-									<a
-										href="/dashboard/template/create"
-										class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wide hover:bg-gray-800 transition-colors"
-									>
-										{emptyMsg?.cta || 'Create Template'}
-									</a>
-								</div>
-							</div>
-						{/if}
-					</div>
-				</div>
-			</div>
-			<div class="lg:col-span-4 flex flex-col h-full">
-				<!-- Top Performing Templates -->
-				<div
-					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl overflow-hidden flex flex-col h-full"
-				>
-					<div
-						class="flex items-center justify-between p-5 md:p-6 border-b-[3px] border-black bg-gray-50 flex-shrink-0"
-					>
-						<div class="flex items-center gap-3">
-							<div
-								class="w-8 h-8 rounded-xl bg-yellow-200 border-[2px] border-black flex items-center justify-center shadow-brutal-sm"
-							>
-								<svg
-									class="w-4 h-4 text-black"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2.5"
-										d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-									/>
-								</svg>
-							</div>
-							<span class="text-xs font-black text-black uppercase tracking-widest"
-								>Top Templates</span
-							>
-						</div>
-					</div>
-
-					<div class="divide-y-[2px] divide-black flex-1 overflow-y-auto">
-						{#if $cdnStore.topTemplates && $cdnStore.topTemplates.length > 0}
-							{#each $cdnStore.topTemplates as tpl, i}
-								<a
-									href="/dashboard/template/{tpl.uid}"
-									class="flex items-center gap-4 p-4 hover:bg-brand-accent/20 transition-colors group"
-								>
-									<!-- Rank -->
-									<div
-										class="w-6 font-black text-gray-400 text-sm group-hover:text-black transition-colors"
-									>
-										#{i + 1}
-									</div>
-
-									<!-- Thumbnail -->
-									<div
-										class="w-12 h-12 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:8px_8px] rounded-xl border-[2px] border-black flex-shrink-0 overflow-hidden shadow-brutal-sm group-hover:shadow-brutal-lg group-hover:-translate-y-0.5 transition-all"
-									>
-										{#if tpl.thumbnail}
-											<img
-												loading="lazy"
-												src={tpl.thumbnail}
-												alt={tpl.name}
-												class="w-full h-full object-cover"
-											/>
-										{:else if tpl.engine === 'html' && tpl.html}
-											<SnippetThumbnail
-												body={tpl.html}
-												cardWidth={48}
-												cardHeight={48}
-												naturalWidth={tpl.width || 1080}
-												naturalHeight={tpl.height || 1080}
-											/>
-										{:else}
-											<div class="w-full h-full flex items-center justify-center bg-gray-50">
-												<svg
-													class="w-5 h-5 text-gray-400"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2.5"
-														d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
-													/>
-												</svg>
-											</div>
-										{/if}
-									</div>
-
-									<!-- Info -->
-									<div
-										class="flex-1 min-w-0 transition-transform duration-200 group-hover:translate-x-1"
-									>
-										<h4 class="text-sm font-black text-black truncate">{tpl.name}</h4>
-										<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
-											{formatNumber(tpl.hits)}
-											{tpl.hits === 1 ? 'view' : 'views'}
-										</p>
-									</div>
-								</a>
-							{/each}
-						{:else}
-							<div class="p-8 text-center flex flex-col items-center justify-center h-full">
-								<div
-									class="w-12 h-12 bg-gray-100 rounded-xl border-[2px] border-gray-300 flex items-center justify-center mb-3"
-								>
-									<svg
-										class="w-6 h-6 text-gray-400"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-										/>
-									</svg>
-								</div>
-								<p class="text-sm font-bold text-gray-900">No views yet</p>
-								<p class="text-xs text-gray-500 mt-1">
-									Share your generated images to see which templates perform best
-								</p>
-							</div>
-						{/if}
-					</div>
-				</div>
+			<!-- ROW 2: Continue Working (full width — the "Top Performing
+				 Templates" panel was removed 2026-08) -->
+			<!-- Recent runs — the page's primary content. "Did my documents go out?"
+				 is the question this product answers; nothing rendered it before. -->
+			<!-- Recent runs — the page's primary content. "Did my documents go out?"
+				 is the question this product answers; nothing rendered it before. -->
+			<div class="lg:col-span-12 flex flex-col">
+				<RecentRuns runs={recentRuns} />
 			</div>
 		</div>
 	{/if}

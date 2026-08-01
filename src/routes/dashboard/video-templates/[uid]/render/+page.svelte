@@ -142,7 +142,7 @@
 			>
 				<p class="mb-4 text-sm font-black uppercase tracking-wider text-black">{loadError}</p>
 				<a
-					href="/dashboard/video-templates"
+					href="/dashboard/template?type=video"
 					class="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-black px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-800"
 				>
 					Back to video templates
@@ -153,7 +153,7 @@
 		<!-- Header -->
 		<div class="mb-8 pt-4">
 			<a
-				href="/dashboard/video-templates"
+				href="/dashboard/template?type=video"
 				class="mb-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-500 transition-colors hover:text-black"
 			>
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

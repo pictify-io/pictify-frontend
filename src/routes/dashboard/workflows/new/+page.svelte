@@ -22,6 +22,9 @@
 	// ?pack=<id> only picks which designs to show and which template-step
 	// section comes first (harmless deep-link). Certificates is the default.
 	const packParam = $page.url.searchParams.get('pack');
+	// ?template=<uid> preselects a template, so "Run a workflow with this template"
+	// from a template card lands on the data step instead of the picker.
+	const templateParam = $page.url.searchParams.get('template');
 	const selectedPack = getPack(packParam) || getPack('certificates');
 	const isCustomPack = !!selectedPack.custom;
 	const packDesigns = selectedPack.designs || [];
@@ -115,6 +118,10 @@
 		bodyText: 'Your document is attached below.'
 	};
 	let createdHook = null;
+	// Opt-in HMAC verification. The URL secret authenticates the caller, but it
+	// travels in the path (proxy logs, history). Signing proves the payload too.
+	let requireSignature = false;
+	let signingSecretCopied = false;
 	let hookCreatedKey = '';
 	let hookCreating = false;
 	let hookCreateError = '';
@@ -309,6 +316,11 @@
 			templates = [...images, ...videos];
 		}
 		templatesLoading = false;
+
+		if (templateParam) {
+			const preselected = templates.find((t) => t.uid === templateParam);
+			if (preselected) await selectTemplate(preselected);
+		}
 	}
 
 	async function resolveVariables(template) {
@@ -675,7 +687,8 @@
 				templateUid: wizard.templateUid,
 				columnMapping: hookColumnMapping,
 				outputFormat,
-				delivery
+				delivery,
+				requireSignature
 			});
 			createdHook = response?.hook || null;
 			if (!createdHook) throw new Error('The webhook was created but no details were returned.');
@@ -714,6 +727,17 @@
 			/* keep polling */
 		}
 		hookPollTimer = setTimeout(pollHookStats, 3000);
+	}
+
+	async function copySigningSecret() {
+		if (!createdHook?.signingSecret) return;
+		try {
+			await navigator.clipboard.writeText(createdHook.signingSecret);
+			signingSecretCopied = true;
+			setTimeout(() => (signingSecretCopied = false), 1500);
+		} catch (error) {
+			/* clipboard unavailable */
+		}
 	}
 
 	async function copyHookUrl() {
@@ -955,7 +979,7 @@
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								stroke-width="2.5"
-								d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5m7.5-2.344a4 4 0 015.656 0l.086.086a4 4 0 010 5.656l-1.5 1.5m-7.5-9.5l3-3a4 4 0 015.656 5.656l-1.5 1.5"
+								d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
 							/>
 						</svg>
 					</div>
@@ -1828,6 +1852,25 @@
 				<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
 					So you can recognize this webhook later on the workflows page.
 				</p>
+
+				<div class="mt-6 pt-6 border-t-[3px] border-black">
+					<label class="flex items-start gap-3 cursor-pointer">
+						<input
+							type="checkbox"
+							bind:checked={requireSignature}
+							class="mt-0.5 w-5 h-5 shrink-0 rounded border-[3px] border-black accent-black focus-brutal"
+						/>
+						<span>
+							<span class="block text-xs font-black text-black uppercase tracking-widest">
+								Require a signed payload
+							</span>
+							<span class="block text-[11px] font-bold text-gray-600 mt-1 leading-relaxed">
+								Senders must HMAC the body with a signing secret. Rejects replayed or tampered
+								requests even if the webhook URL leaks. You get the secret on the next screen.
+							</span>
+						</span>
+					</label>
+				</div>
 			</div>
 		{/if}
 
@@ -1948,6 +1991,56 @@
 					</code>
 				</div>
 			</div>
+
+			{#if createdHook?.signingSecret}
+				<div
+					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-5 md:p-6 mb-6"
+				>
+					<div class="flex items-center gap-3 mb-3">
+						<span class="w-3 h-3 bg-brand-accent rounded-sm border-[2px] border-black rotate-45" />
+						<h3 class="text-sm font-black text-black uppercase tracking-widest">
+							Signing secret
+						</h3>
+						<span
+							class="ml-auto px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black {requireSignature
+								? 'bg-data-green text-black'
+								: 'bg-gray-100 text-gray-700'}"
+						>
+							{requireSignature ? 'Required' : 'Optional'}
+						</span>
+					</div>
+					<p class="text-xs font-bold text-gray-600 mb-4">
+						Shown once. Copy it now — it can't be retrieved later. Sign the raw request body
+						and send the result as an <code class="font-mono">X-Pictify-Signature</code> header.
+					</p>
+
+					<div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+						<code
+							class="flex-1 min-w-0 truncate bg-gray-100 border-[2px] border-black rounded-lg px-3 py-2 text-xs font-bold text-black font-mono"
+						>
+							{createdHook.signingSecret}
+						</code>
+						<button
+							on:click={copySigningSecret}
+							class="inline-flex items-center gap-2 bg-brand-accent text-black px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wide border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex-shrink-0 focus-brutal"
+						>
+							{signingSecretCopied ? 'Copied!' : 'Copy secret'}
+						</button>
+					</div>
+
+					<div class="overflow-x-auto">
+						<code
+							class="block whitespace-pre bg-black text-data-green rounded-lg px-3 py-2 text-[11px] font-bold"
+						>{`t=$(date +%s)
+sig=$(printf "$t.$BODY" | openssl dgst -sha256 -hmac "$SIGNING_SECRET" -hex | awk '{print $2}')
+curl -X POST "$HOOK_URL" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Pictify-Signature: t=$t,v1=$sig" \\
+  -d "$BODY"`}</code
+						>
+					</div>
+				</div>
+			{/if}
 
 			<!-- Send a test event -->
 			<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 mb-8">

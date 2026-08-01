@@ -68,10 +68,26 @@ const listWorkflowHooks = async () => {
 	return response;
 };
 
+/**
+ * All-time workflow totals for the dashboard summary cards. Separate from
+ * listWorkflowRuns because that endpoint caps at 20 runs.
+ * @returns {Promise<Object>} - { totalRuns, documentsRendered, documentsDelivered }
+ */
+const getWorkflowStats = async () => {
+	try {
+		const response = await backend.get('/workflow/stats');
+		return response?.stats || { totalRuns: 0, documentsRendered: 0, documentsDelivered: 0 };
+	} catch (error) {
+		// A stats outage must not blank the dashboard.
+		return { totalRuns: 0, documentsRendered: 0, documentsDelivered: 0 };
+	}
+};
+
 export {
 	createWorkflowRun,
 	getWorkflowRun,
 	listWorkflowRuns,
+	getWorkflowStats,
 	previewWorkflow,
 	createWorkflowHook,
 	listWorkflowHooks

@@ -120,7 +120,7 @@
 
 	<div class="mb-8 pt-4">
 		<a
-			href="/dashboard/video-templates"
+			href="/dashboard/template?type=video"
 			class="mb-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-500 transition-colors hover:text-black"
 		>
 			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

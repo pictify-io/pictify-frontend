@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { getImages, getGifs, getPdfs } from '../api/media';
+import { getImages, getGifs, getPdfs, getVideos } from '../api/media';
 
 // Store structure: { items: [], pagination: { total, limit, offset, hasMore } }
 export const gifs = writable({
@@ -12,6 +12,10 @@ export const images = writable({
 });
 export const pdfs = writable({
 	pdfs: [],
+	pagination: { total: 0, limit: 12, offset: 0, hasMore: false }
+});
+export const videos = writable({
+	videos: [],
 	pagination: { total: 0, limit: 12, offset: 0, hasMore: false }
 });
 
@@ -31,4 +35,10 @@ export const fetchPdfs = async ({ limit = 12, offset = 0 } = {}) => {
 	const pdfsData = await getPdfs({ limit, offset });
 	pdfs.set(pdfsData);
 	return pdfsData;
+};
+
+export const fetchVideos = async ({ limit = 12, offset = 0 } = {}) => {
+	const videosData = await getVideos({ limit, offset });
+	videos.set(videosData);
+	return videosData;
 };
