@@ -69,9 +69,11 @@ export interface HostCallbacks {
     page?: number
   ) => Promise<{ items: Array<any>; pagination: { hasMore: boolean; page: number } }>;
   /**
-   * Ask the copilot what to change. Returns TOOL CALLS, never a document — the
-   * panel validates each against the live scene before applying it, so a
-   * hallucinated clip id costs one operation rather than the scene.
+   * Ask the copilot what to do next, one pipeline phase at a time. Execute and
+   * review phases return TOOL CALLS, never a document — the panel validates
+   * each against the live scene before applying it, so a hallucinated clip id
+   * costs one operation rather than the scene. The design phase returns a
+   * prose `brief` instead, which the panel echoes back on later rounds.
    */
   planAgentEdit?: (
     document: object,
@@ -79,11 +81,17 @@ export interface HostCallbacks {
     instruction: string,
     /**
      * Earlier rounds of the SAME request: what the model already called and
-     * what its lookups returned. This is how it discovers effect and preset
-     * names instead of being handed every catalogue up front.
+     * what actually happened — lookup results, applied edits, failures.
      */
-    history?: Array<{ role: string; content: string }>
-  ) => Promise<{ message: string; calls: Array<{ name: string; args: object }> }>;
+    history?: Array<{ role: string; content: string }>,
+    /** Phase pipeline fields: phase, brief, findings, vocabulary. */
+    extras?: {
+      phase?: "design" | "execute" | "review";
+      brief?: string;
+      findings?: string[];
+      vocabulary?: { effects?: string[]; animations?: string[]; transitions?: string[] };
+    }
+  ) => Promise<{ message?: string; calls?: Array<{ name: string; args: object }>; brief?: string }>;
 }
 
 let hostCallbacks: HostCallbacks = {};

@@ -303,10 +303,16 @@ const transcribeMedia = async (url) => backend.post('/video/transcribe', { url }
  * @param {object} document - describeDocument() output
  * @param {Array} tools - toolSchema() output
  * @param {string} instruction
- * @returns {Promise<{message: string, calls: Array<{name: string, args: object}>}>}
+ * @param {Array} [history] - earlier rounds of the same request
+ * @param {object} [extras] - phase pipeline fields: `phase` ('design' |
+ *   'execute' | 'review'), `brief` (the design phase's plan, echoed back on
+ *   later rounds), `findings` (review phase: what the deterministic scene
+ *   checks flagged) and `vocabulary` (design phase: the real effect /
+ *   animation / transition names).
+ * @returns {Promise<{message?: string, calls?: Array<{name: string, args: object}>, brief?: string}>}
  */
-const planAgentEdit = async (document, tools, instruction, history = []) =>
-	backend.post('/video/templates/agent', { document, tools, instruction, history });
+const planAgentEdit = async (document, tools, instruction, history = [], extras = {}) =>
+	backend.post('/video/templates/agent', { document, tools, instruction, history, ...extras });
 
 const searchStockAssets = async (kind, query, page = 1) => {
 	const params = new URLSearchParams({ query, page: String(page) });

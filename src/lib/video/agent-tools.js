@@ -29,6 +29,7 @@
  */
 
 import { createEffectClip } from './effect-params.js';
+import { fadePatch } from './clip-style.js';
 
 const SECOND = 1_000_000;
 
@@ -391,6 +392,135 @@ export const TOOLS = [
 			doc.clips?.[args.clipId] ? null : `No clip with id ${args.clipId}.`,
 		apply: (doc, args) => ({ op: 'remove', clipId: args.clipId })
 	},
+	/*
+	 * Scene-level tools. Without these the agent literally cannot finish a
+	 * composition: it can place every clip perfectly and still ship a video
+	 * that runs four seconds too long over a default background.
+	 */
+	{
+		name: 'set_background',
+		description: 'Set the scene background colour. Hex, like #111827.',
+		params: { color: 'string hex' },
+		validate: (doc, args) =>
+			/^#[0-9a-f]{3,8}$/i.test(String(args.color || '')) ? null : 'color must be a hex value.',
+		apply: (doc, args) => ({ op: 'settings', patch: { backgroundColor: args.color } })
+	},
+	{
+		name: 'set_scene_duration',
+		description:
+			'Set the total scene duration in seconds. Match it to the end of the last clip — no dead air.',
+		params: { durationS: 'number' },
+		validate: (doc, args) => {
+			if (num(args.durationS) === null) return 'durationS must be a number.';
+			if (Number(args.durationS) <= 0) return 'durationS must be greater than zero.';
+			return null;
+		},
+		apply: (doc, args) => ({ op: 'settings', patch: { duration: toUs(args.durationS) } })
+	},
+	{
+		name: 'set_layer',
+		description:
+			'Set what covers what. Background media 0-1, shapes 2-10, text 20-40, full-frame effects 900.',
+		params: { clipId: 'string', layer: 'integer' },
+		validate: (doc, args) => {
+			if (!doc.clips?.[args.clipId]) return `No clip with id ${args.clipId}.`;
+			if (num(args.layer) === null) return 'layer must be a number.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			return {
+				op: 'update',
+				clipId: args.clipId,
+				patch: {
+					transform: {
+						...clip.transform,
+						zIndex: Math.max(0, Math.min(1000, Math.round(Number(args.layer))))
+					}
+				}
+			};
+		}
+	},
+	{
+		name: 'set_opacity',
+		description: 'Set a clip’s opacity, 0 (invisible) to 1 (solid).',
+		params: { clipId: 'string', opacity: 'number 0-1' },
+		validate: (doc, args) => {
+			if (!doc.clips?.[args.clipId]) return `No clip with id ${args.clipId}.`;
+			if (num(args.opacity) === null) return 'opacity must be a number.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			return {
+				op: 'update',
+				clipId: args.clipId,
+				patch: {
+					transform: { ...clip.transform, opacity: clampFraction(args.opacity) }
+				}
+			};
+		}
+	},
+	{
+		name: 'set_fades',
+		description:
+			'Fade a clip in and/or out, durations in seconds. Use 0 to clear a fade.',
+		params: { clipId: 'string', fadeInS: 'number', fadeOutS: 'number' },
+		validate: (doc, args) => {
+			if (!doc.clips?.[args.clipId]) return `No clip with id ${args.clipId}.`;
+			if (num(args.fadeInS ?? 0) === null || num(args.fadeOutS ?? 0) === null)
+				return 'fadeInS and fadeOutS must be numbers.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			/*
+			 * fadePatch owns the seconds→MILLISECONDS boundary (fades are the one
+			 * timing field the engine reads in ms) and clamps the pair so the
+			 * ramps cannot cross. Applied sequentially so the second fade sees
+			 * the first one's clamp.
+			 */
+			const afterIn = { ...clip, ...fadePatch(clip, 'in', Math.round(Number(args.fadeInS ?? 0) * 1000)) };
+			const patch = fadePatch(afterIn, 'out', Math.round(Number(args.fadeOutS ?? 0) * 1000));
+			return { op: 'update', clipId: args.clipId, patch };
+		}
+	},
+	{
+		name: 'set_font_size',
+		description:
+			'Set a text clip’s type size, as a fraction of the shorter canvas side. Titles 0.055-0.09, supporting text 0.03-0.045.',
+		params: { clipId: 'string', size: 'number 0-1' },
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (clip.type !== 'Text' && clip.type !== 'Caption')
+				return `${clip.type} clips have no type size.`;
+			if (num(args.size) === null || Number(args.size) <= 0)
+				return 'size must be a number greater than zero.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			const { width = 1080, height = 1920 } = doc.settings || {};
+			const fontSize = Math.max(
+				12,
+				Math.round(clampFraction(args.size) * Math.min(width, height))
+			);
+			return {
+				op: 'update',
+				clipId: args.clipId,
+				patch: {
+					style: { ...(clip.style || {}), fontSize },
+					// The box grows with the type, or the bigger text wraps inside
+					// yesterday's box and shows as one squashed line.
+					transform: {
+						...clip.transform,
+						height: Math.max(Number(clip.transform?.height) || 0, Math.round(fontSize * 1.6))
+					}
+				}
+			};
+		}
+	},
 	{
 		name: 'add_effect',
 		description:
@@ -682,5 +812,7 @@ export const summarizeOperations = (operations) => {
 	if (counts.animate) parts.push(`animated ${counts.animate} clip${counts.animate === 1 ? '' : 's'}`);
 	if (counts.transition) parts.push(`added ${counts.transition} transition${counts.transition === 1 ? '' : 's'}`);
 	if (counts.stock) parts.push(`added ${counts.stock} stock clip${counts.stock === 1 ? '' : 's'}`);
+	if (counts.media) parts.push(`placed ${counts.media} media item${counts.media === 1 ? '' : 's'}`);
+	if (counts.settings) parts.push(`adjusted the scene`);
 	return `${parts.join(', ').replace(/^./, (c) => c.toUpperCase())}.`;
 };

@@ -31,6 +31,14 @@ import {
   searchCatalogue,
   describeMedia,
 } from "../../../agent-tools";
+import {
+  classifyRequest,
+  budgetFor,
+  roundReport,
+  shouldReview,
+  condenseBrief,
+} from "../../../agent-orchestrator";
+import { critiqueScene } from "../../../scene-critic";
 import { EFFECT_OPTIONS } from "../../../effects";
 import { IN_PRESETS, OUT_PRESETS, buildAnimation, withAnimationMeta } from "../../../animations";
 import {
@@ -48,21 +56,20 @@ type Turn = {
   restore?: any;
 };
 
-/** Enough rounds for a multi-step request; few enough that a loop cannot run away. */
-const MAX_ROUNDS = 6;
-/** A hard ceiling on edits per request, so a misread instruction cannot rewrite the scene. */
-const MAX_OPERATIONS = 30;
-
 const SUGGESTIONS = [
+  "Create a 15 second promo video for a product launch",
   "Make the title bigger and move it up",
   "Change the accent colour to orange",
-  "Hold the lower third for two more seconds",
 ];
 
 export default function CopilotPanel() {
   const [turns, setTurns] = React.useState<Turn[]>([]);
   const [draft, setDraft] = React.useState("");
   const [busy, setBusy] = React.useState(false);
+  // Which pipeline phase is running, for the busy line. A generation takes
+  // long enough that "working…" for a minute reads as a hang; "designing",
+  // "building", "reviewing" reads as progress.
+  const [phase, setPhase] = React.useState("Working out what to change…");
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const lastCount = React.useRef(0);
 
@@ -163,13 +170,45 @@ export default function CopilotPanel() {
       const state: any = projectStore.getState();
 
       if (operation.op === "add") {
-        core.clip.add({ id: generateId(), ...operation.clip } as any);
+        isolate(operation.tool || "add", () =>
+          core.clip.add({ id: generateId(), ...operation.clip } as any)
+        );
       } else if (operation.op === "remove") {
-        core.clip.remove([operation.clipId]);
+        isolate("delete_clip", () => core.clip.remove([operation.clipId]));
+      } else if (operation.op === "settings") {
+        // Scene-level: background colour, total duration. The engine merges
+        // the patch into settings itself.
+        isolate("scene settings", () => core.project.updateSettings(operation.patch));
+      } else if (operation.op === "media") {
+        /*
+         * Resolved here because the panel holds the media library. Matched by
+         * NAME — exact first, then substring — because that is what the model
+         * was shown and what the user would say out loud.
+         */
+        const items = useMediaLibrary.getState().items || [];
+        const needle = String(operation.name || "").toLowerCase();
+        const item =
+          items.find((entry: any) => (entry.name || "").toLowerCase() === needle) ||
+          items.find((entry: any) => (entry.name || "").toLowerCase().includes(needle));
+        if (!item) {
+          const known = items
+            .slice(0, 5)
+            .map((entry: any) => `"${entry.name}"`)
+            .join(", ");
+          failures.push(
+            `add_media: nothing in the library called "${operation.name}".${known ? ` It has: ${known}.` : ""}`
+          );
+        } else {
+          isolate("add_media", () => placeMedia(item, operation, state, failures));
+        }
       } else if (operation.op === "animate") {
         // Resolved here because composing presets into keyframes needs the
         // engine's preset registry, which the pure tool module cannot import.
         const clip = state.clips[operation.clipId];
+        if (!clip) {
+          failures.push(`set_animation: clip ${operation.clipId} no longer exists.`);
+          continue;
+        }
         const display = clip?.timing?.display || {};
         const durationUs = Math.max(0, (display.to ?? 0) - (display.from ?? 0));
         const selection = {
@@ -177,10 +216,12 @@ export default function CopilotPanel() {
           outPreset: operation.outPreset,
           emphasisPreset: "",
         };
-        core.clip.update(operation.clipId, {
-          animations: buildAnimation(selection, durationUs) ?? [],
-          metadata: withAnimationMeta(clip, selection),
-        });
+        isolate("set_animation", () =>
+          core.clip.update(operation.clipId, {
+            animations: buildAnimation(selection, durationUs) ?? [],
+            metadata: withAnimationMeta(clip, selection),
+          })
+        );
       } else if (operation.op === "transition") {
         // A transition is its own clip joining a PAIR, so it needs the track
         // order to find what comes before.
@@ -189,16 +230,18 @@ export default function CopilotPanel() {
         if (!previous) {
           failures.push("add_transition: nothing before that clip to blend from.");
         } else {
-          const existing = incomingTransition(state.clips, clip);
-          if (existing) core.clip.remove([existing.id]);
-          core.clip.add(
-            createTransitionClip({
-              fromClip: previous,
-              toClip: clip,
-              key: operation.transitionKey,
-              durationUs: operation.durationUs,
-            }) as any
-          );
+          isolate("add_transition", () => {
+            const existing = incomingTransition(state.clips, clip);
+            if (existing) core.clip.remove([existing.id]);
+            core.clip.add(
+              createTransitionClip({
+                fromClip: previous,
+                toClip: clip,
+                key: operation.transitionKey,
+                durationUs: operation.durationUs,
+              }) as any
+            );
+          });
         }
       } else if (operation.op === "stock") {
         // The only operation that needs the network.
@@ -254,10 +297,24 @@ export default function CopilotPanel() {
         } catch (cause: any) {
           failures.push(`add_stock: ${cause?.message || "search failed"}.`);
         }
+      } else if (operation.op === "update") {
+        /*
+         * Re-checked at APPLY time, not just at planning: the batch was
+         * validated as a whole, but an earlier delete in the same batch
+         * invalidates a later edit — and the engine treats an update to a
+         * missing clip as a silent no-op, which would be reported as success.
+         */
+        if (!state.clips[operation.clipId]) {
+          failures.push(`${operation.tool || "update"}: clip ${operation.clipId} no longer exists.`);
+        } else {
+          isolate(operation.tool || "update", () =>
+            core.clip.update(operation.clipId, operation.patch)
+          );
+        }
       } else {
-        core.clip.update(operation.clipId, operation.patch);
+        failures.push(`${operation.tool || operation.op}: the editor cannot apply that operation.`);
       }
-      }
+    }
     return failures;
   };
 
@@ -310,17 +367,16 @@ export default function CopilotPanel() {
       const plan = getHostCallbacks().planAgentEdit;
       if (!plan) throw new Error("The copilot is not available in this editor.");
 
-      const document: any = projectStore.getState();
-
       /*
-       * The catalogues stay OUT of the prompt.
+       * The catalogues stay OUT of the execute prompt.
        *
-       * Pasting them in costs thousands of tokens every turn to name 51
+       * Pasting them in costs thousands of tokens every round to name 51
        * effects, 123 presets and 68 transitions, nearly all of which the
        * request never mentions. Instead the model looks things up: it asks for
        * "film", gets `oldFilm` back, and calls add_effect with a name that
-       * exists. One extra round trip on the requests that need it, nothing on
-       * the ones that do not.
+       * exists. The one place they ARE pasted in full is the design phase,
+       * which runs once — a brief naming presets that do not exist would
+       * poison every round after it.
        */
       const vocabulary = {
         effects: EFFECT_OPTIONS().map((option: any) => option.value),
@@ -329,41 +385,67 @@ export default function CopilotPanel() {
       };
 
       /*
-       * The agent loop: act, LOOK at what happened, decide what is next.
-       *
-       * A single round can only ever do what the model guessed from the opening
-       * state. Real requests are not like that — "make this feel like a trailer"
-       * is several edits, and whether the third is needed depends on how the
-       * second turned out. So each round is handed the document AS IT NOW IS,
-       * plus what the last round actually managed and what it could not.
-       *
-       * It ends when the model stops asking for anything, when a round achieves
-       * nothing, or when the budget runs out. The middle case is the one that
-       * matters: a model repeating a call that keeps failing would otherwise
-       * spin until the user gave up.
+       * The scene and the user's own media, as the model sees them. Re-read
+       * before every call: the model's own last round moved things. Without
+       * the media list the agent answers "add our logo" with a stock search
+       * for the word "logo" — which returns somebody else's.
        */
+      const described = () => ({
+        ...describeDocument(projectStore.getState() as any),
+        media: describeMedia(useMediaLibrary.getState().items || []),
+      });
+
+      /*
+       * Phase 1 — design, for requests that want a video MADE rather than a
+       * scene tweaked. A single dispatch loop produces bad videos even when
+       * every call is valid, because nobody designed the composition: no
+       * palette, no beats, no hierarchy. The brief travels with every round
+       * after this, so eight rounds build ONE video instead of eight guesses.
+       */
+      const kind = classifyRequest(instruction, described());
+      const budget = budgetFor(kind);
+      let brief = "";
+
+      if (kind === "generate") {
+        setPhase("Designing the composition…");
+        try {
+          const designed: any = await plan(described(), [], instruction, [], {
+            phase: "design",
+            vocabulary,
+          });
+          brief = designed?.brief || "";
+          if (brief) {
+            setTurns((prev) => [
+              ...prev,
+              { role: "assistant", text: `Plan: ${condenseBrief(brief)}` },
+            ]);
+          }
+        } catch {
+          // A failed design phase degrades to the old behaviour — the execute
+          // loop still works without a brief, it is just less composed. Not
+          // worth failing the whole request over.
+        }
+      }
+
+      /*
+       * Phase 2 — the agent loop: act, LOOK at what happened, decide what is
+       * next. Each round is handed the document AS IT NOW IS, plus what the
+       * last round actually managed and what it could not — the failures are
+       * the important part, because a model that never hears a call failed
+       * repeats it every round until the budget runs out.
+       *
+       * It ends when the model stops asking for anything, when a round
+       * achieves nothing, or when the budget runs out.
+       */
+      setPhase(kind === "generate" ? "Building the scene…" : "Working out what to change…");
       const history: Array<{ role: string; content: string }> = [];
       const failures: string[] = [];
       let totalOperations = 0;
       let message = "";
       let stopped = "";
 
-      for (let round = 0; round < MAX_ROUNDS; round += 1) {
-        const live: any = projectStore.getState();
-        /*
-         * The user's own media travels with the scene.
-         *
-         * Without it the agent has no idea a logo is already uploaded, and
-         * answers "add our logo" with a stock search for the word "logo" —
-         * which returns somebody else's.
-         */
-        const library = useMediaLibrary.getState().items || [];
-        const reply = await plan(
-          { ...describeDocument(live), media: describeMedia(library) },
-          toolSchema(),
-          instruction,
-          history
-        );
+      for (let round = 0; round < budget.rounds; round += 1) {
+        const reply = await plan(described(), toolSchema(), instruction, history, { brief });
         message = reply.message || message;
 
         if (!reply.calls?.length) {
@@ -377,7 +459,9 @@ export default function CopilotPanel() {
         const lookups = planned.operations.filter((op: any) => op.op === "query");
         const mutations = planned.operations.filter((op: any) => op.op !== "query");
 
-        for (const error of planned.errors) failures.push(`${error.name}: ${error.error}`);
+        const roundFailures = planned.errors.map(
+          (error: any) => `${error.name}: ${error.error}`
+        );
 
         const answers = lookups.map((lookup: any) => {
           const found = searchCatalogue(
@@ -388,7 +472,8 @@ export default function CopilotPanel() {
         });
 
         const applyFailures = mutations.length ? await applyOperations(mutations) : [];
-        for (const failure of applyFailures) failures.push(failure);
+        roundFailures.push(...applyFailures);
+        failures.push(...roundFailures);
         totalOperations += mutations.length;
 
         if (mutations.length) {
@@ -405,28 +490,64 @@ export default function CopilotPanel() {
           stopped = "It could not carry that out.";
           break;
         }
-        if (totalOperations >= MAX_OPERATIONS) {
+        if (totalOperations >= budget.operations) {
           stopped = "Stopped after a lot of changes — check the result before asking for more.";
           break;
         }
-        if (round === MAX_ROUNDS - 1) {
+        if (round === budget.rounds - 1) {
           stopped = "Stopped after several rounds. Ask again to continue.";
         }
 
-        // What it did, what it could not, and where things now stand.
+        // What it did, what it could not, and where things now stand — the
+        // protocol string lives in agent-orchestrator so it can be pinned.
         history.push({ role: "assistant", content: JSON.stringify({ calls: reply.calls }) });
         history.push({
           role: "user",
-          content: [
-            answers.join("\n"),
-            mutations.length ? `Applied: ${summarizeOperations(mutations)}` : "",
-            applyFailures.length ? `Failed: ${applyFailures.join("; ")}` : "",
-            `Scene now: ${JSON.stringify(describeDocument(projectStore.getState() as any))}`,
-            "Continue if the request is not finished. Return an empty calls list when it is done.",
-          ]
-            .filter(Boolean)
-            .join("\n"),
+          content: roundReport({
+            answers,
+            applied: mutations.length ? summarizeOperations(mutations) : "",
+            failures: roundFailures,
+            scene: described(),
+          }),
         });
+      }
+
+      /*
+       * Phase 3 — review. The browser runs deterministic checks over the
+       * finished scene (dead air, cut-off clips, off-screen text, layering)
+       * and the model turns the findings into fix calls. The checks are code,
+       * not the model grading itself: a model asked "is your work good?"
+       * says yes.
+       */
+      const findings = critiqueScene(projectStore.getState() as any);
+      if (shouldReview({ kind, operations: totalOperations, findings })) {
+        setPhase("Reviewing the result…");
+        try {
+          const reviewed = await plan(described(), toolSchema(), instruction, [], {
+            phase: "review",
+            brief,
+            findings,
+          });
+          if (reviewed.calls?.length) {
+            const planned = planToolCalls(projectStore.getState() as any, reviewed.calls, vocabulary);
+            const fixes = planned.operations.filter((op: any) => op.op !== "query");
+            for (const error of planned.errors) failures.push(`${error.name}: ${error.error}`);
+            if (fixes.length) {
+              const fixFailures = await applyOperations(fixes);
+              failures.push(...fixFailures);
+              totalOperations += fixes.length;
+              setTurns((prev) => [
+                ...prev,
+                { role: "assistant", text: `Review: ${summarizeOperations(fixes)}` },
+              ]);
+              getHostCallbacks().onClipStyleChange?.(fixes[0]?.clipId || "");
+            }
+          }
+        } catch {
+          // Review is a quality pass, not a gate: the edits already landed,
+          // and failing the whole request now would report a finished scene
+          // as an error.
+        }
       }
 
       const summary =
@@ -459,11 +580,11 @@ export default function CopilotPanel() {
         {!turns.length && (
           <div className="pt-2">
             <p className="text-[11px] font-bold leading-snug text-foreground">
-              Describe a change and the scene is edited for you.
+              Describe a change — or a whole video — and the scene is edited for you.
             </p>
             <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-              Every edit is checked against your scene first, so a change that cannot be made is
-              refused rather than guessed at.
+              Bigger requests get designed first, built step by step, then reviewed against your
+              scene. Every edit is checked before it is applied.
             </p>
             <div className="mt-3 flex flex-col gap-1.5">
               {SUGGESTIONS.map((suggestion) => (
@@ -522,7 +643,7 @@ export default function CopilotPanel() {
         {busy && (
           <div className="flex items-center gap-2 px-1 py-1 text-[11px] text-muted-foreground">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-accent" />
-            Working out what to change…
+            {phase}
           </div>
         )}
       </div>

@@ -514,3 +514,78 @@ test('a batch summarises in a sentence a person can read', () => {
 test('an empty batch says so rather than claiming success', () => {
 	assert.match(summarizeOperations([]), /Nothing changed/);
 });
+
+// ── The scene-level tools ────────────────────────────────────────────────
+// Added for the design → execute → review pipeline: without these the agent
+// can place every clip perfectly and still ship a video that runs four
+// seconds too long over a default background.
+
+test('set_background writes a settings patch, and rejects non-hex', () => {
+	const { operations } = planToolCalls(doc(), [call('set_background', { color: '#111827' })]);
+	assert.deepEqual(operations[0], {
+		tool: 'set_background',
+		op: 'settings',
+		patch: { backgroundColor: '#111827' }
+	});
+	const { errors } = planToolCalls(doc(), [call('set_background', { color: 'darkish' })]);
+	assert.match(errors[0].error, /hex/);
+});
+
+test('set_scene_duration converts seconds to microseconds once', () => {
+	const { operations } = planToolCalls(doc(), [call('set_scene_duration', { durationS: 8.5 })]);
+	assert.deepEqual(operations[0].patch, { duration: 8_500_000 });
+	const { errors } = planToolCalls(doc(), [call('set_scene_duration', { durationS: 0 })]);
+	assert.match(errors[0].error, /greater than zero/);
+});
+
+test('set_layer clamps to 0..1000 and keeps the rest of the transform', () => {
+	const { operations } = planToolCalls(doc(), [call('set_layer', { clipId: 't1', layer: 900 })]);
+	assert.equal(operations[0].patch.transform.zIndex, 900);
+	assert.equal(operations[0].patch.transform.x, 100, 'siblings survive the one-level merge');
+	const high = planToolCalls(doc(), [call('set_layer', { clipId: 't1', layer: 99999 })]);
+	assert.equal(high.operations[0].patch.transform.zIndex, 1000);
+});
+
+test('set_opacity clamps to 0..1', () => {
+	const { operations } = planToolCalls(doc(), [call('set_opacity', { clipId: 't1', opacity: 3 })]);
+	assert.equal(operations[0].patch.transform.opacity, 1);
+});
+
+test('set_fades converts seconds to MILLISECONDS — the one timing field in ms', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('set_fades', { clipId: 't1', fadeInS: 0.5, fadeOutS: 0.5 })
+	]);
+	const timing = operations[0].patch.timing;
+	assert.equal(timing.fadeIn.duration, 500);
+	assert.equal(timing.fadeOut.duration, 500);
+	// The display window is untouched: fades are additive to timing, not a rewrite.
+	assert.deepEqual(timing.display, { from: 0, to: 3 * S });
+});
+
+test('set_fades with zeros clears the fades rather than storing zero-length ramps', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('set_fades', { clipId: 't1', fadeInS: 0, fadeOutS: 0 })
+	]);
+	assert.equal(operations[0].patch.timing.fadeIn, undefined);
+	assert.equal(operations[0].patch.timing.fadeOut, undefined);
+});
+
+test('set_font_size sizes off the shorter side and grows the box with the type', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('set_font_size', { clipId: 't1', size: 0.08 })
+	]);
+	const patch = operations[0].patch;
+	assert.equal(patch.style.fontSize, Math.round(0.08 * 1080));
+	assert.ok(patch.transform.height >= patch.style.fontSize * 1.6 - 1);
+	assert.equal(patch.style.color, '#ffffff', 'existing style keys survive');
+});
+
+test('set_font_size refuses non-text clips', () => {
+	const { errors } = planToolCalls(doc(), [call('set_font_size', { clipId: 's1', size: 0.08 })]);
+	assert.match(errors[0].error, /no type size/);
+});
+
+test('the settings and media ops read as a sentence', () => {
+	assert.match(summarizeOperations([{ op: 'settings' }]), /Adjusted the scene/);
+	assert.match(summarizeOperations([{ op: 'media' }]), /Placed 1 media item/);
+});
