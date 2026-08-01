@@ -141,9 +141,24 @@ export const createEffectClip = ({
 			duration,
 			playbackRate: 1
 		},
-		// An Effect has no position or size — it covers the frame — but it does
-		// need a stacking order, because that decides what it affects.
-		transform: { zIndex: Number.isFinite(zIndex) ? zIndex : EFFECT_Z_INDEX },
+		/*
+		 * A COMPLETE transform, even though an effect covers the whole frame.
+		 *
+		 * Only a z-index looks sufficient — the engine fills the rest in when it
+		 * builds the sprite — but the partial object round-trips through save and
+		 * import, and anything downstream that reads `transform.width` off a clip
+		 * gets undefined. The studio's own starters always write the full shape;
+		 * this now matches them.
+		 */
+		transform: {
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0,
+			angle: 0,
+			opacity: 1,
+			zIndex: Number.isFinite(zIndex) ? zIndex : EFFECT_Z_INDEX
+		},
 		metadata: {},
 		locked: false
 	};

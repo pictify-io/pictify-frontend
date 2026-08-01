@@ -44,6 +44,8 @@ type Turn = {
   role: "user" | "assistant";
   text: string;
   errors?: string[];
+  /** The scene as it was BEFORE this run, for one-click restore. */
+  restore?: any;
 };
 
 /** Enough rounds for a multi-step request; few enough that a loop cannot run away. */
@@ -140,6 +142,23 @@ export default function CopilotPanel() {
 
   const applyOperations = async (operations: any[]) => {
     const failures: string[] = [];
+
+    /*
+     * Each operation is isolated.
+     *
+     * Without this, one throw from the engine escapes the whole run: the loop
+     * stops mid-batch, the remaining operations never happen, and the scene is
+     * left half-edited with the agent's own record of what it did now wrong.
+     * A failure that costs one operation and reports itself is recoverable; one
+     * that abandons the batch silently is what makes a scene look broken.
+     */
+    const isolate = (label: string, work: () => void) => {
+      try {
+        work();
+      } catch (cause: any) {
+        failures.push(`${label}: ${cause?.message || "the engine refused that change"}`);
+      }
+    };
     for (const operation of operations) {
       const state: any = projectStore.getState();
 
@@ -242,6 +261,26 @@ export default function CopilotPanel() {
     return failures;
   };
 
+  /**
+   * Put the scene back exactly as it was before a run.
+   *
+   * A whole-document import rather than a stack of undos: an agent run is many
+   * edits across several rounds, and unwinding them one at a time is both slow
+   * and fragile if any of them failed halfway.
+   */
+  const restoreScene = async (snapshot: any) => {
+    if (!snapshot) return;
+    try {
+      await core.project.import(JSON.parse(JSON.stringify(snapshot)));
+      setTurns((prev) => [...prev, { role: "assistant", text: "Put the scene back." }]);
+    } catch (cause: any) {
+      setTurns((prev) => [
+        ...prev,
+        { role: "assistant", text: `Could not restore the scene: ${cause?.message || "unknown error"}` },
+      ]);
+    }
+  };
+
   const send = async (text?: string) => {
     const instruction = String(text ?? draft).trim();
     if (!instruction || busy) return;
@@ -249,6 +288,23 @@ export default function CopilotPanel() {
     setDraft("");
     setTurns((prev) => [...prev, { role: "user", text: instruction }]);
     setBusy(true);
+
+    /*
+     * The scene as it stands, before the agent touches anything.
+     *
+     * An agent run is many edits across several rounds, so the engine's own
+     * history holds dozens of entries and Cmd+Z nudges one of them. That is the
+     * difference between "I did not like that" and "it broke my scene and I
+     * cannot get it back". One restore point per run makes the whole thing one
+     * click to undo, whatever went wrong inside it.
+     */
+    const before = (() => {
+      try {
+        return JSON.parse(JSON.stringify(core.project.export()));
+      } catch {
+        return null;
+      }
+    })();
 
     try {
       const plan = getHostCallbacks().planAgentEdit;
@@ -384,6 +440,7 @@ export default function CopilotPanel() {
           role: "assistant",
           text: [message, summary, stopped].filter(Boolean).join(" "),
           errors: failures,
+          restore: totalOperations > 0 ? before : undefined,
         },
       ]);
     } catch (cause: any) {
@@ -439,6 +496,16 @@ export default function CopilotPanel() {
               {/* The refusals, in the tool's own words. "It didn't work" tells
                   you nothing you can act on; "no clip with id x" tells you the
                   model guessed, and asking again usually fixes it. */}
+              {turn.restore ? (
+                <button
+                  type="button"
+                  onClick={() => restoreScene(turn.restore)}
+                  title="Put the scene back exactly as it was before this run"
+                  className="mt-1.5 rounded border-[2px] border-black bg-muted px-2 py-1 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-accent"
+                >
+                  Undo this run
+                </button>
+              ) : null}
               {turn.errors?.length ? (
                 <div className="mt-1 rounded border border-brand-danger/40 bg-brand-danger/10 p-1.5">
                   {turn.errors.map((error) => (
