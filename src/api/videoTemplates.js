@@ -305,8 +305,8 @@ const transcribeMedia = async (url) => backend.post('/video/transcribe', { url }
  * @param {string} instruction
  * @returns {Promise<{message: string, calls: Array<{name: string, args: object}>}>}
  */
-const planAgentEdit = async (document, tools, instruction) =>
-	backend.post('/video/templates/agent', { document, tools, instruction });
+const planAgentEdit = async (document, tools, instruction, history = []) =>
+	backend.post('/video/templates/agent', { document, tools, instruction, history });
 
 const searchStockAssets = async (kind, query, page = 1) => {
 	const params = new URLSearchParams({ query, page: String(page) });

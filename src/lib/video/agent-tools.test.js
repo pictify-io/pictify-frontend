@@ -18,7 +18,7 @@ import {
 	planToolCalls,
 	describeDocument,
 	summarizeOperations,
-	describeCapabilities
+	searchCatalogue
 } from './agent-tools.js';
 
 const S = 1_000_000;
@@ -363,16 +363,50 @@ test('a shape gets a fill even when none was given', () => {
 	assert.match(operations[0].clip.style.fill, /^#[0-9a-f]{6}$/i);
 });
 
-// ── Capabilities ─────────────────────────────────────────────────────────
+// ── Discovery ────────────────────────────────────────────────────────────
 
-test('the capability lists are capped, so the prompt stays affordable', () => {
-	const many = Array.from({ length: 200 }, (_, i) => `effect${i}`);
-	const described = describeCapabilities({ effects: many }, 5);
-	assert.equal(described.effects.split(', ').length, 5);
+test('a lookup returns matching names, not the whole catalogue', () => {
+	// The point of discovery is keeping thousands of tokens out of the prompt.
+	const found = searchCatalogue(['oldFilm', 'filmStripPro', 'glitch', 'invert'], 'film');
+	assert.deepEqual(found.names, ['oldFilm', 'filmStripPro']);
 });
 
-test('describing an empty vocabulary is safe', () => {
-	assert.deepEqual(describeCapabilities(), { effects: '', animations: '', transitions: '' });
+test('matching is case-insensitive', () => {
+	assert.deepEqual(searchCatalogue(['oldFilm'], 'FILM').names, ['oldFilm']);
+});
+
+test('results are capped so a one-letter query cannot dump everything', () => {
+	const many = Array.from({ length: 200 }, (_, i) => `effect${i}`);
+	assert.equal(searchCatalogue(many, 'effect', 5).names.length, 5);
+	assert.equal(searchCatalogue(many, 'effect', 5).total, 200, 'the true count is still reported');
+});
+
+test('a query matching nothing falls back to what exists', () => {
+	// "Here is what there is" beats "no": the model asked for something and can
+	// pick the nearest rather than inventing a name.
+	const found = searchCatalogue(['invert', 'glitch'], 'sparkle');
+	assert.deepEqual(found.names, ['invert', 'glitch']);
+});
+
+test('an empty query lists from the top', () => {
+	assert.equal(searchCatalogue(['a', 'b'], '').names.length, 2);
+	assert.deepEqual(searchCatalogue(null, 'x').names, []);
+});
+
+test('lookups resolve to a query operation, never a document change', () => {
+	const { operations } = planToolCalls(doc(), [call('list_effects', { query: 'film' })]);
+	assert.deepEqual(operations[0], {
+		tool: 'list_effects',
+		op: 'query',
+		list: 'effects',
+		query: 'film'
+	});
+});
+
+test('a turn that only looked things up reports no change', () => {
+	// Claiming "changed 1 clip" after a lookup would be a lie.
+	const { operations } = planToolCalls(doc(), [call('list_effects', { query: 'film' })]);
+	assert.match(summarizeOperations(operations), /Nothing changed/);
 });
 
 // ── Reporting ────────────────────────────────────────────────────────────

@@ -27,7 +27,7 @@ import {
   toolSchema,
   planToolCalls,
   summarizeOperations,
-  describeCapabilities,
+  searchCatalogue,
 } from "../../../agent-tools";
 import { EFFECT_OPTIONS } from "../../../effects";
 import { IN_PRESETS, OUT_PRESETS, buildAnimation, withAnimationMeta } from "../../../animations";
@@ -86,9 +86,14 @@ export default function CopilotPanel() {
       const document: any = projectStore.getState();
 
       /*
-       * The vocabulary comes from the ENGINE's own registries, and goes to the
-       * model as well as to the validator. A model guessing "sparkle" as an
-       * effect fails every time; handed the real names it picks one that exists.
+       * The catalogues stay OUT of the prompt.
+       *
+       * Pasting them in costs thousands of tokens every turn to name 51
+       * effects, 123 presets and 68 transitions, nearly all of which the
+       * request never mentions. Instead the model looks things up: it asks for
+       * "film", gets `oldFilm` back, and calls add_effect with a name that
+       * exists. One extra round trip on the requests that need it, nothing on
+       * the ones that do not.
        */
       const vocabulary = {
         effects: EFFECT_OPTIONS().map((option: any) => option.value),
@@ -96,19 +101,40 @@ export default function CopilotPanel() {
         transitions: TRANSITION_OPTIONS().map((option: any) => option.value),
       };
 
-      const reply = await plan(
-        { ...describeDocument(document), can: describeCapabilities(vocabulary) },
-        toolSchema(),
-        instruction
-      );
+      const history: Array<{ role: string; content: string }> = [];
+      let operations: any[] = [];
+      let errors: any[] = [];
+      let message = "";
 
-      // Validated against the LIVE document, not the snapshot sent to the
-      // model: the user may have moved something while it was thinking.
-      const { operations, errors } = planToolCalls(
-        projectStore.getState() as any,
-        reply.calls || [],
-        vocabulary
-      );
+      // Bounded: a model that keeps looking things up instead of acting would
+      // otherwise loop until the user gives up. Three rounds is enough for
+      // "look up an effect, look up a preset, then act".
+      for (let round = 0; round < 3; round += 1) {
+        const reply = await plan(describeDocument(document), toolSchema(), instruction, history);
+        message = reply.message || message;
+
+        // Validated against the LIVE document, not the snapshot sent to the
+        // model: the user may have moved something while it was thinking.
+        const planned = planToolCalls(
+          projectStore.getState() as any,
+          reply.calls || [],
+          vocabulary
+        );
+
+        const lookups = planned.operations.filter((op: any) => op.op === "query");
+        operations = planned.operations.filter((op: any) => op.op !== "query");
+        errors = planned.errors;
+
+        // Anything to apply, or nothing left to look up: stop asking.
+        if (!lookups.length || operations.length) break;
+
+        const answers = lookups.map((lookup: any) => {
+          const found = searchCatalogue(vocabulary[lookup.list as keyof typeof vocabulary], lookup.query);
+          return `${lookup.list} matching "${lookup.query}" (${found.total} total): ${found.names.join(", ")}`;
+        });
+        history.push({ role: "assistant", content: JSON.stringify({ calls: reply.calls }) });
+        history.push({ role: "user", content: answers.join("\n") });
+      }
 
       const failures = errors.map((e) => `${e.name}: ${e.error}`);
 
@@ -217,7 +243,7 @@ export default function CopilotPanel() {
         ...prev,
         {
           role: "assistant",
-          text: reply.message ? `${reply.message} ${summary}` : summary,
+          text: message ? `${message} ${summary}` : summary,
           errors: failures,
         },
       ]);

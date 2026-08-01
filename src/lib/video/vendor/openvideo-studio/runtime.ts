@@ -76,7 +76,13 @@ export interface HostCallbacks {
   planAgentEdit?: (
     document: object,
     tools: Array<any>,
-    instruction: string
+    instruction: string,
+    /**
+     * Earlier rounds of the SAME request: what the model already called and
+     * what its lookups returned. This is how it discovers effect and preset
+     * names instead of being handed every catalogue up front.
+     */
+    history?: Array<{ role: string; content: string }>
   ) => Promise<{ message: string; calls: Array<{ name: string; args: object }> }>;
 }
 

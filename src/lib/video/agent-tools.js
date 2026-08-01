@@ -100,21 +100,30 @@ export const describeDocument = (projectJson) => {
  */
 
 /**
- * The vocabulary as prompt text.
+ * Catalogue lookup, for the discovery tools.
  *
- * Truncated per list: the full catalogues are 51 effects, 123 presets and 68
- * transitions, which is thousands of tokens on every turn to name things the
- * user rarely asks for by name. The cap keeps the common ones available and
- * the validator still accepts anything in the full list, so a model that knows
- * a name not shown here is not punished for it.
+ * The alternative was pasting the catalogues into every prompt. They are 51
+ * effects, 123 animation presets and 68 transitions — thousands of tokens on
+ * every turn, nearly all of them naming things the user did not ask about, paid
+ * for whether the request mentions an effect or not.
+ *
+ * So the model LOOKS THINGS UP instead. It asks for "film" and gets `oldFilm`
+ * and `filmStripPro` back, then calls add_effect with a name that exists. The
+ * cost is one extra round trip on the requests that need it, and nothing at all
+ * on the ones that do not.
+ *
+ * Matching is substring, case-insensitive, and capped: "e" should not return
+ * the entire catalogue and undo the point of the exercise.
  */
-export const describeCapabilities = (vocabulary = {}, limit = 40) => {
-	const list = (values) => (values || []).slice(0, limit).join(', ');
-	return {
-		effects: list(vocabulary.effects),
-		animations: list(vocabulary.animations),
-		transitions: list(vocabulary.transitions)
-	};
+export const searchCatalogue = (values, query, limit = 25) => {
+	const all = values || [];
+	const needle = String(query || '').trim().toLowerCase();
+	const matched = needle ? all.filter((name) => name.toLowerCase().includes(needle)) : all;
+	// A search that matches nothing falls back to the head of the list rather
+	// than an empty array: the model asked for something, and "here is what
+	// exists" is more useful than "no".
+	const results = matched.length ? matched : all;
+	return { total: results.length, names: results.slice(0, limit) };
 };
 
 const inVocabulary = (values, name) =>
@@ -131,6 +140,36 @@ const inVocabulary = (values, name) =>
  * the engine directly — the executor stays pure so it can be tested.
  */
 export const TOOLS = [
+	/*
+	 * Discovery. These READ; they change nothing.
+	 *
+	 * The executor returns them as `query` operations for the caller to answer,
+	 * and the caller then asks the model again with the results. That loop is
+	 * what keeps the catalogues out of the prompt.
+	 */
+	{
+		name: 'list_effects',
+		description:
+			'Look up available visual effects by keyword before using add_effect. Returns real effect keys.',
+		params: { query: 'string, e.g. "film" or "glitch"' },
+		validate: () => null,
+		apply: (doc, args) => ({ op: 'query', list: 'effects', query: String(args.query || '') })
+	},
+	{
+		name: 'list_animations',
+		description:
+			'Look up entrance and exit animation presets by keyword before using set_animation.',
+		params: { query: 'string, e.g. "fade" or "slide"' },
+		validate: () => null,
+		apply: (doc, args) => ({ op: 'query', list: 'animations', query: String(args.query || '') })
+	},
+	{
+		name: 'list_transitions',
+		description: 'Look up transition keys by keyword before using add_transition.',
+		params: { query: 'string, e.g. "wipe" or "zoom"' },
+		validate: () => null,
+		apply: (doc, args) => ({ op: 'query', list: 'transitions', query: String(args.query || '') })
+	},
 	{
 		name: 'set_text',
 		description: "Change a text clip's words.",
@@ -520,8 +559,10 @@ export const planToolCalls = (projectJson, calls, vocabulary = {}) => {
 
 /** A short, human sentence for what a batch did, for the chat transcript. */
 export const summarizeOperations = (operations) => {
-	if (!operations?.length) return 'Nothing changed.';
-	const counts = operations.reduce((acc, op) => {
+	// Lookups are not edits: a turn that only looked things up changed nothing.
+	const changes = (operations || []).filter((op) => op.op !== 'query');
+	if (!changes.length) return 'Nothing changed.';
+	const counts = changes.reduce((acc, op) => {
 		acc[op.op] = (acc[op.op] || 0) + 1;
 		return acc;
 	}, {});
