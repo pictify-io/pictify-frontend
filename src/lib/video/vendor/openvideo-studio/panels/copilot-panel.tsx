@@ -27,7 +27,16 @@ import {
   toolSchema,
   planToolCalls,
   summarizeOperations,
+  describeCapabilities,
 } from "../../../agent-tools";
+import { EFFECT_OPTIONS } from "../../../effects";
+import { IN_PRESETS, OUT_PRESETS, buildAnimation, withAnimationMeta } from "../../../animations";
+import {
+  TRANSITION_OPTIONS,
+  previousClip,
+  incomingTransition,
+  createTransitionClip,
+} from "../../../transitions";
 
 type Turn = {
   role: "user" | "assistant";
@@ -75,19 +84,132 @@ export default function CopilotPanel() {
       if (!plan) throw new Error("The copilot is not available in this editor.");
 
       const document: any = projectStore.getState();
-      const reply = await plan(describeDocument(document), toolSchema(), instruction);
+
+      /*
+       * The vocabulary comes from the ENGINE's own registries, and goes to the
+       * model as well as to the validator. A model guessing "sparkle" as an
+       * effect fails every time; handed the real names it picks one that exists.
+       */
+      const vocabulary = {
+        effects: EFFECT_OPTIONS().map((option: any) => option.value),
+        animations: [...IN_PRESETS(), ...OUT_PRESETS()].map((option: any) => option.value),
+        transitions: TRANSITION_OPTIONS().map((option: any) => option.value),
+      };
+
+      const reply = await plan(
+        { ...describeDocument(document), can: describeCapabilities(vocabulary) },
+        toolSchema(),
+        instruction
+      );
 
       // Validated against the LIVE document, not the snapshot sent to the
       // model: the user may have moved something while it was thinking.
       const { operations, errors } = planToolCalls(
         projectStore.getState() as any,
-        reply.calls || []
+        reply.calls || [],
+        vocabulary
       );
 
+      const failures = errors.map((e) => `${e.name}: ${e.error}`);
+
       for (const operation of operations) {
-        if (operation.op === "add") core.clip.add({ id: generateId(), ...operation.clip } as any);
-        else if (operation.op === "remove") core.clip.remove([operation.clipId]);
-        else core.clip.update(operation.clipId, operation.patch);
+        const state: any = projectStore.getState();
+
+        if (operation.op === "add") {
+          core.clip.add({ id: generateId(), ...operation.clip } as any);
+        } else if (operation.op === "remove") {
+          core.clip.remove([operation.clipId]);
+        } else if (operation.op === "animate") {
+          // Resolved here because composing presets into keyframes needs the
+          // engine's preset registry, which the pure tool module cannot import.
+          const clip = state.clips[operation.clipId];
+          const display = clip?.timing?.display || {};
+          const durationUs = Math.max(0, (display.to ?? 0) - (display.from ?? 0));
+          const selection = {
+            inPreset: operation.inPreset,
+            outPreset: operation.outPreset,
+            emphasisPreset: "",
+          };
+          core.clip.update(operation.clipId, {
+            animations: buildAnimation(selection, durationUs) ?? [],
+            metadata: withAnimationMeta(clip, selection),
+          });
+        } else if (operation.op === "transition") {
+          // A transition is its own clip joining a PAIR, so it needs the track
+          // order to find what comes before.
+          const clip = state.clips[operation.clipId];
+          const previous = previousClip(state.clips, state.tracks, clip);
+          if (!previous) {
+            failures.push("add_transition: nothing before that clip to blend from.");
+          } else {
+            const existing = incomingTransition(state.clips, clip);
+            if (existing) core.clip.remove([existing.id]);
+            core.clip.add(
+              createTransitionClip({
+                fromClip: previous,
+                toClip: clip,
+                key: operation.transitionKey,
+                durationUs: operation.durationUs,
+              }) as any
+            );
+          }
+        } else if (operation.op === "stock") {
+          // The only operation that needs the network.
+          const search = getHostCallbacks().searchStock;
+          if (!search) {
+            failures.push("add_stock: stock search is not available.");
+            continue;
+          }
+          try {
+            const found = await search(operation.kind, operation.query, 1);
+            const item = found?.items?.[0];
+            if (!item) {
+              failures.push(`add_stock: nothing found for "${operation.query}".`);
+              continue;
+            }
+            const settings = state.settings || {};
+            const compW = settings.width || 1080;
+            const compH = settings.height || 1920;
+            // Fit inside the canvas without distorting: stretching stock
+            // footage to the frame is the most obvious way a video looks wrong.
+            const ratio = (item.width || compW) / (item.height || compH);
+            let w = compW;
+            let h = Math.round(w / ratio);
+            if (h > compH) {
+              h = compH;
+              w = Math.round(h * ratio);
+            }
+            const span = Math.max(1, operation.durationUs);
+            core.clip.add({
+              id: generateId(),
+              type: operation.kind === "video" ? "Video" : "Image",
+              name: item.name || "Stock",
+              src: item.url,
+              timing: {
+                display: { from: operation.fromUs, to: operation.fromUs + span },
+                trim: { from: 0, to: span },
+                duration: span,
+                playbackRate: 1,
+              },
+              transform: {
+                x: Math.round((compW - w) / 2),
+                y: Math.round((compH - h) / 2),
+                width: w,
+                height: h,
+                angle: 0,
+                opacity: 1,
+                zIndex: 1,
+              },
+              style: {},
+              metadata: { stock: item.credit || null },
+              locked: false,
+            } as any);
+          } catch (cause: any) {
+            failures.push(`add_stock: ${cause?.message || "search failed"}.`);
+          }
+        } else {
+          core.clip.update(operation.clipId, operation.patch);
+        }
       }
 
       const summary = summarizeOperations(operations);
@@ -96,7 +218,7 @@ export default function CopilotPanel() {
         {
           role: "assistant",
           text: reply.message ? `${reply.message} ${summary}` : summary,
-          errors: errors.map((e) => `${e.name}: ${e.error}`),
+          errors: failures,
         },
       ]);
       if (operations.length) getHostCallbacks().onClipStyleChange?.(operations[0].clipId || "");

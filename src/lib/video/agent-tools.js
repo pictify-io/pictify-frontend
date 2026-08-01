@@ -28,6 +28,8 @@
  * puts it near the top, on any canvas.
  */
 
+import { createEffectClip } from './effect-params.js';
+
 const SECOND = 1_000_000;
 
 /** Fraction of a dimension to whole pixels. */
@@ -81,6 +83,44 @@ export const describeDocument = (projectJson) => {
 		clips
 	};
 };
+
+/**
+ * What the model is allowed to name.
+ *
+ * Effect keys, animation presets and transition keys all come from the ENGINE's
+ * registries, which cannot be imported here — they pull in PixiJS and this
+ * module has to stay loadable under `node --test`. So the caller passes them in
+ * and the validators check against them.
+ *
+ * That has a second, more important effect: the same lists go to the model. A
+ * model guessing "sparkle" as an effect fails validation every time; a model
+ * handed the real 51 names picks one that exists.
+ *
+ * @typedef {{effects?: string[], animations?: string[], transitions?: string[]}} Vocabulary
+ */
+
+/**
+ * The vocabulary as prompt text.
+ *
+ * Truncated per list: the full catalogues are 51 effects, 123 presets and 68
+ * transitions, which is thousands of tokens on every turn to name things the
+ * user rarely asks for by name. The cap keeps the common ones available and
+ * the validator still accepts anything in the full list, so a model that knows
+ * a name not shown here is not punished for it.
+ */
+export const describeCapabilities = (vocabulary = {}, limit = 40) => {
+	const list = (values) => (values || []).slice(0, limit).join(', ');
+	return {
+		effects: list(vocabulary.effects),
+		animations: list(vocabulary.animations),
+		transitions: list(vocabulary.transitions)
+	};
+};
+
+const inVocabulary = (values, name) =>
+	// No list supplied means the caller cannot check, so do not block the call —
+	// the panel validates again before applying.
+	!values?.length || values.includes(name);
 
 /**
  * The tools, in the order they appear to the model.
@@ -221,6 +261,155 @@ export const TOOLS = [
 		apply: (doc, args) => ({ op: 'remove', clipId: args.clipId })
 	},
 	{
+		name: 'add_effect',
+		description:
+			'Apply a visual effect over the whole frame for a stretch of time. Use one of the listed effect keys.',
+		params: { effectKey: 'string', startS: 'number', durationS: 'number' },
+		validate: (doc, args, vocabulary) => {
+			if (typeof args.effectKey !== 'string' || !args.effectKey) return 'effectKey is required.';
+			if (!inVocabulary(vocabulary?.effects, args.effectKey))
+				return `No effect called ${args.effectKey}.`;
+			return null;
+		},
+		apply: (doc, args) => ({
+			op: 'add',
+			// createEffectClip owns the z-index that puts an effect ABOVE the
+			// content it shades — below it, the effect renders nothing at all.
+			clip: createEffectClip({
+				key: args.effectKey,
+				fromUs: toUs(args.startS ?? 0),
+				durationUs: toUs(args.durationS ?? 3)
+			})
+		})
+	},
+	{
+		name: 'set_animation',
+		description:
+			'Give a clip an entrance and/or exit animation, by preset name from the list.',
+		params: { clipId: 'string', inPreset: 'string or empty', outPreset: 'string or empty' },
+		validate: (doc, args, vocabulary) => {
+			if (!doc.clips?.[args.clipId]) return `No clip with id ${args.clipId}.`;
+			for (const key of ['inPreset', 'outPreset']) {
+				const value = args[key];
+				if (value && !inVocabulary(vocabulary?.animations, value))
+					return `No animation called ${value}.`;
+			}
+			if (!args.inPreset && !args.outPreset) return 'Give at least one preset.';
+			return null;
+		},
+		// Resolved by the caller: composing presets into keyframes needs the
+		// engine's preset registry, which this module cannot import.
+		apply: (doc, args) => ({
+			op: 'animate',
+			clipId: args.clipId,
+			inPreset: args.inPreset || '',
+			outPreset: args.outPreset || ''
+		})
+	},
+	{
+		name: 'add_transition',
+		description:
+			'Blend from the previous clip into this one. Use a transition key from the list.',
+		params: { clipId: 'string', transitionKey: 'string', durationS: 'number' },
+		validate: (doc, args, vocabulary) => {
+			if (!doc.clips?.[args.clipId]) return `No clip with id ${args.clipId}.`;
+			if (!args.transitionKey) return 'transitionKey is required.';
+			if (!inVocabulary(vocabulary?.transitions, args.transitionKey))
+				return `No transition called ${args.transitionKey}.`;
+			return null;
+		},
+		// Also caller-resolved: a transition is its own clip joining a PAIR, and
+		// finding the previous clip needs the track order.
+		apply: (doc, args) => ({
+			op: 'transition',
+			clipId: args.clipId,
+			transitionKey: args.transitionKey,
+			durationUs: toUs(args.durationS ?? 0.6)
+		})
+	},
+	{
+		name: 'add_stock',
+		description:
+			'Search the stock library and place the first good match. kind is "image" or "video".',
+		params: { kind: 'image or video', query: 'string', startS: 'number', durationS: 'number' },
+		validate: (doc, args) => {
+			if (args.kind !== 'image' && args.kind !== 'video') return 'kind must be image or video.';
+			if (typeof args.query !== 'string' || !args.query.trim()) return 'query is required.';
+			return null;
+		},
+		// The only tool that needs the network. Resolved by the caller, which
+		// owns the stock client; planning stays synchronous and pure.
+		apply: (doc, args) => ({
+			op: 'stock',
+			kind: args.kind,
+			query: args.query.trim(),
+			fromUs: toUs(args.startS ?? 0),
+			durationUs: toUs(args.durationS ?? 5)
+		})
+	},
+	{
+		name: 'add_shape',
+		description: 'Add a coloured rectangle. Geometry is fractions of the canvas.',
+		params: {
+			x: 'number 0-1',
+			y: 'number 0-1',
+			width: 'number 0-1',
+			height: 'number 0-1',
+			fill: 'string hex',
+			radius: 'number 0-1',
+			startS: 'number',
+			durationS: 'number'
+		},
+		validate: (doc, args) => {
+			for (const key of ['x', 'y', 'width', 'height']) {
+				if (num(args[key]) === null) return `${key} must be a number.`;
+			}
+			if (Number(args.width) <= 0 || Number(args.height) <= 0)
+				return 'width and height must be greater than zero.';
+			return null;
+		},
+		apply: (doc, args) => {
+			const { width = 1080, height = 1920 } = doc.settings || {};
+			const from = toUs(args.startS ?? 0);
+			const span = Math.max(1, toUs(args.durationS ?? 5));
+			const w = Math.max(1, toPx(clampFraction(args.width), width));
+			const h = Math.max(1, toPx(clampFraction(args.height), height));
+			return {
+				op: 'add',
+				clip: {
+					type: 'Shape',
+					name: 'Shape',
+					shapeType: 'rectangle',
+					src: 'shape://rectangle',
+					timing: {
+						display: { from, to: from + span },
+						trim: { from: 0, to: span },
+						duration: span,
+						playbackRate: 1
+					},
+					transform: {
+						// Centred on the point, like add_text: x is where the shape
+						// should BE, not where its left edge goes.
+						x: toPx(clampFraction(args.x), width) - Math.round(w / 2),
+						y: toPx(clampFraction(args.y), height) - Math.round(h / 2),
+						width: w,
+						height: h,
+						angle: 0,
+						opacity: 1,
+						zIndex: 2
+					},
+					style: {
+						fill: /^#[0-9a-f]{3,8}$/i.test(String(args.fill || '')) ? args.fill : '#3b82f6',
+						fillOpacity: 1,
+						borderRadius: Math.round(clampFraction(args.radius ?? 0) * Math.min(w, h))
+					},
+					metadata: {},
+					locked: false
+				}
+			};
+		}
+	},
+	{
 		name: 'add_text',
 		description:
 			'Add a text clip. x and y are fractions of the canvas; size is a fraction of the canvas height.',
@@ -306,7 +495,7 @@ export const toolSchema = () =>
  * @param {Array<{name: string, args: object}>} calls
  * @returns {{operations: Array, errors: Array<{name: string, error: string}>}}
  */
-export const planToolCalls = (projectJson, calls) => {
+export const planToolCalls = (projectJson, calls, vocabulary = {}) => {
 	const doc = projectJson || {};
 	const operations = [];
 	const errors = [];
@@ -318,7 +507,7 @@ export const planToolCalls = (projectJson, calls) => {
 			continue;
 		}
 		const args = call.args || {};
-		const problem = tool.validate(doc, args);
+		const problem = tool.validate(doc, args, vocabulary);
 		if (problem) {
 			errors.push({ name: tool.name, error: problem });
 			continue;
@@ -340,5 +529,8 @@ export const summarizeOperations = (operations) => {
 	if (counts.add) parts.push(`added ${counts.add} clip${counts.add === 1 ? '' : 's'}`);
 	if (counts.update) parts.push(`changed ${counts.update} clip${counts.update === 1 ? '' : 's'}`);
 	if (counts.remove) parts.push(`removed ${counts.remove} clip${counts.remove === 1 ? '' : 's'}`);
+	if (counts.animate) parts.push(`animated ${counts.animate} clip${counts.animate === 1 ? '' : 's'}`);
+	if (counts.transition) parts.push(`added ${counts.transition} transition${counts.transition === 1 ? '' : 's'}`);
+	if (counts.stock) parts.push(`added ${counts.stock} stock clip${counts.stock === 1 ? '' : 's'}`);
 	return `${parts.join(', ').replace(/^./, (c) => c.toUpperCase())}.`;
 };

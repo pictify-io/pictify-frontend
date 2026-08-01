@@ -17,7 +17,8 @@ import {
 	toolSchema,
 	planToolCalls,
 	describeDocument,
-	summarizeOperations
+	summarizeOperations,
+	describeCapabilities
 } from './agent-tools.js';
 
 const S = 1_000_000;
@@ -261,6 +262,117 @@ test('planning never mutates the document', () => {
 test('an empty or missing call list is a no-op', () => {
 	assert.deepEqual(planToolCalls(doc(), []).operations, []);
 	assert.deepEqual(planToolCalls(doc(), null).errors, []);
+});
+
+// ── The vocabulary gate ──────────────────────────────────────────────────
+
+const vocab = {
+	effects: ['invert', 'glitch', 'oldFilm'],
+	animations: ['fadeIn', 'slideInLeft'],
+	transitions: ['fade', 'wipeLeft']
+};
+
+test('an effect the engine does not have is refused', () => {
+	// The model guesses "sparkle" if it is not told the real names.
+	const { errors } = planToolCalls(doc(), [call('add_effect', { effectKey: 'sparkle' })], vocab);
+	assert.match(errors[0].error, /No effect called sparkle/);
+});
+
+test('a real effect key lands, above the content it shades', () => {
+	const { operations, errors } = planToolCalls(
+		doc(),
+		[call('add_effect', { effectKey: 'invert', startS: 1, durationS: 2 })],
+		vocab
+	);
+	assert.equal(errors.length, 0);
+	assert.equal(operations[0].clip.effectKey, 'invert');
+	// Below the content, an effect renders nothing at all.
+	assert.ok(operations[0].clip.transform.zIndex > 100);
+	assert.equal(operations[0].clip.timing.display.from, 1 * S);
+});
+
+test('an unknown animation preset or transition is refused', () => {
+	const bad = planToolCalls(doc(), [call('set_animation', { clipId: 't1', inPreset: 'zoomy' })], vocab);
+	assert.match(bad.errors[0].error, /No animation called zoomy/);
+	const worse = planToolCalls(doc(), [call('add_transition', { clipId: 't1', transitionKey: 'swoosh' })], vocab);
+	assert.match(worse.errors[0].error, /No transition called swoosh/);
+});
+
+test('with no vocabulary supplied, names are not blocked', () => {
+	// The caller could not check, and the panel validates again before applying.
+	const { errors } = planToolCalls(doc(), [call('add_effect', { effectKey: 'anything' })]);
+	assert.equal(errors.length, 0);
+});
+
+test('animation and transition are left for the caller to resolve', () => {
+	// Composing presets into keyframes needs the engine's registry, and a
+	// transition joins a PAIR, which needs the track order.
+	const { operations } = planToolCalls(
+		doc(),
+		[
+			call('set_animation', { clipId: 't1', inPreset: 'fadeIn' }),
+			call('add_transition', { clipId: 't1', transitionKey: 'fade', durationS: 0.5 })
+		],
+		vocab
+	);
+	assert.equal(operations[0].op, 'animate');
+	assert.equal(operations[1].op, 'transition');
+	assert.equal(operations[1].durationUs, 500_000);
+});
+
+test('set_animation needs at least one preset', () => {
+	const { errors } = planToolCalls(doc(), [call('set_animation', { clipId: 't1' })], vocab);
+	assert.equal(errors.length, 1);
+});
+
+// ── Stock and shapes ─────────────────────────────────────────────────────
+
+test('stock is a resolve step, not a document change', () => {
+	// The only tool that needs the network; planning stays synchronous.
+	const { operations } = planToolCalls(doc(), [
+		call('add_stock', { kind: 'image', query: 'mountains', durationS: 4 })
+	]);
+	assert.equal(operations[0].op, 'stock');
+	assert.equal(operations[0].query, 'mountains');
+	assert.equal(operations[0].durationUs, 4 * S);
+});
+
+test('a stock kind that is not image or video is refused', () => {
+	const { errors } = planToolCalls(doc(), [call('add_stock', { kind: 'gif', query: 'x' })]);
+	assert.equal(errors.length, 1);
+});
+
+test('an empty stock query is refused', () => {
+	const { errors } = planToolCalls(doc(), [call('add_stock', { kind: 'image', query: '  ' })]);
+	assert.equal(errors.length, 1);
+});
+
+test('a shape is centred on its point, like text', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('add_shape', { x: 0.5, y: 0.5, width: 0.5, height: 0.1 })
+	]);
+	const t = operations[0].clip.transform;
+	assert.equal(t.x + Math.round(t.width / 2), 540);
+	assert.equal(t.y + Math.round(t.height / 2), 960);
+});
+
+test('a shape gets a fill even when none was given', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('add_shape', { x: 0.5, y: 0.5, width: 0.5, height: 0.1, fill: 'blueish' })
+	]);
+	assert.match(operations[0].clip.style.fill, /^#[0-9a-f]{6}$/i);
+});
+
+// ── Capabilities ─────────────────────────────────────────────────────────
+
+test('the capability lists are capped, so the prompt stays affordable', () => {
+	const many = Array.from({ length: 200 }, (_, i) => `effect${i}`);
+	const described = describeCapabilities({ effects: many }, 5);
+	assert.equal(described.effects.split(', ').length, 5);
+});
+
+test('describing an empty vocabulary is safe', () => {
+	assert.deepEqual(describeCapabilities(), { effects: '', animations: '', transitions: '' });
 });
 
 // ── Reporting ────────────────────────────────────────────────────────────
