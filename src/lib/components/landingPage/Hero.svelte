@@ -162,15 +162,17 @@
 					><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z" /></svg
 				>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Image Generation API</span
+					>Document Workflows</span
 				>
 			</div>
 
 			<!-- Headline -->
-			<h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
-				Generate Images From Data.<br />
+			<h1
+				class="text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-gray-900 mb-5 lg:mb-4 leading-[1.1]"
+			>
+				Turn Spreadsheets Into<br />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
-					One API Call
+					Branded Documents
 					<!-- Scribble Underline -->
 					<svg
 						class="absolute w-full h-4 sm:h-5 -bottom-2 sm:-bottom-3 left-0 text-black z-[-1] opacity-20"
@@ -179,28 +181,29 @@
 					>
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
 					</svg>
-				</span>.
+				</span>, Delivered.
 			</h1>
 
 			<!-- Subheadline -->
-			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium mb-10">
-				Replace edge-case Puppeteer scripts, hacks, and rendering microservices with a single
-				endpoint. Template + JSON in, pixel-perfect image out in &lt;200ms.
+			<p class="text-lg lg:text-base xl:text-lg text-gray-700 max-w-2xl mx-auto font-medium mb-8 lg:mb-6">
+				Upload a spreadsheet or point a webhook — every row becomes a branded certificate, badge or
+				report, rendered and delivered. Plus a rendering API for developers.
 			</p>
 
 			<!-- CTAs -->
 			<div class="flex flex-col items-center justify-center gap-4">
 				<div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
 					<SignUpButton
-						text="Start Building Free"
+						text="Start Free"
 						location="hero"
-						class="w-full sm:w-auto bg-brand-danger text-white text-lg px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider text-center"
+						href="/signup"
+						class="w-full sm:w-auto bg-brand-danger text-white text-lg lg:text-base px-8 lg:px-6 py-4 lg:py-3 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider text-center"
 					/>
 
 					<a
 						href="https://docs.pictify.io"
 						target="_blank"
-						class="w-full sm:w-auto group flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 text-lg rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-bold"
+						class="w-full sm:w-auto group flex items-center justify-center gap-2 px-8 lg:px-6 py-4 lg:py-3 bg-white text-gray-900 text-lg lg:text-base rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-bold"
 						on:click={() =>
 							analytics.trackOutboundLink({
 								url: 'https://docs.pictify.io',
@@ -244,7 +247,7 @@
 		<!-- ============================================== -->
 		<!-- V4 CREATIVE: SPLIT PANE INTERACTIVE DEMO       -->
 		<!-- ============================================== -->
-		<div class="mt-16 sm:mt-24 w-full relative z-10 max-w-6xl mx-auto">
+		<div class="mt-12 sm:mt-16 lg:mt-12 w-full relative z-10 max-w-6xl mx-auto">
 			<div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center lg:items-stretch">
 				<!-- Left Side: Interactive Inputs (Floating White Card) -->
 				<div class="w-full lg:w-[42%] flex flex-col justify-center relative">
@@ -254,20 +257,20 @@
 					/>
 
 					<div
-						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl p-8 sm:p-10 relative z-10 flex flex-col h-full group"
+						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl p-6 sm:p-8 lg:p-6 xl:p-8 relative z-10 flex flex-col h-full group"
 					>
 						<!-- Quirky Floating Label -->
 						<div
 							class="absolute -top-4 -right-4 bg-brand-accent border-[3px] border-gray-900 rounded-xl px-4 py-1.5 shadow-brutal-lg transform rotate-6 group-hover:-rotate-3 transition-transform duration-300"
 						>
 							<span class="text-xs font-black uppercase text-gray-900 whitespace-nowrap"
-								>Edit JSON</span
+								>Row 1 of 240</span
 							>
 						</div>
 
-						<h3 class="text-2xl font-black text-gray-900 mb-2">Data Payload</h3>
+						<h3 class="text-2xl font-black text-gray-900 mb-2">Spreadsheet Row</h3>
 						<p class="text-sm text-gray-600 font-medium mb-8">
-							Changes re-render the image instantly via API.
+							Every row becomes its own document. Edit one to see it re-render.
 						</p>
 
 						<div class="mt-auto w-full flex flex-col gap-5">
@@ -346,13 +349,17 @@
 							class="bg-gray-100 flex items-center justify-between border-b-[3px] border-gray-900"
 						>
 							<div class="px-5 flex gap-2 h-full items-center py-4">
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-[2px] border-gray-900" />
+								<div
+									class="w-3.5 h-3.5 rounded-full bg-brand-danger border-[2px] border-gray-900"
+								/>
+								<div
+									class="w-3.5 h-3.5 rounded-full bg-brand-accent border-[2px] border-gray-900"
+								/>
 								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-[2px] border-gray-900" />
 							</div>
 							<div
-								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate cursor-pointer hover:bg-gray-50 transition-colors"
-								title="Open API Endpoint"
+								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate"
+								title="Row 1 of 240 — rendered and emailed"
 							>
 								<svg
 									class="w-4 h-4 shrink-0 text-[#1f2937]"
@@ -363,10 +370,14 @@
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="3"
-										d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 									/></svg
 								>
-								https://api.pictify.io/render/hero
+								<span class="truncate">certificate-row-1.pdf &rarr; ada@acme.com</span>
+								<span
+									class="ml-auto shrink-0 px-2 py-0.5 rounded bg-data-green border-[2px] border-gray-900 text-[9px] font-black uppercase tracking-wider"
+									>Delivered</span
+								>
 							</div>
 						</div>
 
@@ -398,7 +409,8 @@
 
 								<!-- The Rendered Image -->
 								{#if imageSrc}
-									<img loading="lazy"
+									<img
+										loading="lazy"
 										src={imageSrc}
 										alt="Live Pictify Demo"
 										class="w-full h-full object-contain rounded border-[3px] border-gray-900 shadow-brutal-2xl transition-opacity duration-300 relative z-10 bg-white"
@@ -431,7 +443,10 @@
 										<div
 											class="px-5 py-2.5 bg-white text-gray-900 font-black uppercase tracking-widest text-xs rounded border-[3px] border-gray-900 shadow-[4px_4px_0_0_#4ade80] animate-pulse flex items-center gap-2"
 										>
-											<svg class="w-4 h-4 animate-spin text-data-green" fill="none" viewBox="0 24 24"
+											<svg
+												class="w-4 h-4 animate-spin text-data-green"
+												fill="none"
+												viewBox="0 24 24"
 												><circle
 													class="opacity-25"
 													cx="12"

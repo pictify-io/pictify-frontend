@@ -51,6 +51,11 @@
 	$: progressColor = getProgressColor($usageWidget.percentage);
 	$: urgencyBg = getUrgencyBg($usageWidget.urgency);
 
+	// AI credits — a separate pool from render credits. null when the server
+	// doesn't report a balance yet, in which case the AI meter is hidden.
+	$: aiCredits = $usageWidget.aiCredits;
+	$: aiProgressColor = aiCredits ? getProgressColor(aiCredits.percentage) : '#10b981';
+
 	function getProgressColor(percentage) {
 		if (percentage >= 95) return '#ff6b6b';
 		if (percentage >= 85) return '#ff6b6b';
@@ -166,6 +171,36 @@
 								<span>{$usageWidget.limit} total</span>
 							</div>
 						</div>
+
+						<!-- AI credits (separate pool from renders) -->
+						{#if aiCredits}
+							<div class="space-y-2 pt-3 border-t-2 border-dashed border-gray-300">
+								<div
+									class="flex justify-between text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"
+								>
+									<span>AI Credits</span>
+									<span>Remaining: {formatNumber(aiCredits.remaining)}</span>
+								</div>
+								<div
+									class="h-4 sm:h-5 bg-white rounded-lg overflow-hidden border-2 border-gray-900 relative"
+								>
+									<div
+										class="absolute inset-0 opacity-10"
+										style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 4px 4px;"
+									/>
+									<div
+										class="h-full transition-all duration-500 border-r-2 border-gray-900 relative z-10"
+										style="width: {aiCredits.percentage}%; background-color: {aiProgressColor}"
+									/>
+								</div>
+								<div
+									class="flex justify-between text-[10px] font-black text-gray-900 uppercase tracking-wide mt-1"
+								>
+									<span>{formatNumber(aiCredits.used)} used</span>
+									<span>{formatNumber(aiCredits.limit)} total</span>
+								</div>
+							</div>
+						{/if}
 
 						<!-- Overage info -->
 						{#if showOverageInfo}
@@ -291,6 +326,39 @@
 					<span>100%</span>
 				</div>
 			</div>
+
+			<!-- AI credits (separate pool from renders) -->
+			{#if aiCredits}
+				<div class="mb-8 pt-6 border-t-[3px] border-gray-900">
+					<div class="flex items-end justify-between mb-3">
+						<div class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+							AI Credits
+						</div>
+						<div
+							class="font-mono text-sm font-black text-gray-900 bg-gray-50 px-2 py-1 rounded border-2 border-gray-200"
+						>
+							{formatNumber(aiCredits.used)} / {formatNumber(aiCredits.limit)}
+						</div>
+					</div>
+					<div class="flex gap-1 h-8">
+						{#each Array(10) as _, i}
+							<div
+								class="flex-1 rounded-sm border border-gray-900 transition-all duration-300
+	            {i < Math.floor(aiCredits.percentage / 10) ? 'opacity-100' : 'opacity-10 bg-gray-100'}"
+								style="background-color: {i < Math.floor(aiCredits.percentage / 10)
+									? aiProgressColor
+									: ''}"
+							/>
+						{/each}
+					</div>
+					<div
+						class="flex justify-between text-[10px] font-bold text-gray-600 uppercase tracking-widest px-1 mt-2"
+					>
+						<span>Copilot · AI Generate · Captions</span>
+						<span>{formatNumber(aiCredits.remaining)} left</span>
+					</div>
+				</div>
+			{/if}
 
 			<!-- Footer / Actions -->
 			{#if $usageWidget.showUpgrade}

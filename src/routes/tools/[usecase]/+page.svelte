@@ -52,7 +52,7 @@
 	let generationError = '';
 	let miniEditorRef;
 
-	function openInCanvasEditor() {
+	function openEditor() {
 		if (!validCase) return;
 		const label = config?.label || useCase?.label || useCaseId;
 		const templateData = getTemplateForUseCase(useCaseId, label);
@@ -78,7 +78,8 @@
 			// Logged in users go directly to image editor
 			goto('/template-workspace/image/create');
 		} else {
-			goto(`/canvas/try?usecase=${useCaseId}`);
+			// Guests sign up first, then land in the template creator.
+			goto('/dashboard/template/create');
 		}
 	}
 
@@ -420,7 +421,7 @@
 								<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
 									<button
 										type="button"
-										on:click={openInCanvasEditor}
+										on:click={openEditor}
 										class="flex-1 py-4 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
 									>
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -431,7 +432,7 @@
 												d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
 											/></svg
 										>
-										Open Editor — Free
+										Open Template Editor — Free
 									</button>
 									<button
 										type="button"
@@ -745,7 +746,7 @@
 				<div class="text-center mt-16 px-4">
 					<button
 						type="button"
-						on:click={openInCanvasEditor}
+						on:click={openEditor}
 						class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
 					>
 						Start Creating Now
@@ -786,19 +787,27 @@
 									</p>
 								</div>
 
-								<div class="flex flex-wrap gap-4">
+								<div class="flex flex-col gap-3">
+									<div class="flex flex-wrap gap-4">
+										<a
+											href="/signup"
+											class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-brand-danger hover:text-gray-900 transition-colors"
+										>
+											Get API Key
+										</a>
+										<a
+											href="https://docs.pictify.io"
+											target="_blank"
+											class="px-6 py-3 bg-white text-gray-900 font-bold border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors"
+										>
+											Read Docs
+										</a>
+									</div>
 									<a
 										href="/signup"
-										class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-brand-danger hover:text-gray-900 transition-colors"
+										class="w-fit text-sm font-black text-gray-900 underline decoration-4 decoration-brand-accent underline-offset-4 hover:text-brand-danger transition-colors"
 									>
-										Get API Key
-									</a>
-									<a
-										href="https://docs.pictify.io"
-										target="_blank"
-										class="px-6 py-3 bg-white text-gray-900 font-bold border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors"
-									>
-										Read Docs
+										Generate in bulk with Workflows →
 									</a>
 								</div>
 							</div>

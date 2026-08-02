@@ -1,0 +1,294 @@
+/*
+ * Written for Pictify. Styles for the transition / animation picker.
+ *
+ * Each preview is two stacked fields: `.ovm-from` is the outgoing clip, `.ovm-to`
+ * the incoming one. A family decides how `.ovm-to` arrives. Showing both is what
+ * makes a transition legible — one moving square shows direction but not that
+ * something is being REPLACED, which is the whole point of a transition.
+ *
+ * Animations run only while a tile is hovered or focused (`.ovm-playing`).
+ * Sixty-eight tiles looping at once is noise, and it would burn CPU in an app
+ * whose main job is rendering a canvas.
+ *
+ * Colours are the literal values of the vendored panel's tokens from
+ * tailwind.config.js. Those tokens are FIXED HEX in the Tailwind theme, not CSS
+ * custom properties — upstream is a shadcn app on CSS variables, this fork is
+ * not — so hsl(var(--popover)) resolves to nothing and the popover renders
+ * fully transparent. Keep these in sync with the `colors` block in
+ * tailwind.config.js; they are private to src/lib/video/vendor/ per DESIGN.md.
+ *
+ * The outgoing field is muted and the incoming one is the accent, so direction
+ * reads even at 34px tall.
+ */
+
+.ovm-preview {
+	position: relative;
+	display: block;
+	flex-shrink: 0;
+	width: 100%;
+	height: 34px;
+	overflow: hidden;
+	border-radius: 3px;
+	background: #1c1c22;
+}
+
+/*
+ * The trigger shows a small square; tiles show a full-width strip. Scoped by an
+ * explicit class because a tile is a <button> too — `button > .ovm-preview`
+ * matched both and squashed every tile preview to 26px.
+ */
+.ovm-trigger-preview {
+	width: 26px;
+	height: 18px;
+}
+
+.ovm-from,
+.ovm-to {
+	position: absolute;
+	inset: 0;
+}
+
+.ovm-from {
+	background: repeating-linear-gradient(
+		-45deg,
+		rgb(156 163 175 / 0.22) 0 3px,
+		transparent 3px 6px
+	);
+}
+
+.ovm-to {
+	background: rgb(250 204 21 / 0.85);
+}
+
+/* "No transition" reads as a hard cut: the two fields meet at a seam. */
+.ovm-none {
+	position: relative;
+	display: block;
+	width: 26px;
+	height: 18px;
+	flex-shrink: 0;
+	border-radius: 3px;
+	background: linear-gradient(
+		to right,
+		rgb(156 163 175 / 0.22) 0 49%,
+		#27272a 49% 51%,
+		rgb(156 163 175 / 0.10) 51% 100%
+	);
+}
+
+/*
+ * Resting state. Each family parks its incoming field mid-transition, so a
+ * static tile still says something about the motion — a wipe sits half wiped, a
+ * zoom sits half grown. A tile that rests fully-revealed would make every
+ * family look identical until hovered.
+ */
+.ovm-fade .ovm-to { opacity: 0.5; }
+.ovm-wipe .ovm-to { clip-path: inset(0 50% 0 0); }
+.ovm-slide .ovm-to { transform: translateX(-50%); }
+.ovm-zoom .ovm-to { transform: scale(0.5); }
+.ovm-blur .ovm-to { opacity: 0.6; filter: blur(2px); }
+.ovm-reveal .ovm-to { clip-path: circle(30% at 50% 50%); }
+.ovm-distort .ovm-to { transform: skewX(-12deg) scaleX(0.6); }
+.ovm-spin .ovm-to { transform: rotate(-35deg) scale(0.6); opacity: 0.8; }
+.ovm-glitch .ovm-to { clip-path: inset(0 40% 0 0); transform: translateX(-2px); }
+
+/* Direction variants, for the families where it means something. */
+.ovm-slide.ovm-dir-right .ovm-to { transform: translateX(50%); }
+.ovm-slide.ovm-dir-up .ovm-to { transform: translateY(50%); }
+.ovm-slide.ovm-dir-down .ovm-to { transform: translateY(-50%); }
+.ovm-wipe.ovm-dir-right .ovm-to { clip-path: inset(0 0 0 50%); }
+.ovm-wipe.ovm-dir-up .ovm-to { clip-path: inset(50% 0 0 0); }
+.ovm-wipe.ovm-dir-down .ovm-to { clip-path: inset(0 0 50% 0); }
+
+/* ── Playing ──────────────────────────────────────────────────────────── */
+
+.ovm-playing .ovm-to {
+	animation-duration: 1100ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint */
+	animation-iteration-count: infinite;
+}
+
+/* An exit is its entrance played backwards, so one keyframe set covers both. */
+.ovm-playing.ovm-reverse .ovm-to {
+	animation-direction: reverse;
+}
+
+.ovm-playing.ovm-fade .ovm-to { animation-name: ovm-fade; }
+.ovm-playing.ovm-wipe .ovm-to { animation-name: ovm-wipe-left; }
+.ovm-playing.ovm-slide .ovm-to { animation-name: ovm-slide-left; }
+.ovm-playing.ovm-zoom .ovm-to { animation-name: ovm-zoom; }
+.ovm-playing.ovm-blur .ovm-to { animation-name: ovm-blur; }
+.ovm-playing.ovm-reveal .ovm-to { animation-name: ovm-reveal; }
+.ovm-playing.ovm-distort .ovm-to { animation-name: ovm-distort; }
+.ovm-playing.ovm-spin .ovm-to { animation-name: ovm-spin; }
+.ovm-playing.ovm-glitch .ovm-to { animation-name: ovm-glitch; animation-timing-function: steps(4, end); }
+
+.ovm-playing.ovm-slide.ovm-dir-right .ovm-to { animation-name: ovm-slide-right; }
+.ovm-playing.ovm-slide.ovm-dir-up .ovm-to { animation-name: ovm-slide-up; }
+.ovm-playing.ovm-slide.ovm-dir-down .ovm-to { animation-name: ovm-slide-down; }
+.ovm-playing.ovm-wipe.ovm-dir-right .ovm-to { animation-name: ovm-wipe-right; }
+.ovm-playing.ovm-wipe.ovm-dir-up .ovm-to { animation-name: ovm-wipe-up; }
+.ovm-playing.ovm-wipe.ovm-dir-down .ovm-to { animation-name: ovm-wipe-down; }
+
+@keyframes ovm-fade {
+	0%, 10% { opacity: 0; }
+	90%, 100% { opacity: 1; }
+}
+@keyframes ovm-wipe-left {
+	0%, 10% { clip-path: inset(0 100% 0 0); }
+	90%, 100% { clip-path: inset(0 0 0 0); }
+}
+@keyframes ovm-wipe-right {
+	0%, 10% { clip-path: inset(0 0 0 100%); }
+	90%, 100% { clip-path: inset(0 0 0 0); }
+}
+@keyframes ovm-wipe-up {
+	0%, 10% { clip-path: inset(100% 0 0 0); }
+	90%, 100% { clip-path: inset(0 0 0 0); }
+}
+@keyframes ovm-wipe-down {
+	0%, 10% { clip-path: inset(0 0 100% 0); }
+	90%, 100% { clip-path: inset(0 0 0 0); }
+}
+@keyframes ovm-slide-left {
+	0%, 10% { transform: translateX(-100%); }
+	90%, 100% { transform: translateX(0); }
+}
+@keyframes ovm-slide-right {
+	0%, 10% { transform: translateX(100%); }
+	90%, 100% { transform: translateX(0); }
+}
+@keyframes ovm-slide-up {
+	0%, 10% { transform: translateY(100%); }
+	90%, 100% { transform: translateY(0); }
+}
+@keyframes ovm-slide-down {
+	0%, 10% { transform: translateY(-100%); }
+	90%, 100% { transform: translateY(0); }
+}
+@keyframes ovm-zoom {
+	0%, 10% { transform: scale(0); opacity: 0.4; }
+	90%, 100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ovm-blur {
+	0%, 10% { opacity: 0; filter: blur(6px); }
+	90%, 100% { opacity: 1; filter: blur(0); }
+}
+@keyframes ovm-reveal {
+	0%, 10% { clip-path: circle(0% at 50% 50%); }
+	90%, 100% { clip-path: circle(75% at 50% 50%); }
+}
+@keyframes ovm-distort {
+	0%, 10% { transform: skewX(-40deg) scaleX(0); }
+	60% { transform: skewX(12deg) scaleX(1.05); }
+	90%, 100% { transform: skewX(0) scaleX(1); }
+}
+@keyframes ovm-spin {
+	0%, 10% { transform: rotate(-180deg) scale(0); opacity: 0; }
+	90%, 100% { transform: rotate(0) scale(1); opacity: 1; }
+}
+@keyframes ovm-glitch {
+	0%, 10% { clip-path: inset(0 100% 0 0); transform: translateX(-4px); }
+	40% { clip-path: inset(0 30% 0 0); transform: translateX(4px); }
+	70% { clip-path: inset(0 55% 0 0); transform: translateX(-3px); }
+	90%, 100% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+}
+
+/* ── Tiles ────────────────────────────────────────────────────────────── */
+
+.ovm-tile {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	gap: 4px;
+	border-radius: 4px;
+	border: 1px solid #27272a;
+	background: rgb(28 28 34 / 0.4);
+	padding: 4px;
+	text-align: left;
+	transition:
+		border-color 160ms ease-out,
+		background-color 160ms ease-out;
+}
+
+.ovm-tile:hover {
+	border-color: rgb(250 204 21 / 0.55);
+	background: #26262e;
+}
+
+.ovm-tile:focus-visible {
+	outline: none;
+	border-color: #facc15;
+	box-shadow: 0 0 0 1px #facc15;
+}
+
+.ovm-tile-selected {
+	border-color: #facc15;
+	background: rgb(250 204 21 / 0.12);
+}
+
+.ovm-tile-label {
+	overflow: hidden;
+	font-size: 9px;
+	line-height: 1.2;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: #9ca3af;
+}
+
+.ovm-tile-selected .ovm-tile-label,
+.ovm-tile:hover .ovm-tile-label {
+	color: #f4f4f5;
+}
+
+/* The "None" tile is full width above the groups, not part of the grid. */
+.ovm-tile:has(> .ovm-none) {
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ── Popover ──────────────────────────────────────────────────────────── */
+
+.ovm-popover {
+	position: fixed;
+	z-index: 60; /* above the studio panels, below toasts */
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border-radius: 6px;
+	border: 1px solid #27272a;
+	background: #16161c;
+	box-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
+	animation: ovm-popover-in 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes ovm-popover-in {
+	from { opacity: 0; transform: translateY(-4px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.ovm-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: #27272a transparent;
+}
+
+/*
+ * Reduced motion: keep the picker fully usable, drop the motion.
+ *
+ * The tiles still differentiate, because each family RESTS in a distinct
+ * mid-transition pose — that is why the resting states above are not all
+ * "fully revealed". Someone who cannot see the animation still gets a wipe that
+ * looks half-wiped and a zoom that looks half-grown.
+ */
+@media (prefers-reduced-motion: reduce) {
+	.ovm-playing .ovm-to {
+		animation: none;
+	}
+	.ovm-popover {
+		animation: none;
+	}
+	.ovm-tile {
+		transition: none;
+	}
+}

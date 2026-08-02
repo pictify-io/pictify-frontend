@@ -71,32 +71,32 @@
 			<a
 				href={PUBLIC_DOCS_URL}
 				target="_blank"
-				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				on:click={() => trackOutbound(PUBLIC_DOCS_URL, 'Docs', 'header')}>Docs</a
 			>
 			<a
 				href="/pricing"
-				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				on:click={() => trackNav('Pricing', '/pricing', 'header')}>Pricing</a
 			>
 			<a
 				href="/tools"
-				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				on:click={() => trackNav('Tools', '/tools', 'header')}>Tools</a
 			>
 			<a
 				href="/templates"
-				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				on:click={() => trackNav('Templates', '/templates', 'header')}>Templates</a
 			>
 			<a
 				href="/integrations"
-				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				on:click={() => trackNav('Integrations', '/integrations', 'header')}>Integrations</a
 			>
 			<a
 				href="/blogs"
-				class="px-6 py-3 text-sm font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
+				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
 				on:click={() => trackNav('Blog', '/blogs', 'header')}>Blog</a
 			>
 		</div>
@@ -109,14 +109,14 @@
 			{#if !isLoggedIn}
 				<a
 					href="/login"
-					class="px-8 flex items-center justify-center text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors uppercase tracking-wide"
+					class="px-8 lg:px-6 flex items-center justify-center text-sm lg:text-xs font-bold text-gray-900 hover:bg-gray-100 transition-colors uppercase tracking-wide"
 					on:click={() => trackCTA('Sign In', 'header')}
 				>
 					Sign In
 				</a>
 				<a
 					href="/login"
-					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-brand-danger hover:text-gray-900 transition-all uppercase tracking-wide border-l-[3px] border-gray-900"
+					class="px-8 lg:px-6 flex items-center justify-center text-sm lg:text-xs font-bold text-white bg-gray-900 hover:bg-brand-danger hover:text-gray-900 transition-all uppercase tracking-wide border-l-[3px] border-gray-900"
 					on:click={() => trackCTA('Start Building Free', 'header')}
 				>
 					Start Building Free
@@ -124,7 +124,7 @@
 			{:else}
 				<a
 					href="/dashboard"
-					class="px-8 flex items-center justify-center text-sm font-bold text-white bg-gray-900 hover:bg-data-green hover:text-gray-900 transition-all uppercase tracking-wide"
+					class="px-8 lg:px-6 flex items-center justify-center text-sm lg:text-xs font-bold text-white bg-gray-900 hover:bg-data-green hover:text-gray-900 transition-all uppercase tracking-wide"
 					on:click={() => trackNav('Dashboard', '/dashboard', 'header')}
 				>
 					Dashboard

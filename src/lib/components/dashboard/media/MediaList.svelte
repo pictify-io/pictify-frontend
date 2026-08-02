@@ -4,9 +4,11 @@
 		gifs,
 		images,
 		pdfs,
+		videos,
 		fetchGifs,
 		fetchImages,
-		fetchPdfs
+		fetchPdfs,
+		fetchVideos
 	} from '../../../../store/media.store';
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
@@ -19,6 +21,17 @@
 	import { createShareResult } from '../../../../api/public-templates.js';
 
 	export let mediaType = 'images';
+
+	// One place to add a media type. Everything below reads from here rather than
+	// chaining another ternary per label.
+	const MEDIA_LABELS = {
+		images: { singular: 'Image', plural: 'Images', badge: 'PNG' },
+		gifs: { singular: 'GIF', plural: 'GIFs', badge: 'GIF' },
+		pdfs: { singular: 'PDF', plural: 'PDFs', badge: 'PDF' },
+		videos: { singular: 'Video', plural: 'Videos', badge: 'MP4' }
+	};
+	$: labels = MEDIA_LABELS[mediaType] || MEDIA_LABELS.images;
+	$: isVideo = mediaType === 'videos';
 
 	let isLoading = true;
 	let isLoadingMore = false;
@@ -45,8 +58,8 @@
 		isCopyingLink = true;
 		try {
 			if (!shareUrlCache.has(cdnUrl)) {
-				const contentType = mediaType === 'gifs' ? 'gif' : 'image';
-				const format = mediaType === 'gifs' ? 'gif' : mediaType === 'pdfs' ? 'pdf' : 'png';
+				const contentType = mediaType === 'gifs' ? 'gif' : mediaType === 'videos' ? 'video' : 'image';
+				const format = labels.badge.toLowerCase();
 				// Find the matching media item to get dimensions
 				const media = mediaList.find((m) => m.url === cdnUrl);
 				const res = await createShareResult({
@@ -116,6 +129,8 @@
 				await fetchGifs({ limit: itemsPerPage, offset });
 			} else if (mediaType === 'pdfs') {
 				await fetchPdfs({ limit: itemsPerPage, offset });
+			} else if (mediaType === 'videos') {
+				await fetchVideos({ limit: itemsPerPage, offset });
 			}
 		} finally {
 			isLoadingMore = false;
@@ -149,6 +164,12 @@
 				pagination = data.pagination || { total: 0, limit: 12, offset: 0, hasMore: false };
 			});
 			await fetchPdfs({ limit: itemsPerPage, offset: 0 });
+		} else if (mediaType === 'videos') {
+			unsubscribe = videos.subscribe((data) => {
+				mediaList = data.videos || [];
+				pagination = data.pagination || { total: 0, limit: 12, offset: 0, hasMore: false };
+			});
+			await fetchVideos({ limit: itemsPerPage, offset: 0 });
 		}
 		isLoading = false;
 	});
@@ -176,7 +197,7 @@
 					Media Library
 				</div>
 				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					{mediaType === 'images' ? 'Image' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
+					{labels.singular}
 					<span class="text-gray-900">Gallery</span>
 				</h1>
 			</div>
@@ -196,7 +217,7 @@
 						Type
 					</div>
 					<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">
-						{mediaType === 'images' ? 'PNG' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
+						{labels.badge}
 					</div>
 				</div>
 			</div>
@@ -241,7 +262,7 @@
 								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
 							/>
 						</svg>
-					{:else if mediaType === 'gifs'}
+					{:else if mediaType === 'gifs' || mediaType === 'videos'}
 						<svg
 							class="w-10 h-10 text-gray-400"
 							fill="none"
@@ -272,13 +293,15 @@
 					{/if}
 				</div>
 				<h2 class="text-2xl font-black text-gray-900 uppercase tracking-wide mb-2">
-					No {mediaType === 'images' ? 'Images' : mediaType === 'gifs' ? 'GIFs' : 'PDFs'} Yet
+					No {labels.plural} Yet
 				</h2>
 				<p class="text-gray-500 font-bold max-w-sm text-center text-sm mb-6">
 					{mediaType === 'images'
 						? 'Rendered images land here. Pick a template and render your first image to get started.'
 						: mediaType === 'gifs'
 						? 'Animated GIFs you render from templates will appear here.'
+						: mediaType === 'videos'
+						? 'Videos you export from a video template land here. Clips you upload into the studio stay in the editor.'
 						: 'PDFs you generate from templates will be stored here.'}
 				</p>
 				<a
@@ -346,6 +369,30 @@
 											PDF
 										</span>
 									</div>
+								</div>
+							{:else if isVideo}
+								<!-- muted+playsinline so the grid can preview without autoplay policy
+									 blocking it; metadata only, so a page of cards is cheap to load. -->
+								<video
+									src={media.url}
+									class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105 drop-shadow-md"
+									preload="metadata"
+									muted
+									playsinline
+									on:mouseenter={(e) => e.currentTarget.play().catch(() => {})}
+									on:mouseleave={(e) => {
+										e.currentTarget.pause();
+										e.currentTarget.currentTime = 0;
+									}}
+								>
+									<track kind="captions" />
+								</video>
+								<div class="absolute top-3 left-3 z-20">
+									<span
+										class="text-[10px] font-black text-gray-900 bg-white/95 px-2 py-1 rounded-md border-[2px] border-gray-900 uppercase tracking-wide shadow-sm"
+									>
+										MP4
+									</span>
 								</div>
 							{:else}
 								<img
@@ -440,7 +487,7 @@
 								<span
 									class="text-[9px] font-black text-gray-900 bg-brand-accent/30 px-2 py-0.5 rounded border border-brand-accent uppercase tracking-wider"
 								>
-									{mediaType === 'images' ? 'PNG' : mediaType === 'gifs' ? 'GIF' : 'PDF'}
+									{labels.badge}
 								</span>
 							</div>
 						</div>
@@ -583,6 +630,15 @@
 								style="background: white;"
 							/>
 						</div>
+					{:else if isVideo}
+						<!-- svelte-ignore a11y-media-has-caption -->
+						<video
+							src={selectedMedia.url}
+							class="max-w-full max-h-[calc(85vh-100px)] object-contain rounded-lg shadow-lg"
+							controls
+							autoplay
+							playsinline
+						/>
 					{:else}
 						<img loading="lazy"
 							src={selectedMedia.url}

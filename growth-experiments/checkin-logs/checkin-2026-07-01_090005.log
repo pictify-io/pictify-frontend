@@ -1,0 +1,43 @@
+=== Pictify experiment weekly check-in: Wed Jul  1 09:00:05 IST 2026 ===
+Done. CSV updated (modified, not committed); key never printed. Here is the **Week-4 check-in (2026-07-01, 27d cumulative since 2026-06-04)**.
+
+---
+
+## Guardrail status: ✅ NO breach — no same-day action required this week
+The one hard daily guardrail (`url-tool-capture-flow-v1` treatment `gen_pct` vs control) **held for both arms**. Guided-capture — which breached in wk2 — is back **above** control on generation and had **no zero-gen days** this window. Auto-capture is above control **every single day**.
+
+## Per-experiment summary
+
+### 1. `url-tool-capture-flow-v1` (374736) — THE powered read
+| arm | rage_pct | gen_pct (guardrail) |
+|---|---|---|
+| control | 11.11% (61/549) | 18.21% |
+| guided-capture | 7.46% (22/295) | 19.32% (≈parity) |
+| **auto-capture** | 7.83% (22/281) | **54.45% (3.0×)** |
+
+- **Primary (rage) softened:** both treatments still below control, but auto's z drifted **down 1.70→1.49** (control rage fell, auto rose) — neither hits frequentist 95%. The winning case now rests on **generation, not rage**.
+- **Decision: SHIP auto-capture** (net-value winner: -30% rage AND 3× generation, positive every day for 27d). **RETIRE guided-capture** (dominated — gen only at parity). ⚠️ Confirm PostHog native **Bayesian prob-to-beat-control ≥95%** before flipping (headless can't read that panel).
+- **⚠️ OPERATIONAL:** the wk3 ship-auto/retire-guided decision was **never actioned** — control + guided are *still live* exposing users. Execute the rollout.
+
+### 2. `tool-signup-cta-v2` (374737) — directional
+| arm | click/gen | signups |
+|---|---|---|
+| control | 32.08% | 9 |
+| **inline-value-prop** | 32.26% | **12** |
+| sticky-bar | 29.73% | 7 |
+
+- **CTR lead evaporated** — inline now tied with control (~32%); but inline **still leads signups** across all 4 reads (thin lead, 12 vs 9).
+- **Decision: keep running** (not powered). ⚠️ **ACTION carried 4 weeks, still unfixed:** `content_copied`/`content_downloaded` instrumentation still not firing (downloaded = 0 site-wide, 27d) — cannibalization guardrail blind; can't finalize a winner.
+
+### 3. `welcome-experiment-a` (374738) — assignment health only
+- signups **109** | assigned welcome **33** / control **41** → **assigned/signups = 30.3%** — **FAILS ~50%** (confirmed 4th read). Coverage 68% (~32% fire no assignment), split skews to control.
+- **Decision: assignment UNHEALTHY** — keep running while debugging the flag-await/assignment path; do **not** trust the `api_render_completed` read.
+
+## Sequenced launch readiness (374739 / 374740 / 374741)
+**HOLD all three** — gated on welcome assignment reaching ~50%, which it has not. Note: their new instrumentation **is** firing (`dashboard_page_viewed` 23, `welcome_wizard_viewed` 18, `verify_banner_shown` 6), so they're blocked **only** on assignment health, not instrumentation. **Nothing launched.**
+
+## Recommended actions (priority order)
+1. **Roll `url-tool-capture-flow-v1` flag → 100% auto-capture** (retire control + guided) after confirming Bayesian ≥95% — this decision has now been carried unexecuted for two weeks.
+2. **Fix `content_copied`/`content_downloaded` instrumentation** — blind 4 weeks, blocking the signup-CTA winner call.
+3. **Debug the welcome assignment path** (missing `welcome_assigned` on ~32% of signups + control skew) — blocks the entire sequenced pipeline.
+=== done: Wed Jul  1 09:03:37 IST 2026 ===

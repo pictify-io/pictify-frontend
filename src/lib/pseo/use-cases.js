@@ -829,7 +829,9 @@ export const useCaseDetails = {
 
 			Perfect for learning platforms, fitness apps, developer communities, and any product with achievement
 			systems. Unlike static badge libraries, Pictify badges are dynamically generated — so each user gets
-			a personalized badge with their name, tier, and achievement date baked in.`,
+			a personalized badge with their name, tier, and achievement date baked in. For whole cohorts, upload
+			a recipient CSV to a Pictify workflow and every badge is bulk-generated and emailed to its recipient
+			automatically.`,
 		useCaseScenarios: [
 			'Learning platforms issuing skill completion badges',
 			'Developer communities awarding contribution badges',
@@ -1454,7 +1456,8 @@ export const useCaseDetails = {
 	},
 	'event-ticket': {
 		label: 'Event Ticket Generator',
-		description: 'Generate branded tickets and passes from registration data.',
+		description:
+			'Generate branded tickets and passes from registration data. Bulk-generate from a CSV workflow and email every attendee their ticket automatically.',
 		recommendedFormats: ['png', 'jpg'],
 		recommendedSizes: ['1200x630', '1600x900'],
 		templateHtml: simpleCardTemplate({
@@ -2157,7 +2160,8 @@ export const useCaseDetails = {
 		longDescription: `Course certificates validate learning achievements and drive completion rates. With Pictify's
 			certificate generator, create beautiful certificates that include learner names, course titles, completion
 			dates, and instructor signatures. Generate certificates automatically when learners complete courses,
-			integrating with your LMS via API.`,
+			integrating with your LMS via API. You can also bulk-generate from a CSV workflow — upload your learner
+			list and every certificate is rendered and emailed automatically.`,
 		useCaseScenarios: [
 			'Online course platforms issuing completion certificates',
 			'Corporate training programs certifying employees',
@@ -2230,7 +2234,8 @@ export const useCaseDetails = {
 		longDescription: `Digital membership cards provide instant credential delivery and easy verification.
 			With Pictify's membership card generator, create branded cards featuring member names, IDs, photos,
 			and expiration dates. Generate cards automatically when members join or renew, and include QR codes
-			for easy verification.`,
+			for easy verification. For bulk onboarding, upload a member CSV to a Pictify workflow and every card
+			is generated and emailed to its member automatically.`,
 		useCaseScenarios: [
 			'Gyms and fitness clubs issuing member cards',
 			'Professional associations providing member credentials',
@@ -3442,7 +3447,7 @@ Feed employee data (name, title, phone, photo URL) into your template and genera
 		],
 		longDescription: `Conference and event organizers need hundreds or thousands of unique name badges — each with a different name, title, company, and sometimes a QR code or photo. Designing each one manually is impossible at scale. With Pictify, you create one badge template and generate every variant programmatically.
 
-Upload your attendee CSV, map columns to template variables, and batch-render all badges in minutes. Print-ready PNG or PDF output ensures crisp text at any size. Perfect for conferences, corporate events, workshops, and trade shows.`,
+Upload your attendee CSV, map columns to template variables, and batch-render all badges in minutes — or run it as a bulk workflow that also emails each attendee their badge automatically. Print-ready PNG or PDF output ensures crisp text at any size. Perfect for conferences, corporate events, workshops, and trade shows.`,
 		useCaseScenarios: [
 			'Conference organizers printing badges for 500+ attendees',
 			'Corporate events creating VIP and general admission badges',

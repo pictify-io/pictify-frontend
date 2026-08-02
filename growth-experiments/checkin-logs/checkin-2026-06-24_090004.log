@@ -1,0 +1,48 @@
+=== Pictify experiment weekly check-in: Wed Jun 24 09:00:04 IST 2026 ===
+CSV updated for all three live experiments (not committed). Here's the week-3 check-in summary.
+
+---
+
+# Pictify Growth Experiments — Week-3 Check-In (2026-06-24)
+
+All three live experiments started **2026-06-04** (≈20 days in). Queries ran against PostHog project 55738 with the personal key (never printed/committed).
+
+## 1. `url-tool-capture-flow-v1` (374736) — THE powered read
+| arm | openers | rage_pct | gen_pct |
+|---|---|---|---|
+| control | 394 | **11.93%** (47) | 18.53% (73) |
+| guided-capture | 209 | 7.18% (15) | 18.66% (39) |
+| auto-capture | 202 | 7.43% (15) | **57.43%** (116) |
+
+- **Primary (rage):** both treatments now below control — guided z≈1.83, auto z≈1.70. Both just under frequentist 95% (z 1.96), ~95–96% one-sided Bayesian.
+- **Generation guardrail:** ✅ **HELD / RECOVERED this week.** auto is 3.1× control and above control *every single day* across all 20d. guided's wk2 breach **recovered to parity** (recent-7d 18.67% vs control 20.15%; cumulative 18.66% slightly *above* control 18.53%) — though intermittent zero-gen days persist (06-22: 0/15 openers).
+- **Decision → SHIP `auto-capture`** (roll flag to 100%; retires control + guided). Net winner on *both* metrics. Gate the flip on confirming PostHog's native Bayesian P(beat control) ≥95% (z≈1.70 is a hair under frequentist 95%; one more week clinches it if strict). **RETIRE `guided-capture`** — strictly dominated by auto.
+- ⚠️ **Note:** last week's same-day KILL of guided-capture was **apparently never actioned** — guided is still live and exposing users through 06-24. No fresh same-day breach this week (guardrail recovered), so no red alarm — but retire it now via the auto-capture rollout.
+
+## 2. `tool-signup-cta-v2` (374737) — directional only
+| arm | gens | click/gen | signups |
+|---|---|---|---|
+| control | 73 | 30.14% | 6 |
+| inline-value-prop | 69 | **34.78%** | **11** |
+| sticky-bar | 86 | 27.91% | 5 |
+
+- **inline-value-prop** leads on both CTR and signups — consistent across all 3 reads.
+- **Guardrail STILL BLIND:** `content_downloaded` 0 site-wide; `content_copied` only 5 events/4 users in 20d. Cannibalization unmeasurable **3 weeks running.**
+- **Decision → keep running.** Not powered for a significance call. **Carried action (3 wks unfixed): fix `content_copied`/`content_downloaded` instrumentation** — cannot finalize a winner while the guardrail is blind.
+
+## 3. `welcome-experiment-a` (374738) — assignment health only
+- signups **88**; welcome_assigned: welcome **25** / control **33**.
+- **assigned_welcome/signups = 28.4%** → **STILL FAILS** the ~50% pass criterion (now confirmed across 3 reads, not small-N noise).
+- Coverage 66% (~34% of signups fire no `welcome_assigned`); split skews to control (43% welcome-share); `welcome_viewed` 32 > assigned_welcome 25 (same anomaly). welcome_skipped 17/32 = 53% (high). curl_ok 10.
+- **Decision → assignment UNHEALTHY; keep flag running while debugging** the flag-await/assignment path. Do **not** trust the `api_render_completed` read until assignment ≈50%.
+
+## 4. Sequenced experiments (step 7)
+**None ready to launch.** Gate is healthy ~50% assignment on `welcome-experiment-a`, which is still at 28.4%. **HOLD** `onboarding-value-first-skip` (374739), `dashboard-checklist-value-first` (374740), `verify-copy-v1` (374741). Did not launch anything.
+
+## Recommended actions (priority order)
+1. **Ship `auto-capture` to 100%** (after a 30-sec native-Bayesian confirm), retiring control + guided-capture on 374736 — biggest win in the portfolio (3.1× generation + lower rage). Also closes the loose thread that guided was never killed last week.
+2. **Fix `content_copied`/`content_downloaded` instrumentation** (blind 3 weeks) — blocks any winner call on the signup-CTA test.
+3. **Debug welcome assignment** (~34% miss rate + control skew) — blocks the entire sequenced activation track.
+
+CSV `result_week1` + `decision` updated for all three live rows; **not committed**, per instructions.
+=== done: Wed Jun 24 09:04:14 IST 2026 ===

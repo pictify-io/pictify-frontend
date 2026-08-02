@@ -460,8 +460,13 @@
 		updateHTML(selectedTemplate);
 	};
 
-	function copyToClipboard(text) {
+	function copyToClipboard(text, contentType = 'image_url') {
 		navigator.clipboard.writeText(text).then(() => {
+			analytics.trackCopy({
+				content_type: contentType,
+				context: 'tool_result',
+				tool_name: 'og_image_generator'
+			});
 			toast.set({ message: 'URL copied to clipboard! 🔗', type: 'success', duration: 1500 });
 		});
 	}
@@ -1237,6 +1242,12 @@
 										href={imageUrl}
 										download="og-image.png"
 										target="_blank"
+										on:click={() =>
+											analytics.trackDownload({
+												content_type: 'image',
+												format: 'png',
+												tool_name: 'og_image_generator'
+											})}
 										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Download

@@ -1,0 +1,127 @@
+/*
+ * Glue module written for Pictify (not part of the upstream app). The studio
+ * panels (left tool rail + right properties panel) share the exact same
+ * runtime as the vendored timeline island: one @openvideo/core instance, one
+ * zustand studio store, one selection. Re-exporting from
+ * ../openvideo-timeline/runtime guarantees a single module instance across
+ * both islands (same Vite module graph), so canvas / timeline / panels stay
+ * in sync automatically.
+ *
+ * setHostCallbacks wires page-level services (media upload) into the panels
+ * without the vendored React code importing Svelte-side modules.
+ */
+export { core, projectStore, useStudioStore, setEditorContext } from "../openvideo-timeline/runtime";
+
+export interface HostCallbacks {
+  /**
+   * Fired after a vendored panel mutates a clip's style. The studio store only
+   * republishes on a SELECTION change, so the Svelte side needs a nudge to
+   * re-read the clip (gradient stop bindings, the dirty flag).
+   */
+  onClipStyleChange?: (clipId: string) => void;
+  /**
+   * Upload a media file and resolve to a persistent URL. Implemented by the
+   * Svelte page: images go to brand assets, video and audio to the video media
+   * library. Falls back to an object URL only when the upload fails, which is
+   * what `persistent: false` reports.
+   */
+  uploadMedia?: (
+    file: File
+  ) => Promise<{ url: string; persistent: boolean; uid?: string; bytes?: number }>;
+  /**
+   * Load the user's saved media. Called once on mount; the panels render a
+   * loading state until it resolves.
+   */
+  loadMedia?: () => Promise<
+    Array<{
+      uid?: string;
+      kind: "image" | "video" | "audio";
+      name: string;
+      url: string;
+      bytes?: number;
+      source?: "brand" | "library";
+    }>
+  >;
+  /**
+   * Remove an item from the library. Soft delete server-side: clips already
+   * placed on a timeline keep working, because the file itself stays.
+   */
+  deleteMedia?: (uid: string) => Promise<void>;
+  /**
+   * Transcribe a media URL into word timings, for caption clips.
+   *
+   * The URL has to be publicly reachable: the transcription service fetches it
+   * directly rather than streaming it through our server, which is what keeps a
+   * 200MB source video off the API box.
+   */
+  transcribe?: (
+    url: string
+  ) => Promise<{ words: Array<{ text: string; from: number; to: number }>; text: string }>;
+  /**
+   * Search stock images or videos. Proxied server-side so the provider key is
+   * never shipped to the browser. Rejects with a `code` of `stock_unavailable`
+   * when the server has no key configured, which the panel shows as a setup
+   * message rather than as a failure.
+   */
+  searchStock?: (
+    kind: "image" | "video",
+    query: string,
+    page?: number
+  ) => Promise<{ items: Array<any>; pagination: { hasMore: boolean; page: number } }>;
+  /** The studio's declared variable definitions, for the copilot's context. */
+  getVariables?: () => Array<{ name: string; type?: string }>;
+  /**
+   * Declare (or enrich) variable definitions. The studio owns
+   * variableDefinitions state; the copilot's make_variable tool writes the
+   * clip half (token or binding) through the engine and hands the definition
+   * half here.
+   */
+  defineVariables?: (
+    definitions: Array<{
+      name: string;
+      type?: string;
+      defaultValue?: unknown;
+      description?: string;
+    }>
+  ) => void;
+  /**
+   * Ask the copilot what to do next, one pipeline phase at a time. Execute and
+   * review phases return TOOL CALLS, never a document — the panel validates
+   * each against the live scene before applying it, so a hallucinated clip id
+   * costs one operation rather than the scene. The design phase returns a
+   * prose `brief` instead, which the panel echoes back on later rounds.
+   */
+  planAgentEdit?: (
+    document: object,
+    tools: Array<any>,
+    instruction: string,
+    /**
+     * Earlier rounds of the SAME request: what the model already called and
+     * what actually happened — lookup results, applied edits, failures.
+     */
+    history?: Array<{ role: string; content: string }>,
+    /** Phase pipeline fields: phase, brief, findings, vocabulary. */
+    extras?: {
+      phase?: "design" | "execute" | "review";
+      brief?: string;
+      findings?: string[];
+      vocabulary?: {
+        effects?: string[];
+        animations?: string[];
+        emphasis?: string[];
+        transitions?: string[];
+        fonts?: string[];
+      };
+    }
+  ) => Promise<{ message?: string; calls?: Array<{ name: string; args: object }>; brief?: string }>;
+}
+
+let hostCallbacks: HostCallbacks = {};
+
+export function setHostCallbacks(callbacks: HostCallbacks) {
+  hostCallbacks = callbacks || {};
+}
+
+export function getHostCallbacks(): HostCallbacks {
+  return hostCallbacks;
+}

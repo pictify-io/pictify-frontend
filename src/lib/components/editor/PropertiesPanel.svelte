@@ -36,12 +36,7 @@
 		getBrandFontFamilies,
 		isBrandFont
 	} from '../../utils/brand-fonts-loader';
-	import {
-		checkFeatureAccessSync,
-		FEATURES,
-		PLAN_DISPLAY_NAMES,
-		getMinimumPlan
-	} from '../../../store/plg.store';
+	import { checkFeatureAccessSync, FEATURES } from '../../../store/plg.store';
 	import {
 		createQRCode,
 		updateQRCode,
@@ -128,11 +123,10 @@
 	let backgroundRemovalError = null;
 	let originalImageUrl = null; // Store original for undo
 
-	// Feature gating for AI Background Remover
+	// Legacy gate for AI background removal — the feature is no longer sold,
+	// but grandfathered plans that still have it keep the working button.
 	$: bgRemoverAccess = checkFeatureAccessSync(FEATURES.AI_BACKGROUND_REMOVER);
 	$: hasBgRemoverAccess = bgRemoverAccess?.hasAccess ?? false;
-	$: bgRemoverMinPlan = getMinimumPlan(FEATURES.AI_BACKGROUND_REMOVER);
-	$: bgRemoverMinPlanName = PLAN_DISPLAY_NAMES[bgRemoverMinPlan];
 
 	// Image clip/mask state
 	let currentClipShape = 'none'; // 'none', 'circle', 'ellipse', 'rounded-rect'
@@ -4609,34 +4603,13 @@
 						{/if}
 					</div>
 
-					<!-- Background Remover -->
-					<div class="pt-4 border-t border-gray-200">
-						<label class={fieldLabelClass}>Remove Background</label>
+					<!-- Background remover — LEGACY. Not a sold feature anymore: the
+					     section only renders for grandfathered plans that still have
+					     access, and there is no upsell for anyone else. -->
+					{#if hasBgRemoverAccess}
+						<div class="pt-4 border-t border-gray-200">
+							<label class={fieldLabelClass}>Remove Background</label>
 
-						{#if !hasBgRemoverAccess}
-							<!-- Locked state for non-subscribers -->
-							<div
-								class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-brutal-lg flex flex-col items-center text-center mt-2"
-							>
-								<div
-									class="w-10 h-10 rounded-xl bg-brand-accent border-[3px] border-gray-900 shadow-brutal-sm flex items-center justify-center mb-3"
-								>
-									<i class="fa fa-magic text-gray-900 text-base" />
-								</div>
-								<h3 class="text-sm font-black text-gray-900 mb-1.5 leading-tight">
-									Unlock AI Remover
-								</h3>
-								<p class="text-[10.5px] font-medium text-gray-600 mb-4 leading-relaxed">
-									Upgrade to the {bgRemoverMinPlanName} plan to erase backgrounds instantly.
-								</p>
-								<a
-									href="/pricing"
-									class="block w-full py-2.5 px-3 bg-[#b4f0a7] border-[2px] border-gray-900 text-gray-900 text-xs font-black rounded-lg shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all uppercase tracking-wide"
-								>
-									Upgrade Now
-								</a>
-							</div>
-						{:else}
 							<div class="space-y-2.5 mt-2">
 								<button
 									class="w-full py-2.5 px-3 bg-brand-accent border-[2px] border-gray-900 text-gray-900 rounded-lg shadow-brutal-md hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#1f2937] transition-all font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-brutal-md"
@@ -4672,8 +4645,8 @@
 									</div>
 								{/if}
 							</div>
-						{/if}
-					</div>
+						</div>
+					{/if}
 
 					<!-- Filters & Effects -->
 					<CollapsibleSection title="Filters & Effects" bind:open={showFiltersPanel}>

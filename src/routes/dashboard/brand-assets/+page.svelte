@@ -10,6 +10,7 @@
 	} from '../../../store/brand-assets.store';
 	import { toast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
+	import { analytics } from '$lib/analytics.js';
 	import { copyToClipboard as sharedCopy, formatRelativeDate } from '$lib/utils/format.js';
 	import Loader from '$lib/components/Loader.svelte';
 	import {
@@ -186,6 +187,10 @@
 				isPrimary: uploadForm.isPrimary
 			});
 
+			analytics.trackBrandAssetCreated({
+				asset_type: uploadType,
+				asset_count: ($brandAssets.assets || []).length
+			});
 			toast.set({
 				message: `${ASSET_TYPE_LABELS[uploadType]} uploaded successfully!`,
 				type: 'success',
@@ -217,6 +222,10 @@
 		isUploading = true;
 		try {
 			await addColor(colorForm);
+			analytics.trackBrandAssetCreated({
+				asset_type: 'color',
+				asset_count: ($brandAssets.assets || []).length
+			});
 			toast.set({ message: 'Color added successfully!', type: 'success', duration: 3000 });
 			closeColorModal();
 		} catch (error) {

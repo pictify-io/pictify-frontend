@@ -1,0 +1,41 @@
+=== Pictify experiment weekly check-in: Wed Jul 22 09:03:58 IST 2026 ===
+CSV is valid (22 columns on every row, wk7 written to all three live experiments, not committed). Final summary:
+
+---
+
+# Pictify growth experiments — wk7 check-in (2026-07-22, 48d cumulative)
+
+## ⚠️ Process failure first (action needed today, but not a metric breach)
+The **wk5 (07-08) and wk6 (07-15) scheduled check-ins both failed with "Not logged in"** — the experiment with a *daily* guardrail ran **unmonitored for 3 weeks**. The guardrail happened to hold, but this was luck. **Re-authenticate `claude` on this machine so the launchd job (`com.pictify.experiment-checkin`) works again.**
+
+## 1. url-tool-capture-flow-v1 (374736) — THE powered read
+| arm | rage_pct | gen_pct |
+|---|---|---|
+| control | 10.30% (116/1126) | 18.03% |
+| guided-capture | 8.23% (z~1.37) | 19.44% |
+| **auto-capture** | **7.56% (z~1.79, 1-sided p=.037)** | **53.51% (3.0× control, z~14.9)** |
+
+- **Guardrail: HELD — no same-day action.** auto's gen_pct was above control **every single day** of the 21-day unmonitored gap (recent-7d: 65.9% vs 17.8%). guided above control cumulatively and recent-7d (no sustained breach, just noisy days).
+- guided's rage edge has **vanished** recent-7d (12.6% vs control 11.9%) — it is strictly dominated.
+- **Decision: SHIP auto-capture — this is the 4th consecutive weekly read with the same verdict and it has STILL not been actioned.** ~1,700 flagged openers have been exposed to losing arms over 48 days. Evidence is at its strongest yet. Roll the flag to 100% auto-capture; retire guided and control. (If a strict frequentist 2-sided 95% on rage is required it's still a hair short, but the ship case rests on the 3× generation guardrail, which is overwhelming.)
+
+## 2. tool-signup-cta-v2 (374737) — directional
+- CTR/gen: control 27.0% | inline 28.7% | sticky 26.5%; signups 16 | 17 | 15 — **fully converged**; inline's early signup lead reverted during the gap (delta: control +7, inline +5, sticky +8).
+- Guardrail **blind for the entire 7-week run**: `content_downloaded` = 0 events site-wide, `content_copied` = 25 events/12 users. Carried unfixed since wk1.
+- **Decision: recommend CONCLUDE as a null result** (7 wks is well past the 2–3wk directional window) — ship inline-value-prop as permanent default (tiebreak: never below control) and retire the flag. Left as a human call per the don't-kill-post-signup rule. Fix the copy/download instrumentation before any successor CTA test.
+
+## 3. welcome-experiment-a (374738) — assignment health
+- signups 184; assigned welcome=58 / control=59 → **assigned_welcome/signups = 31.5% — FAILS ~50% for the 5th consecutive read.**
+- **New signal:** the arm split is now **balanced** (58v59 ≈ 49.6%; the earlier control-skew resolved). The remaining problem is **coverage**: only 64% of signups fire `welcome_assigned` at all — debug the flag-await/event path on the ~36% silent flows, not the randomization. `welcome_viewed` (72) > `assigned_welcome` (58) anomaly persists.
+- Guardrail: skip rate 43% (31/72) — high but improving every week (80→60→53→48→43%).
+- **Decision: keep running; do NOT trust `api_render_completed` until coverage ~100%.**
+
+## 4. Sequenced experiments — NOT ready to launch
+Gate (welcome-experiment-a healthy ~50% assignment) **still not met** → **HOLD 374739 / 374740 / 374741**. Their instrumentation is confirmed live (`dashboard_page_viewed` 309, `welcome_wizard_viewed` 199, `verify_banner_shown` 81, `checklist_step_cta_clicked` 26) — except **verify surfaces are tiny** (`verify_wall_shown` 6 events/48d) → **defer the verify-copy-v1 A/B regardless**, keep instrumentation only. Nothing launched.
+
+## Recommended actions, in order
+1. **Same-day:** re-auth `claude` for the launchd check-in job (3 silent failures).
+2. **This week:** execute the auto-capture 100% rollout (4 weeks overdue).
+3. Debug `welcome_assigned` coverage (36% of signups fire nothing).
+4. Decide on concluding tool-signup-cta-v2 as null; fix content_copied/downloaded events.
+=== done: Wed Jul 22 10:13:30 IST 2026 ===

@@ -45,7 +45,7 @@
 				{
 					label: 'API Access',
 					feature: FEATURES.API_ACCESS,
-					description: 'Full API, no rate limits'
+					description: 'Full REST API access'
 				}
 			]
 		},
@@ -54,7 +54,13 @@
 			category: 'Output Formats',
 			features: [
 				{ label: 'PNG, JPG & GIF', feature: null, allPlans: true },
-				{ label: 'PDF Export', feature: FEATURES.PDF_OUTPUT }
+				{ label: 'PDF Export', feature: FEATURES.PDF_OUTPUT },
+				{
+					label: 'Video Templates (MP4 & GIF)',
+					feature: null,
+					allPlans: true,
+					description: 'Video studio + AI generation'
+				}
 			]
 		},
 		// Templates & Assets
@@ -69,6 +75,12 @@
 		{
 			category: 'Automation',
 			features: [
+				{
+					label: 'Workflow runs (CSV & webhook)',
+					feature: null,
+					allPlans: true,
+					description: 'CSV or webhook in, documents out, email delivery'
+				},
 				{ label: 'Batch Rendering', feature: FEATURES.BATCH_RENDER },
 				{ label: 'Items per Batch', feature: FEATURES.BATCH_ITEMS_PER_REQUEST },
 				{ label: 'Webhooks', feature: FEATURES.WEBHOOKS }
@@ -78,8 +90,12 @@
 		{
 			category: 'AI Features',
 			features: [
-				{ label: 'AI Background Remover', feature: FEATURES.AI_BACKGROUND_REMOVER, unit: '/mo' },
-				{ label: 'AI Copilot', feature: FEATURES.AI_COPILOT, unit: '/mo' }
+				{
+					label: 'AI Credits',
+					feature: FEATURES.AI_CREDITS,
+					unit: '/mo',
+					description: 'Copilot (templates & video), AI video generation & captions'
+				}
 			]
 		},
 		// Team & Enterprise
@@ -106,6 +122,12 @@
 
 	const FAQs = [
 		{
+			question: 'What counts as a render?',
+			answer:
+				'Each generated document or image counts as one render. It works the same everywhere: one API call, one CSV row, or one webhook event each produce one render. A workflow run over a 500-row CSV uses 500 renders.',
+			isOpened: false
+		},
+		{
 			question: 'What happens if I exceed the monthly limit?',
 			answer: `All paid plans can enable <strong>overage billing</strong> to keep rendering beyond their limit. Basic: ${formatOverageRate(
 				PLANS.BASIC
@@ -122,7 +144,7 @@
 		{
 			question: 'What features are included in the free plan?',
 			answer:
-				'The Free plan includes 50 renders/month (PNG, JPG & GIF), 3 saved templates, and full API access with no rate limits. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
+				'The Free plan includes 50 renders/month (PNG, JPG & GIF), 3 saved templates, 25 AI credits/month, and full API access. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
 			isOpened: false
 		},
 		{
@@ -140,7 +162,13 @@
 		{
 			question: 'What AI features are available?',
 			answer:
-				'AI Background Remover and AI Copilot are included on all paid plans. Basic gets 25 and 15 uses/mo respectively, Pro gets 100 and 50, Business gets 500 each.',
+				'Every plan includes ONE monthly AI credit pool — Free 25, Basic 300, Pro 1,000, Business 4,000. It covers everything AI-powered: the Copilot (both template editing and the video timeline copilot), AI video generation, and captions. One instruction, one credit — failed requests are never billed.',
+			isOpened: false
+		},
+		{
+			question: 'Do video renders count toward my render limit?',
+			answer:
+				'Yes — images, PDFs, GIFs and video renders all draw from the same monthly render pool. AI-powered actions like AI video generation and captions draw from your separate AI credits pool instead, so a rendered video costs renders and an AI-generated one also spends AI credits.',
 			isOpened: false
 		}
 	];
@@ -413,7 +441,7 @@
 					</div>
 
 					<h1
-						class="text-5xl md:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
+						class="text-4xl md:text-5xl 2xl:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
 					>
 						Simple, transparent <br />
 						<span class="relative inline-block text-brand-danger mt-1">
@@ -454,7 +482,7 @@
 						</div>
 
 						<button
-							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
+							class="relative z-10 px-10 lg:px-8 py-4 lg:py-3 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
 								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = false)}
@@ -462,7 +490,7 @@
 							Monthly
 						</button>
 						<button
-							class="relative z-10 px-10 py-4 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
+							class="relative z-10 px-10 lg:px-8 py-4 lg:py-3 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
 								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
 								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
 							on:click={() => (showAnnual = true)}
@@ -529,7 +557,7 @@
 									{#if planId === PLANS.BASIC}
 										All features, lower volume. Great for solo devs & small projects.
 									{:else if planId === PLANS.STANDARD}
-										For teams & startups scaling their image generation.
+										For teams & startups scaling documents, images & video.
 									{:else if planId === PLANS.BUSINESS}
 										Unlimited scale, enterprise security & dedicated support.
 									{:else}
@@ -599,6 +627,34 @@
 									</div>
 								</li>
 
+								<!-- AI credits (separate pool: copilot, AI generation, captions) -->
+								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_CREDITS]}
+									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
+										<div
+											class="w-6 h-6 rounded bg-[#c6e0ff] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+										>
+											<svg
+												class="w-3.5 h-3.5 text-gray-900"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+												stroke-width="4"
+											>
+												<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+											</svg>
+										</div>
+										<div class="flex flex-col mt-0.5">
+											<span
+												><strong>{formatLimit(PLAN_FEATURES[planId][FEATURES.AI_CREDITS])}</strong> AI
+												credits/mo</span
+											>
+											<span class="text-xs text-gray-500 font-normal"
+												>Copilot (templates & video), AI video generation & captions</span
+											>
+										</div>
+									</li>
+								{/if}
+
 								<!-- Specific Features with Icons -->
 								{#if PLAN_FEATURES[planId]?.[FEATURES.BATCH_RENDER]}
 									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
@@ -620,28 +676,6 @@
 											</svg>
 										</div>
 										<span class="mt-0.5">Batch processing</span>
-									</li>
-								{/if}
-								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_BACKGROUND_REMOVER]}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="3"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-												/>
-											</svg>
-										</div>
-										<span class="mt-0.5">AI Tools</span>
 									</li>
 								{/if}
 								{#if PLAN_FEATURES[planId]?.[FEATURES.TEAM_SEATS] !== 1}
@@ -715,7 +749,7 @@
 							</ul>
 
 							<button
-								class="w-full py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
+								class="w-full py-4 lg:py-3 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
 								{isPopular
 									? 'bg-brand-accent text-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
 									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'}"
@@ -878,7 +912,7 @@
 						</p>
 						<a
 							href="mailto:support@pictify.io"
-							class="inline-flex items-center gap-3 mt-4 px-8 py-5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg uppercase tracking-widest"
+							class="inline-flex items-center gap-3 mt-4 px-8 lg:px-6 py-5 lg:py-3.5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg lg:text-base uppercase tracking-widest"
 						>
 							<span>Contact Sales</span>
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"

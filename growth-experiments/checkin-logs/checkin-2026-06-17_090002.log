@@ -1,0 +1,52 @@
+=== Pictify experiment weekly check-in: Wed Jun 17 09:00:02 IST 2026 ===
+All three live experiments recorded. Here's the check-in summary.
+
+---
+
+# Pictify Growth Experiments — Weekly Check-In (2026-06-17)
+
+**Window:** all 3 live experiments launched 2026-06-04 → 13 days cumulative. This was the scheduled re-read flagged in the week-1 notes. Queries run via the playbook's HogQL against project 55738 (personal key loaded from `.env`, never printed).
+
+## 🚨 SAME-DAY ACTION NEEDED — `url-tool-capture-flow-v1` (374736)
+
+**The generation guardrail is breaching on `guided-capture`.** This is the playbook's textbook kill condition: a rageclick win *with* a capture-count loss = net loss.
+
+| arm | opened | rage_pct | gen_pct (cumulative) |
+|---|---|---|---|
+| control | 269 | **10.04%** | 17.84% |
+| guided-capture | 135 | **5.93%** (−41% rel) | 19.26% |
+| auto-capture | 128 | 9.38% (≈parity) | **55.47%** (3.1× control) |
+
+- **Guardrail breach (guided-capture):** gen_pct fell **below control on 5 of the last 6 days** (06-11→06-16), including **3 zero-generation days despite openers** (06-12: 11 openers/0 gens; 06-13: 6/0; 06-16: 7/0). Recent-6d window: guided gen **11.3%** (6/53) vs control **20.0%** (23/115). Cumulative still barely above control only because of strong early days — this is the CORS-block-strand failure the guardrail column predicted.
+- **Primary (rage):** guided is lowest (−41% rel) but **still not significant** (z≈1.39, p≈0.17). Auto's rage is now at parity (improved from wk1's above-control).
+- **Decision:** **KILL `guided-capture` arm today.** Keep `auto-capture` vs `control` running ~1 more week — auto is the de-facto net winner (gen 3.1× control, rage parity), but **do not ship** on a non-significant primary. Re-read ~2026-06-24.
+
+## `tool-signup-cta-v2` (374737) — directional, keep running
+
+| arm | gens | click/gen | signups |
+|---|---|---|---|
+| control | 55 | 23.64% | 3 |
+| **inline-value-prop** | 40 | **45.0%** | **7** |
+| sticky-bar | 50 | 30.0% | 3 |
+
+- `inline-value-prop` leads CTR + signups, consistent across both reads. Not powered for significance → **keep running**.
+- **Guardrail still BLIND (2 weeks):** `content_downloaded` 0, `content_copied` 1 site-wide in 13d — cannibalization unmeasurable. **Action carried over & still unfixed: fix the instrumentation.** Cannot finalize a winner until it fires.
+
+## `welcome-experiment-a` (374738) — assignment health: STILL FAILING
+
+- signups 52 · welcome_assigned **welcome=12 / control=22** → **assigned_welcome/signups = 23.1%** (target ~50%). Now confirmed at N=52, **not small-N noise**.
+- Assignment coverage only **65%** (~35% of signups fire no `welcome_assigned`); split skews to control (12 v 22). `welcome_viewed`=15 exceeds assigned_welcome=12 (anomaly). welcome_skipped 9/15 = 60%.
+- **Decision:** assignment **unhealthy** — debug the flag-await/assignment path (missing assignments + control skew). Keep flag running while debugging; do not trust the `api_render_completed` read.
+
+## Sequenced launches — NOT ready
+
+`onboarding-value-first-skip` (374739), `dashboard-checklist-value-first` (374740), `verify-copy-v1` (374741) remain **on HOLD**. The gating condition (welcome-experiment-a showing healthy ~50% assignment) is **not met** — assignment is 23.1%. Nothing launched (per instructions).
+
+## Recommended actions (priority order)
+1. **Today:** kill the `guided-capture` arm of 374736 (gen guardrail breach).
+2. **Today/this week:** investigate welcome-experiment-a assignment bug (~35% missing assignments + 12v22 skew); blocks 3 sequenced experiments.
+3. **This week:** fix `content_copied`/`content_downloaded` instrumentation (guardrail blind 2 weeks).
+4. **~2026-06-24:** re-read 374736 auto-capture vs control for the rage primary; re-read 374737 directional.
+
+CSV updated (`result_week1` appended with the wk2 read + decisions revised); not committed. The `|||` separator marks the wk1→wk2 boundary in each `result_week1` cell.
+=== done: Wed Jun 17 09:03:56 IST 2026 ===

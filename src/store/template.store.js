@@ -40,6 +40,10 @@ export const templatesPagination = writable({
 	sort: 'newest'
 });
 
+// Per-format totals for the library filter chips. Computed server-side without
+// the outputFormat filter, so every chip keeps its count while one is active.
+export const templateCounts = writable({ all: 0, image: 0, pdf: 0 });
+
 // Actions
 export const getTemplatesAction = async ({
 	page = 1,
@@ -64,6 +68,9 @@ export const getTemplatesAction = async ({
 			return { templates: [], pagination: null };
 		}
 		templates.set(response.templates);
+		if (response.counts) {
+			templateCounts.set(response.counts);
+		}
 		if (response.pagination) {
 			templatesPagination.set({
 				...response.pagination,
@@ -190,6 +197,9 @@ export const searchTemplatesAction = async (query, { page = 1, limit = 12 } = {}
 			return { templates: [], pagination: null };
 		}
 		templates.set(response.templates);
+		if (response.counts) {
+			templateCounts.set(response.counts);
+		}
 		if (response.pagination) {
 			templatesPagination.set({
 				...response.pagination,

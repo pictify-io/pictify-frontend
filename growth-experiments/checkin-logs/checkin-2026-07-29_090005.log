@@ -1,0 +1,50 @@
+=== Pictify experiment weekly check-in: Wed Jul 29 09:00:05 IST 2026 ===
+All six edits applied (result + decision for each of the 3 live experiments). CSV updated, not committed.
+
+---
+
+# Weekly Check-In Summary — Pictify Growth Experiments
+**Read date:** 2026-07-29 · **Window:** wk8, 55 days cumulative (START 2026-06-04) · PostHog project 55738
+
+## 🟢 GUARDRAIL STATUS: ALL CLEAR — no same-day action needed
+The one flagged daily guardrail (`url-tool-capture-flow-v1` gen_pct vs control) **HELD**. No treatment arm fell below control this week.
+
+## Per-experiment results
+
+### 1. url-tool-capture-flow-v1 (374736) — THE powered read
+| variant | opened | rage_pct | gen_pct |
+|---|---|---|---|
+| control | 1293 | **10.44%** | 18.17% |
+| guided-capture | 657 | 8.37% | 19.03% |
+| **auto-capture** | 637 | **7.69%** | **52.43%** |
+
+- **Primary (rage):** auto vs control **z≈1.93** (one-sided p≈.027) — strongest read of the entire run, now right at the frequentist 95% line.
+- **Guardrail (gen):** auto **2.9× control** and above control; guided marginally above → **HELD**.
+- **Decision: SHIP auto-capture** — already executed in code today (auto hardcoded to 100%, guided+control retired); this read confirms it. ⚠️ **Remaining action:** the PostHog flag+experiment **archive is still pending deploy** — complete it.
+
+### 2. tool-signup-cta-v2 (374737) — directional
+| variant | CTR (click/gen) | signups |
+|---|---|---|
+| control | 26.03% | 17 |
+| inline-value-prop | 26.76% | 18 |
+| sticky-bar | 25.52% | 15 |
+
+- **Fully converged** — all arms indistinguishable; inline holds only a razor-thin lead.
+- **Decision: RECOMMEND CONCLUDE (null)** at 8 weeks — ship inline-value-prop as permanent default, retire the flag. Not auto-killed (directional/power constraint) — human call.
+- **Debt:** content_copied/content_downloaded cannibalization guardrail **blind the entire run** — fix before any successor CTA experiment.
+
+### 3. welcome-experiment-a (374738) — assignment health only
+- signups 204 · welcome=61 / control=66 · **assigned/signups = 29.9%** (fails ~50%, 6th consecutive read).
+- **Coverage is the failure:** 62% of signups fire welcome_assigned, ~38% fire none. Arm **split itself is healthy (48% welcome)** — randomization is fine.
+- welcome_viewed 75 > assigned_welcome 61 (anomaly persists). welcome_skipped 44% (flat).
+- **Decision: keep running**; debug the coverage/event-fire path on some auth flows. Do NOT trust the `api_render_completed` read yet.
+
+## Sequenced experiments (374739 / 374740 / 374741)
+**Not ready — HOLD all.** Launch is gated on `welcome-experiment-a` showing healthy ~50% assignment; it still fails on coverage. `verify-copy-v1` (374741) should be **deferred regardless** (verify-surface impressions far too low) — keep instrumentation only.
+
+## Recommended actions
+1. **Deploy the code + complete the PostHog archive** for url-tool-capture-flow-v1 (ship already coded; archive pending).
+2. **Debug welcome_assigned coverage** (~38% of signups never fire it) — this blocks the whole sequenced pipeline.
+3. **Conclude tool-signup-cta-v2** as null; ship inline-value-prop default.
+4. **Fix content_copied/content_downloaded instrumentation** (blind 8 weeks) before any new CTA experiment.
+=== done: Wed Jul 29 09:21:30 IST 2026 ===

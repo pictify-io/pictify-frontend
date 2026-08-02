@@ -655,6 +655,7 @@ print(res.json()['image']['url'])`;
 				imageAlt="Generated tweet screenshot"
 				heading="Success! Here is your tweet screenshot"
 				downloadFileName="tweet-screenshot.png"
+				toolName="tweet_screenshot"
 			/>
 		{/if}
 

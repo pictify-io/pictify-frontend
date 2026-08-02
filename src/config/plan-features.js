@@ -101,9 +101,18 @@ export const FEATURES = {
 	BATCH_ITEMS_PER_REQUEST: 'batchItemsPerRequest',
 	BATCH_MONTHLY_LIMIT: 'batchMonthlyLimit',
 
-	// AI Features
+	// AI Features — the ONLY sold AI allowance is AI_CREDITS: one monthly
+	// pool covering the copilot (templates & video), AI video generation and
+	// captions. Values mirror backend util/ai-credits.js AI_LIMITS — keep in
+	// sync. A SEPARATE pool from render credits.
+	//
+	// AI_BACKGROUND_REMOVER and AI_COPILOT are LEGACY buckets — not sold on
+	// any pricing surface. Keys kept only so feature gates on grandfathered
+	// users' pages keep working (e.g. the background-remove button in the
+	// canvas editor). Do not add these back to pricing/upgrade UI.
 	AI_BACKGROUND_REMOVER: 'aiBackgroundRemover',
 	AI_COPILOT: 'aiCopilot',
+	AI_CREDITS: 'aiCredits',
 
 	// Team & Collaboration
 	TEAM_SEATS: 'teamSeats',
@@ -113,7 +122,9 @@ export const FEATURES = {
 	DYNAMIC_LINKS: 'dynamicLinks',
 	STORAGE_CONNECTORS: 'storageConnectors',
 
-	// Experiments
+	// Experiments — RETIRED (July 2026 repositioning). Not sold on any pricing
+	// surface. Keys kept only so feature gates on grandfathered users' pages
+	// keep working. Do not add these back to pricing/upgrade UI.
 	AB_TESTING: 'abTesting',
 	SMART_LINKS: 'smartLinks',
 	SCHEDULED_IMAGES: 'scheduledImages',
@@ -157,6 +168,7 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: false,
 		[FEATURES.AI_COPILOT]: false,
+		[FEATURES.AI_CREDITS]: 25,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 1,
@@ -200,6 +212,7 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: 25,
 		[FEATURES.AI_COPILOT]: 15,
+		[FEATURES.AI_CREDITS]: 300,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 2,
@@ -243,6 +256,7 @@ export const PLAN_FEATURES = {
 		// AI Features - included in Pro tier
 		[FEATURES.AI_BACKGROUND_REMOVER]: 100,
 		[FEATURES.AI_COPILOT]: 50,
+		[FEATURES.AI_CREDITS]: 1000,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 5,
@@ -286,6 +300,9 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: 200,
 		[FEATURES.AI_COPILOT]: 100,
+		// Backend util/ai-credits.js AI_LIMITS has no 'professional' entry, so
+		// grandfathered Professional users fall back to the starter pool (25).
+		[FEATURES.AI_CREDITS]: 25,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 10,
@@ -323,12 +340,13 @@ export const PLAN_FEATURES = {
 
 		// Batch processing
 		[FEATURES.BATCH_RENDER]: true,
-		[FEATURES.BATCH_ITEMS_PER_REQUEST]: null, // Unlimited
+		[FEATURES.BATCH_ITEMS_PER_REQUEST]: 1000, // Mirrors backend config/plg.js maxItems + workflow MAX_ROWS
 		[FEATURES.BATCH_MONTHLY_LIMIT]: null,
 
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: 500,
 		[FEATURES.AI_COPILOT]: 500,
+		[FEATURES.AI_CREDITS]: 4000,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 10,
@@ -413,15 +431,24 @@ export const FEATURE_METADATA = {
 		icon: 'list',
 		category: 'automation'
 	},
+	// Legacy AI bucket metadata — RETIRED from sale. Neutral labels kept only
+	// for feature gates grandfathered users may still hit.
 	[FEATURES.AI_BACKGROUND_REMOVER]: {
 		name: 'AI Background Remover',
-		description: 'Remove backgrounds with AI',
+		description: 'Legacy background removal',
 		icon: 'wand',
 		category: 'ai'
 	},
 	[FEATURES.AI_COPILOT]: {
 		name: 'AI Copilot',
-		description: 'AI-powered design assistance',
+		description: 'Legacy per-plan copilot bucket (now covered by AI Credits)',
+		icon: 'sparkles',
+		category: 'ai'
+	},
+	[FEATURES.AI_CREDITS]: {
+		name: 'AI Credits',
+		description:
+			'Monthly AI credit pool for the copilot (templates & video), AI video generation and captions',
 		icon: 'sparkles',
 		category: 'ai'
 	},
@@ -449,27 +476,29 @@ export const FEATURE_METADATA = {
 		icon: 'cloud',
 		category: 'integrations'
 	},
+	// Experiments metadata — RETIRED features (July 2026). Neutral labels kept
+	// only for feature gates grandfathered users may still hit.
 	[FEATURES.AB_TESTING]: {
 		name: 'A/B Testing',
-		description: 'Test image variants to find the best performer',
+		description: 'Legacy image variant testing',
 		icon: 'split',
 		category: 'experiments'
 	},
 	[FEATURES.SMART_LINKS]: {
 		name: 'Smart Links',
-		description: 'Show different images based on viewer context',
+		description: 'Legacy context-based image links',
 		icon: 'target',
 		category: 'experiments'
 	},
 	[FEATURES.SCHEDULED_IMAGES]: {
 		name: 'Scheduled Images',
-		description: 'Schedule image changes and set expiration dates',
+		description: 'Legacy scheduled image changes',
 		icon: 'clock',
 		category: 'experiments'
 	},
 	[FEATURES.AUTO_OPTIMIZATION]: {
 		name: 'Auto-Optimization',
-		description: 'AI-powered variant optimization with Thompson Sampling',
+		description: 'Legacy automatic variant optimization',
 		icon: 'trending-up',
 		category: 'experiments'
 	},
@@ -499,7 +528,7 @@ export const FEATURE_METADATA = {
 	},
 	[FEATURES.API_ACCESS]: {
 		name: 'API Access',
-		description: 'Full API access with no rate limits',
+		description: 'Full REST API access on every plan',
 		icon: 'code',
 		category: 'core'
 	}
@@ -572,16 +601,9 @@ export const FEATURE_UPGRADE_MESSAGES = {
 		message: 'Process multiple images at once with batch rendering.',
 		benefit: 'Save hours with automated processing'
 	},
-	[FEATURES.AI_BACKGROUND_REMOVER]: {
-		title: 'AI Background Remover',
-		message: 'Remove backgrounds instantly with AI.',
-		benefit: 'Available on Basic (25/mo), Pro (100/mo), Business (500/mo)'
-	},
-	[FEATURES.AI_COPILOT]: {
-		title: 'Unlock AI Copilot',
-		message: 'Get AI-powered design assistance.',
-		benefit: 'Available on Basic (15/mo), Pro (50/mo), Business (500/mo)'
-	},
+	// AI Background Remover and the per-plan AI Copilot bucket are no longer
+	// sold — their upsells were removed alongside the experiments ones. The
+	// copilot is covered by the unified AI credits pool on every plan.
 	[FEATURES.WEBHOOKS]: {
 		title: 'Webhooks Available on All Paid Plans',
 		message: 'Automate your workflow with custom webhooks.',
@@ -596,27 +618,11 @@ export const FEATURE_UPGRADE_MESSAGES = {
 		title: 'Storage Connectors on All Paid Plans',
 		message: 'Connect to S3, GCS, or Cloudinary.',
 		benefit: 'Store renders directly in your cloud storage'
-	},
-	[FEATURES.AB_TESTING]: {
-		title: 'Unlock More A/B Tests',
-		message: "You've reached your A/B test limit.",
-		benefit: 'Test more variants and find what performs best'
-	},
-	[FEATURES.SMART_LINKS]: {
-		title: 'Smart Links Available on All Paid Plans',
-		message: 'Show different images based on device, location, or time.',
-		benefit: 'Personalize images for every viewer automatically'
-	},
-	[FEATURES.SCHEDULED_IMAGES]: {
-		title: 'Scheduled Images on All Paid Plans',
-		message: 'Schedule image changes for campaigns and promotions.',
-		benefit: 'Set it and forget it - images change on your schedule'
-	},
-	[FEATURES.AUTO_OPTIMIZATION]: {
-		title: 'Auto-Optimization on Pro',
-		message: 'Let AI pick the best performing variant automatically.',
-		benefit: 'Thompson Sampling finds winners faster than manual A/B tests'
 	}
+	// Experiments (A/B testing, smart links, scheduled images, auto-optimization)
+	// were retired in the July 2026 repositioning. Their upgrade upsells were
+	// removed — getFeatureUpgradePrompt falls back to neutral generated copy for
+	// any grandfathered user who still hits those gates.
 };
 
 // Helper functions

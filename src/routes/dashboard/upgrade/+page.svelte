@@ -7,7 +7,13 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import { analytics } from '$lib/analytics.js';
 	import { recordDiscountCodeUsed } from '../../../api/plg.js';
-	import { PLANS, FEATURES, PLAN_FEATURES, formatLimit } from '../../../config/plan-features.js';
+	import {
+		PLANS,
+		FEATURES,
+		PLAN_FEATURES,
+		formatLimit,
+		normalizePlan
+	} from '../../../config/plan-features.js';
 
 	let isLoading = true;
 	let allPlans = [];
@@ -32,24 +38,30 @@
 		showAnnual = true;
 	}
 
-	// 3-tier system matching pricing page: Free (Starter), Pro (Standard), Business
-	// Legacy plans (Basic, Professional) are excluded — only for grandfathered users
+	// Paid tiers matching the pricing page: Basic, Pro (product may be named
+	// "Standard" or "Pro" by the store), Business. Legacy Professional is
+	// excluded — grandfathered users only.
 	const legacyPlanNames = ['Professional'];
-	const featuredPlanNames = ['Basic', 'Standard', 'Business'];
+	const featuredPlanNames = ['Basic', 'Standard', 'Pro', 'Business'];
 
 	$: featuredPlans = allPlans
 		.filter((p) => !legacyPlanNames.includes(p.name))
 		.filter((p) => featuredPlanNames.includes(p.name));
 
+	// The Pro tier's store product has been named both "Standard" and "Pro"
+	const isProTier = (plan) => normalizePlan(plan?.name) === PLANS.STANDARD;
+	const displayName = (plan) => (isProTier(plan) ? 'Pro' : plan.name);
+
 	// Get plan features from central config
 	function getQuotas(planName) {
-		const planId = planName?.toLowerCase();
+		const planId = normalizePlan(planName);
 		const features = PLAN_FEATURES[planId] || PLAN_FEATURES[PLANS.STARTER];
 		return {
 			renders: features[FEATURES.RENDERS],
 			templates: features[FEATURES.TEMPLATES_SAVED],
-			aiCopilot: features[FEATURES.AI_COPILOT],
-			aiBackgroundRemover: features[FEATURES.AI_BACKGROUND_REMOVER],
+			// ONE monthly AI credit pool (copilot for templates & video, AI video
+			// generation, captions) — a separate pool from render credits.
+			aiCredits: features[FEATURES.AI_CREDITS],
 			batchRender: features[FEATURES.BATCH_RENDER],
 			teamSeats: features[FEATURES.TEAM_SEATS]
 		};
@@ -93,7 +105,7 @@
 	}
 
 	function isPlanCurrent(plan) {
-		return plan?.name?.toLowerCase() === currentPlan?.toLowerCase();
+		return normalizePlan(plan?.name) === normalizePlan(currentPlan);
 	}
 
 	function handlePurchase(plan) {
@@ -292,7 +304,7 @@
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
 				{#each featuredPlans as plan (plan.name + '-' + showAnnual)}
 					{@const isCurrent = isPlanCurrent(plan)}
-					{@const isPopular = plan.name === 'Standard'}
+					{@const isPopular = isProTier(plan)}
 					{@const quotas = getQuotas(plan.name)}
 					{@const displayPrice =
 						showAnnual && plan.price_annual != null ? plan.price_annual : plan.price}
@@ -314,7 +326,7 @@
 						<div class="p-6 sm:p-8 flex-1 flex flex-col">
 							<div class="mb-6">
 								<h3 class="text-3xl font-black text-gray-900 uppercase tracking-tight mb-2">
-									{plan.name === 'Standard' ? 'Pro' : plan.name}
+									{displayName(plan)}
 								</h3>
 								<div class="flex items-baseline gap-2 mb-1">
 									<span class="text-5xl font-black text-gray-900 tracking-tighter"
@@ -353,7 +365,7 @@
 										? 'bg-brand-danger text-white hover:bg-data-red shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
 										: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
 								>
-									Upgrade to {plan.name === 'Standard' ? 'Pro' : plan.name}
+									Upgrade to {displayName(plan)}
 								</button>
 							{/if}
 
@@ -373,13 +385,13 @@
 								<div
 									class="flex items-center justify-between pb-3 border-b-2 border-dashed border-gray-200"
 								>
-									<span class="text-gray-600">AI Copilot</span>
-									<span class="text-gray-900"
-										>{formatFeatureValue(quotas.aiCopilot)}{quotas.aiCopilot !== false &&
-										quotas.aiCopilot !== null
-											? '/mo'
-											: ''}</span
-									>
+									<div class="flex flex-col">
+										<span class="text-gray-600">AI Credits</span>
+										<span class="text-[10px] text-gray-400 font-medium"
+											>Copilot (templates &amp; video), AI video generation &amp; captions</span
+										>
+									</div>
+									<span class="text-gray-900">{formatFeatureValue(quotas.aiCredits)}/mo</span>
 								</div>
 								<div class="flex items-center justify-between">
 									<span class="text-gray-600">Team Seats</span>

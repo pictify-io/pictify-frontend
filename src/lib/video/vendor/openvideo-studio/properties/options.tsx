@@ -1,0 +1,1877 @@
+/*
+ * Vendored from openvideodev/react-video-editor —
+ * src/components/editor/right-panel/properties/options/{section-header,
+ * transform,opacity,text-color,fill,text-group,volume,alignment}.tsx,
+ * consolidated into one module. License: OpenVideo License (free tier,
+ * accepted 2026-07-27) — see LICENSE at the root of this directory.
+ * Local changes: shadcn/radix primitives (Slider, InputGroup, NumberInput,
+ * Popover color picker, Select, Collapsible) replaced by ../ui equivalents
+ * (native range input, native select, <input type="color"> + hex field);
+ * @remixicon/react replaced by ../icons; the searchable font popover reduced
+ * to a native family select + style select; decoration/case rows kept.
+ * The TimingProperty section is written for Pictify (start / duration in
+ * seconds over timing.display microseconds).
+ */
+import * as React from "react";
+import { Button, ColorField, Input, NumberInput, Select, Slider, cn } from "../ui";
+import {
+  RiAddLine,
+  RiAlignCenter,
+  RiAlignLeft,
+  RiAlignRight,
+  RiSubtractLine,
+} from "../icons";
+import { MotionPicker } from "./motion-picker";
+import "./motion-picker.css";
+import { useSliderThrottle } from "./use-slider-throttle";
+import { getGroupedFonts } from "../font-utils";
+import { ALIGNMENTS, ORDER_OPS } from "../../../arrange";
+import {
+  TRANSITION_OPTIONS,
+  DEFAULT_TRANSITION_US,
+  toSeconds,
+} from "../../../transitions";
+import {
+  IN_PRESETS,
+  OUT_PRESETS,
+  EMPHASIS_PRESETS,
+  DEFAULT_IN_FRACTION,
+  DEFAULT_OUT_FRACTION,
+} from "../../../animations";
+import {
+  GRADIENT_PRESETS,
+  GRADIENT_TYPES,
+  MAX_GRADIENT_STOPS,
+  MIN_GRADIENT_STOPS,
+  gradientCss,
+  parseGradientFill,
+  toGradientFill,
+} from "../../../gradients";
+import {
+  DEFAULT_STROKE,
+  DEFAULT_SHADOW,
+  STROKE_WIDTH_MAX,
+  SHADOW_BLUR_MAX,
+  LINE_HEIGHT_MIN,
+  LINE_HEIGHT_MAX,
+  LETTER_SPACING_MIN,
+  LETTER_SPACING_MAX,
+} from "../../../clip-style";
+import { paramLabel } from "../../../effect-params";
+
+const GROUPED_FONTS = getGroupedFonts();
+
+// ── Layout helpers ───────────────────────────────────────────────────────
+
+export function SectionTitle({ title }: { title: string }) {
+  return (
+    <div className="flex items-center justify-between py-2">
+      <span className="text-xs font-semibold text-foreground">{title}</span>
+    </div>
+  );
+}
+
+export function SectionHeader({
+  title,
+  hasContent,
+  onAdd,
+  onRemove,
+}: {
+  title: string;
+  hasContent: boolean;
+  onAdd: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between py-2">
+      <span className="text-xs font-semibold text-foreground">{title}</span>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 text-muted-foreground"
+        onClick={hasContent ? onRemove : onAdd}
+      >
+        {hasContent ? <RiSubtractLine size={16} /> : <RiAddLine size={16} />}
+      </Button>
+    </div>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1">
+      <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
+      <div className="flex w-[160px] items-center gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+// ── Transform ────────────────────────────────────────────────────────────
+
+interface TransformPropertyProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation?: number;
+  onXChange: (val: number) => void;
+  onYChange: (val: number) => void;
+  onWidthChange: (val: number) => void;
+  onHeightChange: (val: number) => void;
+  onRotationChange?: (val: number) => void;
+}
+
+export function TransformProperty({
+  x,
+  y,
+  width,
+  height,
+  rotation = 0,
+  onXChange,
+  onYChange,
+  onWidthChange,
+  onHeightChange,
+  onRotationChange,
+}: TransformPropertyProps) {
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Transform" />
+      <div className="flex flex-col py-1">
+        <Row label="Position">
+          <NumberInput value={Math.round(x)} onChange={onXChange} aria-label="X" />
+          <NumberInput value={Math.round(y)} onChange={onYChange} aria-label="Y" />
+        </Row>
+        <Row label="Size">
+          <NumberInput value={Math.round(width)} onChange={onWidthChange} aria-label="Width" />
+          <NumberInput value={Math.round(height)} onChange={onHeightChange} aria-label="Height" />
+        </Row>
+        <Row label="Rotation">
+          <NumberInput
+            value={Math.round(rotation)}
+            onChange={(val) => onRotationChange?.(val)}
+            aria-label="Rotation"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Opacity ──────────────────────────────────────────────────────────────
+
+export function OpacityProperty({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (val: number) => void;
+}) {
+  const toPercent = (v: number) => Math.round(v * 100);
+  const fromPercent = (v: number) => v / 100;
+
+  const { localValue, handleChange, handleCommit, handleDirectSet } = useSliderThrottle(
+    toPercent(value),
+    (pct) => onChange(fromPercent(pct)),
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Opacity" />
+      <div className="flex flex-col py-1">
+        <Row label="Opacity">
+          <Slider value={localValue} max={100} onChange={handleChange} onCommit={handleCommit} />
+          <NumberInput
+            value={localValue}
+            onChange={handleDirectSet}
+            className="w-12 shrink-0 text-center"
+            aria-label="Opacity percent"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Volume ───────────────────────────────────────────────────────────────
+
+export function VolumeProperty({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (val: number) => void;
+}) {
+  const toPercent = (v: number) => Math.round(v * 100);
+
+  const { localValue, handleChange, handleCommit, handleDirectSet } = useSliderThrottle(
+    toPercent(value),
+    (pct) => onChange(pct / 100),
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Audio" />
+      <div className="flex flex-col py-1">
+        <Row label="Volume">
+          <Slider value={localValue} max={100} onChange={handleChange} onCommit={handleCommit} />
+          <NumberInput
+            value={localValue}
+            onChange={handleDirectSet}
+            className="w-12 shrink-0 text-center"
+            aria-label="Volume percent"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Text color ───────────────────────────────────────────────────────────
+
+export function TextColorProperty({
+  color,
+  onColorChange,
+}: {
+  color: string;
+  onColorChange: (color: string) => void;
+}) {
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Text Color" />
+      <div className="flex flex-col py-1">
+        <Row label="Color">
+          <ColorField color={color || "#ffffff"} onChange={onColorChange} className="w-full" />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Fill (shapes) ────────────────────────────────────────────────────────
+
+// A shape's fill is EITHER a solid hex string or a CSS gradient string. The
+// patched engine reads both from the same `style.fill`, so switching mode is
+// just a different string — no extra style key to be dropped on deserialize.
+export function FillProperty({
+  color,
+  onColorChange,
+}: {
+  color: string;
+  onColorChange: (color: string) => void;
+}) {
+  const parsed = parseGradientFill(color);
+  const isGradient = Boolean(parsed);
+  const current = parsed ?? {
+    type: "linear",
+    angle: 180,
+    colors: [color || "#3b82f6", "#0000ff"],
+  };
+
+  const {
+    localValue: localAngle,
+    handleChange: onAngleChange,
+    handleCommit: commitAngle,
+  } = useSliderThrottle(current.angle, (value) =>
+    onColorChange(toGradientFill({ ...current, angle: value }))
+  );
+
+  const setGradient = (next: { type: string; angle: number; colors: string[] }) =>
+    onColorChange(toGradientFill(next));
+
+  const setStop = (index: number, value: string) => {
+    const colors = [...current.colors];
+    colors[index] = value;
+    setGradient({ ...current, colors });
+  };
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Fill" />
+
+      <div className="flex flex-col py-1">
+        <Row label="Type">
+          <Select
+            value={isGradient ? "gradient" : "solid"}
+            onValueChange={(mode) =>
+              mode === "gradient"
+                ? setGradient(current)
+                : // Collapse back to the first stop so the shape keeps its look.
+                  onColorChange(current.colors[0] || "#3b82f6")
+            }
+            options={[
+              { value: "solid", label: "Solid" },
+              { value: "gradient", label: "Gradient" },
+            ]}
+          />
+        </Row>
+
+        {!isGradient && (
+          <Row label="Color">
+            <ColorField color={color || "#3b82f6"} onChange={onColorChange} className="w-full" />
+          </Row>
+        )}
+
+        {isGradient && (
+          <>
+            <div
+              className="my-2 h-10 w-full rounded border border-border"
+              style={{ backgroundImage: toGradientFill({ ...current, angle: localAngle }) }}
+            />
+            <Row label="Style">
+              <Select
+                value={current.type}
+                onValueChange={(type) => setGradient({ ...current, type })}
+                options={GRADIENT_TYPES}
+              />
+            </Row>
+            {current.type !== "radial" && (
+              <Row label="Angle">
+                <Slider
+                  value={localAngle}
+                  min={0}
+                  max={360}
+                  step={1}
+                  onChange={onAngleChange}
+                  onCommit={commitAngle}
+                />
+                <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+                  {Math.round(localAngle)}°
+                </span>
+              </Row>
+            )}
+            {current.colors.map((stop, index) => (
+              <Row
+                key={index}
+                label={index === 0 ? "From" : index === current.colors.length - 1 ? "To" : `Stop ${index + 1}`}
+              >
+                <ColorField color={stop} onChange={(value) => setStop(index, value)} />
+                {current.colors.length > MIN_GRADIENT_STOPS && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 shrink-0 text-muted-foreground"
+                    onClick={() =>
+                      setGradient({
+                        ...current,
+                        colors: current.colors.filter((_, i) => i !== index),
+                      })
+                    }
+                    title="Remove this stop"
+                  >
+                    <RiSubtractLine size={14} />
+                  </Button>
+                )}
+              </Row>
+            ))}
+            {current.colors.length < MAX_GRADIENT_STOPS && (
+              <Button
+                variant="ghost"
+                className="mt-1 h-7 w-full text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+                onClick={() =>
+                  setGradient({
+                    ...current,
+                    colors: [...current.colors, current.colors[current.colors.length - 1]],
+                  })
+                }
+              >
+                <RiAddLine size={14} className="mr-1" />
+                Add stop
+              </Button>
+            )}
+            <div className="mt-2 grid grid-cols-4 gap-1.5">
+              {GRADIENT_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() =>
+                    setGradient({ type: "linear", angle: preset.angle, colors: [...preset.colors] })
+                  }
+                  title={preset.name}
+                  className="h-6 w-full rounded-sm border border-border transition-transform hover:scale-105"
+                  style={{
+                    backgroundImage: gradientCss({
+                      type: "linear",
+                      angle: preset.angle,
+                      colors: preset.colors,
+                    }),
+                    backgroundColor: preset.id === "scrim" ? "#4b5563" : undefined,
+                  }}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Typography group ─────────────────────────────────────────────────────
+
+interface TextGroupPropertyProps {
+  text: string;
+  onTextChange: (val: string) => void;
+  currentFamily: string;
+  currentPostScriptName: string;
+  fontSize: number;
+  onFontChange: (postScriptName: string) => void;
+  onFontStyleChange: (postScriptName: string) => void;
+  onFontSizeChange: (val: number) => void;
+  textAlign: "left" | "center" | "right";
+  onTextAlignChange: (val: "left" | "center" | "right") => void;
+}
+
+export function TextGroupProperty({
+  text,
+  onTextChange,
+  currentFamily,
+  currentPostScriptName,
+  fontSize,
+  onFontChange,
+  onFontStyleChange,
+  onFontSizeChange,
+  textAlign,
+  onTextAlignChange,
+}: TextGroupPropertyProps) {
+  const familyData = GROUPED_FONTS.find((f) => f.family === currentFamily);
+  const fontStyles = familyData?.styles || [];
+
+  const familyOptions = GROUPED_FONTS.map((f) => ({ value: f.family, label: f.family })).sort(
+    (a, b) => a.label.localeCompare(b.label),
+  );
+  // The current family may come from a preset outside the vendored subset —
+  // keep it selectable so the select does not silently jump.
+  if (!familyData) familyOptions.unshift({ value: currentFamily, label: currentFamily });
+
+  const styleOptions = fontStyles.map((style) => ({
+    value: style.postScriptName,
+    label: style.fullName.replace(currentFamily, "").trim() || "Regular",
+  }));
+  if (!styleOptions.some((option) => option.value === currentPostScriptName)) {
+    styleOptions.unshift({ value: currentPostScriptName, label: "Custom" });
+  }
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Typography" />
+      <div className="flex flex-col py-1">
+        <Row label="Content">
+          <Input value={text} onChange={(e) => onTextChange(e.target.value)} placeholder="Text" />
+        </Row>
+        <Row label="Font">
+          <Select
+            value={familyData ? currentFamily : currentFamily}
+            onValueChange={(family) => {
+              const target = GROUPED_FONTS.find((f) => f.family === family);
+              if (target) onFontChange(target.mainFont.postScriptName);
+            }}
+            options={familyOptions}
+            aria-label="Font family"
+          />
+        </Row>
+        {styleOptions.length > 1 && (
+          <Row label="Style">
+            <Select
+              value={currentPostScriptName}
+              onValueChange={onFontStyleChange}
+              options={styleOptions}
+              aria-label="Font style"
+            />
+          </Row>
+        )}
+        <Row label="Size">
+          <NumberInput value={fontSize} onChange={onFontSizeChange} aria-label="Font size" />
+        </Row>
+        <Row label="Align">
+          <div className="flex w-full items-center rounded border border-border bg-muted p-0.5">
+            {[
+              { icon: RiAlignLeft, value: "left" as const },
+              { icon: RiAlignCenter, value: "center" as const },
+              { icon: RiAlignRight, value: "right" as const },
+            ].map((item) => (
+              <button
+                key={item.value}
+                onClick={() => onTextAlignChange(item.value)}
+                className={cn(
+                  "flex h-6 flex-1 items-center justify-center rounded-sm transition-colors",
+                  textAlign === item.value
+                    ? "bg-accent text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-label={`Align ${item.value}`}
+              >
+                <item.icon size={14} />
+              </button>
+            ))}
+          </div>
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Timing (written for Pictify) ─────────────────────────────────────────
+
+const US = 1_000_000;
+
+export function TimingProperty({
+  from,
+  to,
+  onFromChange,
+  onDurationChange,
+}: {
+  from: number; // microseconds
+  to: number; // microseconds
+  onFromChange: (fromUs: number) => void;
+  onDurationChange: (durationUs: number) => void;
+}) {
+  const startSec = from / US;
+  const durationSec = Math.max(0, to - from) / US;
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Timing" />
+      <div className="flex flex-col py-1">
+        <Row label="Start (s)">
+          <NumberInput
+            value={Math.round(startSec * 100) / 100}
+            onChange={(val) => onFromChange(Math.max(0, val) * US)}
+            aria-label="Start seconds"
+          />
+        </Row>
+        <Row label="Duration (s)">
+          <NumberInput
+            value={Math.round(durationSec * 100) / 100}
+            onChange={(val) => onDurationChange(Math.max(0.1, val) * US)}
+            aria-label="Duration seconds"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Gradient (Backdrop clips) ────────────────────────────────────────────
+//
+// Written for Pictify. The engine's only gradient primitive is a Backdrop, so
+// this section owns everything about how one looks: type, stop colours, and —
+// for linear — the angle.
+//
+// The angle is stored inside `gradientType` as "linear:<deg>" rather than as
+// its own style key, because BackdropClip rebuilds `style` from a fixed key
+// list on every deserialize and would drop anything else. See src/lib/video/
+// gradients.js.
+
+interface GradientPropertyProps {
+  type: string;
+  angle: number;
+  colors: string[];
+  boundStops?: Record<number, string>;
+  onChange: (next: { type: string; angle: number; colors: string[] }) => void;
+}
+
+export function GradientProperty({
+  type,
+  angle,
+  colors,
+  boundStops = {},
+  onChange,
+}: GradientPropertyProps) {
+  const {
+    localValue: localAngle,
+    handleChange: onAngleChange,
+    handleCommit: commitAngle,
+  } = useSliderThrottle(angle, (value) => onChange({ type, angle: value, colors }));
+
+  const setColor = (index: number, color: string) => {
+    const next = [...colors];
+    next[index] = color;
+    onChange({ type, angle, colors: next });
+  };
+
+  const addStop = () => {
+    if (colors.length >= MAX_GRADIENT_STOPS) return;
+    onChange({ type, angle, colors: [...colors, colors[colors.length - 1] || "#ffffff"] });
+  };
+
+  const removeStop = (index: number) => {
+    if (colors.length <= MIN_GRADIENT_STOPS) return;
+    onChange({ type, angle, colors: colors.filter((_, i) => i !== index) });
+  };
+
+  return (
+    <div className="border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Gradient" />
+
+      <div
+        className="mb-3 h-12 w-full rounded border border-border"
+        style={{ backgroundImage: gradientCss({ type, angle: localAngle, colors }) }}
+      />
+
+      <div className="space-y-1">
+        <Row label="Type">
+          <Select
+            value={type}
+            onValueChange={(value) => onChange({ type: value, angle, colors })}
+            options={GRADIENT_TYPES}
+          />
+        </Row>
+
+        {type !== "radial" && (
+          <Row label="Angle">
+            <Slider
+              value={localAngle}
+              min={0}
+              max={360}
+              step={1}
+              onChange={onAngleChange}
+              onCommit={commitAngle}
+            />
+            <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+              {Math.round(localAngle)}°
+            </span>
+          </Row>
+        )}
+      </div>
+
+      <div className="mt-2 space-y-1">
+        {colors.map((color, index) => {
+          const bound = boundStops[index];
+          return (
+            <Row key={index} label={index === 0 ? "From" : index === colors.length - 1 ? "To" : `Stop ${index + 1}`}>
+              {bound ? (
+                // A bound stop is driven by a variable at render time, so
+                // editing the colour here would be a lie.
+                <span
+                  className="flex-1 truncate rounded border border-primary/60 bg-accent px-2 py-1 font-mono text-[10px] text-primary"
+                  title={`Set by the "${bound}" variable at render time`}
+                >
+                  {bound}
+                </span>
+              ) : (
+                <ColorField color={color} onChange={(value) => setColor(index, value)} />
+              )}
+              {colors.length > MIN_GRADIENT_STOPS && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 shrink-0 text-muted-foreground"
+                  onClick={() => removeStop(index)}
+                  title="Remove this stop"
+                >
+                  <RiSubtractLine size={14} />
+                </Button>
+              )}
+            </Row>
+          );
+        })}
+      </div>
+
+      {colors.length < MAX_GRADIENT_STOPS && (
+        <Button
+          variant="ghost"
+          className="mt-1 h-7 w-full text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+          onClick={addStop}
+        >
+          <RiAddLine size={14} className="mr-1" />
+          Add stop
+        </Button>
+      )}
+
+      <div className="mt-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Presets
+        </span>
+        <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+          {GRADIENT_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() =>
+                onChange({ type: "linear", angle: preset.angle, colors: [...preset.colors] })
+              }
+              title={preset.name}
+              className="h-6 w-full rounded-sm border border-border transition-transform hover:scale-105"
+              style={{
+                backgroundImage: gradientCss({
+                  type: "linear",
+                  angle: preset.angle,
+                  colors: preset.colors,
+                }),
+                backgroundColor: preset.id === "scrim" ? "#4b5563" : undefined,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Text style (Pictify) ─────────────────────────────────────────────────
+//
+// The engine's TextStyleJSON carries stroke, shadow, lineHeight, letterSpacing,
+// textCase and a text background; the vendored panel exposed none of them. The
+// background is the urgent one: the "Simple Badge" text preset SETS
+// style.background, after which the user had no control to edit or remove it.
+//
+// Every value here is a plain style key, so it round-trips through the
+// serializer and renders identically on the server.
+
+const TEXT_CASE_OPTIONS = [
+  { value: "none", label: "As typed" },
+  { value: "uppercase", label: "UPPERCASE" },
+  { value: "lowercase", label: "lowercase" },
+  { value: "title", label: "Title Case" },
+];
+
+interface TextStylePropertyProps {
+  style: Record<string, any>;
+  onStyleChange: (patch: Record<string, any>) => void;
+}
+
+export function TextStyleProperty({ style, onStyleChange }: TextStylePropertyProps) {
+  const stroke = style.stroke || null;
+  const shadow = style.shadow || null;
+  const background = style.background || null;
+
+  const { localValue: localSpacing, handleChange: onSpacing, handleCommit: commitSpacing } =
+    useSliderThrottle(Number(style.letterSpacing ?? 0), (v) => onStyleChange({ letterSpacing: v }));
+  const { localValue: localLine, handleChange: onLine, handleCommit: commitLine } =
+    useSliderThrottle(Math.round(Number(style.lineHeight ?? 1) * 100), (v) =>
+      onStyleChange({ lineHeight: v / 100 })
+    );
+
+  // Nested style objects must be written whole — the engine merges one level.
+  const patchStroke = (patch: Record<string, any>) =>
+    onStyleChange({ stroke: { color: "#000000", width: 2, ...(stroke || {}), ...patch } });
+  const patchShadow = (patch: Record<string, any>) =>
+    onStyleChange({
+      shadow: { color: "#000000", alpha: 0.5, blur: 4, offsetX: 0, offsetY: 2, ...(shadow || {}), ...patch },
+    });
+  const patchBackground = (patch: Record<string, any>) =>
+    onStyleChange({
+      background: {
+        color: "#000000",
+        opacity: 1,
+        borderRadius: 4,
+        paddingX: 8,
+        paddingY: 4,
+        ...(background || {}),
+        ...patch,
+      },
+    });
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Text Style" />
+
+      <div className="flex flex-col py-1">
+        <Row label="Case">
+          <Select
+            value={style.textCase || "none"}
+            onValueChange={(v) => onStyleChange({ textCase: v })}
+            options={TEXT_CASE_OPTIONS}
+          />
+        </Row>
+        <Row label="Line height">
+          <Slider value={localLine} min={50} max={300} step={5} onChange={onLine} onCommit={commitLine} />
+          <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+            {localLine}%
+          </span>
+        </Row>
+        <Row label="Letter sp.">
+          <Slider value={localSpacing} min={-10} max={40} step={1} onChange={onSpacing} onCommit={commitSpacing} />
+          <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+            {localSpacing}
+          </span>
+        </Row>
+      </div>
+
+      <SectionHeader
+        title="Stroke"
+        hasContent={!!stroke}
+        onAdd={() => patchStroke({})}
+        onRemove={() => onStyleChange({ stroke: null })}
+      />
+      {stroke && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField color={stroke.color || "#000000"} onChange={(v) => patchStroke({ color: v })} />
+          </Row>
+          <Row label="Width">
+            <NumberInput
+              value={Number(stroke.width ?? 2)}
+              onChange={(v) => patchStroke({ width: Math.max(0, v) })}
+            />
+          </Row>
+        </div>
+      )}
+
+      <SectionHeader
+        title="Shadow"
+        hasContent={!!shadow}
+        onAdd={() => patchShadow({})}
+        onRemove={() => onStyleChange({ shadow: null })}
+      />
+      {shadow && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField color={shadow.color || "#000000"} onChange={(v) => patchShadow({ color: v })} />
+          </Row>
+          <Row label="Offset">
+            <NumberInput value={Number(shadow.offsetX ?? 0)} onChange={(v) => patchShadow({ offsetX: v })} aria-label="Shadow X" />
+            <NumberInput value={Number(shadow.offsetY ?? 2)} onChange={(v) => patchShadow({ offsetY: v })} aria-label="Shadow Y" />
+          </Row>
+          <Row label="Blur">
+            <NumberInput value={Number(shadow.blur ?? 4)} onChange={(v) => patchShadow({ blur: Math.max(0, v) })} />
+          </Row>
+        </div>
+      )}
+
+      <SectionHeader
+        title="Background"
+        hasContent={!!background}
+        onAdd={() => patchBackground({})}
+        onRemove={() => onStyleChange({ background: null })}
+      />
+      {background && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField color={background.color || "#000000"} onChange={(v) => patchBackground({ color: v })} />
+          </Row>
+          <Row label="Radius">
+            <NumberInput
+              value={Number(background.borderRadius ?? 4)}
+              onChange={(v) => patchBackground({ borderRadius: Math.max(0, v) })}
+            />
+          </Row>
+          <Row label="Padding">
+            <NumberInput value={Number(background.paddingX ?? 8)} onChange={(v) => patchBackground({ paddingX: Math.max(0, v) })} aria-label="Padding X" />
+            <NumberInput value={Number(background.paddingY ?? 4)} onChange={(v) => patchBackground({ paddingY: Math.max(0, v) })} aria-label="Padding Y" />
+          </Row>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Animation (Pictify) ──────────────────────────────────────────────────
+//
+// The engine ships 51 entrance and 51 exit presets and exposed none of them.
+// It gives a clip ONE animation slot, so an In and an Out selection are
+// composed into a single keyframe map (see src/lib/video/animations.js).
+//
+// Emphasis presets loop over the whole clip, so they are mutually exclusive
+// with In/Out rather than a third dropdown you can combine.
+
+interface AnimationPropertyProps {
+  inPreset: string;
+  outPreset: string;
+  emphasisPreset: string;
+  inFraction: number;
+  outFraction: number;
+  onChange: (next: {
+    inPreset: string;
+    outPreset: string;
+    emphasisPreset: string;
+    inFraction: number;
+    outFraction: number;
+  }) => void;
+}
+
+export function AnimationProperty({
+  inPreset,
+  outPreset,
+  emphasisPreset,
+  inFraction,
+  outFraction,
+  onChange,
+}: AnimationPropertyProps) {
+  const none = { value: "", label: "None" };
+  const current = { inPreset, outPreset, emphasisPreset, inFraction, outFraction };
+
+  const { localValue: localIn, handleChange: onIn, handleCommit: commitIn } = useSliderThrottle(
+    Math.round((inFraction ?? DEFAULT_IN_FRACTION) * 100),
+    (v) => onChange({ ...current, inFraction: v / 100 })
+  );
+  const { localValue: localOut, handleChange: onOut, handleCommit: commitOut } = useSliderThrottle(
+    Math.round((outFraction ?? DEFAULT_OUT_FRACTION) * 100),
+    (v) => onChange({ ...current, outFraction: v / 100 })
+  );
+
+  const emphasisOn = !!emphasisPreset;
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Animate" />
+
+      <div className="flex flex-col py-1">
+        <Row label="In">
+          <MotionPicker
+            ariaLabel="Animation in"
+            value={inPreset}
+            options={IN_PRESETS()}
+            onChange={(v) => onChange({ ...current, inPreset: v, emphasisPreset: "" })}
+            disabled={emphasisOn}
+          />
+        </Row>
+        {!!inPreset && !emphasisOn && (
+          <Row label="In length">
+            <Slider value={localIn} min={5} max={90} step={5} onChange={onIn} onCommit={commitIn} />
+            <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+              {localIn}%
+            </span>
+          </Row>
+        )}
+
+        <Row label="Out">
+          <MotionPicker
+            ariaLabel="Animation out"
+            value={outPreset}
+            options={OUT_PRESETS()}
+            onChange={(v) => onChange({ ...current, outPreset: v, emphasisPreset: "" })}
+            disabled={emphasisOn}
+          />
+        </Row>
+        {!!outPreset && !emphasisOn && (
+          <Row label="Out length">
+            <Slider value={localOut} min={5} max={90} step={5} onChange={onOut} onCommit={commitOut} />
+            <span className="w-10 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+              {localOut}%
+            </span>
+          </Row>
+        )}
+
+        <Row label="Loop">
+          <MotionPicker
+            ariaLabel="Loop animation"
+            value={emphasisPreset}
+            options={EMPHASIS_PRESETS()}
+            onChange={(v) =>
+              onChange({ ...current, emphasisPreset: v, inPreset: "", outPreset: "" })
+            }
+          />
+        </Row>
+      </div>
+
+      <p className="pt-1 text-[11px] leading-snug text-muted-foreground">
+        {emphasisOn
+          ? "A loop animation runs for the whole clip, so it replaces In and Out."
+          : "In and Out share the clip: the entrance plays first, then it rests, then the exit."}
+      </p>
+    </div>
+  );
+}
+
+// ── Transition (Pictify) ─────────────────────────────────────────────────
+//
+// The engine ships 68 transitions and exposed none of them. A transition is its
+// own clip joining two others, so it is authored here on the INCOMING clip:
+// "what plays as this clip arrives".
+
+interface TransitionPropertyProps {
+  transitionKey: string;
+  durationUs: number;
+  hasPrevious: boolean;
+  onChange: (next: { transitionKey: string; durationUs: number }) => void;
+}
+
+export function TransitionProperty({
+  transitionKey,
+  durationUs,
+  hasPrevious,
+  onChange,
+}: TransitionPropertyProps) {
+  const seconds = toSeconds(durationUs || DEFAULT_TRANSITION_US);
+
+  if (!hasPrevious) {
+    return (
+      <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+        <SectionTitle title="Transition" />
+        <p className="pb-1 text-[11px] leading-snug text-muted-foreground">
+          A transition blends this clip with the one before it. This is the first clip on its
+          track, so there is nothing to blend from.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Transition" />
+      <div className="flex flex-col py-1">
+        <Row label="In">
+          <MotionPicker
+            ariaLabel="Transition in"
+            value={transitionKey || ""}
+            options={TRANSITION_OPTIONS()}
+            onChange={(v) => onChange({ transitionKey: v, durationUs })}
+            noneLabel="None (cut)"
+          />
+        </Row>
+        {!!transitionKey && (
+          <Row label="Length">
+            <NumberInput
+              value={seconds}
+              onChange={(v) => onChange({ transitionKey, durationUs: Math.max(0.1, v) * 1_000_000 })}
+            />
+            <span className="shrink-0 text-[10px] text-muted-foreground">sec</span>
+          </Row>
+        )}
+      </div>
+      <p className="pt-1 text-[11px] leading-snug text-muted-foreground">
+        Blends from the previous clip on this track, centred on the cut.
+      </p>
+    </div>
+  );
+}
+
+// ── Arrange (Pictify) ────────────────────────────────────────────────────
+//
+// Align, distribute and stacking order. Works for one clip or several — with a
+// multi-selection the panel used to say "select a single clip", which is
+// exactly when you most want to align things to each other.
+//
+// Alignment targets the artboard, so "align left" means the same thing however
+// many clips are selected. Distribute needs three.
+
+interface ArrangePropertyProps {
+  count: number;
+  onAlign: (id: string) => void;
+  onDistribute: (axis: "x" | "y") => void;
+  onOrder: (id: string) => void;
+}
+
+export function ArrangeProperty({ count, onAlign, onDistribute, onOrder }: ArrangePropertyProps) {
+  const canDistribute = count >= 3;
+  const btn =
+    "flex h-7 flex-1 items-center justify-center rounded border border-border bg-muted/60 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-accent hover:text-foreground disabled:opacity-40 disabled:hover:bg-muted/60";
+
+  return (
+    <div className="flex flex-col border-b border-border/50 px-3 pb-3">
+      <SectionTitle title="Arrange" />
+
+      <div className="flex flex-col gap-1.5 py-1">
+        <div className="flex gap-1">
+          {ALIGNMENTS.filter((a) => a.axis === "x").map((a) => (
+            <button key={a.id} className={btn} title={a.label} onClick={() => onAlign(a.id)}>
+              <i className={`fa ${a.icon} text-[11px]`} aria-hidden="true" />
+            </button>
+          ))}
+          <button
+            className={btn}
+            title={canDistribute ? "Distribute horizontally" : "Select 3 or more clips to distribute"}
+            disabled={!canDistribute}
+            onClick={() => onDistribute("x")}
+          >
+            <i className="fa fa-arrows-left-right text-[11px]" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="flex gap-1">
+          {ALIGNMENTS.filter((a) => a.axis === "y").map((a) => (
+            <button key={a.id} className={btn} title={a.label} onClick={() => onAlign(a.id)}>
+              <i className={`fa ${a.icon} text-[11px]`} aria-hidden="true" />
+            </button>
+          ))}
+          <button
+            className={btn}
+            title={canDistribute ? "Distribute vertically" : "Select 3 or more clips to distribute"}
+            disabled={!canDistribute}
+            onClick={() => onDistribute("y")}
+          >
+            <i className="fa fa-arrows-up-down text-[11px]" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="mt-1 flex gap-1">
+          {ORDER_OPS.map((o) => (
+            <button key={o.id} className={btn} title={o.label} onClick={() => onOrder(o.id)}>
+              <i className={`fa ${o.icon} text-[11px]`} aria-hidden="true" />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Stroke ───────────────────────────────────────────────────────────────
+
+// Optional sections use SectionHeader's +/- affordance rather than a checkbox,
+// because "no stroke" and "a stroke of width 0" have to look different: the
+// first hides the controls, the second would leave a row of dead sliders.
+
+export function StrokeProperty({
+  stroke,
+  onChange,
+}: {
+  stroke: { color: string; width: number } | null;
+  onChange: (changes: { color?: string; width?: number } | null) => void;
+}) {
+  const active = !!stroke;
+  const width = useSliderThrottle(stroke?.width ?? DEFAULT_STROKE.width, (val) =>
+    onChange({ width: val }),
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionHeader
+        title="Stroke"
+        hasContent={active}
+        onAdd={() => onChange({})}
+        onRemove={() => onChange(null)}
+      />
+      {active && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField
+              color={stroke.color}
+              onChange={(color) => onChange({ color })}
+              className="w-full"
+            />
+          </Row>
+          <Row label="Width">
+            <Slider
+              value={width.localValue}
+              max={STROKE_WIDTH_MAX}
+              onChange={width.handleChange}
+              onCommit={width.handleCommit}
+            />
+            <NumberInput
+              value={width.localValue}
+              onChange={width.handleDirectSet}
+              className="w-12 shrink-0 text-center"
+              aria-label="Stroke width"
+            />
+          </Row>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Shadow ───────────────────────────────────────────────────────────────
+
+export function ShadowProperty({
+  shadow,
+  onChange,
+}: {
+  shadow: { color: string; alpha: number; blur: number; offsetX: number; offsetY: number } | null;
+  onChange: (
+    changes: {
+      color?: string;
+      alpha?: number;
+      blur?: number;
+      offsetX?: number;
+      offsetY?: number;
+    } | null,
+  ) => void;
+}) {
+  const active = !!shadow;
+  const blur = useSliderThrottle(shadow?.blur ?? DEFAULT_SHADOW.blur, (val) =>
+    onChange({ blur: val }),
+  );
+  // Alpha is stored 0–1 but shown as a percentage, matching Opacity above.
+  const alpha = useSliderThrottle(
+    Math.round((shadow?.alpha ?? DEFAULT_SHADOW.alpha) * 100),
+    (pct) => onChange({ alpha: pct / 100 }),
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionHeader
+        title="Shadow"
+        hasContent={active}
+        onAdd={() => onChange({})}
+        onRemove={() => onChange(null)}
+      />
+      {active && (
+        <div className="flex flex-col py-1">
+          <Row label="Color">
+            <ColorField
+              color={shadow.color}
+              onChange={(color) => onChange({ color })}
+              className="w-full"
+            />
+          </Row>
+          <Row label="Opacity">
+            <Slider
+              value={alpha.localValue}
+              max={100}
+              onChange={alpha.handleChange}
+              onCommit={alpha.handleCommit}
+            />
+            <NumberInput
+              value={alpha.localValue}
+              onChange={alpha.handleDirectSet}
+              className="w-12 shrink-0 text-center"
+              aria-label="Shadow opacity percent"
+            />
+          </Row>
+          <Row label="Blur">
+            <Slider
+              value={blur.localValue}
+              max={SHADOW_BLUR_MAX}
+              onChange={blur.handleChange}
+              onCommit={blur.handleCommit}
+            />
+            <NumberInput
+              value={blur.localValue}
+              onChange={blur.handleDirectSet}
+              className="w-12 shrink-0 text-center"
+              aria-label="Shadow blur"
+            />
+          </Row>
+          <Row label="Offset">
+            <NumberInput
+              value={Math.round(shadow.offsetX)}
+              onChange={(val) => onChange({ offsetX: val })}
+              aria-label="Shadow offset X"
+            />
+            <NumberInput
+              value={Math.round(shadow.offsetY)}
+              onChange={(val) => onChange({ offsetY: val })}
+              aria-label="Shadow offset Y"
+            />
+          </Row>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Corner radius ────────────────────────────────────────────────────────
+
+export function CornerRadiusProperty({
+  value,
+  max,
+  onChange,
+}: {
+  value: number;
+  max: number;
+  onChange: (val: number) => void;
+}) {
+  const radius = useSliderThrottle(value, onChange);
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Corner Radius" />
+      <div className="flex flex-col py-1">
+        <Row label="Radius">
+          {/* The ceiling is half the clip's shorter side: past that the corners
+              have eaten the shape and the slider would keep moving with nothing
+              changing on the canvas. */}
+          <Slider
+            value={radius.localValue}
+            max={max}
+            onChange={radius.handleChange}
+            onCommit={radius.handleCommit}
+          />
+          <NumberInput
+            value={radius.localValue}
+            onChange={radius.handleDirectSet}
+            className="w-12 shrink-0 text-center"
+            aria-label="Corner radius"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Flip ─────────────────────────────────────────────────────────────────
+
+export function FlipProperty({
+  flip,
+  onToggle,
+}: {
+  flip: { x: boolean; y: boolean };
+  onToggle: (axis: "x" | "y") => void;
+}) {
+  const btn = (on: boolean) =>
+    cn(
+      "flex h-7 flex-1 items-center justify-center gap-1.5 rounded border text-[11px] transition-colors",
+      on
+        ? "border-primary/60 bg-primary/15 text-foreground"
+        : "border-border bg-muted/60 text-muted-foreground hover:border-primary/50 hover:bg-accent hover:text-foreground",
+    );
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Flip" />
+      <div className="flex gap-1 py-1">
+        <button
+          type="button"
+          className={btn(flip.x)}
+          aria-pressed={flip.x}
+          onClick={() => onToggle("x")}
+        >
+          <i className="fa fa-arrows-left-right" aria-hidden="true" />
+          Horizontal
+        </button>
+        <button
+          type="button"
+          className={btn(flip.y)}
+          aria-pressed={flip.y}
+          onClick={() => onToggle("y")}
+        >
+          <i className="fa fa-arrows-up-down" aria-hidden="true" />
+          Vertical
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Text spacing ─────────────────────────────────────────────────────────
+
+export function SpacingProperty({
+  lineHeight,
+  letterSpacing,
+  onChange,
+}: {
+  lineHeight: number;
+  letterSpacing: number;
+  onChange: (changes: { lineHeight?: number; letterSpacing?: number }) => void;
+}) {
+  // Line height is a multiplier (1.2 = normal), letter spacing is pixels. The
+  // slider works in integers, so line height is scaled by ten and back.
+  const line = useSliderThrottle(Math.round(lineHeight * 10), (val) =>
+    onChange({ lineHeight: val / 10 }),
+  );
+  const letter = useSliderThrottle(letterSpacing, (val) => onChange({ letterSpacing: val }));
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Spacing" />
+      <div className="flex flex-col py-1">
+        <Row label="Line height">
+          <Slider
+            value={line.localValue}
+            min={LINE_HEIGHT_MIN * 10}
+            max={LINE_HEIGHT_MAX * 10}
+            onChange={line.handleChange}
+            onCommit={line.handleCommit}
+          />
+          <NumberInput
+            value={line.localValue / 10}
+            onChange={(val) => line.handleDirectSet(Math.round(val * 10))}
+            className="w-12 shrink-0 text-center"
+            aria-label="Line height"
+          />
+        </Row>
+        <Row label="Letter">
+          <Slider
+            value={letter.localValue}
+            min={LETTER_SPACING_MIN}
+            max={LETTER_SPACING_MAX}
+            onChange={letter.handleChange}
+            onCommit={letter.handleCommit}
+          />
+          <NumberInput
+            value={letter.localValue}
+            onChange={letter.handleDirectSet}
+            className="w-12 shrink-0 text-center"
+            aria-label="Letter spacing"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Fades ────────────────────────────────────────────────────────────────
+
+export function FadeProperty({
+  inMs,
+  outMs,
+  maxMs,
+  onChange,
+}: {
+  inMs: number;
+  outMs: number;
+  maxMs: number;
+  onChange: (which: "in" | "out", ms: number) => void;
+}) {
+  const fadeIn = useSliderThrottle(inMs, (val) => onChange("in", val));
+  const fadeOut = useSliderThrottle(outMs, (val) => onChange("out", val));
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Fade" />
+      <div className="flex flex-col py-1">
+        {/* Milliseconds, not the microseconds the timeline uses. The two sit one
+            key apart on the same timing object, so the label is load-bearing. */}
+        <Row label="In (ms)">
+          <Slider
+            value={fadeIn.localValue}
+            max={maxMs}
+            step={50}
+            onChange={fadeIn.handleChange}
+            onCommit={fadeIn.handleCommit}
+          />
+          <NumberInput
+            value={fadeIn.localValue}
+            onChange={fadeIn.handleDirectSet}
+            className="w-14 shrink-0 text-center"
+            aria-label="Fade in milliseconds"
+          />
+        </Row>
+        <Row label="Out (ms)">
+          <Slider
+            value={fadeOut.localValue}
+            max={maxMs}
+            step={50}
+            onChange={fadeOut.handleChange}
+            onCommit={fadeOut.handleCommit}
+          />
+          <NumberInput
+            value={fadeOut.localValue}
+            onChange={fadeOut.handleDirectSet}
+            className="w-14 shrink-0 text-center"
+            aria-label="Fade out milliseconds"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+// ── Effect configuration ─────────────────────────────────────────────────
+
+// The controls here are derived from the shader's own uniforms, so this
+// component knows nothing about any particular effect. See ../../../effects.js.
+
+export function EffectConfigProperty({
+  specs,
+  values,
+  onChange,
+  onReset,
+}: {
+  specs: Array<{ name: string; kind: string; value: any; min?: number; max?: number; step?: number }>;
+  values: Record<string, any>;
+  onChange: (name: string, value: any) => void;
+  onReset: () => void;
+}) {
+  if (!specs.length) {
+    return (
+      <div className="flex flex-col">
+        <SectionTitle title="Effect" />
+        <p className="py-1 text-[11px] leading-snug text-muted-foreground">
+          This effect has no settings to adjust. Trim it on the timeline to change how long it runs.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between py-2">
+        <span className="text-xs font-semibold text-foreground">Effect</span>
+        <button
+          type="button"
+          onClick={onReset}
+          title="Put every setting back to the effect's default"
+          className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="flex flex-col py-1">
+        {specs.map((spec) => {
+          const value = values[spec.name];
+          const label = paramLabel(spec.name);
+
+          if (spec.kind === "number") {
+            return (
+              <Row key={spec.name} label={label}>
+                <Slider
+                  value={Number(value) || 0}
+                  min={spec.min}
+                  max={spec.max}
+                  step={spec.step}
+                  onChange={(val) => onChange(spec.name, val)}
+                />
+                <NumberInput
+                  value={Number(value) || 0}
+                  onChange={(val) => onChange(spec.name, val)}
+                  className="w-14 shrink-0 text-center"
+                  aria-label={label}
+                />
+              </Row>
+            );
+          }
+
+          if (spec.kind === "boolean") {
+            return (
+              <Row key={spec.name} label={label}>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={Boolean(value)}
+                  aria-label={label}
+                  onClick={() => onChange(spec.name, !value)}
+                  className={cn(
+                    "h-7 w-full rounded border text-[11px] font-semibold transition-colors",
+                    value
+                      ? "border-primary/60 bg-primary/15 text-foreground"
+                      : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {value ? "On" : "Off"}
+                </button>
+              </Row>
+            );
+          }
+
+          if (spec.kind === "color") {
+            return (
+              <Row key={spec.name} label={label}>
+                <ColorField
+                  color={String(value || "#ffffff")}
+                  onChange={(val) => onChange(spec.name, val)}
+                  className="w-full"
+                />
+              </Row>
+            );
+          }
+
+          // vec2 — an x/y pair, most often a centre point.
+          return (
+            <Row key={spec.name} label={label}>
+              <NumberInput
+                value={Number(value?.[0]) || 0}
+                onChange={(val) => onChange(spec.name, [val, Number(value?.[1]) || 0])}
+                aria-label={`${label} X`}
+              />
+              <NumberInput
+                value={Number(value?.[1]) || 0}
+                onChange={(val) => onChange(spec.name, [Number(value?.[0]) || 0, val])}
+                aria-label={`${label} Y`}
+              />
+            </Row>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Captions ─────────────────────────────────────────────────────────────
+
+export function CaptionColorsProperty({
+  colors,
+  onChange,
+}: {
+  colors: { active?: { color?: string } | null; future?: { color?: string } | null };
+  onChange: (next: any) => void;
+}) {
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Caption Colors" />
+      <div className="flex flex-col py-1">
+        {/* Spoken and upcoming are the only two that read at a glance; the
+            engine also supports a keyword colour, which needs words tagged as
+            keywords and so has nothing to control until that exists. */}
+        <Row label="Spoken">
+          <ColorField
+            color={colors?.active?.color || "#ffc480"}
+            onChange={(val) => onChange({ ...colors, active: { ...(colors?.active || {}), color: val } })}
+            className="w-full"
+          />
+        </Row>
+        <Row label="Upcoming">
+          <ColorField
+            color={colors?.future?.color || "#cbd5e1"}
+            onChange={(val) => onChange({ ...colors, future: { ...(colors?.future || {}), color: val } })}
+            className="w-full"
+          />
+        </Row>
+      </div>
+    </div>
+  );
+}
+
+export function CaptionLayoutProperty({
+  wordsPerLine,
+  onChange,
+}: {
+  wordsPerLine: "single" | "multiple";
+  onChange: (value: "single" | "multiple") => void;
+}) {
+  const option = (value: "single" | "multiple", label: string, hint: string) => (
+    <button
+      type="button"
+      onClick={() => onChange(value)}
+      title={hint}
+      className={cn(
+        "flex-1 rounded border px-2 py-1.5 text-[11px] font-semibold transition-colors",
+        wordsPerLine === value
+          ? "border-primary/60 bg-primary/15 text-foreground"
+          : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Caption Layout" />
+      <div className="flex gap-1 py-1">
+        {option("multiple", "Phrase", "Show the whole phrase and highlight each word as it is said")}
+        {option("single", "One word", "Show only the word being said")}
+      </div>
+    </div>
+  );
+}
+
+// ── Speed ────────────────────────────────────────────────────────────────
+
+export function SpeedProperty({
+  speed,
+  presets,
+  min,
+  max,
+  onChange,
+}: {
+  speed: number;
+  presets: number[];
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="Speed" />
+      <div className="flex gap-1 py-1">
+        {presets.map((preset) => (
+          <button
+            key={preset}
+            type="button"
+            onClick={() => onChange(preset)}
+            className={cn(
+              "flex-1 rounded border px-1 py-1.5 text-[11px] font-semibold transition-colors",
+              Math.abs(speed - preset) < 0.001
+                ? "border-primary/60 bg-primary/15 text-foreground"
+                : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {preset}×
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-col py-1">
+        <Row label="Rate">
+          <Slider
+            value={speed}
+            min={min}
+            max={max}
+            step={0.05}
+            onChange={onChange}
+          />
+          <NumberInput
+            value={speed}
+            onChange={onChange}
+            className="w-14 shrink-0 text-center"
+            aria-label="Playback speed"
+          />
+        </Row>
+        {/* Retiming shortens or lengthens the clip on the timeline, which is
+            not obvious until it happens to a carefully placed clip. */}
+        <p className="pt-1 text-[10px] leading-snug text-muted-foreground">
+          Changing speed resizes the clip on the timeline.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Text fit ─────────────────────────────────────────────────────────────
+
+// What happens when a variable's real value is longer than the design assumed.
+// This is the failure that shows up at scale rather than in the editor, so the
+// hint on each mode says what it does to the LAYOUT, not what it does to text.
+
+export function TextFitProperty({
+  mode,
+  modes,
+  onChange,
+}: {
+  mode: string;
+  modes: Array<{ id: string; label: string; hint: string }>;
+  onChange: (mode: string) => void;
+}) {
+  const current = modes.find((m) => m.id === mode) || modes[0];
+
+  return (
+    <div className="flex flex-col">
+      <SectionTitle title="If the text is too long" />
+      <div className="grid grid-cols-2 gap-1 py-1">
+        {modes.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            title={option.hint}
+            onClick={() => onChange(option.id)}
+            className={cn(
+              "rounded border px-2 py-1.5 text-[11px] font-semibold transition-colors",
+              mode === option.id
+                ? "border-primary/60 bg-primary/15 text-foreground"
+                : "border-border bg-muted/60 text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <p className="pt-1 text-[10px] leading-snug text-muted-foreground">{current.hint}</p>
+    </div>
+  );
+}
+
+// ── Keyframes ────────────────────────────────────────────────────────────
+
+/*
+ * Hand-authored keyframes.
+ *
+ * A row per animated property, with markers along a track. Editing happens at
+ * the PLAYHEAD: move the playhead, change a value, and a keyframe is written
+ * there. That is how every editor that does this works, and it avoids a
+ * separate "add keyframe at time X" affordance that nobody would find.
+ *
+ * The engine gives a clip ONE animation slot, so this and the preset picker are
+ * mutually exclusive. That is said out loud rather than silently discarding
+ * whichever the user picked first.
+ */
+
+export function KeyframesProperty({
+  frames,
+  props,
+  playhead,
+  hasPreset,
+  onSeed,
+  onSet,
+  onRemoveStop,
+  onRemoveProp,
+  onClear,
+  valueAt,
+}: {
+  frames: Array<{ at: number; props: Record<string, number> }>;
+  props: Array<{ name: string; label: string; min: number; max: number; step: number; neutral: number }>;
+  playhead: number;
+  hasPreset: boolean;
+  onSeed: (prop: string) => void;
+  onSet: (prop: string, value: number) => void;
+  onRemoveStop: (at: number) => void;
+  onRemoveProp: (prop: string) => void;
+  onClear: () => void;
+  valueAt: (prop: string, at: number) => number;
+}) {
+  const animated = props.filter((spec) =>
+    frames.some((frame) => frame.props[spec.name] !== undefined)
+  );
+  const available = props.filter((spec) => !animated.includes(spec));
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between py-2">
+        <span className="text-xs font-semibold text-foreground">Keyframes</span>
+        {animated.length > 0 && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {hasPreset && (
+        // Said before anything is edited, because the preset is lost the moment
+        // the first keyframe is written.
+        <p className="mb-1 rounded border border-brand-accent/40 bg-brand-accent/10 px-2 py-1.5 text-[10px] leading-snug text-foreground">
+          This clip uses an animation preset. Adding a keyframe replaces it —
+          a clip can only have one animation.
+        </p>
+      )}
+
+      {animated.length === 0 ? (
+        <p className="py-1 text-[11px] leading-snug text-muted-foreground">
+          Animate a property by hand. Move the playhead, then change the value.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2 py-1">
+          {animated.map((spec) => {
+            const current = valueAt(spec.name, playhead);
+            const stops = frames.filter((f) => f.props[spec.name] !== undefined);
+            return (
+              <div key={spec.name} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{spec.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => onRemoveProp(spec.name)}
+                    title={`Stop animating ${spec.label.toLowerCase()}`}
+                    className="text-[10px] text-muted-foreground transition-colors hover:text-destructive"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <Slider
+                    value={current}
+                    min={spec.min}
+                    max={spec.max}
+                    step={spec.step}
+                    onChange={(val) => onSet(spec.name, val)}
+                  />
+                  <NumberInput
+                    value={Math.round(current * 100) / 100}
+                    onChange={(val) => onSet(spec.name, val)}
+                    className="w-14 shrink-0 text-center"
+                    aria-label={`${spec.label} at playhead`}
+                  />
+                </div>
+
+                {/*
+                  No track here. The markers live on the TIMELINE, at the real
+                  scale and under the clip they animate — a second strip at a
+                  different scale in a side panel was two time axes disagreeing
+                  with each other. This panel owns the VALUE at the playhead.
+                */}
+                <p className="text-[10px] text-muted-foreground">
+                  {stops.length} keyframe{stops.length === 1 ? "" : "s"} · editing at{" "}
+                  {Math.round(playhead * 100)}%
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {available.length > 0 && (
+        <div className="flex flex-col pt-1">
+          <span className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            Animate
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {available.map((spec) => (
+              <button
+                key={spec.name}
+                type="button"
+                onClick={() => onSeed(spec.name)}
+                className="rounded border border-border bg-muted/60 px-2 py-1 text-[10px] font-semibold text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                + {spec.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

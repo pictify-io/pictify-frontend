@@ -60,8 +60,8 @@
 		},
 		{
 			id: 'template-builder',
-			label: 'Template & Bulk Render',
-			desc: 'Design reusable templates and generate images at scale',
+			label: 'Templates & Workflows',
+			desc: 'Design reusable templates and run them at scale',
 			icon: 'template'
 		},
 		{
@@ -105,9 +105,7 @@
 </script>
 
 <!-- Full-screen overlay -->
-<div
-	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
->
+<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4">
 	<div
 		class="w-full max-w-2xl bg-brand-bg border-[3px] border-black rounded-2xl shadow-brutal-2xl overflow-hidden animate-wizard-in"
 	>

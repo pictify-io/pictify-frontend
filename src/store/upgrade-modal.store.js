@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { analytics } from '$lib/analytics.js';
 
 /**
  * Navigate to the upgrade page (or a direct checkout, if provided)
@@ -12,6 +13,12 @@ import { goto } from '$app/navigation';
 let lastCheckoutOpenAt = 0;
 
 export function openUpgradeModal(context = 'general', discountCode = null, checkoutUrl = null) {
+	// Buying signal — fired here because every upgrade path (usage banner, proactive
+	// modal, feature gate, quota wall) funnels through this one function.
+	const usingDirectCheckout =
+		!!checkoutUrl && /^https:\/\//i.test(checkoutUrl) && typeof window !== 'undefined';
+	analytics.trackUpgradePromptTriggered({ context, direct_checkout: usingDirectCheckout });
+
 	// Direct one-click checkout when the backend supplied a prefilled URL.
 	// Only honor https (the URL comes from the 429 body; reject javascript:/data:
 	// and other schemes as defense-in-depth). Anything else falls through to the
