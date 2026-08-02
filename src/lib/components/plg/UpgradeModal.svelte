@@ -79,6 +79,9 @@
 	// Feature comparison based on plan-features.js
 	$: currentFeatures = {
 		renders: getFeatureLimit(plan, FEATURES.RENDERS),
+		// Monthly AI credit pool (copilot, AI video generation, captions) —
+		// a separate pool from render credits.
+		aiCredits: getFeatureLimit(plan, FEATURES.AI_CREDITS),
 		aiCopilot: getFeatureLimit(plan, FEATURES.AI_COPILOT),
 		templates: getFeatureLimit(plan, FEATURES.TEMPLATES_SAVED),
 		batchRender: getFeatureLimit(plan, FEATURES.BATCH_RENDER),
@@ -88,6 +91,7 @@
 	$: nextFeatures = nextPlan
 		? {
 				renders: getFeatureLimit(nextPlan, FEATURES.RENDERS),
+				aiCredits: getFeatureLimit(nextPlan, FEATURES.AI_CREDITS),
 				aiCopilot: getFeatureLimit(nextPlan, FEATURES.AI_COPILOT),
 				templates: getFeatureLimit(nextPlan, FEATURES.TEMPLATES_SAVED),
 				batchRender: getFeatureLimit(nextPlan, FEATURES.BATCH_RENDER),
@@ -109,10 +113,11 @@
 		return String(value);
 	}
 
-	// Features to show in comparison
+	// Features to show in comparison (the first 5 are rendered in the modal)
 	const featureDisplay = [
 		{ key: 'renders', label: 'Renders', unit: '/mo' },
 		{ key: 'templates', label: 'Templates', unit: '' },
+		{ key: 'aiCredits', label: 'AI Credits', unit: '/mo' },
 		{ key: 'aiCopilot', label: 'AI Copilot', unit: '/mo' },
 		{ key: 'aiBackgroundRemover', label: 'AI Background Remover', unit: '/mo' },
 		{ key: 'batchRender', label: 'Batch Render', unit: '' }
@@ -201,7 +206,7 @@
 							</p>
 
 							<div class="space-y-1.5 text-sm text-left opacity-60">
-								{#each featureDisplay.slice(0, 4) as { key, label, unit }}
+								{#each featureDisplay.slice(0, 5) as { key, label, unit }}
 									<div class="flex justify-between items-center text-xs">
 										<span>{label}</span>
 										<span class="font-bold">{formatFeatureValue(currentFeatures[key], unit)}</span>
@@ -230,7 +235,7 @@
 							</p>
 
 							<div class="space-y-1.5 text-sm text-left relative z-10">
-								{#each featureDisplay.slice(0, 4) as { key, label, unit }}
+								{#each featureDisplay.slice(0, 5) as { key, label, unit }}
 									{@const currentVal = currentFeatures[key]}
 									{@const nextVal = nextFeatures[key]}
 									{@const isUpgrade =
@@ -249,6 +254,11 @@
 							</div>
 						</div>
 					</div>
+
+					<!-- What AI credits cover (mirrors the pricing card copy) -->
+					<p class="text-[10px] font-bold text-gray-500 text-center -mt-4 mb-6">
+						AI credits cover Copilot, AI video generation &amp; captions
+					</p>
 				{/if}
 
 				<!-- Time saved stat -->

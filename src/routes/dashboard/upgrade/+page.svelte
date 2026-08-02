@@ -49,6 +49,9 @@
 			renders: features[FEATURES.RENDERS],
 			templates: features[FEATURES.TEMPLATES_SAVED],
 			aiCopilot: features[FEATURES.AI_COPILOT],
+			// Monthly AI credit pool (copilot, AI video generation, captions) —
+			// a separate pool from render credits.
+			aiCredits: features[FEATURES.AI_CREDITS],
 			aiBackgroundRemover: features[FEATURES.AI_BACKGROUND_REMOVER],
 			batchRender: features[FEATURES.BATCH_RENDER],
 			teamSeats: features[FEATURES.TEAM_SEATS]
@@ -380,6 +383,17 @@
 											? '/mo'
 											: ''}</span
 									>
+								</div>
+								<div
+									class="flex items-center justify-between pb-3 border-b-2 border-dashed border-gray-200"
+								>
+									<div class="flex flex-col">
+										<span class="text-gray-600">AI Credits</span>
+										<span class="text-[10px] text-gray-400 font-medium"
+											>Copilot, AI video generation &amp; captions</span
+										>
+									</div>
+									<span class="text-gray-900">{formatFeatureValue(quotas.aiCredits)}/mo</span>
 								</div>
 								<div class="flex items-center justify-between">
 									<span class="text-gray-600">Team Seats</span>
