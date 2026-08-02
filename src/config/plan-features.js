@@ -117,7 +117,9 @@ export const FEATURES = {
 	DYNAMIC_LINKS: 'dynamicLinks',
 	STORAGE_CONNECTORS: 'storageConnectors',
 
-	// Experiments
+	// Experiments — RETIRED (July 2026 repositioning). Not sold on any pricing
+	// surface. Keys kept only so feature gates on grandfathered users' pages
+	// keep working. Do not add these back to pricing/upgrade UI.
 	AB_TESTING: 'abTesting',
 	SMART_LINKS: 'smartLinks',
 	SCHEDULED_IMAGES: 'scheduledImages',
@@ -293,6 +295,9 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: 200,
 		[FEATURES.AI_COPILOT]: 100,
+		// Backend util/ai-credits.js AI_LIMITS has no 'professional' entry, so
+		// grandfathered Professional users fall back to the starter pool (25).
+		[FEATURES.AI_CREDITS]: 25,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 10,
@@ -330,7 +335,7 @@ export const PLAN_FEATURES = {
 
 		// Batch processing
 		[FEATURES.BATCH_RENDER]: true,
-		[FEATURES.BATCH_ITEMS_PER_REQUEST]: null, // Unlimited
+		[FEATURES.BATCH_ITEMS_PER_REQUEST]: 1000, // Mirrors backend config/plg.js maxItems + workflow MAX_ROWS
 		[FEATURES.BATCH_MONTHLY_LIMIT]: null,
 
 		// AI Features
@@ -463,27 +468,29 @@ export const FEATURE_METADATA = {
 		icon: 'cloud',
 		category: 'integrations'
 	},
+	// Experiments metadata — RETIRED features (July 2026). Neutral labels kept
+	// only for feature gates grandfathered users may still hit.
 	[FEATURES.AB_TESTING]: {
 		name: 'A/B Testing',
-		description: 'Test image variants to find the best performer',
+		description: 'Legacy image variant testing',
 		icon: 'split',
 		category: 'experiments'
 	},
 	[FEATURES.SMART_LINKS]: {
 		name: 'Smart Links',
-		description: 'Show different images based on viewer context',
+		description: 'Legacy context-based image links',
 		icon: 'target',
 		category: 'experiments'
 	},
 	[FEATURES.SCHEDULED_IMAGES]: {
 		name: 'Scheduled Images',
-		description: 'Schedule image changes and set expiration dates',
+		description: 'Legacy scheduled image changes',
 		icon: 'clock',
 		category: 'experiments'
 	},
 	[FEATURES.AUTO_OPTIMIZATION]: {
 		name: 'Auto-Optimization',
-		description: 'AI-powered variant optimization with Thompson Sampling',
+		description: 'Legacy automatic variant optimization',
 		icon: 'trending-up',
 		category: 'experiments'
 	},
@@ -513,7 +520,7 @@ export const FEATURE_METADATA = {
 	},
 	[FEATURES.API_ACCESS]: {
 		name: 'API Access',
-		description: 'Full API access with no rate limits',
+		description: 'Full REST API access on every plan',
 		icon: 'code',
 		category: 'core'
 	}
@@ -610,27 +617,11 @@ export const FEATURE_UPGRADE_MESSAGES = {
 		title: 'Storage Connectors on All Paid Plans',
 		message: 'Connect to S3, GCS, or Cloudinary.',
 		benefit: 'Store renders directly in your cloud storage'
-	},
-	[FEATURES.AB_TESTING]: {
-		title: 'Unlock More A/B Tests',
-		message: "You've reached your A/B test limit.",
-		benefit: 'Test more variants and find what performs best'
-	},
-	[FEATURES.SMART_LINKS]: {
-		title: 'Smart Links Available on All Paid Plans',
-		message: 'Show different images based on device, location, or time.',
-		benefit: 'Personalize images for every viewer automatically'
-	},
-	[FEATURES.SCHEDULED_IMAGES]: {
-		title: 'Scheduled Images on All Paid Plans',
-		message: 'Schedule image changes for campaigns and promotions.',
-		benefit: 'Set it and forget it - images change on your schedule'
-	},
-	[FEATURES.AUTO_OPTIMIZATION]: {
-		title: 'Auto-Optimization on Pro',
-		message: 'Let AI pick the best performing variant automatically.',
-		benefit: 'Thompson Sampling finds winners faster than manual A/B tests'
 	}
+	// Experiments (A/B testing, smart links, scheduled images, auto-optimization)
+	// were retired in the July 2026 repositioning. Their upgrade upsells were
+	// removed — getFeatureUpgradePrompt falls back to neutral generated copy for
+	// any grandfathered user who still hits those gates.
 };
 
 // Helper functions

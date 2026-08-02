@@ -45,7 +45,7 @@
 				{
 					label: 'API Access',
 					feature: FEATURES.API_ACCESS,
-					description: 'Full API, no rate limits'
+					description: 'Full REST API access'
 				}
 			]
 		},
@@ -54,7 +54,13 @@
 			category: 'Output Formats',
 			features: [
 				{ label: 'PNG, JPG & GIF', feature: null, allPlans: true },
-				{ label: 'PDF Export', feature: FEATURES.PDF_OUTPUT }
+				{ label: 'PDF Export', feature: FEATURES.PDF_OUTPUT },
+				{
+					label: 'Video Templates (MP4 & GIF)',
+					feature: null,
+					allPlans: true,
+					description: 'Video studio + AI generation'
+				}
 			]
 		},
 		// Templates & Assets
@@ -69,7 +75,12 @@
 		{
 			category: 'Automation',
 			features: [
-				{ label: 'Workflow runs (CSV & webhook)', feature: null, allPlans: true },
+				{
+					label: 'Workflow runs (CSV & webhook)',
+					feature: null,
+					allPlans: true,
+					description: 'CSV or webhook in, documents out, email delivery'
+				},
 				{ label: 'Batch Rendering', feature: FEATURES.BATCH_RENDER },
 				{ label: 'Items per Batch', feature: FEATURES.BATCH_ITEMS_PER_REQUEST },
 				{ label: 'Webhooks', feature: FEATURES.WEBHOOKS }
@@ -135,7 +146,7 @@
 		{
 			question: 'What features are included in the free plan?',
 			answer:
-				'The Free plan includes 50 renders/month (PNG, JPG & GIF), 3 saved templates, and full API access with no rate limits. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
+				'The Free plan includes 50 renders/month (PNG, JPG & GIF), 3 saved templates, 25 AI credits/month, and full API access. Perfect for testing and hobby projects. Need more? The Basic plan unlocks all features at lower volume limits.',
 			isOpened: false
 		},
 		{
@@ -153,7 +164,13 @@
 		{
 			question: 'What AI features are available?',
 			answer:
-				'AI Background Remover and AI Copilot are included on all paid plans. Basic gets 25 and 15 uses/mo respectively, Pro gets 100 and 50, Business gets 500 each.',
+				'Every plan includes a monthly AI credit pool — Free 25, Basic 300, Pro 1,000, Business 4,000 — covering Copilot, AI video generation and captions. Paid plans also include a separate AI Copilot allowance for template editing (Basic 15, Pro 50, Business 500 uses/mo) and AI Background Remover (Basic 25, Pro 100, Business 500 uses/mo).',
+			isOpened: false
+		},
+		{
+			question: 'Do video renders count toward my render limit?',
+			answer:
+				'Yes — images, PDFs, GIFs and video renders all draw from the same monthly render pool. AI-powered actions like AI video generation and captions draw from your separate AI credits pool instead, so a rendered video costs renders and an AI-generated one also spends AI credits.',
 			isOpened: false
 		}
 	];
@@ -542,7 +559,7 @@
 									{#if planId === PLANS.BASIC}
 										All features, lower volume. Great for solo devs & small projects.
 									{:else if planId === PLANS.STANDARD}
-										For teams & startups scaling their image generation.
+										For teams & startups scaling documents, images & video.
 									{:else if planId === PLANS.BUSINESS}
 										Unlimited scale, enterprise security & dedicated support.
 									{:else}
