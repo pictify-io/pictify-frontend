@@ -901,3 +901,13 @@ test('make_variable refuses bad names, wrong targets and missing clips', () => {
 test('the variable op reads as a sentence', () => {
 	assert.match(summarizeOperations([{ op: 'variable' }]), /Parameterised 1 field/);
 });
+
+test('add tools refuse non-numeric timing instead of writing NaN into a clip', () => {
+	const { errors } = planToolCalls(doc(), [
+		call('add_text', { text: 'Hi', x: 0.5, y: 0.2, startS: 'fast' }),
+		call('add_shape', { x: 0.5, y: 0.5, width: 1, height: 1, fill: '#111111', durationS: 'long' }),
+		call('add_effect', { effectKey: 'vignette', startS: 'now' })
+	], { effects: ['vignette'] });
+	assert.equal(errors.length, 3);
+	for (const e of errors) assert.match(e.error, /must be a number/);
+});

@@ -260,6 +260,14 @@ const idProblem = (doc, id) => {
 	return null;
 };
 
+/** Optional timing args: reject non-numeric values instead of writing NaN into a clip. */
+const timingProblem = (args) => {
+	if (args.startS !== undefined && num(args.startS) === null) return 'startS must be a number.';
+	if (args.durationS !== undefined && num(args.durationS) === null)
+		return 'durationS must be a number.';
+	return null;
+};
+
 /** Read a dotted path off a clip ('style.colors.0'), for binding defaults. */
 const readPath = (clip, target) =>
 	String(target)
@@ -582,7 +590,7 @@ export const TOOLS = [
 			if (typeof args.effectKey !== 'string' || !args.effectKey) return 'effectKey is required.';
 			if (!inVocabulary(vocabulary?.effects, args.effectKey))
 				return `No effect called ${args.effectKey}.`;
-			return idProblem(doc, args.id);
+			return timingProblem(args) || idProblem(doc, args.id);
 		},
 		apply: (doc, args) => ({
 			op: 'add',
@@ -644,7 +652,7 @@ export const TOOLS = [
 			if (!args.transitionKey) return 'transitionKey is required.';
 			if (!inVocabulary(vocabulary?.transitions, args.transitionKey))
 				return `No transition called ${args.transitionKey}.`;
-			return null;
+			return timingProblem(args);
 		},
 		// Also caller-resolved: a transition is its own clip joining a PAIR, and
 		// finding the previous clip needs the track order.
@@ -663,7 +671,7 @@ export const TOOLS = [
 		validate: (doc, args) => {
 			if (args.kind !== 'image' && args.kind !== 'video') return 'kind must be image or video.';
 			if (typeof args.query !== 'string' || !args.query.trim()) return 'query is required.';
-			return idProblem(doc, args.id);
+			return timingProblem(args) || idProblem(doc, args.id);
 		},
 		// The only tool that needs the network. Resolved by the caller, which
 		// owns the stock client; planning stays synchronous and pure.
@@ -683,7 +691,7 @@ export const TOOLS = [
 		params: { name: 'string', startS: 'number', durationS: 'number', id: ID_PARAM },
 		validate: (doc, args) => {
 			if (typeof args.name !== 'string' || !args.name.trim()) return 'name is required.';
-			return idProblem(doc, args.id);
+			return timingProblem(args) || idProblem(doc, args.id);
 		},
 		// Resolved by the caller, which holds the media library.
 		apply: (doc, args) => ({
@@ -720,7 +728,7 @@ export const TOOLS = [
 				return 'width and height must be greater than zero.';
 			if (args.gradientTo && !/^#[0-9a-f]{3,8}$/i.test(String(args.gradientTo)))
 				return 'gradientTo must be a hex value.';
-			return idProblem(doc, args.id);
+			return timingProblem(args) || idProblem(doc, args.id);
 		},
 		apply: (doc, args) => {
 			const { width = 1080, height = 1920 } = doc.settings || {};
@@ -795,7 +803,7 @@ export const TOOLS = [
 		validate: (doc, args) => {
 			if (typeof args.text !== 'string' || !args.text.trim()) return 'text is required.';
 			if (num(args.x) === null || num(args.y) === null) return 'x and y must be numbers.';
-			return idProblem(doc, args.id);
+			return timingProblem(args) || idProblem(doc, args.id);
 		},
 		apply: (doc, args) => {
 			const { width = 1080, height = 1920 } = doc.settings || {};

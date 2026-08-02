@@ -772,7 +772,9 @@
 						}
 						data = await backend.post('/pdf/multi-page', {
 							templateUid: pdfMultiPageParams.templateUid,
-							pages,
+							// The backend's field is variableSets — one set per page. The
+							// UI says "pages" because that is what the user thinks in.
+							variableSets: pages,
 							options: {
 								preset: pdfMultiPageParams.preset || 'A4',
 								...(pdfMultiPageParams.title ? { title: pdfMultiPageParams.title } : {})
@@ -1125,7 +1127,7 @@
 				try {
 					return {
 						templateUid: pdfMultiPageParams.templateUid || 'TEMPLATE_UID',
-						pages: JSON.parse(pdfMultiPageParams.pages || '[]'),
+						variableSets: JSON.parse(pdfMultiPageParams.pages || '[]'),
 						options: { preset: pdfMultiPageParams.preset || 'A4' }
 					};
 				} catch {

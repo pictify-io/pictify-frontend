@@ -346,7 +346,7 @@ export default function CopilotPanel() {
           await isolate("add_transition", () => {
             const existing = incomingTransition(state.clips, clip);
             if (existing) core.clip.remove([existing.id]);
-            core.clip.add(
+            return core.clip.add(
               createTransitionClip({
                 fromClip: previous,
                 toClip: clip,
@@ -716,7 +716,15 @@ export default function CopilotPanel() {
     } catch (cause: any) {
       setTurns((prev) => [
         ...prev,
-        { role: "assistant", text: cause?.message || "That did not work. Try rephrasing it." },
+        {
+          role: "assistant",
+          text: cause?.message || "That did not work. Try rephrasing it.",
+          // A run that CRASHED mid-loop is the one that most needs its
+          // restore point: edits already landed and the loop will not
+          // finish them. Omitting this here silently discarded the snapshot
+          // exactly when the scene was left half-edited.
+          restore: before || undefined,
+        },
       ]);
     } finally {
       setBusy(false);
@@ -769,6 +777,7 @@ export default function CopilotPanel() {
               {turn.restore ? (
                 <button
                   type="button"
+                  disabled={busy}
                   onClick={() => restoreScene(turn.restore)}
                   title="Put the scene back exactly as it was before this run"
                   className="mt-1.5 rounded border-[2px] border-black bg-muted px-2 py-1 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-accent"

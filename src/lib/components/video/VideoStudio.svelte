@@ -1128,7 +1128,10 @@
 			isDirty = false;
 			if (!silent) saveMessage = publish ? 'Published' : 'Saved';
 			if (!deferNavigation) await adoptPermanentUrl();
-			return saved || null;
+			// The UID, not the template object: exportVideo interpolates this
+			// return value into the render URL, and an object there renders as
+			// "[object Object]" — a guaranteed 404 on every code-mode render.
+			return saved?.uid || uid || null;
 		} catch (error) {
 			// 422 carries per-error compile messages; anything else is a message.
 			const errors = error?.body?.errors || error?.errors;
@@ -1650,9 +1653,14 @@
 						{#if isExporting}
 							<div class="flex items-center justify-between gap-3">
 								<p class={HEADING}>{exportStage}</p>
-								<button type="button" on:click={cancelExport} class={BUTTON_COMPACT}>
-									Cancel
-								</button>
+								{#if exportStage.includes('browser')}
+									<!-- Only the in-browser path can actually abort; a server
+									     render continues (and meters) regardless, so offering
+									     Cancel there would be a lie. -->
+									<button type="button" on:click={cancelExport} class={BUTTON_COMPACT}>
+										Cancel
+									</button>
+								{/if}
 							</div>
 							<div
 								class="mt-3 h-2 overflow-hidden rounded-full border-[2px] border-black bg-gray-950"
