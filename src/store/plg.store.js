@@ -112,7 +112,10 @@ export const usageWidget = writable({
 	plan: 'starter',
 	isPaidPlan: false,
 	showUpgrade: false,
-	urgency: 'normal'
+	urgency: 'normal',
+	// AI credits are a SEPARATE pool from render credits (copilot, AI
+	// generation, transcription). null until the server reports a balance.
+	aiCredits: null
 });
 
 // Active milestone celebration
@@ -266,6 +269,20 @@ export const initPLG = async () => {
 	}
 };
 
+/**
+ * Normalize the server's aiCredits balance ({ used, limit }) into widget shape.
+ * Returns null when the server doesn't report one (older backend) so the UI
+ * can simply hide the AI meter.
+ */
+const normalizeAiCredits = (planDetails) => {
+	const ai = planDetails?.aiCredits;
+	if (!ai || typeof ai.limit !== 'number') return null;
+	const used = ai.used || 0;
+	const limit = ai.limit;
+	const percentage = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
+	return { used, limit, percentage, remaining: Math.max(0, limit - used) };
+};
+
 const _doInitPLG = async () => {
 	plgLoading.set(true);
 	try {
@@ -354,7 +371,8 @@ const _doInitPLG = async () => {
 			plan,
 			isPaidPlan,
 			showUpgrade: !isPaidPlan && percentage >= 30,
-			urgency
+			urgency,
+			aiCredits: normalizeAiCredits(planDetails)
 		});
 
 		// Check for milestone celebration
@@ -450,7 +468,8 @@ export const refreshUsageWidget = async () => {
 			plan,
 			isPaidPlan,
 			showUpgrade: !isPaidPlan && percentage >= 30,
-			urgency
+			urgency,
+			aiCredits: normalizeAiCredits(planDetails)
 		};
 
 		usageWidget.set(widget);

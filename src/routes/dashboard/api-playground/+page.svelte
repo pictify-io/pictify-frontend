@@ -1332,7 +1332,7 @@
 				'Render a video template with variables — MP4, or an animated GIF (15fps, palette-optimised). Renders take up to a few minutes; the request waits for the file URL.',
 			'video-variables': 'Get a video template’s variable definitions',
 			'video-generate':
-				'Generate a new video template from a prompt — an AI motion brief, compiled scene code and a visual review, returned as a draft template'
+				'Generate a new video template from a prompt — an AI motion brief, compiled scene code and a visual review, returned as a draft template. Costs 5 AI credits.'
 		};
 		return descriptions[selectedEndpoint] || '';
 	})();

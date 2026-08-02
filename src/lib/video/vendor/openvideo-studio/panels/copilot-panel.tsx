@@ -743,6 +743,9 @@ export default function CopilotPanel() {
               Bigger requests get designed first, built step by step, then reviewed against your
               scene. Every edit is checked before it is applied.
             </p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+              1 AI credit per request.
+            </p>
             <div className="mt-3 flex flex-col gap-1.5">
               {SUGGESTIONS.map((suggestion) => (
                 <button
@@ -832,7 +835,7 @@ export default function CopilotPanel() {
           className="w-full resize-none rounded border border-border bg-background px-2 py-1.5 text-[11px] leading-snug text-foreground outline-none transition-colors focus:border-primary/60 disabled:opacity-60"
         />
         <div className="mt-1.5 flex items-center justify-between">
-          <span className="text-[10px] text-muted-foreground">Enter to send</span>
+          <span className="text-[10px] text-muted-foreground">Enter to send · 1 AI credit</span>
           <button
             type="submit"
             disabled={busy || !draft.trim()}

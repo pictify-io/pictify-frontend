@@ -104,6 +104,10 @@ export const FEATURES = {
 	// AI Features
 	AI_BACKGROUND_REMOVER: 'aiBackgroundRemover',
 	AI_COPILOT: 'aiCopilot',
+	// Monthly AI credit pool (copilot, AI generation, transcription).
+	// A SEPARATE pool from render credits — values mirror backend
+	// util/ai-credits.js AI_LIMITS. Keep in sync.
+	AI_CREDITS: 'aiCredits',
 
 	// Team & Collaboration
 	TEAM_SEATS: 'teamSeats',
@@ -157,6 +161,7 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: false,
 		[FEATURES.AI_COPILOT]: false,
+		[FEATURES.AI_CREDITS]: 25,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 1,
@@ -200,6 +205,7 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: 25,
 		[FEATURES.AI_COPILOT]: 15,
+		[FEATURES.AI_CREDITS]: 300,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 2,
@@ -243,6 +249,7 @@ export const PLAN_FEATURES = {
 		// AI Features - included in Pro tier
 		[FEATURES.AI_BACKGROUND_REMOVER]: 100,
 		[FEATURES.AI_COPILOT]: 50,
+		[FEATURES.AI_CREDITS]: 1000,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 5,
@@ -329,6 +336,7 @@ export const PLAN_FEATURES = {
 		// AI Features
 		[FEATURES.AI_BACKGROUND_REMOVER]: 500,
 		[FEATURES.AI_COPILOT]: 500,
+		[FEATURES.AI_CREDITS]: 4000,
 
 		// Team
 		[FEATURES.TEAM_SEATS]: 10,
@@ -422,6 +430,12 @@ export const FEATURE_METADATA = {
 	[FEATURES.AI_COPILOT]: {
 		name: 'AI Copilot',
 		description: 'AI-powered design assistance',
+		icon: 'sparkles',
+		category: 'ai'
+	},
+	[FEATURES.AI_CREDITS]: {
+		name: 'AI Credits',
+		description: 'Monthly AI credit pool for copilot, AI video generation and captions',
 		icon: 'sparkles',
 		category: 'ai'
 	},

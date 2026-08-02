@@ -88,9 +88,12 @@ export default function CaptionsPanel() {
         <p className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
           Captions
         </p>
-        <p className="pb-2 text-[11px] leading-snug text-muted-foreground">
+        <p className="pb-1 text-[11px] leading-snug text-muted-foreground">
           Pick a clip with speech. Its words are transcribed and added as caption clips, timed to
           the audio.
+        </p>
+        <p className="pb-2 text-[11px] leading-snug text-muted-foreground">
+          1 AI credit per minute of audio.
         </p>
       </div>
 

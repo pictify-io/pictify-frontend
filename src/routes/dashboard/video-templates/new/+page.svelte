@@ -390,7 +390,7 @@
 						<i class="fa fa-spinner fa-spin text-[10px]" aria-hidden="true"></i>
 						Directing your scene… ~30s
 					{:else}
-						Generate
+						Generate · 5 AI credits
 					{/if}
 				</button>
 			</div>

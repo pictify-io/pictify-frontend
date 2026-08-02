@@ -79,6 +79,12 @@
 		{
 			category: 'AI Features',
 			features: [
+				{
+					label: 'AI Credits',
+					feature: FEATURES.AI_CREDITS,
+					unit: '/mo',
+					description: 'Copilot, AI video generation & captions'
+				},
 				{ label: 'AI Background Remover', feature: FEATURES.AI_BACKGROUND_REMOVER, unit: '/mo' },
 				{ label: 'AI Copilot', feature: FEATURES.AI_COPILOT, unit: '/mo' }
 			]
@@ -605,6 +611,34 @@
 										{/if}
 									</div>
 								</li>
+
+								<!-- AI credits (separate pool: copilot, AI generation, captions) -->
+								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_CREDITS]}
+									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
+										<div
+											class="w-6 h-6 rounded bg-[#c6e0ff] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
+										>
+											<svg
+												class="w-3.5 h-3.5 text-gray-900"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+												stroke-width="4"
+											>
+												<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+											</svg>
+										</div>
+										<div class="flex flex-col mt-0.5">
+											<span
+												><strong>{formatLimit(PLAN_FEATURES[planId][FEATURES.AI_CREDITS])}</strong> AI
+												credits/mo</span
+											>
+											<span class="text-xs text-gray-500 font-normal"
+												>Copilot, AI video generation & captions</span
+											>
+										</div>
+									</li>
+								{/if}
 
 								<!-- Specific Features with Icons -->
 								{#if PLAN_FEATURES[planId]?.[FEATURES.BATCH_RENDER]}
