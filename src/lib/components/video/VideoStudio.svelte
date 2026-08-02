@@ -54,6 +54,7 @@
 		bindingsForClip,
 		humanizeName,
 		makeDefinition,
+		isPristine,
 		TOKEN_RE
 	} from '$lib/video/variables.js';
 	import { isInlineEditable } from '$lib/video/inline-text.js';
@@ -586,6 +587,33 @@
 				transcribe: transcribeMedia,
 				searchStock: searchStockAssets,
 				planAgentEdit,
+				// The copilot's make_variable tool: it writes the clip half (token
+				// or binding) through the engine and hands the definition half here,
+				// because variableDefinitions is studio state, not scene state.
+				getVariables: () => variableDefinitions,
+				defineVariables: (definitions) => {
+					let next = variableDefinitions;
+					for (const definition of definitions || []) {
+						if (!definition?.name) continue;
+						const existing = next.find((d) => d.name === definition.name);
+						if (existing) {
+							// Enrich a pristine auto-detected stub with the copilot's
+							// richer definition (type, default, description); never
+							// overwrite one the user has already shaped.
+							if (isPristine(existing)) {
+								next = next.map((d) =>
+									d.name === definition.name ? { ...d, ...definition } : d
+								);
+							}
+							continue;
+						}
+						next = [...next, definition];
+					}
+					if (next !== variableDefinitions) {
+						variableDefinitions = next;
+						markDirty();
+					}
+				},
 				// The vendored gradient editor mutates a clip's style directly; the
 				// studio store only republishes on a SELECTION change, so it tells us
 				// when to re-read the clip and re-detect variables.

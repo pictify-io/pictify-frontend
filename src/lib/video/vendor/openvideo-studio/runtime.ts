@@ -68,6 +68,22 @@ export interface HostCallbacks {
     query: string,
     page?: number
   ) => Promise<{ items: Array<any>; pagination: { hasMore: boolean; page: number } }>;
+  /** The studio's declared variable definitions, for the copilot's context. */
+  getVariables?: () => Array<{ name: string; type?: string }>;
+  /**
+   * Declare (or enrich) variable definitions. The studio owns
+   * variableDefinitions state; the copilot's make_variable tool writes the
+   * clip half (token or binding) through the engine and hands the definition
+   * half here.
+   */
+  defineVariables?: (
+    definitions: Array<{
+      name: string;
+      type?: string;
+      defaultValue?: unknown;
+      description?: string;
+    }>
+  ) => void;
   /**
    * Ask the copilot what to do next, one pipeline phase at a time. Execute and
    * review phases return TOOL CALLS, never a document — the panel validates

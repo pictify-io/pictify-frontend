@@ -293,6 +293,27 @@ export default function CopilotPanel() {
         } catch (cause: any) {
           failures.push(`add_captions: ${cause?.message || "transcription failed"}.`);
         }
+      } else if (operation.op === "variable") {
+        /*
+         * Two halves that must land together: the clip edit (token or
+         * binding) goes through the engine, and the definition goes to the
+         * studio, which owns variableDefinitions. Without the callback the
+         * definition half cannot happen, so the whole operation refuses
+         * rather than leaving a half-parameterised clip.
+         */
+        const defineVariables = getHostCallbacks().defineVariables;
+        if (!defineVariables) {
+          failures.push("make_variable: the variables panel is not available in this editor.");
+          continue;
+        }
+        if (!state.clips[operation.clipId]) {
+          failures.push(`make_variable: clip ${operation.clipId} no longer exists.`);
+          continue;
+        }
+        await isolate("make_variable", async () => {
+          await core.clip.update(operation.clipId, operation.patch);
+          defineVariables([operation.define]);
+        });
       } else if (operation.op === "animate") {
         // Resolved here because composing presets into keyframes needs the
         // engine's preset registry, which the pure tool module cannot import.
@@ -490,6 +511,12 @@ export default function CopilotPanel() {
       const described = () => ({
         ...describeDocument(projectStore.getState() as any),
         media: describeMedia(useMediaLibrary.getState().items || []),
+        // Declared variables ride along so the model reuses existing names
+        // instead of minting recipientName2 beside recipientName.
+        variables: (getHostCallbacks().getVariables?.() || []).map((definition: any) => ({
+          name: definition.name,
+          type: definition.type || "text",
+        })),
       });
 
       /*

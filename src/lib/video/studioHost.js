@@ -73,7 +73,9 @@ export const mountToolRail = (
 		onClipStyleChange,
 		transcribe,
 		searchStock,
-		planAgentEdit
+		planAgentEdit,
+		getVariables,
+		defineVariables
 	}
 ) => {
 	if (!core) throw new Error('mountToolRail requires the editor core instance.');
@@ -92,7 +94,9 @@ export const mountToolRail = (
 		onClipStyleChange,
 		transcribe,
 		searchStock,
-		planAgentEdit
+		planAgentEdit,
+		getVariables,
+		defineVariables
 	});
 	const island = mountIsland(el, React.createElement(ToolRail));
 	return {

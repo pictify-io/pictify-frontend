@@ -34,6 +34,13 @@ import { speedPatch, MIN_SPEED, MAX_SPEED } from './clip-speed.js';
 import { writeKeyframes } from './keyframes.js';
 import { toGradientFill } from './gradients.js';
 import { ASPECT_PRESETS } from './scene-settings.js';
+import {
+	VARIABLE_NAME_RE,
+	findBindingTarget,
+	bindingTargetsForClip,
+	bindingsForClip,
+	makeDefinition
+} from './variables.js';
 
 const SECOND = 1_000_000;
 
@@ -252,6 +259,12 @@ const idProblem = (doc, id) => {
 	if (doc.clips?.[id]) return `A clip with id ${id} already exists — pick another.`;
 	return null;
 };
+
+/** Read a dotted path off a clip ('style.colors.0'), for binding defaults. */
+const readPath = (clip, target) =>
+	String(target)
+		.split('.')
+		.reduce((node, key) => (node == null ? undefined : node[key]), clip);
 
 const ID_PARAM = 'string, optional — an id you choose, so later calls in this turn can address the new clip';
 
@@ -1006,6 +1019,85 @@ export const TOOLS = [
 		}
 	},
 	{
+		name: 'make_variable',
+		description:
+			"Turn part of a clip into a render-time variable — 'parameterise this template' so the API, workflows and batches can fill it per render. target 'text' swaps the clip's words for a {{token}} and keeps the current words as the default; other targets bind a field. The variable keeps rendering the current value until a caller overrides it.",
+		params: {
+			clipId: 'string',
+			name: 'string — identifier like recipientName (letters, digits, underscore, no spaces)',
+			target:
+				"what to parameterise: 'text', or one of: src, style.color, style.fill, style.background.color, style.colors.0, style.colors.1, style.colors.2, transform.opacity, timing.display.from, timing.display.to",
+			description: 'string, optional — shown as help text on the render form'
+		},
+		validate: (doc, args) => {
+			const clip = doc.clips?.[args.clipId];
+			if (!clip) return `No clip with id ${args.clipId}.`;
+			if (!VARIABLE_NAME_RE.test(String(args.name || '')))
+				return 'name must be an identifier: letters, digits and underscores, not starting with a digit.';
+			if (args.target === 'text') {
+				if (clip.type !== 'Text' && clip.type !== 'Caption')
+					return `${clip.type} clips have no text — pick a binding target instead.`;
+				return null;
+			}
+			const targetDef = findBindingTarget(args.target);
+			if (!targetDef)
+				return `Unknown target ${args.target}. Use 'text' or one of the listed binding targets.`;
+			if (!bindingTargetsForClip(clip.type).includes(targetDef))
+				return `${clip.type} clips cannot bind ${args.target}.`;
+			return null;
+		},
+		apply: (doc, args) => {
+			const clip = doc.clips[args.clipId];
+			const name = String(args.name);
+			const description = typeof args.description === 'string' ? args.description.slice(0, 500) : '';
+
+			if (args.target === 'text') {
+				/*
+				 * The current words BECOME the default, so the template renders
+				 * identically until a caller overrides the variable — turning a
+				 * design into a template must never change what it looks like.
+				 */
+				const definition = { ...makeDefinition(name, 'text', clip.text || ''), description };
+				return {
+					op: 'variable',
+					clipId: args.clipId,
+					patch: { text: `{{${name}}}` },
+					define: definition
+				};
+			}
+
+			const targetDef = findBindingTarget(args.target);
+			const raw = readPath(clip, args.target);
+			// Timing binds in SECONDS (the one unit callers can reason about);
+			// the stored value is microseconds.
+			const defaultValue =
+				targetDef.unit === 'seconds' && Number.isFinite(Number(raw))
+					? Math.round((Number(raw) / SECOND) * 100) / 100
+					: raw ?? '';
+			const definition = {
+				...makeDefinition(name, targetDef.typeFor(clip.type), defaultValue),
+				description
+			};
+			// One binding per target: re-parameterising a field replaces its
+			// previous variable rather than stacking two writers on one slot.
+			const bindings = [
+				...bindingsForClip(clip).filter((b) => b?.target !== args.target),
+				{ target: args.target, variable: name }
+			];
+			return {
+				op: 'variable',
+				clipId: args.clipId,
+				patch: {
+					metadata: {
+						...(clip.metadata || {}),
+						pictify: { ...(clip.metadata?.pictify || {}), bindings }
+					}
+				},
+				define: definition
+			};
+		}
+	},
+	{
 		name: 'set_canvas_size',
 		description: `Change the canvas aspect: ${ASPECT_PRESETS.map((p) => `${p.id} (${p.ratio})`).join(', ')}. Existing clips keep their pixel positions, so change this FIRST, before placing anything.`,
 		params: { aspect: `string: ${ASPECT_PRESETS.map((p) => p.id).join(', ')}` },
@@ -1084,6 +1176,8 @@ export const summarizeOperations = (operations) => {
 	if (counts.media) parts.push(`placed ${counts.media} media item${counts.media === 1 ? '' : 's'}`);
 	if (counts.font) parts.push(`changed ${counts.font} font${counts.font === 1 ? '' : 's'}`);
 	if (counts.captions) parts.push(`captioned ${counts.captions} clip${counts.captions === 1 ? '' : 's'}`);
+	if (counts.variable)
+		parts.push(`parameterised ${counts.variable} field${counts.variable === 1 ? '' : 's'}`);
 	if (counts.settings) parts.push(`adjusted the scene`);
 	return `${parts.join(', ').replace(/^./, (c) => c.toUpperCase())}.`;
 };

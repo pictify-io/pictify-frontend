@@ -829,3 +829,75 @@ test('sequential per-call planning lets a follow-up see the freshly added clip',
 	assert.equal(second.errors.length, 0);
 	assert.equal(second.operations[0].clipId, 'headline');
 });
+
+// ── make_variable: parameterise-this-template ────────────────────────────
+// Turning a design into a template must never change what it renders: the
+// current value always becomes the variable's default.
+
+test('make_variable on text swaps the words for a token and keeps them as the default', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('make_variable', { clipId: 't1', name: 'headline', description: 'The main title' })
+	].map((c) => ({ ...c, args: { ...c.args, target: 'text' } })));
+	const op = operations[0];
+	assert.equal(op.op, 'variable');
+	assert.deepEqual(op.patch, { text: '{{headline}}' });
+	assert.equal(op.define.name, 'headline');
+	assert.equal(op.define.type, 'text');
+	assert.equal(op.define.defaultValue, 'Hello', 'the current words become the default');
+	assert.equal(op.define.description, 'The main title');
+});
+
+test('make_variable binding writes metadata and infers the type from the target', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('make_variable', { clipId: 't1', name: 'titleColor', target: 'style.color' })
+	]);
+	const op = operations[0];
+	assert.deepEqual(op.patch.metadata.pictify.bindings, [
+		{ target: 'style.color', variable: 'titleColor' }
+	]);
+	assert.equal(op.define.type, 'color');
+	assert.equal(op.define.defaultValue, '#ffffff', 'current colour becomes the default');
+});
+
+test('re-parameterising a target replaces its binding instead of stacking two', () => {
+	const bound = doc();
+	bound.clips.t1.metadata = {
+		pictify: { bindings: [{ target: 'style.color', variable: 'oldColor' }, { target: 'transform.opacity', variable: 'fade' }] }
+	};
+	const { operations } = planToolCalls(bound, [
+		call('make_variable', { clipId: 't1', name: 'newColor', target: 'style.color' })
+	]);
+	const bindings = operations[0].patch.metadata.pictify.bindings;
+	assert.equal(bindings.length, 2);
+	assert.ok(bindings.some((b) => b.variable === 'newColor' && b.target === 'style.color'));
+	assert.ok(bindings.some((b) => b.variable === 'fade'), 'unrelated bindings survive');
+});
+
+test('timing targets default in SECONDS, not the stored microseconds', () => {
+	const { operations } = planToolCalls(doc(), [
+		call('make_variable', { clipId: 't1', name: 'endsAt', target: 'timing.display.to' })
+	]);
+	assert.equal(operations[0].define.defaultValue, 3, '3,000,000µs reads as 3s');
+	assert.equal(operations[0].define.type, 'number');
+});
+
+test('make_variable refuses bad names, wrong targets and missing clips', () => {
+	const bad = planToolCalls(doc(), [
+		call('make_variable', { clipId: 't1', name: '2cool', target: 'text' })
+	]);
+	assert.match(bad.errors[0].error, /identifier/);
+
+	const wrong = planToolCalls(doc(), [
+		call('make_variable', { clipId: 's1', name: 'words', target: 'text' })
+	]);
+	assert.match(wrong.errors[0].error, /no text/);
+
+	const notForType = planToolCalls(doc(), [
+		call('make_variable', { clipId: 't1', name: 'src', target: 'src' })
+	]);
+	assert.match(notForType.errors[0].error, /cannot bind/);
+});
+
+test('the variable op reads as a sentence', () => {
+	assert.match(summarizeOperations([{ op: 'variable' }]), /Parameterised 1 field/);
+});
