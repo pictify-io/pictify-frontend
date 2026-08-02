@@ -106,8 +106,8 @@
 		if (isLoggedIn) {
 			goto('/template-workspace/create');
 		} else {
-			// Let guests try the canvas editor before signup.
-			goto('/canvas/try');
+			// Guests sign up first, then land in the template creator.
+			goto('/dashboard/template/create');
 		}
 	}
 

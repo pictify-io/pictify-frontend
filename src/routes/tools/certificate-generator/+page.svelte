@@ -121,8 +121,8 @@
 		}
 	}
 
-	// Open in full canvas editor (matches [usecase] page pattern)
-	function openInCanvasEditor() {
+	// Open the full editor (logged in) or the certificate workflow (guests)
+	function openEditor() {
 		const template = {
 			...selectedTemplate,
 			name: `${selectedTemplate.name} Certificate`,
@@ -141,7 +141,8 @@
 		if ($user?.email) {
 			goto('/template-workspace/image/create');
 		} else {
-			goto('/canvas/try?usecase=certificate');
+			// Guests sign up first, then land in the certificate workflow.
+			goto('/dashboard/workflows/new');
 		}
 	}
 
@@ -281,7 +282,7 @@
 				'@type': 'HowToStep',
 				position: 3,
 				name: 'Preview the certificate',
-				text: 'Preview your certificate in the interactive canvas editor.'
+				text: 'Preview your certificate in the interactive live preview.'
 			},
 			{
 				'@type': 'HowToStep',
@@ -694,7 +695,7 @@
 					<!-- Open Editor Button -->
 					<button
 						type="button"
-						on:click={openInCanvasEditor}
+						on:click={openEditor}
 						class="w-full py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -705,7 +706,7 @@
 								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
 							/></svg
 						>
-						Open Full Editor
+						{$user?.email ? 'Open Full Editor' : 'Start a Certificate Run'}
 					</button>
 				</div>
 			</div>
@@ -852,7 +853,7 @@
 							Download PNG
 						</a>
 						<button
-							on:click={openInCanvasEditor}
+							on:click={openEditor}
 							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -863,7 +864,7 @@
 									d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
 								/></svg
 							>
-							Edit in Full Editor
+							{$user?.email ? 'Edit in Full Editor' : 'Start a Certificate Run'}
 						</button>
 					</div>
 				</div>
@@ -1020,7 +1021,7 @@
 					How to Make a Certificate Online in 6 Steps
 				</h3>
 				<div class="space-y-4">
-					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive canvas editor' }, { num: '4', text: 'Click any text on the canvas to make direct edits' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate or open it in the full editor for further customization' }] as step}
+					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Click any text on the canvas to make direct edits' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate or open it in the full editor for further customization' }] as step}
 						<div class="flex items-start gap-4">
 							<span
 								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
@@ -1225,12 +1226,17 @@
 						Need More Customization?
 					</h3>
 					<p class="text-gray-400 font-bold mb-8 max-w-lg mx-auto relative z-10">
-						Open your certificate in our full canvas editor to add logos, custom images, QR codes,
-						and fine-tune every design detail.
+						{#if $user?.email}
+							Open your certificate in our full editor to add logos, custom images, QR codes, and
+							fine-tune every design detail.
+						{:else}
+							Start a workflow run to generate personalized certificates in bulk — perfect for
+							events, courses, and training programs.
+						{/if}
 					</p>
 					<button
 						type="button"
-						on:click={openInCanvasEditor}
+						on:click={openEditor}
 						class="px-8 py-4 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1241,7 +1247,7 @@
 								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
 							/></svg
 						>
-						Open Full Editor — Free
+						{$user?.email ? 'Open Full Editor — Free' : 'Start a Run — Free'}
 					</button>
 				</div>
 			</section>
