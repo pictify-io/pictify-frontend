@@ -1,21 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { user } from '../../../store/user.store';
-	import { getProducts } from '../../../api/product';
 	import Loader from '$lib/components/Loader.svelte';
 	import { analytics } from '$lib/analytics.js';
-	import {
-		PLANS,
-		PLAN_DISPLAY_NAMES,
-		PLAN_PRICING,
-		FEATURES,
-		PLAN_FEATURES,
-		formatLimit,
-		OVERAGE_PRICING,
-		isOverageEligible
-	} from '../../../config/plan-features.js';
+	import { isOverageEligible } from '../../../config/plan-features.js';
 	import OverageSettings from '$lib/components/plg/OverageSettings.svelte';
 	import {
 		overageState,
@@ -40,11 +29,6 @@
 	} from '../../../store/billing.store';
 	import { toast } from '../../../store/toast.store';
 
-	let isLoading = true;
-	let allPlans = [];
-	let error = null;
-	let showAllPlans = false;
-	let showAnnual = false;
 	let overageInvoices = [];
 	let overageInvoicesLoading = false;
 
@@ -52,7 +36,6 @@
 	let showPauseModal = false;
 	let showCancelModal = false;
 
-	$: isLoggedIn = !!$user.email;
 	// Get plan from billing API (respects team context) with fallback to user store
 	$: currentPlan = $billingState.subscription?.plan || $user.currentPlan || 'starter';
 	$: isFreeTier = currentPlan.toLowerCase() === 'starter';
@@ -79,60 +62,11 @@
 		// Always refresh billing state when viewing billing page to get latest data
 		// This bypasses the 5-minute server cache to ensure plan changes are reflected
 		initBilling({ refresh: true });
-
-		try {
-			const response = await getProducts();
-			allPlans = (response?.data ?? [])
-				.filter((plan) => plan && typeof plan.request_per_month === 'number')
-				.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-		} catch (err) {
-			error = 'Failed to load pricing plans. Please try again.';
-		} finally {
-			isLoading = false;
-		}
 	});
 
 	// Read discount code from URL params (only apply for free tier users)
 	$: discountCodeParam = $page.url.searchParams.get('discount');
 	$: discountCode = isFreeTier ? discountCodeParam : null;
-	$: source = $page.url.searchParams.get('source');
-
-	// Read billing preference from URL (from pricing page)
-	$: billingParam = $page.url.searchParams.get('billing');
-	$: if (billingParam === 'annual' && !showAnnual) {
-		showAnnual = true;
-	}
-
-	// Featured plans to highlight (3-tier system)
-	// Note: LemonSqueezy returns 'Standard', displayed as 'Pro' on pricing page
-	const featuredPlanNames = ['Standard', 'Business'];
-
-	$: featuredPlans = allPlans.filter((p) => featuredPlanNames.includes(p.name));
-	$: otherPlans = allPlans.filter(
-		(p) => !featuredPlanNames.includes(p.name) && p.name !== 'Starter'
-	);
-
-	// Get plan features from central config
-	function getQuotas(planName) {
-		const planId = planName?.toLowerCase();
-		const features = PLAN_FEATURES[planId] || PLAN_FEATURES[PLANS.STARTER];
-		return {
-			renders: features[FEATURES.RENDERS],
-			templates: features[FEATURES.TEMPLATES_SAVED],
-			aiCopilot: features[FEATURES.AI_COPILOT],
-			aiBackgroundRemover: features[FEATURES.AI_BACKGROUND_REMOVER],
-			batchRender: features[FEATURES.BATCH_RENDER],
-			teamSeats: features[FEATURES.TEAM_SEATS]
-		};
-	}
-
-	// Format feature value for display
-	function formatFeatureValue(value) {
-		if (value === null) return '∞';
-		if (value === true) return '✓';
-		if (value === false) return '—';
-		return formatLimit(value);
-	}
 
 	async function handleOverageSettingsChange(event) {
 		const { allowOverages, spendingCapCents } = event.detail;
@@ -199,73 +133,6 @@
 		}
 	}
 
-	function formatRequests(value) {
-		const numeric = typeof value === 'number' ? value : Number(value ?? 0);
-		if (Number.isNaN(numeric)) return '-';
-		if (numeric >= 1_000_000) return `${(numeric / 1_000_000).toFixed(0)}M`;
-		if (numeric >= 1_000) return `${(numeric / 1_000).toFixed(numeric % 1_000 === 0 ? 0 : 1)}K`;
-		return numeric.toString();
-	}
-
-	function isPlanCurrent(plan) {
-		return plan?.name?.toLowerCase() === currentPlan?.toLowerCase();
-	}
-
-	function handlePurchase(plan) {
-		if (!plan) return;
-
-		// Use annual URL if available and annual billing is selected
-		const purchaseUrl =
-			showAnnual && plan.purchase_url_annual ? plan.purchase_url_annual : plan.purchase_url;
-
-		// Track upgrade started
-		analytics.trackUpgradeStarted({
-			plan: plan.name,
-			source: source || 'dashboard_upgrade',
-			price: plan.price,
-			requests: plan.request_per_month,
-			current_plan: currentPlan,
-			discount_code: discountCode,
-			billing_interval: showAnnual ? 'annual' : 'monthly'
-		});
-
-		if (!isLoggedIn) {
-			window.location.href = `/signup?redirect=${purchaseUrl ?? '/dashboard/api-token'}`;
-			return;
-		}
-		if (purchaseUrl) {
-			let checkoutUrl = purchaseUrl;
-
-			// Append custom data for reliable user identification in webhooks
-			// This ensures the webhook knows which user/team to update, avoiding email mismatch issues
-			const customParams = [];
-
-			// Always include user ID for reliable webhook processing
-			if ($user._id) {
-				customParams.push(`checkout[custom][user_id]=${encodeURIComponent($user._id)}`);
-			}
-
-			// Include team UID if user is on a team
-			if ($user.activeTeam) {
-				customParams.push(`checkout[custom][team_uid]=${encodeURIComponent($user.activeTeam)}`);
-			}
-
-			// Append discount code to LemonSqueezy checkout URL if present
-			if (discountCode) {
-				customParams.push(`checkout[discount_code]=${encodeURIComponent(discountCode)}`);
-			}
-
-			// Join all parameters with the checkout URL
-			if (customParams.length > 0) {
-				const separator = checkoutUrl.includes('?') ? '&' : '?';
-				checkoutUrl = `${checkoutUrl}${separator}${customParams.join('&')}`;
-			}
-
-			window.location.href = checkoutUrl;
-		} else {
-			goto('/dashboard/api-token');
-		}
-	}
 </script>
 
 <svelte:head>
