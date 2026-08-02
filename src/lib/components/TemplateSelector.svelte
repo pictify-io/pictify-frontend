@@ -6,6 +6,18 @@
 	export let selectedTemplate = null;
 	export let placeholder = 'Select a template...';
 	export let disabled = false;
+	/**
+	 * Where the templates come from. Defaults to the HTML template API, which
+	 * is what every original consumer expects; pass one to select from another
+	 * collection (video templates) with the exact same experience — search,
+	 * thumbnails, keyboard navigation, infinite scroll.
+	 *
+	 * @type {null | ((params: {query: string, page: number, limit: number}) =>
+	 *   Promise<{templates: Array<{uid: string, name?: string, thumbnail?: string, width?: number, height?: number}>, hasMore?: boolean}>)}
+	 */
+	export let fetcher = null;
+	/** Shown when the list comes back empty without a search query. */
+	export let emptyText = 'No templates found';
 
 	const dispatch = createEventDispatcher();
 	const PAGE_SIZE = 20;
@@ -146,6 +158,18 @@
 		close();
 	});
 
+	// The default source: the HTML template API this component grew up on.
+	const defaultFetcher = async ({ query: q, page, limit }) => {
+		const isSearch = q.trim() !== '';
+		const res = isSearch
+			? await searchTemplates(q.trim(), { page, limit })
+			: await getTemplates({ page, limit });
+		return {
+			templates: res?.templates || [],
+			hasMore: res?.pagination?.hasNext ?? false
+		};
+	};
+
 	async function fetchPage(page, append) {
 		if (append) {
 			loadingMore = true;
@@ -155,10 +179,7 @@
 		}
 
 		try {
-			const isSearch = query.trim() !== '';
-			const res = isSearch
-				? await searchTemplates(query.trim(), { page, limit: PAGE_SIZE })
-				: await getTemplates({ page, limit: PAGE_SIZE });
+			const res = await (fetcher || defaultFetcher)({ query, page, limit: PAGE_SIZE });
 
 			if (res?.templates) {
 				if (append) {
@@ -167,7 +188,7 @@
 					templates = res.templates;
 				}
 				currentPage = page;
-				hasMore = res.pagination?.hasNext ?? false;
+				hasMore = res.hasMore ?? false;
 			}
 		} catch (err) { /* ignored */ } finally {
 			loading = false;
@@ -330,7 +351,7 @@
 		if (templates.length === 0) {
 			listEl.innerHTML = `
 				<div class="py-8 text-center">
-					<p class="text-sm font-bold text-gray-600">No templates found</p>
+					<p class="text-sm font-bold text-gray-600">${escapeHtml(query ? 'No templates found' : emptyText)}</p>
 					${query ? '<p class="text-xs text-gray-600 mt-1">Try a different search term</p>' : ''}
 				</div>`;
 			return;

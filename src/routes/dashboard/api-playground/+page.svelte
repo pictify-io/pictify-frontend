@@ -94,11 +94,28 @@
 	// User templates for dropdown
 	let userTemplates = [];
 	let loadingTemplates = false;
-	// Video templates for their own dropdown — a different model on a
-	// different endpoint, so TemplateSelector (hard-wired to the HTML
-	// template API) cannot serve them.
-	let videoTemplateOptions = [];
-	let loadingVideoTemplates = false;
+	/*
+	 * Video templates through the SAME TemplateSelector as everything else —
+	 * one selection experience across the playground. The video endpoint has
+	 * no server-side search or pagination (the list caps at 100), so the
+	 * fetcher loads once and filters in memory; posterUrl maps onto the
+	 * thumbnail slot the selector already renders.
+	 */
+	let videoTemplateCache = null;
+	const videoTemplateFetcher = async ({ query }) => {
+		if (!videoTemplateCache) {
+			const result = await getVideoTemplates();
+			videoTemplateCache = (result?.templates || []).map((t) => ({
+				...t,
+				thumbnail: t.posterUrl || null
+			}));
+		}
+		const needle = query.trim().toLowerCase();
+		const templates = needle
+			? videoTemplateCache.filter((t) => (t.name || '').toLowerCase().includes(needle))
+			: videoTemplateCache;
+		return { templates, hasMore: false };
+	};
 	let manualTemplateInput = {
 		'get-template': false,
 		'delete-template': false,
@@ -109,19 +126,6 @@
 		'video-render': false,
 		'video-variables': false
 	};
-
-	async function fetchVideoTemplateOptions() {
-		if (!isUserLoggedIn) return;
-		loadingVideoTemplates = true;
-		try {
-			const result = await getVideoTemplates();
-			if (result?.templates) videoTemplateOptions = result.templates;
-		} catch (error) {
-			/* the manual UID input still works */
-		} finally {
-			loadingVideoTemplates = false;
-		}
-	}
 
 	// Fetch user templates
 	async function fetchUserTemplates() {
@@ -168,9 +172,6 @@
 			// Fetch templates when user is logged in
 			if (isUserLoggedIn && userTemplates.length === 0) {
 				fetchUserTemplates();
-			}
-			if (isUserLoggedIn && videoTemplateOptions.length === 0) {
-				fetchVideoTemplateOptions();
 			}
 		});
 	});
@@ -2852,23 +2853,12 @@
 										placeholder="Enter video template UID"
 									/>
 								{:else}
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+									<TemplateSelector
 										bind:value={videoRenderParams.templateUid}
-									>
-										<option value="" disabled selected>
-											{loadingVideoTemplates
-												? 'Loading video templates…'
-												: videoTemplateOptions.length
-												? 'Select a video template...'
-												: 'No video templates yet — create one in the studio'}
-										</option>
-										{#each videoTemplateOptions as option}
-											<option value={option.uid}>
-												{option.name || 'Untitled'} ({option.kind === 'tsx' ? 'code' : 'timeline'})
-											</option>
-										{/each}
-									</select>
+										fetcher={videoTemplateFetcher}
+										placeholder="Select a video template..."
+										emptyText="No video templates yet — create one in the studio"
+									/>
 								{/if}
 							</div>
 								<div>
@@ -2929,23 +2919,12 @@
 										placeholder="Enter video template UID"
 									/>
 								{:else}
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
+									<TemplateSelector
 										bind:value={videoVariablesParams.uid}
-									>
-										<option value="" disabled selected>
-											{loadingVideoTemplates
-												? 'Loading video templates…'
-												: videoTemplateOptions.length
-												? 'Select a video template...'
-												: 'No video templates yet — create one in the studio'}
-										</option>
-										{#each videoTemplateOptions as option}
-											<option value={option.uid}>
-												{option.name || 'Untitled'} ({option.kind === 'tsx' ? 'code' : 'timeline'})
-											</option>
-										{/each}
-									</select>
+										fetcher={videoTemplateFetcher}
+										placeholder="Select a video template..."
+										emptyText="No video templates yet — create one in the studio"
+									/>
 								{/if}
 							</div>
 						{:else if selectedEndpoint === 'video-generate'}
