@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
-// Feature retired (2026-07): marketing page removed, permanent redirect home.
+// Experiments feature retired July 2026 — permanent redirect home.
 export function load() {
-	throw redirect(301, '/');
+	redirect(301, '/');
 }
