@@ -79,23 +79,19 @@
 	// Feature comparison based on plan-features.js
 	$: currentFeatures = {
 		renders: getFeatureLimit(plan, FEATURES.RENDERS),
-		// Monthly AI credit pool (copilot, AI video generation, captions) —
-		// a separate pool from render credits.
+		// ONE monthly AI credit pool (copilot for templates & video, AI video
+		// generation, captions) — a separate pool from render credits.
 		aiCredits: getFeatureLimit(plan, FEATURES.AI_CREDITS),
-		aiCopilot: getFeatureLimit(plan, FEATURES.AI_COPILOT),
 		templates: getFeatureLimit(plan, FEATURES.TEMPLATES_SAVED),
-		batchRender: getFeatureLimit(plan, FEATURES.BATCH_RENDER),
-		aiBackgroundRemover: getFeatureLimit(plan, FEATURES.AI_BACKGROUND_REMOVER)
+		batchRender: getFeatureLimit(plan, FEATURES.BATCH_RENDER)
 	};
 
 	$: nextFeatures = nextPlan
 		? {
 				renders: getFeatureLimit(nextPlan, FEATURES.RENDERS),
 				aiCredits: getFeatureLimit(nextPlan, FEATURES.AI_CREDITS),
-				aiCopilot: getFeatureLimit(nextPlan, FEATURES.AI_COPILOT),
 				templates: getFeatureLimit(nextPlan, FEATURES.TEMPLATES_SAVED),
-				batchRender: getFeatureLimit(nextPlan, FEATURES.BATCH_RENDER),
-				aiBackgroundRemover: getFeatureLimit(nextPlan, FEATURES.AI_BACKGROUND_REMOVER)
+				batchRender: getFeatureLimit(nextPlan, FEATURES.BATCH_RENDER)
 		  }
 		: null;
 
@@ -113,13 +109,11 @@
 		return String(value);
 	}
 
-	// Features to show in comparison (the first 5 are rendered in the modal)
+	// Features to show in comparison
 	const featureDisplay = [
 		{ key: 'renders', label: 'Renders', unit: '/mo' },
 		{ key: 'templates', label: 'Templates', unit: '' },
 		{ key: 'aiCredits', label: 'AI Credits', unit: '/mo' },
-		{ key: 'aiCopilot', label: 'AI Copilot', unit: '/mo' },
-		{ key: 'aiBackgroundRemover', label: 'AI Background Remover', unit: '/mo' },
 		{ key: 'batchRender', label: 'Batch Render', unit: '' }
 	];
 </script>

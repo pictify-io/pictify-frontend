@@ -101,12 +101,17 @@ export const FEATURES = {
 	BATCH_ITEMS_PER_REQUEST: 'batchItemsPerRequest',
 	BATCH_MONTHLY_LIMIT: 'batchMonthlyLimit',
 
-	// AI Features
+	// AI Features — the ONLY sold AI allowance is AI_CREDITS: one monthly
+	// pool covering the copilot (templates & video), AI video generation and
+	// captions. Values mirror backend util/ai-credits.js AI_LIMITS — keep in
+	// sync. A SEPARATE pool from render credits.
+	//
+	// AI_BACKGROUND_REMOVER and AI_COPILOT are LEGACY buckets — not sold on
+	// any pricing surface. Keys kept only so feature gates on grandfathered
+	// users' pages keep working (e.g. the background-remove button in the
+	// canvas editor). Do not add these back to pricing/upgrade UI.
 	AI_BACKGROUND_REMOVER: 'aiBackgroundRemover',
 	AI_COPILOT: 'aiCopilot',
-	// Monthly AI credit pool (copilot, AI generation, transcription).
-	// A SEPARATE pool from render credits — values mirror backend
-	// util/ai-credits.js AI_LIMITS. Keep in sync.
 	AI_CREDITS: 'aiCredits',
 
 	// Team & Collaboration
@@ -426,21 +431,24 @@ export const FEATURE_METADATA = {
 		icon: 'list',
 		category: 'automation'
 	},
+	// Legacy AI bucket metadata — RETIRED from sale. Neutral labels kept only
+	// for feature gates grandfathered users may still hit.
 	[FEATURES.AI_BACKGROUND_REMOVER]: {
 		name: 'AI Background Remover',
-		description: 'Remove backgrounds with AI',
+		description: 'Legacy background removal',
 		icon: 'wand',
 		category: 'ai'
 	},
 	[FEATURES.AI_COPILOT]: {
 		name: 'AI Copilot',
-		description: 'AI-powered design assistance',
+		description: 'Legacy per-plan copilot bucket (now covered by AI Credits)',
 		icon: 'sparkles',
 		category: 'ai'
 	},
 	[FEATURES.AI_CREDITS]: {
 		name: 'AI Credits',
-		description: 'Monthly AI credit pool for copilot, AI video generation and captions',
+		description:
+			'Monthly AI credit pool for the copilot (templates & video), AI video generation and captions',
 		icon: 'sparkles',
 		category: 'ai'
 	},
@@ -593,16 +601,9 @@ export const FEATURE_UPGRADE_MESSAGES = {
 		message: 'Process multiple images at once with batch rendering.',
 		benefit: 'Save hours with automated processing'
 	},
-	[FEATURES.AI_BACKGROUND_REMOVER]: {
-		title: 'AI Background Remover',
-		message: 'Remove backgrounds instantly with AI.',
-		benefit: 'Available on Basic (25/mo), Pro (100/mo), Business (500/mo)'
-	},
-	[FEATURES.AI_COPILOT]: {
-		title: 'Unlock AI Copilot',
-		message: 'Get AI-powered design assistance.',
-		benefit: 'Available on Basic (15/mo), Pro (50/mo), Business (500/mo)'
-	},
+	// AI Background Remover and the per-plan AI Copilot bucket are no longer
+	// sold — their upsells were removed alongside the experiments ones. The
+	// copilot is covered by the unified AI credits pool on every plan.
 	[FEATURES.WEBHOOKS]: {
 		title: 'Webhooks Available on All Paid Plans',
 		message: 'Automate your workflow with custom webhooks.',

@@ -94,10 +94,8 @@
 					label: 'AI Credits',
 					feature: FEATURES.AI_CREDITS,
 					unit: '/mo',
-					description: 'Copilot, AI video generation & captions'
-				},
-				{ label: 'AI Background Remover', feature: FEATURES.AI_BACKGROUND_REMOVER, unit: '/mo' },
-				{ label: 'AI Copilot', feature: FEATURES.AI_COPILOT, unit: '/mo' }
+					description: 'Copilot (templates & video), AI video generation & captions'
+				}
 			]
 		},
 		// Team & Enterprise
@@ -164,7 +162,7 @@
 		{
 			question: 'What AI features are available?',
 			answer:
-				'Every plan includes a monthly AI credit pool — Free 25, Basic 300, Pro 1,000, Business 4,000 — covering Copilot, AI video generation and captions. Paid plans also include a separate AI Copilot allowance for template editing (Basic 15, Pro 50, Business 500 uses/mo) and AI Background Remover (Basic 25, Pro 100, Business 500 uses/mo).',
+				'Every plan includes ONE monthly AI credit pool — Free 25, Basic 300, Pro 1,000, Business 4,000. It covers everything AI-powered: the Copilot (both template editing and the video timeline copilot), AI video generation, and captions. One instruction, one credit — failed requests are never billed.',
 			isOpened: false
 		},
 		{
@@ -651,7 +649,7 @@
 												credits/mo</span
 											>
 											<span class="text-xs text-gray-500 font-normal"
-												>Copilot, AI video generation & captions</span
+												>Copilot (templates & video), AI video generation & captions</span
 											>
 										</div>
 									</li>
@@ -678,28 +676,6 @@
 											</svg>
 										</div>
 										<span class="mt-0.5">Batch processing</span>
-									</li>
-								{/if}
-								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_BACKGROUND_REMOVER]}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-brand-accent border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="3"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-												/>
-											</svg>
-										</div>
-										<span class="mt-0.5">AI Tools</span>
 									</li>
 								{/if}
 								{#if PLAN_FEATURES[planId]?.[FEATURES.TEAM_SEATS] !== 1}

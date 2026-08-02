@@ -7,15 +7,7 @@
 	import { fade, fly, slide } from 'svelte/transition';
 	import { copilotExecution, copilotActions } from '../../../store/copilot.store';
 	import { canSafelyUndo, historyActions } from '../../../store/history.store';
-	import {
-		canUseFeature,
-		trackFeatureUsage,
-		plgStatus,
-		showMilestoneCelebration,
-		checkFeatureAccessSync,
-		FEATURES,
-		getFeatureUpgradePrompt
-	} from '../../../store/plg.store';
+	import { plgStatus, usageWidget, refreshUsageWidget } from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 
 	let messages = [];
@@ -45,25 +37,13 @@
 	let currentAgent = null;
 	let agentSteps = [];
 
-	// PLG Feature gating
-	let aiCopilotLimit = null;
-	let featureLimitReached = false;
-
+	// PLG gating — the copilot draws from the unified AI-credit pool (the
+	// same one the video copilot and AI generation spend), so every plan has
+	// an allowance and the only lock state is an exhausted pool. The server
+	// re-checks and answers 402 when out of credits, so this is display-only.
 	$: isPaidPlan = $plgStatus.isPaidPlan;
-
-	// Plan-based feature access check (must depend on $plgStatus so it re-evaluates after PLG loads)
-	$: copilotAccess = ($plgStatus.plan, checkFeatureAccessSync(FEATURES.AI_COPILOT));
-	$: hasCopilotAccess = copilotAccess?.hasAccess ?? false;
-	$: copilotUpgradePrompt = ($plgStatus.plan, getFeatureUpgradePrompt(FEATURES.AI_COPILOT));
-	// Re-check usage limits whenever plan-level access changes (all plans have quotas)
-	$: if (hasCopilotAccess && $plgStatus.loaded) {
-		checkCopilotUsageLimit();
-	}
-
-	async function checkCopilotUsageLimit() {
-		aiCopilotLimit = await canUseFeature('aiCopilot');
-		featureLimitReached = !aiCopilotLimit?.allowed;
-	}
+	$: aiCredits = $usageWidget.aiCredits;
+	$: featureLimitReached = aiCredits ? aiCredits.remaining <= 0 : false;
 
 	const QUICK_ACTIONS = [
 		'Make it modern',
@@ -348,29 +328,28 @@
 
 		await scrollToBottom();
 
-		// Check feature limit (all plans have quotas)
-		const limitCheck = await canUseFeature('aiCopilot');
-		if (!limitCheck.allowed) {
+		// Check the AI-credit balance (all plans have an allowance); the
+		// server re-checks and refuses with 402 when the pool is empty.
+		if (aiCredits && aiCredits.remaining <= 0) {
 			isLoading = false;
-			featureLimitReached = true;
-			error = "You've reached your AI Copilot limit for this month. Upgrade to continue!";
+			error = "You've used this month's AI credits. Upgrade for more!";
 			messages = [
 				...messages,
 				{
 					role: 'system',
-					content: 'AI Copilot limit reached. Upgrade for more generations!'
+					content: 'AI credits used up for this month. Upgrade for more!'
 				}
 			];
 			return;
 		}
 
 		// Show warning if close to limit
-		if (limitCheck.remaining <= 1) {
+		if (aiCredits && aiCredits.remaining <= 1) {
 			messages = [
 				...messages,
 				{
 					role: 'system',
-					content: `Last AI generation for this month! ${
+					content: `Last AI credit for this month! ${
 						!isPaidPlan ? 'Upgrade for more access.' : ''
 					}`
 				}
@@ -436,15 +415,10 @@
 				onComplete: async (payload) => {
 					await handleCompletePayload(payload);
 
-					// Update quota display after successful generation
+					// The server spends the AI credit; just refresh the balance
+					// so the header badge and lock state stay honest.
 					if (payload.success) {
-						const result = await trackFeatureUsage('aiCopilot');
-						if (result.milestone?.isNew) {
-							showMilestoneCelebration(result.milestone);
-						}
-						// Update limit check
-						aiCopilotLimit = await canUseFeature('aiCopilot');
-						featureLimitReached = !aiCopilotLimit?.allowed;
+						await refreshUsageWidget().catch(() => {});
 					}
 				},
 				onError: (err) => handleStreamFailure(err)
@@ -545,13 +519,14 @@
 			</div>
 			<span class="font-bold text-gray-800 text-xs truncate">Copilot</span>
 
-			{#if aiCopilotLimit?.remaining >= 0 && hasCopilotAccess && !featureLimitReached}
+			{#if aiCredits && !featureLimitReached}
 				<span
 					class="text-[9px] px-1.5 py-0.5 rounded-full border-[2px] border-gray-900 bg-brand-accent text-gray-900 font-bold shrink-0"
+					title="AI credits left this month"
 				>
-					{aiCopilotLimit.remaining}/{aiCopilotLimit.limit}
+					{aiCredits.remaining}/{aiCredits.limit}
 				</span>
-			{:else if !hasCopilotAccess || featureLimitReached}
+			{:else if featureLimitReached}
 				<span
 					class="text-[9px] px-1.5 py-0.5 rounded-full border-[2px] border-gray-900 bg-gray-200 text-gray-900 font-bold shrink-0"
 				>
@@ -568,7 +543,7 @@
 			{/if}
 		</div>
 
-		{#if hasCopilotAccess && !featureLimitReached}
+		{#if !featureLimitReached}
 			<div class="flex items-center shrink-0">
 				{#if $canSafelyUndo}
 					<button
@@ -617,7 +592,7 @@
 	</div>
 
 	<!-- Content Area -->
-	{#if !hasCopilotAccess || featureLimitReached}
+	{#if featureLimitReached}
 		<div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-brand-bg">
 			<div
 				class="w-full bg-white border-[3px] border-gray-900 rounded-xl p-4 shadow-brutal-lg flex flex-col items-center text-center"
@@ -640,15 +615,9 @@
 						<path d="M7 11V7a5 5 0 0 1 10 0v4" />
 					</svg>
 				</div>
-				<h3 class="text-sm font-black text-gray-900 mb-1.5 leading-tight">
-					{!hasCopilotAccess ? 'Unlock AI Copilot' : 'Limit Reached'}
-				</h3>
+				<h3 class="text-sm font-black text-gray-900 mb-1.5 leading-tight">AI Credits Used Up</h3>
 				<p class="text-[11px] font-medium text-gray-600 mb-4 leading-relaxed">
-					{!hasCopilotAccess
-						? `Upgrade to ${
-								copilotUpgradePrompt?.targetPlan?.name || 'Pro'
-						  } to use AI design assistant.`
-						: 'Generation limit reached. Upgrade for more.'}
+					You've used this month's AI credits. Upgrade for more, or they reset next month.
 				</p>
 				<button
 					on:click={() => openUpgradeModal('ai_copilot')}
@@ -660,7 +629,7 @@
 		</div>
 	{:else}
 		<!-- Low usage warning -->
-		{#if aiCopilotLimit?.remaining > 0 && aiCopilotLimit?.remaining <= 3}
+		{#if aiCredits && aiCredits.remaining > 0 && aiCredits.remaining <= 3}
 			<div
 				class="px-3 py-1.5 border-b-[3px] border-gray-900 bg-brand-accent text-gray-900 text-[10px] font-bold flex items-center justify-between shrink-0"
 			>
@@ -677,7 +646,7 @@
 					>
 						<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 					</svg>
-					{aiCopilotLimit.remaining} left
+					{aiCredits.remaining} AI credits left
 				</span>
 				<button
 					on:click={() => openUpgradeModal('ai_copilot')}

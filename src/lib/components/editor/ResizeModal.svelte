@@ -5,7 +5,7 @@
 	import { editor } from '../../../store/editor.store';
 	import { toast } from '../../../store/toast.store';
 	import { analytics } from '$lib/analytics.js';
-	import { canUseFeature } from '../../../store/plg.store';
+	import { usageWidget } from '../../../store/plg.store';
 	import { page } from '$app/stores';
 
 	export let show = false;
@@ -120,9 +120,11 @@
 			return;
 		}
 
-		const canUse = canUseFeature('aiCopilot');
-		if (!canUse) {
-			toast.set({ message: 'AI Copilot limit reached. Upgrade your plan.', type: 'error' });
+		// Display-only balance check on the unified AI-credit pool — the
+		// server re-checks and answers 402 when the pool is empty.
+		const aiCredits = $usageWidget.aiCredits;
+		if (aiCredits && aiCredits.remaining <= 0) {
+			toast.set({ message: "You've used this month's AI credits. Upgrade your plan.", type: 'error' });
 			return;
 		}
 
