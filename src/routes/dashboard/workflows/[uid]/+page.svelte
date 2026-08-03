@@ -2,12 +2,15 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { getWorkflowRun, createWorkflowHook } from '../../../../api/workflow';
+	import { getWorkflowRun, createWorkflowHook, resendWorkflowItem } from '../../../../api/workflow';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { analytics } from '$lib/analytics.js';
 
 	const ACTIVE_STATUSES = ['pending', 'queued', 'processing', 'running'];
-	const DELIVERY_KEYS = ['method', 'emailColumn', 'subject', 'fromName', 'bodyText'];
+	const DELIVERY_KEYS = ['method', 'emailColumn', 'subject', 'fromName', 'bodyText', 'bodyHtml', 'replyTo'];
+	// Delivery states a re-send can recover from. 'complained' is deliberately
+	// absent — a spam complaint means never contact this recipient again.
+	const RESENDABLE_STATUSES = ['failed', 'bounced', 'skipped', 'suppressed'];
 
 	let run = null;
 	let isLoading = true;
@@ -96,11 +99,71 @@
 	$: completedLinks = items.filter((item) => item.url);
 
 	function renderBadgeStyle(status) {
-		if (status === 'rendered' || status === 'completed' || status === 'success')
+		if (
+			status === 'rendered' ||
+			status === 'completed' ||
+			status === 'success' ||
+			status === 'delivered'
+		)
 			return 'bg-data-green text-black border-black';
-		if (status === 'failed' || status === 'error') return 'bg-brand-danger text-white border-black';
-		if (ACTIVE_STATUSES.includes(status)) return 'bg-brand-accent text-black border-black';
+		if (
+			status === 'failed' ||
+			status === 'error' ||
+			status === 'bounced' ||
+			status === 'complained'
+		)
+			return 'bg-brand-danger text-white border-black';
+		if (status === 'sent' || ACTIVE_STATUSES.includes(status))
+			return 'bg-brand-accent text-black border-black';
 		return 'bg-gray-100 text-gray-700 border-gray-400';
+	}
+
+	// Per-row re-send state: index -> { busy, done, error }
+	let resendState = {};
+
+	function canResend(item) {
+		return (
+			run?.delivery?.method === 'email' &&
+			!!item.url &&
+			RESENDABLE_STATUSES.includes(item.deliveryStatus)
+		);
+	}
+
+	async function resendItem(item) {
+		if (resendState[item.index]?.busy) return;
+		resendState = { ...resendState, [item.index]: { busy: true } };
+		try {
+			const response = await resendWorkflowItem(run.uid, item.index);
+			const updated = response?.item;
+			if (updated) {
+				run = {
+					...run,
+					counts: response.counts || run.counts,
+					items: (run.items || []).map((i) =>
+						i.index === item.index
+							? { ...i, deliveryStatus: updated.deliveryStatus, error: updated.error }
+							: i
+					)
+				};
+			}
+			resendState = {
+				...resendState,
+				[item.index]: { busy: false, done: updated?.deliveryStatus === 'sent' }
+			};
+			analytics.track('Workflow Item Resent', {
+				runUid: run.uid,
+				index: item.index,
+				result: updated?.deliveryStatus
+			});
+			setTimeout(() => {
+				resendState = { ...resendState, [item.index]: {} };
+			}, 2500);
+		} catch (error) {
+			resendState = {
+				...resendState,
+				[item.index]: { busy: false, error: error?.message || 'Re-send failed' }
+			};
+		}
 	}
 
 	// Buying signal: fire once per run when we first observe a terminal status.
@@ -493,6 +556,9 @@
 							<th class="px-5 py-4 text-[10px] font-black text-black uppercase tracking-widest">
 								File
 							</th>
+							<th class="px-5 py-4 text-[10px] font-black text-black uppercase tracking-widest">
+								Actions
+							</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y-[2px] divide-gray-200">
@@ -548,10 +614,35 @@
 										<span class="text-xs font-bold text-gray-400">—</span>
 									{/if}
 								</td>
+								<td class="px-5 py-4">
+									{#if canResend(item)}
+										<button
+											on:click={() => resendItem(item)}
+											disabled={resendState[item.index]?.busy}
+											class="inline-flex items-center gap-1.5 bg-brand-accent text-black px-3 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-widest border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-60"
+										>
+											{resendState[item.index]?.busy ? 'Sending...' : 'Re-send'}
+										</button>
+										{#if resendState[item.index]?.error}
+											<p
+												class="text-[10px] font-bold text-brand-danger mt-1"
+												title={resendState[item.index].error}
+											>
+												{resendState[item.index].error}
+											</p>
+										{/if}
+									{:else if resendState[item.index]?.done}
+										<span class="text-[10px] font-black text-brand-success uppercase tracking-widest"
+											>Sent ✓</span
+										>
+									{:else}
+										<span class="text-xs font-bold text-gray-400">—</span>
+									{/if}
+								</td>
 							</tr>
 						{:else}
 							<tr>
-								<td colspan="4" class="px-5 py-10 text-center">
+								<td colspan="5" class="px-5 py-10 text-center">
 									<p class="text-sm font-black text-gray-500 uppercase tracking-wider">
 										No items yet
 									</p>

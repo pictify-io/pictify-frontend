@@ -83,12 +83,52 @@ const getWorkflowStats = async () => {
 	}
 };
 
+/**
+ * Re-send one row's delivery email (bounce recovery). Reuses the rendered
+ * deliverable; optionally corrects the recipient address first.
+ * @param {string} runUid
+ * @param {number} index - Row index within the run
+ * @param {string} [email] - Corrected recipient address
+ * @returns {Promise<Object>} - { item: { index, deliveryStatus, error }, counts }
+ */
+const resendWorkflowItem = async (runUid, index, email) => {
+	const response = await backend.post(
+		`/workflow/${runUid}/items/${index}/resend`,
+		email ? { email } : {}
+	);
+	return response;
+};
+
+/**
+ * Compose the delivery email for one row — powers the composer's live
+ * preview. Server-side so the preview shows exactly what recipients get.
+ * @param {Object} payload - { delivery, row, url, outputFormat }
+ * @returns {Promise<Object>} - { subject, html, from, replyTo }
+ */
+const previewWorkflowEmail = async (payload) => {
+	const response = await backend.post('/workflow/email-preview', payload);
+	return response;
+};
+
+/**
+ * Send the composed email to the signed-in user's own address (test send).
+ * @param {Object} payload - { delivery, row, url, outputFormat }
+ * @returns {Promise<Object>} - { sent, to }
+ */
+const testWorkflowEmail = async (payload) => {
+	const response = await backend.post('/workflow/email-test', payload);
+	return response;
+};
+
 export {
 	createWorkflowRun,
 	getWorkflowRun,
 	listWorkflowRuns,
 	getWorkflowStats,
 	previewWorkflow,
+	previewWorkflowEmail,
+	testWorkflowEmail,
 	createWorkflowHook,
-	listWorkflowHooks
+	listWorkflowHooks,
+	resendWorkflowItem
 };

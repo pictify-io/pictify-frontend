@@ -17,6 +17,7 @@
 		createWorkflowHook,
 		listWorkflowHooks
 	} from '../../../../api/workflow';
+	import EmailComposer from '$lib/components/workflows/EmailComposer.svelte';
 	import { analytics } from '$lib/analytics.js';
 
 	// ?pack=<id> only picks which designs to show and which template-step
@@ -87,7 +88,10 @@
 			method: 'download',
 			emailColumn: '',
 			subject: 'Your document',
-			bodyText: 'Your document is attached below.'
+			bodyText: 'Your document is attached below.',
+			bodyHtml: '',
+			fromName: '',
+			replyTo: ''
 		}
 	};
 
@@ -115,7 +119,10 @@
 		method: 'download',
 		emailKey: 'email',
 		subject: 'Your document',
-		bodyText: 'Your document is attached below.'
+		bodyText: 'Your document is attached below.',
+		bodyHtml: '',
+		fromName: '',
+		replyTo: ''
 	};
 	let createdHook = null;
 	// Opt-in HMAC verification. The URL secret authenticates the caller, but it
@@ -681,6 +688,9 @@
 				delivery.emailColumn = hookDelivery.emailKey.trim();
 				delivery.subject = hookDelivery.subject;
 				delivery.bodyText = hookDelivery.bodyText;
+				if (hookDelivery.bodyHtml) delivery.bodyHtml = hookDelivery.bodyHtml;
+				if (hookDelivery.fromName) delivery.fromName = hookDelivery.fromName;
+				if (hookDelivery.replyTo) delivery.replyTo = hookDelivery.replyTo;
 			}
 			const response = await createWorkflowHook({
 				name: hookName.trim(),
@@ -783,6 +793,9 @@
 				delivery.emailColumn = wizard.delivery.emailColumn;
 				delivery.subject = wizard.delivery.subject;
 				delivery.bodyText = wizard.delivery.bodyText;
+				if (wizard.delivery.bodyHtml) delivery.bodyHtml = wizard.delivery.bodyHtml;
+				if (wizard.delivery.fromName) delivery.fromName = wizard.delivery.fromName;
+				if (wizard.delivery.replyTo) delivery.replyTo = wizard.delivery.replyTo;
 			}
 			// The backend only knows 'certificates' | 'custom' — other packs run as custom.
 			const packType =
@@ -1798,39 +1811,14 @@
 						</select>
 					{/if}
 				</div>
-				<div>
-					<label
-						for="email-subject"
-						class="block text-xs font-black text-black uppercase tracking-widest mb-2"
-					>
-						Subject
-					</label>
-					<input
-						id="email-subject"
-						type="text"
-						value={activeDelivery.subject}
-						on:input={(e) => setActiveDelivery({ subject: e.target.value })}
-						class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
-					/>
-					<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
-						You can use {'{{variables}}'} from your mapping, e.g. {'{{organizationName}}'}.
-					</p>
-				</div>
-				<div>
-					<label
-						for="email-body"
-						class="block text-xs font-black text-black uppercase tracking-widest mb-2"
-					>
-						Message
-					</label>
-					<textarea
-						id="email-body"
-						rows="3"
-						value={activeDelivery.bodyText}
-						on:input={(e) => setActiveDelivery({ bodyText: e.target.value })}
-						class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all resize-none"
-					/>
-				</div>
+				<EmailComposer
+					delivery={activeDelivery}
+					onChange={setActiveDelivery}
+					headers={source === 'webhook' ? Object.values(hookColumnMapping) : wizard.headers}
+					sampleRow={source === 'webhook' ? hookPayload : wizard.rows[0] || {}}
+					previewUrl={wizard.previews?.[0]?.url || ''}
+					{outputFormat}
+				/>
 			</div>
 		{/if}
 
