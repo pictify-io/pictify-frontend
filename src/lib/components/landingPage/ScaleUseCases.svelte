@@ -1,36 +1,42 @@
 <script>
 	import { fade, fly, scale } from 'svelte/transition';
 
-	// State for the email (Block 3) interactions
-	let activeEmailTier = 0;
-	const emailTiers = [
+	// State for the delivery (Block 3) interactions — spreadsheet rows whose
+	// certificate renders are REAL Pictify outputs (demo template 6E3AHG9PYB)
+	let activeRecipient = 0;
+	const recipients = [
 		{
-			id: 'gold',
-			label: 'Gold Member',
-			greeting: 'Welcome, Alex!',
-			status: 'GOLD',
-			points: '450',
-			nextReward: 'Free Ship',
+			row: 1,
+			name: 'Ada Lovelace',
+			email: 'ada@acme.com',
+			course: 'Advanced Analytics Bootcamp',
+			cert: 'https://media.pictify.io/template-renders/cj944exs-1785797479873.png',
 			color: 'bg-brand-accent'
 		},
 		{
-			id: 'silver',
-			label: 'Silver Member',
-			greeting: 'Hi, Jordan!',
-			status: 'SILVER',
-			points: '120',
-			nextReward: '5% Off',
-			color: 'bg-gray-300'
+			row: 2,
+			name: 'Tom Okafor',
+			email: 'tom@northwind.io',
+			course: 'Cloud Architecture 101',
+			cert: 'https://media.pictify.io/template-renders/dqk5p2xy-1785800750071.png',
+			color: 'bg-data-violet'
 		},
 		{
-			id: 'platinum',
-			label: 'Platinum Member',
-			greeting: 'Hello, Sam!',
-			status: 'PLATINUM',
-			points: '890',
-			nextReward: '$50 Credit',
+			row: 3,
+			name: 'Mei-Ling Chen',
+			email: 'mei@brightpath.co',
+			course: 'Leadership Essentials',
+			cert: 'https://media.pictify.io/template-renders/6atuz9pd-1785800751255.png',
 			color: 'bg-brand-danger'
 		}
+	];
+
+	// State for the video (Block 2) interactions
+	let activeVideoVariant = 0;
+	const videoVariants = [
+		{ name: 'Ada', full: 'Ada Lovelace', course: 'Advanced Analytics Bootcamp' },
+		{ name: 'Tom', full: 'Tom Okafor', course: 'Cloud Architecture 101' },
+		{ name: 'Mei-Ling', full: 'Mei-Ling Chen', course: 'Leadership Essentials' }
 	];
 
 	const socialVariations = [
@@ -60,26 +66,6 @@
 		}
 	];
 
-	const retailVariations = [
-		{
-			product: 'Nike Air Max',
-			price: '$129',
-			discount: '-20%',
-			rating: '4.8',
-			image:
-				'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80',
-			color: 'bg-brand-danger'
-		},
-		{
-			product: 'Adidas Ultra',
-			price: '$180',
-			discount: 'NEW',
-			rating: '4.9',
-			image:
-				'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&w=500&q=80',
-			color: 'bg-blue-500'
-		}
-	];
 </script>
 
 <section
@@ -311,71 +297,105 @@
 				</div>
 			</div>
 
-			<!-- Block 2: Dynamic Retail (Spans 5 cols) -->
+			<!-- Block 2: Personalized Video (Spans 5 cols) -->
 			<div
 				class="xl:col-span-5 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl hover:shadow-brutal-3xl transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[400px] md:min-h-[500px]"
 			>
 				<div
-					class="absolute inset-0 bg-[radial-gradient(#ff6b6b_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.15] pointer-events-none"
+					class="absolute inset-0 bg-[radial-gradient(#a78bfa_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.18] pointer-events-none"
 				/>
 
 				<div class="p-8 md:p-10 flex flex-col relative z-10 text-gray-900">
 					<div class="flex items-center gap-4">
 						<div
-							class="w-14 h-14 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-6 transition-transform"
+							class="w-14 h-14 bg-data-violet border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-lg group-hover:rotate-6 transition-transform"
 						>
 							<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="3"
-									d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+									d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
 								/></svg
 							>
 						</div>
 						<h3 class="text-3xl md:text-3xl font-black leading-tight text-gray-900 drop-shadow-sm">
-							Product & Promo Cards
+							Personalized Video
 						</h3>
 					</div>
 				</div>
 
-				<div class="flex-1 flex flex-col justify-end items-center gap-4 px-6 md:px-10 z-10 pb-10">
-					{#each retailVariations as variant, i}
+				<div class="flex-1 flex flex-col justify-end px-6 md:px-10 z-10 pb-10 gap-4">
+					<!-- Player -->
+					<div
+						class="w-full bg-gray-950 rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden relative aspect-video group-hover:-translate-y-1 transition-transform duration-300"
+					>
+						<!-- ambient gradient "footage" -->
+						<div class="absolute inset-0 bg-gradient-to-br from-data-violet/50 via-gray-950 to-brand-danger/30" />
 						<div
-							class="w-full bg-[#f8f9fa] rounded-[1rem] border-[3px] border-gray-900 shadow-brutal-lg p-4 flex items-center gap-2 relative overflow-hidden transition-all duration-300 group-hover:scale-[1.03] {i ===
-							0
-								? '-rotate-1 group-hover:-translate-y-2 group-hover:-rotate-2'
-								: 'rotate-1 group-hover:-translate-y-1 group-hover:rotate-2'}"
-						>
-							<div
-								class="absolute top-0 right-0 w-3/5 h-full {variant.color}/10 skew-x-12 translate-x-10"
-							/>
+							class="absolute inset-0 bg-[radial-gradient(#ffffff14_1px,transparent_1px)] [background-size:18px_18px]"
+						/>
 
-							<div class="flex-1 relative z-10 pl-2">
-								<div
-									class="inline-block px-1.5 py-0.5 {variant.color} text-white text-[9px] md:text-[10px] font-black uppercase tracking-wider mb-2 rounded border-[1.5px] border-gray-900 shadow-[1px_1px_0_0_#1f2937]"
-								>
-									{variant.discount}
-								</div>
-								<h2 class="text-lg md:text-xl font-black text-gray-900 leading-none mb-1">
-									{variant.product}
-								</h2>
-								<div class="text-xl md:text-2xl font-bold text-gray-900">
-									{variant.price}
-								</div>
-							</div>
+						<!-- play button -->
+						<div class="absolute inset-0 flex items-center justify-center">
 							<div
-								class="w-[100px] md:w-[130px] relative z-10 h-full flex flex-col justify-center items-center"
+								class="w-14 h-14 bg-white rounded-full border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center group-hover:scale-110 transition-transform"
 							>
-								<img
-									loading="lazy"
-									src={variant.image}
-									alt="product"
-									class="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500"
-								/>
+								<svg class="w-6 h-6 text-gray-900 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24"
+									><path d="M8 5v14l11-7z" /></svg
+								>
 							</div>
 						</div>
-					{/each}
+
+						<!-- personalized lower third -->
+						{#key activeVideoVariant}
+							<div class="absolute left-4 bottom-9" in:fly={{ y: 10, duration: 300 }}>
+								<div
+									class="bg-white border-[2px] border-gray-900 rounded-lg px-3 py-1.5 shadow-brutal-sm"
+								>
+									<p class="text-[12px] font-black text-gray-900 leading-tight">
+										Congrats, {videoVariants[activeVideoVariant].full}! 🎉
+									</p>
+									<p class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">
+										{videoVariants[activeVideoVariant].course}
+									</p>
+								</div>
+							</div>
+						{/key}
+
+						<!-- variant counter -->
+						<div
+							class="absolute top-3 right-3 px-2.5 py-1 bg-gray-900/80 rounded-md border border-white/20 text-[9px] font-black uppercase tracking-widest text-white"
+						>
+							Variant {activeVideoVariant + 1} of 240
+						</div>
+
+						<!-- progress bar -->
+						<div class="absolute bottom-0 left-0 right-0 h-5 bg-gray-900 border-t-[2px] border-gray-700 flex items-center px-3 gap-2">
+							<div class="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+								<div class="h-full w-1/3 bg-data-violet rounded-full" />
+							</div>
+							<span class="text-[8px] font-black text-gray-400 font-mono">0:08 / 0:24</span>
+						</div>
+					</div>
+
+					<!-- variant switcher -->
+					<div class="flex items-center gap-2 flex-wrap">
+						<span class="text-[10px] font-black uppercase text-gray-500 tracking-widest mr-1"
+							>Same template:</span
+						>
+						{#each videoVariants as variant, i}
+							<button
+								class="px-3 py-1.5 rounded-full border-[2px] border-gray-900 text-[10px] font-black uppercase tracking-wider transition-all
+									{activeVideoVariant === i
+									? 'bg-gray-900 text-white shadow-brutal-sm'
+									: 'bg-white text-gray-900 hover:-translate-y-0.5 hover:shadow-brutal-sm'}"
+								on:click={() => (activeVideoVariant = i)}
+							>
+								{variant.name}
+							</button>
+						{/each}
+					</div>
 				</div>
 			</div>
 
@@ -417,22 +437,32 @@
 							<div
 								class="text-[10px] font-black uppercase text-gray-600 tracking-widest pl-2 drop-shadow-sm mb-1"
 							>
-								Click to Simulate Audience
+								Click a spreadsheet row
 							</div>
-							{#each emailTiers as tier, i}
+							{#each recipients as recipient, i}
 								<button
-									class="flex items-center gap-4 px-5 py-3.5 rounded-xl border-[3px] border-gray-900 font-bold transition-all text-left w-full max-w-sm
-										{activeEmailTier === i
+									class="flex items-center gap-3 px-4 py-3 rounded-xl border-[3px] border-gray-900 font-bold transition-all text-left w-full max-w-sm
+										{activeRecipient === i
 										? 'bg-black text-white shadow-brutal-accent translate-x-2'
 										: 'bg-white text-gray-900 shadow-brutal-lg hover:-translate-y-0.5 hover:shadow-brutal-xl'}"
-									on:click={() => (activeEmailTier = i)}
+									on:click={() => (activeRecipient = i)}
 									on:keydown={(e) =>
-										(e.key === 'Enter' || e.key === ' ') && (() => (activeEmailTier = i))()}
+										(e.key === 'Enter' || e.key === ' ') && (() => (activeRecipient = i))()}
 								>
-									<div class="w-4 h-4 rounded-full {tier.color} border-[2px] border-gray-900" />
-									<div class="flex-1 text-sm uppercase tracking-wider font-black">{tier.label}</div>
-									{#if activeEmailTier === i}
-										<div class="w-2 h-2 rounded-full bg-data-green animate-pulse" />
+									<span class="text-xs font-black {activeRecipient === i ? 'text-gray-400' : 'text-gray-400'}"
+										>#{recipient.row}</span
+									>
+									<div class="flex-1 min-w-0">
+										<div class="text-sm font-black leading-tight truncate">{recipient.name}</div>
+										<div class="text-[10px] font-bold {activeRecipient === i ? 'text-gray-400' : 'text-gray-500'} truncate">
+											{recipient.email}
+										</div>
+									</div>
+									{#if activeRecipient === i}
+										<span
+											class="px-2 py-0.5 rounded-full border-[2px] {activeRecipient === i ? 'border-white/40' : 'border-gray-900'} bg-data-green text-black text-[8px] font-black uppercase tracking-widest"
+											>Delivered</span
+										>
 									{/if}
 								</button>
 							{/each}
@@ -449,7 +479,7 @@
 
 						<!-- Floating JSON Card -->
 						<div
-							class="absolute top-8 left-8 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 md:p-4 w-[200px] md:w-[240px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
+							class="absolute top-6 left-6 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[190px] md:w-[215px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
 						>
 							<div
 								class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
@@ -457,101 +487,93 @@
 								<div
 									class="w-2 h-2 bg-data-green rounded-full border border-gray-900 animate-pulse"
 								/>
-								Incoming payload
+								Row {recipients[activeRecipient].row} of 240
 							</div>
-							{#key activeEmailTier}
+							{#key activeRecipient}
 								<pre
 									class="font-mono text-[9px] md:text-[11px] text-gray-900 font-bold"
 									in:fade={{ duration: 200 }}>
 {`{
-  "greeting": "${emailTiers[activeEmailTier].greeting}",
-  "status": "${emailTiers[activeEmailTier].status}",
-  "points": ${emailTiers[activeEmailTier].points}
+  "name": "${recipients[activeRecipient].name}",
+  "course": "${recipients[activeRecipient].course.length > 18 ? recipients[activeRecipient].course.slice(0, 17) + '…' : recipients[activeRecipient].course}",
+  "email": "${recipients[activeRecipient].email}"
 }`}
 								</pre>
 							{/key}
 						</div>
 
-						<!-- Output Render Card -->
+						<!-- Output: the recipient's inbox, certificate attached -->
 						<div
-							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-0 xl:ml-32"
+							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-8 xl:mt-32 xl:mb-8 xl:ml-40"
 						>
-							<div
-								class="h-8 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 justify-between"
-							>
-								<div class="flex flex-1 gap-1.5 h-full items-center">
+							{#key activeRecipient}
+								<div in:fade={{ duration: 200 }}>
+									<!-- inbox chrome -->
 									<div
-										class="w-2.5 h-2.5 rounded-full bg-brand-danger border-[1.5px] border-gray-900"
-									/>
-									<div
-										class="w-2.5 h-2.5 rounded-full bg-brand-accent border-[1.5px] border-gray-900"
-									/>
-									<div
-										class="w-2.5 h-2.5 rounded-full bg-data-green border-[1.5px] border-gray-900"
-									/>
-								</div>
-								<div
-									class="text-[9px] font-black font-mono uppercase tracking-widest text-gray-400"
-								>
-									welcome-email.png
-								</div>
-							</div>
-
-							<div
-								class="w-full bg-data-green relative flex flex-col items-center justify-center text-center p-8 overflow-hidden aspect-[4/3]"
-							>
-								<div
-									class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/30 to-transparent"
-								/>
-
-								{#key activeEmailTier}
-									<div
-										class="relative z-10 w-full bg-white border-[3px] border-gray-900 p-5 md:p-6 shadow-[8px_8px_0_0_rgba(0,0,0,0.2)] transform transition-all duration-300"
-										in:scale={{ duration: 400, start: 0.95 }}
+										class="h-8 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 justify-between"
 									>
-										<div
-											class="w-12 h-12 md:w-14 md:h-14 bg-gray-900 rounded-full mx-auto -mt-10 md:-mt-12 mb-3 md:mb-4 border-[3px] border-white flex items-center justify-center shadow-[0_4px_0_0_rgba(0,0,0,0.2)]"
-										>
-											<span class="text-xl md:text-2xl">🎁</span>
+										<div class="flex flex-1 gap-1.5 h-full items-center">
+											<div
+												class="w-2.5 h-2.5 rounded-full bg-brand-danger border-[1.5px] border-gray-900"
+											/>
+											<div
+												class="w-2.5 h-2.5 rounded-full bg-brand-accent border-[1.5px] border-gray-900"
+											/>
+											<div
+												class="w-2.5 h-2.5 rounded-full bg-data-green border-[1.5px] border-gray-900"
+											/>
 										</div>
-										<h2 class="text-xl md:text-3xl font-black text-gray-900 mb-2 leading-none">
-											{emailTiers[activeEmailTier].greeting}
-										</h2>
 										<div
-											class="inline-block px-3 py-1 bg-gray-100 rounded text-[9px] md:text-[10px] font-black uppercase tracking-wider text-gray-800 mb-6 border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
+											class="text-[9px] font-black font-mono uppercase tracking-widest text-gray-400 truncate"
 										>
-											{emailTiers[activeEmailTier].status}
-										</div>
-
-										<div
-											class="grid grid-cols-2 gap-4 border-t-[3px] border-dashed border-gray-200 pt-4"
-										>
-											<div>
-												<div
-													class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1"
-												>
-													Points
-												</div>
-												<div class="text-xl md:text-2xl font-black text-data-green leading-none">
-													{emailTiers[activeEmailTier].points}
-												</div>
-											</div>
-											<div>
-												<div
-													class="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1"
-												>
-													Next Reward
-												</div>
-												<div
-													class="text-xs md:text-sm font-black text-gray-900 leading-none mt-1 uppercase"
-												>
-													{emailTiers[activeEmailTier].nextReward}
-												</div>
-											</div>
+											inbox — {recipients[activeRecipient].email}
 										</div>
 									</div>
-								{/key}
-							</div>
+
+									<!-- email header -->
+									<div class="px-5 pt-4 pb-3 border-b-[2px] border-gray-200">
+										<div class="flex items-center justify-between gap-2 mb-1.5">
+											<p class="text-[11px] font-black text-gray-900 truncate">
+												Acme Academy <span class="text-gray-400 font-bold">via Pictify</span>
+											</p>
+											<span
+												class="px-2 py-0.5 rounded-full border-[2px] border-gray-900 bg-data-green text-[8px] font-black uppercase tracking-widest shrink-0"
+												>Delivered</span
+											>
+										</div>
+										<p class="text-sm font-black text-gray-900 leading-tight">
+											Your certificate is ready, {recipients[activeRecipient].name.split(' ')[0]} 🎓
+										</p>
+									</div>
+
+									<!-- email body: the real rendered document -->
+									<div class="px-5 py-4">
+										<p class="text-[11px] font-medium text-gray-600 mb-3">
+											Congratulations on completing
+											<span class="font-black text-gray-900">{recipients[activeRecipient].course}</span> —
+											your certificate is attached below.
+										</p>
+										<div class="relative">
+											<img
+												loading="lazy"
+												src={recipients[activeRecipient].cert}
+												alt="Certificate for {recipients[activeRecipient].name}"
+												class="w-full rounded-lg border-[2px] border-gray-900 shadow-brutal-sm bg-white"
+											/>
+											<span
+												class="absolute -top-2 -right-2 px-2 py-0.5 bg-white rounded border-[2px] border-gray-900 text-[8px] font-black uppercase tracking-widest shadow-brutal-sm"
+												>PDF · {recipients[activeRecipient].row} of 240</span
+											>
+										</div>
+										<div class="mt-3 flex justify-center">
+											<span
+												class="inline-block px-4 py-2 bg-gray-900 text-white rounded-lg border-[2px] border-gray-900 text-[10px] font-black uppercase tracking-widest"
+												>View your document</span
+											>
+										</div>
+									</div>
+								</div>
+							{/key}
 						</div>
 					</div>
 				</div>
