@@ -53,6 +53,8 @@
 		{ value: 'api', label: 'API' },
 		{ value: 'connector', label: 'Connectors' },
 		{ value: 'webhook', label: 'Webhooks' },
+		{ value: 'workflow', label: 'Workflow Runs' },
+		{ value: 'video', label: 'Video' },
 		{ value: 'other', label: 'Other' }
 	];
 
@@ -101,6 +103,14 @@
 		webhook: {
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />',
 			color: 'bg-teal-100 text-teal-800 border-teal-800'
+		},
+		workflow: {
+			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />',
+			color: 'bg-orange-100 text-orange-800 border-orange-800'
+		},
+		video: {
+			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />',
+			color: 'bg-pink-100 text-pink-800 border-pink-800'
 		},
 		other: {
 			icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />',
