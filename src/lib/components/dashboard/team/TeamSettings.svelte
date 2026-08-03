@@ -20,6 +20,7 @@
 	} from '../../../../store/team.store';
 	import { toast } from '../../../../store/toast.store';
 	import { formatRelativeDate } from '$lib/utils/format.js';
+	import EmailSendingCard from './EmailSendingCard.svelte';
 
 	let loading = true;
 	let saving = false;
@@ -439,6 +440,8 @@
 						</div>
 					</div>
 				{/if}
+				<!-- Email sending domain (workflow delivery) -->
+				<EmailSendingCard />
 			</div>
 
 			<!-- Right Column: Actions -->
