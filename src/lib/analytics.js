@@ -532,6 +532,51 @@ export const analytics = {
 	},
 
 	// ============================================
+	// Support (PostHog Conversations widget)
+	// ============================================
+
+	/**
+	 * Whether the in-app support chat is loaded and usable.
+	 * @returns {boolean}
+	 */
+	supportAvailable: () => {
+		if (!browser || !isProd) return false;
+		try {
+			return (
+				typeof posthog.conversations?.isAvailable === 'function' &&
+				posthog.conversations.isAvailable()
+			);
+		} catch {
+			return false;
+		}
+	},
+
+	/**
+	 * Open the support chat, optionally sending a prefilled first message.
+	 * Sending immediately creates the ticket, so the reply arrives with the
+	 * user's session replay, events and errors already attached — no
+	 * "can you describe what happened" round-trip.
+	 * @param {string} [message] - Context message to send (e.g. failed run details)
+	 * @returns {Promise<boolean>} true when the widget handled it
+	 */
+	openSupport: async (message) => {
+		if (!analytics.supportAvailable()) return false;
+		try {
+			posthog.conversations.show();
+			if (message) {
+				await posthog.conversations.sendMessage(message);
+			}
+			analytics.track('support_opened', {
+				prefilled: !!message,
+				page: window?.location?.pathname
+			});
+			return true;
+		} catch {
+			return false;
+		}
+	},
+
+	// ============================================
 	// Error Tracking
 	// ============================================
 

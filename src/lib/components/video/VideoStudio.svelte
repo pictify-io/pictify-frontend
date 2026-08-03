@@ -1689,6 +1689,18 @@
 								<button type="button" on:click={exportVideo} class={BUTTON_COMPACT}>
 									Try again
 								</button>
+								{#if analytics.supportAvailable()}
+									<button
+										type="button"
+										class={BUTTON_COMPACT}
+										on:click={() =>
+											analytics.openSupport(
+												`My video export failed in the studio.\nTemplate: ${uid || 'unsaved'}\nError: ${exportError}`
+											)}
+									>
+										Get help
+									</button>
+								{/if}
 								<button
 									type="button"
 									on:click={() => (exportError = '')}

@@ -18,6 +18,26 @@
 	let hookCreating = false;
 	let hookError = '';
 	let hookCopied = false;
+	let supportOpening = false;
+
+	// Contextual support: opens the in-app chat with the run context prefilled,
+	// so the ticket lands with replay + events attached and the exact run uid.
+	async function getHelpWithRun() {
+		if (!run || supportOpening) return;
+		supportOpening = true;
+		const c = run.counts || {};
+		const firstError = (run.items || []).find((item) => item.error)?.error;
+		const message = [
+			`I need help with a workflow run that had failures.`,
+			`Run: ${run.uid} (${run.status})`,
+			`Rows: ${c.total} total, ${c.rendered} rendered, ${c.delivered} delivered, ${c.failed} failed.`,
+			firstError ? `First error: ${firstError}` : null
+		]
+			.filter(Boolean)
+			.join('\n');
+		await analytics.openSupport(message);
+		supportOpening = false;
+	}
 
 	$: hookUrl = hook?.path ? `${PUBLIC_BACKEND_URL}${hook.path}` : '';
 	$: sampleRow = buildSampleRow(run?.columnMapping);
@@ -332,6 +352,30 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Failed rows: contextual support entry point -->
+		{#if !isActive && counts.failed > 0 && analytics.supportAvailable()}
+			<div class="bg-brand-danger/10 rounded-2xl border-[3px] border-black shadow-brutal-lg p-6 mb-10">
+				<div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+					<div>
+						<p class="font-black text-black uppercase tracking-wide text-sm mb-1">
+							{counts.failed}
+							{counts.failed === 1 ? 'row' : 'rows'} failed
+						</p>
+						<p class="text-sm font-bold text-gray-700">
+							Stuck? Ask us — the chat opens with this run's details already attached.
+						</p>
+					</div>
+					<button
+						class="shrink-0 px-5 py-3 bg-black text-white font-black uppercase tracking-wide text-sm rounded-xl border-[3px] border-black shadow-brutal-sm hover:translate-y-[-2px] transition-transform disabled:opacity-60"
+						disabled={supportOpening}
+						on:click={getHelpWithRun}
+					>
+						{supportOpening ? 'Opening…' : 'Get help with this run'}
+					</button>
+				</div>
+			</div>
+		{/if}
 
 		<!-- Completed: download all note -->
 		{#if run.status === 'completed' && completedLinks.length > 0}
