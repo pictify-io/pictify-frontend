@@ -9,9 +9,9 @@
 	const DEMO_TEMPLATE_UID = '4M26J82TW7';
 
 	// Live demo state — matches template variable names
-	let header = 'Generate';
-	let heading_2 = 'DYNAMIC';
-	let header_3 = 'Images';
+	let header = 'Every Row';
+	let heading_2 = 'BECOMES A';
+	let header_3 = 'Document';
 	let subheading = 'EDIT THE DATA BELOW';
 
 	// Image state
@@ -55,18 +55,23 @@
 	let mobilePresetIndex = 0;
 	const mobilePresets = [
 		{
-			header: 'Generate',
-			heading_2: 'DYNAMIC',
-			header_3: 'Images',
+			header: 'Every Row',
+			heading_2: 'BECOMES A',
+			header_3: 'Document',
 			subheading: 'EDIT THE DATA BELOW'
 		},
 		{
-			header: 'Generate',
-			heading_2: 'SOCIAL',
-			header_3: 'Cards',
-			subheading: 'WITH A SINGLE API CALL'
+			header: 'One CSV',
+			heading_2: '300 INBOXES',
+			header_3: 'Delivered',
+			subheading: 'WITH PER-ROW STATUS'
 		},
-		{ header: 'Ship', heading_2: 'CUSTOM', header_3: 'Visuals', subheading: 'AT SCALE IN SECONDS' }
+		{
+			header: 'Data In',
+			heading_2: 'DOCS & VIDEO',
+			header_3: 'Out',
+			subheading: 'WIZARD, API OR AGENTS'
+		}
 	];
 
 	let mobileImageSrc = '';
@@ -374,7 +379,7 @@
 										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 									/></svg
 								>
-								<span class="truncate">certificate-row-1.pdf &rarr; ada@acme.com</span>
+								<span class="truncate">row-1-of-240.pdf &rarr; ada@acme.com</span>
 								<span
 									class="ml-auto shrink-0 px-2 py-0.5 rounded bg-data-green border-[2px] border-gray-900 text-[9px] font-black uppercase tracking-wider"
 									>Delivered</span

@@ -58,13 +58,13 @@
 						<h2
 							class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight"
 						>
-							Render Your First Image <br class="md:hidden" />
+							Run Your First Batch <br class="md:hidden" />
 							<span class="text-brand-danger">in Under 5 Minutes</span>
 						</h2>
 
 						<p class="text-xl text-gray-700 max-w-xl mx-auto mb-8 font-medium">
-							Sign up, design a template, hit the API, and get a pixel-perfect PNG back. Free tier,
-							no credit card.
+							Sign up, pick a template, add your data — get pixel-perfect documents rendered and
+							delivered. Free tier, no credit card.
 						</p>
 
 						<div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-4">
@@ -111,7 +111,8 @@
 							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">
 								<h4 class="font-black text-gray-900 text-base mb-2">How long to integrate?</h4>
 								<p class="text-sm text-gray-600 font-medium">
-									Most teams integrate in under 2 hours. One endpoint, JSON in, image out.
+									Most teams integrate in under 2 hours. One endpoint — JSON in, documents,
+									images or video out.
 								</p>
 							</div>
 							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">

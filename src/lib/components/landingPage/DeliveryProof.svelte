@@ -67,8 +67,8 @@
 				</span>
 			</h2>
 			<p class="text-base md:text-lg text-gray-700 font-medium">
-				Generating 300 certificates was never the hard part. Getting all 300 into inboxes — and
-				knowing they arrived — is.
+				Generating 300 personalized documents was never the hard part. Getting all 300 into
+				inboxes — and knowing they arrived — is.
 			</p>
 		</div>
 

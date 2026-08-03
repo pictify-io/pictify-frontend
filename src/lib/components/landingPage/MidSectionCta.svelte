@@ -63,8 +63,8 @@
 					<p
 						class="text-lg md:text-xl lg:text-2xl text-gray-800 font-medium mb-10 max-w-xl bg-white px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-1"
 					>
-						Sign up, create a template, call the endpoint. Your first rendered image in under 5
-						minutes.
+						Sign up, pick a template, add your data. Your first batch rendered and delivered in
+						under 5 minutes.
 					</p>
 
 					<div class="transform transition-transform duration-300 w-full sm:w-auto z-20">
@@ -164,7 +164,7 @@
 										d="M13 10V3L4 14h7v7l9-11h-7z"
 									/>
 								</svg>
-								Ready to render images at scale
+								Ready to render &amp; deliver at scale
 							</div>
 						</div>
 					</div>

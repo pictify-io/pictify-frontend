@@ -115,8 +115,8 @@
 				.
 			</h2>
 			<p class="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				Certificates, event badges, wedding place cards, numbered tickets — or bring your own HTML
-				via the API. One template, one CSV, done.
+				Invoices, certificates, product cards, reports, social banners, personalized videos — or
+				bring your own HTML via the API. One template, one data source, done.
 			</p>
 		</div>
 
@@ -152,7 +152,7 @@
 							>
 						</div>
 						<h3 class="text-2xl md:text-3xl font-black text-gray-900 leading-tight drop-shadow-sm">
-							Certificates & Badges
+							Content & Social Cards
 						</h3>
 					</div>
 				</div>
@@ -334,7 +334,7 @@
 							>
 						</div>
 						<h3 class="text-3xl md:text-3xl font-black leading-tight text-gray-900 drop-shadow-sm">
-							Tickets & Place Cards
+							Product & Promo Cards
 						</h3>
 					</div>
 				</div>
