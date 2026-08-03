@@ -124,13 +124,13 @@ const image = await pictify.render({
 				<div
 					class="inline-block px-5 py-2 bg-brand-danger border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-2 mb-8"
 				>
-					<span class="text-sm font-black text-white uppercase tracking-wider">Developer-First</span>
+					<span class="text-sm font-black text-white uppercase tracking-wider">Pipelines &amp; Agents</span>
 				</div>
 
 				<h2 class="text-4xl md:text-5xl 2xl:text-6xl lg:text-7xl font-black text-black leading-[1.1] mb-6">
-					Developer-First API.<br />
+					Same Templates.<br />
 					<span class="relative inline-block mt-2">
-						5 Minutes to Integrate
+						API, Webhooks &amp; MCP
 						<svg
 							class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-data-green -z-10"
 							viewBox="0 0 100 10"
@@ -142,8 +142,9 @@ const image = await pictify.render({
 				</h2>
 
 				<p class="text-xl text-black/70 font-medium mb-10 max-w-lg">
-					One endpoint. Template + JSON in, image out. Under 200ms. Works with Node.js, Python, or
-					just cURL.
+					The coordinator runs the wizard. Your code calls the API or signs a webhook. Your AI
+					agents use the MCP server. Same template, same brand, same run history — SDKs in Node,
+					Python, Ruby and Go.
 				</p>
 
 				<!-- Features List (V1 Layout, V2 Styling) -->

@@ -4,6 +4,8 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
 	import ScaleUseCases from '$lib/components/landingPage/ScaleUseCases.svelte';
+	import UseCaseRouter from '$lib/components/landingPage/UseCaseRouter.svelte';
+	import DeliveryProof from '$lib/components/landingPage/DeliveryProof.svelte';
 	import ApiShowcase from '$lib/components/landingPage/ApiShowcase.svelte';
 	import HowItWorks from '$lib/components/landingPage/HowItWorks.svelte';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
@@ -46,23 +48,23 @@
 </script>
 
 <svelte:head>
-	<title>Pictify — Turn Spreadsheets into Branded Documents, Delivered</title>
+	<title>Pictify — Turn Your Data into Documents & Videos, Delivered</title>
 	<meta
 		name="description"
-		content="Upload a CSV or point a webhook — every row becomes a branded certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers. Free tier available."
+		content="Upload a spreadsheet, point a webhook, or call the API — every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status. Free tier available."
 	/>
 	<meta
 		name="keywords"
-		content="certificate generator, event badge generator, bulk document generation, CSV to certificates, webhook document automation, personalized email delivery, image generation API, template rendering, Pictify.io"
+		content="certificate generator, event badge generator, bulk document generation, CSV to certificates, personalized video generation, video generation API, webhook document automation, personalized email delivery, template rendering, MCP server, Pictify.io"
 	/>
 	<meta name="author" content="Pictify.io" />
 	<meta
 		property="og:title"
-		content="Pictify — Turn Spreadsheets into Branded Documents, Delivered"
+		content="Pictify — Turn Your Data into Documents & Videos, Delivered"
 	/>
 	<meta
 		property="og:description"
-		content="Upload a CSV or point a webhook — every row becomes a branded certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers."
+		content="Every row becomes a branded certificate, badge, report or personalized video — rendered and emailed to each recipient with per-person delivery status."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta property="og:url" content="https://pictify.io" />
@@ -72,11 +74,11 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta
 		name="twitter:title"
-		content="Pictify — Turn Spreadsheets into Branded Documents, Delivered"
+		content="Pictify — Turn Your Data into Documents & Videos, Delivered"
 	/>
 	<meta
 		name="twitter:description"
-		content="Upload a CSV or point a webhook — every row becomes a branded certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers."
+		content="Every row becomes a branded certificate, badge, report or personalized video — rendered and emailed to each recipient with per-person delivery status."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta name="twitter:site" content="@pictify_io" />
@@ -88,15 +90,16 @@
 		url: 'https://pictify.io',
 		image: 'https://media.pictify.io/v3g37-1775406808141.png',
 		description:
-			'Turn spreadsheets into branded documents. Upload a CSV or point a webhook — every row becomes a certificate, badge or report, rendered and emailed to each recipient. Plus a rendering API for developers.',
+			'Turn your data into branded documents and videos. Upload a spreadsheet, point a webhook, or call the API — every row becomes a certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status.',
 		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
 		operatingSystem: 'Web',
 		featureList: [
 			'Workflows with CSV upload and per-workflow webhooks',
 			'HTML document templates',
-			'Per-recipient email delivery',
+			'Personalized video rendering (timeline editor, code, or AI-authored templates)',
+			'Per-recipient email delivery with per-row delivery status, bounce handling and re-send',
 			'Batch rendering',
-			'REST API and SDKs'
+			'REST API, SDKs and MCP server for AI agents'
 		],
 		offers: {
 			'@type': 'Offer',
@@ -114,9 +117,15 @@
 
 	<!-- 1. Hero: Problem + Solution -->
 	<Hero />
+
+	<!-- 2. Use-case router: one engine, three ways in (documents / video / API+agents) -->
+	<UseCaseRouter />
 	<SectionSeparator icon="arrow" />
 
-	<!-- 2. Use Cases: Recognition Moments -->
+	<!-- 3. Delivery proof: "everything else stops at the send" + per-row run summary -->
+	<DeliveryProof />
+
+	<!-- 4. Use Cases: Recognition Moments -->
 	<ScaleUseCases />
 	<SectionSeparator icon="hash" />
 

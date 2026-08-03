@@ -162,7 +162,7 @@
 					><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z" /></svg
 				>
 				<span class="text-sm font-bold text-gray-900 uppercase tracking-wider"
-					>Document Workflows</span
+					>Documents &amp; Video Workflows</span
 				>
 			</div>
 
@@ -170,9 +170,9 @@
 			<h1
 				class="text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-gray-900 mb-5 lg:mb-4 leading-[1.1]"
 			>
-				Turn Spreadsheets Into<br />
+				Turn Your Data Into<br />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
-					Branded Documents
+					Documents &amp; Videos
 					<!-- Scribble Underline -->
 					<svg
 						class="absolute w-full h-4 sm:h-5 -bottom-2 sm:-bottom-3 left-0 text-black z-[-1] opacity-20"
@@ -181,13 +181,14 @@
 					>
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
 					</svg>
-				</span>, Delivered.
+				</span> — Delivered.
 			</h1>
 
 			<!-- Subheadline -->
 			<p class="text-lg lg:text-base xl:text-lg text-gray-700 max-w-2xl mx-auto font-medium mb-8 lg:mb-6">
-				Upload a spreadsheet or point a webhook — every row becomes a branded certificate, badge or
-				report, rendered and delivered. Plus a rendering API for developers.
+				Upload a spreadsheet, point a webhook, or call the API — every row becomes a branded
+				certificate, badge, report or personalized video, rendered and emailed to each recipient
+				with per-person delivery status.
 			</p>
 
 			<!-- CTAs -->
@@ -423,7 +424,7 @@
 										<svg
 											class="w-8 h-8 text-gray-300"
 											fill="none"
-											viewBox="0 24 24"
+											viewBox="0 0 24 24"
 											stroke="currentColor"
 											><path
 												stroke-linecap="round"
@@ -446,7 +447,7 @@
 											<svg
 												class="w-4 h-4 animate-spin text-data-green"
 												fill="none"
-												viewBox="0 24 24"
+												viewBox="0 0 24 24"
 												><circle
 													class="opacity-25"
 													cx="12"
