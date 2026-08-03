@@ -1,14 +1,14 @@
 <script>
 	/**
 	 * DeliveryProof — "everything else stops at the send."
-	 * Differentiator ① from positioning-synthesis-2026-08-04: the failure
-	 * vignettes are live-verified claims (sources in the positioning canvas
-	 * sheet) rendered as the error UIs people have actually seen.
+	 * Differentiator ① from positioning-synthesis-2026-08-04; every failure
+	 * is a live-verified claim (sources in the positioning canvas sheet).
 	 *
-	 * Layout: the four error-windows CASCADE like dialogs piling up on a
-	 * desktop — alternating left/right with slight overlaps and rotations —
-	 * so the column reads as one composition (no ragged grid) and its height
-	 * matches the run-summary card, the section's other artifact.
+	 * Layout (option C from the layout review): TWO MATCHED FRAMES. All four
+	 * failure vignettes keep their full graphic treatment — banner, dialog,
+	 * toast, console — but stacked inside ONE "Everything you tried" window,
+	 * facing the run-summary card. Nothing rotates or overlaps; the section
+	 * is exactly two objects.
 	 */
 	import SignUpButton from './SignUpButton.svelte';
 
@@ -56,7 +56,7 @@
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-14 items-start relative max-w-5xl mx-auto">
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-14 items-stretch relative max-w-5xl mx-auto">
 			<!-- VS badge on the seam -->
 			<div
 				class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-brutal-lg items-center justify-center z-30 rotate-12"
@@ -64,105 +64,104 @@
 				<span class="text-sm font-black text-gray-900">VS</span>
 			</div>
 
-			<!-- THE OLD WAY: error dialogs piling up on the desktop -->
-			<div>
-				<p class="text-[11px] font-black uppercase tracking-widest text-brand-danger mb-5 flex items-center gap-2">
+			<!-- THE OLD WAY: all four vignettes inside one window -->
+			<div class="flex flex-col">
+				<p class="text-[11px] font-black uppercase tracking-widest text-brand-danger mb-4 flex items-center gap-2">
 					<span class="w-5 h-5 bg-brand-danger rounded border-[2px] border-gray-900 inline-flex items-center justify-center">
 						<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18L18 6M6 6l12 12" /></svg>
 					</span>
 					The old way
 				</p>
-
-				<div class="flex flex-col items-stretch">
-					<!-- Gmail: sending limit banner -->
-					<div class="w-[88%] self-start bg-white rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform -rotate-1 relative z-[1]">
-						<div class="bg-gray-100 border-b-[2px] border-gray-900 px-3 py-1.5 flex items-center gap-1.5">
-							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900" />
-							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-900" />
-							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-900" />
-							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500">Gmail</span>
+				<div class="relative flex-1">
+					<div
+						class="absolute inset-0 bg-brand-danger rounded-2xl transform -rotate-1 -translate-x-2 translate-y-2 pointer-events-none"
+					/>
+					<div
+						class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden h-full flex flex-col"
+					>
+						<!-- window chrome -->
+						<div class="bg-gray-100 border-b-[3px] border-gray-900 px-4 py-3 flex items-center gap-2">
+							<span class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
+							<span class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
+							<span class="w-3 h-3 rounded-full bg-data-green border-[2px] border-gray-900" />
+							<span class="ml-2 text-[10px] font-black uppercase tracking-widest text-gray-600 truncate">
+								Everything you tried
+							</span>
+							<span
+								class="ml-auto px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black bg-brand-danger text-white whitespace-nowrap"
+							>
+								0 of 240 confirmed
+							</span>
 						</div>
-						<div class="p-3">
-							<div class="bg-brand-danger/10 border-[2px] border-brand-danger rounded-lg px-3 py-2 flex items-start gap-2">
-								<svg class="w-4 h-4 text-brand-danger shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M12 3l9.5 16.5H2.5L12 3z" /></svg>
-								<p class="text-[11px] font-bold text-gray-900 leading-snug">
-									You have reached a limit for sending mail. Try again in 24 hours.
-									<span class="block text-[10px] text-gray-400 mt-0.5 font-medium">Row 137 of 240 — batch dead</span>
+
+						<div class="flex-1 flex flex-col divide-y-[2px] divide-gray-200">
+							<!-- Gmail: the limit banner -->
+							<div class="px-4 py-3.5 flex-1 flex items-center">
+								<div class="w-full bg-brand-danger/10 border-[2px] border-brand-danger rounded-lg px-3.5 py-2.5 flex items-start gap-2.5">
+									<svg class="w-4 h-4 text-brand-danger shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M12 3l9.5 16.5H2.5L12 3z" /></svg>
+									<p class="text-[12px] font-bold text-gray-900 leading-snug">
+										You have reached a limit for sending mail. Try again in 24 hours.
+										<span class="block text-[10px] text-gray-500 mt-0.5 font-medium">Gmail — died at row 137 of 240</span>
+									</p>
+								</div>
+							</div>
+
+							<!-- Word: the attachments dialog -->
+							<div class="px-4 py-3.5 flex-1 flex items-center gap-3">
+								<span class="w-9 h-9 bg-gray-100 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
+									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+								</span>
+								<p class="text-[12px] font-bold text-gray-900 leading-snug flex-1 min-w-0">
+									Mail merge can't include attachments.
+									<span class="block text-[10px] text-gray-500 font-medium mt-0.5">Word — recipients get an icon, not the certificate</span>
+								</p>
+								<span class="px-3.5 py-1 bg-gray-100 rounded-md border-[2px] border-gray-900 text-[10px] font-black uppercase shrink-0">OK</span>
+							</div>
+
+							<!-- Canva: the download toast -->
+							<div class="px-4 py-3.5 flex-1 flex items-center gap-3">
+								<span class="w-9 h-9 bg-data-green/30 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
+									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+								</span>
+								<p class="text-[12px] font-bold text-gray-900 leading-snug flex-1 min-w-0">
+									certificates-240-pages.pdf downloaded
+									<span class="block text-[10px] text-gray-500 font-medium mt-0.5">Canva — splitting, naming &amp; emailing 240 files: still you</span>
 								</p>
 							</div>
-						</div>
-					</div>
 
-					<!-- Word: attachments dialog -->
-					<div class="w-[88%] self-end -mt-3 bg-white rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform rotate-1 relative z-[2]">
-						<div class="bg-gray-100 border-b-[2px] border-gray-900 px-3 py-1.5 flex items-center gap-1.5">
-							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900" />
-							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-900" />
-							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-900" />
-							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500">Word — Mail Merge</span>
+							<!-- Add-on: the timeout console, full-bleed dark strip -->
+							<div class="flex-1 flex items-center bg-gray-950 px-4 py-3.5">
+								<div class="font-mono text-[10.5px] leading-relaxed">
+									<p class="text-gray-400">Sending 240 emails…</p>
+									<p class="text-data-red font-bold">Exception: Exceeded maximum execution time (6 min)</p>
+									<p class="text-gray-500">Free add-on — support: none. Retry: tomorrow.</p>
+								</div>
+							</div>
 						</div>
-						<div class="p-3 flex items-center gap-2.5">
-							<span class="w-8 h-8 bg-gray-100 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
-								<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-							</span>
-							<p class="text-[11px] font-bold text-gray-900 leading-snug flex-1">
-								Mail merge can't include attachments.
-								<span class="block text-[10px] text-gray-500 font-medium mt-0.5">Recipients get an icon — not the certificate.</span>
+
+						<div class="border-t-[3px] border-gray-900 bg-gray-50 px-4 py-3">
+							<p class="text-[11px] font-bold text-gray-600">
+								No per-recipient status. No bounce handling. No re-send.
 							</p>
-							<span class="px-3 py-1 bg-gray-100 rounded border-[2px] border-gray-900 text-[9px] font-black uppercase self-end">OK</span>
-						</div>
-					</div>
-
-					<!-- Canva: download complete, now what -->
-					<div class="w-[88%] self-start -mt-3 bg-white rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform -rotate-1 relative z-[3]">
-						<div class="bg-gray-100 border-b-[2px] border-gray-900 px-3 py-1.5 flex items-center gap-1.5">
-							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900" />
-							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-900" />
-							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-900" />
-							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500">Design tool</span>
-						</div>
-						<div class="p-3 flex items-center gap-2.5">
-							<span class="w-8 h-8 bg-data-green/30 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
-								<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-							</span>
-							<p class="text-[11px] font-bold text-gray-900 leading-snug">
-								certificates-240-pages.pdf downloaded
-								<span class="block text-[10px] text-gray-500 font-medium mt-0.5">Splitting, naming & emailing 240 files: still you.</span>
-							</p>
-						</div>
-					</div>
-
-					<!-- Apps Script: timeout console -->
-					<div class="w-[88%] self-end -mt-3 bg-gray-950 rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform rotate-1 relative z-[4]">
-						<div class="bg-gray-900 border-b-[2px] border-gray-700 px-3 py-1.5 flex items-center gap-1.5">
-							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-700" />
-							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-700" />
-							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-700" />
-							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400">Free add-on — logs</span>
-						</div>
-						<div class="p-3 font-mono text-[10px] leading-relaxed">
-							<p class="text-gray-400">Sending 240 emails…</p>
-							<p class="text-data-red font-bold">Exception: Exceeded maximum execution time (6 min)</p>
-							<p class="text-gray-500">Support: none. Retry: tomorrow.</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- WITH PICTIFY: the per-row run summary -->
-			<div>
-				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900 mb-5 flex items-center gap-2">
+			<div class="flex flex-col">
+				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900 mb-4 flex items-center gap-2">
 					<span class="w-5 h-5 bg-data-green rounded border-[2px] border-gray-900 inline-flex items-center justify-center">
 						<svg class="w-3 h-3 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7" /></svg>
 					</span>
 					With Pictify
 				</p>
-				<div class="relative">
+				<div class="relative flex-1">
 					<div
 						class="absolute inset-0 bg-data-green rounded-2xl transform rotate-1 translate-x-2 translate-y-2 pointer-events-none"
 					/>
 					<div
-						class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
+						class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden h-full flex flex-col"
 					>
 						<div class="bg-gray-100 border-b-[3px] border-gray-900 px-5 py-4 flex items-center justify-between gap-3">
 							<p class="text-xs font-black uppercase tracking-widest text-gray-900">
@@ -174,9 +173,9 @@
 								239 delivered
 							</span>
 						</div>
-						<ul class="divide-y-[2px] divide-gray-200">
+						<ul class="divide-y-[2px] divide-gray-200 flex-1 flex flex-col">
 							{#each rows as row}
-								<li class="px-5 py-3.5 flex items-center gap-3">
+								<li class="px-5 py-3.5 flex-1 flex items-center gap-3">
 									<span class="text-sm font-black text-gray-400 w-7 shrink-0">#{row.n}</span>
 									<span class="text-[13px] font-bold text-gray-900 flex-1 truncate">{row.name}</span>
 									<span
