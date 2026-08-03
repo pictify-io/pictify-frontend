@@ -6,7 +6,7 @@
 	 * send.pictify.io vs a dedicated per-workspace subdomain), drives
 	 * one-click provisioning, DNS verification status, and sender defaults.
 	 */
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import {
 		getSendingDomain,
 		provisionSendingDomain,
@@ -102,6 +102,7 @@
 	}
 
 	onMount(load);
+	onDestroy(() => clearInterval(cooldownTimer));
 </script>
 
 <div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden">

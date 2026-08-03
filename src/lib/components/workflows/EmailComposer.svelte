@@ -185,6 +185,9 @@
 	$: if (previewKey) schedulePreview();
 
 	function schedulePreview() {
+		// Bump the sequence immediately so an in-flight response for the
+		// previous inputs can't land as if it were current.
+		previewSeq += 1;
 		clearTimeout(previewTimer);
 		previewTimer = setTimeout(loadPreview, 450);
 	}
