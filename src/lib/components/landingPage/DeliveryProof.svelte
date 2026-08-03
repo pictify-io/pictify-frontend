@@ -1,33 +1,15 @@
 <script>
 	/**
 	 * DeliveryProof — "everything else stops at the send."
-	 * Differentiator ① from positioning-synthesis-2026-08-04: the receipts
-	 * are live-verified claims (sources in the positioning canvas sheet).
+	 * Differentiator ① from positioning-synthesis-2026-08-04: the failure
+	 * vignettes are live-verified claims (sources in the positioning canvas
+	 * sheet) rendered as the error UIs people have actually seen.
 	 *
-	 * Layout principle: ONE hero artifact. The receipts are a quiet
-	 * typographic ledger (no boxes) so the run-summary card — the product's
-	 * answer — is the only heavy element in the section.
+	 * Layout: two halves — THE OLD WAY (four mini error-windows, uniform
+	 * chrome so they read as a set, slight rotations for the hand-made feel)
+	 * vs WITH PICTIFY (the per-row run summary, the section's hero artifact).
 	 */
 	import SignUpButton from './SignUpButton.svelte';
-
-	const receipts = [
-		{
-			who: 'Gmail & mail merge',
-			claim: 'capped at 500–1,500 emails a day, locked mid-batch when you hit it'
-		},
-		{
-			who: 'Word mail merge',
-			claim: "can't attach the file to each email — the file is the whole point"
-		},
-		{
-			who: 'Canva & design tools',
-			claim: 'stop at download; naming and sending 200 files is still your evening'
-		},
-		{
-			who: 'Free add-ons',
-			claim: '6-minute scripts on Gmail quotas, and nobody to call when they break'
-		}
-	];
 
 	// The per-row run summary — real product states, not a mockup of vapor
 	const rows = [
@@ -73,73 +55,156 @@
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-center">
-			<!-- The wall: quiet typographic ledger, no boxes -->
-			<div class="lg:col-span-2">
-				<ul class="divide-y-2 divide-gray-200">
-					{#each receipts as receipt}
-						<li class="py-5 flex items-baseline gap-3">
-							<span class="text-brand-danger font-black text-lg leading-none select-none">✗</span>
-							<p class="text-base leading-snug">
-								<span class="font-black text-gray-900">{receipt.who}</span>
-								<span class="text-gray-600 font-medium"> — {receipt.claim}.</span>
-							</p>
-						</li>
-					{/each}
-					<li class="py-5 flex items-baseline gap-3">
-						<span class="text-data-green font-black text-lg leading-none select-none">✓</span>
-						<p class="text-base leading-snug font-bold text-gray-900">
-							Pictify sends on its own email infrastructure — and shows you what happened to
-							every single row.
-						</p>
-					</li>
-				</ul>
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-10 items-start relative">
+			<!-- VS badge on the seam -->
+			<div
+				class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-brutal-lg items-center justify-center z-20 rotate-12"
+			>
+				<span class="text-sm font-black text-gray-900">VS</span>
 			</div>
 
-			<!-- The answer: per-row run summary — the section's one artifact -->
-			<div class="lg:col-span-3 relative">
-				<div
-					class="absolute inset-0 bg-data-green rounded-2xl transform rotate-1 translate-x-2 translate-y-2 pointer-events-none"
-				/>
-				<div
-					class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
-				>
-					<div class="bg-gray-100 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between">
-						<p class="text-xs font-black uppercase tracking-widest text-gray-900">
-							Run summary — 240 recipients
-						</p>
-						<span
-							class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black bg-data-green text-black"
-						>
-							239 delivered
-						</span>
+			<!-- THE OLD WAY: four error-windows everyone has seen -->
+			<div>
+				<p class="text-[11px] font-black uppercase tracking-widest text-brand-danger mb-4 flex items-center gap-2">
+					<span class="w-5 h-5 bg-brand-danger rounded border-[2px] border-gray-900 inline-flex items-center justify-center">
+						<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18L18 6M6 6l12 12" /></svg>
+					</span>
+					The old way
+				</p>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<!-- Gmail: sending limit banner -->
+					<div class="bg-white rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform -rotate-1">
+						<div class="bg-gray-100 border-b-[2px] border-gray-900 px-3 py-1.5 flex items-center gap-1.5">
+							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900" />
+							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-900" />
+							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-900" />
+							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500">Gmail</span>
+						</div>
+						<div class="p-3">
+							<div class="bg-brand-danger/10 border-[2px] border-brand-danger rounded-lg px-3 py-2.5 flex items-start gap-2">
+								<svg class="w-4 h-4 text-brand-danger shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M12 3l9.5 16.5H2.5L12 3z" /></svg>
+								<p class="text-[11px] font-bold text-gray-900 leading-snug">
+									You have reached a limit for sending mail. Try again in 24 hours.
+								</p>
+							</div>
+							<p class="text-[10px] font-bold text-gray-400 mt-2">Row 137 of 240 — batch dead</p>
+						</div>
 					</div>
-					<ul class="divide-y-[2px] divide-gray-200">
-						{#each rows as row}
-							<li class="px-6 py-4 flex items-center gap-4">
-								<span class="text-sm font-black text-gray-400 w-8 shrink-0">#{row.n}</span>
-								<span class="text-sm font-bold text-gray-900 flex-1 truncate">{row.name}</span>
-								<span
-									class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] {badge(row.delivery)}"
-									>{row.delivery}</span
-								>
-								{#if row.action}
+
+					<!-- Word: attachments dialog -->
+					<div class="bg-white rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform rotate-1">
+						<div class="bg-gray-100 border-b-[2px] border-gray-900 px-3 py-1.5 flex items-center gap-1.5">
+							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900" />
+							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-900" />
+							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-900" />
+							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500">Word — Mail Merge</span>
+						</div>
+						<div class="p-3">
+							<div class="flex items-start gap-2.5">
+								<span class="w-8 h-8 bg-gray-100 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
+									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+								</span>
+								<p class="text-[11px] font-bold text-gray-900 leading-snug">
+									Mail merge can't include attachments.
+									<span class="block text-[10px] text-gray-500 font-medium mt-1">Recipients get an icon — not the certificate.</span>
+								</p>
+							</div>
+							<div class="mt-2.5 flex justify-end">
+								<span class="px-3 py-1 bg-gray-100 rounded border-[2px] border-gray-900 text-[9px] font-black uppercase">OK</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Canva: download complete, now what -->
+					<div class="bg-white rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform rotate-1">
+						<div class="bg-gray-100 border-b-[2px] border-gray-900 px-3 py-1.5 flex items-center gap-1.5">
+							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900" />
+							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-900" />
+							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-900" />
+							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500">Design tool</span>
+						</div>
+						<div class="p-3">
+							<div class="flex items-center gap-2.5">
+								<span class="w-8 h-8 bg-data-green/30 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
+									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+								</span>
+								<p class="text-[11px] font-bold text-gray-900 leading-snug">
+									certificates-240-pages.pdf downloaded
+									<span class="block text-[10px] text-gray-500 font-medium mt-1">Splitting, naming & emailing 240 files: still you.</span>
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Apps Script: timeout console -->
+					<div class="bg-gray-950 rounded-xl border-[2px] border-gray-900 shadow-brutal-md overflow-hidden transform -rotate-1">
+						<div class="bg-gray-900 border-b-[2px] border-gray-700 px-3 py-1.5 flex items-center gap-1.5">
+							<span class="w-2 h-2 rounded-full bg-brand-danger border border-gray-700" />
+							<span class="w-2 h-2 rounded-full bg-brand-accent border border-gray-700" />
+							<span class="w-2 h-2 rounded-full bg-data-green border border-gray-700" />
+							<span class="ml-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400">Free add-on — logs</span>
+						</div>
+						<div class="p-3 font-mono text-[10px] leading-relaxed">
+							<p class="text-gray-400">Sending 240 emails…</p>
+							<p class="text-data-red font-bold">Exception: Exceeded maximum execution time (6 min)</p>
+							<p class="text-gray-500">Support: none. Retry: tomorrow.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- WITH PICTIFY: the per-row run summary -->
+			<div>
+				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900 mb-4 flex items-center gap-2">
+					<span class="w-5 h-5 bg-data-green rounded border-[2px] border-gray-900 inline-flex items-center justify-center">
+						<svg class="w-3 h-3 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7" /></svg>
+					</span>
+					With Pictify
+				</p>
+				<div class="relative">
+					<div
+						class="absolute inset-0 bg-data-green rounded-2xl transform rotate-1 translate-x-2 translate-y-2 pointer-events-none"
+					/>
+					<div
+						class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
+					>
+						<div class="bg-gray-100 border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between">
+							<p class="text-xs font-black uppercase tracking-widest text-gray-900">
+								Run summary — 240 recipients
+							</p>
+							<span
+								class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black bg-data-green text-black"
+							>
+								239 delivered
+							</span>
+						</div>
+						<ul class="divide-y-[2px] divide-gray-200">
+							{#each rows as row}
+								<li class="px-6 py-4 flex items-center gap-4">
+									<span class="text-sm font-black text-gray-400 w-8 shrink-0">#{row.n}</span>
+									<span class="text-sm font-bold text-gray-900 flex-1 truncate">{row.name}</span>
 									<span
-										class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[2px] border-gray-900 bg-brand-accent text-gray-900 shadow-brutal-sm whitespace-nowrap"
-										>{row.action}</span
+										class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] {badge(row.delivery)}"
+										>{row.delivery}</span
 									>
-								{/if}
+									{#if row.action}
+										<span
+											class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border-[2px] border-gray-900 bg-brand-accent text-gray-900 shadow-brutal-sm whitespace-nowrap"
+											>{row.action}</span
+										>
+									{/if}
+								</li>
+							{/each}
+							<li class="px-6 py-3 text-center bg-gray-50">
+								<span class="text-xs font-bold text-gray-400 tracking-widest">⋯ 236 more rows</span>
 							</li>
-						{/each}
-						<li class="px-6 py-3 text-center bg-gray-50">
-							<span class="text-xs font-bold text-gray-400 tracking-widest">⋯ 236 more rows</span>
-						</li>
-					</ul>
-					<div class="border-t-[3px] border-gray-900 bg-gray-50 px-6 py-3">
-						<p class="text-[11px] font-bold text-gray-600">
-							Live product, not a mockup: sent → delivered / bounced, automatic suppression of
-							bad addresses, one-click re-send.
-						</p>
+						</ul>
+						<div class="border-t-[3px] border-gray-900 bg-gray-50 px-6 py-3">
+							<p class="text-[11px] font-bold text-gray-600">
+								Own email infrastructure — no Gmail quotas. Sent → delivered / bounced per row,
+								bad addresses auto-suppressed, one-click re-send.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
