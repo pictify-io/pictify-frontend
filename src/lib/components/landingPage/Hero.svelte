@@ -5,14 +5,18 @@
 	import { analytics } from '$lib/analytics.js';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-	// Demo template config
-	const DEMO_TEMPLATE_UID = '4M26J82TW7';
+	// Demo template config — a real certificate DOCUMENT so the graphic
+	// matches the "every row becomes a document" copy.
+	// Published per-environment by scripts/publish-landing-demo-template.js
+	// in the backend repo (fixed uid, isPublic).
+	const DEMO_TEMPLATE_UID = '6E3AHG9PYB';
 
-	// Live demo state — matches template variable names
-	let header = 'Every Row';
-	let heading_2 = 'BECOMES A';
-	let header_3 = 'Document';
-	let subheading = 'EDIT THE DATA BELOW';
+	// Live demo state — spreadsheet columns; name/course/date render the
+	// document, email drives the delivery chip in the chrome bar.
+	let name = 'Ada Lovelace';
+	let course = 'Advanced Analytics Bootcamp';
+	let date = 'August 4, 2026';
+	let email = 'ada@acme.com';
 
 	// Image state
 	let imageSrc = '';
@@ -47,30 +51,31 @@
 	function handleInput() {
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
-			renderTemplate({ header, heading_2, header_3, subheading });
+			renderTemplate({ name, course, date });
 		}, 600);
 	}
+
+	// Delivery chip mirrors the row: filename from the name column
+	$: chipFile = `${(name || 'row-1').trim().split(/\s+/)[0].toLowerCase() || 'row-1'}-certificate.pdf`;
+	$: chipEmail = (email || '').trim() || 'ada@acme.com';
 
 	// Mobile auto-cycle through preset data
 	let mobilePresetIndex = 0;
 	const mobilePresets = [
 		{
-			header: 'Every Row',
-			heading_2: 'BECOMES A',
-			header_3: 'Document',
-			subheading: 'EDIT THE DATA BELOW'
+			name: 'Ada Lovelace',
+			course: 'Advanced Analytics Bootcamp',
+			date: 'August 4, 2026'
 		},
 		{
-			header: 'One CSV',
-			heading_2: '300 INBOXES',
-			header_3: 'Delivered',
-			subheading: 'WITH PER-ROW STATUS'
+			name: 'Tom Okafor',
+			course: 'Cloud Architecture 101',
+			date: 'August 4, 2026'
 		},
 		{
-			header: 'Data In',
-			heading_2: 'DOCS & VIDEO',
-			header_3: 'Out',
-			subheading: 'WIZARD, API OR AGENTS'
+			name: 'Mei-Ling Chen',
+			course: 'Leadership Essentials',
+			date: 'August 4, 2026'
 		}
 	];
 
@@ -102,7 +107,7 @@
 
 	onMount(() => {
 		// Initial fetch for desktop
-		renderTemplate({ header, heading_2, header_3, subheading });
+		renderTemplate({ name, course, date });
 
 		// Only run mobile cycle on small screens
 		const isMobile = window.matchMedia('(max-width: 1023px)').matches;
@@ -282,53 +287,52 @@
 						<div class="mt-auto w-full flex flex-col gap-5">
 							<div class="flex flex-col gap-1.5">
 								<label
-									for="hero-header"
+									for="hero-name"
 									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
-									>Header Text</label
+									>Name</label
 								>
 								<input
-									id="hero-header"
-									bind:value={header}
+									id="hero-name"
+									bind:value={name}
 									on:input={handleInput}
 									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
 								<label
-									for="hero-header2"
+									for="hero-course"
 									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
-									>Highlight Text</label
+									>Course</label
 								>
 								<input
-									id="hero-header2"
-									bind:value={heading_2}
+									id="hero-course"
+									bind:value={course}
 									on:input={handleInput}
 									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
 								<label
-									for="hero-header3"
+									for="hero-date"
 									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
-									>Header 3</label
+									>Date</label
 								>
 								<input
-									id="hero-header3"
-									bind:value={header_3}
+									id="hero-date"
+									bind:value={date}
 									on:input={handleInput}
 									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
 							<div class="flex flex-col gap-1.5">
 								<label
-									for="hero-subheading"
+									for="hero-email"
 									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
-									>Subheading (Ribbon)</label
+									>Email (delivery)</label
 								>
 								<input
-									id="hero-subheading"
-									bind:value={subheading}
-									on:input={handleInput}
+									id="hero-email"
+									bind:value={email}
 									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
@@ -379,7 +383,7 @@
 										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 									/></svg
 								>
-								<span class="truncate">row-1-of-240.pdf &rarr; ada@acme.com</span>
+								<span class="truncate">{chipFile} &rarr; {chipEmail}</span>
 								<span
 									class="ml-auto shrink-0 px-2 py-0.5 rounded bg-data-green border-[2px] border-gray-900 text-[9px] font-black uppercase tracking-wider"
 									>Delivered</span
