@@ -128,20 +128,20 @@
 
 	<!-- 4. Use Cases: Recognition Moments -->
 	<ScaleUseCases />
+
+	<!-- 5. Agent-native: AI authoring, MCP, always-on workflows -->
+	<AgentShowcase />
 	<SectionSeparator icon="hash" />
 
-	<!-- 3. Core Workflow: Template → Data → Image -->
+	<!-- 6. Core Workflow: Template → Data → Image -->
 	<HowItWorks />
 
 	<!-- 4. Contextual CTA -->
 	<MidSectionCta />
 	<SectionSeparator icon="bolt" />
 
-	<!-- 5. API Integration: Code First -->
+	<!-- 7. API Integration: Code First -->
 	<ApiShowcase />
-
-	<!-- 6. Agent-native: AI authoring, MCP, always-on workflows -->
-	<AgentShowcase />
 	<SectionSeparator icon="hash" />
 
 	<!-- Responsive Image API section retired from the homepage (2026-08): it sold
