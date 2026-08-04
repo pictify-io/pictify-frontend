@@ -248,7 +248,7 @@
 							d="M5 13l4 4L19 7"
 						/></svg
 					>
-					<span>50 free credits/mo</span>
+					<span>50 free renders/mo</span>
 					<span class="w-1.5 h-1.5 rounded-full bg-gray-300 mx-1" />
 					<span>Plans from $15</span>
 				</div>

@@ -43,7 +43,7 @@
 			<h2 class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight">
 				From Data to <br />
 				<span class="relative inline-block text-brand-danger">
-					Pixel-Perfect Output
+					Delivered
 					<svg
 						class="absolute w-full h-3 -bottom-1 left-0 text-gray-900 opacity-20"
 						viewBox="0 0 100 10"
@@ -92,7 +92,8 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Design your certificate, badge or ticket on the canvas — or bring your own HTML. Add <span
+						Design your certificate, badge or ticket on the canvas, bring your own HTML — or describe
+						it and let the AI draft the template. Add <span
 							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
 						>
 						and you're ready to run.
@@ -164,8 +165,8 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Every document is emailed to its recipient or ready to download. PNG, JPG, WebP, GIF, or
-						PDF.
+						Every document is emailed to its recipient — with per-row delivered/bounced status and
+						one-click re-send — or ready to download as PDF, PNG or ZIP.
 						{#if activeStep === 2 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"
@@ -311,7 +312,7 @@
 										class="w-full h-auto object-cover border-b-[3px] border-gray-900"
 									/>
 									<div class="p-4 flex items-center justify-between bg-white">
-										<div class="font-bold text-gray-900">generated_image.png</div>
+										<div class="font-bold text-gray-900">ada-certificate.pdf</div>
 										<div
 											class="px-3 py-1 bg-data-green border-[2px] border-gray-900 text-xs font-bold shadow-brutal-sm"
 										>

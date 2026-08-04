@@ -40,16 +40,16 @@
 						class="inline-block mb-6 px-4 py-1.5 bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full transform rotate-2"
 					>
 						<span class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider"
-							>Start Building</span
+							>5-Minute Setup</span
 						>
 					</div>
 
 					<h2
 						class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl lg:text-7xl font-black text-gray-900 mb-8 leading-[1.1] max-w-2xl"
 					>
-						Get your API key in <br class="hidden sm:block" />
+						The deadline is Friday. <br class="hidden sm:block" />
 						<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
-							30 seconds
+							This takes 5 minutes
 							<svg
 								class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-gray-900 z-[-1] opacity-20"
 								viewBox="0 0 100 10"
@@ -58,7 +58,6 @@
 								<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
 							</svg>
 						</span>
-						.
 					</h2>
 					<p
 						class="text-lg md:text-xl lg:text-2xl text-gray-800 font-medium mb-10 max-w-xl bg-white px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-1"
@@ -69,7 +68,7 @@
 
 					<div class="transform transition-transform duration-300 w-full sm:w-auto z-20">
 						<SignUpButton
-							text="Start Building Free"
+							text="Send Your First Batch Free"
 							location="mid_cta"
 							class="w-full sm:w-auto bg-brand-danger text-white text-lg md:text-xl lg:text-base px-8 lg:px-6 py-5 lg:py-3 rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider flex-shrink-0 inline-flex items-center justify-center gap-3"
 						/>

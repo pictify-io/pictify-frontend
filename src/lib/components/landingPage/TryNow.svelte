@@ -112,13 +112,15 @@
 								<h4 class="font-black text-gray-900 text-base mb-2">How long to integrate?</h4>
 								<p class="text-sm text-gray-600 font-medium">
 									Most teams integrate in under 2 hours. One endpoint — JSON in, documents,
-									images or video out.
+									images or video out. No code? The wizard does the same thing in the browser.
 								</p>
 							</div>
 							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">
 								<h4 class="font-black text-gray-900 text-base mb-2">What about my data?</h4>
 								<p class="text-sm text-gray-600 font-medium">
-									Your data is never stored. We render and return. That's it.
+									Your rows stay in your workspace and are used for one thing: rendering and
+									delivering your documents. Run history exists so you can track delivery and
+									re-send — never sold, never used for anything else.
 								</p>
 							</div>
 							<div class="bg-white rounded-xl p-5 border-[2px] border-gray-900 shadow-brutal-md">
