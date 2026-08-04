@@ -370,6 +370,13 @@
 							Variant {activeVideoVariant + 1} of 240
 						</div>
 
+						<!-- AI authoring chip -->
+						<div
+							class="absolute top-3 left-3 px-2.5 py-1 bg-brand-accent rounded-md border-[2px] border-gray-900 text-[9px] font-black uppercase tracking-widest text-gray-900 shadow-brutal-sm"
+						>
+							✨ Described → Templated
+						</div>
+
 						<!-- progress bar -->
 						<div class="absolute bottom-0 left-0 right-0 h-5 bg-gray-900 border-t-[2px] border-gray-700 flex items-center px-3 gap-2">
 							<div class="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">

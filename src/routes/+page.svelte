@@ -6,6 +6,7 @@
 	import ScaleUseCases from '$lib/components/landingPage/ScaleUseCases.svelte';
 	import UseCaseRouter from '$lib/components/landingPage/UseCaseRouter.svelte';
 	import DeliveryProof from '$lib/components/landingPage/DeliveryProof.svelte';
+	import AgentShowcase from '$lib/components/landingPage/AgentShowcase.svelte';
 	import ApiShowcase from '$lib/components/landingPage/ApiShowcase.svelte';
 	import HowItWorks from '$lib/components/landingPage/HowItWorks.svelte';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
@@ -138,6 +139,9 @@
 
 	<!-- 5. API Integration: Code First -->
 	<ApiShowcase />
+
+	<!-- 6. Agent-native: AI authoring, MCP, always-on workflows -->
+	<AgentShowcase />
 	<SectionSeparator icon="hash" />
 
 	<!-- Responsive Image API section retired from the homepage (2026-08): it sold
