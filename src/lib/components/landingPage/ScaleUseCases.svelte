@@ -477,35 +477,51 @@
 							class="absolute inset-0 bg-[radial-gradient(#4ade80_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none"
 						/>
 
-						<!-- Floating JSON Card -->
-						<div
-							class="absolute top-6 left-6 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[190px] md:w-[215px] z-30 transform -rotate-2 group-hover:rotate-0 transition-transform hidden sm:block"
-						>
+						<!-- Row payload -> arrow -> inbox: one connected vertical flow -->
+						<div class="relative z-10 w-full max-w-[340px] md:max-w-[400px] flex flex-col">
+							<!-- Row payload card -->
 							<div
-								class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
+								class="self-start bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[230px] md:w-[250px] overflow-hidden transform -rotate-1 group-hover:rotate-0 transition-transform relative z-20 hidden sm:block"
 							>
 								<div
-									class="w-2 h-2 bg-data-green rounded-full border border-gray-900 animate-pulse"
-								/>
-								Row {recipients[activeRecipient].row} of 240
-							</div>
-							{#key activeRecipient}
-								<pre
-									class="font-mono text-[9px] md:text-[11px] text-gray-900 font-bold"
-									in:fade={{ duration: 200 }}>
+									class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
+								>
+									<div
+										class="w-2 h-2 bg-data-green rounded-full border border-gray-900 animate-pulse"
+									/>
+									Row {recipients[activeRecipient].row} of 240
+								</div>
+								{#key activeRecipient}
+									<pre
+										class="font-mono text-[9px] md:text-[10px] text-gray-900 font-bold overflow-hidden"
+										in:fade={{ duration: 200 }}>
 {`{
   "name": "${recipients[activeRecipient].name}",
-  "course": "${recipients[activeRecipient].course.length > 18 ? recipients[activeRecipient].course.slice(0, 17) + '…' : recipients[activeRecipient].course}",
+  "course": "${recipients[activeRecipient].course.length > 16 ? recipients[activeRecipient].course.slice(0, 15) + '…' : recipients[activeRecipient].course}",
   "email": "${recipients[activeRecipient].email}"
 }`}
-								</pre>
-							{/key}
-						</div>
+									</pre>
+								{/key}
+							</div>
 
-						<!-- Output: the recipient's inbox, certificate attached -->
-						<div
-							class="relative z-10 w-full max-w-[340px] md:max-w-[400px] bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-8 xl:mt-32 xl:mb-8 xl:ml-40"
-						>
+							<!-- connector -->
+							<div class="hidden sm:flex items-center -my-3 ml-[250px] md:ml-[264px] relative z-30">
+								<div
+									class="flex items-center gap-1.5 bg-gray-900 rounded-full border-[2px] border-white shadow-brutal-sm pl-2 pr-3 py-1.5"
+								>
+									<svg class="w-3.5 h-3.5 text-data-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg
+									>
+									<span class="text-[9px] font-black uppercase tracking-widest text-white whitespace-nowrap"
+										>Rendered &amp; sent</span
+									>
+								</div>
+							</div>
+
+							<!-- Output: the recipient's inbox, certificate attached -->
+							<div
+								class="w-full bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden transition-transform duration-500 hover:-translate-y-2 mt-4 sm:mt-0 relative z-10"
+							>
 							{#key activeRecipient}
 								<div in:fade={{ duration: 200 }}>
 									<!-- inbox chrome -->
@@ -574,6 +590,7 @@
 									</div>
 								</div>
 							{/key}
+							</div>
 						</div>
 					</div>
 				</div>
