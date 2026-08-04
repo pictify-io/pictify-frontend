@@ -477,11 +477,12 @@
 							class="absolute inset-0 bg-[radial-gradient(#4ade80_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none"
 						/>
 
-						<!-- Row payload -> arrow -> inbox: one connected vertical flow -->
+						<!-- Row payload tilted over the inbox corner — same overlap language
+						     as the chips on the hero and certificate cards -->
 						<div class="relative z-10 w-full max-w-[340px] md:max-w-[400px] flex flex-col">
 							<!-- Row payload card -->
 							<div
-								class="self-start bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[230px] md:w-[250px] overflow-hidden transform -rotate-1 group-hover:rotate-0 transition-transform relative z-20 hidden sm:block"
+								class="self-start bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[230px] md:w-[250px] overflow-hidden transform -rotate-2 group-hover:-rotate-1 transition-transform relative z-20 -mb-6 -ml-2 md:-ml-5 hidden sm:block"
 							>
 								<div
 									class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
@@ -502,20 +503,6 @@
 }`}
 									</pre>
 								{/key}
-							</div>
-
-							<!-- connector -->
-							<div class="hidden sm:flex items-center -my-3 ml-[250px] md:ml-[264px] relative z-30">
-								<div
-									class="flex items-center gap-1.5 bg-gray-900 rounded-full border-[2px] border-white shadow-brutal-sm pl-2 pr-3 py-1.5"
-								>
-									<svg class="w-3.5 h-3.5 text-data-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg
-									>
-									<span class="text-[9px] font-black uppercase tracking-widest text-white whitespace-nowrap"
-										>Rendered &amp; sent</span
-									>
-								</div>
 							</div>
 
 							<!-- Output: the recipient's inbox, certificate attached -->
