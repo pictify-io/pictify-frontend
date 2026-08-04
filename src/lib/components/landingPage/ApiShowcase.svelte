@@ -143,7 +143,7 @@ const image = await pictify.render({
 
 				<p class="text-xl text-gray-900/70 font-medium mb-10 max-w-lg">
 					The coordinator runs the wizard. Your code calls the API or signs a webhook. Your AI
-					agents use the MCP server. Same template, same brand, same run history — SDKs in Node,
+					agents use the MCP server. Same template, same brand, same run history. SDKs in Node,
 					Python, Ruby and Go.
 				</p>
 

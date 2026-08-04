@@ -105,7 +105,7 @@
 				</span>.
 			</h2>
 			<p class="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto font-medium">
-				Invoices, certificates, product cards, reports, social banners, personalized videos — or
+				Invoices, certificates, product cards, reports, social banners, personalized videos, or
 				bring your own HTML via the API. One template, one data source, done.
 			</p>
 		</div>
@@ -455,7 +455,7 @@
 											<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900"></div>
 										</div>
 										<div class="text-[10px] font-black font-mono uppercase tracking-widest text-gray-500 truncate max-w-[200px]">
-											inbox — {recipients[activeRecipient].email}
+											inbox · {recipients[activeRecipient].email}
 										</div>
 									</div>
 

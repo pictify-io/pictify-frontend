@@ -191,12 +191,12 @@
 					>
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
 					</svg>
-				</span> — Delivered.
+				</span>. Delivered.
 			</h1>
 
 			<!-- Subheadline -->
 			<p class="text-lg lg:text-base xl:text-lg text-gray-700 max-w-2xl mx-auto font-medium mb-8 lg:mb-6">
-				Upload a spreadsheet, point a webhook, or call the API — every row becomes a branded
+				Upload a spreadsheet, point a webhook, or call the API. Every row becomes a branded
 				certificate, badge, report or personalized video, rendered and emailed to each recipient
 				with per-person delivery status.
 			</p>
@@ -369,7 +369,7 @@
 							</div>
 							<div
 								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate"
-								title="Row 1 of 240 — rendered and emailed"
+								title="Row 1 of 240, rendered and emailed"
 							>
 								<svg
 									class="w-4 h-4 shrink-0 text-[#1f2937]"

@@ -49,10 +49,10 @@
 </script>
 
 <svelte:head>
-	<title>Pictify — Turn Your Data into Documents & Videos, Delivered</title>
+	<title>Pictify | Turn Your Data into Documents & Videos, Delivered</title>
 	<meta
 		name="description"
-		content="Upload a spreadsheet, point a webhook, or call the API — every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status. Free tier available."
+		content="Upload a spreadsheet, point a webhook, or call the API. Every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status. Free tier available."
 	/>
 	<meta
 		name="keywords"
@@ -61,11 +61,11 @@
 	<meta name="author" content="Pictify.io" />
 	<meta
 		property="og:title"
-		content="Pictify — Turn Your Data into Documents & Videos, Delivered"
+		content="Pictify | Turn Your Data into Documents & Videos, Delivered"
 	/>
 	<meta
 		property="og:description"
-		content="Every row becomes a branded certificate, badge, report or personalized video — rendered and emailed to each recipient with per-person delivery status."
+		content="Every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta property="og:url" content="https://pictify.io" />
@@ -75,11 +75,11 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta
 		name="twitter:title"
-		content="Pictify — Turn Your Data into Documents & Videos, Delivered"
+		content="Pictify | Turn Your Data into Documents & Videos, Delivered"
 	/>
 	<meta
 		name="twitter:description"
-		content="Every row becomes a branded certificate, badge, report or personalized video — rendered and emailed to each recipient with per-person delivery status."
+		content="Every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta name="twitter:site" content="@pictify_io" />
@@ -91,7 +91,7 @@
 		url: 'https://pictify.io',
 		image: 'https://media.pictify.io/v3g37-1775406808141.png',
 		description:
-			'Turn your data into branded documents and videos. Upload a spreadsheet, point a webhook, or call the API — every row becomes a certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status.',
+			'Turn your data into branded documents and videos. Upload a spreadsheet, point a webhook, or call the API. Every row becomes a certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status.',
 		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
 		operatingSystem: 'Web',
 		featureList: [

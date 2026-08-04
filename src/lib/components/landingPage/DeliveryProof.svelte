@@ -31,7 +31,7 @@
 			</h2>
 			<p class="text-lg md:text-xl text-gray-700 font-medium">
 				Generating 300 personalized documents was never the hard part. Getting all 300 into
-				inboxes — and knowing they arrived — is.
+				The hard part is getting them into 300 inboxes and knowing they arrived.
 			</p>
 		</div>
 

@@ -55,7 +55,7 @@
 			</h2>
 			<p class="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto font-medium">
 				Template in. CSV or webhook data in. <br class="hidden md:block" />
-				Rendered documents out — delivered.
+				Rendered documents out, delivered.
 			</p>
 		</div>
 
@@ -92,7 +92,7 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Design your certificate, badge or ticket on the canvas, bring your own HTML — or describe
+						Design your certificate, badge or ticket on the canvas, bring your own HTML, or describe
 						it and let the AI draft the template. Add <span
 							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
 						>
@@ -165,8 +165,8 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Every document is emailed to its recipient — with per-row delivered/bounced status and
-						one-click re-send — or ready to download as PDF, PNG or ZIP.
+						Every document is emailed to its recipient with per-row delivered/bounced status and
+						one-click re-send, or ready to download as PDF, PNG or ZIP.
 						{#if activeStep === 2 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"

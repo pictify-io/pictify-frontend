@@ -16,7 +16,7 @@
 				What are you <br class="hidden md:block"/>making?
 			</h2>
 			<p class="text-lg md:text-xl text-gray-700 font-medium max-w-2xl">
-				Invoices for a team, personalized videos for a campaign, or an AI-agent pipeline — it's one engine underneath.
+				Invoices for a team, personalized videos for a campaign, or an AI-agent pipeline. It's one engine underneath.
 			</p>
 		</div>
 
@@ -68,7 +68,7 @@
 						Documents at Scale
 					</h3>
 					<p class="text-base sm:text-lg text-gray-600 font-medium leading-relaxed mb-10 max-w-md">
-						Invoices, certificates, reports, badges, tickets — upload your list, pick a template, every person gets theirs by email. No design skills, no Gmail limits.
+						Invoices, certificates, reports, badges, tickets. Upload your list, pick a template, and every person gets theirs by email. No design skills, no Gmail limits.
 					</p>
 					<div class="mt-auto">
 						<span class="inline-flex items-center gap-3 text-sm sm:text-base font-black uppercase tracking-wider text-white bg-[#ff6b6b] px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] group-hover:shadow-[2px_2px_0_0_#1f2937] group-hover:translate-x-[4px] group-hover:translate-y-[4px] transition-all">
@@ -121,7 +121,7 @@
 						Personalized Video
 					</h3>
 					<p class="text-base sm:text-lg text-gray-600 font-medium leading-relaxed mb-10">
-						Describe a video or build a template — then render one, or five thousand, personalized from your data. No render farm to babysit.
+						Describe a video or build a template, then render one, or five thousand, personalized from your data. No render farm to babysit.
 					</p>
 					<div class="mt-auto">
 						<span class="inline-flex items-center gap-3 text-sm sm:text-base font-black uppercase tracking-wider text-gray-900 bg-white px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] group-hover:shadow-[2px_2px_0_0_#1f2937] group-hover:translate-x-[4px] group-hover:translate-y-[4px] transition-all">
@@ -188,7 +188,7 @@
 							API, Webhooks <br class="hidden xl:block"/>& MCP
 						</h3>
 						<p class="text-base sm:text-lg lg:text-xl text-gray-400 font-medium leading-relaxed mb-10 max-w-2xl">
-							REST API, SDKs in four languages, signed webhooks, and a first-party MCP server — every template is callable by your code and your AI agents.
+							REST API, SDKs in four languages, signed webhooks, and a first-party MCP server. Every template is callable by your code and your AI agents.
 						</p>
 						<div class="mt-auto">
 							<span class="inline-flex items-center gap-3 text-sm sm:text-base font-black uppercase tracking-wider text-gray-900 bg-[#ffc480] px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#000] group-hover:shadow-[2px_2px_0_0_#000] group-hover:translate-x-[4px] group-hover:translate-y-[4px] transition-all">
