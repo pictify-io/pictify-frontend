@@ -37,21 +37,19 @@
 				<!-- Left Content -->
 				<div class="relative z-10 flex flex-col items-start w-full lg:w-1/2">
 					<div
-						class="inline-block mb-6 px-4 py-1.5 bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-full transform rotate-2"
+						class="inline-flex items-center gap-2 px-5 py-2 bg-white border-[3px] border-gray-900 shadow-brutal-sm rounded-full mb-6 transform rotate-2"
 					>
-						<span class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider"
+						<span class="text-sm font-black text-gray-900 uppercase tracking-wider"
 							>5-Minute Setup</span
 						>
 					</div>
 
-					<h2
-						class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl lg:text-7xl font-black text-gray-900 mb-8 leading-[1.1] max-w-2xl"
-					>
+					<h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1] mb-6 max-w-2xl">
 						The deadline is Friday. <br class="hidden sm:block" />
 						<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
 							This takes 5 minutes
 							<svg
-								class="absolute w-full h-4 sm:h-5 -bottom-1 sm:-bottom-2 left-0 text-gray-900 z-[-1] opacity-20"
+								class="absolute w-full h-4 sm:h-5 -bottom-2 left-0 text-gray-900 z-[-1] opacity-20"
 								viewBox="0 0 100 10"
 								preserveAspectRatio="none"
 							>

@@ -1,48 +1,27 @@
 <script>
-	/**
-	 * DeliveryProof — "everything else stops at the send."
-	 * Differentiator ① from positioning-synthesis-2026-08-04; every failure
-	 * is a live-verified claim (sources in the positioning canvas sheet).
-	 *
-	 * Layout (option C from the layout review): TWO MATCHED FRAMES. All four
-	 * failure vignettes keep their full graphic treatment — banner, dialog,
-	 * toast, console — but stacked inside ONE "Everything you tried" window,
-	 * facing the run-summary card. Nothing rotates or overlaps; the section
-	 * is exactly two objects.
-	 */
 	import SignUpButton from './SignUpButton.svelte';
-
-	// The per-row run summary — real product states, not a mockup of vapor
-	const rows = [
-		{ n: 1, name: 'Aisha Kamara', delivery: 'delivered' },
-		{ n: 2, name: 'Tom Okafor', delivery: 'delivered' },
-		{ n: 3, name: 'Mei-Ling Chen', delivery: 'bounced', action: 'Re-send' },
-		{ n: 4, name: 'Priya Nair', delivery: 'delivered' }
-	];
-
-	const badge = (status) => {
-		if (status === 'delivered') return 'bg-data-green text-black border-black';
-		if (status === 'bounced') return 'bg-brand-danger text-white border-black';
-		return 'bg-brand-accent text-black border-black';
-	};
 </script>
 
-<section class="w-full py-20 md:py-28 bg-white border-b-[3px] border-gray-900 relative overflow-hidden">
+<section class="w-full py-24 md:py-32 bg-brand-bg border-b-[3px] border-gray-900 relative overflow-hidden">
+    <!-- Graphic background dots -->
 	<div
-		class="absolute inset-0 opacity-[0.03] pointer-events-none"
+		class="absolute inset-0 opacity-[0.03] pointer-events-none z-0"
 		style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
-	/>
-	<div class="max-w-6xl mx-auto px-6 relative z-10">
-		<div class="text-center mb-16 max-w-3xl mx-auto">
-			<p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">
-				Why "delivered" is in the headline
-			</p>
-			<h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4">
-				Everything Else Stops<br />
+	></div>
+
+	<div class="max-w-7xl mx-auto px-6 relative z-10">
+		<div class="text-center mb-20 relative max-w-4xl mx-auto">
+			<div
+				class="inline-flex items-center gap-2 px-5 py-2 bg-brand-danger border-[3px] border-gray-900 shadow-brutal-sm rounded-full mb-6 transform -rotate-2"
+			>
+				<span class="text-sm font-black text-white uppercase tracking-wider">Why "delivered" is in the headline</span>
+			</div>
+			<h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1] mb-6">
+				Everything Else Stops<br class="hidden md:block" />
 				<span class="relative inline-block text-brand-danger transform -rotate-1 mt-2">
 					At the Send
 					<svg
-						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
+						class="absolute w-full h-4 sm:h-5 -bottom-2 left-0 text-gray-900 z-[-1] opacity-20"
 						viewBox="0 0 100 10"
 						preserveAspectRatio="none"
 					>
@@ -50,167 +29,173 @@
 					</svg>
 				</span>
 			</h2>
-			<p class="text-base md:text-lg text-gray-700 font-medium">
+			<p class="text-lg md:text-xl text-gray-700 font-medium">
 				Generating 300 personalized documents was never the hard part. Getting all 300 into
 				inboxes — and knowing they arrived — is.
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-14 items-stretch relative max-w-5xl mx-auto">
+		<div class="flex flex-col lg:flex-row gap-12 lg:gap-8 items-center relative max-w-6xl mx-auto">
+			
 			<!-- VS badge on the seam -->
 			<div
-				class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-brand-accent rounded-full border-[3px] border-gray-900 shadow-brutal-lg items-center justify-center z-30 rotate-12"
+				class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-[#ffc480] rounded-full border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] items-center justify-center z-30 rotate-12"
 			>
-				<span class="text-sm font-black text-gray-900">VS</span>
+				<span class="text-2xl font-black text-gray-900">VS</span>
 			</div>
 
-			<!-- THE OLD WAY: all four vignettes inside one window -->
-			<div class="flex flex-col">
-				<p class="text-[11px] font-black uppercase tracking-widest text-brand-danger mb-4 flex items-center gap-2">
-					<span class="w-5 h-5 bg-brand-danger rounded border-[2px] border-gray-900 inline-flex items-center justify-center">
-						<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18L18 6M6 6l12 12" /></svg>
-					</span>
-					The old way
-				</p>
-				<div class="relative flex-1">
-					<div
-						class="absolute inset-0 bg-brand-danger rounded-2xl transform -rotate-1 -translate-x-2 translate-y-2 pointer-events-none"
-					/>
-					<div
-						class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden h-full flex flex-col"
-					>
-						<!-- window chrome -->
-						<div class="bg-gray-100 border-b-[3px] border-gray-900 px-4 py-3 flex items-center gap-2">
-							<span class="w-3 h-3 rounded-full bg-brand-danger border-[2px] border-gray-900" />
-							<span class="w-3 h-3 rounded-full bg-brand-accent border-[2px] border-gray-900" />
-							<span class="w-3 h-3 rounded-full bg-data-green border-[2px] border-gray-900" />
-							<span class="ml-2 text-[10px] font-black uppercase tracking-widest text-gray-600 truncate">
-								Everything you tried
-							</span>
-							<span
-								class="ml-auto px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black bg-brand-danger text-white whitespace-nowrap"
-							>
-								0 of 240 confirmed
-							</span>
-						</div>
+			<!-- THE OLD WAY -->
+            <div class="w-full lg:w-1/2 bg-[#ff6b6b] rounded-[2.5rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 md:p-12 relative overflow-hidden group">
+                <!-- Abstract pipeline breaking -->
+                <svg class="absolute top-1/2 left-0 w-full h-32 -translate-y-1/2 text-gray-900 opacity-20 pointer-events-none" fill="none" viewBox="0 0 400 100" preserveAspectRatio="none">
+                    <path stroke="currentColor" stroke-width="6" stroke-dasharray="12 12" d="M0 50 Q 150 50 200 80 T 400 50" />
+                    <!-- broken line mark -->
+                    <line x1="180" y1="20" x2="220" y2="100" stroke="currentColor" stroke-width="12" />
+                </svg>
 
-						<div class="flex-1 flex flex-col divide-y-[2px] divide-gray-200">
-							<!-- Gmail: the limit banner -->
-							<div class="px-4 py-3.5 flex-1 flex items-center">
-								<div class="w-full bg-brand-danger/10 border-[2px] border-brand-danger rounded-lg px-3.5 py-2.5 flex items-start gap-2.5">
-									<svg class="w-4 h-4 text-brand-danger shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M12 3l9.5 16.5H2.5L12 3z" /></svg>
-									<p class="text-[12px] font-bold text-gray-900 leading-snug">
-										You have reached a limit for sending mail. Try again in 24 hours.
-										<span class="block text-[10px] text-gray-500 mt-0.5 font-medium">Gmail — died at row 137 of 240</span>
-									</p>
-								</div>
-							</div>
+                <div class="relative z-10 mb-10">
+                    <p class="text-xs font-black uppercase tracking-widest text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center border-2 border-transparent">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </span>
+                        The Old Way
+                    </p>
+                    <h3 class="text-3xl sm:text-4xl font-black text-white leading-tight">
+                        A black hole of errors and limits.
+                    </h3>
+                </div>
 
-							<!-- Word: the attachments dialog -->
-							<div class="px-4 py-3.5 flex-1 flex items-center gap-3">
-								<span class="w-9 h-9 bg-gray-100 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
-									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-								</span>
-								<p class="text-[12px] font-bold text-gray-900 leading-snug flex-1 min-w-0">
-									Mail merge can't include attachments.
-									<span class="block text-[10px] text-gray-500 font-medium mt-0.5">Word — recipients get an icon, not the certificate</span>
-								</p>
-								<span class="px-3.5 py-1 bg-gray-100 rounded-md border-[2px] border-gray-900 text-[10px] font-black uppercase shrink-0">OK</span>
-							</div>
+                <!-- Floating chaotic elements -->
+                <div class="relative h-[22rem] w-full mt-4">
+                    <!-- Element 1: Exception -->
+                    <div class="absolute top-0 right-0 w-64 md:w-72 bg-gray-900 rounded-xl border-[3px] border-gray-900 p-4 shadow-[6px_6px_0_0_#000] transform rotate-6 group-hover:rotate-12 group-hover:translate-x-2 transition-transform duration-500 z-10">
+                        <div class="flex gap-2 mb-3">
+                            <div class="w-3 h-3 rounded-full bg-[#ff6b6b]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#ffc480]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#4ade80]"></div>
+                        </div>
+                        <p class="font-mono text-xs md:text-sm text-[#ff6b6b] leading-relaxed">
+                            > Exception: Exceeded max execution time (6 min)
+                        </p>
+                    </div>
 
-							<!-- Canva: the download toast -->
-							<div class="px-4 py-3.5 flex-1 flex items-center gap-3">
-								<span class="w-9 h-9 bg-data-green/30 rounded-lg border-[2px] border-gray-900 flex items-center justify-center shrink-0">
-									<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-								</span>
-								<p class="text-[12px] font-bold text-gray-900 leading-snug flex-1 min-w-0">
-									certificates-240-pages.pdf downloaded
-									<span class="block text-[10px] text-gray-500 font-medium mt-0.5">Canva — splitting, naming &amp; emailing 240 files: still you</span>
-								</p>
-							</div>
+                    <!-- Element 2: Word dialog -->
+                    <div class="absolute top-24 -left-2 w-64 md:w-72 bg-white rounded-xl border-[3px] border-gray-900 p-5 shadow-[6px_6px_0_0_#1f2937] transform -rotate-3 group-hover:-rotate-6 group-hover:-translate-x-2 transition-transform duration-500 z-20">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gray-100 border-[3px] border-gray-900 flex items-center justify-center shrink-0 shadow-brutal-sm">
+                                <span class="text-2xl font-black text-blue-600">W</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-black text-gray-900 mb-2 leading-snug">Mail merge can't include attachments.</p>
+                                <button class="px-5 py-2 bg-gray-100 border-[2px] border-gray-900 rounded-lg text-xs font-black uppercase shadow-[2px_2px_0_0_#1f2937]">OK</button>
+                            </div>
+                        </div>
+                    </div>
 
-							<!-- Add-on: the timeout console, full-bleed dark strip -->
-							<div class="flex-1 flex items-center bg-gray-950 px-4 py-3.5">
-								<div class="font-mono text-[10.5px] leading-relaxed">
-									<p class="text-gray-400">Sending 240 emails…</p>
-									<p class="text-data-red font-bold">Exception: Exceeded maximum execution time (6 min)</p>
-									<p class="text-gray-500">Free add-on — support: none. Retry: tomorrow.</p>
-								</div>
-							</div>
-						</div>
+                    <!-- Element 3: Canva Toast -->
+                    <div class="absolute bottom-32 right-4 w-60 bg-white rounded-xl border-[3px] border-gray-900 p-3 shadow-[6px_6px_0_0_#1f2937] transform rotate-3 group-hover:-rotate-2 group-hover:-translate-y-2 transition-transform duration-500 z-30">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 bg-[#4ade80] rounded-lg border-[3px] border-gray-900 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </span>
+                            <p class="text-xs font-bold text-gray-900 leading-tight">certificates-240-pages.pdf downloaded</p>
+                        </div>
+                    </div>
 
-						<div class="border-t-[3px] border-gray-900 bg-gray-50 px-4 py-3">
-							<p class="text-[11px] font-bold text-gray-600">
-								No per-recipient status. No bounce handling. No re-send.
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
+                    <!-- Element 4: Gmail limit -->
+                    <div class="absolute bottom-4 left-4 right-8 md:right-12 bg-white rounded-xl border-[3px] border-gray-900 p-5 shadow-[6px_6px_0_0_#1f2937] transform -rotate-2 group-hover:-rotate-4 group-hover:translate-y-2 transition-transform duration-500 z-40">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-12 h-12 rounded-full bg-[#ff6b6b] border-[3px] border-gray-900 flex items-center justify-center shrink-0 shadow-brutal-sm">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M12 3l9.5 16.5H2.5L12 3z" /></svg>
+                            </div>
+                            <p class="text-sm font-black text-gray-900 leading-snug">You have reached a limit for sending mail. Try again in 24 hours.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-			<!-- WITH PICTIFY: the per-row run summary -->
-			<div class="flex flex-col">
-				<p class="text-[11px] font-black uppercase tracking-widest text-gray-900 mb-4 flex items-center gap-2">
-					<span class="w-5 h-5 bg-data-green rounded border-[2px] border-gray-900 inline-flex items-center justify-center">
-						<svg class="w-3 h-3 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7" /></svg>
-					</span>
-					With Pictify
-				</p>
-				<div class="relative flex-1">
-					<div
-						class="absolute inset-0 bg-data-green rounded-2xl transform rotate-1 translate-x-2 translate-y-2 pointer-events-none"
-					/>
-					<div
-						class="relative bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden h-full flex flex-col"
-					>
-						<div class="bg-gray-100 border-b-[3px] border-gray-900 px-5 py-4 flex items-center justify-between gap-3">
-							<p class="text-xs font-black uppercase tracking-widest text-gray-900">
-								Run summary — 240 recipients
-							</p>
-							<span
-								class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black bg-data-green text-black whitespace-nowrap"
-							>
-								239 delivered
-							</span>
-						</div>
-						<ul class="divide-y-[2px] divide-gray-200 flex-1 flex flex-col">
-							{#each rows as row}
-								<li class="px-5 py-3.5 flex-1 flex items-center gap-3">
-									<span class="text-sm font-black text-gray-400 w-7 shrink-0">#{row.n}</span>
-									<span class="text-[13px] font-bold text-gray-900 flex-1 truncate">{row.name}</span>
-									<span
-										class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] {badge(row.delivery)} whitespace-nowrap"
-										>{row.delivery}</span
-									>
-									{#if row.action}
-										<span
-											class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg border-[2px] border-gray-900 bg-brand-accent text-gray-900 shadow-brutal-sm whitespace-nowrap"
-											>{row.action}</span
-										>
-									{/if}
-								</li>
-							{/each}
-							<li class="px-5 py-2.5 text-center bg-gray-50">
-								<span class="text-xs font-bold text-gray-400 tracking-widest">⋯ 236 more rows</span>
-							</li>
-						</ul>
-						<div class="border-t-[3px] border-gray-900 bg-gray-50 px-5 py-3">
-							<p class="text-[11px] font-bold text-gray-600">
-								Own email infrastructure — no Gmail quotas. Per-row delivered / bounced,
-								auto-suppression, one-click re-send.
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
+			<!-- WITH PICTIFY -->
+            <div class="w-full lg:w-1/2 bg-[#4ade80] rounded-[2.5rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] p-8 md:p-12 relative overflow-hidden group mt-4 lg:mt-0">
+                <!-- Abstract successful pipeline -->
+                <svg class="absolute top-1/2 left-0 w-full h-32 -translate-y-1/2 text-gray-900 opacity-10 pointer-events-none" fill="none" viewBox="0 0 400 100" preserveAspectRatio="none">
+                    <path stroke="currentColor" stroke-width="12" d="M0 50 L 400 50" />
+                    <!-- Checkmarks along the line -->
+                    <circle cx="100" cy="50" r="14" fill="currentColor" />
+                    <circle cx="200" cy="50" r="14" fill="currentColor" />
+                    <circle cx="300" cy="50" r="14" fill="currentColor" />
+                </svg>
+
+                <div class="relative z-10 mb-10">
+                    <p class="text-xs font-black uppercase tracking-widest text-gray-900 mb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center border-2 border-transparent">
+                            <svg class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
+                        </span>
+                        With Pictify
+                    </p>
+                    <h3 class="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
+                        Every row verified.<br/>Zero limits.
+                    </h3>
+                </div>
+
+                <!-- Neatly stacked success receipts -->
+                <div class="relative h-[22rem] w-full flex flex-col mt-4">
+                    <!-- Main Dashboard Window Mockup -->
+                    <div class="absolute inset-0 bg-[#FFFDF8] rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] flex flex-col overflow-hidden group-hover:scale-[1.02] group-hover:-translate-y-2 transition-transform duration-500 z-10">
+                        <div class="bg-white border-b-[3px] border-gray-900 px-6 py-4 flex items-center justify-between shrink-0">
+                            <p class="text-xs font-black uppercase tracking-widest text-gray-900">Run summary</p>
+                            <span class="px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 bg-[#4ade80] text-gray-900 shadow-[2px_2px_0_0_#1f2937]">240/240 Sent</span>
+                        </div>
+                        <div class="flex-1 flex flex-col p-5 gap-4 bg-gray-50 overflow-hidden">
+                            <!-- Row 1 -->
+                            <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 flex items-center justify-between shadow-brutal-sm hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-base font-black text-gray-400 w-8">#1</span>
+                                    <span class="text-base font-bold text-gray-900">Aisha Kamara</span>
+                                </div>
+                                <span class="text-xs font-black uppercase tracking-wider text-[#4ade80] flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-lg border-2 border-[#4ade80]/30">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
+                                    Delivered
+                                </span>
+                            </div>
+                            <!-- Row 2 -->
+                            <div class="bg-white border-[3px] border-gray-900 rounded-xl p-4 flex items-center justify-between shadow-brutal-sm hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#1f2937] transition-all">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-base font-black text-gray-400 w-8">#2</span>
+                                    <span class="text-base font-bold text-gray-900">Tom Okafor</span>
+                                </div>
+                                <span class="text-xs font-black uppercase tracking-wider text-[#4ade80] flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-lg border-2 border-[#4ade80]/30">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" /></svg>
+                                    Delivered
+                                </span>
+                            </div>
+                            <!-- Row 3 (Bounced) -->
+                            <div class="bg-[#FFFDF8] border-[3px] border-gray-900 rounded-xl p-4 flex items-center justify-between shadow-brutal-sm group-hover:bg-[#ffc480]/20 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-base font-black text-gray-400 w-8">#3</span>
+                                    <span class="text-base font-bold text-gray-900 truncate max-w-[120px] sm:max-w-none">Mei-Ling Chen</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs font-black uppercase tracking-wider text-[#ff6b6b] bg-red-50 px-3 py-1.5 rounded-lg border-2 border-[#ff6b6b]/30">Bounced</span>
+                                    <button class="px-4 py-2 bg-[#ffc480] border-[3px] border-gray-900 rounded-lg text-[10px] font-black uppercase shadow-[3px_3px_0_0_#1f2937] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all">Re-send</button>
+                                </div>
+                            </div>
+                            <!-- More -->
+                            <div class="text-center mt-auto mb-2">
+                                <span class="text-xs font-black text-gray-400 tracking-widest uppercase">⋯ 237 more rows</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 		</div>
 
-		<div class="flex justify-center mt-14">
+		<div class="flex justify-center mt-20">
 			<SignUpButton
-				text="Run Your First Batch Free"
+				text="Run Your First Batch Free →"
 				location="delivery_proof"
 				href="/signup"
-				class="bg-gray-900 text-white text-lg lg:text-base px-8 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:translate-y-1 hover:translate-x-1 hover:shadow-brutal-sm transition-all font-black uppercase tracking-wider"
+				class="bg-[#ff6b6b] text-white text-lg md:text-xl px-10 py-5 rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:translate-y-2 hover:translate-x-2 hover:shadow-[2px_2px_0_0_#1f2937] transition-all font-black uppercase tracking-wider"
 			/>
 		</div>
 	</div>
