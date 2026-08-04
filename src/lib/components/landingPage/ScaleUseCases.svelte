@@ -482,7 +482,7 @@
 						<div class="relative z-10 w-full max-w-[340px] md:max-w-[400px] flex flex-col">
 							<!-- Row payload card -->
 							<div
-								class="self-start bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[230px] md:w-[250px] overflow-hidden transform -rotate-2 group-hover:-rotate-1 transition-transform relative z-20 -mb-6 -ml-2 md:-ml-5 hidden sm:block"
+								class="self-start bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg p-3 w-[230px] md:w-[250px] overflow-hidden transform -rotate-2 group-hover:-rotate-1 transition-transform relative z-20 -mb-6 -ml-6 md:-ml-14 hidden sm:block"
 							>
 								<div
 									class="text-[9px] md:text-[10px] font-bold text-gray-600 mb-2 flex items-center gap-2 uppercase tracking-wider border-b-2 border-dashed border-gray-200 pb-2"
