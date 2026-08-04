@@ -186,7 +186,7 @@ const image = await pictify.render({
 						<div class="pt-1">
 							<h3 class="text-xl font-black text-gray-900 mb-1">Typed SDKs</h3>
 							<p class="text-gray-900/70 font-medium text-lg leading-relaxed">
-								First-class TypeScript support. Python and Go coming soon.
+								First-class TypeScript support, with official SDKs for Python, Ruby and Go.
 							</p>
 						</div>
 					</div>
