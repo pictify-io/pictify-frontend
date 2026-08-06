@@ -6,9 +6,9 @@
 	const pillar = getPillar();
 	const others = solutions.filter((s) => !s.isPillar);
 
-	const title = 'Solutions — Programmable Image Generation Use Cases | Pictify';
+	const title = 'Solutions — Documents & Videos Generated and Delivered | Pictify';
 	const description =
-		'Every way teams automate image generation with Pictify — from OG images to personalized email headers, product catalogs, and bulk rendering.';
+		'Guides for turning spreadsheet rows into delivered documents: mail merge with real attachments, bulk certificates, personalized PDFs and video, emailed per recipient.';
 	const canonical = 'https://pictify.io/solutions';
 </script>
 
@@ -24,7 +24,7 @@
 	<meta property="og:image" content="https://pictify.io/og/solutions/index.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Every way teams automate images — Pictify Solutions" />
+	<meta property="og:image:alt" content="Documents and videos generated and delivered — Pictify Solutions" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
@@ -46,11 +46,12 @@
 
 		<header class="text-center mb-16">
 			<h1 class="text-5xl md:text-6xl font-black text-gray-900 leading-[0.95] mb-6">
-				Every way teams<br />
-				<span class="text-brand-danger">automate images.</span>
+				Data in.<br />
+				<span class="text-brand-danger">Delivered documents out.</span>
 			</h1>
 			<p class="text-xl text-gray-700 font-medium max-w-2xl mx-auto">
-				One API. Eleven use cases. Real expression engine, live data bindings, and A/B experiments built in.
+				Guides for every workflow that ends in an inbox: certificates, personalized PDFs, badges,
+				and video — rendered per row and emailed per recipient.
 			</p>
 		</header>
 
