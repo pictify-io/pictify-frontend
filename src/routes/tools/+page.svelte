@@ -150,6 +150,13 @@
 			icon: 'fa-solid fa-certificate'
 		},
 		{
+			name: 'CSV to PDF',
+			description:
+				'Turn a spreadsheet into documents — the whole sheet as a table, or one PDF page per row.',
+			url: '/tools/csv-to-pdf',
+			icon: 'fa-solid fa-file-csv'
+		},
+		{
 			name: 'Tweet Screenshot Generator',
 			description:
 				'Paste any tweet URL, customize every field, download a clean PNG — no Twitter API key required.',

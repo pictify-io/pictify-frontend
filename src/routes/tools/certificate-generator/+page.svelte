@@ -184,11 +184,23 @@
 		},
 		{
 			q: 'What formats can I download certificates in?',
-			a: 'Currently certificates are generated as high-quality PNG images at 1920x1080 resolution. PDF support is coming soon. You can also use our API to generate certificates in JPG and WebP formats.'
+			a: 'This free tool generates high-quality PNG images at 1920x1080 resolution. With a free account, the API and workflows also render certificates as PDF (including multi-page), JPG, and WebP.'
 		},
 		{
 			q: 'Can I bulk generate certificates for events or training programs?',
-			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Use the API to batch generate certificates programmatically — pass different recipient names, dates, and achievement text for each request. Perfect for course completions, event attendance, and employee recognition programs.'
+			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow — one row per attendee — and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
+		},
+		{
+			q: 'Can I email certificates to recipients automatically?',
+			a: 'Yes — this is what makes Pictify different from other certificate makers. A workflow run renders each row\'s certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row.'
+		},
+		{
+			q: 'Can I generate certificates from Google Sheets?',
+			a: 'Export your Sheet as CSV and upload it to a workflow — columns map to certificate variables in the wizard. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
+		},
+		{
+			q: 'Can my LMS or form tool trigger certificates automatically?',
+			a: 'Yes. Every workflow exposes a signed webhook — point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders and delivers one certificate, with the same per-recipient status tracking as a CSV run.'
 		},
 		{
 			q: 'Can I add my company logo?',
@@ -1031,6 +1043,72 @@
 						</div>
 					{/each}
 				</div>
+			</section>
+
+			<!-- Bulk Certificates for Events: the delivery wedge -->
+			<section
+				class="mb-8 sm:mb-12 bg-gray-900 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 rounded-none"
+			>
+				<div
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+				>
+					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+						/></svg
+					>
+					Bulk + Delivered
+				</div>
+				<h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-white tracking-tight">
+					Bulk Certificate Generator for Events — Delivered, Not Downloaded
+				</h3>
+				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium mb-6">
+					Generating 300 certificates was never the hard part. Getting 300 certificates into 300
+					inboxes before the deadline is. Every other path stops one step short of the send:
+				</p>
+				<div class="grid sm:grid-cols-3 gap-4 mb-6">
+					<a
+						href="/alternatives/autocrat"
+						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					>
+						<h4 class="font-black text-black text-sm mb-1">Sheets add-ons</h4>
+						<p class="text-xs text-gray-600 leading-relaxed">
+							Autocrat rides Apps Script (6-minute cap) and your Gmail quota — and broke across its
+							81M-install base in June 2026. →
+						</p>
+					</a>
+					<a
+						href="/alternatives/canva-bulk-create"
+						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					>
+						<h4 class="font-black text-black text-sm mb-1">Canva Bulk Create</h4>
+						<p class="text-xs text-gray-600 leading-relaxed">
+							Makes beautiful variants, then stops at download. No email delivery of any kind — the
+							zip file is your problem. →
+						</p>
+					</a>
+					<a
+						href="/solutions/mail-merge-with-attachments"
+						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					>
+						<h4 class="font-black text-black text-sm mb-1">Mail merge</h4>
+						<p class="text-xs text-gray-600 leading-relaxed">
+							Word can't attach the file. Gmail caps at 500–1,500 a day and locks you out
+							mid-batch. →
+						</p>
+					</a>
+				</div>
+				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium">
+					A Pictify workflow run does the whole job: upload the attendee CSV, every row renders its
+					own certificate, and every certificate emails itself to its recipient from an isolated
+					sending domain. You watch <span class="text-data-green font-black"
+						>delivered / bounced / suppressed per person</span
+					> — and re-send any single row with a corrected address. That's the difference between "sent"
+					and "delivered".
+				</p>
 			</section>
 
 			<!-- FAQ Section -->
