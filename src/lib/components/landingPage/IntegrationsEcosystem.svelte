@@ -5,7 +5,7 @@
 			description: 'Connect to your existing workflows',
 			color: 'bg-brand-danger',
 			iconBg: 'bg-white',
-			iconColor: 'text-black',
+			iconColor: 'text-gray-900',
 			items: ['Zapier', 'Make', 'n8n', 'Pipedream'],
 			cols: 'xl:col-span-7'
 		},
@@ -14,7 +14,7 @@
 			description: 'Deliver to your own CDN',
 			color: 'bg-data-green',
 			iconBg: 'bg-white',
-			iconColor: 'text-black',
+			iconColor: 'text-gray-900',
 			items: ['AWS S3', 'Google Cloud', 'Cloudinary', 'ImageKit'],
 			cols: 'xl:col-span-5'
 		},
@@ -23,7 +23,7 @@
 			description: 'Real-time event notifications',
 			color: 'bg-brand-accent',
 			iconBg: 'bg-white',
-			iconColor: 'text-black',
+			iconColor: 'text-gray-900',
 			items: ['render.completed', 'render.failed', 'batch.completed'],
 			cols: 'xl:col-span-4'
 		},
@@ -32,7 +32,7 @@
 			description: 'First-class developer support',
 			color: 'bg-blue-400',
 			iconBg: 'bg-white',
-			iconColor: 'text-black',
+			iconColor: 'text-gray-900',
 			items: ['Node.js', 'Python', 'REST API', 'cURL'],
 			cols: 'xl:col-span-4'
 		},
@@ -41,7 +41,7 @@
 			description: 'Intelligence built in',
 			color: 'bg-purple-400',
 			iconBg: 'bg-white',
-			iconColor: 'text-black',
+			iconColor: 'text-gray-900',
 			items: ['AI Copilot', 'Smart Resize'],
 			cols: 'xl:col-span-4'
 		},
@@ -51,7 +51,7 @@
 				'Scale with your organization. Advanced access control, custom domains, and audit logs.',
 			color: 'bg-white',
 			iconBg: 'bg-brand-accent',
-			iconColor: 'text-black',
+			iconColor: 'text-gray-900',
 			items: ['Multi-Workspace', 'Role-Based Access', 'SSO/SAML', 'Audit Logs'],
 			cols: 'xl:col-span-12'
 		}
@@ -75,13 +75,18 @@
 
 	<div class="max-w-7xl mx-auto px-6 relative z-10">
 		<!-- Main Header -->
-		<div class="text-center mb-24 relative max-w-4xl mx-auto">
-			<h2 class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-gray-900 mb-6 leading-tight">
-				Plugs Into Your Stack.<br />
+		<div class="text-center mb-20 relative max-w-4xl mx-auto">
+			<div
+				class="inline-flex items-center gap-2 px-5 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-sm rounded-full mb-6 transform -rotate-2"
+			>
+				<span class="text-sm font-black text-gray-900 uppercase tracking-wider">Infrastructure</span>
+			</div>
+			<h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1] mb-6">
+				Plugs Into Your Stack.<br class="hidden md:block" />
 				<span class="relative inline-block text-brand-danger transform rotate-1 mt-2">
 					No Glue Code
 					<svg
-						class="absolute w-full h-4 -bottom-2 left-0 text-black z-[-1] opacity-20"
+						class="absolute w-full h-4 sm:h-5 -bottom-2 left-0 text-gray-900 z-[-1] opacity-20"
 						viewBox="0 0 100 10"
 						preserveAspectRatio="none"
 					>
@@ -211,7 +216,7 @@
 						<div class="mt-auto flex flex-wrap gap-3">
 							{#each cat.items as item}
 								<span
-									class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-black text-black shadow-brutal-sm group-hover:-translate-y-0.5 group-hover:shadow-brutal-lg transition-all"
+									class="px-4 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-black text-gray-900 shadow-brutal-sm group-hover:-translate-y-0.5 group-hover:shadow-brutal-lg transition-all"
 								>
 									{#if cat.title === 'Webhooks'}
 										<code class="font-mono text-xs uppercase tracking-wider">{item}</code>
@@ -230,13 +235,13 @@
 		<div class="text-center mt-20">
 			<a
 				href="/integrations"
-				class="inline-flex items-center gap-3 px-8 py-4 bg-brand-accent text-black font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-1 hover:translate-y-1 transition-all group"
+				class="inline-flex items-center gap-3 px-8 py-4 bg-brand-accent text-gray-900 font-black uppercase tracking-wider rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-1 hover:translate-y-1 transition-all group"
 			>
 				<span class="text-lg">View All Integrations</span>
 				<div
 					class="w-8 h-8 bg-white border-[2px] border-gray-900 rounded-full flex items-center justify-center transform group-hover:translate-x-1 transition-transform"
 				>
-					<svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
 							stroke-linecap="round"
 							stroke-linejoin="round"
