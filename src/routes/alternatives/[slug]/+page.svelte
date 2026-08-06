@@ -441,10 +441,10 @@
 						{alt.cta}
 					</a>
 					<a
-						href="/compare/{alt.comparison.slug}"
+						href="/pricing"
 						class="px-8 py-4 bg-transparent text-white border-[3px] border-white font-black uppercase tracking-wide hover:bg-white hover:text-gray-900 transition-all rounded-xl"
 					>
-						Full Comparison
+						See Pricing
 					</a>
 				</div>
 			</section>

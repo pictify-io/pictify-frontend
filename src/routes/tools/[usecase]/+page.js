@@ -4,7 +4,8 @@ import { useCaseDetails } from '$lib/pseo/use-cases.js';
 // Use-case slugs that duplicate a dedicated tool page. They 301 to the
 // canonical page instead of rendering a competing near-duplicate.
 const CONSOLIDATED = {
-	certificate: '/tools/certificate-generator'
+	certificate: '/tools/certificate-generator',
+	'course-certificate': '/tools/certificate-generator'
 };
 
 export function load({ params }) {

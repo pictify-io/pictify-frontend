@@ -280,12 +280,6 @@
 			</div>
 			<div class="flex flex-wrap justify-center gap-4">
 				<a
-					href="/compare"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					All Comparisons
-				</a>
-				<a
 					href="/pricing"
 					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 				>

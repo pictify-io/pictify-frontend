@@ -137,15 +137,8 @@
 						</li>
 						<li>
 							<a
-								href="/compare"
-								class="text-gray-600 font-bold hover:text-data-green transition-colors"
-								>Comparisons</a
-							>
-						</li>
-						<li>
-							<a
-								href="/glossary"
-								class="text-gray-600 font-bold hover:text-data-green transition-colors">Glossary</a
+								href="/blogs"
+								class="text-gray-600 font-bold hover:text-data-green transition-colors">Blog</a
 							>
 						</li>
 					</ul>

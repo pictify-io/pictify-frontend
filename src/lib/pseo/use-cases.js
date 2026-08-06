@@ -162,7 +162,8 @@ export const useCases = [
 	{ id: 'instagram-story', label: 'Instagram Story Generator' },
 	{ id: 'email-header', label: 'Email Header Generator' },
 	{ id: 'blog-featured-image', label: 'Blog Featured Image' },
-	{ id: 'course-certificate', label: 'Course Certificate' },
+	// 'course-certificate' intentionally omitted: /tools/course-certificate 301s
+	// to /tools/certificate-generator (same keyword cluster, consolidated).
 	{ id: 'membership-card', label: 'Membership Card' },
 	{ id: 'event-invitation', label: 'Event Invitation' },
 	{ id: 'discount-coupon', label: 'Discount Coupon' },
@@ -534,99 +535,6 @@ export const useCaseDetails = {
 		],
 		related: ['code', 'html-email']
 	},
-	certificate: {
-		label: 'Certificate Generator',
-		toolUrl: '/tools/certificate-generator',
-		description:
-			'Generate personalized certificates and diplomas as downloadable images for events, courses, and recognition programs.',
-		seoKeywords: [
-			'certificate generator',
-			'create certificates online',
-			'HTML to certificate',
-			'automated certificate generation',
-			'bulk certificate maker',
-			'certificate template generator',
-			'online certificate creator',
-			'certificate of completion generator',
-			'diploma image generator',
-			'custom certificate maker'
-		],
-		longDescription: `Creating professional certificates at scale is a common challenge for educational platforms,
-			HR teams, and event organizers. Traditional design tools require manual effort for each certificate,
-			making it impractical when you need to generate hundreds or thousands of certificates. With Pictify's
-			certificate generator, you design your certificate template once using HTML/CSS, bind dynamic variables
-			like recipient name, course name, and completion date, then generate certificates programmatically via API.
-
-			This automation saves hours of manual work and ensures consistent branding across all certificates.
-			Whether you are issuing completion certificates for an online course, recognition awards for employees,
-			or attendance certificates for a conference, the workflow is the same: design once, render thousands.`,
-		useCaseScenarios: [
-			'Online courses issuing completion certificates to students',
-			'HR departments creating employee recognition certificates',
-			'Conference organizers generating attendee certificates',
-			'Training platforms automating certification upon assessment completion',
-			'Professional associations issuing membership certificates'
-		],
-		features: [
-			'HTML/CSS certificate template with full styling control',
-			'Dynamic variables for name, course, date, and credentials',
-			'Batch rendering for hundreds of certificates in one API call',
-			'Support for signatures, seals, and watermarks as image layers',
-			'High-resolution output suitable for printing',
-			'QR code integration for certificate verification'
-		],
-		recommendedFormats: ['jpg', 'png'],
-		recommendedSizes: ['1920x1080'],
-		templateHtml: simpleCardTemplate({
-			title: 'Certificate of Achievement',
-			subtitle: '{{recipientName}} · {{courseName}} · {{date}}',
-			badge: 'CERTIFIED',
-			accent: '#c8a76b',
-			background: '#fefbf0'
-		}),
-		overview: [
-			'Education platforms, webinar hosts, and community events frequently issue certificates. Generating them as images ensures recipients can download, print, or share them instantly without dealing with PDF rendering quirks.',
-			'Because the certificate layout is HTML, you can personalize names, achievements, and dates at scale before turning them into polished graphics — no designer bottleneck.'
-		],
-		painPoints: [
-			'Creating certificates manually in design tools does not scale',
-			'PDF exports are heavy and unfriendly for mobile recipients',
-			'Ensuring consistent branding across hundreds of certificates',
-			'Delayed delivery when certificates require manual approval'
-		],
-		workflow: [
-			{
-				title: 'Build the template',
-				detail:
-					'Design your certificate using HTML/CSS with placeholders for names, achievements, and dates.'
-			},
-			{
-				title: 'Merge participant data',
-				detail:
-					'Replace placeholders with dynamic data from your CRM, LMS, or spreadsheet before conversion.'
-			},
-			{
-				title: 'Generate and distribute',
-				detail:
-					'Export images and send them via email, allow download from your portal, or embed in your LMS.'
-			}
-		],
-		faqs: [
-			{
-				q: 'Can I print the generated certificate?',
-				a: 'Yes. Use 1920×1080 or larger to produce high-quality prints. You can also create a PDF from the image if needed.'
-			},
-			{
-				q: 'How do I handle signatures or seals?',
-				a: 'Embed them as transparent PNGs in your HTML template. They will render in the final image with full fidelity.'
-			},
-			{
-				q: 'Can I add a unique verification ID?',
-				a: 'Yes. Bind a unique ID variable and optionally render it as a QR code for instant verification.'
-			}
-		],
-		related: ['badge', 'course-certificate']
-	},
 	code: {
 		label: 'Code to Image',
 		description:
@@ -894,7 +802,7 @@ export const useCaseDetails = {
 				a: 'Call the Pictify API when a user earns an achievement. Pass user and badge data as variables to generate a unique image URL.'
 			}
 		],
-		related: ['certificate', 'leaderboard']
+		related: ['badge', 'leaderboard']
 	},
 	'quote-card': {
 		label: 'Quote Card Generator',
@@ -1481,7 +1389,7 @@ export const useCaseDetails = {
 			{ title: 'Batch deliver', detail: 'Batch render and send through your email provider.' }
 		],
 		faqs: [{ q: 'Can I include QR codes?', a: 'Yes. Bind a QR image URL into the template.' }],
-		related: ['webinar-promo', 'certificate']
+		related: ['webinar-promo', 'badge']
 	},
 	'job-post': {
 		label: 'Job Post Card',
@@ -2142,80 +2050,6 @@ export const useCaseDetails = {
 		],
 		related: ['og-image', 'youtube-thumbnail']
 	},
-	'course-certificate': {
-		label: 'Course Certificate Generator',
-		description: 'Generate branded course completion certificates and credentials.',
-		seoKeywords: [
-			'course certificate generator',
-			'certificate maker',
-			'training certificate generator',
-			'completion certificate template',
-			'online course certificate',
-			'certificate of completion generator',
-			'digital certificate maker',
-			'certification generator',
-			'e-learning certificate',
-			'course completion certificate'
-		],
-		longDescription: `Course certificates validate learning achievements and drive completion rates. With Pictify's
-			certificate generator, create beautiful certificates that include learner names, course titles, completion
-			dates, and instructor signatures. Generate certificates automatically when learners complete courses,
-			integrating with your LMS via API. You can also bulk-generate from a CSV workflow — upload your learner
-			list and every certificate is rendered and emailed automatically.`,
-		useCaseScenarios: [
-			'Online course platforms issuing completion certificates',
-			'Corporate training programs certifying employees',
-			'Bootcamps providing graduation credentials',
-			'Professional development courses offering certificates',
-			'Workshop organizers providing attendee certificates',
-			'Certification programs issuing digital credentials'
-		],
-		recommendedFormats: ['png', 'pdf', 'jpg'],
-		recommendedSizes: ['1920x1080', '2480x3508', '1600x1200'],
-		templateHtml: simpleCardTemplate({
-			title: 'Certificate of Completion',
-			subtitle: '{{learnerName}} · {{courseName}} · {{date}}',
-			badge: 'CERTIFICATE',
-			accent: '#f59e0b',
-			background: '#fffbeb'
-		}),
-		benefits: [
-			'Automated certificate generation on completion',
-			'Branded certificates increase perceived value',
-			'Shareable credentials boost course marketing'
-		],
-		steps: [
-			'Design certificate template with learner variables',
-			'Include course name, completion date, instructor',
-			'Connect to LMS for automated generation',
-			'Deliver via email or learner dashboard'
-		],
-		overview: [
-			'Certificates motivate learners and provide shareable proof of achievement.',
-			'Automate certificate generation so every completion triggers instant delivery.'
-		],
-		painPoints: [
-			"Manual certificate creation doesn't scale",
-			'Inconsistent certificate designs',
-			'Delayed delivery after completion'
-		],
-		workflow: [
-			{ title: 'Design template', detail: 'Create certificate with learner and course variables.' },
-			{ title: 'Connect LMS', detail: 'Trigger generation on course completion via webhook.' },
-			{ title: 'Auto-deliver', detail: 'Email certificate immediately upon completion.' }
-		],
-		faqs: [
-			{
-				q: 'Can I add signatures?',
-				a: 'Yes. Include instructor signature images or bind signature URL variables.'
-			},
-			{
-				q: 'What about unique certificate IDs?',
-				a: 'Bind a unique ID variable for verification purposes.'
-			}
-		],
-		related: ['certificate', 'event-ticket']
-	},
 	'membership-card': {
 		label: 'Membership Card Generator',
 		description: 'Create digital membership cards and loyalty program credentials.',
@@ -2285,7 +2119,7 @@ export const useCaseDetails = {
 				a: 'Create template variants for each tier with different colors or badges.'
 			}
 		],
-		related: ['event-ticket', 'course-certificate']
+		related: ['event-ticket', 'membership-card']
 	},
 	'event-invitation': {
 		label: 'Event Invitation Generator',
@@ -3504,7 +3338,7 @@ Upload your attendee CSV, map columns to template variables, and batch-render al
 				a: 'Yes. Re-render individual badges instantly via API when attendee details change.'
 			}
 		],
-		related: ['badge', 'event-ticket', 'certificate']
+		related: ['badge', 'event-ticket', 'membership-card']
 	},
 	'social-proof-card': {
 		label: 'Social Proof Card',
