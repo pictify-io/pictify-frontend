@@ -433,7 +433,7 @@
 			>
 				<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Ready to Switch?</h2>
 				<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
-					Join teams who've already made the move. Start generating images in minutes.
+					Join teams who've already made the move. Your first run takes minutes.
 				</p>
 				<div class="flex flex-wrap justify-center gap-4">
 					<a

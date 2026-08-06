@@ -144,7 +144,7 @@
 	<!-- The walls: why every mail-merge path breaks on attachments -->
 	<section class="max-w-5xl mx-auto mb-16">
 		<h2 class="text-2xl md:text-3xl font-black text-gray-900 mb-2 text-center">
-			Why "mail merge with attachments" is a search with 480 results and no answer
+			Why "mail merge with attachments" is a search without a good answer
 		</h2>
 		<p class="text-gray-600 font-medium text-center max-w-2xl mx-auto mb-8">
 			Every tool in the usual toolkit stops one step short of the inbox.
