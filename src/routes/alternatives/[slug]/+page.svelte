@@ -73,7 +73,7 @@
 					name: 'Pictify',
 					applicationCategory: 'DeveloperApplication',
 					operatingSystem: 'Web',
-					description: `Pictify is a ${alt.competitor} alternative — a programmable image engine with a real expression engine, live data bindings, and native A/B experiments.`,
+					description: `Pictify is a ${alt.competitor} alternative — an HTML-native rendering engine with a real expression engine, AI template authoring, and batch rendering with per-item results.`,
 					offers: {
 						'@type': 'Offer',
 						price: '0',
@@ -171,13 +171,15 @@
 					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-4"
 				>
 					The Best {alt.competitor} Alternative
-					<span class="block text-data-green">for Developers</span>
+					<span class="block text-data-green"
+						>{alt.comparison.audienceLabel || 'for Developers'}</span
+					>
 				</h1>
 
 				<!-- Supporting subhead: repeats the keyword + adds long-tail variants. -->
 				<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl mb-6">
-					Looking for a free {alt.competitor.toLowerCase()} alternative? Pictify is the programmable
-					image engine teams switch to when {alt.competitor} falls short.
+					{alt.comparison.subhead ||
+						`Looking for a free ${alt.competitor.toLowerCase()} alternative? Pictify is the programmable image engine teams switch to when ${alt.competitor} falls short.`}
 				</p>
 
 				<!-- TL;DR -->
