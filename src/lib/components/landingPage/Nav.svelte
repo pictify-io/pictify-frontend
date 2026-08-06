@@ -85,9 +85,9 @@
 				on:click={() => trackNav('Tools', '/tools', 'header')}>Tools</a
 			>
 			<a
-				href="/templates"
+				href="/solutions"
 				class="px-6 lg:px-4 py-3 lg:py-2.5 text-sm lg:text-xs font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors uppercase tracking-wide"
-				on:click={() => trackNav('Templates', '/templates', 'header')}>Templates</a
+				on:click={() => trackNav('Solutions', '/solutions', 'header')}>Solutions</a
 			>
 			<a
 				href="/integrations"
@@ -194,9 +194,9 @@
 				on:click={() => trackNav('Tools', '/tools', 'mobile_menu')}>Tools</a
 			>
 			<a
-				href="/templates"
+				href="/solutions"
 				class="p-4 text-lg font-black text-gray-900 border-[3px] border-gray-900 bg-white shadow-brutal-lg rounded-xl uppercase active:translate-y-1 active:shadow-none transition-all"
-				on:click={() => trackNav('Templates', '/templates', 'mobile_menu')}>Templates</a
+				on:click={() => trackNav('Solutions', '/solutions', 'mobile_menu')}>Solutions</a
 			>
 			<a
 				href="/integrations"

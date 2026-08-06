@@ -3,22 +3,19 @@
 	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits } from '../../../store/generationLimits.store';
-	import { pageActions } from '../../../store/pages.store';
-	import { goto } from '$app/navigation';
-	import backend from '../../../service/backend';
+	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/analytics.js';
-	import { certificateTemplates } from '$lib/components/tools/CertificateTemplates.js';
+	import { certificateHtmlTemplates } from '$lib/components/tools/CertificateHtmlTemplates.js';
 
 	// User login state (reactive — no manual subscribe needed)
 	$: isUserLoggedIn = !!$user?.email;
 
-	let selectedTemplate = certificateTemplates[0];
+	let selectedTemplate = certificateHtmlTemplates[0];
 	let formValues = {
 		recipientName: 'John Doe',
 		organizationName: 'Your Organization',
@@ -33,26 +30,14 @@
 	let isGenerating = false;
 	let generatedImageUrl = '';
 	let generationError = '';
-	let miniEditorRef;
-	let lastEditedData = null;
+	let previewContainerWidth = 0;
 
-	// Debounced form-to-canvas sync (single renderAll via setVariableValues)
-	let debounceTimer;
-	$: if (miniEditorRef && formValues) {
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => {
-			miniEditorRef.setVariableValues?.({
-				recipientName: formValues.recipientName,
-				organizationName: formValues.organizationName,
-				date: formValues.date,
-				achievementText: formValues.achievementText
-			});
-		}, 150);
-	}
-
-	onDestroy(() => {
-		clearTimeout(debounceTimer);
-	});
+	// The preview HTML is rebuilt from the form on every keystroke — the same
+	// string that gets POSTed to /image/public, so preview === output.
+	$: previewHtml = selectedTemplate.render(formValues);
+	$: previewScale = previewContainerWidth
+		? Math.min(1, previewContainerWidth / selectedTemplate.width)
+		: 1;
 
 	function selectTemplate(template) {
 		selectedTemplate = template;
@@ -68,34 +53,26 @@
 		};
 		generatedImageUrl = '';
 		generationError = '';
-		lastEditedData = null;
 	}
 
-	// Generation flow (matches [usecase] page pattern)
+	// Generation flow (matches [usecase] page pattern) — renders the HTML
+	// template through the public endpoint, same engine as the paid API.
 	async function handleGenerate() {
-		const editedData = miniEditorRef?.getEditedFabricData?.() || selectedTemplate.fabricJSData;
-		if (!editedData) {
-			toast.set({ message: 'No template data available', type: 'error', duration: 2000 });
-			return;
-		}
-
 		generationLimits.increment();
 		isGenerating = true;
 		generationError = '';
 		generatedImageUrl = '';
 
 		try {
-			const response = await backend.post('/image/public/canvas', {
-				fabricJSData: editedData,
+			const { image } = await createImagePublic({
+				html: previewHtml,
 				width: selectedTemplate.width,
 				height: selectedTemplate.height,
-				fileExtension: 'png',
-				watermark: !isUserLoggedIn
+				fileExtension: 'png'
 			});
 
-			if (response?.url) {
-				generatedImageUrl = response.url;
-				lastEditedData = editedData;
+			if (image?.url) {
+				generatedImageUrl = image.url;
 				toast.set({
 					message: 'Certificate generated successfully!',
 					type: 'success',
@@ -104,7 +81,7 @@
 				analytics.trackImageGenerated({
 					tool_name: 'certificate_generator',
 					format: 'png',
-					with_watermark: !isUserLoggedIn
+					with_watermark: false
 				});
 			} else {
 				throw new Error('No image URL in response');
@@ -121,66 +98,26 @@
 		}
 	}
 
-	// Open the full editor (logged in) or the certificate workflow (guests)
-	function openEditor() {
-		const template = {
-			...selectedTemplate,
-			name: `${selectedTemplate.name} Certificate`,
-			outputFormat: 'image'
-		};
-
-		pageActions.initFromTemplate(template);
-
-		try {
-			const DRAFT_KEY = 'pictify_template_draft_v1';
-			localStorage.setItem(DRAFT_KEY, JSON.stringify(template));
-		} catch (e) {
-			/* ignored */
-		}
-
-		if ($user?.email) {
-			goto('/template-workspace/image/create');
-		} else {
-			// Guests sign up first, then land in the certificate workflow.
-			goto('/dashboard/workflows/new');
-		}
-	}
-
-	// NextSteps template draft — uses the edited canvas state captured on generation
-	$: currentFabricData = lastEditedData || selectedTemplate.fabricJSData;
-	$: templateDraft = {
-		version: 1,
-		name: 'Certificate template',
-		type: 'certificate',
-		width: selectedTemplate.width,
-		height: selectedTemplate.height,
-		fabricJSData: currentFabricData,
-		source: 'certificate-generator'
-	};
-
-	// API snippet for NextSteps — reflects the actual data that was rendered
-	$: apiSnippet = `curl -X POST https://api.pictify.io/image/canvas \\
+	// API snippet for NextSteps — the same HTML with variables swapped in
+	const apiSnippet = `curl -X POST https://api.pictify.io/image \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '${JSON.stringify(
-		{
-			fabricJSData: currentFabricData,
-			width: selectedTemplate.width,
-			height: selectedTemplate.height
-		},
-		null,
-		2
-	)}'`;
+  -d '{
+    "html": "<your certificate HTML — swap the sample values for {{recipientName}}, {{date}}...>",
+    "width": 1920,
+    "height": 1080,
+    "fileExtension": "png"
+  }'`;
 
 	// FAQ data
 	const faqs = [
 		{
 			q: 'Is this certificate generator really free?',
-			a: 'Yes, you can generate unlimited certificates for free. Logged-in users get watermark-free downloads, while guests receive a small Pictify watermark. Sign up for a free account to remove it.'
+			a: 'Yes — pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and email delivery via workflows.'
 		},
 		{
 			q: 'Can I customize the certificate design?',
-			a: 'Yes, you can edit any text directly on the canvas preview by clicking on it. Use the form fields to update recipient name, organization, date, and achievement text. For full design control, open the certificate in our full editor.'
+			a: 'Yes. The form fields update the recipient name, organization, date, and achievement text live in the preview. Every template is plain HTML and CSS under the hood, so with a free account you can edit the template code directly — or describe the design you want and let the AI Template Maker write it.'
 		},
 		{
 			q: 'What formats can I download certificates in?',
@@ -204,7 +141,7 @@
 		},
 		{
 			q: 'Can I add my company logo?',
-			a: 'Open the certificate in our full editor to add logos, custom images, shapes, and additional text elements. The full editor gives you complete design control over every element.'
+			a: 'Yes. In a workflow, templates are HTML — drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
 		},
 		{
 			q: 'Are the generated certificates printable?',
@@ -230,7 +167,7 @@
 		},
 		featureList: [
 			'5 professional certificate templates',
-			'Real-time canvas preview',
+			'Real-time live preview',
 			'Customizable text fields',
 			'High-resolution PNG download',
 			'API for bulk generation',
@@ -299,8 +236,8 @@
 			{
 				'@type': 'HowToStep',
 				position: 4,
-				name: 'Edit on canvas',
-				text: 'Click any text on the canvas to make direct edits.'
+				name: 'Watch the live preview',
+				text: 'The certificate preview updates instantly as you type.'
 			},
 			{
 				'@type': 'HowToStep',
@@ -312,7 +249,7 @@
 				'@type': 'HowToStep',
 				position: 6,
 				name: 'Download',
-				text: 'Download your certificate or open it in the full editor for further customization.'
+				text: 'Download your certificate, or start a workflow run to generate and email them in bulk.'
 			}
 		]
 	});
@@ -573,7 +510,7 @@
 			</h2>
 
 			<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-				{#each certificateTemplates as template}
+				{#each certificateHtmlTemplates as template}
 					<button
 						class="flex-shrink-0 w-44 bg-white border-[3px] {selectedTemplate.id === template.id
 							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
@@ -704,10 +641,9 @@
 						/>
 					</div>
 
-					<!-- Open Editor Button -->
-					<button
-						type="button"
-						on:click={openEditor}
+					<!-- Workflow CTA: bulk generation + delivery -->
+					<a
+						href="/dashboard/workflows/new"
 						class="w-full py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -715,15 +651,15 @@
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								stroke-width="2"
-								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+								d="M13 10V3L4 14h7v7l9-11h-7z"
 							/></svg
 						>
-						{$user?.email ? 'Open Full Editor' : 'Start a Certificate Run'}
-					</button>
+						Start a Certificate Run
+					</a>
 				</div>
 			</div>
 
-			<!-- Right Column: Canvas Preview -->
+			<!-- Right Column: Live Preview -->
 			<div class="space-y-4 sm:space-y-6">
 				<div
 					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
@@ -742,13 +678,13 @@
 						>
 							<span
 								class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
-								>Interactive Editor</span
+								>Live Preview</span
 							>
 							{selectedTemplate.width} x {selectedTemplate.height}px
 						</div>
 					</div>
 
-					<!-- Interactive Mini-Editor Preview -->
+					<!-- Live HTML Preview (scaled iframe of the exact render HTML) -->
 					<div
 						class="p-4 sm:p-6 bg-gray-100 flex flex-col items-center justify-center relative min-h-[300px]"
 					>
@@ -757,21 +693,18 @@
 							style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
 						/>
 
-						<div class="relative z-10 flex flex-col items-center w-full max-w-[640px] mx-auto">
-							{#if selectedTemplate?.fabricJSData}
-								<MiniEditor
-									bind:this={miniEditorRef}
-									fabricJSData={selectedTemplate.fabricJSData}
-									width={selectedTemplate.width}
-									height={selectedTemplate.height}
+						<div class="relative z-10 w-full" bind:clientWidth={previewContainerWidth}>
+							<div
+								class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
+								style="height: {Math.round(selectedTemplate.height * previewScale)}px;"
+							>
+								<iframe
+									title="Certificate preview"
+														srcdoc={previewHtml}
+									scrolling="no"
+									style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
 								/>
-							{:else}
-								<div
-									class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
-								>
-									<p class="font-bold text-gray-400">Preview not available</p>
-								</div>
-							{/if}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -864,8 +797,8 @@
 							>
 							Download PNG
 						</a>
-						<button
-							on:click={openEditor}
+						<a
+							href="/dashboard/workflows/new"
 							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -873,11 +806,11 @@
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
 								/></svg
 							>
-							{$user?.email ? 'Edit in Full Editor' : 'Start a Certificate Run'}
-						</button>
+							Send These in Bulk
+						</a>
 					</div>
 				</div>
 
@@ -886,7 +819,6 @@
 						heading="Now Automate It"
 						description="You've proved it works. Now integrate certificate generation into your app."
 						curlSnippet={apiSnippet}
-						{templateDraft}
 						generatedUrl={generatedImageUrl}
 						generatedWidth={selectedTemplate.width}
 						generatedHeight={selectedTemplate.height}
@@ -994,7 +926,7 @@
 					Why Use Our Certificate Generator?
 				</h3>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					{#each ['5 professionally designed certificate templates', 'Real-time interactive canvas preview', 'Customize recipient name, organization, date, and achievement', 'High-resolution 1920x1080px PNG output', 'API available for bulk certificate generation', 'No signup required to get started'] as benefit}
+					{#each ['5 professionally designed certificate templates', 'Real-time live preview as you type', 'Customize recipient name, organization, date, and achievement', 'High-resolution 1920x1080px PNG output', 'API available for bulk certificate generation', 'No signup required to get started'] as benefit}
 						<div
 							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
@@ -1033,7 +965,7 @@
 					How to Make a Certificate Online in 6 Steps
 				</h3>
 				<div class="space-y-4">
-					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Click any text on the canvas to make direct edits' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate or open it in the full editor for further customization' }] as step}
+					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Watch the live preview update as you type' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate, or start a workflow run to email them in bulk' }] as step}
 						<div class="flex items-start gap-4">
 							<span
 								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
@@ -1273,20 +1205,21 @@
 				</h3>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
 					Pictify's online certificate maker runs entirely in your browser — no downloads, no
-					installs, no signup. The certificate maker supports real-time preview, direct-on-canvas
-					editing, and high-resolution PNG export at 1920×1080. Generate one certificate in under a
+					installs, no signup. The certificate maker supports a real-time preview that updates as
+					you type, and high-resolution PNG export at 1920×1080. Generate one certificate in under a
 					minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds
 					at once from a spreadsheet or database.
 				</p>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					Because the certificate maker is part of the full Pictify editor, anything you create here
-					can be reopened, edited, or connected to a webhook, Zapier, or Make.com flow. That's the
-					difference between a one-off certificate generator and a programmable certificate builder:
-					you get the fast free tool today and the API for when you're ready to scale.
+					Every template here is plain HTML and CSS — the same template a Pictify workflow renders
+					at scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
+					certificate, emailed to its recipient. That's the difference between a one-off certificate
+					generator and a programmable certificate builder: the fast free tool today, delivery-grade
+					automation when you're ready to scale.
 				</p>
 			</section>
 
-			<!-- Open in Editor CTA -->
+			<!-- Bulk Run CTA -->
 			<section class="mb-12 sm:mb-16 text-center">
 				<div
 					class="bg-gray-900 border-[3px] border-black rounded-2xl p-8 sm:p-12 relative overflow-hidden"
@@ -1301,20 +1234,15 @@
 					<h3
 						class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-4 relative z-10"
 					>
-						Need More Customization?
+						Need Them Delivered, Not Just Downloaded?
 					</h3>
 					<p class="text-gray-400 font-bold mb-8 max-w-lg mx-auto relative z-10">
-						{#if $user?.email}
-							Open your certificate in our full editor to add logos, custom images, QR codes, and
-							fine-tune every design detail.
-						{:else}
-							Start a workflow run to generate personalized certificates in bulk — perfect for
-							events, courses, and training programs.
-						{/if}
+						Start a workflow run to generate personalized certificates in bulk — and email each
+						one to its recipient with per-person delivery status. Perfect for events, courses,
+						and training programs.
 					</p>
-					<button
-						type="button"
-						on:click={openEditor}
+					<a
+						href="/dashboard/workflows/new"
 						class="px-8 py-4 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -1322,11 +1250,11 @@
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								stroke-width="2"
-								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+								d="M13 10V3L4 14h7v7l9-11h-7z"
 							/></svg
 						>
-						{$user?.email ? 'Open Full Editor — Free' : 'Start a Run — Free'}
-					</button>
+						Start a Run — Free
+					</a>
 				</div>
 			</section>
 		</div>

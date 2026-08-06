@@ -98,9 +98,9 @@
 						</li>
 						<li>
 							<a
-								href="/templates"
+								href="/solutions"
 								class="text-gray-600 font-bold hover:text-brand-danger transition-colors"
-								>Templates</a
+								>Solutions</a
 							>
 						</li>
 						<li>

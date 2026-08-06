@@ -23,8 +23,8 @@
 		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
 			<!-- Documents Block (Spans 7 cols) -->
 			<a
-				href="/templates"
-				on:click={() => trackLane('documents', '/templates')}
+				href="/solutions"
+				on:click={() => trackLane('documents', '/solutions')}
 				class="group block lg:col-span-7 bg-[#FFFDF8] rounded-[2rem] border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all overflow-hidden flex flex-col relative"
 			>
 				<!-- Decorative Graphic Area -->
@@ -72,7 +72,7 @@
 					</p>
 					<div class="mt-auto">
 						<span class="inline-flex items-center gap-3 text-sm sm:text-base font-black uppercase tracking-wider text-white bg-[#ff6b6b] px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-[6px_6px_0_0_#1f2937] group-hover:shadow-[2px_2px_0_0_#1f2937] group-hover:translate-x-[4px] group-hover:translate-y-[4px] transition-all">
-							Browse templates
+							See how it works
 							<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 						</span>
 					</div>

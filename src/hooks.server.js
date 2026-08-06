@@ -61,6 +61,7 @@ const NO_CACHE_PATTERNS = [
  */
 const PERMANENT_REDIRECTS = {
 	'/tools/code': '/tools/code-to-image',
+	'/sitemap-templates.xml': '/sitemap.xml',
 
 	// Retired standalone pages
 	'/dynamic-images': '/',
@@ -134,7 +135,9 @@ const PERMANENT_REDIRECTS = {
 const PREFIX_REDIRECTS = [
 	{ prefix: '/glossary', to: '/' },
 	{ prefix: '/for', to: '/' },
-	{ prefix: '/compare', to: '/alternatives' }
+	{ prefix: '/compare', to: '/alternatives' },
+	// Canvas template gallery retired 2026-08 — closest live intent is the free tools.
+	{ prefix: '/templates', to: '/tools' }
 ];
 
 /**

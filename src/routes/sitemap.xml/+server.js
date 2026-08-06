@@ -11,8 +11,7 @@ const SECTION_SITEMAPS = [
 	'sitemap-blogs.xml',
 	'sitemap-alternatives.xml',
 	'sitemap-integrations.xml',
-	'sitemap-solutions.xml',
-	'sitemap-templates.xml'
+	'sitemap-solutions.xml'
 ];
 
 export async function GET() {

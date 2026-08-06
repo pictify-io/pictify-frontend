@@ -3,7 +3,7 @@
 // Individual imports from specific files are preferred for better tree-shaking
 
 // Templates and dimensions
-export { templateCategories, dimensionContexts } from './templates.js';
+export { dimensionContexts } from './templates.js';
 
 // Comparisons and alternatives
 export { comparisons, alternatives } from './comparisons.js';

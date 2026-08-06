@@ -92,8 +92,8 @@
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Design your certificate, badge or ticket on the canvas, bring your own HTML, or describe
-						it and let the AI draft the template. Add <span
+						Bring your own HTML for your certificate, badge or ticket, start from a template pack, or
+						describe it and let the AI draft the template. Add <span
 							class="bg-blue-100 px-1 border-b-2 border-blue-300">variables</span
 						>
 						and you're ready to run.
