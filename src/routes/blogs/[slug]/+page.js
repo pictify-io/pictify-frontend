@@ -15,8 +15,13 @@ export async function load({ params, fetch }) {
 				}
 				return { props: { blog } };
 			}
+			// Migration moved every post into Sanity, so a clean miss here means
+			// the post genuinely doesn't exist (or was deliberately unpublished/
+			// deleted) — falling through to legacy would resurrect content that
+			// was intentionally removed from the CMS.
+			throw error(404, 'Blog not found');
 		} catch (e) {
-			if (e?.status === 301) throw e;
+			if (e?.status === 301 || e?.status === 404) throw e;
 			// Sanity outage → fall through to the legacy API below. Logged so a
 			// misconfiguration doesn't silently and permanently mask the CMS here.
 			console.error('Sanity post fetch failed, falling back to legacy API:', e);
