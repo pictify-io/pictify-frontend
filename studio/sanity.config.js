@@ -2,12 +2,12 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { markdownSchema } from 'sanity-plugin-markdown';
 import { schemaTypes } from './schemaTypes';
+import { DEFAULT_PROJECT_ID, DEFAULT_DATASET } from './project';
 
 // Project ID comes from the Sanity project you create with `sanity init`
-// (or at sanity.io/manage). Keep it in sync with the frontend's
-// PUBLIC_SANITY_PROJECT_ID env var.
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'ayq6mmxw';
-const dataset = process.env.SANITY_STUDIO_DATASET || 'production';
+// (or at sanity.io/manage).
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || DEFAULT_PROJECT_ID;
+const dataset = process.env.SANITY_STUDIO_DATASET || DEFAULT_DATASET;
 
 export default defineConfig({
 	name: 'pictify',

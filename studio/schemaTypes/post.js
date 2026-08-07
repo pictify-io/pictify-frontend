@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity';
 
+const SLUG_MAX_LENGTH = 96;
+
 /**
  * Blog post. Body stays markdown (the 18 migrated posts are markdown and the
  * frontend already renders it with `marked`) — portable text can come later
@@ -26,14 +28,14 @@ export default defineType({
 			type: 'slug',
 			options: {
 				source: 'title',
-				maxLength: 96,
+				maxLength: SLUG_MAX_LENGTH,
 				slugify: (input) =>
 					input
 						.toLowerCase()
 						.replace(/['’]/g, '')
 						.replace(/[^a-z0-9]+/g, '-')
 						.replace(/^-+|-+$/g, '')
-						.slice(0, 96)
+						.slice(0, SLUG_MAX_LENGTH)
 			},
 			validation: (rule) => rule.required()
 		}),
@@ -98,7 +100,8 @@ export default defineType({
 			name: 'heroImage',
 			title: 'Hero image URL',
 			type: 'url',
-			description: 'Absolute URL (media.pictify.io or Cloudinary). Also used as the OG image.'
+			description: 'Absolute URL (media.pictify.io or Cloudinary). Also used as the OG image.',
+			validation: (rule) => rule.uri({ scheme: ['http', 'https'] })
 		}),
 		defineField({
 			name: 'featured',
