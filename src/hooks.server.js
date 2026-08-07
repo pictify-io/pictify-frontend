@@ -137,7 +137,10 @@ const PREFIX_REDIRECTS = [
 	{ prefix: '/for', to: '/' },
 	{ prefix: '/compare', to: '/alternatives' },
 	// Canvas template gallery retired 2026-08 — closest live intent is the free tools.
-	{ prefix: '/templates', to: '/tools' }
+	{ prefix: '/templates', to: '/tools' },
+	// Canvas editors removed 2026-08 — old deep links land on the template list.
+	{ prefix: '/template-workspace/image', to: '/dashboard/template' },
+	{ prefix: '/template-workspace/pdf', to: '/dashboard/template' }
 ];
 
 /**

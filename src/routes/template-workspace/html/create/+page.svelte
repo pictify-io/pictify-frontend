@@ -2,24 +2,17 @@
 	/**
 	 * /template-workspace/html/create
 	 *
-	 * Two states:
-	 *   - If ?engine=html in the query, the user just came from the engine
-	 *     picker — skip the picker and show the fresh editor.
-	 *   - Otherwise, show the EnginePicker first.
+	 * HTML is the only image/PDF engine (canvas removed 2026-08), so this
+	 * opens straight into a fresh editor.
 	 *
 	 * On save: POST to /templates with engine='html', then redirect to
 	 * /template-workspace/html/[uid] for the edit view.
 	 */
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import EnginePicker from '$lib/components/editor/html/EnginePicker.svelte';
 	import HtmlEditorLayout from '$lib/components/editor/html/HtmlEditorLayout.svelte';
 	import backend from '../../../../service/backend';
 	import { toast } from '../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
-
-	$: engineParam = $page.url.searchParams.get('engine');
-	$: showPicker = engineParam !== 'html';
 
 	let isSaving = false;
 	let template = {
@@ -90,12 +83,8 @@
 
 <Toast />
 
-{#if showPicker}
-	<EnginePicker />
-{:else}
-	<HtmlEditorLayout
-		bind:template
-		{isSaving}
-		on:save={handleSave}
-	/>
-{/if}
+<HtmlEditorLayout
+	bind:template
+	{isSaving}
+	on:save={handleSave}
+/>

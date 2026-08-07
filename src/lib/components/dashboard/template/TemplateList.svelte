@@ -33,8 +33,9 @@
 		} else if (template.engine === 'html') {
 			url = `/template-workspace/html/${template.uid}`;
 		} else {
-			const formatPath = template.outputFormat === 'pdf' ? 'pdf' : 'image';
-			url = `/template-workspace/${formatPath}/${template.uid}`;
+			// Legacy canvas templates: the fabric editor is removed (2026-08), but
+			// rendering them with variables still works — open the render page.
+			url = `/dashboard/template/${template.uid}/render`;
 		}
 		if (browser) {
 			window.open(url, '_blank', 'noopener,noreferrer');
