@@ -51,10 +51,14 @@
 		aiPrompt = '';
 	}
 
-	$: previewScale =
-		selected && containerWidth ? Math.min(1, containerWidth / selected.width) : 1;
-	$: editPreviewScale =
-		selected && editContainerWidth ? Math.min(1, editContainerWidth / selected.width) : 1;
+	// Fit previews by width AND a height cap so tall/square templates don't
+	// dominate the page at full workbench width.
+	$: previewScale = selected && containerWidth
+		? Math.min(1, containerWidth / selected.width, 720 / selected.height)
+		: 1;
+	$: editPreviewScale = selected && editContainerWidth
+		? Math.min(1, editContainerWidth / selected.width, 560 / selected.height)
+		: 1;
 
 	function selectTemplate(template) {
 		if (aiBusy) return;
@@ -171,87 +175,87 @@
 </script>
 
 <div class="w-full">
-	{#if templates.length > 1}
-		<!-- Template picker -->
-		<div class="flex gap-3 overflow-x-auto pb-3 mb-4 scrollbar-thin">
-			{#each templates as template}
+	<!-- Workbench toolbar: template picker + view tabs -->
+	<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+		{#if templates.length > 1}
+			<div class="flex gap-2.5 overflow-x-auto scrollbar-thin max-w-full">
+				{#each templates as template}
+					<button
+						type="button"
+						on:click={() => selectTemplate(template)}
+						class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2 bg-white border-[3px] rounded-xl transition-all cursor-pointer
+							{selected?.id === template.id
+							? 'border-brand-danger shadow-[4px_4px_0_0_#ff6b6b]'
+							: 'border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px]'}"
+						title={template.description || template.name}
+					>
+						<span
+							class="w-4 h-4 rounded border-2 border-gray-900 flex-shrink-0"
+							style="background-color: {template.thumbnailColor};"
+						/>
+						<span class="text-xs font-black text-gray-900 uppercase tracking-wide whitespace-nowrap"
+							>{template.name}</span
+						>
+					</button>
+				{/each}
+			</div>
+		{/if}
+
+		<div class="flex items-center gap-2 ml-auto">
+			{#if selected && currentHtml !== selected.html}
 				<button
 					type="button"
-					on:click={() => selectTemplate(template)}
-					class="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-white border-[3px] rounded-xl transition-all cursor-pointer
-						{selected?.id === template.id
-						? 'border-brand-danger shadow-[4px_4px_0_0_#ff6b6b]'
-						: 'border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px]'}"
-					title={template.description || template.name}
+					on:click={resetTemplate}
+					class="text-xs font-bold text-gray-500 underline underline-offset-2 hover:text-gray-900 mr-2"
 				>
-					<span
-						class="w-5 h-5 rounded-md border-2 border-gray-900 flex-shrink-0"
-						style="background-color: {template.thumbnailColor};"
-					/>
-					<span class="text-xs font-black text-gray-900 uppercase tracking-wide whitespace-nowrap"
-						>{template.name}</span
-					>
+					Reset
 				</button>
-			{/each}
+			{/if}
+			<div class="flex bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-md">
+				<button
+					type="button"
+					on:click={() => (activeTab = 'preview')}
+					class="px-5 py-2.5 text-xs font-black uppercase tracking-wide transition-colors
+						{activeTab === 'preview' ? 'bg-brand-accent text-gray-900' : 'bg-white text-gray-500 hover:text-gray-900'}"
+				>
+					Preview
+				</button>
+				<button
+					type="button"
+					on:click={openEditTab}
+					class="px-5 py-2.5 text-xs font-black uppercase tracking-wide transition-colors border-l-[3px] border-gray-900
+						{activeTab === 'edit' ? 'bg-brand-accent text-gray-900' : 'bg-white text-gray-500 hover:text-gray-900'}"
+				>
+					&lt;/&gt; Edit HTML
+				</button>
+			</div>
 		</div>
-	{/if}
-
-	<!-- Tab switcher -->
-	<div class="flex items-center justify-between mb-3">
-		<div class="flex gap-2">
-			<button
-				type="button"
-				on:click={() => (activeTab = 'preview')}
-				class="px-4 py-2 text-xs font-black uppercase tracking-wide border-2 rounded-lg transition-all
-					{activeTab === 'preview'
-					? 'border-gray-900 bg-brand-accent text-gray-900 shadow-brutal-md'
-					: 'border-gray-300 bg-white text-gray-500 hover:border-gray-500'}"
-			>
-				Preview
-			</button>
-			<button
-				type="button"
-				on:click={openEditTab}
-				class="px-4 py-2 text-xs font-black uppercase tracking-wide border-2 rounded-lg transition-all
-					{activeTab === 'edit'
-					? 'border-gray-900 bg-brand-accent text-gray-900 shadow-brutal-md'
-					: 'border-gray-300 bg-white text-gray-500 hover:border-gray-500'}"
-			>
-				Edit HTML
-			</button>
-		</div>
-		{#if selected && currentHtml !== selected.html}
-			<button
-				type="button"
-				on:click={resetTemplate}
-				class="text-xs font-bold text-gray-500 underline underline-offset-2 hover:text-gray-900"
-			>
-				Reset template
-			</button>
-		{/if}
 	</div>
 
 	{#if activeTab === 'preview'}
-		<div
-			bind:clientWidth={containerWidth}
-			class="w-full overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
-			style="height: {selected ? Math.round(selected.height * previewScale) : 320}px;"
-		>
+		<div bind:clientWidth={containerWidth} class="w-full flex justify-center">
 			{#if selected}
-				<iframe
-					title="Template preview"
-					srcdoc={previewHtml}
-					scrolling="no"
-					style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
-				/>
+				<div
+					class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
+					style="width: {Math.round(selected.width * previewScale)}px; height: {Math.round(
+						selected.height * previewScale
+					)}px;"
+				>
+					<iframe
+						title="Template preview"
+						srcdoc={previewHtml}
+						scrolling="no"
+						style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
+					/>
+				</div>
 			{/if}
 		</div>
 	{:else}
-		<!-- Edit HTML: CodeMirror + live preview side by side on wide screens -->
-		<div class="grid lg:grid-cols-2 gap-4">
+		<!-- Edit mode: code gets the lion's share, live preview rides along -->
+		<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 items-start">
 			<div
-				class="bg-gray-900 border-[3px] border-gray-900 rounded-lg shadow-brutal-xl overflow-hidden"
-				style="height: 420px;"
+				class="border-[3px] border-gray-900 rounded-lg shadow-brutal-xl overflow-auto bg-brand-bg"
+				style="height: 560px; min-height: 320px; resize: vertical;"
 			>
 				{#if HtmlEditorComponent}
 					<svelte:component
@@ -259,7 +263,7 @@
 						bind:this={editorRef}
 						value={currentHtml}
 						on:change={handleEditorChange}
-					lineWrap={true}
+						lineWrap={true}
 					/>
 				{:else if editorLoadFailed}
 					<textarea
@@ -276,25 +280,27 @@
 					</div>
 				{/if}
 			</div>
-			<div class="hidden lg:block">
-				<div
-					bind:clientWidth={editContainerWidth}
-					class="w-full overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
-					style="height: {selected
-						? Math.min(420, Math.round(selected.height * editPreviewScale))
-						: 420}px;"
-				>
+			<div class="xl:sticky xl:top-6">
+				<div bind:clientWidth={editContainerWidth} class="w-full">
 					{#if selected}
-						<iframe
-							title="Live preview"
-							srcdoc={previewHtml}
-							scrolling="no"
-							style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({editPreviewScale}); transform-origin: top left; pointer-events: none;"
-						/>
+						<div
+							class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg mx-auto"
+							style="width: {Math.round(selected.width * editPreviewScale)}px; height: {Math.round(
+								selected.height * editPreviewScale
+							)}px;"
+						>
+							<iframe
+								title="Live preview"
+								srcdoc={previewHtml}
+								scrolling="no"
+								style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({editPreviewScale}); transform-origin: top left; pointer-events: none;"
+							/>
+						</div>
 					{/if}
 				</div>
-				<p class="mt-2 text-xs font-medium text-gray-500">
-					Live preview — this exact HTML is what the API renders. Swap sample values for
+				<p class="mt-2 text-xs font-medium text-gray-500 text-center">
+					Live preview — updates as you type. This exact HTML is what the API renders; swap
+					sample values for
 					<code class="font-mono bg-gray-100 px-1 rounded">{'{{variables}}'}</code> when you automate.
 				</p>
 			</div>

@@ -323,8 +323,8 @@
 				<!-- Barcode Editor (self-contained: input, preview, generate, result, API examples) -->
 				<BarcodeEditor />
 			{:else}
-				<!-- Template Preview Section (Window Style) -->
-				<div class="max-w-5xl mx-auto px-4 mb-20">
+				<!-- Template Workbench (full-width window card) -->
+				<div class="max-w-screen-2xl mx-auto px-4 mb-20">
 					<div
 						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
 					>
@@ -347,18 +347,16 @@
 							</div>
 						</div>
 
-						<!-- Interactive Mini-Editor Preview -->
+						<!-- Template workbench body -->
 						<div
-							class="p-8 bg-gray-100 flex flex-col items-center justify-center relative min-h-[400px]"
+							class="p-4 sm:p-6 lg:p-8 bg-gray-100 flex flex-col relative min-h-[400px]"
 						>
 							<div
 								class="absolute inset-0 opacity-10"
 								style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
 							/>
 
-							<div
-								class="relative z-10 flex flex-col items-center gap-8 w-full max-w-[640px] mx-auto"
-							>
+							<div class="relative z-10 flex flex-col items-center gap-8 w-full">
 								<!-- HTML template editor: live preview + editable source -->
 								{#if toolTemplates.length}
 									<HtmlTemplateEditor bind:this={editorRef} templates={toolTemplates} />
