@@ -24,10 +24,22 @@ export async function sanityQuery(query, params = {}, fetchFn = fetch) {
 		url.searchParams.set(`$${key}`, JSON.stringify(value));
 	}
 
-	const res = await fetchFn(url.toString(), { headers: { Accept: 'application/json' } });
+	// A slow/hung Sanity CDN request defeats the whole "fall back on outage"
+	// design if it never fails — cap it so callers fail fast into legacy.
+	const res = await fetchFn(url.toString(), {
+		headers: { Accept: 'application/json' },
+		signal: AbortSignal.timeout(4000)
+	});
 	if (!res.ok) throw new Error(`Sanity query failed (${res.status})`);
 	const body = await res.json();
 	return body.result ?? null;
+}
+
+/** Editors don't always fill in reading time — estimate from word count (~200 wpm). */
+function estimateReadingTime(markdown) {
+	if (!markdown) return null;
+	const words = markdown.trim().split(/\s+/).filter(Boolean).length;
+	return words ? Math.max(1, Math.round(words / 200)) : null;
 }
 
 /** Map a Sanity post document onto the legacy blog shape the UI renders. */
@@ -44,7 +56,7 @@ export function toLegacyBlog(doc) {
 		type: doc.type || 'article',
 		heroImage: doc.heroImage || null,
 		image: doc.heroImage || null,
-		readingTime: doc.readingTime || null,
+		readingTime: doc.readingTime || estimateReadingTime(doc.content),
 		isFeatured: !!doc.featured,
 		createdAt: doc.publishedAt,
 		date: doc.publishedAt,
@@ -52,10 +64,17 @@ export function toLegacyBlog(doc) {
 	};
 }
 
-const POST_PROJECTION = `{
-	title, seoTitle, "slug": slug.current, legacySlugs, description, content,
+/** Shared fields for both list and single-post views. */
+const POST_FIELDS = `
+	title, seoTitle, "slug": slug.current, legacySlugs, description,
 	tags, author, type, heroImage, readingTime, featured, publishedAt, _updatedAt
-}`;
+`;
+
+/** List views don't render body content — skip fetching every post's full markdown. */
+const LIST_PROJECTION = `{ ${POST_FIELDS} }`;
+
+/** Single-post view needs the body. */
+const POST_PROJECTION = `{ ${POST_FIELDS}, content }`;
 
 /** One post by clean slug OR legacy slug. Returns { blog, matchedLegacy }. */
 export async function getSanityPost(slug, fetchFn = fetch) {
@@ -64,14 +83,16 @@ export async function getSanityPost(slug, fetchFn = fetch) {
 		{ slug },
 		fetchFn
 	);
-	if (!doc) return { blog: null, matchedLegacy: false };
+	// Guard against a doc written without a slug (Studio requires one, but a
+	// direct API write — e.g. a migration re-run — could still skip it).
+	if (!doc || !doc.slug) return { blog: null, matchedLegacy: false };
 	return { blog: toLegacyBlog(doc), matchedLegacy: doc.slug !== slug };
 }
 
-/** All published posts, newest first. */
+/** All published posts, newest first. List view — no body content. */
 export async function getSanityPosts(fetchFn = fetch) {
 	const docs = await sanityQuery(
-		`*[_type == "post" && !(_id in path("drafts.**"))] | order(publishedAt desc) ${POST_PROJECTION}`,
+		`*[_type == "post" && !(_id in path("drafts.**"))] | order(publishedAt desc) ${LIST_PROJECTION}`,
 		{},
 		fetchFn
 	);

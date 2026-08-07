@@ -14,7 +14,9 @@ export async function load({ fetch }) {
 				return { props: { articles, guides, featured } };
 			}
 		} catch (e) {
-			// Sanity outage → legacy API below.
+			// Sanity outage → legacy API below. Logged so a misconfiguration
+			// (bad dataset, revoked CDN access) doesn't fail silently forever.
+			console.error('Sanity blog list fetch failed, falling back to legacy API:', e);
 		}
 	}
 

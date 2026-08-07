@@ -20,7 +20,9 @@ export async function GET() {
 			);
 			if (docs?.length) links = docs;
 		} catch (e) {
-			/* ignored — legacy below */
+			// Ignored — legacy below. Logged so a misconfiguration doesn't
+			// silently and permanently mask the CMS from the sitemap.
+			console.error('Sanity sitemap fetch failed, falling back to legacy links:', e);
 		}
 	}
 

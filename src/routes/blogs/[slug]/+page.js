@@ -4,7 +4,7 @@ import { sanityEnabled, getSanityPost } from '$lib/sanity/client';
 
 export async function load({ params, fetch }) {
 	// CMS first: posts live in Sanity after the migration. Legacy
-	// punctuation-heavy slugs are stored on the doc as `legacySlug`, so old
+	// punctuation-heavy slugs are stored on the doc as `legacySlugs`, so old
 	// URLs 301 to the clean slug without a hardcoded redirect map.
 	if (sanityEnabled()) {
 		try {
@@ -17,7 +17,9 @@ export async function load({ params, fetch }) {
 			}
 		} catch (e) {
 			if (e?.status === 301) throw e;
-			// Sanity outage → fall through to the legacy API below.
+			// Sanity outage → fall through to the legacy API below. Logged so a
+			// misconfiguration doesn't silently and permanently mask the CMS here.
+			console.error('Sanity post fetch failed, falling back to legacy API:', e);
 		}
 	}
 
