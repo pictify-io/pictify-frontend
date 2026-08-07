@@ -120,6 +120,9 @@
 			currentVariables: [],
 			width: selected.width,
 			height: selected.height,
+			// Free tools render HTML verbatim — no Handlebars pass, so the AI
+			// must not introduce {{variables}}.
+			mode: 'static',
 			onComplete: (result) => {
 				aiBusy = false;
 				if (result?.html) {

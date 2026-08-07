@@ -15,7 +15,8 @@
 		SubscriptionCard,
 		InvoiceHistory,
 		OverageInvoices,
-		ConfirmModal
+		ConfirmModal,
+		PlanUsageCard
 	} from '$lib/components/billing';
 	import { getOverageInvoices } from '../../../api/billing';
 	import {
@@ -272,6 +273,9 @@
 
 		<!-- Right Column: Settings & Upgrade -->
 		<div class="lg:col-span-4 space-y-8 sticky top-8">
+			<!-- Usage: render + AI credit pools -->
+			<PlanUsageCard />
+
 			<!-- Overage Settings -->
 			{#if canUseOverages && $billingState.subscription}
 				<OverageSettings

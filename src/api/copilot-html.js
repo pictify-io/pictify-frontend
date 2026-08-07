@@ -41,6 +41,7 @@ export const streamHtmlCopilot = ({
 	brandContext = null,
 	width = 1080,
 	height = 1080,
+	mode = 'template',
 	onToken,
 	onStep,
 	onComplete,
@@ -64,7 +65,8 @@ export const streamHtmlCopilot = ({
 					currentVariables,
 					brandContext,
 					width,
-					height
+					height,
+					mode
 				}),
 				signal: controller.signal
 			})
