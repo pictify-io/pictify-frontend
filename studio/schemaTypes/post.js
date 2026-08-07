@@ -38,6 +38,13 @@ export default defineType({
 			validation: (rule) => rule.required()
 		}),
 		defineField({
+			name: 'legacyId',
+			title: 'Legacy ID',
+			type: 'string',
+			hidden: true,
+			description: 'Mongo uid from the pre-CMS blog engine. Migration re-runs match on this.'
+		}),
+		defineField({
 			name: 'legacySlugs',
 			title: 'Legacy slugs',
 			type: 'array',
