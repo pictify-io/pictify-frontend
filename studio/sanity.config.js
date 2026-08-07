@@ -6,7 +6,7 @@ import { schemaTypes } from './schemaTypes';
 // Project ID comes from the Sanity project you create with `sanity init`
 // (or at sanity.io/manage). Keep it in sync with the frontend's
 // PUBLIC_SANITY_PROJECT_ID env var.
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'REPLACE_WITH_PROJECT_ID';
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'ayq6mmxw';
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production';
 
 export default defineConfig({
