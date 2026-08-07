@@ -19,7 +19,7 @@
 		sizeUrl,
 		parseSize
 	} from '$lib/pseo/config.js';
-	import { getHtmlTemplateForUseCase } from '$lib/pseo/useCaseHtmlTemplates.js';
+	import { getHtmlTemplatesForUseCase } from '$lib/pseo/useCaseHtmlTemplates.js';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
@@ -54,8 +54,13 @@
 	// Uses the public HTML endpoint (no auth required, rate limited) — the same
 	// render engine as the authenticated /image API.
 	async function handleQuickGenerate() {
-		const htmlSource = editorRef?.getHtml?.() || htmlTemplate?.html;
-		if (!htmlSource) {
+		const sel = editorRef?.getSelected?.() ||
+			(toolTemplates[0] && {
+				html: toolTemplates[0].html,
+				width: toolTemplates[0].width,
+				height: toolTemplates[0].height
+			});
+		if (!sel?.html) {
 			toast.set({ message: 'No template available', type: 'error', duration: 2000 });
 			return;
 		}
@@ -68,14 +73,15 @@
 
 		try {
 			const { image } = await createImagePublic({
-				html: htmlSource,
-				width: templateWidth,
-				height: templateHeight,
+				html: sel.html,
+				width: sel.width,
+				height: sel.height,
 				fileExtension: 'png'
 			});
 
 			if (image?.url) {
 				generatedImageUrl = image.url;
+				generatedDims = { width: sel.width, height: sel.height };
 				toast.set({ message: 'Image generated successfully!', type: 'success', duration: 2000 });
 			} else {
 				throw new Error('No image URL in response');
@@ -93,10 +99,11 @@
 		}
 	}
 
-	// HTML starter template for this use case (null for the code-editor tools)
-	$: htmlTemplate = validCase ? getHtmlTemplateForUseCase(useCaseId) : null;
-	$: templateWidth = htmlTemplate?.width || 1200;
-	$: templateHeight = htmlTemplate?.height || 630;
+	// HTML starter templates for this use case (empty for the code-editor tools)
+	$: toolTemplates = validCase ? getHtmlTemplatesForUseCase(useCaseId) : [];
+	$: templateWidth = toolTemplates[0]?.width || 1200;
+	$: templateHeight = toolTemplates[0]?.height || 630;
+	let generatedDims = { width: 1200, height: 630 };
 
 	// Escape HTML for code display
 	function escapeHtml(source) {
@@ -337,7 +344,6 @@
 									class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
 									>Interactive Editor</span
 								>
-								{templateWidth} x {templateHeight}px
 							</div>
 						</div>
 
@@ -354,13 +360,8 @@
 								class="relative z-10 flex flex-col items-center gap-8 w-full max-w-[640px] mx-auto"
 							>
 								<!-- HTML template editor: live preview + editable source -->
-								{#if htmlTemplate}
-									<HtmlTemplateEditor
-										bind:this={editorRef}
-										html={htmlTemplate.html}
-										width={templateWidth}
-										height={templateHeight}
-									/>
+								{#if toolTemplates.length}
+									<HtmlTemplateEditor bind:this={editorRef} templates={toolTemplates} />
 								{:else}
 									<div
 										class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
@@ -475,8 +476,8 @@
 								description="You've proved it works. Now integrate this into your app."
 								curlSnippet={apiSnippet}
 								generatedUrl={generatedImageUrl}
-								generatedWidth={templateWidth}
-								generatedHeight={templateHeight}
+								generatedWidth={generatedDims.width}
+								generatedHeight={generatedDims.height}
 								generatedFormat="png"
 								toolName={config?.label || useCaseId}
 							/>
