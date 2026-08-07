@@ -5,15 +5,32 @@
 
 import { getBlogLinks } from '../../api/blog';
 import { xmlEscape } from '$lib/seo/xml.js';
+import { sanityEnabled, sanityQuery } from '$lib/sanity/client';
 
 export async function GET() {
 	const baseUrl = 'https://pictify.io';
 
+	let links = null;
+
+	// CMS first — same env gate + legacy fallback as the blog routes.
+	if (sanityEnabled()) {
+		try {
+			const docs = await sanityQuery(
+				'*[_type == "post" && !(_id in path("drafts.**"))]{ "slug": slug.current, "createdAt": publishedAt }'
+			);
+			if (docs?.length) links = docs;
+		} catch (e) {
+			/* ignored — legacy below */
+		}
+	}
+
 	let urls = [];
 
 	try {
-		const response = await getBlogLinks();
-		const { links } = response;
+		if (!links) {
+			const response = await getBlogLinks();
+			links = response.links;
+		}
 
 		urls = links.map(
 			(link) => `  <url>

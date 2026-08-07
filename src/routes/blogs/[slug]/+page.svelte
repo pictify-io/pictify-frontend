@@ -61,7 +61,7 @@
 </script>
 
 <svelte:head>
-	<title>{blog.title} | Pictify</title>
+	<title>{blog.seoTitle || blog.title} | Pictify</title>
 	{#if metaDescription}
 		<meta name="description" content={metaDescription} />
 	{/if}
