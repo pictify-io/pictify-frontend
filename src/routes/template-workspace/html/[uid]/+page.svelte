@@ -6,8 +6,8 @@
 	 * hydrates the layout, persists via PUT /templates/:uid on save.
 	 *
 	 * If the server reports the template is NOT engine='html' (e.g. user
-	 * pasted a fabric template URL by mistake), we redirect them to the
-	 * fabric editor — one more friendly guardrail than showing a broken UI.
+	 * pasted a legacy fabric template URL by mistake), we redirect them to
+	 * the render page — one more friendly guardrail than a broken UI.
 	 */
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -32,8 +32,9 @@
 			}
 			const t = res.template;
 			if (t.engine !== 'html') {
-				// Fabric template served at the HTML URL — redirect.
-				goto(`/template-workspace/image/${uid}`);
+				// Legacy fabric template — the canvas editor is removed, but the
+				// render-with-variables page still works for these.
+				goto(`/dashboard/template/${uid}/render`);
 				return;
 			}
 			template = {

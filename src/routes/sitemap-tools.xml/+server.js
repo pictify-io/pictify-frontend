@@ -22,7 +22,8 @@ export async function GET() {
 		{ path: '/tools/online-invoice-generator', priority: '0.8' },
 		{ path: '/tools/url-to-image-generator', priority: '0.8' },
 		{ path: '/tools/linkedin-banner-generator', priority: '0.8' },
-		{ path: '/tools/certificate-generator', priority: '0.8' },
+		{ path: '/tools/certificate-generator', priority: '0.9' },
+		{ path: '/tools/csv-to-pdf', priority: '0.9' },
 		{ path: '/tools/tweet-screenshot', priority: '0.8' }
 	];
 

@@ -2344,12 +2344,7 @@
 				>OG Image Generator</a
 			>
 			<a
-				href="/glossary/html-to-image"
-				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-				>What is HTML to Image?</a
-			>
-			<a
-				href="/compare"
+				href="/alternatives"
 				class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
 				>Compare Alternatives</a
 			>

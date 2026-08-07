@@ -58,6 +58,9 @@
 	export let value = '';
 	/** @type {Array<{name: string}>} */
 	export let variableDefinitions = [];
+	/** Soft-wrap long lines (used by the free-tool pages, whose templates
+	 * are single-line inline-style HTML). */
+	export let lineWrap = false;
 	/** @type {string[]} helper names that the backend exposes */
 	export let safelistedHelpers = [];
 
@@ -308,6 +311,7 @@
 				// them. Fixed positioning then keeps them anchored to the
 				// caret as the user scrolls.
 				tooltips({ parent: document.body, position: 'fixed' }),
+				...(lineWrap ? [EditorView.lineWrapping] : []),
 				lineNumbers(),
 				highlightActiveLine(),
 				history(),

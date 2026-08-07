@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 
 	onMount(() => {
-		goto('/template-workspace/create', { replaceState: true });
+		goto('/template-workspace/html/create', { replaceState: true });
 	});
 </script>
 

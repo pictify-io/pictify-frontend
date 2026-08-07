@@ -5,7 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { getShareResult, forkTemplate } from '../../../api/public-templates.js';
+	import { getShareResult } from '../../../api/public-templates.js';
 	import { toast } from '../../../store/toast.store.js';
 	import { user } from '../../../store/user.store.js';
 	import backend from '../../../service/backend.js';
@@ -15,7 +15,6 @@
 	let template = null;
 	let loading = true;
 	let error = null;
-	let forking = false;
 
 	// Embed codes state
 	let activeEmbedTab = 'img';
@@ -95,10 +94,10 @@
 				};
 			case 'template':
 				return {
-					sidebar: { heading: 'Built from Template', button: 'Remix This Template', link: null },
+					sidebar: { heading: 'Built from Template', button: 'Build Your Own', link: '/signup' },
 					banner: {
 						headline: 'ONE TEMPLATE. INFINITE VARIANTS.',
-						body: 'Remix it, change the variables, batch render at scale.'
+						body: 'Build an HTML template, change the variables, batch render at scale.'
 					}
 				};
 			case 'api':
@@ -189,45 +188,9 @@
 		}
 	}
 
-	// Fork template (remix flow)
-	async function handleRemix() {
-		if (!template?.uid) return;
-
-		if (!isLoggedIn) {
-			sessionStorage.setItem('pictify_fork_template', template.uid);
-			goto(`/signup?return=/templates/${template.uid}`);
-			return;
-		}
-
-		forking = true;
-		try {
-			const response = await forkTemplate(template.uid);
-			if (response.success && response.template) {
-				toast.set({
-					message: 'Template remixed! Opening editor...',
-					type: 'success',
-					duration: 2000
-				});
-				setTimeout(() => {
-					goto(`/template-workspace/${response.template.uid}`);
-				}, 500);
-			}
-		} catch (e) {
-			toast.set({
-				message: e.message || 'Failed to remix template',
-				type: 'error',
-				duration: 3000
-			});
-		} finally {
-			forking = false;
-		}
-	}
-
 	// Handle sidebar CTA click
 	function handleSidebarCta() {
-		if (result?.source === 'template' && template?.uid) {
-			handleRemix();
-		} else if (ctaConfig?.sidebar?.link) {
+		if (ctaConfig?.sidebar?.link) {
 			goto(ctaConfig.sidebar.link);
 		}
 	}
@@ -306,7 +269,7 @@
 		<title>{result.title || 'Shared Image'} | Pictify</title>
 		<meta
 			name="description"
-			content="View and remix this image created with Pictify. Generate unlimited variants with our templates and API."
+			content="View this image created with Pictify. Generate unlimited variants with HTML templates and the API."
 		/>
 		<link rel="canonical" href={`https://pictify.io/r/${result.uid}`} />
 
@@ -314,7 +277,7 @@
 		<meta property="og:title" content={result.title || 'Created with Pictify'} />
 		<meta
 			property="og:description"
-			content="View and remix this image. Create your own with Pictify templates and API."
+			content="View this image. Create your own with Pictify templates and the API."
 		/>
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Pictify" />
@@ -326,7 +289,7 @@
 		<!-- Twitter Card -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={result.title || 'Created with Pictify'} />
-		<meta name="twitter:description" content="View and remix this image with Pictify." />
+		<meta name="twitter:description" content="View this image — created with Pictify." />
 		<meta name="twitter:image" content={result.assetUrl} />
 
 		<!-- JSON-LD Structured Data -->
@@ -750,65 +713,6 @@
 						</div>
 					{/if}
 
-					<!-- A4: Remix This Template (enhanced) -->
-					{#if template && template.isPublic}
-						<div
-							class="bg-[#f0f9ff] border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl p-5 relative overflow-hidden group transition-all"
-						>
-							<div class="absolute top-0 right-0 p-2 opacity-10">
-								<svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-									/></svg
-								>
-							</div>
-
-							<p class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-1">
-								Remix This Template
-							</p>
-							<h3 class="font-black text-gray-900 text-lg mb-2 truncate relative z-10">
-								{template.name}
-							</h3>
-							<p class="text-xs text-gray-500 font-medium mb-4">
-								{isLoggedIn
-									? 'Fork this template into your workspace and customize it.'
-									: 'Sign up to remix this template with your own data.'}
-							</p>
-
-							<button
-								on:click={handleRemix}
-								disabled={forking}
-								class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-lg text-sm relative z-10 disabled:opacity-50"
-							>
-								{#if forking}
-									<span class="flex items-center justify-center gap-2">
-										<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"
-											><circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-												fill="none"
-											/><path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-											/></svg
-										>
-										Remixing...
-									</span>
-								{:else}
-									Remix Template
-								{/if}
-							</button>
-						</div>
-					{/if}
-
 					<!-- A1: Analytics Card (visible to creator and team members) -->
 					{#if isLoggedIn && (analytics || analyticsLoading)}
 						<div
@@ -1043,10 +947,10 @@
 									{result.source === 'api' ? 'Get API Key' : 'Start Free'}
 								</a>
 								<a
-									href="/templates"
+									href="/tools"
 									class="px-8 py-4 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:bg-gray-800 transition-all rounded-xl"
 								>
-									Browse Templates
+									Try the Free Tools
 								</a>
 							</div>
 						</div>

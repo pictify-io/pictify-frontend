@@ -4,7 +4,7 @@
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import MiniEditor from '$lib/components/tools/MiniEditor.svelte';
+	import HtmlTemplateEditor from '$lib/components/tools/HtmlTemplateEditor.svelte';
 	import MarkdownEditor from '$lib/components/tools/MarkdownEditor.svelte';
 	import TableEditor from '$lib/components/tools/TableEditor.svelte';
 	import BarcodeEditor from '$lib/components/tools/BarcodeEditor.svelte';
@@ -19,14 +19,12 @@
 		sizeUrl,
 		parseSize
 	} from '$lib/pseo/config.js';
-	import { getTemplateForUseCase } from '$lib/pseo/useCaseTemplates.js';
-	import { goto } from '$app/navigation';
+	import { getHtmlTemplatesForUseCase } from '$lib/pseo/useCaseHtmlTemplates.js';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits } from '../../../store/generationLimits.store';
-	import { pageActions } from '../../../store/pages.store';
-	import backend from '../../../service/backend';
+	import { createImagePublic } from '../../../api/image.js';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -50,46 +48,20 @@
 	let isGenerating = false;
 	let generatedImageUrl = '';
 	let generationError = '';
-	let miniEditorRef;
+	let editorRef;
 
-	function openEditor() {
-		if (!validCase) return;
-		const label = config?.label || useCase?.label || useCaseId;
-		const templateData = getTemplateForUseCase(useCaseId, label);
-
-		// Ensure template is set to image format (not PDF)
-		const template = {
-			...templateData,
-			outputFormat: 'image'
-		};
-
-		// Initialize the pages store with template data
-		pageActions.initFromTemplate(template);
-
-		// Also save to localStorage for CreateTemplate compatibility
-		try {
-			const DRAFT_KEY = 'pictify_template_draft_v1';
-			localStorage.setItem(DRAFT_KEY, JSON.stringify(template));
-		} catch (e) {
-			/* ignored */
-		}
-
-		if ($user?.email) {
-			// Logged in users go directly to image editor
-			goto('/template-workspace/image/create');
-		} else {
-			// Guests sign up first, then land in the template creator.
-			goto('/dashboard/template/create');
-		}
-	}
-
-	// Quick generate from template
-	// Uses public endpoint (no auth required, rate limited)
+	// Quick generate from the edited HTML template.
+	// Uses the public HTML endpoint (no auth required, rate limited) — the same
+	// render engine as the authenticated /image API.
 	async function handleQuickGenerate() {
-		// Use edited data from MiniEditor if available, otherwise fallback to template
-		const editedData = miniEditorRef?.getEditedFabricData?.() || template?.fabricJSData;
-		if (!editedData) {
-			toast.set({ message: 'No template data available', type: 'error', duration: 2000 });
+		const sel = editorRef?.getSelected?.() ||
+			(toolTemplates[0] && {
+				html: toolTemplates[0].html,
+				width: toolTemplates[0].width,
+				height: toolTemplates[0].height
+			});
+		if (!sel?.html) {
+			toast.set({ message: 'No template available', type: 'error', duration: 2000 });
 			return;
 		}
 
@@ -100,18 +72,16 @@
 		generatedImageUrl = '';
 
 		try {
-			// Use public canvas endpoint (no auth required, rate limited)
-			// Request watermark for non-logged-in users
-			const response = await backend.post('/image/public/canvas', {
-				fabricJSData: editedData,
-				width: templateWidth,
-				height: templateHeight,
-				fileExtension: 'png',
-				watermark: !isUserLoggedIn // Request watermark for guests
+			const { image } = await createImagePublic({
+				html: sel.html,
+				width: sel.width,
+				height: sel.height,
+				fileExtension: 'png'
 			});
 
-			if (response?.url) {
-				generatedImageUrl = response.url;
+			if (image?.url) {
+				generatedImageUrl = image.url;
+				generatedDims = { width: sel.width, height: sel.height };
 				toast.set({ message: 'Image generated successfully!', type: 'success', duration: 2000 });
 			} else {
 				throw new Error('No image URL in response');
@@ -129,10 +99,11 @@
 		}
 	}
 
-	// Template data (MiniEditor handles its own FabricJS loading)
-	$: template = validCase ? getTemplateForUseCase(useCaseId, config?.label || useCaseId) : null;
-	$: templateWidth = template?.width || 1200;
-	$: templateHeight = template?.height || 630;
+	// HTML starter templates for this use case (empty for the code-editor tools)
+	$: toolTemplates = validCase ? getHtmlTemplatesForUseCase(useCaseId) : [];
+	$: templateWidth = toolTemplates[0]?.width || 1200;
+	$: templateHeight = toolTemplates[0]?.height || 630;
+	let generatedDims = { width: 1200, height: 630 };
 
 	// Escape HTML for code display
 	function escapeHtml(source) {
@@ -220,18 +191,6 @@
     "fileExtension": "${formatOptions[0] || 'png'}"
   }'`;
 
-	// Template draft for NextSteps
-	$: templateDraft = template
-		? {
-				version: 1,
-				name: config?.label || useCaseId,
-				type: 'custom',
-				width: templateWidth,
-				height: templateHeight,
-				fabricJSData: template.fabricJSData,
-				source: `workflow-${useCaseId}`
-		  }
-		: null;
 </script>
 
 <svelte:head>
@@ -364,8 +323,8 @@
 				<!-- Barcode Editor (self-contained: input, preview, generate, result, API examples) -->
 				<BarcodeEditor />
 			{:else}
-				<!-- Template Preview Section (Window Style) -->
-				<div class="max-w-5xl mx-auto px-4 mb-20">
+				<!-- Template Workbench (full-width window card) -->
+				<div class="max-w-screen-2xl mx-auto px-4 mb-20">
 					<div
 						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
 					>
@@ -385,30 +344,22 @@
 									class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
 									>Interactive Editor</span
 								>
-								{templateWidth} x {templateHeight}px
 							</div>
 						</div>
 
-						<!-- Interactive Mini-Editor Preview -->
+						<!-- Template workbench body -->
 						<div
-							class="p-8 bg-gray-100 flex flex-col items-center justify-center relative min-h-[400px]"
+							class="p-4 sm:p-6 lg:p-8 bg-gray-100 flex flex-col relative min-h-[400px]"
 						>
 							<div
 								class="absolute inset-0 opacity-10"
 								style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
 							/>
 
-							<div
-								class="relative z-10 flex flex-col items-center gap-8 w-full max-w-[640px] mx-auto"
-							>
-								<!-- MiniEditor (interactive canvas — replaces StaticCanvas) -->
-								{#if template?.fabricJSData}
-									<MiniEditor
-										bind:this={miniEditorRef}
-										fabricJSData={template.fabricJSData}
-										width={templateWidth}
-										height={templateHeight}
-									/>
+							<div class="relative z-10 flex flex-col items-center gap-8 w-full">
+								<!-- HTML template editor: live preview + editable source -->
+								{#if toolTemplates.length}
+									<HtmlTemplateEditor bind:this={editorRef} templates={toolTemplates} />
 								{:else}
 									<div
 										class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
@@ -419,9 +370,8 @@
 
 								<!-- Action Bar -->
 								<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
-									<button
-										type="button"
-										on:click={openEditor}
+									<a
+										href="/signup"
 										class="flex-1 py-4 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
 									>
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -432,8 +382,8 @@
 												d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
 											/></svg
 										>
-										Open Template Editor — Free
-									</button>
+										Automate This Template — Free
+									</a>
 									<button
 										type="button"
 										on:click={handleQuickGenerate}
@@ -465,7 +415,7 @@
 													d="M13 10V3L4 14h7v7l9-11h-7z"
 												/></svg
 											>
-											Quick Preview
+											Generate Image
 										{/if}
 									</button>
 								</div>
@@ -523,10 +473,9 @@
 								heading="Now Automate It"
 								description="You've proved it works. Now integrate this into your app."
 								curlSnippet={apiSnippet}
-								{templateDraft}
 								generatedUrl={generatedImageUrl}
-								generatedWidth={templateWidth}
-								generatedHeight={templateHeight}
+								generatedWidth={generatedDims.width}
+								generatedHeight={generatedDims.height}
 								generatedFormat="png"
 								toolName={config?.label || useCaseId}
 							/>
@@ -744,9 +693,8 @@
 				</div>
 
 				<div class="text-center mt-16 px-4">
-					<button
-						type="button"
-						on:click={openEditor}
+					<a
+						href="/signup"
 						class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
 					>
 						Start Creating Now
@@ -758,7 +706,7 @@
 								d="M17 8l4 4m0 0l-4 4m4-4H3"
 							/></svg
 						>
-					</button>
+					</a>
 				</div>
 			</section>
 

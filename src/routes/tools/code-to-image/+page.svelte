@@ -2935,9 +2935,9 @@
 					>Markdown to Image</a
 				>
 				<a
-					href="/compare"
+					href="/alternatives"
 					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-					>Compare Tools</a
+					>Compare Alternatives</a
 				>
 			</div>
 		</section>

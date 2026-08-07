@@ -2,46 +2,43 @@
 	/**
 	 * Shared closing CTA block for every /solutions/* page.
 	 *
-	 * Single source of truth for the "Programmable Image Engine" positioning, the
-	 * six differentiators vs Bannerbear/Placid/Orshot, and the Get API Key + Read
-	 * Docs CTAs. Changing the pitch once here updates all 11 pages in the cluster.
+	 * Single source of truth for the delivery-wedge positioning and the CTAs.
+	 * Changing the pitch once here updates the whole cluster.
 	 *
 	 * Consumer can pass a custom headline/kicker per page or fall back to defaults.
-	 *
-	 * See plan: docs/plans/2026-04-15-003-strategy-automated-images-cluster-plan.md
 	 */
 	import { analytics } from '$lib/analytics.js';
 
-	export let headline = 'One API. Templates with logic. Rendering at scale.';
-	export let kicker = 'The Programmable Image Engine';
+	export let headline = 'Every row rendered. Every recipient reached. Provable.';
+	export let kicker = 'Documents & Videos, Delivered';
 	export let toolName = 'solution';
 	/** Set to true on the pillar page to hide the "Back to the pillar guide" link. */
 	export let isPillar = false;
 
 	const differentiators = [
 		{
+			title: 'Delivery is part of the run',
+			body: 'Every row renders AND emails to its recipient from an isolated sending domain. Your job ends at delivered, not downloaded.'
+		},
+		{
+			title: 'Per-row proof',
+			body: 'Sent, delivered, bounced, complained — per person, via real ESP webhooks. A bounce is a one-click re-send with a corrected address.'
+		},
+		{
+			title: 'One engine, every deliverable',
+			body: 'Certificates, badges, tickets, reports, personalized video — the same template and data contract renders PNG, PDF, GIF, and MP4.'
+		},
+		{
 			title: 'Real expression engine',
-			body: '{{ price * 0.9 | currency }} is a first-class template feature — not a string you pre-format in your backend. Conditionals, filters, nested lookups, all built in.'
+			body: '{{ price * 0.9 | currency }} is a first-class template feature. Conditionals, filters, loops — logic lives in the template, not your backend.'
 		},
 		{
-			title: 'Live data bindings',
-			body: 'Templates connect to HTTP endpoints, webhooks, or static JSON. Images update when data updates. Nothing else in the category ships this.'
+			title: 'Wizard + API + agents',
+			body: 'Organizers run the wizard. Developers sign a webhook. AI agents author templates over MCP. Same template, same run history.'
 		},
 		{
-			title: 'API + no-code, same product',
-			body: 'Designers build templates in a visual canvas. Engineers call one endpoint. No hand-off, no context switch, no rebuild.'
-		},
-		{
-			title: 'A/B experiments on images',
-			body: 'Ship variants of a template, track impressions and conversions per variant, declare a winner — all from the same API that renders the image.'
-		},
-		{
-			title: 'One API, many outputs',
-			body: 'PNG, JPEG, WebP, multi-page PDF, GIF. Same template, different fileExtension. No separate service for each format.'
-		},
-		{
-			title: 'Agentic AI copilot',
-			body: '"Make a dark-mode variant," "resize this for Instagram Story," "generate five backgrounds." The copilot edits templates step by step, not as a single-shot generator.'
+			title: 'AI Template Maker',
+			body: 'Describe the document or video and get an editable HTML-native template with your brand and variables in place.'
 		}
 	];
 
@@ -97,12 +94,12 @@
 			</div>
 			{#if !isPillar}
 				<p class="mt-6 text-sm text-gray-600 font-medium">
-					Looking for the bigger picture?
+					Prefer to see it first?
 					<a
-						href="/solutions/automated-image-generation"
+						href="/tools/certificate-generator"
 						on:click={() => trackClick('back_to_pillar')}
 						class="underline font-black text-gray-900 hover:text-brand-danger transition-colors"
-					>Read the automated image generation guide →</a>
+					>Generate a certificate in your browser →</a>
 				</p>
 			{/if}
 		</div>

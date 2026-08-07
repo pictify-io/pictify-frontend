@@ -3,19 +3,13 @@
 // Individual imports from specific files are preferred for better tree-shaking
 
 // Templates and dimensions
-export { templateCategories, dimensionContexts } from './templates.js';
+export { dimensionContexts } from './templates.js';
 
 // Comparisons and alternatives
 export { comparisons, alternatives } from './comparisons.js';
 
-// Glossary terms
-export { glossary } from './glossary.js';
-
 // Integrations
 export { integrationCategories, integrations } from './integrations.js';
-
-// Personas
-export { personas } from './personas.js';
 
 // Formats and sizes
 export { formats, popularSizes, apiLanguages } from './formats.js';

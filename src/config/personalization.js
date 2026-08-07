@@ -93,7 +93,7 @@ export const GETTING_STARTED_STEPS = {
 			title: 'Create a template with variables',
 			description:
 				'Templates let you swap variables (name, title, price) on each render. Open the editor to build one.',
-			href: '/template-workspace/create',
+			href: '/template-workspace/html/create',
 			cta: 'Open Editor',
 			color: '#4ade80',
 			icon: 'layout',
@@ -188,7 +188,7 @@ export const GETTING_STARTED_STEPS = {
 			title: 'Create a template with variables',
 			description:
 				'Want to swap text/images on each render? Build a template with variables in the editor.',
-			href: '/template-workspace/create',
+			href: '/template-workspace/html/create',
 			cta: 'Open Editor',
 			color: '#4ade80',
 			icon: 'layout',
@@ -201,7 +201,7 @@ export const GETTING_STARTED_STEPS = {
 			number: 1,
 			title: 'Create your first template',
 			description: 'Open the template editor to design a reusable image template.',
-			href: '/template-workspace/create',
+			href: '/template-workspace/html/create',
 			cta: 'Open Editor',
 			color: '#ffc480',
 			icon: 'layout',
@@ -238,7 +238,7 @@ export const GETTING_STARTED_STEPS = {
 			number: 1,
 			title: 'Open the template editor',
 			description: 'Build a reusable template in the HTML editor.',
-			href: '/template-workspace/create',
+			href: '/template-workspace/html/create',
 			cta: 'Open Editor',
 			color: '#ff6b6b',
 			icon: 'layout',
@@ -461,7 +461,7 @@ export const PRIMARY_CTA = {
 	'ai-agent': { label: 'API Playground', href: '/dashboard/api-playground' },
 	'api-integration': { label: 'API Playground', href: '/dashboard/api-playground' },
 	'no-code': { label: 'Create Template', href: '/dashboard/template/create' },
-	'template-builder': { label: 'Create Template', href: '/template-workspace/create' },
+	'template-builder': { label: 'Create Template', href: '/template-workspace/html/create' },
 	exploring: { label: 'Browse Templates', href: '/dashboard/template' }
 };
 

@@ -10,12 +10,8 @@ const SECTION_SITEMAPS = [
 	'sitemap-formats.xml',
 	'sitemap-blogs.xml',
 	'sitemap-alternatives.xml',
-	'sitemap-compare.xml',
-	'sitemap-glossary.xml',
 	'sitemap-integrations.xml',
-	'sitemap-personas.xml',
-	'sitemap-solutions.xml',
-	'sitemap-templates.xml'
+	'sitemap-solutions.xml'
 ];
 
 export async function GET() {

@@ -143,7 +143,7 @@
 											<div class="w-3.5 h-3.5 rounded-full border-[2px] border-gray-900 bg-[#4ade80]"></div>
 										</div>
 										<div class="flex-1 bg-gray-100 h-7 rounded border-[2px] border-gray-900 flex items-center px-3 mx-2">
-											<span class="text-[10px] font-black font-mono text-gray-400">canvas.pictify.io/preview</span>
+											<span class="text-[10px] font-black font-mono text-gray-400">pictify.io/preview</span>
 										</div>
 									</div>
 									<!-- Image area -->

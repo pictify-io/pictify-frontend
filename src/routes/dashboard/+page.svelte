@@ -62,7 +62,6 @@
 			: null;
 
 	let nudges = [];
-	let starterPreviews = {}; // templateId → { name, svgHtml }
 	let userApiKey = '';
 
 	// Filtered daily stats based on time range
@@ -170,94 +169,6 @@
 		nudges = nudges.filter((n) => n.id !== id);
 	}
 
-	/**
-	 * Generate an inline SVG preview from FabricJS template data.
-	 */
-	function fabricToSvg(tpl) {
-		const width = tpl.width || 1080;
-		const height = tpl.height || 1080;
-		const data = tpl.fabricJSData;
-		if (!data?.objects?.length) return null;
-
-		const els = [];
-		for (const obj of data.objects) {
-			if (!obj) continue;
-			const op = obj.opacity ?? 1;
-			const x = obj.left || 0;
-			const y = obj.top || 0;
-			if (obj.type === 'rect') {
-				const w = (obj.width || 0) * (obj.scaleX || 1);
-				const h = (obj.height || 0) * (obj.scaleY || 1);
-				els.push(
-					`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${
-						obj.fill || '#ccc'
-					}" opacity="${op}" rx="${obj.rx || 0}"/>`
-				);
-			} else if (obj.type === 'circle') {
-				const r = (obj.radius || 0) * (obj.scaleX || 1);
-				els.push(
-					`<circle cx="${x + r}" cy="${y + r}" r="${r}" fill="${obj.fill || '#ccc'}" stroke="${
-						obj.stroke || 'none'
-					}" stroke-width="${obj.strokeWidth || 0}" opacity="${op}"/>`
-				);
-			} else if (['i-text', 'text', 'IText', 'Text', 'Textbox', 'textbox'].includes(obj.type)) {
-				const fs = (obj.fontSize || 16) * (obj.scaleX || 1);
-				const t = (obj.text || '')
-					.replace(/&/g, '&amp;')
-					.replace(/</g, '&lt;')
-					.replace(/>/g, '&gt;');
-				els.push(
-					`<text x="${x}" y="${y + fs * 0.85}" font-size="${fs}px" font-family="${
-						obj.fontFamily || 'Arial'
-					}" font-weight="${obj.fontWeight || 'normal'}" fill="${
-						obj.fill || '#000'
-					}" opacity="${op}">${t}</text>`
-				);
-			} else if (obj.type === 'path' && obj.path) {
-				let d = '';
-				if (Array.isArray(obj.path))
-					d = obj.path.map((p) => (Array.isArray(p) ? p.join(' ') : p)).join(' ');
-				else if (typeof obj.path === 'string') d = obj.path;
-				if (d) {
-					const sx = obj.scaleX || 1;
-					const sy = obj.scaleY || 1;
-					els.push(
-						`<path d="${d}" fill="${obj.fill || 'none'}" stroke="${
-							obj.stroke || 'none'
-						}" opacity="${op}" transform="translate(${x},${y}) scale(${sx},${sy})"/>`
-					);
-				}
-			}
-		}
-		const bg = data.background || '#ffffff';
-		return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><rect width="${width}" height="${height}" fill="${bg}"/>${els.join(
-			''
-		)}</svg>`;
-	}
-
-	/**
-	 * Load starter template previews for the current use case.
-	 */
-	async function loadStarterPreviews(ids) {
-		if (!ids?.length) return;
-		try {
-			const { getTemplateForUseCase } = await import('$lib/pseo/useCaseTemplates.js');
-			const previews = {};
-			for (const id of ids.slice(0, 3)) {
-				const tpl = getTemplateForUseCase(id);
-				if (tpl) {
-					previews[id] = {
-						name: tpl.name || id.replace(/-/g, ' '),
-						svgHtml: fabricToSvg(tpl)
-					};
-				}
-			}
-			starterPreviews = previews;
-		} catch {
-			// Silently fall back to text-only cards
-		}
-	}
-
 	onMount(async () => {
 		analytics.page('Dashboard Home');
 		// Fire the canonical dashboard_page_viewed event on the main dashboard route.
@@ -330,11 +241,6 @@
 			isLoading = false;
 		}
 
-		// Load starter template previews (non-blocking)
-		if ($personalization?.useCase) {
-			const ids = STARTER_TEMPLATES[$personalization.useCase] || [];
-			loadStarterPreviews(ids);
-		}
 	});
 </script>
 
@@ -466,47 +372,38 @@
 				</div>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					{#each starterTemplateIds.slice(0, 3) as templateId}
-						{@const preview = starterPreviews[templateId]}
 						<a
-							href="/template-workspace/create?useCase={templateId}"
+							href="/template-workspace/html/create?engine=html"
 							class="group bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
 							<!-- Template Preview -->
 							<div
 								class="aspect-[4/3] bg-[radial-gradient(circle_at_30%_30%,#f8f8f8,#e8e8e8)] overflow-hidden relative"
 							>
-								{#if preview?.svgHtml}
+								<div class="w-full h-full flex items-center justify-center">
 									<div
-										class="w-full h-full p-3 group-hover:scale-105 transition-transform duration-500"
+										class="w-14 h-14 bg-brand-accent/20 rounded-xl border-[2px] border-brand-accent flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform"
 									>
-										{@html preview.svgHtml}
-									</div>
-								{:else}
-									<div class="w-full h-full flex items-center justify-center">
-										<div
-											class="w-14 h-14 bg-brand-accent/20 rounded-xl border-[2px] border-brand-accent flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform"
+										<svg
+											class="w-7 h-7 text-brand-accent"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
 										>
-											<svg
-												class="w-7 h-7 text-brand-accent"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2.5"
-													d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
-												/>
-											</svg>
-										</div>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2.5"
+												d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
+											/>
+										</svg>
 									</div>
-								{/if}
+								</div>
 							</div>
 							<!-- Label -->
 							<div class="px-4 py-3 border-t-[3px] border-black">
 								<span class="text-sm font-black text-black capitalize"
-									>{preview?.name || templateId.replace(/-/g, ' ')}</span
+									>{templateId.replace(/-/g, ' ')}</span
 								>
 								<span class="block text-xs font-bold text-gray-500 mt-0.5">Try this template</span>
 							</div>

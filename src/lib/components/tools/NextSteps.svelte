@@ -104,7 +104,7 @@
 		}
 
 		if (isLoggedIn) {
-			goto('/template-workspace/create');
+			goto('/template-workspace/html/create');
 		} else {
 			// Guests sign up first, then land in the template creator.
 			goto('/dashboard/template/create');
