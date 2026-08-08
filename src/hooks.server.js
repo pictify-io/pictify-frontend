@@ -169,6 +169,20 @@ export async function handle({ event, resolve }) {
 
 	const response = await resolve(event);
 
+	// Agent/crawler discovery (RFC 8288 Link headers + RFC 9727 well-known
+	// relation types) — only on the homepage, the conventional place an agent
+	// looks first. service-desc is deliberately omitted: the only machine-
+	// readable API spec found (docs.pictify.io/api-reference/openapi.json) is
+	// still Mintlify's unconfigured "OpenAPI Plant Store" placeholder, not
+	// Pictify's real API — pointing agents at it would be worse than nothing.
+	if (pathname === '/') {
+		response.headers.append(
+			'Link',
+			'<https://pictify.io/.well-known/api-catalog>; rel="api-catalog"'
+		);
+		response.headers.append('Link', '<https://docs.pictify.io/>; rel="service-doc"');
+	}
+
 	// Skip if response already has cache-control
 	if (response.headers.has('Cache-Control')) {
 		return response;
