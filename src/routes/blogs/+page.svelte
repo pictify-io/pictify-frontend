@@ -9,6 +9,17 @@
 	let articles = data.props.articles;
 	let guides = data.props.guides;
 	let featured = data.props.featured;
+
+	const itemListJsonLd = {
+		'@context': 'https://schema.org/',
+		'@type': 'ItemList',
+		itemListElement: [...guides, ...articles].map((post, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			url: `https://pictify.io/blogs/${post.slug}`,
+			name: post.title
+		}))
+	};
 </script>
 
 <svelte:head>
@@ -37,6 +48,10 @@
 		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows."
 	/>
 	<meta name="twitter:image" content="https://pictify.io/og/blogs/index.png" />
+	{@html `<script type="application/ld+json">${JSON.stringify(itemListJsonLd).replace(
+		/</g,
+		'\\u003c'
+	)}</script>`}
 </svelte:head>
 
 <div
@@ -106,7 +121,8 @@
 						<div
 							class="h-[280px] border-[3px] border-gray-900 rounded-xl overflow-hidden bg-gray-100 mb-6 relative"
 						>
-							<img loading="lazy"
+							<img
+								loading="lazy"
 								src={featured?.heroImage}
 								class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
 								alt={featured?.title}

@@ -1,4 +1,3 @@
-
 /**
  * Server Hooks
  * Cache headers and server-side processing for PSEO pages
@@ -195,11 +194,15 @@ export async function handle({ event, resolve }) {
 	}
 
 	// Default cache for static-ish pages
+	// Note: '/blogs' (no trailing slash) is the list page — the '/blogs/'
+	// PSEO_CACHE_PATTERNS entry above only matches post pages, so it needs
+	// its own exact-path check here or it falls through uncached.
 	if (
 		pathname === '/' ||
 		pathname === '/pricing' ||
 		pathname === '/tools' ||
-		pathname === '/templates'
+		pathname === '/templates' ||
+		pathname === '/blogs'
 	) {
 		response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
 	}

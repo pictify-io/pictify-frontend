@@ -10,21 +10,26 @@
 	import ShareIcon from '$lib/assets/social/link.svg';
 	import SvelteMarkdown from 'svelte-markdown';
 	import TryNow from '$lib/components/landingPage/TryNow.svelte';
-	import { getRecommendedBlogs } from '../../../api/blog';
 	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
-
-	import { onMount } from 'svelte';
 
 	import 'github-markdown-css/github-markdown-light.css';
 
 	export let data;
-	let recommendedBlogs = [];
+	$: recommendedBlogs = data.props.recommendedBlogs || [];
 	$: blog = data.props.blog;
 	$: formattedDate = new Date(blog.createdAt).toLocaleDateString('en-GB', {
 		day: 'numeric',
 		month: 'short'
 	});
-	$: source = blog.content;
+	// The page renders its own <h1> from blog.title above the article body —
+	// if the markdown itself opens with a "# Title" line, SvelteMarkdown
+	// renders that as a second <h1>, which reads to search engines as an
+	// ambiguous topic signal. Strip a leading H1 line so there's only ever one.
+	function stripLeadingH1(markdown) {
+		if (!markdown) return markdown;
+		return markdown.replace(/^\s*#\s+.+\n+/, '');
+	}
+	$: source = stripLeadingH1(blog.content);
 	$: canonicalUrl = `https://pictify.io/blogs/${blog.slug || $page.params.slug}`;
 	$: blogImage = blog.heroImage || blog.image;
 
@@ -49,15 +54,6 @@
 		code: CodeHighlight,
 		link: Link
 	};
-
-	onMount(() => {
-		getRecommendedBlogs({
-			slug: $page.params.slug,
-			limit: 3
-		}).then((res) => {
-			recommendedBlogs = res?.recommendedBlogs || [];
-		});
-	});
 </script>
 
 <svelte:head>
@@ -92,6 +88,10 @@
 		headline: blog.title,
 		image: blogImage,
 		url: canonicalUrl,
+		mainEntityOfPage: {
+			'@type': 'WebPage',
+			'@id': canonicalUrl
+		},
 		author: {
 			'@type': 'Person',
 			name: blog.author
