@@ -1,6 +1,17 @@
 import { error, redirect } from '@sveltejs/kit';
-import { getBlog } from '../../../api/blog';
+import { getBlog, getRecommendedBlogs } from '../../../api/blog';
 import { sanityEnabled, getSanityPost } from '$lib/sanity/client';
+
+// Runs server-side (was client-only via onMount) so related posts ship in
+// the initial HTML crawlers see, instead of arriving after hydration.
+async function fetchRecommended(slug) {
+	try {
+		const res = await getRecommendedBlogs({ slug, limit: 3 });
+		return res?.recommendedBlogs || [];
+	} catch (e) {
+		return [];
+	}
+}
 
 export async function load({ params, fetch }) {
 	// CMS first: posts live in Sanity after the migration. Legacy
@@ -13,7 +24,8 @@ export async function load({ params, fetch }) {
 				if (matchedLegacy) {
 					throw redirect(301, `/blogs/${blog.slug}`);
 				}
-				return { props: { blog } };
+				const recommendedBlogs = await fetchRecommended(blog.slug);
+				return { props: { blog, recommendedBlogs } };
 			}
 			// Migration moved every post into Sanity, so a clean miss here means
 			// the post genuinely doesn't exist (or was deliberately unpublished/
@@ -50,5 +62,6 @@ export async function load({ params, fetch }) {
 		throw redirect(301, `/blogs/${blog.slug}`);
 	}
 
-	return { props: { blog } };
+	const recommendedBlogs = await fetchRecommended(blog.slug || params.slug);
+	return { props: { blog, recommendedBlogs } };
 }
