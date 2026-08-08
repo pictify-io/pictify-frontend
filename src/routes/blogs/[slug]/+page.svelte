@@ -61,7 +61,7 @@
 </script>
 
 <svelte:head>
-	<title>{blog.title} | Pictify</title>
+	<title>{blog.seoTitle || blog.title} | Pictify</title>
 	{#if metaDescription}
 		<meta name="description" content={metaDescription} />
 	{/if}
@@ -107,7 +107,7 @@
 		datePublished: blog.createdAt || blog.date,
 		dateModified: blog.updatedAt || blog.createdAt || blog.date,
 		description: metaDescription
-	})}</script>`}
+	}).replace(/</g, '\\u003c')}</script>`}
 </svelte:head>
 
 <div

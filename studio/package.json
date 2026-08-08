@@ -1,0 +1,19 @@
+{
+	"name": "pictify-studio",
+	"private": true,
+	"version": "1.0.0",
+	"description": "Sanity Studio for Pictify content (blog posts; marketing pages in phase 2)",
+	"main": "package.json",
+	"scripts": {
+		"dev": "sanity dev",
+		"build": "sanity build",
+		"deploy": "sanity deploy"
+	},
+	"dependencies": {
+		"react": "^19.2.2",
+		"react-dom": "^19.2.2",
+		"sanity": "^6.9.1",
+		"sanity-plugin-markdown": "^9.0.9",
+		"styled-components": "^6.5.0"
+	}
+}

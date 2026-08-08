@@ -11,3 +11,5 @@ vite.config.ts.timestamp-*
 .wrangler
 .gstack/
 .antigravitycli/
+studio/dist
+studio/.sanity

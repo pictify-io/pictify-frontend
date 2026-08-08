@@ -14,3 +14,7 @@ yarn.lock
 
 # Vendored third-party code (kept close to upstream formatting)
 src/lib/video/vendor/
+
+# Sanity Studio build output (not committed)
+studio/dist/
+studio/.sanity/
