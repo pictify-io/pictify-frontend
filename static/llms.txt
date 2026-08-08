@@ -1,0 +1,33 @@
+# Pictify
+
+> API-first image, document, and video generation. Every row of a spreadsheet or a webhook payload becomes a rendered, personalized certificate, badge, report, or video — delivered by email, with per-recipient delivery and bounce status tracked.
+
+Pictify renders HTML/CSS as images (PNG/JPG/WebP), screenshots arbitrary URLs, generates multi-page PDFs, and renders video from templates authored visually or in code (Remotion). Workflows connect a CSV upload or a signed webhook to a template and a delivery pipeline in one step.
+
+## Product
+
+- [Homepage](https://pictify.io/): what Pictify does and who it's for
+- [Pricing](https://pictify.io/pricing): plans, free tier, render/AI credit pools
+- [API reference](https://docs.pictify.io): full endpoint documentation
+
+## Developer guides
+
+- [HTML to Image API: The Complete Developer Guide](https://pictify.io/blogs/html-to-image-the-complete-developer-guide-2026): client-side (html2canvas/html-to-image/dom-to-image) vs. headless browsers (Puppeteer/Playwright) vs. rendering APIs — failure modes, production code, benchmarks
+- [Website Screenshot API: The Complete Developer Guide](https://pictify.io/blogs/website-screenshot-api-the-complete-developer-guide-2026): cookie banners, SPA wait-timing, mobile emulation, full-page capture, the auth-wall limitation
+
+## Solutions
+
+- [Mail Merge with Attachments](https://pictify.io/solutions/mail-merge-with-attachments): a personalized PDF per spreadsheet row, emailed to each recipient
+- [Video Mail Merge](https://pictify.io/solutions/video-mail-merge): the same pattern, video instead of documents
+
+## Core tools
+
+- [URL to Image / Website Screenshot](https://pictify.io/tools/url-to-image-generator)
+- [HTML to PNG](https://pictify.io/tools/html-to-png)
+- [Code to Image](https://pictify.io/tools/code-to-image)
+- [Certificate Generator](https://pictify.io/tools/certificate-generator)
+- [CSV to PDF](https://pictify.io/tools/csv-to-pdf)
+
+## Optional
+
+- [Full sitemap](https://pictify.io/sitemap.xml): every page, including all comparison and blog content

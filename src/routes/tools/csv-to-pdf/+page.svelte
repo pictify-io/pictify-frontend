@@ -117,7 +117,9 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		const fields = headers
 			.map(
 				(h) =>
-					`<div class="row"><div class="k">${escapeHtml(h)}</div><div class="v">${escapeHtml(row[h])}</div></div>`
+					`<div class="row"><div class="k">${escapeHtml(h)}</div><div class="v">${escapeHtml(
+						row[h]
+					)}</div></div>`
 			)
 			.join('');
 		return `${styleBlock}<body>
@@ -244,11 +246,11 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		},
 		{
 			q: 'Can each CSV row become its own PDF document?',
-			a: 'Yes — that is this tool\'s specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout.'
+			a: "Yes — that is this tool's specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout."
 		},
 		{
-			q: 'Can I email each row\'s PDF to a different recipient?',
-			a: 'Yes, with a Pictify workflow. If your CSV has an email column, a workflow run renders each row\'s document AND emails it to that recipient, with delivered/bounced status per person. That is the part no converter, spreadsheet, or mail-merge add-on does.'
+			q: "Can I email each row's PDF to a different recipient?",
+			a: "Yes, with a Pictify workflow. If your CSV has an email column, a workflow run renders each row's document AND emails it to that recipient, with delivered/bounced status per person. That is the part no converter, spreadsheet, or mail-merge add-on does."
 		},
 		{
 			q: 'Is there a row limit?',
@@ -286,6 +288,16 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 		creator: { '@type': 'Organization', name: 'Pictify.io', url: 'https://pictify.io' }
 	});
+
+	const breadcrumbSchemaJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'CSV to PDF' }
+		]
+	});
 </script>
 
 <svelte:head>
@@ -300,7 +312,10 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	/>
 	<link rel="canonical" href="https://pictify.io/tools/csv-to-pdf" />
 	<meta name="robots" content="index, follow, max-image-preview:large" />
-	<meta property="og:title" content="CSV to PDF Converter — Every Row Becomes a Document | Pictify" />
+	<meta
+		property="og:title"
+		content="CSV to PDF Converter — Every Row Becomes a Document | Pictify"
+	/>
 	<meta
 		property="og:description"
 		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row — then deliver each one by email."
@@ -310,7 +325,10 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	<meta property="og:site_name" content="Pictify" />
 	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="CSV to PDF Converter — Every Row Becomes a Document | Pictify" />
+	<meta
+		name="twitter:title"
+		content="CSV to PDF Converter — Every Row Becomes a Document | Pictify"
+	/>
 	<meta
 		name="twitter:description"
 		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row."
@@ -318,6 +336,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
 	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
+	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
@@ -329,7 +348,9 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 			<ol class="inline-flex items-center gap-2 text-sm font-bold">
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
-				<li><a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a></li>
+				<li>
+					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
+				</li>
 				<li class="text-gray-300">/</li>
 				<li class="text-gray-900">CSV to PDF</li>
 			</ol>
@@ -362,7 +383,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 					Turn a spreadsheet into
 					<span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>real documents</span
-					> — the whole sheet as a table, or one formatted PDF page per row.
+					>
+					— the whole sheet as a table, or one formatted PDF page per row.
 					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
 						>Free, in your browser. No signup required.</span
 					>
@@ -389,7 +411,11 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 						on:drop|preventDefault={handleFile}
 						on:dragover|preventDefault
 					>
-						<svg class="w-8 h-8 mb-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+						<svg
+							class="w-8 h-8 mb-2 text-gray-500"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
 							><path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -398,7 +424,9 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 							/></svg
 						>
 						<span class="font-black text-sm">Upload or drop a .csv file</span>
-						<span class="text-xs text-gray-500 font-semibold mt-1">{fileName || 'header row required'}</span>
+						<span class="text-xs text-gray-500 font-semibold mt-1"
+							>{fileName || 'header row required'}</span
+						>
 						<input type="file" accept=".csv,text/csv" class="hidden" on:change={handleFile} />
 					</label>
 					<div class="flex flex-col">
@@ -427,7 +455,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 				{/if}
 				{#if rows.length}
 					<p class="mt-4 text-sm font-bold text-gray-700">
-						Parsed <span class="bg-data-green px-1 border-b-2 border-black">{rows.length} rows</span>
+						Parsed <span class="bg-data-green px-1 border-b-2 border-black">{rows.length} rows</span
+						>
 						· {headers.length} columns: <span class="font-mono text-xs">{headers.join(', ')}</span>
 					</p>
 				{/if}
@@ -451,7 +480,11 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 							on:click={() => (mode = 'per-row')}
 						>
 							<div class="font-black mb-1">One document per row</div>
-							<p class="text-xs font-semibold {mode === 'per-row' ? 'text-gray-300' : 'text-gray-500'}">
+							<p
+								class="text-xs font-semibold {mode === 'per-row'
+									? 'text-gray-300'
+									: 'text-gray-500'}"
+							>
 								Every row becomes its own formatted PDF page — titles, labeled fields, ready to
 								send. {rows.length} rows → {Math.min(rows.length, rowsToRender) || 0} pages now{rows.length >
 								rowsToRender
@@ -466,7 +499,9 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 							on:click={() => (mode = 'table')}
 						>
 							<div class="font-black mb-1">Whole sheet as a table</div>
-							<p class="text-xs font-semibold {mode === 'table' ? 'text-gray-300' : 'text-gray-500'}">
+							<p
+								class="text-xs font-semibold {mode === 'table' ? 'text-gray-300' : 'text-gray-500'}"
+							>
 								One clean, print-ready PDF of the table itself (first 40 rows).
 							</p>
 						</button>
@@ -501,18 +536,20 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 							href={pdfBlobUrl}
 							download="{(fileName || 'documents').replace(/\.csv$/i, '')}.pdf"
 							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-white font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>Download PDF ({generatedImages.length} page{generatedImages.length === 1 ? '' : 's'})</a
+							>Download PDF ({generatedImages.length} page{generatedImages.length === 1
+								? ''
+								: 's'})</a
 						>
 					</div>
 					{#if mode === 'per-row'}
 						<div class="border-t-[3px] border-white/20 pt-5">
 							<p class="font-bold text-gray-300 text-sm leading-relaxed">
-								<span class="text-white font-black">Next step:</span> these documents are still on your
-								disk — the deadline wants them in inboxes. A workflow run renders every row
+								<span class="text-white font-black">Next step:</span> these documents are still on
+								your disk — the deadline wants them in inboxes. A workflow run renders every row
 								{rows.length > rowsToRender ? `(all ${rows.length}, not just ${rowsToRender})` : ''}
-								with a branded template and <span class="text-data-green font-black"
-									>emails each one to its recipient</span
-								> with delivered/bounced status per person.
+								with a branded template and
+								<span class="text-data-green font-black">emails each one to its recipient</span> with
+								delivered/bounced status per person.
 							</p>
 							<a
 								href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew"
@@ -543,8 +580,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 					<a href="/solutions/mail-merge-with-attachments" class="underline font-black"
 						>Pictify workflow</a
 					>
-					takes the same CSV, renders each row against a branded template (certificate, letter,
-					report — or one the
+					takes the same CSV, renders each row against a branded template (certificate, letter, report
+					— or one the
 					<span class="font-black">AI Template Maker</span> writes from your description), and emails
 					every document to its recipient with per-person delivery status.
 				</p>

@@ -98,6 +98,45 @@
 		}
 	});
 
+	const invoiceFaqs = [
+		{
+			q: 'How do I use this invoice generator?',
+			a: 'Simply fill in your company and client details, add invoice items, select a template, and click "Generate Invoice". You can then download your professional invoice.'
+		},
+		{
+			q: 'Is this invoice generator free to use?',
+			a: 'Yes, our online invoice generator is completely free to use. Create and download as many invoices as you need without any cost.'
+		},
+		{
+			q: 'Can I customize the invoice template?',
+			a: 'You can choose from a variety of professional designs. Each template can be populated with your specific invoice details.'
+		},
+		{
+			q: 'Are the generated invoices legally compliant?',
+			a: 'Our templates include standard elements required for most invoices. Please check your local regulations for specific requirements.'
+		}
+	];
+
+	const faqSchemaJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: invoiceFaqs.map((faq) => ({
+			'@type': 'Question',
+			name: faq.q,
+			acceptedAnswer: { '@type': 'Answer', text: faq.a }
+		}))
+	});
+
+	const breadcrumbSchemaJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'Online Invoice Generator' }
+		]
+	});
+
 	// Function to calculate iframe scale based on container width
 	function calculateScale(containerWidth) {
 		// Invoice is 800px wide, scale to fit container with some padding
@@ -319,6 +358,8 @@
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
+	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
+	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
 </svelte:head>
 
 <svelte:window bind:innerWidth={windowWidth} />
@@ -707,7 +748,8 @@
 							</div>
 						</div>
 						<div class="p-4">
-							<img loading="lazy"
+							<img
+								loading="lazy"
 								src={imageUrl}
 								alt="Invoice"
 								class="w-full h-auto border-[3px] border-black shadow-brutal-lg"
@@ -919,7 +961,7 @@
 					Frequently Asked Questions
 				</h3>
 				<div class="space-y-3">
-					{#each [{ q: 'How do I use this invoice generator?', a: 'Simply fill in your company and client details, add invoice items, select a template, and click "Generate Invoice". You can then download your professional invoice.' }, { q: 'Is this invoice generator free to use?', a: 'Yes, our online invoice generator is completely free to use. Create and download as many invoices as you need without any cost.' }, { q: 'Can I customize the invoice template?', a: 'You can choose from a variety of professional designs. Each template can be populated with your specific invoice details.' }, { q: 'Are the generated invoices legally compliant?', a: 'Our templates include standard elements required for most invoices. Please check your local regulations for specific requirements.' }] as faq}
+					{#each invoiceFaqs as faq}
 						<details
 							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 						>
@@ -980,7 +1022,6 @@
 
 	<Toast />
 	<Footer />
-
 </section>
 
 <style>

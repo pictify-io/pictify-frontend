@@ -502,6 +502,29 @@
 		docsLabel: 'View LinkedIn Banner API docs',
 		secondaryCtaLabel: 'See code examples'
 	};
+
+	const structuredDataJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'WebApplication',
+		name: 'Pictify LinkedIn Banner Generator',
+		url: 'https://pictify.io/tools/linkedin-banner-generator',
+		description:
+			'Create professional LinkedIn banners in seconds — 20+ templates at the correct 1584×396 dimensions, free with API access.',
+		applicationCategory: ['DesignApplication', 'BusinessApplication'],
+		operatingSystem: 'Web',
+		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+		creator: { '@type': 'Organization', name: 'Pictify.io', url: 'https://pictify.io' }
+	});
+
+	const breadcrumbSchemaJson = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'LinkedIn Banner Generator' }
+		]
+	});
 </script>
 
 <svelte:head>
@@ -529,10 +552,15 @@
 	<meta property="og:image:alt" content="Pictify LinkedIn banner generator — free, 1584×396" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Free LinkedIn Banner Generator | Pictify" />
-	<meta name="twitter:description" content="Create professional LinkedIn banners in seconds. 20+ templates. Free, no watermark." />
+	<meta
+		name="twitter:description"
+		content="Create professional LinkedIn banners in seconds. 20+ templates. Free, no watermark."
+	/>
 	<meta name="twitter:image" content="https://pictify.io/og/tools/linkedin-banner-generator.png" />
 
 	<link rel="canonical" href="https://pictify.io/tools/linkedin-banner-generator" />
+	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
+	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
 </svelte:head>
 
 <section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
@@ -965,7 +993,8 @@
 							<div
 								class="aspect-[4/1] border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden mb-6"
 							>
-								<img loading="lazy"
+								<img
+									loading="lazy"
 									src={imageUrl}
 									alt="Generated LinkedIn Banner"
 									class="w-full h-full object-cover"
@@ -974,9 +1003,7 @@
 
 							<!-- Watermark Notice -->
 							{#if !isUserLoggedIn && generationCount > 2}
-								<div
-									class="bg-brand-accent border-[3px] border-gray-900 p-5 mb-6 shadow-brutal-lg"
-								>
+								<div class="bg-brand-accent border-[3px] border-gray-900 p-5 mb-6 shadow-brutal-lg">
 									<p class="font-black text-gray-900 uppercase tracking-wide">
 										Free downloads include a small Pictify watermark
 									</p>
@@ -985,7 +1012,11 @@
 									</p>
 									<a
 										href="/signup"
-										on:click={() => analytics.track('tool_signup_click', { tool_name: 'linkedin_banner_generator', cta_location: 'remove_watermark' })}
+										on:click={() =>
+											analytics.track('tool_signup_click', {
+												tool_name: 'linkedin_banner_generator',
+												cta_location: 'remove_watermark'
+											})}
 										class="inline-block mt-3 px-6 py-3 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:shadow-[2px_2px_0_0_#ff6b6b] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Remove Watermark Free
@@ -1114,7 +1145,8 @@
 									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
 										<span class="text-data-green font-black">✓</span>
 										<span class="font-bold"
-											>Company Page: <strong class="text-brand-danger">1128 x 191 pixels</strong></span
+											>Company Page: <strong class="text-brand-danger">1128 x 191 pixels</strong
+											></span
 										>
 									</li>
 									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">

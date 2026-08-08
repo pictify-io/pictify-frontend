@@ -717,6 +717,47 @@
 			'@id': canonicalUrl
 		}
 	};
+
+	const faqSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: [
+			{
+				'@type': 'Question',
+				name: 'How do I add an OG image?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: "Add the og:image meta tag in your page's <head> section with the absolute URL of your image."
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'What size should it be?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'The recommended size is 1200×630 pixels (1.91:1 ratio) for optimal display on Facebook, Twitter, and LinkedIn.'
+				}
+			},
+			{
+				'@type': 'Question',
+				name: 'Is there an API?',
+				acceptedAnswer: {
+					'@type': 'Answer',
+					text: 'Yes! Use our REST API to generate OG images programmatically. Perfect for blogs, e-commerce, and SaaS platforms.'
+				}
+			}
+		]
+	};
+
+	const breadcrumbSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
+			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
+			{ '@type': 'ListItem', position: 3, name: 'OG Image Generator' }
+		]
+	};
 </script>
 
 {#if !isPlatform}
@@ -735,7 +776,7 @@
 			description:
 				'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'
 		}}
-		schema={structuredData}
+		schema={[structuredData, faqSchema, breadcrumbSchema]}
 	/>
 {/if}
 
