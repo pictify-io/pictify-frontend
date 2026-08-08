@@ -1448,6 +1448,48 @@
 			</section>
 		</div>
 
+		<!-- Screenshot API comparisons + related guide -->
+		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20">
+			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
+				<h3 class="text-2xl font-black mb-6 uppercase">Comparing Screenshot APIs?</h3>
+				<p class="font-medium text-gray-600 mb-6">
+					This tool is API-backed — see how it stacks up against the other screenshot/rendering APIs
+					developers usually compare it to.
+				</p>
+				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+					<a
+						href="/alternatives/screenshotone"
+						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						>vs ScreenshotOne</a
+					>
+					<a
+						href="/alternatives/screenshotapi"
+						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						>vs ScreenshotAPI</a
+					>
+					<a
+						href="/alternatives/screenshot-machine"
+						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						>vs Screenshot Machine</a
+					>
+					<a
+						href="/alternatives/apiflash"
+						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						>vs APIFlash</a
+					>
+				</div>
+				<p class="font-medium text-gray-600">
+					Have HTML instead of a live URL? Read the
+					<a
+						href="/blogs/html-to-image-the-complete-developer-guide-2026"
+						class="underline font-bold text-gray-900 hover:text-brand-danger"
+					>
+						HTML to Image API developer guide</a
+					> instead.
+				</p>
+			</section>
+		</div>
+
 		<div class="mt-8 mb-20 w-full max-w-5xl mx-auto px-2 md:px-0 text-center">
 			<p class="font-bold text-gray-500 uppercase tracking-widest mb-6">Spread the word</p>
 			<div class="flex flex-col md:flex-row justify-center md:space-x-6">
