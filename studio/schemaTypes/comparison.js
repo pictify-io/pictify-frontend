@@ -110,8 +110,18 @@ export default defineType({
 					type: 'object',
 					name: 'pricingTier',
 					fields: [
-						defineField({ name: 'tier', title: 'Tier name', type: 'string' }),
-						defineField({ name: 'price', title: 'Price', type: 'string' })
+						defineField({
+							name: 'tier',
+							title: 'Tier name',
+							type: 'string',
+							validation: (rule) => rule.required()
+						}),
+						defineField({
+							name: 'price',
+							title: 'Price',
+							type: 'string',
+							validation: (rule) => rule.required()
+						})
 					],
 					preview: {
 						select: { title: 'tier', subtitle: 'price' }
@@ -128,8 +138,18 @@ export default defineType({
 					type: 'object',
 					name: 'pricingTier',
 					fields: [
-						defineField({ name: 'tier', title: 'Tier name', type: 'string' }),
-						defineField({ name: 'price', title: 'Price', type: 'string' })
+						defineField({
+							name: 'tier',
+							title: 'Tier name',
+							type: 'string',
+							validation: (rule) => rule.required()
+						}),
+						defineField({
+							name: 'price',
+							title: 'Price',
+							type: 'string',
+							validation: (rule) => rule.required()
+						})
 					],
 					preview: {
 						select: { title: 'tier', subtitle: 'price' }
@@ -147,18 +167,23 @@ export default defineType({
 					type: 'object',
 					name: 'featureRow',
 					fields: [
-						defineField({ name: 'label', title: 'Feature', type: 'string' }),
+						defineField({
+							name: 'label',
+							title: 'Feature',
+							type: 'string',
+							validation: (rule) => rule.required()
+						}),
 						defineField({
 							name: 'pictifyScore',
 							title: 'Pictify score (1-5)',
 							type: 'number',
-							validation: (rule) => rule.min(1).max(5)
+							validation: (rule) => rule.required().min(1).max(5)
 						}),
 						defineField({
 							name: 'competitorScore',
 							title: 'Competitor score (1-5)',
 							type: 'number',
-							validation: (rule) => rule.min(1).max(5)
+							validation: (rule) => rule.required().min(1).max(5)
 						})
 					],
 					preview: {
@@ -195,8 +220,19 @@ export default defineType({
 					type: 'object',
 					name: 'faq',
 					fields: [
-						defineField({ name: 'q', title: 'Question', type: 'string' }),
-						defineField({ name: 'a', title: 'Answer', type: 'text', rows: 3 })
+						defineField({
+							name: 'q',
+							title: 'Question',
+							type: 'string',
+							validation: (rule) => rule.required()
+						}),
+						defineField({
+							name: 'a',
+							title: 'Answer',
+							type: 'text',
+							rows: 3,
+							validation: (rule) => rule.required()
+						})
 					],
 					preview: {
 						select: { title: 'q' }
