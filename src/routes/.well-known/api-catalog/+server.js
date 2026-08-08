@@ -6,6 +6,13 @@
  *
  * Keep this to endpoints that are actually verified/live — an agent acting
  * on a wrong or stale entry here is worse than this file not existing.
+ *
+ * service-desc (a real OpenAPI/machine-readable spec) is deliberately
+ * omitted: docs.pictify.io/api-reference/openapi.json is still Mintlify's
+ * unconfigured "OpenAPI Plant Store" placeholder, and there's no
+ * @fastify/swagger or generated spec anywhere in the backend (checked
+ * directly, 2026-08-08). Add it here once a real one exists — pointing
+ * agents at fake API data would be worse than omitting the relation.
  */
 
 const CATALOG = {
@@ -13,6 +20,7 @@ const CATALOG = {
 		{
 			anchor: 'https://pictify.io/',
 			'service-doc': [{ href: 'https://docs.pictify.io/', type: 'text/html' }],
+			status: [{ href: 'https://api.pictify.io/health', type: 'application/json' }],
 			item: [
 				{
 					href: 'https://api.pictify.io/image',
