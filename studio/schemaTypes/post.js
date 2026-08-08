@@ -101,7 +101,7 @@ export default defineType({
 			title: 'Hero image URL',
 			type: 'url',
 			description: 'Absolute URL (media.pictify.io or Cloudinary). Also used as the OG image.',
-			validation: (rule) => rule.uri({ scheme: ['http', 'https'] })
+			validation: (rule) => rule.required().uri({ scheme: ['http', 'https'] })
 		}),
 		defineField({
 			name: 'featured',
