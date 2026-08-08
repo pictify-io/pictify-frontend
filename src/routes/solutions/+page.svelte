@@ -69,7 +69,9 @@
 					<span class="text-xs font-black uppercase tracking-widest text-gray-900">Start here</span>
 				</div>
 				<div class="p-8">
-					<h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">{pillar.label}</h2>
+					<h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+						{pillar.breadcrumbLabel}
+					</h2>
 					<p class="text-lg text-gray-700 font-medium">{pillar.summary}</p>
 					<div
 						class="mt-4 text-sm font-black uppercase tracking-widest text-gray-500 inline-flex items-center gap-1.5"
@@ -110,7 +112,7 @@
 						<h3
 							class="font-black text-gray-900 mb-2 text-lg leading-tight group-hover:text-brand-danger transition-colors"
 						>
-							{s.label}
+							{s.breadcrumbLabel}
 						</h3>
 						<p class="text-sm text-gray-600 leading-relaxed mb-4">{s.summary}</p>
 						<div

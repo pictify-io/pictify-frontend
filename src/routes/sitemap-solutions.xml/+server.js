@@ -5,6 +5,7 @@
  */
 
 import { getSanitySolutions } from '$lib/sanity/solutions';
+import { xmlEscape } from '$lib/seo/xml.js';
 
 export async function GET() {
 	const baseUrl = 'https://pictify.io';
@@ -30,7 +31,7 @@ export async function GET() {
 			// Pillar gets priority 0.9; supporting pages 0.8.
 			const priority = s.isPillar ? '0.9' : '0.8';
 			return `  <url>
-    <loc>${baseUrl}/solutions/${s.slug}</loc>
+    <loc>${baseUrl}/solutions/${xmlEscape(s.slug)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${priority}</priority>

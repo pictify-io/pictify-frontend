@@ -25,9 +25,12 @@
 		creator: { '@type': 'Organization', name: 'Pictify', url: 'https://pictify.io' }
 	};
 
-	$: stepsForSchema = solution.body.find((b) => b._type === 'stepsBlock');
-	$: howToSteps = stepsForSchema ? stepsForSchema.steps : null;
-	$: howToMeta = stepsForSchema
+	// A page could carry more than one stepsBlock (e.g. two audiences) — the
+	// schema doesn't cap it, so fold every block's steps into one HowTo
+	// rather than silently dropping all but the first from structured data.
+	$: stepsBlocks = solution.body.filter((b) => b._type === 'stepsBlock');
+	$: howToSteps = stepsBlocks.length ? stepsBlocks.flatMap((b) => b.steps) : null;
+	$: howToMeta = stepsBlocks.length
 		? {
 				name: solution.keyword ? `How to ${solution.keyword}` : solution.breadcrumbLabel,
 				description: solution.metaDescription
