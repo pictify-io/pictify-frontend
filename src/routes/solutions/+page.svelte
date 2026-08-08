@@ -1,10 +1,10 @@
 <script>
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import { solutions, getPillar } from '$lib/solutions/related.js';
 
-	const pillar = getPillar();
-	const others = solutions.filter((s) => !s.isPillar);
+	export let data;
+	$: pillar = data.solutions.find((s) => s.isPillar);
+	$: others = data.solutions.filter((s) => !s.isPillar);
 
 	const title = 'Solutions — Documents & Videos Generated and Delivered | Pictify';
 	const description =
@@ -24,7 +24,10 @@
 	<meta property="og:image" content="https://pictify.io/og/solutions/index.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Documents and videos generated and delivered — Pictify Solutions" />
+	<meta
+		property="og:image:alt"
+		content="Documents and videos generated and delivered — Pictify Solutions"
+	/>
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
@@ -37,7 +40,9 @@
 
 	<main class="max-w-6xl mx-auto px-4 py-20">
 		<nav class="mb-8 flex justify-center">
-			<ol class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg">
+			<ol
+				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
+			>
 				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
 				<li class="text-gray-300">/</li>
 				<li class="text-gray-900">Solutions</li>
@@ -64,11 +69,22 @@
 					<span class="text-xs font-black uppercase tracking-widest text-gray-900">Start here</span>
 				</div>
 				<div class="p-8">
-					<h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">{pillar.label}</h2>
+					<h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+						{pillar.breadcrumbLabel}
+					</h2>
 					<p class="text-lg text-gray-700 font-medium">{pillar.summary}</p>
-					<div class="mt-4 text-sm font-black uppercase tracking-widest text-gray-500 inline-flex items-center gap-1.5">
+					<div
+						class="mt-4 text-sm font-black uppercase tracking-widest text-gray-500 inline-flex items-center gap-1.5"
+					>
 						Read the guide
-						<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+						<svg
+							class="w-3 h-3"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="3"
+							><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg
+						>
 					</div>
 				</div>
 			</a>
@@ -79,20 +95,38 @@
 		</h2>
 		<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 			{#each others as s, i}
-				{@const colors = ['bg-brand-danger', 'bg-data-green', 'bg-brand-accent', 'bg-data-violet', 'bg-[#06b6d4]', 'bg-[#ec4899]']}
+				{@const colors = [
+					'bg-brand-danger',
+					'bg-data-green',
+					'bg-brand-accent',
+					'bg-data-violet',
+					'bg-[#06b6d4]',
+					'bg-[#ec4899]'
+				]}
 				<a
 					href="/solutions/{s.slug}"
 					class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
 				>
-					<div class="{colors[i % colors.length]} h-2 border-b-[3px] border-gray-900"></div>
+					<div class="{colors[i % colors.length]} h-2 border-b-[3px] border-gray-900" />
 					<div class="p-6">
-						<h3 class="font-black text-gray-900 mb-2 text-lg leading-tight group-hover:text-brand-danger transition-colors">
-							{s.label}
+						<h3
+							class="font-black text-gray-900 mb-2 text-lg leading-tight group-hover:text-brand-danger transition-colors"
+						>
+							{s.breadcrumbLabel}
 						</h3>
 						<p class="text-sm text-gray-600 leading-relaxed mb-4">{s.summary}</p>
-						<div class="text-xs font-black uppercase tracking-widest text-gray-500 group-hover:text-gray-900 transition-colors inline-flex items-center gap-1.5">
+						<div
+							class="text-xs font-black uppercase tracking-widest text-gray-500 group-hover:text-gray-900 transition-colors inline-flex items-center gap-1.5"
+						>
 							Read the guide
-							<svg class="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+							<svg
+								class="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="3"
+								><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg
+							>
 						</div>
 					</div>
 				</a>
