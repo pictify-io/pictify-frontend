@@ -6,13 +6,31 @@
 	import { brandIcons } from '$lib/config/brandIcons.js';
 
 	// Unknown slugs are redirected server-side in +page.js before this renders.
+	export let data;
 	$: slug = $page.params.slug;
-	$: alt = alternatives.find((a) => a.slug === slug);
+	$: alt = data.alt;
 	$: validAlt = !!alt;
 	$: icon = validAlt ? brandIcons[slug] || brandIcons.default : brandIcons.default;
 
-	// Other alternatives for navigation
+	// Other alternatives for navigation — still drawn from the legacy static
+	// list regardless of whether the current page came from Sanity: this is
+	// just cross-link suggestions, not the canonical content for this page.
 	$: otherAlts = alternatives.filter((a) => a.slug !== slug).slice(0, 4);
+
+	// Pricing tier names vary per competitor (free/basic/pro vs free/plus/
+	// advanced), so render whatever tiers actually exist instead of assuming
+	// a fixed Free/Starter/Pro shape — the old fixed-row table silently
+	// rendered "undefined" for any competitor whose tier names didn't match.
+	$: pricingRows = (() => {
+		const pictify = alt?.comparison?.pricing?.pictify || {};
+		const competitor = alt?.comparison?.pricing?.competitor || {};
+		const tiers = [...new Set([...Object.keys(pictify), ...Object.keys(competitor)])];
+		return tiers.map((tier) => ({
+			tier,
+			pictify: pictify[tier] || '-',
+			competitor: competitor[tier] || 'None'
+		}));
+	})();
 
 	// SEO
 	$: title = validAlt
@@ -179,7 +197,9 @@
 				<!-- Supporting subhead: repeats the keyword + adds long-tail variants. -->
 				<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl mb-6">
 					{alt.comparison.subhead ||
-						`Looking for a free ${alt.competitor.toLowerCase()} alternative? Pictify is the programmable image engine teams switch to when ${alt.competitor} falls short.`}
+						`Looking for a free ${alt.competitor.toLowerCase()} alternative? Pictify is the programmable image engine teams switch to when ${
+							alt.competitor
+						} falls short.`}
 				</p>
 
 				<!-- TL;DR -->
@@ -335,36 +355,13 @@
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-gray-200">
-								<tr>
-									<td class="px-6 py-4 font-bold text-gray-900">Free</td>
-									<td class="px-6 py-4 font-medium text-data-green"
-										>{alt.comparison.pricing.pictify.free}</td
-									>
-									<td class="px-6 py-4 font-medium text-gray-600"
-										>{alt.comparison.pricing.competitor.free || 'None'}</td
-									>
-								</tr>
-								<tr class="bg-gray-50">
-									<td class="px-6 py-4 font-bold text-gray-900">Starter</td>
-									<td class="px-6 py-4 font-medium text-data-green"
-										>{alt.comparison.pricing.pictify.starter}</td
-									>
-									<td class="px-6 py-4 font-medium text-gray-600"
-										>{alt.comparison.pricing.competitor.starter}</td
-									>
-								</tr>
-								<tr>
-									<td class="px-6 py-4 font-bold text-gray-900">Pro</td>
-									<td class="px-6 py-4 font-medium text-data-green"
-										>{alt.comparison.pricing.pictify.pro}</td
-									>
-									<td class="px-6 py-4 font-medium text-gray-600"
-										>{alt.comparison.pricing.competitor.pro ||
-											alt.comparison.pricing.competitor.advanced ||
-											alt.comparison.pricing.competitor.growth ||
-											'-'}</td
-									>
-								</tr>
+								{#each pricingRows as row, i}
+									<tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
+										<td class="px-6 py-4 font-bold text-gray-900 capitalize">{row.tier}</td>
+										<td class="px-6 py-4 font-medium text-data-green">{row.pictify}</td>
+										<td class="px-6 py-4 font-medium text-gray-600">{row.competitor}</td>
+									</tr>
+								{/each}
 							</tbody>
 						</table>
 					</div>

@@ -1,8 +1,10 @@
 <script>
 	import Nav from '$lib/components/landingPage/Nav.svelte';
 	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import { alternatives } from '$lib/pseo/comparisons.js';
 	import { brandIcons } from '$lib/config/brandIcons.js';
+
+	export let data;
+	$: alternatives = data.alternatives;
 
 	const title = 'Pictify Alternatives | Switch to Better Image Generation';
 	const description =
@@ -91,9 +93,7 @@
 
 		<!-- Why Teams Switch Section -->
 		<section class="mb-16">
-			<div
-				class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl"
-			>
+			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl">
 				<h2 class="text-2xl font-black text-gray-900 mb-6 text-center">
 					Why Teams Switch to Pictify
 				</h2>
@@ -211,7 +211,9 @@
 
 								<div class="flex flex-col items-center gap-1">
 									<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
-									<div class="text-xs font-black text-data-green uppercase tracking-widest">ALT</div>
+									<div class="text-xs font-black text-data-green uppercase tracking-widest">
+										ALT
+									</div>
 									<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
 								</div>
 
