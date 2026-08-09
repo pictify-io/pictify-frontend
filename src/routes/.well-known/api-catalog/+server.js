@@ -27,6 +27,26 @@ const CATALOG = {
 					type: 'application/json',
 					title: 'Image API — render HTML or a URL to PNG/JPG/WebP'
 				}
+			],
+			// Not a registered IANA relation — api.pictify.io is the real OAuth
+			// issuer and can't republish its own metadata under this origin
+			// (RFC 8414 §3.3 requires the issuer field to match the origin the
+			// document was fetched from), so this is a plain pointer, same as
+			// service-doc/item above, not a claim that this document IS the
+			// authorization server metadata.
+			'oauth-authorization-server': [
+				{
+					href: 'https://api.pictify.io/.well-known/oauth-authorization-server',
+					type: 'application/json',
+					title: 'OAuth 2.1 Authorization Server Metadata (RFC 8414) — how agents authenticate to the API'
+				}
+			],
+			'agent-registration': [
+				{
+					href: 'https://api.pictify.io/auth.md',
+					type: 'text/markdown',
+					title: 'auth.md — step-by-step agent registration and authentication guide'
+				}
 			]
 		}
 	]
