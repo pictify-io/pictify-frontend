@@ -1,0 +1,11 @@
+/.well-known/agent-skills/index.json
+  Content-Type: application/json
+  Access-Control-Allow-Origin: *
+
+/.well-known/agent-skills/pictify/SKILL.md
+  Content-Type: text/markdown
+  Access-Control-Allow-Origin: *
+
+/.well-known/agent-skills/pictify/rules/*
+  Content-Type: text/markdown
+  Access-Control-Allow-Origin: *

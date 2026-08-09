@@ -1,0 +1,12 @@
+{
+	"$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+	"skills": [
+		{
+			"name": "pictify",
+			"type": "skill-md",
+			"description": "Generate images and short videos from HTML/CSS or a text prompt using Pictify — OG images, social cards, banners, screenshots, certificates, product images, email headers, presentation slides, reusable Handlebars HTML templates, and AI-generated video templates. Includes pre-render validation, platform dimension presets, CSS patterns, and design guidance. Use when the user mentions 'pictify,' 'html to image,' 'generate image,' 'create image,' 'og image,' 'social card,' 'banner image,' 'screenshot,' 'pictify template,' 'handlebars template,' or 'pictify video.'",
+			"url": "/.well-known/agent-skills/pictify/SKILL.md",
+			"digest": "sha256:593124db3f71ec29f1025f0ccc74563c9f05bc6e26efaf02975d3447d2cd0231"
+		}
+	]
+}
