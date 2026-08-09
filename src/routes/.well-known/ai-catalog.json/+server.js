@@ -21,7 +21,7 @@ export async function GET() {
 	return new Response(JSON.stringify(CATALOG, null, 2), {
 		headers: {
 			'Content-Type': 'application/ai-catalog+json',
-			'Cache-Control': 'public, max-age=86400'
+			'Cache-Control': 'public, max-age=300, must-revalidate'
 		}
 	});
 }
