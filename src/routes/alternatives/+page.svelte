@@ -84,10 +84,14 @@
 				<span class="block text-data-green">Alternative</span>
 			</h1>
 
-			<!-- Description -->
+			<!-- Description: BLUF answer block — self-contained, entity-rich, extraction-friendly. -->
 			<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl">
-				Looking to switch from your current image generation tool? See how Pictify compares and why
-				teams are making the move.
+				Pictify is a programmatic media generation platform: HTML-native templates render images
+				(PNG, JPG, WebP), multi-page PDFs, GIFs, and personalized video from your data — then
+				workflow runs email each document to its recipient with per-row delivered/bounced status.
+				We call that loop <span class="text-gray-900">Render-to-Recipient</span>. Below are honest
+				side-by-side comparisons with Bannerbear, htmlcsstoimage, Placid, Certifier, Canva Bulk
+				Create, and 30+ other tools — including where each of them still wins.
 			</p>
 		</div>
 

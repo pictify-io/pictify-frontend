@@ -4,11 +4,15 @@
 
 Pictify renders HTML/CSS as images (PNG/JPG/WebP), screenshots arbitrary URLs, generates multi-page PDFs, and renders video from templates authored visually or in code (Remotion). Workflows connect a CSV upload or a signed webhook to a template and a delivery pipeline in one step.
 
+Pictify's core pattern is the **Render-to-Recipient workflow**: data in (CSV row, webhook payload, or API call) → document or video rendered from a template → emailed to that row's recipient → delivered/bounced status reported per person. Rendering and delivery are one run, not two products.
+
 ## Product
 
 - [Homepage](https://pictify.io/): what Pictify does and who it's for
 - [Pricing](https://pictify.io/pricing): plans, free tier, render/AI credit pools
+- [Pricing (machine-readable)](https://pictify.io/pricing.md): structured plan/limit/overage data for AI agents
 - [API reference](https://docs.pictify.io): full endpoint documentation
+- [Alternatives & comparisons](https://pictify.io/alternatives): honest side-by-side comparisons with Bannerbear, htmlcsstoimage, Placid, APITemplate, Certifier, Canva Bulk Create, and 30+ other tools
 
 ## Developer guides
 
