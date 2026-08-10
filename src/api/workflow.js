@@ -41,11 +41,26 @@ const listWorkflowRuns = async () => {
  * template/format pairing and rejects a video template asked for png with
  * 400 output_format_mismatch.
  *
+ * Image templates render synchronously and resolve with { url, width,
+ * height }. Video templates are queued server-side instead (a video render
+ * is a full headless-Chromium session, tens of seconds+) — this resolves
+ * with { jobId, status: 'queued' } instead; poll it with getPreviewJob.
+ *
  * @param {Object} payload - { templateUid, row, columnMapping, outputFormat }
- * @returns {Promise<Object>} - { url }
+ * @returns {Promise<Object>} - { url, width, height } | { jobId, status }
  */
 const previewWorkflow = async (payload) => {
 	const response = await backend.post('/workflow/preview', payload);
+	return response;
+};
+
+/**
+ * Poll a queued video preview job started by previewWorkflow.
+ * @param {string} jobId
+ * @returns {Promise<Object>} - { status: 'queued'|'rendering'|'completed'|'failed', url?, width?, height?, message? }
+ */
+const getPreviewJob = async (jobId) => {
+	const response = await backend.get(`/workflow/preview/${jobId}`);
 	return response;
 };
 
@@ -126,6 +141,7 @@ export {
 	listWorkflowRuns,
 	getWorkflowStats,
 	previewWorkflow,
+	getPreviewJob,
 	previewWorkflowEmail,
 	testWorkflowEmail,
 	createWorkflowHook,

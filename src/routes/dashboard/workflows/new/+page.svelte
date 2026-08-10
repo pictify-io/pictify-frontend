@@ -14,6 +14,7 @@
 	import {
 		createWorkflowRun,
 		previewWorkflow,
+		getPreviewJob,
 		createWorkflowHook,
 		listWorkflowHooks
 	} from '../../../../api/workflow';
@@ -558,24 +559,52 @@
 	// ── Step 4: previews ─────────────────────────────────────────────────
 	$: previewKey = `${wizard.templateUid}::${JSON.stringify(wizard.mapping)}::${wizard.rows.length}::${outputFormat}`;
 
+	const PREVIEW_POLL_INTERVAL_MS = 2000;
+	// Bumped every time a fresh loadPreviews() starts (and on destroy) so a
+	// stale poll from a previous mapping/template selection stops touching
+	// `wizard` instead of racing the current one.
+	let previewGeneration = 0;
+
+	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+	/**
+	 * Resolve one row's preview. Image templates come back already rendered.
+	 * Video templates come back as a queued job (a video render is a full
+	 * headless-Chromium session, tens of seconds+) — poll until it resolves.
+	 */
+	async function resolvePreviewRow(row, generation) {
+		const response = await previewWorkflow({
+			templateUid: wizard.templateUid,
+			row,
+			columnMapping: wizard.mapping,
+			outputFormat
+		});
+		if (!response?.jobId) return response;
+
+		while (generation === previewGeneration) {
+			await wait(PREVIEW_POLL_INTERVAL_MS);
+			if (generation !== previewGeneration) break;
+			const status = await getPreviewJob(response.jobId);
+			if (status.status === 'completed') return status;
+			if (status.status === 'failed') throw new Error(status.message || 'Preview render failed');
+			// 'queued' | 'rendering' — keep polling
+		}
+		throw new Error('Preview cancelled');
+	}
+
 	async function loadPreviews() {
 		if (wizard.previewLoading) return;
 		if (wizard.previewsForKey === previewKey && wizard.previews.length && !wizard.previewError)
 			return;
 
+		const generation = ++previewGeneration;
 		wizard = { ...wizard, previewLoading: true, previewError: '', previews: [] };
 		try {
 			const sampleRows = wizard.rows.slice(0, 3);
 			const results = await Promise.all(
-				sampleRows.map((row) =>
-					previewWorkflow({
-						templateUid: wizard.templateUid,
-						row,
-						columnMapping: wizard.mapping,
-						outputFormat
-					})
-				)
+				sampleRows.map((row) => resolvePreviewRow(row, generation))
 			);
+			if (generation !== previewGeneration) return; // superseded mid-flight
 			wizard = {
 				...wizard,
 				previews: results.map((result, i) => ({
@@ -586,6 +615,7 @@
 				previewLoading: false
 			};
 		} catch (error) {
+			if (generation !== previewGeneration) return; // superseded mid-flight
 			wizard = {
 				...wizard,
 				previewLoading: false,
@@ -844,6 +874,7 @@
 
 	onDestroy(() => {
 		stopHookPolling();
+		previewGeneration += 1; // stop any in-flight preview polling
 	});
 </script>
 
@@ -1526,7 +1557,14 @@
 				{/each}
 			</div>
 			<p class="text-xs font-black text-gray-500 uppercase tracking-widest mb-8">
-				Rendering previews&hellip; this can take a few seconds.
+				{#if isVideoWorkflow}
+					Rendering video previews&hellip; this can take a few minutes for {Math.min(
+						3,
+						wizard.rows.length
+					)} rows.
+				{:else}
+					Rendering previews&hellip; this can take a few seconds.
+				{/if}
 			</p>
 		{:else if wizard.previewError}
 			<div
