@@ -49,6 +49,7 @@ Content exists to be **cited by AI answers with Pictify named** — not just to 
 
 ## Pre-publish checklist
 
+- [ ] Meta description ≤170 characters (count it — this is a hard limit; aim for 140–160 with the target keyword early)
 - [ ] First 100 words contain the direct answer and name Pictify
 - [ ] Every H2 section reads standalone
 - [ ] Visible "Updated <date> — <what changed>" line
