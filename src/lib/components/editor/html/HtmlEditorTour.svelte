@@ -27,7 +27,7 @@
 			id: 'welcome',
 			targetId: null, // no anchor — centered modal
 			title: 'Write templates in HTML + Handlebars',
-			body: 'Type regular HTML, then reference variables with {{name}}. Preview updates as you type. No JavaScript knowledge required — just markup.',
+			body: 'Type regular HTML, then reference variables with {{name}}. Preview updates as you type. No JavaScript knowledge required, just markup.',
 			icon: 'fa-hand-wave',
 			cta: 'Show me around'
 		},
@@ -44,7 +44,7 @@
 			targetId: 'tab-variables',
 			placement: 'bottom',
 			title: 'Variables auto-declare',
-			body: 'Type {{customerName}} in the editor and we add it here automatically. ⌘-click any token to edit its properties — type, default, required, raw HTML. A plain click just places the caret.',
+			body: 'Type {{customerName}} in the editor and we add it here automatically. ⌘-click any token to edit its properties: type, default, required, raw HTML. A plain click just places the caret.',
 			icon: 'fa-cube'
 		},
 		{

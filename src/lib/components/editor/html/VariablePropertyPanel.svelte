@@ -46,8 +46,8 @@
 		{ value: 'text', label: 'Text', short: 'Text' },
 		{ value: 'image', label: 'Image URL', short: 'Img' },
 		{ value: 'color', label: 'Color', short: 'Color' },
-		{ value: 'array', label: 'Array — use with {{#each}}', short: 'Array' },
-		{ value: 'object', label: 'Object — nested path access', short: 'Obj' },
+		{ value: 'array', label: 'Array: use with {{#each}}', short: 'Array' },
+		{ value: 'object', label: 'Object: nested path access', short: 'Obj' },
 		{ value: 'chart', label: 'Chart', short: 'Chart' },
 		{ value: 'table', label: 'Table', short: 'Table' }
 	];
@@ -79,11 +79,11 @@
 		try {
 			const parsed = JSON.parse(next);
 			if (draft.type === 'array' && !Array.isArray(parsed)) {
-				jsonError = 'Expected a JSON array — wrap values in [ … ]';
+				jsonError = 'Expected a JSON array. Wrap values in [ … ]';
 				return;
 			}
 			if (draft.type === 'object' && (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed))) {
-				jsonError = 'Expected a JSON object — wrap in { … }';
+				jsonError = 'Expected a JSON object. Wrap in { … }';
 				return;
 			}
 			jsonError = null;
@@ -160,7 +160,7 @@
 		if (!draft || !draft.name) return draft ? 'Name is required' : null;
 		if (!draft.name.trim()) return 'Name is required';
 		if (!/^[a-zA-Z_][\w]*$/.test(draft.name)) {
-			return 'Letters, numbers, underscores — start with a letter';
+			return 'Letters, numbers, underscores; start with a letter';
 		}
 		if (
 			allNames.filter((n) => n !== variable?.name).includes(draft.name)
@@ -357,7 +357,7 @@
 						<p class="pt-0.5 text-[10px] font-bold text-[#c62828]">{jsonError}</p>
 					{:else}
 						<p class="pt-0.5 font-mono text-[10px] text-gray-500">
-							Parsed as live JSON — preview + API both consume this default.
+							Parsed as live JSON; preview + API both consume this default.
 						</p>
 					{/if}
 				{:else}
@@ -365,7 +365,7 @@
 						type="text"
 						value={draft.defaultValue ?? ''}
 						on:input={(e) => (draft = { ...draft, defaultValue: e.target.value })}
-						placeholder="—"
+						placeholder="None"
 						autocomplete="off"
 						class="w-full rounded-lg border-[2px] border-gray-900 bg-white px-3 py-2 font-mono text-xs text-gray-900 transition-all focus:-translate-y-0.5 focus:shadow-[3px_3px_0_0_#ffc480] focus:outline-none"
 					/>

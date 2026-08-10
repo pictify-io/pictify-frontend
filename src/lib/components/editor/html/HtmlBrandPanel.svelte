@@ -346,7 +346,7 @@
 		<p class="text-[10px] font-bold leading-snug text-gray-600">
 			{#if activeType === 'colors'}
 				<i class="fa fa-lightbulb mr-1 text-[10px] text-brand-accent"></i>
-				Inserts the hex value — paste inside a <code class="font-mono">style=</code> attribute.
+				Inserts the hex value. Paste inside a <code class="font-mono">style=</code> attribute.
 			{:else if activeType === 'fonts'}
 				<i class="fa fa-lightbulb mr-1 text-[10px] text-brand-accent"></i>
 				Inserts a <code class="font-mono">@font-face</code> / Google Fonts link plus the

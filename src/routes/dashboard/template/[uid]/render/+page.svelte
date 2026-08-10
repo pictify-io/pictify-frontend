@@ -353,7 +353,7 @@ const result = await response.json();
 console.log(result.url); // CDN URL of rendered image
 
 // === Option 2: URL Parameter Render (for <img> tags & emails) ===
-// Returns binary image directly — use as an img src:
+// Returns binary image directly. Use as an img src:
 // <img loading="lazy" src="${urlParamUrl}" />`;
 
 		navigator.clipboard.writeText(code);

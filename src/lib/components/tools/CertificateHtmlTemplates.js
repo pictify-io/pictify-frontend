@@ -141,7 +141,7 @@ export const certificateHtmlTemplates = [
 	{
 		id: 'modern-dark',
 		name: 'Modern Dark',
-		description: 'Bold dark design with a cyan accent — built for tech courses and communities',
+		description: 'Bold dark design with a cyan accent, built for tech courses and communities',
 		thumbnailColor: '#22d3ee',
 		width: 1920,
 		height: 1080,

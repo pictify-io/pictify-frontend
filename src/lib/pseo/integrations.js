@@ -26,7 +26,7 @@ export const integrations = [
 		category: 'automation',
 		description: 'Connect Pictify to 5,000+ apps without code using Zapier automations.',
 		longDescription:
-			'Zapier integration enables you to generate images automatically when events happen in other apps. Create OG images when a blog post is published, generate certificates when a course is completed, or produce social cards when a new product is added—all without writing code.',
+			'Zapier integration enables you to generate images automatically when events happen in other apps. Create OG images when a blog post is published, generate certificates when a course is completed, or produce social cards when a new product is added, all without writing code.',
 		features: [
 			'Trigger-based image generation',
 			'Multi-step Zaps support',
@@ -233,7 +233,7 @@ Request content:
 				{
 					title: 'Enable Scheduling (Optional)',
 					description:
-						'Click the clock icon on your trigger to run the scenario on a schedule—every hour, daily, or when data changes.',
+						'Click the clock icon on your trigger to run the scenario on a schedule: every hour, daily, or when data changes.',
 					code: null,
 					tip: 'Start with manual runs while testing, then enable scheduling once everything works.'
 				}
@@ -293,7 +293,7 @@ Header Auth:
 				{
 					title: 'Create a New Workflow',
 					description:
-						'Click "New Workflow" in n8n. Add a trigger node—use Manual Trigger for testing or Webhook/Schedule for production.',
+						'Click "New Workflow" in n8n. Add a trigger node: use Manual Trigger for testing or Webhook/Schedule for production.',
 					code: null,
 					tip: null
 				},
@@ -762,7 +762,7 @@ Find the <head> section and add/modify OG tags:
 				{
 					issue: 'Wrong product data in image',
 					solution:
-						'Check your variable mapping in Pictify. Shopify sends nested data—verify the path to each field.'
+						'Check your variable mapping in Pictify. Shopify sends nested data. Verify the path to each field.'
 				}
 			]
 		}

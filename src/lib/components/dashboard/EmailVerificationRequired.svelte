@@ -84,7 +84,7 @@
 			</h3>
 			<p class="text-sm font-medium text-gray-600 leading-relaxed">
 				{#if isValueUnlock}
-					Your {feature} is locked until you confirm your email — it takes one click.
+					Your {feature} is locked until you confirm your email; it takes one click.
 				{:else}
 					To use {feature}, please verify your email address.
 				{/if}

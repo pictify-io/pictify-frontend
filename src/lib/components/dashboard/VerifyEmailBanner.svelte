@@ -82,7 +82,7 @@
 			</p>
 			<p class="text-sm font-medium text-gray-800 leading-snug max-w-xl">
 				{#if isValueUnlock}
-					Your authenticated renders are blocked until you confirm — it takes one click.{#if email}
+					Your authenticated renders are blocked until you confirm; it takes one click.{#if email}
 						We sent the link to <span class="font-bold underline decoration-2">{email}</span>.{/if}
 				{:else if email}
 					We sent a link to <span class="font-bold underline decoration-2">{email}</span>. Click

@@ -30,14 +30,14 @@
 	<meta property="og:image" content="https://pictify.io/og/alternatives/index.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify alternatives — 34 tools compared" />
+	<meta property="og:image:alt" content="Pictify alternatives: 34 tools compared" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
 	<meta name="twitter:image" content="https://pictify.io/og/alternatives/index.png" />
-	<meta name="twitter:image:alt" content="Pictify alternatives — 34 tools compared" />
+	<meta name="twitter:image:alt" content="Pictify alternatives: 34 tools compared" />
 </svelte:head>
 
 <section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
@@ -87,11 +87,11 @@
 			<!-- Description: BLUF answer block — self-contained, entity-rich, extraction-friendly. -->
 			<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl">
 				Pictify is a programmatic media generation platform: HTML-native templates render images
-				(PNG, JPG, WebP), multi-page PDFs, GIFs, and personalized video from your data — then
+				(PNG, JPG, WebP), multi-page PDFs, GIFs, and personalized video from your data, then
 				workflow runs email each document to its recipient with per-row delivered/bounced status.
 				We call that loop <span class="text-gray-900">Render-to-Recipient</span>. Below are honest
 				side-by-side comparisons with Bannerbear, htmlcsstoimage, Placid, Certifier, Canva Bulk
-				Create, and 30+ other tools — including where each of them still wins.
+				Create, and 30+ other tools, including where each of them still wins.
 			</p>
 		</div>
 

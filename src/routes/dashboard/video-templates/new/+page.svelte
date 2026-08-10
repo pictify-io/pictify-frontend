@@ -139,7 +139,7 @@
 			New video template.
 		</h1>
 		<p class="mt-2 max-w-lg text-sm font-bold text-gray-500">
-			Build it once with variables, then render it as many times as you need — from here, from a
+			Build it once with variables, then render it as many times as you need: from here, from a
 			CSV, or from your code.
 		</p>
 	</div>
@@ -197,7 +197,7 @@
 				<code class="rounded border-[2px] border-black bg-gray-50 px-1 font-mono text-[10px]">
 					{'{{'}variables{'}}'}
 				</code>
-				in it — edit the words, then render one per row.
+				in it. Edit the words, then render one per row.
 			</p>
 		</div>
 

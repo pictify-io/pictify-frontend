@@ -1325,14 +1325,14 @@
 			'get-variables': 'Get template variable definitions',
 			'pdf-render': 'Render an HTML template as a single-page PDF (A4, Letter and more)',
 			'pdf-multi-page':
-				'Render one PDF with a page per variable set — certificates or reports as a single document',
+				'Render one PDF with a page per variable set: certificates or reports as a single document',
 			'pdf-presets': 'List the available page size presets',
 			'video-list': 'List your video templates with their UIDs',
 			'video-render':
-				'Render a video template with variables — MP4, or an animated GIF (15fps, palette-optimised). Renders take up to a few minutes; the request waits for the file URL.',
+				'Render a video template with variables: MP4, or an animated GIF (15fps, palette-optimised). Renders take up to a few minutes; the request waits for the file URL.',
 			'video-variables': 'Get a video template’s variable definitions',
 			'video-generate':
-				'Generate a new video template from a prompt — an AI motion brief, compiled scene code and a visual review, returned as a draft template. Costs 5 AI credits.'
+				'Generate a new video template from a prompt: an AI motion brief, compiled scene code and a visual review, returned as a draft template. Costs 5 AI credits.'
 		};
 		return descriptions[selectedEndpoint] || '';
 	})();
@@ -2809,7 +2809,7 @@
 								</div>
 								<div>
 									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Pages — one variable object per page (JSON array)</label
+										>Pages: one variable object per page (JSON array)</label
 									>
 									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
 										<CodeMirror
@@ -2822,7 +2822,7 @@
 							</div>
 						{:else if selectedEndpoint === 'pdf-presets' || selectedEndpoint === 'video-list'}
 							<p class="text-sm font-bold text-gray-500">
-								No parameters — send the request to see the response.
+								No parameters. Send the request to see the response.
 							</p>
 						{:else if selectedEndpoint === 'video-render'}
 							<div class="space-y-4">
@@ -2859,7 +2859,7 @@
 										bind:value={videoRenderParams.templateUid}
 										fetcher={videoTemplateFetcher}
 										placeholder="Select a video template..."
-										emptyText="No video templates yet — create one in the studio"
+										emptyText="No video templates yet. Create one in the studio"
 									/>
 								{/if}
 							</div>
@@ -2925,7 +2925,7 @@
 										bind:value={videoVariablesParams.uid}
 										fetcher={videoTemplateFetcher}
 										placeholder="Select a video template..."
-										emptyText="No video templates yet — create one in the studio"
+										emptyText="No video templates yet. Create one in the studio"
 									/>
 								{/if}
 							</div>
@@ -2993,7 +2993,7 @@
 								</div>
 								<p class="text-[10px] text-gray-500">
 									Generation designs a motion brief, writes the scene code, renders frames and
-									reviews them — expect 30-60 seconds. The response is a draft template with a
+									reviews them; expect 30-60 seconds. The response is a draft template with a
 									preview URL.
 								</p>
 							</div>
@@ -3717,7 +3717,7 @@
 			<!-- Footer -->
 			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
 				<div class="text-[10px] text-gray-500">
-					Format: <code class="bg-gray-100 px-1 rounded">[{'{'}"key": "value"{'}'}]</code> — each object
+					Format: <code class="bg-gray-100 px-1 rounded">[{'{'}"key": "value"{'}'}]</code>. Each object
 					is one variation
 				</div>
 				<button

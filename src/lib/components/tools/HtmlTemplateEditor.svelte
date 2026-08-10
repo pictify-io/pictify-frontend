@@ -134,7 +134,7 @@
 					toast.set({ message: 'Template updated by AI', type: 'success', duration: 2500 });
 				} else {
 					toast.set({
-						message: 'The AI did not return any HTML — try rephrasing.',
+						message: 'The AI did not return any HTML. Try rephrasing.',
 						type: 'error',
 						duration: 3000
 					});
@@ -302,7 +302,7 @@
 					{/if}
 				</div>
 				<p class="mt-2 text-xs font-medium text-gray-500 text-center">
-					Live preview — updates as you type. This exact HTML is what the API renders; swap
+					Live preview: updates as you type. This exact HTML is what the API renders; swap
 					sample values for
 					<code class="font-mono bg-gray-100 px-1 rounded">{'{{variables}}'}</code> when you automate.
 				</p>
@@ -321,7 +321,7 @@
 				bind:value={aiPrompt}
 				on:keydown={(e) => e.key === 'Enter' && handleAiEdit()}
 				disabled={aiBusy}
-				placeholder="Describe a change — “make it dark mode”, “add a logo spot”, “more playful”…"
+				placeholder="Describe a change: “make it dark mode”, “add a logo spot”, “more playful”…"
 				class="w-full bg-transparent text-sm font-medium text-gray-100 placeholder-gray-500 py-3 focus:outline-none disabled:opacity-50"
 			/>
 		</div>
@@ -354,7 +354,7 @@
 	</div>
 	{#if !isLoggedIn}
 		<p class="mt-2 text-xs font-medium text-gray-500">
-			AI editing needs a free account — your prompt is kept while you sign up, and you'll land
+			AI editing needs a free account; your prompt is kept while you sign up, and you'll land
 			right back here.
 		</p>
 	{/if}

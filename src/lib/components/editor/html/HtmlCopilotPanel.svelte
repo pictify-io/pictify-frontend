@@ -224,7 +224,7 @@
 		const after = fence[3].trim();
 		const lines = inside.split('\n').length;
 		const chars = inside.length;
-		const marker = `\n\n\u2554\u2550 Generated HTML (${lines} lines, ${chars} chars) — see Apply below\n`;
+		const marker = `\n\n\u2554\u2550 Generated HTML (${lines} lines, ${chars} chars): see Apply below\n`;
 		return [before, marker, after].filter(Boolean).join('');
 	}
 </script>
@@ -269,7 +269,7 @@
 					Describe the template
 				</p>
 				<p class="max-w-[340px] text-[12px] font-semibold leading-relaxed text-gray-600">
-					Ask for a design, a fix, or a tweak. Follow-ups keep context from the previous reply — say "bigger heading" and it knows what you mean.
+					Ask for a design, a fix, or a tweak. Follow-ups keep context from the previous reply. Say "bigger heading" and it knows what you mean.
 				</p>
 				<div class="flex flex-wrap justify-center gap-2 px-4">
 					{#each QUICK_PROMPTS as qp}
@@ -322,7 +322,7 @@
 		<div class="border-t-[3px] border-gray-900 {pendingWarnings.length > 0 ? 'bg-brand-danger' : 'bg-[#ffe066]'} px-6 py-3">
 			<div class="mb-2 flex items-center justify-between gap-2">
 				<p class="text-[11px] font-black uppercase tracking-widest {pendingWarnings.length > 0 ? 'text-white' : 'text-gray-900'}">
-					{pendingWarnings.length > 0 ? 'Ready — with warnings' : 'Ready to apply'}
+					{pendingWarnings.length > 0 ? 'Ready, with warnings' : 'Ready to apply'}
 				</p>
 				<span class="font-mono text-[10px] {pendingWarnings.length > 0 ? 'text-white/90' : 'text-gray-700'}">
 					{pendingApplyHtml.split('\n').length} lines

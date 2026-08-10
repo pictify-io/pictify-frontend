@@ -149,7 +149,7 @@
 					return stubMedia;
 				},
 				deleteMedia: async (mediaUid) => {
-					if (mediaMode === 'deletefail') throw new Error('Delete failed — try again.');
+					if (mediaMode === 'deletefail') throw new Error('Delete failed. Try again.');
 					deletedMedia = [...deletedMedia, mediaUid];
 				}
 			});

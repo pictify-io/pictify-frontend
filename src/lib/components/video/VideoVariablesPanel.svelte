@@ -375,7 +375,7 @@
 							</span>
 						</div>
 						<p class="text-[11px] font-semibold leading-snug {TEXT_MUTED}">
-							Select a clip and bind a field — an image source, a color, a timing — from the
+							Select a clip and bind a field (an image source, a color, a timing) from the
 							Properties tab.
 						</p>
 					</div>
@@ -568,10 +568,10 @@
 					<span class="font-black uppercase tracking-widest text-brand-accent">Previewing</span>
 					these values on the canvas. Your template still holds the tokens.
 				{:else if alwaysLive}
-					<span class={LABEL}>Preview values</span> — shown in the player as you type, and
+					<span class={LABEL}>Preview values</span>: shown in the player as you type, and
 					prefilled when you render.
 				{:else}
-					<span class={LABEL}>Preview values</span> — used by
+					<span class={LABEL}>Preview values</span>: used by
 					<span class="font-black text-gray-200">Preview</span> and prefilled when you render.
 				{/if}
 			</p>

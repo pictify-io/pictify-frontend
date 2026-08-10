@@ -50,26 +50,26 @@
 	$: headTitle = hasSize
 		? `HTML to ${
 				(currentFormat && currentFormat.fullName) || 'Image'
-		  } ${sizeString} — Free Converter | Pictify`
+		  } ${sizeString}: Free Converter | Pictify`
 		: format === 'png'
-		? `HTML to PNG — Free Online Converter & API | Pictify`
+		? `HTML to PNG: Free Online Converter & API | Pictify`
 		: format === 'jpg'
-		? `HTML to JPG — Free Online Converter & API | Pictify`
+		? `HTML to JPG: Free Online Converter & API | Pictify`
 		: format === 'image'
-		? `HTML to Image — Convert HTML & CSS to PNG, JPG or WebP (Free + API) | Pictify`
+		? `HTML to Image: Convert HTML & CSS to PNG, JPG or WebP (Free + API) | Pictify`
 		: `HTML to ${
 				(format && format.toUpperCase()) || 'Image'
-		  } — Free Online Converter & API | Pictify`;
+		  }: Free Online Converter & API | Pictify`;
 	$: headDescription = hasSize
 		? `Convert HTML to ${
 				(currentFormat && currentFormat.fullName) || 'image'
 		  } at ${sizeString} instantly. Paste your code, preview live, and export. No file upload needed.`
 		: format === 'png'
-		? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor — no signup, no file upload. API available for automation.`
+		? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor. No signup, no file upload. API available for automation.`
 		: format === 'jpg'
-		? `Free online HTML to JPG converter — paste HTML + CSS, preview it live, and download a high-quality JPG in one click. No signup, no file upload. API available for automation.`
+		? `Free online HTML to JPG converter: paste HTML + CSS, preview it live, and download a high-quality JPG in one click. No signup, no file upload. API available for automation.`
 		: format === 'image'
-		? `Convert HTML and CSS to an image — PNG, JPG, or WebP — instantly. Paste code, preview live, and export, or automate with the API. Free, no signup, no file upload.`
+		? `Convert HTML and CSS to an image (PNG, JPG, or WebP) instantly. Paste code, preview live, and export, or automate with the API. Free, no signup, no file upload.`
 		: `Convert HTML to ${
 				(format && format.toUpperCase()) || 'IMAGE'
 		  } images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
@@ -785,7 +785,7 @@
 						Convert your HTML & CSS into an <span
 							class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
 						>
-						in one click — export <span class="font-black">PNG</span>,
+						in one click: export <span class="font-black">PNG</span>,
 						<span class="font-black">JPG</span>, or <span class="font-black">WebP</span>.
 						<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
 							>Perfect for {currentFormat.bestFor}</span
@@ -1248,7 +1248,7 @@
 							<div class="flex-1">
 								<p class="text-sm font-bold text-gray-700 mb-3">
 									Generate {currentFormat.fullName} images programmatically. Send HTML, get back a hosted
-									image URL — one API call.
+									image URL. One API call.
 								</p>
 								<a
 									href="https://docs.pictify.io/api-reference/overview"
@@ -1345,7 +1345,7 @@
 											Go unlimited
 										</h4>
 										<p class="text-xs font-bold text-white/80 mt-1">
-											No watermarks, unlimited generations, and your own API key — all free.
+											No watermarks, unlimited generations, and your own API key. All free.
 										</p>
 									</div>
 								</div>
@@ -1603,7 +1603,7 @@
 							<div>
 								<p class="text-black font-bold text-lg leading-tight">
 									{benefit}
-									{#if hasSize} — works great at {sizeString}{/if}
+									{#if hasSize}(works great at {sizeString}){/if}
 								</p>
 							</div>
 						</div>
@@ -1628,7 +1628,7 @@
 			class="mb-16 border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-[8px_8px_0_0_#9ca3af]"
 		>
 			<h2 class="text-3xl font-black mb-6 text-black uppercase">
-				HTML to Image — Choosing the Right Format
+				HTML to Image: Choosing the Right Format
 			</h2>
 			<div class="overflow-x-auto">
 				<table class="w-full text-left border-collapse">

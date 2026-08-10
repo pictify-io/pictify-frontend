@@ -69,9 +69,9 @@
 			const status = err?.status || 0;
 			let message = err?.message || 'Save failed';
 			if (status === 404) {
-				message = 'Backend route not found — restart the API server to pick up engine=html routes.';
+				message = 'Backend route not found. Restart the API server to pick up engine=html routes.';
 			} else if (status === 401 || status === 403) {
-				message = 'Auth required — sign in to the dashboard first.';
+				message = 'Auth required. Sign in to the dashboard first.';
 			}
 			toast.set({ message, type: 'error', duration: 5000 });
 			console.error('[html-editor] save failed:', err);

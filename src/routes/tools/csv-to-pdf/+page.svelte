@@ -127,7 +127,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 			<div class="title">${escapeHtml(titleValue)}</div>
 			<div class="rule"></div>
 			${fields}
-			<div class="footer">Generated with Pictify — pictify.io/tools/csv-to-pdf</div>
+			<div class="footer">Generated with Pictify: pictify.io/tools/csv-to-pdf</div>
 		</body>`;
 	}
 
@@ -139,8 +139,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 			.join('');
 		const truncated =
 			rows.length > 40
-				? `<div class="footer">Showing first 40 of ${rows.length} rows — sign up to render the full sheet.</div>`
-				: `<div class="footer">Generated with Pictify — pictify.io/tools/csv-to-pdf</div>`;
+				? `<div class="footer">Showing first 40 of ${rows.length} rows. Sign up to render the full sheet.</div>`
+				: `<div class="footer">Generated with Pictify: pictify.io/tools/csv-to-pdf</div>`;
 		return `${styleBlock}<body>
 			<div class="eyebrow">${escapeHtml(fileName || 'Spreadsheet')}</div>
 			<div class="title">${rows.length} rows · ${headers.length} columns</div>
@@ -242,11 +242,11 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	const faqs = [
 		{
 			q: 'How do I convert a CSV file to PDF?',
-			a: 'Upload or paste your CSV above. Choose "one document per row" to get a clean PDF page for every data row, or "whole sheet" to render the table as a single-page PDF. Click Generate and download the result — free, in your browser, no signup required.'
+			a: 'Upload or paste your CSV above. Choose "one document per row" to get a clean PDF page for every data row, or "whole sheet" to render the table as a single-page PDF. Click Generate and download the result: free, in your browser, no signup required.'
 		},
 		{
 			q: 'Can each CSV row become its own PDF document?',
-			a: "Yes — that is this tool's specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout."
+			a: "Yes, that is this tool's specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout."
 		},
 		{
 			q: "Can I email each row's PDF to a different recipient?",
@@ -258,11 +258,11 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		},
 		{
 			q: 'Can I automate CSV to PDF conversion?',
-			a: 'Yes. The REST API renders any HTML template to PDF (including multi-page) — POST your data, get a document URL back. Workflows accept a CSV upload or a signed webhook, so your CRM, form tool, or n8n/Zapier/Make flow can trigger document generation automatically.'
+			a: 'Yes. The REST API renders any HTML template to PDF (including multi-page): POST your data, get a document URL back. Workflows accept a CSV upload or a signed webhook, so your CRM, form tool, or n8n/Zapier/Make flow can trigger document generation automatically.'
 		},
 		{
 			q: 'Does my data leave my browser?',
-			a: 'Rows are sent to the Pictify rendering API over HTTPS to produce each page, and rendered files are stored on the CDN so you can download them. Your CSV itself is never stored — parsing happens in your browser.'
+			a: 'Rows are sent to the Pictify rendering API over HTTPS to produce each page, and rendered files are stored on the CDN so you can download them. Your CSV itself is never stored; parsing happens in your browser.'
 		}
 	];
 
@@ -282,7 +282,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		name: 'Pictify CSV to PDF Converter',
 		url: 'https://pictify.io/tools/csv-to-pdf',
 		description:
-			'Convert CSV to PDF free in your browser — render the whole sheet as a table, or turn every row into its own formatted PDF document.',
+			'Convert CSV to PDF free in your browser: render the whole sheet as a table, or turn every row into its own formatted PDF document.',
 		applicationCategory: ['BusinessApplication', 'Utility'],
 		operatingSystem: 'Web',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -301,10 +301,10 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 </script>
 
 <svelte:head>
-	<title>CSV to PDF Converter — Free, Every Row Becomes a Document | Pictify</title>
+	<title>CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify</title>
 	<meta
 		name="description"
-		content="Convert CSV to PDF free in your browser. Render the whole sheet as a clean table PDF, or turn every row into its own formatted document — then email each one to its recipient with Pictify workflows."
+		content="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document and email each one with Pictify workflows."
 	/>
 	<meta
 		name="keywords"
@@ -314,11 +314,11 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	<meta name="robots" content="index, follow, max-image-preview:large" />
 	<meta
 		property="og:title"
-		content="CSV to PDF Converter — Every Row Becomes a Document | Pictify"
+		content="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
 	/>
 	<meta
 		property="og:description"
-		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row — then deliver each one by email."
+		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email."
 	/>
 	<meta property="og:url" content="https://pictify.io/tools/csv-to-pdf" />
 	<meta property="og:type" content="website" />
@@ -327,7 +327,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta
 		name="twitter:title"
-		content="CSV to PDF Converter — Every Row Becomes a Document | Pictify"
+		content="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
 	/>
 	<meta
 		name="twitter:description"
@@ -383,8 +383,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 					Turn a spreadsheet into
 					<span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
 						>real documents</span
-					>
-					— the whole sheet as a table, or one formatted PDF page per row.
+					>:
+					the whole sheet as a table, or one formatted PDF page per row.
 					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
 						>Free, in your browser. No signup required.</span
 					>
@@ -485,7 +485,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 									? 'text-gray-300'
 									: 'text-gray-500'}"
 							>
-								Every row becomes its own formatted PDF page — titles, labeled fields, ready to
+								Every row becomes its own formatted PDF page: titles, labeled fields, ready to
 								send. {rows.length} rows → {Math.min(rows.length, rowsToRender) || 0} pages now{rows.length >
 								rowsToRender
 									? ` (free cap)`
@@ -545,7 +545,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 						<div class="border-t-[3px] border-white/20 pt-5">
 							<p class="font-bold text-gray-300 text-sm leading-relaxed">
 								<span class="text-white font-black">Next step:</span> these documents are still on
-								your disk — the deadline wants them in inboxes. A workflow run renders every row
+								your disk; the deadline wants them in inboxes. A workflow run renders every row
 								{rows.length > rowsToRender ? `(all ${rows.length}, not just ${rowsToRender})` : ''}
 								with a branded template and
 								<span class="text-data-green font-black">emails each one to its recipient</span> with
@@ -569,7 +569,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 					A CSV to PDF converter that understands rows are people
 				</h2>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
-					Most CSV to PDF converters print your spreadsheet as one long table — fine for archiving,
+					Most CSV to PDF converters print your spreadsheet as one long table, fine for archiving,
 					useless when each row is a person who needs their own document. This tool does both jobs:
 					render the whole sheet as a clean table PDF, or flip one switch and every row becomes its
 					own formatted page, with the first column as the title and every column as a labeled
@@ -580,8 +580,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 					<a href="/solutions/mail-merge-with-attachments" class="underline font-black"
 						>Pictify workflow</a
 					>
-					takes the same CSV, renders each row against a branded template (certificate, letter, report
-					— or one the
+					takes the same CSV, renders each row against a branded template (certificate, letter, report,
+					or one the
 					<span class="font-black">AI Template Maker</span> writes from your description), and emails
 					every document to its recipient with per-person delivery status.
 				</p>

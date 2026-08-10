@@ -763,8 +763,8 @@
 {#if !isPlatform}
 	<!-- Platform variants render their own SEOHead in [platform]/+page.svelte -->
 	<SEOHead
-		title="Free OG Image Generator — Create Open Graph Images in Seconds | Pictify"
-		description="Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free with no signup — API available for automation."
+		title="Free OG Image Generator: Create Open Graph Images in Seconds | Pictify"
+		description="Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup. API available."
 		canonical="https://pictify.io/tools/og-image-generator"
 		robots="index, follow, max-image-preview:large"
 		ogImage="https://media.pictify.io/31hxg-1775406864453.png"
@@ -1459,7 +1459,7 @@
 					<h3 class="text-2xl font-black mb-4 text-black uppercase">What is an OG Image?</h3>
 					<p class="text-black font-medium leading-relaxed">
 						An OG (Open Graph) image is the preview that appears when your content is shared on
-						social media. It's your first impression—make it count with professional designs.
+						social media. It's your first impression. Make it count with professional designs.
 					</p>
 				</div>
 

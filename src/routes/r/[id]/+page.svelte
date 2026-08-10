@@ -289,7 +289,7 @@
 		<!-- Twitter Card -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={result.title || 'Created with Pictify'} />
-		<meta name="twitter:description" content="View this image — created with Pictify." />
+		<meta name="twitter:description" content="View this image, created with Pictify." />
 		<meta name="twitter:image" content={result.assetUrl} />
 
 		<!-- JSON-LD Structured Data -->

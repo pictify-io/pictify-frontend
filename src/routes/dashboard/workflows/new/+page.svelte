@@ -388,7 +388,7 @@
 		sampleError = '';
 		try {
 			const response = await createTemplate({
-				name: `${packNounTitle} — ${design.name}`,
+				name: `${packNounTitle}: ${design.name}`,
 				html: design.html,
 				width: design.width,
 				height: design.height,
@@ -1013,7 +1013,7 @@
 				</div>
 				<h3 class="text-base font-black text-black uppercase tracking-wide">Connect a webhook</h3>
 				<p class="text-xs font-bold text-gray-500 mt-1 leading-relaxed">
-					Your systems send rows one at a time — LMS completions, form submissions, Zapier or n8n.
+					Your systems send rows one at a time: LMS completions, form submissions, Zapier or n8n.
 				</p>
 			</button>
 		</div>
@@ -1135,7 +1135,7 @@
 				{#if wizard.truncated}
 					<div class="p-4 bg-brand-accent/20 border-b-[3px] border-black">
 						<p class="text-xs font-black text-black uppercase tracking-wide">
-							Your file has {wizard.totalRows} rows — only the first {MAX_ROWS} will be used in this
+							Your file has {wizard.totalRows} rows; only the first {MAX_ROWS} will be used in this
 							run.
 						</p>
 					</div>
@@ -1224,7 +1224,7 @@
 							<a href="/dashboard/template" class="underline text-black hover:text-brand-danger">
 								template editor
 							</a>
-							— or start from a sample below.
+							or start from a sample below.
 						</p>
 					</div>
 				{:else}
@@ -1305,7 +1305,7 @@
 						</h2>
 					</div>
 					<p class="text-xs font-bold text-gray-500 mb-6">
-						{packNounTitle} designs — one click creates a template in your workspace.
+						{packNounTitle} designs. One click creates a template in your workspace.
 					</p>
 
 					{#if sampleError}
@@ -1370,7 +1370,7 @@
 					</h2>
 				</div>
 				<p class="text-xs font-bold text-gray-500 mb-6">
-					Paste an HTML document with {'{{variables}}'} — one click creates a template in your workspace.
+					Paste an HTML document with {'{{variables}}'}. One click creates a template in your workspace.
 				</p>
 
 				{#if customError}
@@ -1456,7 +1456,7 @@
 					Map CSV columns to template fields
 				</span>
 				<p class="text-xs font-bold text-gray-500 mt-1">
-					We auto-matched what we could — check each field below.
+					We auto-matched what we could. Check each field below.
 				</p>
 			</div>
 			<div class="p-6 space-y-4">
@@ -1479,7 +1479,7 @@
 							on:change={(e) => setMapping(variable, e.target.value)}
 							class="flex-1 rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 						>
-							<option value="">— Select a column —</option>
+							<option value="">– Select a column –</option>
 							{#each wizard.headers as header}
 								<option value={header}>{header}</option>
 							{/each}
@@ -1487,7 +1487,7 @@
 					</div>
 				{:else}
 					<p class="text-xs font-black text-gray-500 uppercase tracking-wide">
-						This template has no variables — every file will look the same.
+						This template has no variables; every file will look the same.
 					</p>
 				{/each}
 			</div>
@@ -1638,7 +1638,7 @@
 					</div>
 				{:else}
 					<p class="text-xs font-black text-gray-500 uppercase tracking-wide">
-						This template has no variables — every event will render the same file.
+						This template has no variables; every event will render the same file.
 					</p>
 				{/each}
 			</div>
@@ -1804,7 +1804,7 @@
 							on:change={(e) => setDelivery({ emailColumn: e.target.value })}
 							class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 						>
-							<option value="">— Select the column with email addresses —</option>
+							<option value="">– Select the column with email addresses –</option>
 							{#each wizard.headers as header}
 								<option value={header}>{header}</option>
 							{/each}
@@ -1998,7 +1998,7 @@
 						</span>
 					</div>
 					<p class="text-xs font-bold text-gray-600 mb-4">
-						Shown once. Copy it now — it can't be retrieved later. Sign the raw request body
+						Shown once. Copy it now; it can't be retrieved later. Sign the raw request body
 						and send the result as an <code class="font-mono">X-Pictify-Signature</code> header.
 					</p>
 

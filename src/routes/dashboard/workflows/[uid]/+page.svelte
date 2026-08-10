@@ -426,7 +426,7 @@
 							{counts.failed === 1 ? 'row' : 'rows'} failed
 						</p>
 						<p class="text-sm font-bold text-gray-700">
-							Stuck? Ask us — the chat opens with this run's details already attached.
+							Stuck? Ask us. The chat opens with this run's details already attached.
 						</p>
 					</div>
 					<button
@@ -459,11 +459,11 @@
 						</svg>
 					</div>
 					<h3 class="text-sm font-black text-black uppercase tracking-widest">
-						All done — download your deliverables
+						All done: download your deliverables
 					</h3>
 				</div>
 				<p class="text-xs font-bold text-gray-600 mb-0">
-					Every rendered file is listed in the table below — use the view link on each row to open
+					Every rendered file is listed in the table below. Use the view link on each row to open
 					or download it.
 				</p>
 			</div>
@@ -490,7 +490,7 @@
 					</h3>
 				</div>
 				<p class="text-xs font-bold text-gray-600 mb-4">
-					Get a permanent URL with this run's template, mapping, and delivery baked in — POST one
+					Get a permanent URL with this run's template, mapping, and delivery baked in. POST one
 					row of JSON and it renders (and delivers) automatically.
 				</p>
 				{#if !hook}
@@ -580,7 +580,7 @@
 											item.deliveryStatus
 										)}"
 									>
-										{item.deliveryStatus || '—'}
+										{item.deliveryStatus || '–'}
 									</span>
 								</td>
 								<td class="px-5 py-4">
@@ -611,7 +611,7 @@
 											{item.error}
 										</span>
 									{:else}
-										<span class="text-xs font-bold text-gray-400">—</span>
+										<span class="text-xs font-bold text-gray-400">–</span>
 									{/if}
 								</td>
 								<td class="px-5 py-4">
@@ -636,7 +636,7 @@
 											>Sent ✓</span
 										>
 									{:else}
-										<span class="text-xs font-bold text-gray-400">—</span>
+										<span class="text-xs font-bold text-gray-400">–</span>
 									{/if}
 								</td>
 							</tr>

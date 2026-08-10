@@ -295,7 +295,7 @@
 				class="w-full rounded-xl border-[3px] border-black px-4 py-3 text-sm font-bold text-black bg-white focus:outline-none focus:shadow-brutal-md transition-all"
 			/>
 			<p class="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-wide">
-				Use {'{{column}}'} to personalize — it fills from each row.
+				Use {'{{column}}'} to personalize; it fills from each row.
 			</p>
 		</div>
 
@@ -434,7 +434,7 @@
 	<div>
 		<div class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md overflow-hidden">
 			<div class="bg-gray-100 border-b-[3px] border-black px-4 py-3">
-				<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Preview — row 1</p>
+				<p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Preview: row 1</p>
 				{#if previewFrom}
 					<p class="text-xs font-bold text-black mt-1 truncate">From: {previewFrom}</p>
 				{/if}

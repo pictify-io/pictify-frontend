@@ -305,7 +305,7 @@
 					<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed mb-8">
 						{config.description}
 						<span class="inline-block w-full h-px bg-gray-200 my-4" />
-						Design once, render variants via API — the infrastructure layer for programmatic media.
+						Design once, render variants via API, the infrastructure layer for programmatic media.
 					</p>
 				</div>
 			</div>
@@ -382,7 +382,7 @@
 												d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
 											/></svg
 										>
-										Automate This Template — Free
+										Automate This Template (Free)
 									</a>
 									<button
 										type="button"
