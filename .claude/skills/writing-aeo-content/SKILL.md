@@ -19,6 +19,7 @@ Content exists to be **cited by AI answers with Pictify named** — not just to 
 2. **Atomic sections.** Every H2 must make sense read completely out of context (AI chunks unpredictably). Test: read the section alone — if it needs the previous section, rewrite it.
 3. **Entity-rich.** Name specific things: formats (PNG, JPG, WebP, multi-page PDF, GIF, MP4), prices ($19/mo), syntax (`{{ price | currency }}`), competitors, limits (50 renders/month). Never "this tool helps with images."
 4. **Simple and declarative.** Short sentences. Subject–verb–object. One idea per sentence. If it takes two reads, split it.
+5. **No em-dashes (—) anywhere in copy.** Rewrite with a comma, colon, semicolon, period, or parentheses instead. This is a hard brand rule (em-dashes also read as an AI-writing tell). Plain hyphens in code examples are fine.
 
 ## Required page elements
 
