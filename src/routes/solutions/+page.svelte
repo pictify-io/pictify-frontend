@@ -6,7 +6,7 @@
 	$: pillar = data.solutions.find((s) => s.isPillar);
 	$: others = data.solutions.filter((s) => !s.isPillar);
 
-	const title = 'Solutions — Documents & Videos Generated and Delivered | Pictify';
+	const title = 'Solutions: Documents & Videos Generated and Delivered | Pictify';
 	const description =
 		'Guides for turning spreadsheet rows into delivered documents: mail merge with real attachments, bulk certificates, personalized PDFs and video, emailed per recipient.';
 	const canonical = 'https://pictify.io/solutions';
@@ -26,7 +26,7 @@
 	<meta property="og:image:height" content="630" />
 	<meta
 		property="og:image:alt"
-		content="Documents and videos generated and delivered — Pictify Solutions"
+		content="Documents and videos generated and delivered | Pictify Solutions"
 	/>
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
@@ -56,7 +56,7 @@
 			</h1>
 			<p class="text-xl text-gray-700 font-medium max-w-2xl mx-auto">
 				Guides for every workflow that ends in an inbox: certificates, personalized PDFs, badges,
-				and video — rendered per row and emailed per recipient.
+				and video, rendered per row and emailed per recipient.
 			</p>
 		</header>
 

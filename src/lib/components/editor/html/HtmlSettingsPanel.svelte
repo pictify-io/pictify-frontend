@@ -106,7 +106,7 @@
 							class="w-full rounded-lg border-[3px] border-gray-900 bg-white px-4 py-2.5 text-sm font-black uppercase tracking-wider text-gray-900 transition-all focus:-translate-y-1 focus:shadow-brutal-accent focus:outline-none"
 						>
 							{#each PDF_PRESETS as p}
-								<option value={p.value}>{p.label} — {p.note}</option>
+								<option value={p.value}>{p.label}: {p.note}</option>
 							{/each}
 						</select>
 					</div>

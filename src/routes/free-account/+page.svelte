@@ -83,7 +83,7 @@
 	<meta property="og:image" content="https://pictify.io/og/pages/free-account.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify — 50 free renders per month, no credit card" />
+	<meta property="og:image:alt" content="Pictify: 50 free renders per month, no credit card" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Free Account Benefits | Pictify" />
 	<meta name="twitter:description" content="50 free renders/month. No credit card. No watermark. Full API access." />

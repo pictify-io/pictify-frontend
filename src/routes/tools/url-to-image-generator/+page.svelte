@@ -659,8 +659,8 @@
 </script>
 
 <SEOHead
-	title="URL to Image — Capture Any Webpage as PNG/JPG Free | Pictify"
-	description="Enter any URL and get a high-quality screenshot as PNG, JPG, or WebP. Choose device size, crop specific elements, and download instantly. Free with API access — no signup needed."
+	title="URL to Image: Capture Any Webpage as PNG/JPG Free | Pictify"
+	description="Enter any URL and get a high-quality screenshot as PNG, JPG, or WebP. Choose device size, crop elements, and download instantly. Free with API access."
 	canonical="https://pictify.io/tools/url-to-image-generator"
 	robots="index, follow, max-image-preview:large"
 	ogImage="https://media.pictify.io/vombm-1775406853373.png"
@@ -841,7 +841,7 @@
 							</p>
 						{:else if !isPreviewLoaded}
 							<p class="mt-3 text-sm font-bold text-gray-500">
-								Load the preview first — then the green
+								Load the preview first; then the green
 								<span class="text-data-green font-black">Capture</span> button activates below.
 							</p>
 						{/if}
@@ -1154,7 +1154,7 @@
 								Like it? Automate it.
 							</p>
 							<p class="text-sm font-bold text-gray-600 max-w-md">
-								Sign up to get your API key and capture unlimited screenshots programmatically —
+								Sign up to get your API key and capture unlimited screenshots programmatically:
 								same quality, zero daily limits.
 							</p>
 							<a
@@ -1162,7 +1162,7 @@
 								on:click={() => trackSignupClick('post_generation_value_prop')}
 								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>
-								Get Your API Key — Free
+								Get Your API Key (Free)
 							</a>
 						</div>
 					{/if}
@@ -1178,7 +1178,7 @@
 						<span class="text-xs font-black uppercase tracking-widest text-brand-accent"
 							>Your API Request</span
 						>
-						<span class="text-xs text-gray-500 font-mono">— updates as you change settings</span>
+						<span class="text-xs text-gray-500 font-mono">updates as you change settings</span>
 					</div>
 					<button
 						on:click={() => copyToClipboard(liveCurlSnippet, 'code')}
@@ -1252,7 +1252,7 @@
 				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
 					<h3 class="font-black text-lg mb-2">Image Link Converter</h3>
 					<p class="text-gray-600 font-medium text-sm">
-						Convert any URL to a picture URL that can be embedded anywhere — Notion, Confluence,
+						Convert any URL to a picture URL that can be embedded anywhere: Notion, Confluence,
 						Slack, or email.
 					</p>
 				</div>
@@ -1453,7 +1453,7 @@
 			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
 				<h3 class="text-2xl font-black mb-6 uppercase">Comparing Screenshot APIs?</h3>
 				<p class="font-medium text-gray-600 mb-6">
-					This tool is API-backed — see how it stacks up against the other screenshot/rendering APIs
+					This tool is API-backed. See how it stacks up against the other screenshot/rendering APIs
 					developers usually compare it to.
 				</p>
 				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">

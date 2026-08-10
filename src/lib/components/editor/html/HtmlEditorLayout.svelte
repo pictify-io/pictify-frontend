@@ -867,7 +867,7 @@
 					{/if}
 				</p>
 				<p class="mt-3 text-[12px] font-semibold leading-relaxed text-gray-600">
-					Deleting the declaration will <strong>also remove the <code class="font-mono text-gray-900">{'{{…}}'}</code> tokens from your HTML</strong>. This can't be undone through the editor toolbar — use <span class="font-mono">⌘Z</span> in the editor to recover.
+					Deleting the declaration will <strong>also remove the <code class="font-mono text-gray-900">{'{{…}}'}</code> tokens from your HTML</strong>. This can't be undone through the editor toolbar; use <span class="font-mono">⌘Z</span> in the editor to recover.
 				</p>
 
 				<!-- Block-statement heads-up — each/if/with wrappers are NOT stripped. -->
@@ -876,7 +876,7 @@
 						<i class="fa fa-circle-info mr-1 text-[10px]"></i>
 						<span class="font-black uppercase tracking-widest">Block uses kept.</span>
 						Occurrences inside <code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{#each}}'}</code> /
-						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{#if}}'}</code> stay — remove those by hand if needed.
+						<code class="rounded border-[1.5px] border-gray-900 bg-gray-900 px-1 font-mono text-[10px] text-brand-accent">{'{{#if}}'}</code> stay; remove those by hand if needed.
 					</p>
 				</div>
 			</div>
@@ -1002,7 +1002,7 @@
 				label: template.jsEnabled
 					? 'Disable JavaScript at render'
 					: 'Enable JavaScript at render',
-				hint: 'Danger when on — allows scripts during Puppeteer render',
+				hint: 'Danger when on: allows scripts during Puppeteer render',
 				icon: 'fa-code-compare',
 				action: () =>
 					handleSettingsChange({ detail: { jsEnabled: !template.jsEnabled } })
@@ -1021,7 +1021,7 @@
 			{
 				key: 'publish',
 				label: 'Publish template',
-				hint: 'Ship to production — opens preview',
+				hint: 'Ship to production (opens preview)',
 				icon: 'fa-rocket',
 				disabled: isDirty || !template.uid,
 				action: () => dispatch('publish')

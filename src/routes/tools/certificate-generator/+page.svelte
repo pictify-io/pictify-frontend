@@ -103,7 +103,7 @@
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -d '{
-    "html": "<your certificate HTML — swap the sample values for {{recipientName}}, {{date}}...>",
+    "html": "<your certificate HTML: swap the sample values for {{recipientName}}, {{date}}...>",
     "width": 1920,
     "height": 1080,
     "fileExtension": "png"
@@ -113,11 +113,11 @@
 	const faqs = [
 		{
 			q: 'Is this certificate generator really free?',
-			a: 'Yes — pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and email delivery via workflows.'
+			a: 'Yes, pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and email delivery via workflows.'
 		},
 		{
 			q: 'Can I customize the certificate design?',
-			a: 'Yes. The form fields update the recipient name, organization, date, and achievement text live in the preview. Every template is plain HTML and CSS under the hood, so with a free account you can edit the template code directly — or describe the design you want and let the AI Template Maker write it.'
+			a: 'Yes. The form fields update the recipient name, organization, date, and achievement text live in the preview. Every template is plain HTML and CSS under the hood, so with a free account you can edit the template code directly, or describe the design you want and let the AI Template Maker write it.'
 		},
 		{
 			q: 'What formats can I download certificates in?',
@@ -125,23 +125,23 @@
 		},
 		{
 			q: 'Can I bulk generate certificates for events or training programs?',
-			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow — one row per attendee — and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
+			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow (one row per attendee) and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
 		},
 		{
 			q: 'Can I email certificates to recipients automatically?',
-			a: 'Yes — this is what makes Pictify different from other certificate makers. A workflow run renders each row\'s certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row.'
+			a: 'Yes, this is what makes Pictify different from other certificate makers. A workflow run renders each row\'s certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row.'
 		},
 		{
 			q: 'Can I generate certificates from Google Sheets?',
-			a: 'Export your Sheet as CSV and upload it to a workflow — columns map to certificate variables in the wizard. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
+			a: 'Export your Sheet as CSV and upload it to a workflow; columns map to certificate variables in the wizard. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
 		},
 		{
 			q: 'Can my LMS or form tool trigger certificates automatically?',
-			a: 'Yes. Every workflow exposes a signed webhook — point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders and delivers one certificate, with the same per-recipient status tracking as a CSV run.'
+			a: 'Yes. Every workflow exposes a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders and delivers one certificate, with the same per-recipient status tracking as a CSV run.'
 		},
 		{
 			q: 'Can I add my company logo?',
-			a: 'Yes. In a workflow, templates are HTML — drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
+			a: 'Yes. In a workflow, templates are HTML: drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
 		},
 		{
 			q: 'Are the generated certificates printable?',
@@ -320,10 +320,10 @@
 </script>
 
 <svelte:head>
-	<title>Certificate Generator — Free Maker + Bulk API for Events & Training | Pictify</title>
+	<title>Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify</title>
 	<meta
 		name="description"
-		content="Free certificate generator with 5 professional templates — customize names, dates, and achievements, then download a high-res PNG. Bulk-generate certificates for events, training programs, and courses with the free API."
+		content="Free certificate generator with 5 professional templates: customize names, dates, and achievements, then download a high-res PNG. Bulk-generate via the free API."
 	/>
 	<meta
 		name="keywords"
@@ -335,7 +335,7 @@
 	<!-- Open Graph -->
 	<meta
 		property="og:title"
-		content="Certificate Generator — Free Maker + Bulk API for Events & Training | Pictify"
+		content="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
 	/>
 	<meta
 		property="og:description"
@@ -349,7 +349,7 @@
 	<meta property="og:image:height" content="630" />
 	<meta
 		property="og:image:alt"
-		content="Pictify Certificate Generator — 5 free templates with API for bulk generation"
+		content="Pictify Certificate Generator: 5 free templates with API for bulk generation"
 	/>
 
 	<!-- Twitter Card -->
@@ -357,7 +357,7 @@
 	<meta name="twitter:site" content="@pictify_io" />
 	<meta
 		name="twitter:title"
-		content="Certificate Generator — Free Maker + Bulk API for Events & Training | Pictify"
+		content="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
 	/>
 	<meta
 		name="twitter:description"
@@ -366,7 +366,7 @@
 	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	<meta
 		name="twitter:image:alt"
-		content="Pictify Certificate Generator — 5 free templates with API for bulk generation"
+		content="Pictify Certificate Generator: 5 free templates with API for bulk generation"
 	/>
 
 	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
@@ -478,7 +478,7 @@
 						Need certificates for a whole list?
 					</h2>
 					<p class="text-sm sm:text-base font-bold text-gray-800">
-						Upload a CSV and email every recipient automatically. Or trigger it by webhook — issue a
+						Upload a CSV and email every recipient automatically. Or trigger it by webhook: issue a
 						certificate the moment your LMS reports a completion.
 					</p>
 				</div>
@@ -516,7 +516,7 @@
 							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
 							: 'border-black shadow-brutal-lg'} p-3 overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
 						on:click={() => selectTemplate(template)}
-						aria-label="{template.name} certificate template — {template.description}"
+						aria-label="{template.name} certificate template: {template.description}"
 						title="{template.name} certificate template"
 					>
 						{#if selectedTemplate.id === template.id}
@@ -995,7 +995,7 @@
 					Bulk + Delivered
 				</div>
 				<h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-white tracking-tight">
-					Bulk Certificate Generator for Events — Delivered, Not Downloaded
+					Bulk Certificate Generator for Events: Delivered, Not Downloaded
 				</h3>
 				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium mb-6">
 					Generating 300 certificates was never the hard part. Getting 300 certificates into 300
@@ -1008,7 +1008,7 @@
 					>
 						<h4 class="font-black text-black text-sm mb-1">Sheets add-ons</h4>
 						<p class="text-xs text-gray-600 leading-relaxed">
-							Autocrat rides Apps Script (6-minute cap) and your Gmail quota — and broke across its
+							Autocrat rides Apps Script (6-minute cap) and your Gmail quota, and broke across its
 							81M-install base in June 2026. →
 						</p>
 					</a>
@@ -1018,7 +1018,7 @@
 					>
 						<h4 class="font-black text-black text-sm mb-1">Canva Bulk Create</h4>
 						<p class="text-xs text-gray-600 leading-relaxed">
-							Makes beautiful variants, then stops at download. No email delivery of any kind — the
+							Makes beautiful variants, then stops at download. No email delivery of any kind; the
 							zip file is your problem. →
 						</p>
 					</a>
@@ -1038,7 +1038,7 @@
 					own certificate, and every certificate emails itself to its recipient from an isolated
 					sending domain. You watch <span class="text-data-green font-black"
 						>delivered / bounced / suppressed per person</span
-					> — and re-send any single row with a corrected address. That's the difference between "sent"
+					>, and re-send any single row with a corrected address. That's the difference between "sent"
 					and "delivered".
 				</p>
 			</section>
@@ -1118,7 +1118,7 @@
 					Certificate Templates: Choose from 5 Free Designs
 				</h3>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-6">
-					Every certificate template works for any certificate type — award, achievement,
+					Every certificate template works for any certificate type: award, achievement,
 					completion, participation, or appreciation. Pick a design that matches your brand and
 					customize the title, recipient name, date, and achievement text. All templates are free
 					and come with commercial-use rights.
@@ -1132,7 +1132,7 @@
 							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong
 								>Elegant</strong
 							> template, with gold borders and serif typography, is our most popular certificate of
-							achievement template — ideal for awards ceremonies, academic honors, and sales milestones.
+							achievement template, ideal for awards ceremonies, academic honors, and sales milestones.
 						</p>
 					</div>
 					<div class="border-l-[4px] border-data-sky pl-4 sm:pl-5">
@@ -1163,7 +1163,7 @@
 						<p class="text-sm text-gray-700 font-medium">
 							Celebrate winners and honorees with a bold award certificate. The <strong
 								>Creative</strong
-							> template — coral accents and playful geometry — works well for employee-of-the-month
+							> template (coral accents and playful geometry) works well for employee-of-the-month
 							awards, tournament winners, and community recognition.
 						</p>
 					</div>
@@ -1174,8 +1174,8 @@
 						<p class="text-sm text-gray-700 font-medium">
 							Thank volunteers, partners, and team members with a certificate of appreciation. The <strong
 								>Minimalist</strong
-							> template's generous whitespace and refined typography puts the focus on the recipient
-							— a perfect certificate of appreciation template for donor recognition and retirement gifts.
+							> template's generous whitespace and refined typography puts the focus on the recipient,
+							a perfect certificate of appreciation template for donor recognition and retirement gifts.
 						</p>
 					</div>
 				</div>
@@ -1204,14 +1204,14 @@
 					Use Our Online Certificate Maker for Free
 				</h3>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
-					Pictify's online certificate maker runs entirely in your browser — no downloads, no
+					Pictify's online certificate maker runs entirely in your browser: no downloads, no
 					installs, no signup. The certificate maker supports a real-time preview that updates as
 					you type, and high-resolution PNG export at 1920×1080. Generate one certificate in under a
 					minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds
 					at once from a spreadsheet or database.
 				</p>
 				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					Every template here is plain HTML and CSS — the same template a Pictify workflow renders
+					Every template here is plain HTML and CSS, the same template a Pictify workflow renders
 					at scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
 					certificate, emailed to its recipient. That's the difference between a one-off certificate
 					generator and a programmable certificate builder: the fast free tool today, delivery-grade
@@ -1237,7 +1237,7 @@
 						Need Them Delivered, Not Just Downloaded?
 					</h3>
 					<p class="text-gray-400 font-bold mb-8 max-w-lg mx-auto relative z-10">
-						Start a workflow run to generate personalized certificates in bulk — and email each
+						Start a workflow run to generate personalized certificates in bulk, and email each
 						one to its recipient with per-person delivery status. Perfect for events, courses,
 						and training programs.
 					</p>
@@ -1253,7 +1253,7 @@
 								d="M13 10V3L4 14h7v7l9-11h-7z"
 							/></svg
 						>
-						Start a Run — Free
+						Start a Run (Free)
 					</a>
 				</div>
 			</section>

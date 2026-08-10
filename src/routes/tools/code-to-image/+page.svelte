@@ -897,8 +897,8 @@
 </script>
 
 <SEOHead
-	title="Code to Image — Code Screenshot Generator (25+ Themes, Free API) | Pictify"
-	description="Turn code snippets into beautiful screenshots with syntax highlighting — 25+ languages, 18+ themes, custom fonts and window frames. Export PNG free, or automate code images with the API."
+	title="Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify"
+	description="Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API."
 	canonical="https://pictify.io/tools/code-to-image"
 	robots="index, follow, max-image-preview:large"
 	ogImage="https://media.pictify.io/by55n-1775406886142.png"

@@ -90,7 +90,7 @@
 					</svg>
 				</div>
 				<div>
-					<p class="text-sm font-bold text-red-800">Overdue invoice — renders are paused</p>
+					<p class="text-sm font-bold text-red-800">Overdue invoice: renders are paused</p>
 					<p class="text-xs text-red-600">Pay the outstanding invoice to resume rendering.</p>
 				</div>
 			</div>

@@ -118,14 +118,14 @@
 			</div>
 			<h2 class="text-3xl sm:text-4xl font-black text-black tracking-tight leading-tight">
 				{#if isValueSkip}
-					Your API key is ready — what should we set up first?
+					Your API key is ready. What should we set up first?
 				{:else}
 					How will you use Pictify?
 				{/if}
 			</h2>
 			<p class="text-sm font-bold text-gray-500 mt-2">
 				{#if isValueSkip}
-					Pick one and we'll tailor your guide — or jump straight to your key.
+					Pick one and we'll tailor your guide, or jump straight to your key.
 				{:else}
 					Pick the option that best describes you. We'll personalize your getting started guide.
 				{/if}

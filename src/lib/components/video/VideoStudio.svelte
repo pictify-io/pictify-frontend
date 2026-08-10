@@ -987,7 +987,7 @@
 		const patches = computeOverlayPatches(authoredDoc, testValues, variableDefinitions);
 		if (!patches.length) {
 			exportError = '';
-			saveMessage = 'Nothing to preview yet — add a {{token}} or a binding first.';
+			saveMessage = 'Nothing to preview yet. Add a {{token}} or a binding first.';
 			return;
 		}
 		suppressDirty = true;
@@ -1497,7 +1497,7 @@
 					disabled={isExporting}
 					aria-pressed={exportFormat === option}
 					title={option === 'gif'
-						? 'Animated GIF — renders on the server, capped at 15fps for shareable file sizes'
+						? 'Animated GIF: renders on the server, capped at 15fps for shareable file sizes'
 						: 'MP4 video'}
 					class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors
 						{exportFormat === option
@@ -1672,7 +1672,7 @@
 							</div>
 							<p class="mt-2 text-[10px] font-bold {TEXT_MUTED}">
 								{exportStage.includes('browser')
-									? 'Rendering on your machine — keep this tab open.'
+									? 'Rendering on your machine. Keep this tab open.'
 									: 'Rendering on the server. This can take a few minutes.'}
 							</p>
 						{:else if exportError}

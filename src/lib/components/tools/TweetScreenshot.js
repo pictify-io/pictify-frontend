@@ -190,7 +190,7 @@ export const DEFAULT_TWEET = {
 		is_verified_blue: true,
 		is_verified: false
 	},
-	body: 'Generate tweet screenshots programmatically via a simple HTTP call. Paste any tweet URL above, tweak the fields, and download — or copy the API snippet and automate it. #API #SaaS',
+	body: 'Generate tweet screenshots programmatically via a simple HTTP call. Paste any tweet URL above, tweak the fields, and download, or copy the API snippet and automate it. #API #SaaS',
 	entities: {
 		urls: [],
 		user_mentions: [],

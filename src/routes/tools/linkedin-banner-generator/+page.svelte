@@ -509,7 +509,7 @@
 		name: 'Pictify LinkedIn Banner Generator',
 		url: 'https://pictify.io/tools/linkedin-banner-generator',
 		description:
-			'Create professional LinkedIn banners in seconds — 20+ templates at the correct 1584×396 dimensions, free with API access.',
+			'Create professional LinkedIn banners in seconds: 20+ templates at the correct 1584×396 dimensions, free with API access.',
 		applicationCategory: ['DesignApplication', 'BusinessApplication'],
 		operatingSystem: 'Web',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -549,7 +549,7 @@
 	<meta property="og:image" content="https://pictify.io/og/tools/linkedin-banner-generator.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify LinkedIn banner generator — free, 1584×396" />
+	<meta property="og:image:alt" content="Pictify LinkedIn banner generator: free, 1584×396" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Free LinkedIn Banner Generator | Pictify" />
 	<meta

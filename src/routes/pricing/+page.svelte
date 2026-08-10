@@ -162,13 +162,13 @@
 		{
 			question: 'What AI features are available?',
 			answer:
-				'Every plan includes ONE monthly AI credit pool — Free 25, Basic 300, Pro 1,000, Business 4,000. It covers everything AI-powered: the Copilot (both template editing and the video timeline copilot), AI video generation, and captions. One instruction, one credit — failed requests are never billed.',
+				'Every plan includes ONE monthly AI credit pool: Free 25, Basic 300, Pro 1,000, Business 4,000. It covers everything AI-powered: the Copilot (both template editing and the video timeline copilot), AI video generation, and captions. One instruction, one credit; failed requests are never billed.',
 			isOpened: false
 		},
 		{
 			question: 'Do video renders count toward my render limit?',
 			answer:
-				'Yes — images, PDFs, GIFs and video renders all draw from the same monthly render pool. AI-powered actions like AI video generation and captions draw from your separate AI credits pool instead, so a rendered video costs renders and an AI-generated one also spends AI credits.',
+				'Yes: images, PDFs, GIFs and video renders all draw from the same monthly render pool. AI-powered actions like AI video generation and captions draw from your separate AI credits pool instead, so a rendered video costs renders and an AI-generated one also spends AI credits.',
 			isOpened: false
 		}
 	];
@@ -518,7 +518,7 @@
 						Just exploring? Start with our <button
 							on:click={() => selectPlanHandler(PLANS.STARTER)}
 							class="text-brand-danger underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black"
-							>Free plan — 50 renders/mo</button
+							>Free plan: 50 renders/mo</button
 						>. No credit card needed.
 					</p>
 				</div>

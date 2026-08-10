@@ -242,7 +242,7 @@ print(res.json()['image']['url'])`;
 				generatedImageUrl = '';
 				generationError = '';
 				fetchNotice = body.tweet.is_long_form_truncated
-					? 'This is a long-form tweet. X only returns the 277-character preview to embeds — paste the full text into the body field below if you want the whole thing.'
+					? 'This is a long-form tweet. X only returns the 277-character preview to embeds. Paste the full text into the body field below if you want the whole thing.'
 					: '';
 				analytics.trackToolOpened?.({ tool_name: 'tweet_screenshot', action: 'fetch_success' });
 			} else {
@@ -356,7 +356,7 @@ print(res.json()['image']['url'])`;
 		},
 		{
 			q: 'Where does the tweet data come from?',
-			a: 'We fetch public tweet metadata via Twitter\'s public syndication endpoint — the same one Twitter itself uses to power embeds. No Twitter API key needed on your end. If the data is unavailable (deleted, private, or rate-limited), the tool falls back to manual entry so you can still produce the screenshot.'
+			a: 'We fetch public tweet metadata via Twitter\'s public syndication endpoint, the same one Twitter itself uses to power embeds. No Twitter API key needed on your end. If the data is unavailable (deleted, private, or rate-limited), the tool falls back to manual entry so you can still produce the screenshot.'
 		},
 		{
 			q: 'Is there a watermark on downloads?',
@@ -368,7 +368,7 @@ print(res.json()['image']['url'])`;
 		},
 		{
 			q: 'Can I edit the tweet before downloading?',
-			a: 'Absolutely. Every field is editable — great for making "what-if" screenshots, typo corrections, or creating mockups from scratch without a real tweet URL.'
+			a: 'Absolutely. Every field is editable: great for making "what-if" screenshots, typo corrections, or creating mockups from scratch without a real tweet URL.'
 		}
 	];
 
@@ -381,7 +381,7 @@ print(res.json()['image']['url'])`;
 		name: 'Pictify.io Tweet Screenshot Generator',
 		url: 'https://pictify.io/tools/tweet-screenshot',
 		description:
-			'Generate tweet screenshots from any public tweet URL. Auto-fill via Twitter syndication, customize every field, download as PNG — or automate the whole thing with one API call.',
+			'Generate tweet screenshots from any public tweet URL. Auto-fill via Twitter syndication, customize every field, download as PNG, or automate the whole thing with one API call.',
 		applicationCategory: ['DesignApplication', 'ImageGenerator'],
 		operatingSystem: 'Web',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -398,7 +398,7 @@ print(res.json()['image']['url'])`;
 	const howToMeta = {
 		name: 'How to screenshot a tweet',
 		description:
-			'Generate a clean PNG screenshot of any public tweet in three steps — no screen capture, no Twitter API key.',
+			'Generate a clean PNG screenshot of any public tweet in three steps. No screen capture, no Twitter API key.',
 		totalTime: 'PT30S',
 		supply: [{ '@type': 'HowToSupply', name: 'A public tweet URL from twitter.com or x.com' }],
 		tool: [{ '@type': 'HowToTool', name: 'Pictify Tweet Screenshot Generator' }]
@@ -411,7 +411,7 @@ print(res.json()['image']['url'])`;
 		},
 		{
 			name: 'Customize the fields',
-			text: 'Edit any field — display name, handle, verified badge, body text, media, or engagement metrics. The live preview updates instantly.',
+			text: 'Edit any field: display name, handle, verified badge, body text, media, or engagement metrics. The live preview updates instantly.',
 			url: 'https://pictify.io/tools/tweet-screenshot#customize'
 		},
 		{
@@ -427,20 +427,20 @@ print(res.json()['image']['url'])`;
 </script>
 
 <ToolSeoHead
-	title="Tweet Screenshot Generator — Free Twitter Screenshot Maker | Pictify"
-	description="Free tweet screenshot generator. Paste any Twitter or X URL, customize the tweet, download a PNG — or automate it with one API call. No Twitter API key needed."
+	title="Tweet Screenshot Generator: Free Twitter Screenshot Maker | Pictify"
+	description="Free tweet screenshot generator. Paste any Twitter or X URL, customize the tweet, download a PNG, or automate it with one API call. No Twitter API key needed."
 	canonical="https://pictify.io/tools/tweet-screenshot"
 	robots="index,follow,max-image-preview:large,max-snippet:-1"
 	ogSiteName="Pictify"
-	ogTitle="Tweet Screenshot Generator — Free Twitter Screenshot Maker"
-	ogDescription="Paste a tweet URL, customize every field, download a PNG. Automate the whole thing with one API call — no Twitter API key required."
+	ogTitle="Tweet Screenshot Generator: Free Twitter Screenshot Maker"
+	ogDescription="Paste a tweet URL, customize every field, download a PNG. Automate the whole thing with one API call. No Twitter API key required."
 	ogImage="https://pictify.io/og/tools/tweet-screenshot.png"
 	ogImageWidth={1200}
 	ogImageHeight={630}
-	ogImageAlt="Pictify tweet screenshot generator — paste a URL, download a PNG"
+	ogImageAlt="Pictify tweet screenshot generator: paste a URL, download a PNG"
 	twitterSite="@pictify_io"
 	twitterCreator="@pictify_io"
-	twitterTitle="Tweet Screenshot Generator — Free Twitter Screenshot Maker"
+	twitterTitle="Tweet Screenshot Generator: Free Twitter Screenshot Maker"
 	twitterDescription="Paste a tweet URL, customize every field, download a PNG. Automate with one API call."
 	twitterImage="https://pictify.io/og/tools/tweet-screenshot.png"
 	twitterImageAlt="Pictify tweet screenshot generator"
@@ -460,7 +460,7 @@ print(res.json()['image']['url'])`;
 				Tweet Screenshot Generator
 			</h1>
 			<p class="mt-4 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-				Paste any tweet URL. Auto-fills in a click. Tweak anything. Download as PNG — or automate with one API call.
+				Paste any tweet URL. Auto-fills in a click. Tweak anything. Download as PNG, or automate with one API call.
 			</p>
 		</header>
 
@@ -741,16 +741,16 @@ print(res.json()['image']['url'])`;
 				<p class="text-lg text-gray-700 leading-relaxed mb-5">
 					A clean tweet screenshot does a lot of work in content. Newsletters quote tweets. LinkedIn
 					posts lead with them. Podcast thumbnails reference them. Decks drop them onto slides.
-					The problem: the built-in phone or browser screenshot always looks wrong — wrong crop,
+					The problem: the built-in phone or browser screenshot always looks wrong: wrong crop,
 					wrong dark/light mode, UI chrome bleeding in, verified badge missing, weird resolution.
 					This tool fixes that in one paste.
 				</p>
 				<p class="text-lg text-gray-700 leading-relaxed mb-8">
 					Paste any public tweet URL from twitter.com or x.com. We fetch the tweet body, author,
 					avatar, verified badge, media, and engagement metrics through Twitter's own public
-					syndication endpoint — no Twitter API key required on your side. Every field is editable,
+					syndication endpoint; no Twitter API key required on your side. Every field is editable,
 					so you can tweak the name, rewrite the body for a mockup, adjust metric counts, or swap
-					the avatar. Click download and you get a crisp PNG at 600&nbsp;×&nbsp;auto — perfect for any
+					the avatar. Click download and you get a crisp PNG at 600&nbsp;×&nbsp;auto, perfect for any
 					social graphic, blog embed, or presentation slide.
 				</p>
 
@@ -762,8 +762,8 @@ print(res.json()['image']['url'])`;
 						different phone sizes.
 					</li>
 					<li>
-						<strong>Marketing teams</strong> turning customer praise into social proof — testimonial
-						tweets, product launch reactions, founder announcements — formatted for LinkedIn,
+						<strong>Marketing teams</strong> turning customer praise into social proof (testimonial
+						tweets, product launch reactions, founder announcements) formatted for LinkedIn,
 						Instagram, and ads.
 					</li>
 					<li>
@@ -776,7 +776,7 @@ print(res.json()['image']['url'])`;
 					</li>
 					<li>
 						<strong>Developers and product teams</strong> generating tweet images programmatically
-						for content pipelines, CMS integrations, or automated lifecycle emails — see the
+						for content pipelines, CMS integrations, or automated lifecycle emails. See the
 						<a href="#api" class="text-brand-danger underline">API section</a> above.
 					</li>
 				</ul>
@@ -794,12 +794,12 @@ print(res.json()['image']['url'])`;
 					</li>
 					<li>
 						<strong>Edit any field.</strong> Display name, handle, verified badge (blue or
-						legacy), body text, media, date, replies, retweets, likes — every surface is editable.
+						legacy), body text, media, date, replies, retweets, likes. Every surface is editable.
 						Great for typo fixes, hypothetical tweets, or stress-testing a draft before posting.
 					</li>
 					<li>
 						<strong>Download the PNG</strong> or copy the API call and automate it from your
-						backend. Both paths produce the exact same image — what you preview is what you ship.
+						backend. Both paths produce the exact same image: what you preview is what you ship.
 					</li>
 				</ol>
 
@@ -823,14 +823,14 @@ print(res.json()['image']['url'])`;
 						<h4 class="font-black text-gray-900 mb-2">No Twitter API key</h4>
 						<p class="text-gray-700">
 							Other tools require you to spin up a Twitter developer account and manage
-							tokens. We use the public syndication endpoint — zero setup, zero monthly cost.
+							tokens. We use the public syndication endpoint: zero setup, zero monthly cost.
 						</p>
 					</div>
 					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
 						<h4 class="font-black text-gray-900 mb-2">Scales to a million</h4>
 						<p class="text-gray-700">
 							Need tweet images for every author, every post, every campaign? The same tool
-							ships a REST API — POST a payload, get a CDN-backed PNG.
+							ships a REST API: POST a payload, get a CDN-backed PNG.
 						</p>
 					</div>
 				</div>
@@ -843,7 +843,7 @@ print(res.json()['image']['url'])`;
 					<li>Profile picture (auto-fetched from <code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">pbs.twimg.com</code>)</li>
 					<li>Display name + @handle with verified badge (blue checkmark or legacy gold)</li>
 					<li>Tweet body with clickable URLs, mentions, and hashtags styled in Twitter blue</li>
-					<li>Attached photos — up to four, in the same grid layout Twitter uses</li>
+					<li>Attached photos: up to four, in the same grid layout Twitter uses</li>
 					<li>Post timestamp in the Twitter time format</li>
 					<li>Engagement metrics: replies, retweets, and likes (formatted with K/M suffixes)</li>
 					<li>The X logo in the top-right corner, so the screenshot reads as a tweet at a glance</li>
@@ -855,7 +855,7 @@ print(res.json()['image']['url'])`;
 					does via a single HTTP call. Generate tweet screenshots as part of a daily newsletter
 					build, a CMS publish hook, or a scheduled social campaign. The API snippet
 					<a href="#api" class="text-brand-danger underline">above</a> is the exact call we'd make
-					ourselves — copy it, swap in your key, and you're shipping.
+					ourselves. Copy it, swap in your key, and you're shipping.
 				</p>
 				<p class="text-lg text-gray-700 leading-relaxed">
 					Common automated workflows: <em>"every new reply to our product account becomes a social

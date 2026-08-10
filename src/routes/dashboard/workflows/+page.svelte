@@ -114,7 +114,7 @@
 				Workflows
 			</h1>
 			<p class="text-base sm:text-lg font-bold text-gray-500 mt-3 max-w-lg">
-				Turn a spreadsheet into branded deliverables — upload your data, pick a template, and every
+				Turn a spreadsheet into branded deliverables: upload your data, pick a template, and every
 				row gets rendered and delivered.
 			</p>
 		</div>
@@ -248,7 +248,7 @@
 			</div>
 			<p class="text-lg font-black text-black mb-2">No runs yet</p>
 			<p class="text-sm font-bold text-gray-500 mb-6 max-w-sm">
-				Start your first run — upload a CSV, pick a template, and we'll render a deliverable for
+				Start your first run: upload a CSV, pick a template, and we'll render a deliverable for
 				each row.
 			</p>
 			<a

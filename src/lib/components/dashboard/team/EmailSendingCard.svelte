@@ -52,7 +52,7 @@
 		try {
 			const response = await provisionSendingDomain();
 			identity = response?.identity || null;
-			toast.success?.('Sending domain provisioned — DNS is verifying.');
+			toast.success?.('Sending domain provisioned. DNS is verifying.');
 		} catch (e) {
 			error = e?.message || 'Provisioning failed';
 		} finally {
@@ -76,7 +76,7 @@
 			const response = await verifySendingDomain();
 			identity = response?.identity || identity;
 			if (identity?.status === 'verified') {
-				toast.success?.('Domain verified — your workflow emails now send from it.');
+				toast.success?.('Domain verified. Your workflow emails now send from it.');
 			} else {
 				startCooldown(30);
 			}
@@ -146,7 +146,7 @@
 						</code>
 					</p>
 					<p class="text-xs font-bold text-gray-500 mt-2 leading-relaxed">
-						Get a dedicated subdomain for your workspace — your delivery reputation stays yours
+						Get a dedicated subdomain for your workspace; your delivery reputation stays yours
 						alone, and recipients see your name on your own domain. Set up automatically, no DNS
 						work needed.
 					</p>
@@ -177,7 +177,7 @@
 
 				{#if identity.status !== 'verified'}
 					<p class="text-xs font-bold text-gray-500 leading-relaxed">
-						DNS records were added automatically and are propagating — this usually takes a few
+						DNS records were added automatically and are propagating; this usually takes a few
 						minutes. Emails keep sending from the shared domain until verification completes.
 					</p>
 					<button

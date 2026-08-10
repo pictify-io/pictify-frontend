@@ -10,13 +10,13 @@
 		{
 			name: 'Workflow Runs',
 			description:
-				'Turn a spreadsheet or webhook into branded certificates, badges, tickets — rendered and delivered.',
+				'Turn a spreadsheet or webhook into branded certificates, badges, tickets, rendered and delivered.',
 			url: '/signup',
 			icon: 'fa-solid fa-bolt'
 		},
 		{
 			name: 'HTML to Image',
-			description: 'Convert HTML & CSS to PNG, JPG, or WebP — free converter with API access.',
+			description: 'Convert HTML & CSS to PNG, JPG, or WebP. Free converter with API access.',
 			url: '/tools/html-to-image',
 			icon: 'fa-solid fa-file-code'
 		},
@@ -78,14 +78,14 @@
 		{
 			name: 'CSV to PDF',
 			description:
-				'Turn a spreadsheet into documents — the whole sheet as a table, or one PDF page per row.',
+				'Turn a spreadsheet into documents: the whole sheet as a table, or one PDF page per row.',
 			url: '/tools/csv-to-pdf',
 			icon: 'fa-solid fa-file-csv'
 		},
 		{
 			name: 'Tweet Screenshot Generator',
 			description:
-				'Paste any tweet URL, customize every field, download a clean PNG — no Twitter API key required.',
+				'Paste any tweet URL, customize every field, download a clean PNG. No Twitter API key required.',
 			url: '/tools/tweet-screenshot',
 			icon: 'fa-brands fa-x-twitter'
 		},
@@ -109,7 +109,7 @@
 		'@type': 'ItemList',
 		name: 'Pictify.io Free Tools for Programmatic Media',
 		description:
-			'Free tools powered by Pictify — design templates and generate images programmatically at scale.',
+			'Free tools powered by Pictify: design templates and generate images programmatically at scale.',
 		itemListElement: tools.map((tool, index) => ({
 			'@type': 'ListItem',
 			position: index + 1,
@@ -127,7 +127,7 @@
 	<title>Free Tools for Programmatic Media | Pictify.io</title>
 	<meta
 		name="description"
-		content="Explore Pictify.io's free tools to generate images from HTML, URLs, and templates. Design once, render variants via API — the infrastructure layer for programmatic media."
+		content="Explore Pictify.io's free tools to generate images from HTML, URLs, and templates. Design once, render variants via API, the infrastructure layer for programmatic media."
 	/>
 	<meta
 		name="keywords"
@@ -137,7 +137,7 @@
 	<meta property="og:title" content="Free Tools for Programmatic Media | Pictify.io" />
 	<meta
 		property="og:description"
-		content="Free tools powered by Pictify — design templates and render images at scale via API."
+		content="Free tools powered by Pictify: design templates and render images at scale via API."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	<meta property="og:url" content="https://pictify.io/tools" />
@@ -171,7 +171,7 @@
 
 				<p class="text-xl md:text-2xl font-bold max-w-3xl leading-relaxed text-gray-700">
 					Design templates once, render variants in seconds. <br class="hidden md:block" />
-					Try our free tools — then automate at scale with the Pictify API.
+					Try our free tools, then automate at scale with the Pictify API.
 				</p>
 				<p class="text-sm md:text-base font-bold text-gray-600 max-w-3xl">
 					Free to try. Guest limits may apply; create a free account to unlock higher limits and
@@ -370,7 +370,7 @@
 					<div class="p-6 pt-0 border-t-[3px] border-gray-900 bg-white">
 						<p class="text-lg font-medium text-gray-700 leading-relaxed mt-4">
 							Pictify is the infrastructure layer for programmatic media. Design templates (HTML/CSS
-							or our editor), inject variables, and render images/GIFs at scale via API — with fast,
+							or our editor), inject variables, and render images/GIFs at scale via API, with fast,
 							predictable output.
 						</p>
 					</div>
@@ -393,7 +393,7 @@
 					</summary>
 					<div class="p-6 pt-0 border-t-[3px] border-gray-900 bg-white">
 						<p class="text-lg font-medium text-gray-700 leading-relaxed mt-4">
-							Yes — these tools are free to try. Some tools enforce a daily guest limit and may add
+							Yes, these tools are free to try. Some tools enforce a daily guest limit and may add
 							a watermark after a few generations. Creating a free account unlocks higher limits and
 							removes watermarks. For production workloads and high volume, use our API plans.
 						</p>

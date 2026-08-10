@@ -212,7 +212,7 @@ const templates = {
   <div style="position:relative;">
     <div style="color:#22d3ee;font-weight:800;font-size:22px;letter-spacing:.3em;">LAUNCH DAY</div>
     <div style="color:#fafafa;font-weight:800;font-size:68px;letter-spacing:-.02em;margin-top:16px;line-height:1.05;">Workflows 2.0 is here</div>
-    <div style="color:#a1a1aa;font-weight:600;font-size:26px;margin-top:14px;">Render, deliver, and prove it — in one run.</div>
+    <div style="color:#a1a1aa;font-weight:600;font-size:26px;margin-top:14px;">Render, deliver, and prove it in one run.</div>
   </div>
   <div style="position:relative;width:150px;height:150px;border-radius:36px;background:linear-gradient(135deg,#22d3ee,#6366f1);display:flex;align-items:center;justify-content:center;color:#09090b;font-weight:800;font-size:64px;box-shadow:0 20px 60px rgba(34,211,238,.35);flex-shrink:0;">2.0</div>
 </div>`

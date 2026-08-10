@@ -71,7 +71,7 @@
 	function formatFeatureValue(value) {
 		if (value === null) return '∞';
 		if (value === true) return '✓';
-		if (value === false) return '—';
+		if (value === false) return '–';
 		return formatLimit(value);
 	}
 

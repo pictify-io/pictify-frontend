@@ -18,7 +18,7 @@
 		return '#4ade80';
 	};
 
-	const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('en-US') : '—');
+	const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('en-US') : '–');
 
 	onMount(async () => {
 		const details = await getPlanDetails();
@@ -97,7 +97,7 @@
 						/>
 					</div>
 					<p class="mt-1 text-[10px] font-medium text-gray-500">
-						One credit per AI instruction — Template Maker, AI edits, and the video copilot share
+						One credit per AI instruction: Template Maker, AI edits, and the video copilot share
 						this pool.
 					</p>
 				</div>

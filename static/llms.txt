@@ -1,6 +1,6 @@
 # Pictify
 
-> API-first image, document, and video generation. Every row of a spreadsheet or a webhook payload becomes a rendered, personalized certificate, badge, report, or video — delivered by email, with per-recipient delivery and bounce status tracked.
+> API-first image, document, and video generation. Every row of a spreadsheet or a webhook payload becomes a rendered, personalized certificate, badge, report, or video, delivered by email with per-recipient delivery and bounce status tracked.
 
 Pictify renders HTML/CSS as images (PNG/JPG/WebP), screenshots arbitrary URLs, generates multi-page PDFs, and renders video from templates authored visually or in code (Remotion). Workflows connect a CSV upload or a signed webhook to a template and a delivery pipeline in one step.
 
@@ -16,7 +16,7 @@ Pictify's core pattern is the **Render-to-Recipient workflow**: data in (CSV row
 
 ## Developer guides
 
-- [HTML to Image API: The Complete Developer Guide](https://pictify.io/blogs/html-to-image-the-complete-developer-guide-2026): client-side (html2canvas/html-to-image/dom-to-image) vs. headless browsers (Puppeteer/Playwright) vs. rendering APIs — failure modes, production code, benchmarks
+- [HTML to Image API: The Complete Developer Guide](https://pictify.io/blogs/html-to-image-the-complete-developer-guide-2026): client-side (html2canvas/html-to-image/dom-to-image) vs. headless browsers (Puppeteer/Playwright) vs. rendering APIs: failure modes, production code, benchmarks
 - [Website Screenshot API: The Complete Developer Guide](https://pictify.io/blogs/website-screenshot-api-the-complete-developer-guide-2026): cookie banners, SPA wait-timing, mobile emulation, full-page capture, the auth-wall limitation
 
 ## Solutions

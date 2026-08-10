@@ -75,11 +75,11 @@
 			const st = err?.status || 0;
 			if (st === 404) {
 				error =
-					'Preview route 404 — is the backend running the engine=html branch?';
+					'Preview route 404. Is the backend running the engine=html branch?';
 			} else if (st === 401 || st === 403) {
 				error = 'Sign in to use live preview.';
 			} else if (st === 429) {
-				error = 'Preview rate limit — slow down typing.';
+				error = 'Preview rate limit: slow down typing.';
 			} else {
 				error = (err && err.message) || 'Preview failed';
 			}

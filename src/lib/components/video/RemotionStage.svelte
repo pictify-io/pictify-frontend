@@ -96,7 +96,7 @@
 		regenerating: 'Trying again…',
 		writing: 'Writing the new scene…',
 		compiling: 'Checking it builds…',
-		retrying: 'That did not compile — fixing it…'
+		retrying: 'That did not compile. Fixing it…'
 	};
 
 	const SUGGESTIONS = [
@@ -155,7 +155,7 @@
 				dispatch('change', { tsx });
 				messages = [
 					...messages,
-					{ role: 'assistant', text: 'Done — the preview is updated.', status: 'applied', revertable: true }
+					{ role: 'assistant', text: 'Done. The preview is updated.', status: 'applied', revertable: true }
 				];
 			} else {
 				messages = [
@@ -435,7 +435,7 @@
 						{#if editableBars === bars.length}
 							Drag to retime
 						{:else}
-							{editableBars} of {bars.length} draggable — the rest use computed timing
+							{editableBars} of {bars.length} draggable; the rest use computed timing
 						{/if}
 					</span>
 				</div>
@@ -446,8 +446,8 @@
 							class="relative mb-1 h-6 w-full"
 							style="padding-left: {bar.depth * 10}px"
 							title={bar.editable
-								? `${bar.label || 'Beat'} — frames ${bar.start} to ${bar.start + bar.length}`
-								: `${bar.label || 'Beat'} — computed timing, edit it in the code`}
+								? `${bar.label || 'Beat'}: frames ${bar.start} to ${bar.start + bar.length}`
+								: `${bar.label || 'Beat'}: computed timing, edit it in the code`}
 						>
 							<div
 								role={bar.editable ? 'button' : 'presentation'}

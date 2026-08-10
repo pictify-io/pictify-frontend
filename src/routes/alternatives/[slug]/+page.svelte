@@ -91,7 +91,7 @@
 					name: 'Pictify',
 					applicationCategory: 'DeveloperApplication',
 					operatingSystem: 'Web',
-					description: `Pictify is a ${alt.competitor} alternative — an HTML-native rendering engine with a real expression engine, AI template authoring, and batch rendering with per-item results.`,
+					description: `Pictify is a ${alt.competitor} alternative: an HTML-native rendering engine with a real expression engine, AI template authoring, and batch rendering with per-item results.`,
 					offers: {
 						'@type': 'Offer',
 						price: '0',
@@ -126,7 +126,7 @@
 	<meta property="og:image" content={ogImage} />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify — the best {alt?.competitor} alternative" />
+	<meta property="og:image:alt" content="Pictify, the best {alt?.competitor} alternative" />
 	<meta property="og:site_name" content="Pictify" />
 
 	<!-- Twitter Card -->
@@ -134,7 +134,7 @@
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
 	<meta name="twitter:image" content={ogImage} />
-	<meta name="twitter:image:alt" content="Pictify — the best {alt?.competitor} alternative" />
+	<meta name="twitter:image:alt" content="Pictify, the best {alt?.competitor} alternative" />
 
 	{#if structuredData}
 		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}

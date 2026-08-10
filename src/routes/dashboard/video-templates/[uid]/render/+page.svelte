@@ -88,7 +88,7 @@
 		} catch (error) {
 			if (error?.data?.code === 'render_bridge_not_installed') {
 				renderError =
-					'Server rendering is not enabled on this server yet. Open the studio and use Render MP4 — it renders in your browser.';
+					'Server rendering is not enabled on this server yet. Open the studio and use Render MP4; it renders in your browser.';
 			} else {
 				renderError = error?.message || 'The render failed. Please try again.';
 			}
@@ -320,7 +320,7 @@
 					{:else if blank.length}
 						<p class="text-[11px] font-bold text-gray-500">
 							{blank.map((n) => `"${n}"`).join(', ')}
-							{blank.length === 1 ? 'is' : 'are'} empty — the video will show the raw
+							{blank.length === 1 ? 'is' : 'are'} empty; the video will show the raw
 							<code class="font-mono">{'{{'}token{'}}'}</code>.
 						</p>
 					{:else if isRendering}

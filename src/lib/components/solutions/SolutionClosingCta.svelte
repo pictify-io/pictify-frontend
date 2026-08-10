@@ -22,15 +22,15 @@
 		},
 		{
 			title: 'Per-row proof',
-			body: 'Sent, delivered, bounced, complained — per person, via real ESP webhooks. A bounce is a one-click re-send with a corrected address.'
+			body: 'Sent, delivered, bounced, complained. Per person, via real ESP webhooks. A bounce is a one-click re-send with a corrected address.'
 		},
 		{
 			title: 'One engine, every deliverable',
-			body: 'Certificates, badges, tickets, reports, personalized video — the same template and data contract renders PNG, PDF, GIF, and MP4.'
+			body: 'Certificates, badges, tickets, reports, personalized video. The same template and data contract renders PNG, PDF, GIF, and MP4.'
 		},
 		{
 			title: 'Real expression engine',
-			body: '{{ price * 0.9 | currency }} is a first-class template feature. Conditionals, filters, loops — logic lives in the template, not your backend.'
+			body: '{{ price * 0.9 | currency }} is a first-class template feature. Conditionals, filters, loops: logic lives in the template, not your backend.'
 		},
 		{
 			title: 'Wizard + API + agents',

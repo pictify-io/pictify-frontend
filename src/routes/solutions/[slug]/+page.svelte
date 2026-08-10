@@ -16,7 +16,7 @@
 	$: webApplicationSchema = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
-		name: `Pictify — ${solution.breadcrumbLabel}`,
+		name: `Pictify: ${solution.breadcrumbLabel}`,
 		url: canonical,
 		description: solution.metaDescription,
 		applicationCategory: 'BusinessApplication',

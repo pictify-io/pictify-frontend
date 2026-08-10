@@ -539,7 +539,7 @@
 				<div class="border-[3px] border-black p-5 bg-brand-accent/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">1</div>
 					<h3 class="font-black text-lg mb-2">Enter Your Data</h3>
-					<p class="text-sm font-medium text-gray-600">Type the text or numbers you want to encode. Choose a barcode format that matches your use case — Code 128 for general purpose, EAN-13 for retail products, UPC-A for US retail.</p>
+					<p class="text-sm font-medium text-gray-600">Type the text or numbers you want to encode. Choose a barcode format that matches your use case: Code 128 for general purpose, EAN-13 for retail products, UPC-A for US retail.</p>
 				</div>
 				<div class="border-[3px] border-black p-5 bg-data-green/10">
 					<div class="w-10 h-10 bg-black text-white font-black text-lg flex items-center justify-center mb-3">2</div>

@@ -582,7 +582,7 @@
 					class="mx-5 mb-3 flex items-center gap-2 rounded-md border-[2px] border-dashed border-gray-900 bg-[#fff7e0] px-3 py-2 text-[11px] font-bold text-gray-800"
 				>
 					<i class="fa fa-circle-info text-gray-900"></i>
-					Save the template first — the render API needs a template uid.
+					Save the template first; the render API needs a template uid.
 				</div>
 			{/if}
 		</div>
@@ -869,7 +869,7 @@
 											Image not ready
 										</p>
 										<p class="max-w-xs text-[10px] font-bold text-gray-500">
-											The CDN hasn't served the file yet. It should finish shortly — retry or
+											The CDN hasn't served the file yet. It should finish shortly; retry or
 											open the URL directly.
 										</p>
 										<button

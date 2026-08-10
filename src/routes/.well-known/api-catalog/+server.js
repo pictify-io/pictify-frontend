@@ -25,7 +25,7 @@ const CATALOG = {
 				{
 					href: 'https://api.pictify.io/image',
 					type: 'application/json',
-					title: 'Image API — render HTML or a URL to PNG/JPG/WebP'
+					title: 'Image API: render HTML or a URL to PNG/JPG/WebP'
 				}
 			],
 			// Not a registered IANA relation — api.pictify.io is the real OAuth
@@ -38,14 +38,14 @@ const CATALOG = {
 				{
 					href: 'https://api.pictify.io/.well-known/oauth-authorization-server',
 					type: 'application/json',
-					title: 'OAuth 2.1 Authorization Server Metadata (RFC 8414) — how agents authenticate to the API'
+					title: 'OAuth 2.1 Authorization Server Metadata (RFC 8414): how agents authenticate to the API'
 				}
 			],
 			'agent-registration': [
 				{
 					href: 'https://api.pictify.io/auth.md',
 					type: 'text/markdown',
-					title: 'auth.md — step-by-step agent registration and authentication guide'
+					title: 'auth.md: step-by-step agent registration and authentication guide'
 				}
 			]
 		}

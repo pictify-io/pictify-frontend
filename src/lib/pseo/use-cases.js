@@ -282,7 +282,7 @@ export const useCaseDetails = {
 			},
 			{
 				q: 'What about charts and graphs?',
-				a: 'If your charts render as HTML/SVG, Pictify will capture them. For <canvas>-drawn charts (Chart.js and similar), the API captures those too — the renderer runs a full Chromium, so anything a browser can draw ends up in the image.'
+				a: 'If your charts render as HTML/SVG, Pictify will capture them. For <canvas>-drawn charts (Chart.js and similar), the API captures those too. The renderer runs a full Chromium, so anything a browser can draw ends up in the image.'
 			}
 		],
 		related: ['markdown', 'badge']
@@ -304,13 +304,13 @@ export const useCaseDetails = {
 			'developer social images'
 		],
 		longDescription: `Developers and technical writers regularly need to share Markdown content on platforms
-			that require or prefer images — Twitter, LinkedIn, Instagram, and internal wikis. Traditional screenshots
+			that require or prefer images: Twitter, LinkedIn, Instagram, and internal wikis. Traditional screenshots
 			capture browser chrome and create inconsistent visuals. With Pictify's Markdown to image converter,
 			you render your Markdown as beautifully styled HTML and convert it directly to a crisp, shareable image.
 			Perfect for changelogs, README highlights, code tutorials, and release announcements.
 
 			Use dark mode themes, syntax highlighting, and custom fonts to match your brand. The API integration lets
-			you automate image generation from Markdown files in your CI/CD pipeline — every time you push a release,
+			you automate image generation from Markdown files in your CI/CD pipeline; every time you push a release,
 			a social card is generated automatically. No more manual screenshots or inconsistent formatting across
 			your marketing channels.`,
 		useCaseScenarios: [
@@ -379,7 +379,7 @@ export const useCaseDetails = {
 	},
 	badge: {
 		label: 'Badge Generator',
-		seoTitle: 'Free Badge Generator — Achievement & Certification Badges (PNG + API) | Pictify',
+		seoTitle: 'Free Badge Generator: Achievement & Certification Badges (PNG + API) | Pictify',
 		description:
 			'Generate achievement badges, skill labels, and milestone markers as shareable images for gamification and recognition.',
 		seoKeywords: [
@@ -400,7 +400,7 @@ export const useCaseDetails = {
 			badge name, user name, and date earned, then generate shareable badge images via API.
 
 			Perfect for learning platforms, fitness apps, developer communities, and any product with achievement
-			systems. Unlike static badge libraries, Pictify badges are dynamically generated — so each user gets
+			systems. Unlike static badge libraries, Pictify badges are dynamically generated, so each user gets
 			a personalized badge with their name, tier, and achievement date baked in. For whole cohorts, upload
 			a recipient CSV to a Pictify workflow and every badge is bulk-generated and emailed to its recipient
 			automatically.`,
@@ -776,10 +776,10 @@ export const useCaseDetails = {
 	},
 	'barcode-generator': {
 		label: 'Barcodes',
-		seoTitle: 'Barcode Generator API — Bulk Barcodes for Labels & Inventory (Free) | Pictify',
+		seoTitle: 'Barcode Generator API: Bulk Barcodes for Labels & Inventory (Free) | Pictify',
 		ogImage: 'https://media.pictify.io/que8z-1775618085943.png',
 		description:
-			'Generate Code 128, EAN-13, UPC-A, and ITF-14 barcodes — free online tool plus a bulk barcode generator API for product labels, inventory, and shipping at scale.',
+			'Generate Code 128, EAN-13, UPC-A, and ITF-14 barcodes: free online tool plus a bulk barcode generator API for product labels, inventory, and shipping at scale.',
 		seoKeywords: [
 			'barcode generator',
 			'barcode maker',
@@ -792,7 +792,7 @@ export const useCaseDetails = {
 			'inventory barcode',
 			'shipping label barcode'
 		],
-		longDescription: `Modern inventory and logistics systems require barcodes on demand — for product labels, shipping packages, warehouse bins, and event tickets. Manually creating barcodes in design tools is slow and error-prone. With Pictify, you render barcode HTML (using libraries like JsBarcode or bwip-js) as pixel-perfect images via API. Generate thousands of unique barcode labels in seconds, each with custom text, sizes, and formats.
+		longDescription: `Modern inventory and logistics systems require barcodes on demand (for product labels, shipping packages, warehouse bins, and event tickets). Manually creating barcodes in design tools is slow and error-prone. With Pictify, you render barcode HTML (using libraries like JsBarcode or bwip-js) as pixel-perfect images via API. Generate thousands of unique barcode labels in seconds, each with custom text, sizes, and formats.
 
 Automate barcode generation in your warehouse management system, e-commerce platform, or ticketing pipeline. Every barcode is rendered server-side, delivered as a CDN-hosted image, and ready to print or embed.`,
 		useCaseScenarios: [
@@ -812,7 +812,7 @@ Automate barcode generation in your warehouse management system, e-commerce plat
 			background: '#ffffff'
 		}),
 		overview: [
-			'Inventory, logistics, and retail teams need barcodes generated on demand — not hand-crafted in Illustrator. By rendering barcode HTML as images via API, you integrate barcode generation directly into your existing workflows.',
+			'Inventory, logistics, and retail teams need barcodes generated on demand, not hand-crafted in Illustrator. By rendering barcode HTML as images via API, you integrate barcode generation directly into your existing workflows.',
 			'E-commerce, warehouse, and shipping systems use this to produce scannable barcode labels programmatically, eliminating manual steps and reducing labeling errors.'
 		],
 		painPoints: [
@@ -838,7 +838,7 @@ Automate barcode generation in your warehouse management system, e-commerce plat
 		faqs: [
 			{
 				q: 'What barcode formats are supported?',
-				a: 'Any format your HTML barcode library supports — Code 128, EAN-13, UPC-A, QR codes, Data Matrix, and more. Pictify renders whatever HTML you send.'
+				a: 'Any format your HTML barcode library supports: Code 128, EAN-13, UPC-A, QR codes, Data Matrix, and more. Pictify renders whatever HTML you send.'
 			},
 			{
 				q: 'Can I batch generate barcodes?',
@@ -867,9 +867,9 @@ Automate barcode generation in your warehouse management system, e-commerce plat
 			'customer feedback image',
 			'social proof image generator'
 		],
-		longDescription: `Customer testimonials are your most powerful marketing asset — but they are buried in review platforms and support tickets. With Pictify, you turn raw testimonial text into beautifully designed, shareable image cards that work on Twitter, LinkedIn, Instagram, and your website.
+		longDescription: `Customer testimonials are your most powerful marketing asset, but they are buried in review platforms and support tickets. With Pictify, you turn raw testimonial text into beautifully designed, shareable image cards that work on Twitter, LinkedIn, Instagram, and your website.
 
-Design a testimonial card template once — with customer photo, name, company, star rating, and quote — then generate variants for every review via API. Perfect for social media managers, growth teams, and marketing automation pipelines.`,
+Design a testimonial card template once (with customer photo, name, company, star rating, and quote), then generate variants for every review via API. Perfect for social media managers, growth teams, and marketing automation pipelines.`,
 		useCaseScenarios: [
 			'Marketing teams sharing customer testimonials on social media',
 			'Growth teams creating review cards for ad campaigns',
@@ -887,7 +887,7 @@ Design a testimonial card template once — with customer photo, name, company, 
 			background: '#FFFDF8'
 		}),
 		overview: [
-			'Testimonials convert — but plain text quotes get ignored on visual platforms. Turning reviews into designed image cards dramatically increases engagement and shareability.',
+			'Testimonials convert, but plain text quotes get ignored on visual platforms. Turning reviews into designed image cards dramatically increases engagement and shareability.',
 			'Marketing, growth, and social media teams use this to systematically convert customer feedback into on-brand visual content for every channel.'
 		],
 		painPoints: [

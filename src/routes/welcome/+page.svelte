@@ -138,7 +138,7 @@
 			});
 		} catch (err) {
 			runState = 'error';
-			runError = err?.message || 'Render failed — try from your terminal instead.';
+			runError = err?.message || 'Render failed. Try from your terminal instead.';
 			analytics.track('welcome_curl_run_failed', { error: runError });
 		}
 	}
@@ -159,7 +159,7 @@
 </script>
 
 <svelte:head>
-	<title>Welcome to Pictify — Render this from your terminal</title>
+	<title>Welcome to Pictify: Render this from your terminal</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -231,7 +231,7 @@
 					{:else}
 						<div class="text-center px-6 py-10">
 							<p class="text-sm font-bold text-gray-500 mb-2">
-								No prior render found — we filled in a placeholder.
+								No prior render found; we filled in a placeholder.
 							</p>
 							<a href="/tools" class="text-sm font-black text-brand-danger hover:underline"
 								>Try a free tool first →</a
@@ -259,7 +259,7 @@
 						<div
 							class="flex-grow bg-gray-50 border-[2px] border-black font-mono text-xs px-3 py-2 flex items-center overflow-hidden"
 						>
-							<span class="truncate">{apiKey || 'No key — refresh and try again'}</span>
+							<span class="truncate">{apiKey || 'No key; refresh and try again'}</span>
 						</div>
 						<button
 							on:click={copyKey}
@@ -295,7 +295,7 @@
 				<div>
 					<h3 class="font-black text-lg mb-1">Don't have a terminal open?</h3>
 					<p class="text-sm font-medium text-gray-700 max-w-xl">
-						Run the same call from your browser — it counts as your first real API render and we'll show you the result.
+						Run the same call from your browser; it counts as your first real API render and we'll show you the result.
 					</p>
 				</div>
 				<button
@@ -309,7 +309,7 @@
 					{#if runState === 'running'}
 						Rendering…
 					{:else if runState === 'success'}
-						✓ Rendered — run again
+						✓ Rendered. Run again
 					{:else}
 						▶ Run this now
 					{/if}
