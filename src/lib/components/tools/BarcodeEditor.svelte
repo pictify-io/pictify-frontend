@@ -6,6 +6,7 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import ApiCodeSection from './ApiCodeSection.svelte';
 
 	let isUserLoggedIn = false;
@@ -427,14 +428,13 @@
 				</div>
 
 				<div class="flex flex-wrap justify-center gap-4">
-					<a
-						href={imageUrl}
-						download="barcode.{fileFormat}"
+					<button
+						on:click={() => downloadFile(imageUrl, `barcode.${fileFormat}`, { tool_name: 'barcode_generator' })}
 						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
 						Download {fileFormat.toUpperCase()}
-					</a>
+					</button>
 					<button
 						on:click={() => copyToClipboard(imageUrl)}
 						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"

@@ -10,6 +10,7 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import { certificateHtmlTemplates } from '$lib/components/tools/CertificateHtmlTemplates.js';
 
 	// User login state (reactive — no manual subscribe needed)
@@ -700,7 +701,8 @@
 							>
 								<iframe
 									title="Certificate preview"
-														srcdoc={previewHtml}
+									srcdoc={previewHtml}
+									sandbox="allow-scripts"
 									scrolling="no"
 									style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
 								/>
@@ -776,13 +778,9 @@
 					</div>
 
 					<div class="flex flex-wrap justify-center gap-4">
-						<a
-							href={generatedImageUrl}
-							download="certificate.png"
+						<button
 							on:click={() =>
-								analytics.trackDownload({
-									content_type: 'image',
-									format: 'png',
+								downloadFile(generatedImageUrl, 'certificate.png', {
 									tool_name: 'certificate_generator'
 								})}
 							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
@@ -796,7 +794,7 @@
 								/></svg
 							>
 							Download PNG
-						</a>
+						</button>
 						<a
 							href="/dashboard/workflows/new"
 							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"

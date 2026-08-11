@@ -244,12 +244,15 @@
 						selected.height * previewScale
 					)}px;"
 				>
-					<iframe
-						title="Template preview"
-						srcdoc={previewHtml}
-						scrolling="no"
-						style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
-					/>
+					{#key previewHtml}
+						<iframe
+							title="Template preview"
+							srcdoc={previewHtml}
+							sandbox="allow-scripts"
+							scrolling="no"
+							style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
+						/>
+					{/key}
 				</div>
 			{/if}
 		</div>
@@ -292,12 +295,15 @@
 								selected.height * editPreviewScale
 							)}px;"
 						>
-							<iframe
-								title="Live preview"
-								srcdoc={previewHtml}
-								scrolling="no"
-								style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({editPreviewScale}); transform-origin: top left; pointer-events: none;"
-							/>
+							{#key previewHtml}
+								<iframe
+									title="Live preview"
+									srcdoc={previewHtml}
+									sandbox="allow-scripts"
+									scrolling="no"
+									style="width: {selected.width}px; height: {selected.height}px; border: 0; transform: scale({editPreviewScale}); transform-origin: top left; pointer-events: none;"
+								/>
+							{/key}
 						</div>
 					{/if}
 				</div>

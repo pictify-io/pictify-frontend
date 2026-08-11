@@ -230,8 +230,13 @@
 		generationLimits.increment();
 		isImageGenerating = true;
 
-		const iframe = invoiceTemplateWrapper.querySelector('iframe');
-		const doc = iframe.contentWindow.document;
+		const iframe = invoiceTemplateWrapper?.querySelector('iframe');
+		const doc = iframe?.contentWindow?.document;
+		if (!doc?.documentElement) {
+			isImageGenerating = false;
+			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			return;
+		}
 		let html = doc.documentElement.outerHTML;
 
 		// Add watermark for ALL non-logged in users
@@ -281,7 +286,10 @@
 		}
 		const iframe = invoiceTemplateWrapper.querySelector('iframe');
 
-		const document = iframe.contentWindow.document;
+		const document = iframe?.contentWindow?.document;
+		// document.body is null until the srcdoc parses; a missing template node
+		// should degrade to a skipped write, not a thrown TypeError.
+		if (!document?.body) return;
 		const companyName = document.querySelector('#company-name');
 		const companyAddress = document.querySelector('#company-address');
 		const clientName = document.querySelector('#client-name');
@@ -307,27 +315,29 @@
       `;
 			})
 			.join('');
-		companyName.innerHTML = invoiceData.companyName || '';
-		companyAddress.innerHTML = invoiceData.companyAddress || '';
-		clientName.innerHTML = invoiceData.clientName || '';
-		clientAddress.innerHTML = invoiceData.clientAddress || '';
-		invoiceNumber.innerHTML = invoiceData.invoiceNumber || '';
-		invoiceDate.innerHTML = invoiceData.invoiceDate || '';
-		dueDate.innerHTML = invoiceData.dueDate || '';
-		items.innerHTML = `<tbody id="line-items">${itemsHTML}</tbody>`;
-		notes.innerHTML = invoiceData.notes || '';
+		if (companyName) companyName.innerHTML = invoiceData.companyName || '';
+		if (companyAddress) companyAddress.innerHTML = invoiceData.companyAddress || '';
+		if (clientName) clientName.innerHTML = invoiceData.clientName || '';
+		if (clientAddress) clientAddress.innerHTML = invoiceData.clientAddress || '';
+		if (invoiceNumber) invoiceNumber.innerHTML = invoiceData.invoiceNumber || '';
+		if (invoiceDate) invoiceDate.innerHTML = invoiceData.invoiceDate || '';
+		if (dueDate) dueDate.innerHTML = invoiceData.dueDate || '';
+		if (items) items.innerHTML = `<tbody id="line-items">${itemsHTML}</tbody>`;
+		if (notes) notes.innerHTML = invoiceData.notes || '';
 
-		const updatedLogo = document.createElement('img');
-		updatedLogo.src = invoiceData.logo;
-		updatedLogo.classList.add('logo');
-		logo.parentNode.replaceChild(updatedLogo, logo);
+		if (logo?.parentNode) {
+			const updatedLogo = document.createElement('img');
+			updatedLogo.src = invoiceData.logo;
+			updatedLogo.classList.add('logo');
+			logo.parentNode.replaceChild(updatedLogo, logo);
+		}
 
 		total = calculateTotal();
 		const tax = (total * invoiceData.taxRate) / 100;
 		const totalElement = document.querySelector('#total-amount');
-		totalElement.innerHTML = `$${total.toFixed(2)}`;
-		taxAmount.innerHTML = `$${tax.toFixed(2)}`;
-		subtotal.innerHTML = `$${invoiceData.items
+		if (totalElement) totalElement.innerHTML = `$${total.toFixed(2)}`;
+		if (taxAmount) taxAmount.innerHTML = `$${tax.toFixed(2)}`;
+		if (subtotal) subtotal.innerHTML = `$${invoiceData.items
 			.reduce((total, item) => total + item.quantity * item.price, 0)
 			.toFixed(2)}`;
 		html = document.documentElement.outerHTML;

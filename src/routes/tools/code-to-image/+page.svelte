@@ -14,6 +14,7 @@
 	import { page } from '$app/stores';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
 	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
@@ -1571,6 +1572,7 @@
 										class="bg-transparent transition-all duration-300 ease-out border-[3px] border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,0.2)] max-w-full"
 										title="code-image-preview"
 										srcdoc={srcdocContent}
+										sandbox="allow-scripts"
 										bind:this={previewFrame}
 										style="width: min({previewWidth}px, 100%); height: {previewHeight}px;"
 									/>
@@ -1597,6 +1599,14 @@
 								>✓ Image generated</span
 							>
 							<div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+								<button
+									on:click={() =>
+										downloadFile(generatedImage.url, 'code-snippet.png', {
+											tool_name: 'code_to_image'
+										})}
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									>Download PNG</button
+								>
 								<a
 									href={generatedImage.url}
 									target="_blank"

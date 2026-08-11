@@ -535,6 +535,12 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 						<a
 							href={pdfBlobUrl}
 							download="{(fileName || 'documents').replace(/\.csv$/i, '')}.pdf"
+							on:click={() =>
+								analytics.trackDownload({
+									content_type: 'document',
+									format: 'pdf',
+									tool_name: 'csv_to_pdf'
+								})}
 							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-white font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 							>Download PDF ({generatedImages.length} page{generatedImages.length === 1
 								? ''

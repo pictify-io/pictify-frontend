@@ -16,6 +16,7 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
 
@@ -68,6 +69,7 @@
 	function handleFirstInput() {
 		// Once the user actually types, they're no longer in the prefilled state.
 		isPrefilled = false;
+		urlError = '';
 		if (!hasTrackedFirstInput) {
 			hasTrackedFirstInput = true;
 			analytics.trackToolFirstInput({ tool_name: 'url_to_image_generator' });
@@ -174,7 +176,9 @@
 	// ── Live API curl (reactive) ───────────────────────────
 	function buildLiveCurl(urlVal, sel, w, h, fmt) {
 		const payload = {
-			url: urlVal || 'https://example.com',
+			// Same normalization as the validator, so the snippet never
+			// advertises a URL that Load Preview just refused.
+			url: normalizeUrl(urlVal) || 'https://example.com',
 			width: w,
 			height: h,
 			fileExtension: fmt
@@ -358,20 +362,52 @@
 	let iframeElement;
 	let isIframeReady = false;
 
-	const isValidUrl = (url) => {
+	let urlError = '';
+
+	/**
+	 * Normalize user input into a fetchable page URL: trim, prepend https://
+	 * when no scheme was typed (so bare "stripe.com" works), and require an
+	 * http(s) URL with a dotted hostname. `new URL()` alone is wrong in both
+	 * directions: it throws on "stripe.com" yet happily parses "foo:bar",
+	 * "mailto:x", and "localhost:3000", none of which the backend can capture.
+	 * Returns the normalized href, or null when the input can't become one.
+	 */
+	function normalizeUrl(raw) {
+		const trimmed = (raw || '').trim();
+		if (!trimmed) return null;
+		const withScheme = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(trimmed)
+			? trimmed
+			: `https://${trimmed}`;
 		try {
-			new URL(url);
-			return true;
-		} catch (e) {
-			return false;
+			const parsed = new URL(withScheme);
+			if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+			if (!parsed.hostname.includes('.')) return null;
+			// Rejects credential-bearing URLs, including "mailto:x@y.com" which
+			// otherwise parses as user "mailto", password "x", host "y.com".
+			if (parsed.username || parsed.password) return null;
+			return parsed.href;
+		} catch {
+			return null;
 		}
-	};
+	}
 
 	async function loadPreview() {
-		if (!isValidUrl(url)) {
-			toast.set({ message: 'Please enter a valid URL', type: 'error', duration: 3000 });
+		const normalized = normalizeUrl(url);
+		if (!normalized) {
+			urlError =
+				'That does not look like a web address. Try something like stripe.com. Only public http(s) pages can be captured.';
+			analytics.trackError({
+				error_type: 'invalid_url',
+				error_message: 'url input rejected by validation',
+				context: 'load_preview',
+				page: '/tools/url-to-image-generator'
+			});
 			return;
 		}
+		urlError = '';
+		// Reflect the normalized URL back into the field so what we fetch,
+		// what the user sees, and what the API snippet advertises all match.
+		url = normalized;
 		isPreviewLoaded = false;
 		hasAutoCaptured = false;
 		isLoading = true;
@@ -815,7 +851,11 @@
 							<input
 								bind:value={url}
 								on:input={handleFirstInput}
-								type="text"
+								type="url"
+								inputmode="url"
+								autocomplete="url"
+								spellcheck="false"
+								aria-invalid={urlError ? 'true' : undefined}
 								class="w-full h-full border-[3px] border-black bg-white placeholder-gray-400 text-lg font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#ff6b6b] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all px-6 py-4"
 								placeholder="https://example.com"
 							/>
@@ -831,7 +871,9 @@
 						</div>
 					</div>
 
-					{#if url}
+					{#if urlError}
+						<p class="mt-3 text-sm font-bold text-red-600" role="alert">{urlError}</p>
+					{:else if url}
 						{#if isLoading}
 							<p class="mt-3 text-sm font-bold text-gray-500 flex items-center gap-2">
 								<span
@@ -989,8 +1031,14 @@
 					height="100%"
 					scale="0.7"
 					frameborder="0"
-					sandbox="allow-scripts allow-same-origin"
+					sandbox="allow-scripts"
 				/>
+				<!-- No allow-same-origin: this frame executes a stranger's fetched
+				     page, which must not run in the pictify.io origin (cookies,
+				     localStorage, parent DOM). The element-selector bridge only
+				     uses postMessage with '*', which works across the opaque
+				     origin; nothing reads contentDocument. -->
+
 			</div>
 			<!-- Element Selector Bar -->
 			<div
@@ -1106,13 +1154,9 @@
 					</div>
 
 					<div class="flex flex-wrap justify-center gap-4">
-						<a
-							href={imageUrl}
-							download="pictify-screenshot.{fileFormat}"
+						<button
 							on:click={() =>
-								analytics.trackDownload({
-									content_type: 'image',
-									format: fileFormat,
+								downloadFile(imageUrl, `pictify-screenshot.${fileFormat}`, {
 									tool_name: 'url_to_image_generator'
 								})}
 							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
@@ -1126,7 +1170,7 @@
 								/></svg
 							>
 							Download {fileFormat.toUpperCase()}
-						</a>
+						</button>
 						<button
 							on:click={() => copyToClipboard(imageUrl)}
 							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"

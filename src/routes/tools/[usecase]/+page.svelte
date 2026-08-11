@@ -25,6 +25,7 @@
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
+	import { downloadFile } from '$lib/utils/download.js';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -450,9 +451,11 @@
 							</div>
 
 							<div class="flex flex-wrap justify-center gap-4">
-								<a
-									href={generatedImageUrl}
-									download="pictify-result.png"
+								<button
+									on:click={() =>
+										downloadFile(generatedImageUrl, 'pictify-result.png', {
+											tool_name: useCaseId.replace(/-/g, '_')
+										})}
 									class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -464,7 +467,7 @@
 										/></svg
 									>
 									Download PNG
-								</a>
+								</button>
 							</div>
 						</div>
 

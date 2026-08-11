@@ -25,6 +25,7 @@
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// Optional platform prop to specialize content (e.g., 'wordpress')
@@ -174,9 +175,13 @@
 		}
 
 		const iframe = ogImageTemplateWrapper.querySelector('iframe');
-		if (!iframe.contentWindow.document.body.innerHTML) {
+		// A freshly created iframe has document.body === null until its srcdoc
+		// parses; probing body.innerHTML directly threw for cold organic landings.
+		if (!iframe?.contentWindow?.document?.body?.innerHTML) {
 			await new Promise((resolve) => {
-				iframe.onload = resolve;
+				if (iframe) iframe.onload = resolve;
+				// Fallback so a never-firing onload can't hang the promise.
+				setTimeout(resolve, 1500);
 			});
 		}
 
@@ -369,14 +374,18 @@
 		const iframe = ogImageTemplateWrapper.querySelector('iframe');
 		if (!iframe) return;
 
-		// Wait for iframe to be ready
-		if (!iframe.contentWindow.document.body.innerHTML) {
+		// Wait for iframe to be ready. document.body is null until the srcdoc
+		// parses, so the readiness probe itself must be null-safe.
+		if (!iframe.contentWindow?.document?.body?.innerHTML) {
 			await new Promise((resolve) => {
 				iframe.onload = resolve;
+				// Fallback so a never-firing onload can't hang the promise.
+				setTimeout(resolve, 1500);
 			});
 		}
 
-		const document = iframe.contentWindow.document;
+		const document = iframe.contentWindow?.document;
+		if (!document?.body) return;
 		const heading = document.querySelector('#template-heading');
 		const subHeading = document.querySelector('#template-subheading');
 		const logo = document.querySelector('#template-logo');
@@ -556,8 +565,13 @@
 		generationCount++;
 
 		isImageGenerating = true;
-		const iframe = ogImageTemplateWrapper.querySelector('iframe');
-		const document = iframe.contentWindow.document;
+		const iframe = ogImageTemplateWrapper?.querySelector('iframe');
+		const document = iframe?.contentWindow?.document;
+		if (!document?.documentElement) {
+			isImageGenerating = false;
+			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			return;
+		}
 		let html = document.documentElement.outerHTML;
 
 		// Add watermark for ALL non-logged in users (not just after 2 generations)
@@ -1279,20 +1293,15 @@
 									>
 										Copy URL
 									</button>
-									<a
-										href={imageUrl}
-										download="og-image.png"
-										target="_blank"
+									<button
 										on:click={() =>
-											analytics.trackDownload({
-												content_type: 'image',
-												format: 'png',
+											downloadFile(imageUrl, 'og-image.png', {
 												tool_name: 'og_image_generator'
 											})}
 										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Download
-									</a>
+									</button>
 								</div>
 							</div>
 						</div>
