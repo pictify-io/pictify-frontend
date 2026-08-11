@@ -260,22 +260,29 @@
 			</h2>
 		</div>
 
-		<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6" role="tablist">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6" role="tablist">
 			{#each agents as agent}
 				<button
 					role="tab"
 					aria-selected={selectedAgent === agent.id}
 					on:click={() => selectAgent(agent.id)}
-					class="px-3 py-3 rounded-xl border-[3px] text-left transition-all
+					class="flex items-center gap-3 px-4 py-3 rounded-xl border-[3px] text-left transition-all
 						{selectedAgent === agent.id
 						? 'bg-brand-accent border-gray-900 shadow-brutal-md text-gray-900'
 						: 'bg-white border-gray-300 hover:border-gray-900 text-gray-700'}"
 				>
-					<img src={agent.logo} alt="" class="w-6 h-6 mb-2" aria-hidden="true" />
-					<span class="block text-sm font-black leading-tight">{agent.name}</span>
-					<span class="block text-[10px] font-bold uppercase tracking-wide text-gray-500 mt-1"
-						>{agent.sub}</span
+					<span
+						class="w-9 h-9 shrink-0 flex items-center justify-center bg-white border-[2px] border-gray-900 rounded-lg"
 					>
+						<img src={agent.logo} alt="" class="w-5 h-5" aria-hidden="true" />
+					</span>
+					<span class="min-w-0">
+						<span class="block text-sm font-black leading-tight truncate">{agent.name}</span>
+						<span
+							class="block text-[10px] font-bold uppercase tracking-wide text-gray-500 mt-0.5 truncate"
+							>{agent.sub}</span
+						>
+					</span>
 				</button>
 			{/each}
 		</div>
