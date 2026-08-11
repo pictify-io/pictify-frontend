@@ -1,4 +1,5 @@
 import { analytics } from '$lib/analytics.js';
+import { toast } from '../../store/toast.store';
 
 /**
  * Save a generated file to disk from a (possibly cross-origin) URL.
@@ -41,7 +42,17 @@ export async function downloadFile(url, filename, tracking = {}) {
 		}
 		return true;
 	} catch {
-		window.open(url, '_blank', 'noopener');
+		// By now the await has consumed the click's user activation, so a popup
+		// blocker may refuse the tab. window.open returns null when blocked;
+		// surface that instead of letting the button appear to do nothing.
+		const opened = window.open(url, '_blank', 'noopener');
+		if (!opened) {
+			toast.set({
+				message: 'Download failed. Right-click the image and choose "Save image as".',
+				type: 'error',
+				duration: 5000
+			});
+		}
 		return false;
 	}
 }

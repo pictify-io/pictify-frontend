@@ -219,7 +219,14 @@
 	$: previewSrcdoc = codeHTML + PREVIEW_BEACON;
 
 	function handlePreviewMessage(event) {
-		if (event.data?.type === 'pictify-preview-alive') previewAlive = true;
+		// Source check: a queued beacon from a torn-down frame must not mark the
+		// keyed replacement frame alive and mask a hijack there.
+		if (
+			event.source === previewFrame?.contentWindow &&
+			event.data?.type === 'pictify-preview-alive'
+		) {
+			previewAlive = true;
+		}
 	}
 
 	function handlePreviewLoad() {
