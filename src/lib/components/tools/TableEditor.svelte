@@ -13,6 +13,7 @@
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 
 	export let isUserLoggedIn = false;
 
@@ -507,8 +508,11 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 		});
 	}
 
-	function handleDownload() {
-		analytics.track('tool_download', { tool_name: 'table_to_image' });
+	async function handleDownload() {
+		const saved = await downloadFile(generatedImageUrl, 'pictify-table.png', {
+			tool_name: 'table_to_image'
+		});
+		if (saved) analytics.track('tool_download', { tool_name: 'table_to_image' });
 	}
 
 	function handleSignupClick() {
@@ -682,11 +686,11 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 					<img loading="lazy" src={generatedImageUrl} alt="Generated table" class="max-w-full h-auto max-h-[500px]" />
 				</div>
 				<div class="flex flex-wrap justify-center gap-4">
-					<a href={generatedImageUrl} download="pictify-table.png" on:click={handleDownload}
+					<button on:click={handleDownload}
 						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 						Download PNG
-					</a>
+					</button>
 					<button on:click={() => copyToClipboard(generatedImageUrl, 'Link')}
 						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>

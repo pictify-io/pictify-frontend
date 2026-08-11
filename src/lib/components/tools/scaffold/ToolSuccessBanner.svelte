@@ -12,25 +12,42 @@
 	 *
 	 * See plan: docs/plans/2026-04-15-002-refactor-tool-scaffold-plan.md
 	 */
-	import { analytics } from '$lib/analytics.js';
+	import { onMount } from 'svelte';
+	import { downloadFile } from '$lib/utils/download.js';
 
 	export let imageUrl = '';
 	export let imageAlt = 'Generated result';
 	export let heading = 'Success! Here is your image';
 	export let downloadFileName = 'pictify-result.png';
-	/** Fires content_downloaded on the Download click — the guest-value guardrail metric. */
+	/** Fires content_downloaded once the save succeeds — the guest-value guardrail metric. */
 	export let toolName = '';
 
-	function trackDownload() {
-		analytics.trackDownload({
-			content_type: 'image',
-			format: downloadFileName.split('.').pop() || 'png',
-			tool_name: toolName
-		});
+	let container;
+	let isDownloading = false;
+
+	onMount(() => {
+		// The banner mounts below the whole editor after generation. Without this
+		// the result renders off screen with no signal that anything happened.
+		container?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		container?.focus({ preventScroll: true });
+	});
+
+	async function handleDownload() {
+		if (isDownloading) return;
+		isDownloading = true;
+		try {
+			await downloadFile(imageUrl, downloadFileName, { tool_name: toolName });
+		} finally {
+			isDownloading = false;
+		}
 	}
 </script>
 
-<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
+<div
+	class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up focus:outline-none"
+	bind:this={container}
+	tabindex="-1"
+>
 	<div
 		class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
 	>
@@ -47,11 +64,10 @@
 		</div>
 
 		<div class="flex flex-wrap justify-center gap-4">
-			<a
-				href={imageUrl}
-				download={downloadFileName}
-				on:click={trackDownload}
-				class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+			<button
+				on:click={handleDownload}
+				disabled={isDownloading}
+				class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2 disabled:opacity-60 disabled:cursor-wait"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 					><path
@@ -61,8 +77,8 @@
 						d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
 					/></svg
 				>
-				Download PNG
-			</a>
+				{isDownloading ? 'Saving…' : 'Download PNG'}
+			</button>
 			<slot name="extra-actions" />
 		</div>
 	</div>

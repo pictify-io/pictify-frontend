@@ -16,6 +16,7 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
 
@@ -1106,13 +1107,9 @@
 					</div>
 
 					<div class="flex flex-wrap justify-center gap-4">
-						<a
-							href={imageUrl}
-							download="pictify-screenshot.{fileFormat}"
+						<button
 							on:click={() =>
-								analytics.trackDownload({
-									content_type: 'image',
-									format: fileFormat,
+								downloadFile(imageUrl, `pictify-screenshot.${fileFormat}`, {
 									tool_name: 'url_to_image_generator'
 								})}
 							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
@@ -1126,7 +1123,7 @@
 								/></svg
 							>
 							Download {fileFormat.toUpperCase()}
-						</a>
+						</button>
 						<button
 							on:click={() => copyToClipboard(imageUrl)}
 							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"

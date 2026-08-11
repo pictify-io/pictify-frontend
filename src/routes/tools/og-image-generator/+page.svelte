@@ -25,6 +25,7 @@
 	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/analytics.js';
+	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// Optional platform prop to specialize content (e.g., 'wordpress')
@@ -1279,20 +1280,15 @@
 									>
 										Copy URL
 									</button>
-									<a
-										href={imageUrl}
-										download="og-image.png"
-										target="_blank"
+									<button
 										on:click={() =>
-											analytics.trackDownload({
-												content_type: 'image',
-												format: 'png',
+											downloadFile(imageUrl, 'og-image.png', {
 												tool_name: 'og_image_generator'
 											})}
 										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 									>
 										Download
-									</a>
+									</button>
 								</div>
 							</div>
 						</div>
