@@ -1572,6 +1572,7 @@
 										class="bg-transparent transition-all duration-300 ease-out border-[3px] border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,0.2)] max-w-full"
 										title="code-image-preview"
 										srcdoc={srcdocContent}
+										sandbox="allow-scripts"
 										bind:this={previewFrame}
 										style="width: min({previewWidth}px, 100%); height: {previewHeight}px;"
 									/>

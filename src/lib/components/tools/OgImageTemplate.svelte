@@ -62,7 +62,7 @@
 			srcdoc={html}
 			class="w-full h-full border-none bg-transparent"
 			scrolling="no"
-			sandbox="allow-scripts allow-same-origin"
+			sandbox="allow-scripts"
 			on:load={handleLoad}
 		/>
 	</div>

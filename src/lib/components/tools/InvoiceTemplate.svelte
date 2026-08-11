@@ -9,6 +9,7 @@
 	<iframe
 		title="og-image-template"
 		srcdoc={html}
+		sandbox="allow-scripts"
 		scale="0"
 		style="width: {width}px; height: {height}px; transform: scale({scale}); transform-origin: top left;"
 	/>

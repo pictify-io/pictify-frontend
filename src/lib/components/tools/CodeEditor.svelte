@@ -134,6 +134,7 @@
 	const dispatch = createEventDispatcher();
 
 	onMount(() => {
+		window.addEventListener('message', handlePreviewMessage);
 		if (editorElement) {
 			editorView = new EditorView({
 				state: EditorState.create({
@@ -188,17 +189,65 @@
 
 	onDestroy(() => {
 		editorView?.destroy();
+		clearTimeout(srcdocDebounceTimer);
+		clearTimeout(hijackTimer);
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('message', handlePreviewMessage);
+		}
 	});
 
 	function getSrcDoc() {
 		return codeHTML;
 	}
 
+	// ── Preview hijack containment + detection ──────────────
+	// The preview renders arbitrary pasted HTML. sandbox (without
+	// allow-same-origin) keeps it off the pictify.io origin, the {#key} block
+	// mounts a fresh frame per (debounced) edit so a document that navigated
+	// the frame away can't survive the next keystroke, and the beacon below
+	// tells us when a loaded document isn't ours so hijacks show up in
+	// analytics instead of only in session recordings.
+	// Split so the literal doesn't terminate this component's own script block.
+	const PREVIEW_BEACON =
+		`<script>try{parent.postMessage({type:'pictify-preview-alive'},'*')}catch(e){}</scr` + `ipt>`;
+	let srcdocKey = 0;
+	let srcdocDebounceTimer;
+	let previewAlive = false;
+	let hijackTimer;
+	let hijackReported = false;
+
+	$: previewSrcdoc = codeHTML + PREVIEW_BEACON;
+
+	function handlePreviewMessage(event) {
+		if (event.data?.type === 'pictify-preview-alive') previewAlive = true;
+	}
+
+	function handlePreviewLoad() {
+		clearTimeout(hijackTimer);
+		// The beacon posts during parse, but postMessage delivery order vs the
+		// load event is not guaranteed either way; give it a beat, then judge.
+		// previewAlive re-arms only after the check so a beacon that landed
+		// before load still counts for this document.
+		hijackTimer = setTimeout(() => {
+			if (!previewAlive && !hijackReported) {
+				hijackReported = true;
+				analytics.trackError({
+					error_type: 'preview_hijacked',
+					error_message: 'preview iframe navigated away from srcdoc',
+					context: toolName || 'code_editor'
+				});
+			}
+			previewAlive = false;
+		}, 400);
+	}
+
 	function updateIframe() {
-		if (previewFrame) {
-			previewFrame.srcdoc = getSrcDoc();
+		clearTimeout(srcdocDebounceTimer);
+		srcdocDebounceTimer = setTimeout(() => {
+			srcdocKey++;
+			hijackReported = false;
 			dispatch('previewUpdated', { html: getSrcDoc(), width: previewWidth, height: previewHeight });
-		}
+		}, 300);
 	}
 
 	async function createGif() {
@@ -319,12 +368,16 @@
 					class="bg-white border border-gray-300 shadow-md origin-top-left"
 					style="width: {previewWidth}px; height: {previewHeight}px; transform: scale({previewScale}); margin-left: {previewMarginLeft}px;"
 				>
-					<iframe
-						class="w-full h-full bg-white border-0"
-						title="code-preview"
-						srcdoc={getSrcDoc()}
-						bind:this={previewFrame}
-					/>
+					{#key srcdocKey}
+						<iframe
+							class="w-full h-full bg-white border-0"
+							title="code-preview"
+							srcdoc={previewSrcdoc}
+							sandbox="allow-scripts"
+							on:load={handlePreviewLoad}
+							bind:this={previewFrame}
+						/>
+					{/key}
 				</div>
 			</div>
 		</div>

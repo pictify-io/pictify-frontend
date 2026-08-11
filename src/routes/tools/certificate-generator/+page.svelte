@@ -701,7 +701,8 @@
 							>
 								<iframe
 									title="Certificate preview"
-														srcdoc={previewHtml}
+									srcdoc={previewHtml}
+									sandbox="allow-scripts"
 									scrolling="no"
 									style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
 								/>
