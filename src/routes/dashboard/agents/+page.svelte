@@ -52,9 +52,9 @@
 		analytics.track('agent_selected', { agent: id });
 	}
 
-	function copyText(text, item) {
+	async function copyText(text, item) {
 		try {
-			navigator.clipboard.writeText(text);
+			await navigator.clipboard.writeText(text);
 			toast.set({ message: 'Copied to clipboard', type: 'success', duration: 1500 });
 			analytics.track('agent_config_copied', { agent: selectedAgent, item });
 		} catch {
