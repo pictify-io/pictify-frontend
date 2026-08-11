@@ -26,10 +26,34 @@ export const analytics = {
 		if (browser && isProd && !posthog.__loaded) {
 			posthog.init('phc_3ecva80rtrdIJiDyYVwsqjy2YI7CbhbAydPApERhNtU', {
 				api_host: 'https://api.pictify.io/posthog',
+				// Pin SDK defaults so future posthog-js default changes can't
+				// silently alter what gets captured. Explicit options below win.
+				defaults: '2025-05-24',
 				disable_compression: true,
 				capture_pageview: true,
 				capture_pageleave: true,
-				persistence: 'localStorage'
+				persistence: 'localStorage',
+				// The /flags call goes through our reverse proxy, which adds
+				// latency; the SDK's default 3s timeout aborted it and reported
+				// its own AbortError into error tracking.
+				feature_flag_request_timeout_ms: 10000,
+				// Drop known-benign browser noise before it reaches error
+				// tracking. The ResizeObserver warning is emitted when an
+				// observer callback mutates observed layout (Canvas/CodeEditor
+				// scale updates); it has no stack and breaks nothing.
+				before_send: (event) => {
+					if (event?.event === '$exception') {
+						const list = event.properties?.$exception_list;
+						const value = Array.isArray(list) ? String(list[0]?.value ?? '') : '';
+						if (
+							value.includes('ResizeObserver loop completed with undelivered notifications') ||
+							value.includes('ResizeObserver loop limit exceeded')
+						) {
+							return null;
+						}
+					}
+					return event;
+				}
 			});
 		}
 	},
