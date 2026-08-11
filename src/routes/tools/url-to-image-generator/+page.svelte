@@ -467,7 +467,10 @@
 				/<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi,
 				''
 			);
-			const baseTag = `<base href="${new URL(url).origin}/">`;
+			// Full document URL, not just the origin: document-relative assets on
+			// nested pages (style.css, ../images/logo.png) must resolve against
+			// the fetched page's path, exactly as they would on the real site.
+			const baseTag = `<base href="${new URL(url).href}">`;
 			modifiedHTML = /<head[^>]*>/i.test(modifiedHTML)
 				? modifiedHTML.replace(/<head[^>]*>/i, (match) => `${match}${baseTag}`)
 				: baseTag + modifiedHTML;
