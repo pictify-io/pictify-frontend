@@ -69,6 +69,13 @@
 		},
 		{
 			type: 'nav',
+			label: 'MCP & Agents',
+			description: 'Connect Claude, Cursor, and other AI agents',
+			path: '/dashboard/agents',
+			keywords: 'mcp agents claude cursor windsurf ai connect model context protocol'
+		},
+		{
+			type: 'nav',
 			label: 'API Playground',
 			description: 'Test API endpoints interactively',
 			path: '/dashboard/api-playground',
