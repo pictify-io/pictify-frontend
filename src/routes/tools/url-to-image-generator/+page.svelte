@@ -1031,8 +1031,14 @@
 					height="100%"
 					scale="0.7"
 					frameborder="0"
-					sandbox="allow-scripts allow-same-origin"
+					sandbox="allow-scripts"
 				/>
+				<!-- No allow-same-origin: this frame executes a stranger's fetched
+				     page, which must not run in the pictify.io origin (cookies,
+				     localStorage, parent DOM). The element-selector bridge only
+				     uses postMessage with '*', which works across the opaque
+				     origin; nothing reads contentDocument. -->
+
 			</div>
 			<!-- Element Selector Bar -->
 			<div

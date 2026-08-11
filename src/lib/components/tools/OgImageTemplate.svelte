@@ -57,12 +57,16 @@
 		class:opacity-100={loaded}
 		style="width: {width}px; height: {height}px; transform: scale({scale});"
 	>
+		<!-- allow-same-origin is load-bearing: the og-image and linkedin-banner
+		     pages edit this frame's document in place (headings, colors, logo),
+		     which requires same-origin access. Only first-party template HTML may
+		     be rendered here; never point this component at user-pasted markup. -->
 		<iframe
 			title="og-image-template"
 			srcdoc={html}
 			class="w-full h-full border-none bg-transparent"
 			scrolling="no"
-			sandbox="allow-scripts"
+			sandbox="allow-scripts allow-same-origin"
 			on:load={handleLoad}
 		/>
 	</div>

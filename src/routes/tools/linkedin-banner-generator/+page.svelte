@@ -275,10 +275,13 @@
 		if (!iframe.contentWindow?.document?.body?.innerHTML) {
 			await new Promise((resolve) => {
 				iframe.onload = resolve;
+				// Fallback so a never-firing onload can't hang the promise.
+				setTimeout(resolve, 1500);
 			});
 		}
 
-		const doc = iframe.contentWindow.document;
+		const doc = iframe.contentWindow?.document;
+		if (!doc?.body) return;
 
 		// Update all template variables
 		Object.entries(templateVariables).forEach(([id, variable]) => {
@@ -399,8 +402,13 @@
 		generationCount++;
 		isImageGenerating = true;
 
-		const iframe = bannerTemplateWrapper.querySelector('iframe');
-		const doc = iframe.contentWindow.document;
+		const iframe = bannerTemplateWrapper?.querySelector('iframe');
+		const doc = iframe?.contentWindow?.document;
+		if (!doc?.documentElement) {
+			isImageGenerating = false;
+			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			return;
+		}
 		let html = doc.documentElement.outerHTML;
 
 		// Add watermark for non-logged in users after 2 generations

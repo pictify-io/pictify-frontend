@@ -175,9 +175,13 @@
 		}
 
 		const iframe = ogImageTemplateWrapper.querySelector('iframe');
-		if (!iframe.contentWindow.document.body.innerHTML) {
+		// A freshly created iframe has document.body === null until its srcdoc
+		// parses; probing body.innerHTML directly threw for cold organic landings.
+		if (!iframe?.contentWindow?.document?.body?.innerHTML) {
 			await new Promise((resolve) => {
-				iframe.onload = resolve;
+				if (iframe) iframe.onload = resolve;
+				// Fallback so a never-firing onload can't hang the promise.
+				setTimeout(resolve, 1500);
 			});
 		}
 
@@ -370,14 +374,18 @@
 		const iframe = ogImageTemplateWrapper.querySelector('iframe');
 		if (!iframe) return;
 
-		// Wait for iframe to be ready
-		if (!iframe.contentWindow.document.body.innerHTML) {
+		// Wait for iframe to be ready. document.body is null until the srcdoc
+		// parses, so the readiness probe itself must be null-safe.
+		if (!iframe.contentWindow?.document?.body?.innerHTML) {
 			await new Promise((resolve) => {
 				iframe.onload = resolve;
+				// Fallback so a never-firing onload can't hang the promise.
+				setTimeout(resolve, 1500);
 			});
 		}
 
-		const document = iframe.contentWindow.document;
+		const document = iframe.contentWindow?.document;
+		if (!document?.body) return;
 		const heading = document.querySelector('#template-heading');
 		const subHeading = document.querySelector('#template-subheading');
 		const logo = document.querySelector('#template-logo');
@@ -557,8 +565,13 @@
 		generationCount++;
 
 		isImageGenerating = true;
-		const iframe = ogImageTemplateWrapper.querySelector('iframe');
-		const document = iframe.contentWindow.document;
+		const iframe = ogImageTemplateWrapper?.querySelector('iframe');
+		const document = iframe?.contentWindow?.document;
+		if (!document?.documentElement) {
+			isImageGenerating = false;
+			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			return;
+		}
 		let html = document.documentElement.outerHTML;
 
 		// Add watermark for ALL non-logged in users (not just after 2 generations)
