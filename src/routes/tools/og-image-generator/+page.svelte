@@ -105,15 +105,19 @@
 	let error = null;
 	let creationMode = 'website'; // 'website' or 'direct'
 
-	let backgroundColorRgb = websiteInfo?.colors
-		? { r: websiteInfo.colors[0][0], g: websiteInfo.colors[0][1], b: websiteInfo.colors[0][2] }
-		: { r: 255, g: 255, b: 255 };
-	let headingColorRgb = websiteInfo?.colors
-		? { r: websiteInfo.colors[1][0], g: websiteInfo.colors[1][1], b: websiteInfo.colors[1][2] }
-		: { r: 0, g: 0, b: 0 };
-	let subHeadingColorRgb = websiteInfo?.colors
-		? { r: websiteInfo.colors[2][0], g: websiteInfo.colors[2][1], b: websiteInfo.colors[2][2] }
-		: { r: 0, g: 0, b: 0 };
+	// /api/tools/website-info can return fewer than three palette entries (or
+	// none at all); indexing a missing entry used to throw and silently kill
+	// the generate flow. Always read the palette through this fallback.
+	const paletteColor = (colors, index, fallback) => {
+		const entry = colors?.[index];
+		return Array.isArray(entry) && entry.length >= 3
+			? { r: entry[0], g: entry[1], b: entry[2] }
+			: fallback;
+	};
+
+	let backgroundColorRgb = paletteColor(websiteInfo?.colors, 0, { r: 255, g: 255, b: 255 });
+	let headingColorRgb = paletteColor(websiteInfo?.colors, 1, { r: 0, g: 0, b: 0 });
+	let subHeadingColorRgb = paletteColor(websiteInfo?.colors, 2, { r: 0, g: 0, b: 0 });
 
 	let ogImageTemplateWrapper;
 	// Remove the dynamic width/height calculations
@@ -152,40 +156,34 @@
 			return;
 		}
 		isFetchingWebsiteInfo = false;
-		backgroundColorRgb = {
-			r: websiteInfo.colors[0][0],
-			g: websiteInfo.colors[0][1],
-			b: websiteInfo.colors[0][2]
-		};
-		headingColorRgb = {
-			r: websiteInfo.colors[1][0],
-			g: websiteInfo.colors[1][1],
-			b: websiteInfo.colors[1][2]
-		};
-		subHeadingColorRgb = {
-			r: websiteInfo.colors[2][0],
-			g: websiteInfo.colors[2][1],
-			b: websiteInfo.colors[2][2]
-		};
+		try {
+			backgroundColorRgb = paletteColor(websiteInfo?.colors, 0, { r: 255, g: 255, b: 255 });
+			headingColorRgb = paletteColor(websiteInfo?.colors, 1, { r: 0, g: 0, b: 0 });
+			subHeadingColorRgb = paletteColor(websiteInfo?.colors, 2, { r: 0, g: 0, b: 0 });
 
-		while (!ogImageTemplateWrapper) {
-			await new Promise((resolve) => {
-				setTimeout(resolve, 100);
-			});
+			while (!ogImageTemplateWrapper) {
+				await new Promise((resolve) => {
+					setTimeout(resolve, 100);
+				});
+			}
+
+			const iframe = ogImageTemplateWrapper.querySelector('iframe');
+			// A freshly created iframe has document.body === null until its srcdoc
+			// parses; probing body.innerHTML directly threw for cold organic landings.
+			if (!iframe?.contentWindow?.document?.body?.innerHTML) {
+				await new Promise((resolve) => {
+					if (iframe) iframe.onload = resolve;
+					// Fallback so a never-firing onload can't hang the promise.
+					setTimeout(resolve, 1500);
+				});
+			}
+
+			await updateHTML(selectedTemplate);
+		} catch (e) {
+			// Post-fetch failures used to escape as unhandled rejections, leaving
+			// the spinner cleared but no preview and no message.
+			error = 'Could not build a preview from that site. Try another URL.';
 		}
-
-		const iframe = ogImageTemplateWrapper.querySelector('iframe');
-		// A freshly created iframe has document.body === null until its srcdoc
-		// parses; probing body.innerHTML directly threw for cold organic landings.
-		if (!iframe?.contentWindow?.document?.body?.innerHTML) {
-			await new Promise((resolve) => {
-				if (iframe) iframe.onload = resolve;
-				// Fallback so a never-firing onload can't hang the promise.
-				setTimeout(resolve, 1500);
-			});
-		}
-
-		await updateHTML(selectedTemplate);
 	};
 
 	const templateNames = [

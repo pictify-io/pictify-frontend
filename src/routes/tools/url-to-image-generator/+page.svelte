@@ -411,9 +411,16 @@
 		isPreviewLoaded = false;
 		hasAutoCaptured = false;
 		isLoading = true;
+		analytics.track('preview_load_attempted', { tool_name: 'url_to_image_generator' });
 		try {
-			const { content: html } = await getWebsiteHTML(url);
+			const response = await getWebsiteHTML(url);
+			const html = response?.content;
 			if (!html) {
+				analytics.track('preview_load_failed', {
+					tool_name: 'url_to_image_generator',
+					reason: 'no_content',
+					status: null
+				});
 				toast.set({
 					message: 'No content returned. Check the URL and try again.',
 					type: 'error',
@@ -452,40 +459,94 @@
     <\/script>
   `;
 
-			const modifiedHTML = html.replace('</body>', `${injectedScript}</body>`);
+			// Relative asset URLs in the fetched markup would otherwise resolve
+			// against pictify.io and 404, leaving a blank white preview. Point the
+			// document base at the target site, and strip any CSP meta tag that
+			// came along (it would block the injected selection bridge).
+			let modifiedHTML = html.replace(
+				/<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi,
+				''
+			);
+			// Full document URL, not just the origin: document-relative assets on
+			// nested pages (style.css, ../images/logo.png) must resolve against
+			// the fetched page's path, exactly as they would on the real site.
+			const baseTag = `<base href="${new URL(url).href}">`;
+			modifiedHTML = /<head[^>]*>/i.test(modifiedHTML)
+				? modifiedHTML.replace(/<head[^>]*>/i, (match) => `${match}${baseTag}`)
+				: baseTag + modifiedHTML;
+			// SPA shells and minified pages may lack a literal </body>; append then.
+			modifiedHTML = modifiedHTML.includes('</body>')
+				? modifiedHTML.replace('</body>', `${injectedScript}</body>`)
+				: modifiedHTML + injectedScript;
 			const iframe = iframeWrapper.querySelector('iframe');
 			if (iframe) {
 				// Wait for iframe load instead of hardcoded 1s delay
 				const loadPromise = new Promise((resolve) => {
 					const onLoad = () => {
 						iframe.removeEventListener('load', onLoad);
-						resolve();
+						resolve('loaded');
 					};
 					iframe.addEventListener('load', onLoad);
 				});
-				const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 10000));
+				const timeoutPromise = new Promise((resolve) =>
+					setTimeout(() => resolve('timeout'), 10000)
+				);
 				iframe.srcdoc = modifiedHTML;
-				await Promise.race([loadPromise, timeoutPromise]);
+				const loadResult = await Promise.race([loadPromise, timeoutPromise]);
 				iframe.contentWindow.postMessage({ type: 'checkReady' }, '*');
-				// Mitigation (guided/auto arms): enable Capture even if the iframe 'load'
-				// event never fires for a CORS-quirky page we successfully fetched.
+				// Capture renders server-side from the URL, so a struggling client
+				// preview must not block it (the fetch itself succeeded) — but a
+				// timeout is no longer silent.
 				isPreviewLoaded = true;
+				if (loadResult === 'timeout') {
+					analytics.track('preview_load_failed', {
+						tool_name: 'url_to_image_generator',
+						reason: 'iframe_timeout',
+						status: null
+					});
+					toast.set({
+						message: 'Preview is slow to render. Capture still works: we fetch the page on our servers.',
+						type: 'warning',
+						duration: 5000
+					});
+				} else {
+					analytics.track('preview_load_succeeded', { tool_name: 'url_to_image_generator' });
+				}
 			}
 		} catch (error) {
+			// Branch on the HttpError status backend.js already provides instead of
+			// string-matching the message: a quota 429, a site blocking our fetcher,
+			// and a renderer 5xx are not "check the URL" problems, and telling the
+			// user they are sends them into hopeless retry loops.
+			const status = error?.status ?? null;
+			const code = error?.data?.code ?? null;
 			const msg = error?.message || '';
-			if (msg.includes('timeout') || msg.includes('TIMEOUT')) {
-				toast.set({
-					message: 'Page took too long to load. Try a simpler URL.',
-					type: 'error',
-					duration: 5000
-				});
+			let message;
+			if (status === 429) {
+				// maybeHandleQuota already opened the upgrade modal for
+				// quota_exceeded; only plain rate limits need a message here.
+				message =
+					code === 'quota_exceeded'
+						? ''
+						: 'Too many requests. Please wait a moment and try again.';
+			} else if (status >= 500) {
+				message = 'Our renderer is struggling right now. Please retry in a moment.';
+			} else if (status >= 400) {
+				message = 'That site blocked our request. Try a different page, or capture it via the API.';
+			} else if (msg.includes('timeout') || msg.includes('TIMEOUT')) {
+				message = 'Page took too long to load. Try a simpler URL.';
 			} else {
-				toast.set({
-					message: 'Could not fetch this page. Check the URL and try again.',
-					type: 'error',
-					duration: 4000
-				});
+				message = 'Could not fetch this page. Check the URL and try again.';
 			}
+			if (message) {
+				toast.set({ message, type: 'error', duration: 5000 });
+			}
+			analytics.track('preview_load_failed', {
+				tool_name: 'url_to_image_generator',
+				reason: status ? 'http_error' : 'fetch_error',
+				status,
+				code
+			});
 		} finally {
 			isLoading = false;
 		}
