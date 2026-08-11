@@ -2,11 +2,9 @@
 	import { logoutAction } from '../../../store/user.store';
 	import { goto } from '$app/navigation';
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
-	import { getPaymentPortal } from '../../../api/user';
 	import { user } from '../../../store/user.store';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 	import TeamSwitcher from './TeamSwitcher.svelte';
 	import { analytics } from '$lib/analytics.js';
 	import { initializeTeamState, currentTeam, isTeamOwner } from '../../../store/team.store';
@@ -28,20 +26,114 @@
 		}
 	});
 
-	async function gotoPaymentPortal() {
-		try {
-			const paymentPortal = await getPaymentPortal();
-			if (!paymentPortal?.portalLink) return;
-			window.open(paymentPortal.portalLink, '_blank');
-		} catch (error) {
-			/* ignored */
-		}
-	}
-
 	function logout() {
 		logoutAction();
 		goto('/');
 	}
+
+	function trackNav(label) {
+		analytics.track('nav_clicked', { label, location: 'sidebar' });
+	}
+
+	// Nav definition. One item = one link; sections render a small uppercase
+	// label above their items. Keep icons as heroicons outline path data.
+	const sections = [
+		{
+			label: 'Content',
+			items: [
+				{
+					href: '/dashboard/template',
+					label: 'Templates',
+					icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z'
+				},
+				{
+					href: '/dashboard/brand-assets',
+					label: 'Brand Assets',
+					icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
+				},
+				{
+					href: '/dashboard/workflows',
+					label: 'Workflows',
+					icon: 'M13 10V3L4 14h7v7l9-11h-7z'
+				}
+				// Video templates are no longer a separate nav item — they live in
+				// Templates behind the "Video" filter. The /dashboard/video-templates
+				// routes stay live so the studio and existing deep links keep working.
+			]
+		},
+		{
+			label: 'Media',
+			items: [
+				{
+					href: '/dashboard/media/images',
+					label: 'Images',
+					icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+				},
+				{
+					href: '/dashboard/media/gifs',
+					label: 'GIFs',
+					icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+				},
+				{
+					href: '/dashboard/media/pdfs',
+					label: 'PDFs',
+					icon: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
+				},
+				{
+					href: '/dashboard/media/videos',
+					label: 'Videos',
+					icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z'
+				}
+			]
+		},
+		{
+			label: 'Developer',
+			items: [
+				{
+					href: '/dashboard/agents',
+					label: 'MCP & Agents',
+					badge: 'new',
+					icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+				},
+				{
+					href: '/dashboard/api-playground',
+					label: 'API Playground',
+					icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
+				},
+				{
+					href: '/dashboard/api-token',
+					label: 'API Keys',
+					icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z'
+				},
+				{
+					href: '/dashboard/integrations',
+					label: 'Integrations',
+					icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'
+				}
+			]
+		},
+		{
+			label: 'Analytics',
+			items: [
+				{
+					href: '/dashboard/analytics',
+					label: 'Image Analytics',
+					icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+				},
+				{
+					href: '/dashboard/activity-logs',
+					label: 'Activity Logs',
+					icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+				}
+			]
+		}
+	];
+
+	const homeItem = {
+		href: '/dashboard',
+		label: 'Home',
+		icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
+	};
 </script>
 
 <div
@@ -57,17 +149,16 @@
 		<nav class="space-y-1" aria-label="Main navigation">
 			<!-- Home -->
 			<a
-				href="/dashboard"
-				aria-current={isActive(currentPath, '/dashboard') && currentPath === '/dashboard'
-					? 'page'
-					: undefined}
+				href={homeItem.href}
+				on:click={() => trackNav(homeItem.label)}
+				aria-current={isActive(currentPath, homeItem.href) ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{$page.url.pathname === '/dashboard'
+					{isActive(currentPath, homeItem.href)
 					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
 			>
 				<svg
-					class="w-5 h-5 mr-3 {$page.url.pathname === '/dashboard'
+					class="w-5 h-5 mr-3 {isActive(currentPath, homeItem.href)
 						? 'text-gray-900'
 						: 'text-gray-500 group-hover:text-gray-900'}"
 					fill="none"
@@ -78,355 +169,49 @@
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						stroke-width="2.5"
-						d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+						d={homeItem.icon}
 					/>
 				</svg>
-				<span>Home</span>
+				<span>{homeItem.label}</span>
 			</a>
 
-			<!-- ═══ CONTENT Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
-				Content
-			</p>
-
-			<!-- Templates (HTML engine) -->
-			<a
-				href="/dashboard/template"
-				aria-current={isActive(currentPath, '/dashboard/template') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/template')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/template')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
+			{#each sections as section}
+				<p
+					class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]"
 				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"
-					/>
-				</svg>
-				<span>Templates</span>
-			</a>
-
-			<!-- Brand Assets -->
-			<a
-				href="/dashboard/brand-assets"
-				aria-current={isActive(currentPath, '/dashboard/brand-assets') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/brand-assets')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/brand-assets')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-					/>
-				</svg>
-				<span>Brand Assets</span>
-			</a>
-
-			<!-- Workflows -->
-			<a
-				href="/dashboard/workflows"
-				aria-current={isActive(currentPath, '/dashboard/workflows') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/workflows')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/workflows')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M13 10V3L4 14h7v7l9-11h-7z"
-					/>
-				</svg>
-				<span>Workflows</span>
-			</a>
-
-			<!-- Video templates are no longer a separate nav item — they live in
-				 Templates behind the "Video" filter. The /dashboard/video-templates
-				 routes stay live so the studio and existing deep links keep working. -->
-
-			<!-- ═══ MEDIA Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
-				Media
-			</p>
-
-			<a
-				href="/dashboard/media/images"
-				aria-current={$page.url.pathname === '/dashboard/media/images' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{$page.url.pathname === '/dashboard/media/images'
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {$page.url.pathname === '/dashboard/media/images'
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-					/>
-				</svg>
-				<span>Images</span>
-			</a>
-
-			<a
-				href="/dashboard/media/gifs"
-				aria-current={$page.url.pathname === '/dashboard/media/gifs' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{$page.url.pathname === '/dashboard/media/gifs'
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {$page.url.pathname === '/dashboard/media/gifs'
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
-					/>
-				</svg>
-				<span>GIFs</span>
-			</a>
-
-			<a
-				href="/dashboard/media/pdfs"
-				aria-current={$page.url.pathname === '/dashboard/media/pdfs' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{$page.url.pathname === '/dashboard/media/pdfs'
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {$page.url.pathname === '/dashboard/media/pdfs'
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-					/>
-				</svg>
-				<span>PDFs</span>
-			</a>
-
-			<a
-				href="/dashboard/media/videos"
-				aria-current={$page.url.pathname === '/dashboard/media/videos' ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{$page.url.pathname === '/dashboard/media/videos'
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {$page.url.pathname === '/dashboard/media/videos'
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-					/>
-				</svg>
-				<span>Videos</span>
-			</a>
-
-			<!-- ═══ ANALYTICS Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
-				Analytics
-			</p>
-
-			<!-- Image Analytics -->
-			<a
-				href="/dashboard/analytics"
-				aria-current={isActive(currentPath, '/dashboard/analytics') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/analytics')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/analytics')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-					/>
-				</svg>
-				<span>Image Analytics</span>
-			</a>
-
-			<!-- Activity Logs -->
-			<a
-				href="/dashboard/activity-logs"
-				aria-current={isActive(currentPath, '/dashboard/activity-logs') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/activity-logs')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/activity-logs')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-					/>
-				</svg>
-				<span>Activity Logs</span>
-			</a>
-
-			<!-- ═══ DEVELOPER Section ═══ -->
-			<p class="px-4 pt-5 pb-1 text-[10px] font-black text-gray-600 uppercase tracking-[0.15em]">
-				Developer
-			</p>
-
-			<!-- API Playground -->
-			<a
-				href="/dashboard/api-playground"
-				aria-current={isActive(currentPath, '/dashboard/api-playground') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/api-playground')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/api-playground')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-					/>
-				</svg>
-				<span>API Playground</span>
-			</a>
-
-			<!-- API Keys -->
-			<a
-				href="/dashboard/api-token"
-				aria-current={isActive(currentPath, '/dashboard/api-token') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/api-token')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/api-token')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-					/>
-				</svg>
-				<span>API Keys</span>
-			</a>
-
-			<!-- Integrations -->
-			<a
-				href="/dashboard/integrations"
-				aria-current={isActive(currentPath, '/dashboard/integrations') ? 'page' : undefined}
-				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
-					{isActive(currentPath, '/dashboard/integrations')
-					? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
-					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
-			>
-				<svg
-					class="w-5 h-5 mr-3 {isActive(currentPath, '/dashboard/integrations')
-						? 'text-gray-900'
-						: 'text-gray-500 group-hover:text-gray-900'}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2.5"
-						d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-					/>
-				</svg>
-				<span>Integrations</span>
-			</a>
+					{section.label}
+				</p>
+				{#each section.items as item}
+					<a
+						href={item.href}
+						on:click={() => trackNav(item.label)}
+						aria-current={isActive(currentPath, item.href) ? 'page' : undefined}
+						class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
+							{isActive(currentPath, item.href)
+							? 'bg-brand-accent text-gray-900 border-[3px] border-gray-900 shadow-brutal-md'
+							: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-[3px] border-transparent'}"
+					>
+						<svg
+							class="w-5 h-5 mr-3 {isActive(currentPath, item.href)
+								? 'text-gray-900'
+								: 'text-gray-500 group-hover:text-gray-900'}"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d={item.icon} />
+						</svg>
+						<span>{item.label}</span>
+						{#if item.badge === 'new'}
+							<span
+								class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-data-green text-white rounded-full border border-gray-900"
+							>
+								New
+							</span>
+						{/if}
+					</a>
+				{/each}
+			{/each}
 
 			<!-- ═══ Bottom Section ═══ -->
 			<div class="h-[2px] bg-gray-200 my-4 mx-4" />
@@ -435,6 +220,7 @@
 			{#if $currentTeam}
 				<a
 					href="/dashboard/team"
+					on:click={() => trackNav('Team Settings')}
 					aria-current={isActive(currentPath, '/dashboard/team') ? 'page' : undefined}
 					class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 						{isActive(currentPath, '/dashboard/team')
@@ -470,6 +256,7 @@
 			<!-- Billing -->
 			<a
 				href="/dashboard/billing"
+				on:click={() => trackNav('Billing')}
 				aria-current={isActive(currentPath, '/dashboard/billing') ? 'page' : undefined}
 				class="group relative flex items-center px-4 py-3 lg:py-2.5 text-sm font-bold rounded-xl transition-all duration-200
 					{isActive(currentPath, '/dashboard/billing')
