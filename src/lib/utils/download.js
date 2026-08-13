@@ -1,4 +1,4 @@
-import { analytics } from '$lib/analytics.js';
+import { analytics } from '$lib/telemetry.js';
 import { toast } from '../../store/toast.store';
 
 /**

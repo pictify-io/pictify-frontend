@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { analytics } from '$lib/analytics.js';
+import { analytics } from '$lib/telemetry.js';
 
 /**
  * Navigate to the upgrade page (or a direct checkout, if provided)

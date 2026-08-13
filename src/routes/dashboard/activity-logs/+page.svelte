@@ -14,7 +14,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../store/toast.store';
 	import { formatDateTime } from '$lib/utils/format.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let logs = [];
 	let summary = {};

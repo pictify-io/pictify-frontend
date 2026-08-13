@@ -12,7 +12,7 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
 
 	export let isUserLoggedIn = false;

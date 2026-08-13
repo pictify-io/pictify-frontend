@@ -10,7 +10,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { user } from '../../../store/user.store';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import {
 		allTemplates,
 		getTemplatesByCategory,

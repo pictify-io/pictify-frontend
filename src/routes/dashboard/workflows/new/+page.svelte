@@ -19,7 +19,7 @@
 		listWorkflowHooks
 	} from '../../../../api/workflow';
 	import EmailComposer from '$lib/components/workflows/EmailComposer.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	// ?pack=<id> only picks which designs to show and which template-step
 	// section comes first (harmless deep-link). Certificates is the default.

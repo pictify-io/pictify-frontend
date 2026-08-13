@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { user } from '../../../store/user.store';
 	import Loader from '$lib/components/Loader.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { isOverageEligible } from '../../../config/plan-features.js';
 	import OverageSettings from '$lib/components/plg/OverageSettings.svelte';
 	import {

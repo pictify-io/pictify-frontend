@@ -1,6 +1,6 @@
 <script>
 	import { user } from '../../../store/user.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import posthog from 'posthog-js';
 	import { browser } from '$app/environment';
 

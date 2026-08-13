@@ -22,7 +22,7 @@
 	export let codeExamples = [];
 	export let toolName = '';
 
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let selectedLang = codeExamples.length ? codeExamples[0].id : 'javascript';
 	$: activeLang = codeExamples.find((e) => e.id === selectedLang) || codeExamples[0];

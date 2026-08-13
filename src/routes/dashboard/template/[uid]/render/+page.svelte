@@ -15,7 +15,7 @@
 	import Loader from '$lib/components/Loader.svelte';
 	import RenderForm from '$lib/components/render/RenderForm.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import ModeTabs from '$lib/components/dashboard/ModeTabs.svelte';
 	import CopyAsCode from '$lib/components/render/CopyAsCode.svelte';
 	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';

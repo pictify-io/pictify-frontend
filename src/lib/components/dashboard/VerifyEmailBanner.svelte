@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import posthog from 'posthog-js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { resendVerificationEmail } from '../../../api/auth';
 
 	export let email = '';

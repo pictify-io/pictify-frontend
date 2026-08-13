@@ -21,7 +21,7 @@
 	import { getTemplates } from '../../api/template';
 	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
 	import { getApiToken, createApiToken } from '../../api/user';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import {
 		getQuickActions,
 		getWelcomeMessage,

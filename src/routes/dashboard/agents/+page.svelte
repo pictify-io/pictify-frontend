@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { user, getAPITokenAction, createAPITokenAction } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
 
 	const MCP_URL = 'https://mcp.pictify.io';

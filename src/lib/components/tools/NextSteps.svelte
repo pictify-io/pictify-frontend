@@ -4,7 +4,7 @@
 	import { user } from '../../../store/user.store';
 	import ShareResultButton from './ShareResultButton.svelte';
 	import { onMount } from 'svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	/**
 	 * Next steps module for PLG:

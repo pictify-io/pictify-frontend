@@ -3,7 +3,7 @@
 	import { browser } from '$app/environment';
 	import { user } from '../../../store/user.store';
 	import { getApiToken, createApiToken } from '../../../api/user';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	export let toolName = '';
 

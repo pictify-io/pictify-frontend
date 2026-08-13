@@ -4,7 +4,7 @@
 	import { listWorkflowRuns, listWorkflowHooks } from '../../../api/workflow';
 	import { PACKS, getPack } from '$lib/workflows/packs.js';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let isLoading = true;
 	let loadError = '';

@@ -12,7 +12,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { getVideoTemplate, renderVideoTemplate } from '../../../../../api/videoTemplates';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { sampleAll } from '$lib/utils/sample-variable-generator';
 	import { humanizeName, missingRequired, MEDIA_TYPES } from '$lib/video/variables.js';
 

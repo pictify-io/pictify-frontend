@@ -7,7 +7,7 @@
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import { indentWithTab } from '@codemirror/commands';
 	import { createGifPublic } from '../../../api/image.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	export let isGifEnabled = false;
 	export let isPreviewEnabled = true;

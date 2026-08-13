@@ -5,7 +5,7 @@
 		DEFAULT_GETTING_STARTED_STEPS,
 		getCurlExample
 	} from '../../../config/personalization.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	export let hasApiKey = false;
 	export let hasTemplates = false;

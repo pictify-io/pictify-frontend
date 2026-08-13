@@ -10,7 +10,7 @@
 	} from '../../../store/brand-assets.store';
 	import { toast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { copyToClipboard as sharedCopy, formatRelativeDate } from '$lib/utils/format.js';
 	import Loader from '$lib/components/Loader.svelte';
 	import {

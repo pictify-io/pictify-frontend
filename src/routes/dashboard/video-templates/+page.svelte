@@ -13,7 +13,7 @@
 		deleteVideoTemplate,
 		duplicateVideoTemplate
 	} from '../../../api/videoTemplates';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let isLoading = true;
 	let loadError = '';

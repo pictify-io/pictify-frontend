@@ -13,7 +13,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { generationLimits } from '../../../store/generationLimits.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';

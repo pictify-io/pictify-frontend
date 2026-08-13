@@ -7,7 +7,7 @@
 	 *
 	 * Consumer can pass a custom headline/kicker per page or fall back to defaults.
 	 */
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	export let headline = 'Every row rendered. Every recipient reached. Provable.';
 	export let kicker = 'Documents & Videos, Delivered';

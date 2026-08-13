@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	export let text = 'Start For Free';
 	export let variant = 'primary'; // primary or secondary
 	export let location = 'landing_page';

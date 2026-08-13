@@ -12,7 +12,7 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import backend from '../../../service/backend';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { buildTweetHtml, DEFAULT_TWEET } from '$lib/components/tools/TweetScreenshot.js';
 
 	$: isUserLoggedIn = !!$user?.email;

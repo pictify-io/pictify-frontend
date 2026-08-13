@@ -4,7 +4,7 @@
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { getWorkflowRun, createWorkflowHook, resendWorkflowItem } from '../../../../api/workflow';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	const ACTIVE_STATUSES = ['pending', 'queued', 'processing', 'running'];
 	const DELIVERY_KEYS = ['method', 'emailColumn', 'subject', 'fromName', 'bodyText', 'bodyHtml', 'replyTo'];

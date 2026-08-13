@@ -5,11 +5,27 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
+				// v2 display face. Variable weight 200–800 with width + optical-size axes.
+				display: ['Bricolage Grotesque', 'Inter', 'sans-serif'],
 				sans: ['Inter', 'sans-serif'],
-				heading: ['DynaPuff', 'Inter', 'sans-serif'],
 				// Code face used by the HTML editor, CodeMirror panes, and API snippets.
-				// Falls back through the Apple/Windows/Linux mono stack.
-				mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
+				mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+				// v1 — marketing display face. Deprecated by `display`; still referenced
+				// by pre-rebrand marketing pages.
+				heading: ['DynaPuff', 'Inter', 'sans-serif']
+			},
+			// Marketing type scale. Deliberately in px, not rem: the density system in
+			// app.css steps the root font-size down below 1680/1440px, which is right
+			// for the dashboard but would shrink the marketing display type off-spec.
+			fontSize: {
+				'display-lg': ['112px', { lineHeight: '0.86', letterSpacing: '-0.045em' }],
+				display: ['80px', { lineHeight: '0.88', letterSpacing: '-0.04em' }],
+				'display-sm': ['52px', { lineHeight: '0.88', letterSpacing: '-0.04em' }],
+				heading: ['64px', { lineHeight: '0.9', letterSpacing: '-0.04em' }],
+				'heading-sm': ['38px', { lineHeight: '0.94', letterSpacing: '-0.04em' }],
+				title: ['40px', { lineHeight: '1.02', letterSpacing: '-0.035em' }],
+				subtitle: ['32px', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+				card: ['26px', { lineHeight: '1.05', letterSpacing: '-0.03em' }]
 			},
 			colors: {
 				// Semantic tokens used by the vendored OpenVideo timeline island
@@ -26,6 +42,37 @@ export default {
 				destructive: '#f87171',
 				border: '#27272a',
 				brand: {
+					// ── v2 (rebrand 2026) ──────────────────────────────────────────
+					// Grounds
+					paper: '#FFFFFF', // light section band
+					canvas: '#E2E4DD', // greige section band
+					field: '#D8F34A', // saturated colour field — hero + closing CTA
+					sky: '#A9D7F2', // printed blue tint — integrations ground
+					// Ink
+					ink: '#000000', // display type, primary text
+					slate: '#383A42', // body text on light grounds
+					mute: '#8A8A85', // captions, mono labels
+					rule: '#E5E7EB', // hairlines
+					// Dark surfaces
+					press: '#242628', // dark card
+					'press-deep': '#131417', // dark section band + CTA strips
+					'press-text': '#ADB9C6', // body text on dark
+					// Actions
+					plum: '#252527', // primary filled button
+					// Decorative fills. NOT interactive surfaces — these carry the
+					// pixel graphics, capsules and accent cards only.
+					// Derived from the risograph ink drawer (2026-08 palette rework —
+					// the previous family was hex-identical to fal.ai's tokens).
+					blue: '#0078BF', // riso blue — the working ink
+					royal: '#0054A6', // deep blue — focus rings, links
+					powder: '#D3E7F6', // blue at light coverage
+					rose: '#FFD3E8', // pink at light coverage
+					pink: '#FF48B0', // fluorescent pink — spot punch, rare
+					proof: '#00BE43', // rendered/delivered status wash
+
+					// ── v1 (neo-brutalist) — deprecated ────────────────────────────
+					// Still referenced by /dashboard and pre-rebrand marketing pages.
+					// Remove once those surfaces are migrated.
 					bg: '#FFFDF8',
 					accent: '#ffc480',
 					danger: '#ff6b6b',
@@ -54,7 +101,16 @@ export default {
 					red: '#ff5252'
 				}
 			},
+			borderRadius: {
+				// v2 shape scale. Four steps, no more.
+				btn: '4px', // buttons + inputs — sharp
+				tile: '12px', // render tiles, media wells
+				card: '16px', // accent cards, CTA strips
+				pane: '28px' // large dark panes
+			},
 			boxShadow: {
+				// v1 — deprecated. The v2 system uses flat surfaces and colour
+				// inversion for hierarchy, not elevation.
 				'brutal-sm': '2px 2px 0 0 #1f2937',
 				'brutal-md': '3px 3px 0 0 #1f2937',
 				'brutal-lg': '4px 4px 0 0 #1f2937',
@@ -66,6 +122,11 @@ export default {
 			},
 			borderWidth: {
 				3: '3px'
+			},
+			maxWidth: {
+				// Outer bound, not the content width: every landing container pairs
+				// this with px-10, so content resolves to the drawn 1200px column.
+				page: '1280px'
 			}
 		}
 	},

@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getCdnAnalytics } from '../../../api/cdn';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let isLoading = true;
 	let data = null;

@@ -5,7 +5,7 @@
 	 * and a spacious interactive showcase stage.
 	 */
 	import { fade } from 'svelte/transition';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	const ADA_CERT = 'https://media.pictify.io/template-renders/cj944exs-1785797479873.png';
 

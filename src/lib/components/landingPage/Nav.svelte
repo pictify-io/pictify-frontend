@@ -3,7 +3,7 @@
 	import { user } from '../../../store/user.store';
 	import { onMount, onDestroy } from 'svelte';
 	import { PUBLIC_DOCS_URL } from '$env/static/public';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let isLoggedIn = false;
 	let unsubscribe = () => {};

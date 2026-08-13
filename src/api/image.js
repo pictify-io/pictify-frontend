@@ -24,7 +24,7 @@ const createGifPublic = async ({ html, width, height, duration }) => {
 };
 
 const createOgImage = async ({ template, heading, description, logo, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image/og-image',
 		{
@@ -39,7 +39,7 @@ const createOgImage = async ({ template, heading, description, logo, apiKey }) =
 };
 
 const createImage = async ({ html, width, height, selector, url, fileExtension, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image',
 		{
@@ -56,7 +56,7 @@ const createImage = async ({ html, width, height, selector, url, fileExtension, 
 };
 
 const createGif = async ({ html, width, height, framesPerSecond, selector, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/gif',
 		{
@@ -72,7 +72,7 @@ const createGif = async ({ html, width, height, framesPerSecond, selector, apiKe
 };
 
 const createAgentScreenshot = async ({ prompt, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image/agent-screenshot',
 		{
@@ -92,7 +92,7 @@ const createCanvasImage = async ({
 	fileExtension,
 	apiKey
 }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image/canvas',
 		{
@@ -109,7 +109,7 @@ const createCanvasImage = async ({
 };
 
 const captureGif = async ({ url, width, height, frameDurationSeconds, quality, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/gif/capture',
 		{
@@ -125,7 +125,7 @@ const captureGif = async ({ url, width, height, frameDurationSeconds, quality, a
 };
 
 const renderTemplate = async ({ templateUid, variables, outputFormat, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		`/templates/${templateUid}/render`,
 		{

@@ -7,7 +7,7 @@
 	import { resetPassword } from '../../../api/user';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let token = '';
 	let password = '';

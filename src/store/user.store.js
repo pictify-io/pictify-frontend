@@ -9,7 +9,7 @@ import {
 	getPlanDetails
 } from '../api/user';
 import validateEmail from '../util/validateEmail';
-import { analytics } from '$lib/analytics.js';
+import { analytics } from '$lib/telemetry.js';
 
 const createDefaultUserState = () => ({
 	email: null,

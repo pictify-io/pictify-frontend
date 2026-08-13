@@ -5,7 +5,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { user } from '../../store/user.store';
 	import { goto } from '$app/navigation';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { fade, fly } from 'svelte/transition';
 	import {
 		PLANS,

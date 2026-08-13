@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import TeamSwitcher from './TeamSwitcher.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { initializeTeamState, currentTeam, isTeamOwner } from '../../../store/team.store';
 
 	$: isPaidPlan = $user?.currentPlan !== 'starter' && $user?.currentPlan !== 'free';

@@ -14,7 +14,7 @@
 	} from '../../../store/plg.store';
 	import { openUpgradeModal } from '../../../store/upgrade-modal.store';
 	import { recordUpgradePrompt } from '../../../api/plg.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { goto } from '$app/navigation';
 
 	let showBanner = false;

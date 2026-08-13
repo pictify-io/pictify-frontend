@@ -1,6 +1,6 @@
 <script>
 	import { toast } from '../../../store/toast.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	export let imageUrl = '';
 	export let templateUid = '';

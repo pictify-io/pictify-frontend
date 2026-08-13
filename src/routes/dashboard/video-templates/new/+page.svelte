@@ -10,7 +10,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { generateVideoTemplate } from '../../../../api/videoTemplates';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { STARTERS, buildStarterClips } from '$lib/video/starters.js';
 	import { readGradient, gradientCss } from '$lib/video/gradients.js';
 

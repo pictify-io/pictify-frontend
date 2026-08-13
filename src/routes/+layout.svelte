@@ -3,7 +3,7 @@
 	import { getUser } from '../store/user.store';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	// Initialize analytics
 	if (browser) {

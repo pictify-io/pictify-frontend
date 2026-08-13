@@ -12,7 +12,7 @@
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { page } from '$app/stores';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 
 	// User login state

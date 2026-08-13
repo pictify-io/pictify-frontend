@@ -1,20 +1,21 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Hero from '$lib/components/landingPage/Hero.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import TryNow from '$lib/components/landingPage/TryNow.svelte';
-	import ScaleUseCases from '$lib/components/landingPage/ScaleUseCases.svelte';
-	import UseCaseRouter from '$lib/components/landingPage/UseCaseRouter.svelte';
-	import DeliveryProof from '$lib/components/landingPage/DeliveryProof.svelte';
-	import AgentShowcase from '$lib/components/landingPage/AgentShowcase.svelte';
-	import ApiShowcase from '$lib/components/landingPage/ApiShowcase.svelte';
-	import HowItWorks from '$lib/components/landingPage/HowItWorks.svelte';
-	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
-	import MidSectionCta from '$lib/components/landingPage/MidSectionCta.svelte';
-	import IntegrationsEcosystem from '$lib/components/landingPage/IntegrationsEcosystem.svelte';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Hero from '$lib/components/landing/Hero.svelte';
+	import ProofSheet from '$lib/components/landing/ProofSheet.svelte';
+	import Contract from '$lib/components/landing/Contract.svelte';
+	import VideoSection from '$lib/components/landing/VideoSection.svelte';
+	import Moments from '$lib/components/landing/Moments.svelte';
+	import Integrations from '$lib/components/landing/Integrations.svelte';
+	import ClosingCta from '$lib/components/landing/ClosingCta.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
+
+	// Gates every scroll reveal on the page (see app.css). Set on the client only,
+	// so a blocked bundle or a reduced-motion preference leaves the page complete
+	// and static instead of hiding content that JS never comes back to reveal.
+	let motion = false;
 
 	// Scroll depth tracking
 	let scrollDepthsTracked = new Set();
@@ -38,6 +39,7 @@
 	onMount(() => {
 		if (browser) {
 			window.addEventListener('scroll', trackScrollDepth, { passive: true });
+			motion = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 		}
 	});
 
@@ -49,23 +51,20 @@
 </script>
 
 <svelte:head>
-	<title>Pictify | Turn Your Data into Documents & Videos, Delivered</title>
+	<title>Pictify | Templated media API for images, PDFs, GIFs and video</title>
 	<meta
 		name="description"
-		content="Upload a spreadsheet, point a webhook, or call the API. Every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status. Free tier available."
+		content="Write one HTML template with named variables. Anything that can fill them — your code, a spreadsheet, a webhook, a person, an agent — renders a PNG, JPG, PDF, GIF or MP4. Node and Python SDKs, Zapier, Make, n8n and an MCP server. Free tier."
 	/>
 	<meta
 		name="keywords"
-		content="certificate generator, event badge generator, bulk document generation, CSV to certificates, personalized video generation, video generation API, webhook document automation, personalized email delivery, template rendering, MCP server, Pictify.io"
+		content="templated media, image generation API, html to image, html to pdf, html to video API, personalized images API, OG image generation, PDF generation API, CSV to PDF, bulk document generation, MCP server, Zapier image generation, Pictify.io"
 	/>
 	<meta name="author" content="Pictify.io" />
-	<meta
-		property="og:title"
-		content="Pictify | Turn Your Data into Documents & Videos, Delivered"
-	/>
+	<meta property="og:title" content="Pictify | Templated media for developers" />
 	<meta
 		property="og:description"
-		content="Every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status."
+		content="One HTML template declares its variables. Anything that can fill them makes a file — PNG, JPG, PDF, GIF or MP4."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta property="og:url" content="https://pictify.io" />
@@ -73,13 +72,10 @@
 	<meta property="og:site_name" content="Pictify.io" />
 	<meta property="og:locale" content="en_US" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta
-		name="twitter:title"
-		content="Pictify | Turn Your Data into Documents & Videos, Delivered"
-	/>
+	<meta name="twitter:title" content="Pictify | Templated media for developers" />
 	<meta
 		name="twitter:description"
-		content="Every row becomes a branded certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status."
+		content="One HTML template declares its variables. Anything that can fill them makes a file — PNG, JPG, PDF, GIF or MP4."
 	/>
 	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
 	<meta name="twitter:site" content="@pictify_io" />
@@ -91,16 +87,16 @@
 		url: 'https://pictify.io',
 		image: 'https://media.pictify.io/v3g37-1775406808141.png',
 		description:
-			'Turn your data into branded documents and videos. Upload a spreadsheet, point a webhook, or call the API. Every row becomes a certificate, badge, report or personalized video, rendered and emailed to each recipient with per-person delivery status.',
-		applicationCategory: ['DesignApplication', 'DeveloperApplication', 'Utility'],
+			'Templated media API. Write one HTML template that declares its variables, then let anything fill them — your code, a spreadsheet, a webhook, a person or an AI agent — and get back a PNG, JPG, PDF, GIF or MP4.',
+		applicationCategory: ['DeveloperApplication', 'DesignApplication', 'Utility'],
 		operatingSystem: 'Web',
 		featureList: [
-			'Workflows with CSV upload and per-workflow webhooks',
-			'HTML document templates',
+			'HTML templates with typed, validated variables',
+			'PNG, JPG, PDF, GIF and MP4 output from one template',
 			'Personalized video rendering (timeline editor, code, or AI-authored templates)',
-			'Per-recipient email delivery with per-row delivery status, bounce handling and re-send',
-			'Batch rendering',
-			'REST API, SDKs and MCP server for AI agents'
+			'Batch rendering from CSV, and per-workflow webhooks',
+			'Optional per-recipient email delivery for rendered files',
+			'REST API, Node and Python SDKs, Zapier, Make, n8n, and an MCP server for AI agents'
 		],
 		offers: {
 			'@type': 'Offer',
@@ -111,55 +107,30 @@
 	})}</script>`}
 </svelte:head>
 
-<section
-	class="w-screen bg-brand-bg min-h-screen flex flex-col justify-between md:items-start items-between lg:overflow-x-hidden md:overflow-x-hidden"
->
+<!-- .landing-v2 opts this page out of the app-wide root font-size down-scale (see app.css). -->
+<div class="landing-v2 w-full overflow-x-hidden" class:motion>
 	<Nav />
+	<main>
+		<!-- 1. Templated media for developers -->
+		<Hero />
 
-	<!-- 1. Hero: Problem + Solution -->
-	<Hero />
+		<!-- 2. What one template and one spreadsheet actually produced -->
+		<ProofSheet />
 
-	<!-- 2. Use-case router: one engine, three ways in (documents / video / API+agents) -->
-	<UseCaseRouter />
-	<SectionSeparator icon="arrow" />
+		<!-- 3. The contract: a template declares variables, five callers fill them -->
+		<Contract />
 
-	<!-- 3. Delivery proof: "everything else stops at the send" + per-row run summary -->
-	<DeliveryProof />
+		<!-- 4. Same variables, now it moves -->
+		<VideoSection />
 
-	<!-- 4. Use Cases: Recognition Moments -->
-	<ScaleUseCases />
+		<!-- 5. Four moments where a product has to hand someone a file -->
+		<Moments />
 
-	<!-- 5. Agent-native: AI authoring, MCP, always-on workflows -->
-	<AgentShowcase />
-	<SectionSeparator icon="hash" />
+		<!-- 6. Call it from wherever you already are -->
+		<Integrations />
 
-	<!-- 6. Core Workflow: Template → Data → Image -->
-	<HowItWorks />
-
-	<!-- 4. Contextual CTA -->
-	<MidSectionCta />
-	<SectionSeparator icon="bolt" />
-
-	<!-- 7. API Integration: Code First -->
-	<ApiShowcase />
-	<SectionSeparator icon="hash" />
-
-	<!-- Responsive Image API section retired from the homepage (2026-08): it sold
-		 "one template → Instagram/Twitter/LinkedIn/YouTube sizes", which is the
-		 pre-pivot social-image story and dilutes the document-workflow message.
-		 The component is untouched on disk if it's wanted on a dedicated page. -->
-
-	<!-- 6. Infrastructure & Integrations -->
-	<IntegrationsEcosystem />
-	<SectionSeparator icon="arrow" />
-
-	<!-- 8. Final CTA -->
-	<div class="w-full bg-brand-bg">
-		<div class="max-w-5xl mx-auto px-4">
-			<TryNow />
-		</div>
-	</div>
-
-	<SectionSeparator icon="hash" />
+		<!-- 7. Closing -->
+		<ClosingCta />
+	</main>
 	<Footer />
-</section>
+</div>

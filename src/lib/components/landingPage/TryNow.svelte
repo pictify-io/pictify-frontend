@@ -1,6 +1,6 @@
 <script>
 	import SignUpButton from './SignUpButton.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 </script>
 
 <section class="w-full py-16 md:py-24 bg-brand-bg overflow-hidden relative z-0">

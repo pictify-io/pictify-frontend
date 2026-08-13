@@ -2,7 +2,7 @@
 	import SignUpButton from './SignUpButton.svelte';
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	// Demo template config — a real certificate DOCUMENT so the graphic

@@ -5,7 +5,7 @@
 	import { user } from '../../../store/user.store';
 	import { getProducts } from '../../../api/product';
 	import Loader from '$lib/components/Loader.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { recordDiscountCodeUsed } from '../../../api/plg.js';
 	import {
 		PLANS,

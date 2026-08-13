@@ -22,7 +22,7 @@
 	 */
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { goto, beforeNavigate } from '$app/navigation';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import {
 		createVideoTemplate,
 		updateVideoTemplate,

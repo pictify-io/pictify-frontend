@@ -14,7 +14,7 @@
 		resendInvitationAction
 	} from '../../../../store/team.store';
 	import { toast } from '../../../../store/toast.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { formatRelativeDate } from '$lib/utils/format.js';
 
 	let loading = true;

@@ -9,7 +9,7 @@
 	import { toast } from '../../../store/toast.store';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import { certificateHtmlTemplates } from '$lib/components/tools/CertificateHtmlTemplates.js';
 

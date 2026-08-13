@@ -19,7 +19,7 @@
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { generationLimits } from '../../../store/generationLimits.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
 	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';

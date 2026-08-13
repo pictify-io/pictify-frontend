@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	/**
 	 * Generation Limit Banner

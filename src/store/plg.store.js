@@ -12,7 +12,7 @@ import {
 	recordMilestone,
 	recordUpgradePrompt
 } from '../api/plg';
-import { analytics } from '$lib/analytics.js';
+import { analytics } from '$lib/telemetry.js';
 import {
 	PLANS,
 	PLAN_DISPLAY_NAMES,
