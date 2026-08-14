@@ -145,7 +145,8 @@ const getOgImageTemplates = async (apiKey) => {
 
 const checkApiHealth = async () => {
 	try {
-		await backend.get('/healthcheck');
+		// The render pipeline's health route — there is no bare /healthcheck.
+		await backend.get('/image/health');
 		return true;
 	} catch (error) {
 		return false;

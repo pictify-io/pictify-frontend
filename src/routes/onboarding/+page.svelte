@@ -21,14 +21,16 @@
 		recordRedraw,
 		skipOnboarding
 	} from '../../api/onboarding-v2.js';
+	import { savePersonalization } from '../../api/onboarding.js';
 	import PickStep from '$lib/components/onboarding/v2/PickStep.svelte';
 	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
 	import Capsule from '$lib/components/landing/Capsule.svelte';
 	import GeneratingStep from '$lib/components/onboarding/v2/GeneratingStep.svelte';
 	import RenderedStep from '$lib/components/onboarding/v2/RenderedStep.svelte';
+	import FillStep from '$lib/components/onboarding/v2/FillStep.svelte';
 	import IntegrateStep from '$lib/components/onboarding/v2/IntegrateStep.svelte';
 
-	/** @type {'pick' | 'generating' | 'rendered' | 'integrate'} */
+	/** @type {'pick' | 'generating' | 'rendered' | 'fill' | 'integrate'} */
 	let step = 'pick';
 	/** @type {'ai' | 'template'} */
 	let source = 'template';
@@ -61,7 +63,7 @@
 		abortGeneration?.abort();
 	});
 
-	$: stepLabel = step === 'integrate' ? 'Step 2 of 2' : 'Step 1 of 2';
+	$: stepLabel = step === 'integrate' || step === 'fill' ? 'Step 2 of 2' : 'Step 1 of 2';
 
 	let errorMessage = '';
 
@@ -227,6 +229,25 @@
 	}
 
 	/**
+	 * The one personalization question. Every answer is saved; only 'api' goes
+	 * on to the curl walkthrough — the other paths get their setup on the
+	 * dashboard home, where the declared card is waiting.
+	 */
+	async function handleFillAnswer(event) {
+		const mode = event.detail.mode;
+		analytics.track('onboarding_fill_answered', { mode, source });
+		savePersonalization({ integrationMode: mode }).catch(() => {
+			// A lost answer degrades to the home's default card — not worth
+			// blocking the flow over.
+		});
+		if (mode === 'api') {
+			goToIntegrate();
+		} else {
+			finish(`declared_${mode}`);
+		}
+	}
+
+	/**
 	 * Polls for the first render from a caller the user controls. There is no
 	 * "I've done it" button because the server is the only thing that can know.
 	 */
@@ -320,11 +341,16 @@
 				{variables}
 				{url}
 				{elapsedMs}
-				on:next={goToIntegrate}
+				on:next={() => {
+					analytics.track('onboarding_reached_fill', { source });
+					step = 'fill';
+				}}
 				on:redraw={handleRedraw}
 				on:retry={handleRetry}
 				on:edit={handleEditDescription}
 			/>
+		{:else if step === 'fill'}
+			<FillStep on:answer={handleFillAnswer} />
 		{:else}
 			<IntegrateStep
 				{apiKey}

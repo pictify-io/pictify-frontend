@@ -46,6 +46,19 @@ export function formatRelativeDate(dateString) {
 }
 
 /**
+ * Compact relative time for live surfaces: "12s ago", "2m ago", "1h ago", "3d ago".
+ * @param {string|Date} dateString - ISO date string or Date
+ * @returns {string}
+ */
+export function timeAgo(dateString) {
+	const s = Math.max(0, Math.floor((Date.now() - new Date(dateString).getTime()) / 1000));
+	if (s < 60) return `${s}s ago`;
+	if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+	if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+	return `${Math.floor(s / 86400)}d ago`;
+}
+
+/**
  * Format a date string as short date + time
  * @param {string} dateString - ISO date string
  * @returns {string} Formatted date with time
