@@ -84,6 +84,16 @@
 	const tagged = (list, format) => (list || []).map((r) => ({ ...r, format }));
 
 	onMount(async () => {
+		// A starter picked on the Templates page (or anywhere else) lands in
+		// the composer here.
+		if (browser) {
+			const seed = sessionStorage.getItem('pictify_seed_prompt');
+			if (seed) {
+				prompt = seed;
+				sessionStorage.removeItem('pictify_seed_prompt');
+			}
+		}
+
 		const [templatesData, imagesData, gifsData, pdfsData, status, health] = await Promise.all([
 			getTemplates({ page: 1, limit: 4, sort: 'newest' }),
 			getImages({ limit: 100 }),

@@ -13,6 +13,8 @@
 	export let templates = [];
 	/** When true, render the drawn starter set instead of `templates`. */
 	export let starters = false;
+	/** The host page provides its own section header (e.g. the empty state). */
+	export let hideHeader = false;
 
 	const STARTERS = [
 		{
@@ -45,7 +47,7 @@
 </script>
 
 <section class="flex flex-col gap-3.5">
-	<div class="flex items-center justify-between">
+	<div class="flex items-center justify-between" class:hidden={hideHeader}>
 		<div class="flex items-center gap-3">
 			<h2 class="font-mono text-[11px] uppercase tracking-[0.12em] text-brand-mute">
 				{starters ? 'Starters' : 'Templates'}
@@ -164,7 +166,7 @@
 						<span class="flex min-w-0 flex-col">
 							<span class="truncate font-sans text-[13.5px] font-bold text-brand-ink">{t.name || 'Untitled'}</span>
 							<span class="font-mono text-[10.5px] text-brand-mute">
-								{t.usageCount ? `${t.usageCount.toLocaleString()} runs` : 'no runs yet'}
+								{t.usageCount ? `${t.usageCount.toLocaleString()} renders` : 'no renders yet'}
 							</span>
 						</span>
 						<span class="ml-2 flex-shrink-0 rounded-[3px] bg-brand-powder px-[7px] py-0.5 font-mono text-[9px] tracking-[0.06em] text-brand-royal">

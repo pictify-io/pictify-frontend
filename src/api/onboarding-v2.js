@@ -45,7 +45,18 @@ export async function generateFromPrompt({ prompt, onToken, onStage, onTemplate,
 	}
 
 	if (!response.ok || !response.body) {
-		onError?.({ message: 'Could not start generating. Try again.', code: 'bad_response' });
+		// The server's refusal (e.g. template_limit_reached) says exactly why —
+		// surface its words rather than a generic shrug.
+		let payload = null;
+		try {
+			payload = await response.json();
+		} catch {
+			// Non-JSON error body; fall through to the generic message.
+		}
+		onError?.({
+			message: payload?.message || 'Could not start generating. Try again.',
+			code: payload?.code || 'bad_response'
+		});
 		return;
 	}
 
