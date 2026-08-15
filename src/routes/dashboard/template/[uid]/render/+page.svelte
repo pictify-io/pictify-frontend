@@ -142,6 +142,18 @@
 				return;
 			}
 
+			// The studio absorbed rendering for HTML templates — it renders with
+			// the same sample inputs you're already looking at. Legacy fabric
+			// templates have no studio, so they stay here. `?from=studio` means
+			// the studio sent us, and bouncing back would loop.
+			if (
+				templateRes.template.engine === 'html' &&
+				$page.url.searchParams.get('from') !== 'studio'
+			) {
+				goto(`/template-workspace/html/${uid}`, { replaceState: true });
+				return;
+			}
+
 			template = templateRes.template;
 			variables = variablesRes?.variables || [];
 			apiTokens = tokensRes?.apiTokens || [];

@@ -1,4 +1,5 @@
 import backend from '../service/backend';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 const getTemplate = async ({ type, variables }) => {
 	const url = `/fe/template?type=${type}&variables=${JSON.stringify(variables)}`;
@@ -420,7 +421,122 @@ const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) 
 	}
 };
 
+/**
+ * Studio "Say it": one instruction through the template agent, streamed.
+ *
+ * The agent takes ~25s and narrates itself; a single pulse for that long reads
+ * as a hang, so this is SSE rather than a plain POST and the caller gets the
+ * agent's own stages as they happen. The previous html is snapshotted
+ * server-side before the change, so `undoTemplateEdit` always has a way back.
+ *
+ * Refusals (quota, not found, wrong engine) arrive as ordinary JSON before the
+ * stream opens — the server only switches to event-stream once it commits to
+ * running the agent.
+ *
+ * @param {string} uid
+ * @param {string} instruction
+ * @param {object} handlers
+ * @param {(stage: object) => void} [handlers.onStage]
+ * @param {(payload: object) => void} handlers.onDone
+ * @param {(err: object) => void} handlers.onError
+ * @param {AbortSignal} [handlers.signal]
+ */
+const editTemplateBySaying = async (uid, instruction, { onStage, onDone, onError, signal } = {}) => {
+	let response;
+	try {
+		response = await fetch(`${PUBLIC_BACKEND_URL}/template-studio/${uid}/edit`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ instruction }),
+			signal
+		});
+	} catch (e) {
+		if (e?.name !== 'AbortError') onError?.({ message: "Couldn't reach the server.", code: 'network' });
+		return;
+	}
+
+	if (!response.ok || !response.body) {
+		let payload = null;
+		try {
+			payload = await response.json();
+		} catch {
+			// Non-JSON body; fall through to the generic message.
+		}
+		onError?.({
+			message: payload?.message || "That change didn't go through.",
+			code: payload?.code || 'bad_response'
+		});
+		return;
+	}
+
+	const reader = response.body.getReader();
+	const decoder = new TextDecoder();
+	let buffer = '';
+	let settled = false;
+
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			buffer += decoder.decode(value, { stream: true });
+
+			// A chunk can split a frame anywhere; only whole frames are parsed.
+			const frames = buffer.split('\n\n');
+			buffer = frames.pop() ?? '';
+
+			for (const frame of frames) {
+				const lines = frame.split('\n');
+				const eventLine = lines.find((l) => l.startsWith('event:'));
+				const dataLine = lines.find((l) => l.startsWith('data:'));
+				if (!eventLine || !dataLine) continue;
+
+				const event = eventLine.slice(6).trim();
+				let payload;
+				try {
+					payload = JSON.parse(dataLine.slice(5).trim());
+				} catch {
+					continue;
+				}
+
+				if (event === 'stage') onStage?.(payload);
+				else if (event === 'done') {
+					settled = true;
+					onDone?.(payload);
+				} else if (event === 'error') {
+					settled = true;
+					onError?.(payload);
+				}
+			}
+		}
+	} catch (e) {
+		if (e?.name !== 'AbortError') {
+			onError?.({ message: 'The connection dropped mid-edit.', code: 'stream_failed' });
+		}
+		return;
+	}
+
+	// Closed without ever saying how it ended.
+	if (!settled) {
+		onError?.({ message: 'The edit stopped early. Nothing was changed.', code: 'incomplete' });
+	}
+};
+
+/** Pop the newest snapshot back onto the template. */
+const undoTemplateEdit = async (uid) => backend.post(`/template-studio/${uid}/undo`, {});
+
+/**
+ * Live proof. Renders ad-hoc html with the studio's sample values — never
+ * persisted, and it returns the render time the proof bar shows.
+ * @returns {Promise<{dataUrl, width, height, totalMs}>}
+ */
+const previewTemplateHtml = async (body, options = {}) =>
+	backend.post('/templates/preview', body, options);
+
 export {
+	editTemplateBySaying,
+	undoTemplateEdit,
+	previewTemplateHtml,
 	getTemplate,
 	getTemplates,
 	getTemplateById,

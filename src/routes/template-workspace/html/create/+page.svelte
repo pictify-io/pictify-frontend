@@ -1,90 +1,77 @@
 <script>
 	/**
-	 * /template-workspace/html/create
+	 * /template-workspace/html/create — new template.
 	 *
-	 * HTML is the only image/PDF engine (canvas removed 2026-08), so this
-	 * opens straight into a fresh editor.
+	 * A template has to exist before it can be edited: Say it needs a uid to
+	 * edit against, and the html pane needs somewhere to save. So this creates
+	 * an empty one immediately and hands straight over to the studio, rather
+	 * than making the user fill in a form to earn the editor.
 	 *
-	 * On save: POST to /templates with engine='html', then redirect to
-	 * /template-workspace/html/[uid] for the edit view.
+	 * `?mode=html` opens the studio in the code pane — that is the paste-your-own
+	 * HTML entry point.
 	 */
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import HtmlEditorLayout from '$lib/components/editor/html/HtmlEditorLayout.svelte';
+	import { page } from '$app/stores';
 	import backend from '../../../../service/backend';
-	import { toast } from '../../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
+	import { toast } from '../../../../store/toast.store';
 
-	let isSaving = false;
-	let template = {
-		uid: null,
-		name: 'Untitled HTML template',
-		engine: 'html',
-		html: '',
-		variableDefinitions: [],
-		jsEnabled: false,
-		strictVariables: false,
-		width: 1080,
-		height: 1080,
-		outputFormat: 'image',
-		pdfPreset: 'A4'
-	};
+	let error = null;
 
-	async function handleSave(event) {
-		isSaving = true;
+	$: mode = $page.url.searchParams.get('mode') === 'html' ? 'html' : 'say';
+
+	onMount(async () => {
 		try {
-			// Strip fields the create route doesn't expect (uid is server-generated;
-			// engine is re-applied explicitly to avoid client drift).
-			const { uid: _ignore, ...rest } = event.detail.template;
 			const res = await backend.post('/templates', {
-				...rest,
+				name: 'Untitled template',
 				engine: 'html',
-				// Legacy schema requires `variables` (array of names). Populate from
-				// variableDefinitions so we don't rely on the backend's regex extractor
-				// which also picks up block helpers (#if / #each / /if / /each).
-				variables: (rest.variableDefinitions || [])
-					.map((v) => v && v.name)
-					.filter(Boolean)
+				html: '',
+				variables: [],
+				variableDefinitions: [],
+				width: 1080,
+				height: 1080,
+				outputFormat: 'image'
 			});
-			if (res && res.template && res.template.uid) {
-				if (res.addedVariables && res.addedVariables.length > 0) {
-					toast.set({
-						message: `Saved · auto-added ${res.addedVariables.length} variable(s)`,
-						type: 'success',
-						duration: 3000
-					});
-				} else {
-					toast.set({
-						message: 'Template saved',
-						type: 'success',
-						duration: 2000
-					});
-				}
-				goto(`/template-workspace/html/${res.template.uid}`);
+			const uid = res?.template?.uid;
+			if (!uid) {
+				error = 'The template was created but came back without an id.';
+				return;
 			}
+			goto(`/template-workspace/html/${uid}?mode=${mode}`, { replaceState: true });
 		} catch (err) {
-			// HTTP errors from backend.post surface as HttpError with .status + .message.
-			// Give the user an actionable hint when the route isn't wired (most
-			// common cause is a stale dev server that hasn't been restarted to pick
-			// up the Phase 3 routes).
+			// The saved-template cap lands here; say so plainly rather than
+			// dumping the user on a blank screen.
 			const status = err?.status || 0;
-			let message = err?.message || 'Save failed';
-			if (status === 404) {
-				message = 'Backend route not found. Restart the API server to pick up engine=html routes.';
+			if (status === 402 || err?.data?.code === 'template_limit_reached') {
+				error = err?.message || "You're out of template slots — upgrade to add more.";
 			} else if (status === 401 || status === 403) {
-				message = 'Auth required. Sign in to the dashboard first.';
+				error = 'Sign in to create a template.';
+			} else {
+				error = err?.message || 'Could not create a template.';
 			}
-			toast.set({ message, type: 'error', duration: 5000 });
-			console.error('[html-editor] save failed:', err);
-		} finally {
-			isSaving = false;
+			toast.set({ message: error, type: 'error', duration: 5000 });
 		}
-	}
+	});
 </script>
+
+<svelte:head>
+	<title>New template | Pictify.io</title>
+</svelte:head>
 
 <Toast />
 
-<HtmlEditorLayout
-	bind:template
-	{isSaving}
-	on:save={handleSave}
-/>
+<div class="flex h-screen flex-col items-center justify-center gap-3 bg-brand-paper px-6 text-center">
+	{#if error}
+		<span class="font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">New template</span>
+		<p class="max-w-[420px] font-display text-xl font-extrabold tracking-[-0.02em] text-brand-ink">{error}</p>
+		<a
+			href="/dashboard/template"
+			class="rounded-btn bg-brand-ink px-4 py-2 font-sans text-[13px] font-bold text-white hover:opacity-90"
+		>
+			Back to templates
+		</a>
+	{:else}
+		<span class="font-mono text-[11px] uppercase tracking-[0.1em] text-brand-mute">Opening studio…</span>
+	{/if}
+</div>

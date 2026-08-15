@@ -23,9 +23,11 @@
 	$: openHref = template.isVideo
 		? `/dashboard/video-templates/${template.uid}`
 		: `/template-workspace/html/${template.uid}`;
+	// Render opens the studio: its top bar is the render surface now, and it
+	// arrives already filled with the sample inputs the render would use.
 	$: renderHref = template.isVideo
 		? `/dashboard/video-templates/${template.uid}`
-		: `/dashboard/template/${template.uid}/render`;
+		: `/template-workspace/html/${template.uid}`;
 	$: liveness = template.usageCount
 		? `${template.usageCount.toLocaleString()} renders${template.lastRenderedAt ? ` · ${timeAgo(template.lastRenderedAt)}` : ''}`
 		: 'no renders yet — try a test render';

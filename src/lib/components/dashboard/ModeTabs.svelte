@@ -10,7 +10,9 @@
 			id: 'render',
 			label: 'Render',
 			color: '#4ecdc4',
-			href: (uid) => `/dashboard/template/${uid}/render`
+			// The studio is the render surface; /render redirects here anyway for
+			// HTML templates, so point straight at it and skip the bounce.
+			href: (uid) => `/template-workspace/html/${uid}`
 		},
 		{
 			id: 'bulk',

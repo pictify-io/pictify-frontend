@@ -80,7 +80,9 @@
 		}
 		if (browser) sessionStorage.setItem('pictify_seed_prompt', FORMAT_EMPTY[formatKey].seed);
 		analytics.track('templates_format_empty_seeded', { format: formatKey });
-		goto('/dashboard');
+		// Straight into the studio: the seed becomes its first instruction, so
+		// the user lands on the thing being built rather than on a composer.
+		goto('/template-workspace/html/create');
 	}
 
 	$: total = imageTotal + videoCount;
@@ -141,7 +143,7 @@
 			return;
 		}
 		if (browser) sessionStorage.setItem('pictify_seed_prompt', event.detail.seed);
-		goto('/dashboard');
+		goto('/template-workspace/html/create');
 	}
 
 	async function handleDuplicate(event) {
