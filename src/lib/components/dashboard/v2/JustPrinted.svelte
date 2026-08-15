@@ -33,7 +33,7 @@
 		{/if}
 		{#if !empty}
 			<a
-				href="/dashboard/media/images"
+				href="/dashboard/renders"
 				class="ml-auto font-sans text-[12.5px] font-semibold text-brand-slate underline underline-offset-[3px]"
 			>
 				All renders

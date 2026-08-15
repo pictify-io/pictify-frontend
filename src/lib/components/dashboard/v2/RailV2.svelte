@@ -18,7 +18,7 @@
 
 	const SHOP = [
 		{ href: '/dashboard', icon: 'home', label: 'Home', exact: true },
-		{ href: '/dashboard/media/images', icon: 'renders', label: 'Renders' },
+		{ href: '/dashboard/renders', icon: 'renders', label: 'Renders' },
 		{ href: '/dashboard/template', icon: 'templates', label: 'Templates' },
 		{ href: '/dashboard/integrations', icon: 'callers', label: 'Callers' }
 	];

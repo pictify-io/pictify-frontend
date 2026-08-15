@@ -48,6 +48,7 @@ export default {
 					canvas: '#E2E4DD', // greige section band
 					field: '#D8F34A', // saturated colour field — hero + closing CTA
 					sky: '#A9D7F2', // printed blue tint — integrations ground
+					subtle: '#F4F6F4', // barely-there panel wash — chart wells, meta strips
 					// Ink
 					ink: '#000000', // display type, primary text
 					slate: '#383A42', // body text on light grounds
@@ -69,6 +70,7 @@ export default {
 					rose: '#FFD3E8', // pink at light coverage
 					pink: '#FF48B0', // fluorescent pink — spot punch, rare
 					proof: '#00BE43', // rendered/delivered status wash
+					alarm: '#B0483A', // failed / gone quiet — the only red in v2
 
 					// ── v1 (neo-brutalist) — deprecated ────────────────────────────
 					// Still referenced by /dashboard and pre-rebrand marketing pages.
