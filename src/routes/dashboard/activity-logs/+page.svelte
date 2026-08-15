@@ -23,15 +23,16 @@
 	 * fetched page rather than in five round trips — this is a recent-activity
 	 * view, not an archive search.
 	 *
-	 * There is no TEAM chip: routes/teams.js writes no audit rows at all, so it
-	 * would be permanently empty. WEBHOOKS takes its place because that data
-	 * genuinely exists and is the thing people come here to debug.
+	 * TEAM and KEYS both draw on the 'auth' category, so they are separated by
+	 * action rather than category — team events are logged with invite/member
+	 * actions, key events with token ones.
 	 */
 	const CHIPS = [
 		{ id: 'ALL', categories: null },
 		{ id: 'RENDERS', categories: ['image', 'gif', 'pdf', 'batch', 'video'] },
 		{ id: 'TEMPLATES', categories: ['template'] },
-		{ id: 'KEYS', categories: ['api', 'auth'] },
+		{ id: 'KEYS', categories: ['api'] },
+		{ id: 'TEAM', categories: ['auth'], actions: /^(invite|member-)/ },
 		{ id: 'WEBHOOKS', categories: ['webhook'] }
 	];
 
@@ -52,7 +53,11 @@
 
 	$: activeChip = CHIPS.find((c) => c.id === chip) || CHIPS[0];
 	$: visible = activeChip.categories
-		? logs.filter((l) => activeChip.categories.includes(l.category))
+		? logs.filter(
+				(l) =>
+					activeChip.categories.includes(l.category) &&
+					(!activeChip.actions || activeChip.actions.test(l.action))
+			)
 		: logs;
 	$: groups = groupByDay(visible);
 

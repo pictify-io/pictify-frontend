@@ -38,9 +38,18 @@
 	$: forceSolo = preview === 'solo';
 
 	$: teamId = $currentTeam?.uid || null;
-	// Seat caps are real (plan-features defines TEAM_SEATS per plan), so the
-	// header can say "N of M seats" rather than inventing a limit.
-	$: seatCap = PLAN_FEATURES[normalizePlan($plgStatus?.plan || 'starter')]?.[FEATURES.TEAM_SEATS] ?? null;
+	/*
+	 * The seat cap the SERVER enforces, not one derived from the plan.
+	 * `team.seatLimit` is a stored field on the team document — the invitation
+	 * route checks that value, and it does not necessarily track currentPlan.
+	 * Showing a plan-derived number would let the header promise seats the
+	 * server then refuses to sell. PLAN_FEATURES is the fallback for teams
+	 * predating the field.
+	 */
+	$: seatCap =
+		$currentTeam?.seatLimit ??
+		PLAN_FEATURES[normalizePlan($plgStatus?.plan || 'starter')]?.[FEATURES.TEAM_SEATS] ??
+		null;
 
 	// Pending invites occupy a seat as far as capacity goes — they are people
 	// you have already committed a place to.
