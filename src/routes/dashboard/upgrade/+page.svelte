@@ -1,407 +1,191 @@
 <script>
+	/**
+	 * Plans — one card per purchasable tier, three facts each, no feature matrix.
+	 *
+	 * A comparison table asks the reader to diff twenty rows to answer one
+	 * question: which of these do I need. The limits that actually differ are
+	 * renders, templates and seats, so those are the card, and everything else
+	 * is left to the docs rather than padded into checkmarks.
+	 *
+	 * Prices come from /products (Lemon Squeezy), never from constants — a
+	 * hardcoded price is a lie the moment billing changes it.
+	 */
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { user } from '../../../store/user.store';
-	import { getProducts } from '../../../api/product';
-	import Loader from '$lib/components/Loader.svelte';
 	import { analytics } from '$lib/telemetry.js';
+	import { user } from '../../../store/user.store';
+	import { plgStatus, initPLG } from '../../../store/plg.store';
+	import { getProducts } from '../../../api/product';
 	import { recordDiscountCodeUsed } from '../../../api/plg.js';
-	import {
-		PLANS,
-		FEATURES,
-		PLAN_FEATURES,
-		formatLimit,
-		normalizePlan
-	} from '../../../config/plan-features.js';
+	import { PLAN_FEATURES, FEATURES, normalizePlan } from '../../../config/plan-features.js';
 
-	let isLoading = true;
-	let allPlans = [];
-	let error = null;
-	let showAnnual = false;
-	// Record a discount intent once per page visit, even if the user clicks
-	// multiple plan cards before navigation completes.
-	let discountRecorded = false;
+	let loaded = false;
+	let products = [];
+	let annual = false;
 
-	$: isLoggedIn = !!$user.email;
-	$: currentPlan = $user.currentPlan || 'starter';
-	$: isFreeTier = currentPlan.toLowerCase() === 'starter';
+	$: discountCode = $page.url.searchParams.get('discount') || '';
+	$: currentPlan = normalizePlan($plgStatus?.plan || 'starter');
 
-	// Read discount code from URL params (only apply for free tier users)
-	$: discountCodeParam = $page.url.searchParams.get('discount');
-	$: discountCode = isFreeTier ? discountCodeParam : null;
-	$: source = $page.url.searchParams.get('source');
+	// Only tiers that are actually purchasable: the free tier is the account's
+	// current state rather than something to buy, and legacy products are not
+	// offered to new buyers (same filter v1 applied). The board drew four cards
+	// but /products returns three sellable plans — the board was illustrative,
+	// the data is the truth, so the grid renders what exists.
+	const FEATURED = ['basic', 'standard', 'pro', 'business'];
+	$: cards = products
+		.filter((p) => p.purchase_url || p.purchase_url_annual)
+		.map((p) => {
+			const slug = normalizePlan(p.name);
+			const features = PLAN_FEATURES[slug] || {};
+			return {
+				slug,
+				name: p.name,
+				price: annual ? p.price_annual_formatted : p.price_formatted,
+				url: annual ? p.purchase_url_annual : p.purchase_url,
+				// `null` in plan-features means UNLIMITED, not missing — treating it
+				// as absent silently understated every paid tier's best feature.
+				limits: [
+					`${(p.request_per_month || 0).toLocaleString()} renders a month`,
+					FEATURES.TEMPLATES_SAVED in features
+						? features[FEATURES.TEMPLATES_SAVED] === null
+							? 'Unlimited saved templates'
+							: `${features[FEATURES.TEMPLATES_SAVED]} saved templates`
+						: null,
+					FEATURES.TEAM_SEATS in features
+						? features[FEATURES.TEAM_SEATS] === null
+							? 'Unlimited team seats'
+							: `${features[FEATURES.TEAM_SEATS]} team seat${features[FEATURES.TEAM_SEATS] === 1 ? '' : 's'}`
+						: null
+				].filter(Boolean),
+				isCurrent: slug === currentPlan
+			};
+		})
+		.filter((c) => FEATURED.includes(c.slug))
+		.slice(0, 4);
 
-	// Read billing preference from URL (from pricing page)
-	$: billingParam = $page.url.searchParams.get('billing');
-	$: if (billingParam === 'annual' && !showAnnual) {
-		showAnnual = true;
-	}
+	// "Most picked" is the middle of the offered range rather than a hardcoded
+	// tier, so removing a product doesn't leave the badge on nothing.
+	$: recommended = cards.length > 2 ? cards[Math.min(1, cards.length - 1)].slug : null;
 
-	// Paid tiers matching the pricing page: Basic, Pro (product may be named
-	// "Standard" or "Pro" by the store), Business. Legacy Professional is
-	// excluded — grandfathered users only.
-	const legacyPlanNames = ['Professional'];
-	const featuredPlanNames = ['Basic', 'Standard', 'Pro', 'Business'];
-
-	$: featuredPlans = allPlans
-		.filter((p) => !legacyPlanNames.includes(p.name))
-		.filter((p) => featuredPlanNames.includes(p.name));
-
-	// The Pro tier's store product has been named both "Standard" and "Pro"
-	const isProTier = (plan) => normalizePlan(plan?.name) === PLANS.STANDARD;
-	const displayName = (plan) => (isProTier(plan) ? 'Pro' : plan.name);
-
-	// Get plan features from central config
-	function getQuotas(planName) {
-		const planId = normalizePlan(planName);
-		const features = PLAN_FEATURES[planId] || PLAN_FEATURES[PLANS.STARTER];
-		return {
-			renders: features[FEATURES.RENDERS],
-			templates: features[FEATURES.TEMPLATES_SAVED],
-			// ONE monthly AI credit pool (copilot for templates & video, AI video
-			// generation, captions) — a separate pool from render credits.
-			aiCredits: features[FEATURES.AI_CREDITS],
-			batchRender: features[FEATURES.BATCH_RENDER],
-			teamSeats: features[FEATURES.TEAM_SEATS]
-		};
-	}
-
-	// Format feature value for display
-	function formatFeatureValue(value) {
-		if (value === null) return '∞';
-		if (value === true) return '✓';
-		if (value === false) return '–';
-		return formatLimit(value);
+	function checkout(card) {
+		if (!card.url || card.isCurrent) return;
+		const params = [];
+		if ($user?.email) params.push(`checkout[email]=${encodeURIComponent($user.email)}`);
+		if ($user?._id) params.push(`checkout[custom][user_id]=${encodeURIComponent($user._id)}`);
+		if ($user?.activeTeam) params.push(`checkout[custom][team_uid]=${encodeURIComponent($user.activeTeam)}`);
+		if (discountCode) {
+			params.push(`checkout[discount_code]=${encodeURIComponent(discountCode)}`);
+			recordDiscountCodeUsed(discountCode, 'plans_page').catch(() => {});
+		}
+		const url = params.length ? `${card.url}?${params.join('&')}` : card.url;
+		analytics.track('plan_checkout_started', { plan: card.slug, annual });
+		window.location.href = url;
 	}
 
 	onMount(async () => {
-		// Track pricing page view from dashboard
-		analytics.trackPricingViewed({ source: 'dashboard_upgrade' });
-		analytics.track('checkout_page_loaded', {
-			source: source || 'dashboard_upgrade',
-			current_plan: currentPlan,
-			discount_code: discountCode || null
-		});
-
+		initPLG();
 		try {
-			const response = await getProducts();
-			allPlans = (response?.data ?? [])
-				.filter((plan) => plan && typeof plan.request_per_month === 'number')
-				.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-		} catch (err) {
-			error = 'Failed to load pricing plans. Please try again.';
+			const res = await getProducts();
+			products = res?.data || res?.products || [];
 		} finally {
-			isLoading = false;
+			loaded = true;
 		}
+		analytics.track('plans_v2_viewed', { current: currentPlan });
 	});
-
-	function formatRequests(value) {
-		const numeric = typeof value === 'number' ? value : Number(value ?? 0);
-		if (Number.isNaN(numeric)) return '-';
-		if (numeric >= 1_000_000) return `${(numeric / 1_000_000).toFixed(0)}M`;
-		if (numeric >= 1_000) return `${(numeric / 1_000).toFixed(numeric % 1_000 === 0 ? 0 : 1)}K`;
-		return numeric.toString();
-	}
-
-	function isPlanCurrent(plan) {
-		return normalizePlan(plan?.name) === normalizePlan(currentPlan);
-	}
-
-	function handlePurchase(plan) {
-		if (!plan) return;
-
-		// Use annual URL if available and annual billing is selected
-		const purchaseUrl =
-			showAnnual && plan.purchase_url_annual ? plan.purchase_url_annual : plan.purchase_url;
-
-		// Track upgrade started
-		analytics.trackUpgradeStarted({
-			plan: plan.name,
-			source: source || 'dashboard_upgrade',
-			price: plan.price,
-			requests: plan.request_per_month,
-			current_plan: currentPlan,
-			discount_code: discountCode,
-			billing_interval: showAnnual ? 'annual' : 'monthly'
-		});
-
-		if (!isLoggedIn) {
-			window.location.href = `/signup?redirect=${purchaseUrl ?? '/dashboard/api-token'}`;
-			return;
-		}
-		if (purchaseUrl) {
-			let checkoutUrl = purchaseUrl;
-
-			// Append custom data for reliable user identification in webhooks
-			// This ensures the webhook knows which user/team to update, avoiding email mismatch issues
-			const customParams = [];
-
-			// Always include user ID for reliable webhook processing
-			if ($user._id) {
-				customParams.push(`checkout[custom][user_id]=${encodeURIComponent($user._id)}`);
-			}
-
-			// Include team UID if user is on a team
-			if ($user.activeTeam) {
-				customParams.push(`checkout[custom][team_uid]=${encodeURIComponent($user.activeTeam)}`);
-			}
-
-			// Append discount code to LemonSqueezy checkout URL if present
-			if (discountCode) {
-				customParams.push(`checkout[discount_code]=${encodeURIComponent(discountCode)}`);
-				// Also pass through custom_data so the webhook can attribute the code on subscription_created
-				customParams.push(`checkout[custom][discount_code]=${encodeURIComponent(discountCode)}`);
-				// Fire-and-forget: record on plgEngagement.discountCodesUsed.
-				// Best-effort attribution at intent-to-checkout time — the webhook can confirm later.
-				// Guard against double-recording on rapid multi-card clicks before navigation.
-				if (!discountRecorded) {
-					discountRecorded = true;
-					recordDiscountCodeUsed(discountCode, {
-						plan: plan.name,
-						source: source || 'dashboard_upgrade'
-					});
-				}
-			}
-
-			// Join all parameters with the checkout URL
-			if (customParams.length > 0) {
-				const separator = checkoutUrl.includes('?') ? '&' : '?';
-				checkoutUrl = `${checkoutUrl}${separator}${customParams.join('&')}`;
-			}
-
-			window.location.href = checkoutUrl;
-		} else {
-			goto('/dashboard/api-token');
-		}
-	}
 </script>
 
-<svelte:head>
-	<title>Upgrade Plan - Pictify.io</title>
-</svelte:head>
+<svelte:head><title>Plans | Pictify.io</title></svelte:head>
 
-<section class="min-h-full max-w-5xl mx-auto flex flex-col pt-4">
-	<!-- Discount Banner -->
-	{#if discountCode}
-		<div
-			class="mb-8 p-4 bg-brand-success/10 border-[3px] border-brand-success rounded-2xl flex items-center gap-4 shadow-[4px_4px_0_0_#10b981]"
-		>
-			<div
-				class="w-12 h-12 bg-brand-success rounded-xl border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
-			>
-				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
-					/>
-				</svg>
-			</div>
-			<div>
-				<p class="font-black text-gray-900 text-lg uppercase tracking-tight">
-					Code Applied: <span class="text-brand-success">{discountCode}</span>
-				</p>
-				<p class="text-sm font-bold text-gray-600">
-					Your discount will be applied at checkout automatically.
-				</p>
-			</div>
-		</div>
-	{/if}
-
-	<!-- Header -->
-	<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
-		<div>
-			<div
-				class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
-			>
-				<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full" />
-				Pricing Plans
-			</div>
-			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-2">
-				Upgrade Your <span class="text-gray-900">Plan</span>
+<div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
+	<div class="mx-auto flex max-w-page flex-col gap-6">
+		<div class="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
+			<h1 class="font-display text-[44px] font-extrabold leading-[44px] tracking-[-0.02em] text-brand-ink">
+				Plans
 			</h1>
-			<p class="text-gray-600 font-bold text-sm sm:text-base">
-				Unlock more renders, AI generations, and features
-			</p>
-		</div>
-
-		<!-- Monthly/Annual Toggle -->
-		<div class="flex flex-col items-start md:items-end gap-2 shrink-0">
-			<div
-				class="flex items-center p-1 bg-gray-100 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
-			>
-				<button
-					class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all {showAnnual
-						? 'text-gray-500 hover:text-gray-700'
-						: 'bg-white text-gray-900 shadow-brutal-sm border-2 border-gray-900'}"
-					on:click={() => (showAnnual = false)}
-				>
-					Monthly
-				</button>
-				<div class="relative">
-					<button
-						class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all {showAnnual
-							? 'bg-brand-accent text-gray-900 shadow-brutal-sm border-2 border-gray-900'
-							: 'text-gray-500 hover:text-gray-700'}"
-						on:click={() => (showAnnual = true)}
-					>
-						Annual
-					</button>
-					{#if !showAnnual}
-						<span
-							class="absolute -top-3 -right-3 px-1.5 py-0.5 bg-brand-success text-white text-[10px] font-black uppercase tracking-widest rounded border-2 border-gray-900 shadow-brutal-sm rotate-12"
+			<div class="flex items-center gap-3">
+				<div class="flex gap-1.5" role="group" aria-label="Billing period">
+					{#each [{ v: false, l: 'MONTHLY' }, { v: true, l: 'ANNUAL' }] as opt (opt.l)}
+						<button
+							type="button"
+							on:click={() => (annual = opt.v)}
+							aria-pressed={annual === opt.v}
+							class="rounded-btn border px-3.5 py-1.5 font-mono text-[11px] tracking-[0.06em] {annual === opt.v
+								? 'border-brand-ink bg-brand-field font-medium text-brand-ink'
+								: 'border-brand-rule text-brand-slate hover:border-brand-ink'}"
 						>
-							-20%
-						</span>
-					{/if}
+							{opt.l}
+						</button>
+					{/each}
 				</div>
+				<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">
+					Annual = 2 months free
+				</span>
 			</div>
-			{#if showAnnual}
-				<p
-					class="text-[10px] font-black text-brand-success uppercase tracking-widest bg-brand-success/10 px-2 py-0.5 rounded border-2 border-brand-success"
-				>
-					Save 20% with annual billing
-				</p>
-			{/if}
 		</div>
-	</div>
 
-	<div class="flex-1 flex flex-col">
-		{#if isLoading}
-			<div
-				class="flex flex-col items-center justify-center py-16 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
-			>
-				<Loader size="10" show={true} />
-				<p class="text-gray-900 font-bold mt-4 text-sm uppercase tracking-widest">
-					Loading plans...
-				</p>
+		{#if !loaded}
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-hidden="true">
+				{#each Array(4) as _}
+					<div class="h-[280px] animate-pulse rounded-card bg-brand-canvas"></div>
+				{/each}
 			</div>
-		{:else if error}
-			<div
-				class="flex flex-col items-center justify-center py-12 flex-1 bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl"
-			>
-				<div
-					class="w-12 h-12 bg-brand-danger/20 rounded-xl border-[3px] border-brand-danger flex items-center justify-center mb-4"
-				>
-					<svg class="w-6 h-6 text-brand-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2.5"
-							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-						/>
-					</svg>
-				</div>
-				<p class="text-gray-900 font-black text-lg uppercase tracking-tight mb-2">
-					Something went wrong
-				</p>
-				<p class="text-gray-600 font-medium text-sm">{error}</p>
-			</div>
+		{:else if cards.length === 0}
+			<p class="py-6 font-sans text-sm text-brand-slate">
+				Plans aren't loading right now. Refresh, or contact support if it persists.
+			</p>
 		{:else}
-			<!-- Featured Plans (3-tier: Basic, Pro, Business) -->
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-				{#each featuredPlans as plan (plan.name + '-' + showAnnual)}
-					{@const isCurrent = isPlanCurrent(plan)}
-					{@const isPopular = isProTier(plan)}
-					{@const quotas = getQuotas(plan.name)}
-					{@const displayPrice =
-						showAnnual && plan.price_annual != null ? plan.price_annual : plan.price}
-					{@const monthlySavings = plan.price_annual != null ? plan.price - plan.price_annual : 0}
-
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+				{#each cards as card (card.slug)}
+					{@const isRec = card.slug === recommended && !card.isCurrent}
 					<div
-						class="flex flex-col relative bg-white rounded-2xl border-[3px] {isPopular
-							? 'border-brand-danger shadow-[8px_8px_0_0_#ff6b6b]'
-							: 'border-gray-900 shadow-brutal-2xl'} {isCurrent ? 'opacity-70' : ''}"
+						class="flex h-full flex-col gap-4 rounded-card p-5 {isRec
+							? 'border-2 border-brand-ink'
+							: 'border border-brand-rule'}"
 					>
-						{#if isPopular}
-							<div
-								class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-brand-danger text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
-							>
-								Most Popular
-							</div>
-						{/if}
-
-						<div class="p-6 sm:p-8 flex-1 flex flex-col">
-							<div class="mb-6">
-								<h3 class="text-3xl font-black text-gray-900 uppercase tracking-tight mb-2">
-									{displayName(plan)}
-								</h3>
-								<div class="flex items-baseline gap-2 mb-1">
-									<span class="text-5xl font-black text-gray-900 tracking-tighter"
-										>${displayPrice}</span
-									>
-									<span class="text-sm font-bold text-gray-500 uppercase">/mo</span>
-									{#if showAnnual && monthlySavings > 0}
-										<span class="text-lg text-gray-400 font-bold line-through ml-2 decoration-2"
-											>${plan.price}</span
-										>
-									{/if}
-								</div>
-								{#if showAnnual && monthlySavings > 0}
-									<p class="text-sm text-brand-success font-black uppercase tracking-widest">
-										Save ${monthlySavings * 12}/year
-									</p>
-								{:else}
-									<p class="text-sm text-gray-500 font-bold uppercase tracking-widest">
-										{formatRequests(plan.request_per_month)} renders/mo
-									</p>
-								{/if}
-							</div>
-
-							{#if isCurrent}
-								<button
-									disabled
-									class="w-full py-4 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed mb-8"
-								>
-									Current Plan
-								</button>
-							{:else}
-								<button
-									on:click={() => handlePurchase(plan)}
-									class="w-full py-4 text-xs font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 transition-all mb-8
-										{isPopular
-										? 'bg-brand-danger text-white hover:bg-data-red shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'
-										: 'bg-brand-accent text-gray-900 hover:bg-[#ffb360] shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
-								>
-									Upgrade to {displayName(plan)}
-								</button>
+						<div class="flex items-center gap-2">
+							<span class="font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">
+								{card.name}
+							</span>
+							{#if card.isCurrent}
+								<span class="rounded-[3px] bg-brand-powder px-[7px] py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] text-brand-royal">
+									Current
+								</span>
+							{:else if isRec}
+								<span class="rounded-[3px] bg-brand-field px-[7px] py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] text-brand-ink">
+									Most picked
+								</span>
 							{/if}
-
-							<div class="space-y-4 text-sm font-bold flex-1">
-								<div
-									class="flex items-center justify-between pb-3 border-b-2 border-dashed border-gray-200"
-								>
-									<span class="text-gray-600">Renders</span>
-									<span class="text-gray-900">{formatFeatureValue(quotas.renders)}/mo</span>
-								</div>
-								<div
-									class="flex items-center justify-between pb-3 border-b-2 border-dashed border-gray-200"
-								>
-									<span class="text-gray-600">Templates</span>
-									<span class="text-gray-900">{formatFeatureValue(quotas.templates)}</span>
-								</div>
-								<div
-									class="flex items-center justify-between pb-3 border-b-2 border-dashed border-gray-200"
-								>
-									<div class="flex flex-col">
-										<span class="text-gray-600">AI Credits</span>
-										<span class="text-[10px] text-gray-400 font-medium"
-											>Copilot (templates &amp; video), AI video generation &amp; captions</span
-										>
-									</div>
-									<span class="text-gray-900">{formatFeatureValue(quotas.aiCredits)}/mo</span>
-								</div>
-								<div class="flex items-center justify-between">
-									<span class="text-gray-600">Team Seats</span>
-									<span class="text-gray-900">{formatFeatureValue(quotas.teamSeats)}</span>
-								</div>
-							</div>
 						</div>
+
+						<span class="font-display text-[28px] font-extrabold leading-none tracking-[-0.03em] text-brand-ink">
+							{card.price}
+						</span>
+
+						<div class="flex flex-1 flex-col gap-1.5">
+							{#each card.limits as line (line)}
+								<span class="font-mono text-[11px] uppercase tracking-[0.06em] text-brand-mute">
+									{line}
+								</span>
+							{/each}
+						</div>
+
+						<button
+							type="button"
+							disabled={card.isCurrent || !card.url}
+							on:click={() => checkout(card)}
+							class="w-full rounded-btn px-4 py-2.5 font-sans text-[13.5px] font-semibold transition-opacity {card.isCurrent
+								? 'cursor-default bg-brand-subtle text-brand-mute'
+								: 'bg-brand-ink text-white hover:opacity-90'}"
+						>
+							{card.isCurrent ? 'Your plan' : `Choose ${card.name}`}
+						</button>
 					</div>
 				{/each}
 			</div>
 		{/if}
+
+		<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">
+			Payment &amp; receipts handled by Lemon Squeezy
+		</span>
 	</div>
-</section>
+</div>

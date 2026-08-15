@@ -7,6 +7,7 @@
 	 */
 	import { browser } from '$app/environment';
 	import { analytics } from '$lib/telemetry.js';
+	import { highlightToHtml, PRESS } from '$lib/utils/press-highlight.js';
 
 	/** 'api' | 'mcp' | 'automation' | 'csv' */
 	export let variant = 'api';
@@ -254,7 +255,7 @@
 							{copiedWhat === 'config' ? 'COPIED' : 'COPY'}
 						</span>
 					</span>
-					<pre class="whitespace-pre-wrap font-mono text-[10.5px] leading-[16px] text-[#9AA1AF]">{cursorConfig.replace(key, keyTail)}</pre>
+					<pre class="whitespace-pre-wrap font-mono text-[10.5px] leading-[16px]" style="color: {PRESS.text}">{@html highlightToHtml(cursorConfig.replace(key, keyTail))}</pre>
 				</button>
 			{/if}
 		</div>
@@ -270,7 +271,7 @@
 					{copiedWhat === 'snippet' ? 'COPIED' : 'COPY'}
 				</span>
 			</span>
-			<pre class="overflow-x-auto whitespace-pre font-mono text-[11.5px] leading-[18px] text-[#7D8494]">{(apiSnippets[tab] || '').replace(key, keyTail)}</pre>
+			<pre class="overflow-x-auto whitespace-pre font-mono text-[11.5px] leading-[18px]" style="color: {PRESS.text}">{@html highlightToHtml((apiSnippets[tab] || '').replace(key, keyTail))}</pre>
 		</button>
 		<span class="flex items-center gap-2 opacity-60">
 			<span class="block h-2 w-2 border-[1.5px] border-brand-press-text"></span>
