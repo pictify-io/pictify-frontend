@@ -1,232 +1,283 @@
 <script>
+	/**
+	 * Callers — everything that renders through the account, on one switchboard.
+	 *
+	 * The v1 page was a directory of logos: a grid of things you could integrate
+	 * with, none of which knew whether you actually had. This asks the opposite
+	 * question — of the ways to reach the press, which ones are running, which
+	 * has gone quiet, and which was never wired up. A caller only earns a card
+	 * because it exists as a path, and it only shows a number because renders
+	 * came through it.
+	 *
+	 * Storage connectors are deliberately absent. Delivery is not a caller.
+	 */
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { fade } from 'svelte/transition';
+	import { analytics } from '$lib/telemetry.js';
+	import CallerCard from '$lib/components/dashboard/v2/CallerCard.svelte';
+	import WebhooksTab from '$lib/components/dashboard/v2/WebhooksTab.svelte';
+	import NextStepCard from '$lib/components/dashboard/v2/NextStepCard.svelte';
+	import { getCallers } from '../../../api/media.js';
+	import { getTemplates } from '../../../api/template.js';
+	import { activeApiToken, getAPITokenAction } from '../../../store/user.store';
 
-	const integrations = [
+	// Shape, copy and glyph per caller. The stats come from the server; this is
+	// everything the server has no opinion about.
+	const CALLERS = [
 		{
-			id: 'mcp-agents',
-			name: 'MCP & Agents',
-			description:
-				'Connect Claude, Cursor, Windsurf, or any MCP client. Your agent renders images, GIFs, videos, and PDFs from natural language.',
-			iconPath: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-			category: 'Core',
-			href: '/dashboard/agents',
-			bgColor: 'bg-data-green'
+			source: 'api',
+			name: 'Your code',
+			glyph: 'M9 6L4 12l5 6M15 6l5 6-5 6',
+			tint: '#D3E7F6',
+			action: 'ROTATE KEY',
+			variant: 'api',
+			description: 'Call the render API from your backend with your key.'
 		},
 		{
-			id: 'webhooks',
-			name: 'Webhooks',
-			description: 'Receive real-time events when images are generated or templates are updated.',
-			iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
-			category: 'Core',
-			href: '/dashboard/integrations/webhooks',
-			bgColor: 'bg-brand-accent'
+			source: 'mcp',
+			name: 'Agent',
+			detail: 'Connected over MCP',
+			glyph: 'M12 4v16M4 12h16M6.8 6.8l10.4 10.4M17.2 6.8L6.8 17.2',
+			tint: '#FFD3E8',
+			action: 'MCP SETUP',
+			variant: 'mcp',
+			description: 'Hand an agent the press — it renders on your behalf over MCP.'
 		},
 		{
-			id: 'storage',
-			name: 'Storage Connectors',
-			description:
-				'Automatically upload your generated content to S3, Google Cloud, Cloudinary, or ImageKit.',
-			iconPath:
-				'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
-			category: 'Core',
-			href: '/dashboard/integrations/storage',
-			bgColor: 'bg-data-green'
+			source: 'dashboard',
+			name: 'Dashboard',
+			detail: 'You, rendering by hand',
+			glyph: 'M5 3l14 8-6.5 2L10 20 5 3z',
+			tint: '#D8F34A',
+			action: null,
+			variant: null,
+			description: 'Rendering by hand, right here.'
 		},
 		{
-			id: 'zapier',
-			name: 'Zapier',
-			description: 'Connect Pictify to 5,000+ apps like Sheets, Slack, and Airtable.',
-			iconPath: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
-			category: 'No-Code',
-			url: 'https://zapier.com/apps/pictify',
-			external: true,
-			comingSoon: true,
-			bgColor: 'bg-brand-danger'
+			source: 'automation',
+			name: 'Automation',
+			detail: 'Zapier, Make or n8n on a trigger',
+			glyph: 'M13 2L5 14h6l-2 8 8-12h-6l2-8z',
+			tint: '#A9D7F2',
+			action: 'CHECK ZAP',
+			variant: 'automation',
+			description: 'Fire a render from a Zap, scenario or workflow step.'
 		},
 		{
-			id: 'make',
-			name: 'Make.com',
-			description: 'Build complex visual automation workflows with Pictify integration.',
-			iconPath:
-				'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
-			category: 'No-Code',
-			url: 'https://make.com/en/integrations/pictify',
-			external: true,
-			comingSoon: true,
-			bgColor: 'bg-data-violet'
-		},
-		{
-			id: 'n8n',
-			name: 'n8n',
-			description: 'Fair-code workflow automation. Host it yourself or use their cloud.',
-			iconPath:
-				'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
-			category: 'Low-Code',
-			url: 'https://n8n.io/integrations/pictify',
-			external: true,
-			comingSoon: true,
-			bgColor: 'bg-[#ea580c]'
-		},
-		{
-			id: 'pipedream',
-			name: 'Pipedream',
-			description: 'Developer-friendly integration platform for serverless capabilities.',
-			iconPath: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
-			category: 'Developer',
-			url: 'https://pipedream.com/apps/pictify',
-			external: true,
-			comingSoon: true,
-			bgColor: 'bg-data-sky'
+			source: 'csv',
+			name: 'A spreadsheet',
+			detail: 'CSV batches',
+			glyph: 'M4 4h16v16H4V4zM4 10h16M4 16h16M10 4v16',
+			tint: '#E2E4DD',
+			action: null,
+			variant: 'csv',
+			description: 'Upload a CSV — one row becomes one file, up to 500 rows a batch.'
 		}
 	];
 
-	function handleCardClick(integration) {
-		if (integration.external && integration.url) {
-			window.open(integration.url, '_blank');
-		} else if (integration.href) {
-			goto(integration.href);
+	const AUTOMATION_HOME = 'https://zapier.com/apps/pictify';
+
+	let loaded = false;
+	let errorMessage = '';
+	let stats = [];
+	let windowStart = null;
+	let unattributed = 0;
+	let templates = [];
+	let setupVariant = null;
+
+	$: tab = $page.url.searchParams.get('tab') === 'webhooks' ? 'webhooks' : 'callers';
+
+	$: apiKey = $activeApiToken?.token || '';
+	$: keyMasked = apiKey ? `API key pic_live_••••${apiKey.slice(-5)}` : 'No API key yet';
+
+	$: statsBySource = Object.fromEntries((stats || []).map((s) => [s.source, s]));
+
+	/**
+	 * "Not connected" means there is nothing wired up — not merely that nothing
+	 * has rendered yet. Renders are one signal; configuration is another, and a
+	 * path you have already set up should not be offering you "Set up".
+	 *
+	 * Dashboard is always live: you are standing in it. Your code is live the
+	 * moment a key exists. MCP, automation and CSV leave no trace until they
+	 * actually call, so for those a render is the only signal we have.
+	 */
+	const configured = (source) => {
+		if (source === 'dashboard') return true;
+		if (source === 'api') return Boolean(apiKey);
+		return false;
+	};
+
+	$: callers = CALLERS.map((c) => {
+		const stat = statsBySource[c.source] || {};
+		return {
+			...c,
+			detail: c.source === 'api' ? keyMasked : c.detail,
+			connected: Boolean(stat.connected) || configured(c.source),
+			// Distinct from `connected`: has this caller ever actually rendered?
+			// Set up but idle is not the same as working, and the header count
+			// should mean working.
+			hasRendered: Boolean(stat.connected),
+			quiet: Boolean(stat.quiet),
+			quietDays: stat.quietDays ?? null,
+			renders: stat.renders ?? 0,
+			lastRenderAt: stat.lastRenderAt ?? null
+		};
+	});
+	$: liveCount = callers.filter((c) => c.hasRendered && !c.quiet).length;
+
+	// Until a full month has passed since attribution shipped, the label names
+	// the real start of the data rather than implying it covers the month.
+	$: windowLabel = windowStart
+		? `Renders since ${new Date(windowStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+		: 'Renders';
+
+	function pickTab(next) {
+		const url = new URL($page.url);
+		if (next === 'webhooks') url.searchParams.set('tab', 'webhooks');
+		else url.searchParams.delete('tab');
+		goto(`${url.pathname}${url.search}`, { replaceState: true, noScroll: true });
+		analytics.track('callers_tab_switched', { tab: next });
+	}
+
+	function handleAction(event) {
+		const caller = event.detail.caller;
+		analytics.track('callers_action_clicked', {
+			source: caller.source,
+			connected: caller.connected
+		});
+		if (caller.source === 'api' && caller.connected) {
+			goto('/dashboard/api-token');
+			return;
+		}
+		if (caller.source === 'automation' && caller.connected) {
+			window.open(AUTOMATION_HOME, '_blank', 'noopener');
+			return;
+		}
+		setupVariant = caller.variant;
+	}
+
+	async function load() {
+		errorMessage = '';
+		try {
+			const [callerData, templateData] = await Promise.all([
+				getCallers(),
+				getTemplates({ page: 1, limit: 1, sort: 'newest' }).catch(() => null)
+			]);
+			stats = callerData?.callers || [];
+			windowStart = callerData?.windowStart || null;
+			unattributed = callerData?.unattributed || 0;
+			templates = templateData?.templates || [];
+		} catch (e) {
+			errorMessage = e?.message || 'Could not load your callers.';
+		} finally {
+			loaded = true;
 		}
 	}
+
+	onMount(() => {
+		getAPITokenAction().catch(() => {});
+		load().then(() => analytics.track('callers_v2_viewed', { live: liveCount }));
+	});
 </script>
 
-<section class="min-h-full pb-12">
-	<!-- Header -->
-	<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
-		<div>
-			<div
-				class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
-			>
-				<span class="w-2 h-2 bg-brand-accent rounded-full" />
-				Directory
+<svelte:head>
+	<title>Callers | Pictify.io</title>
+</svelte:head>
+
+<div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
+	<div class="mx-auto flex max-w-page flex-col">
+		<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-end">
+			<div class="flex items-end gap-3">
+				<h1 class="font-display text-[44px] font-extrabold leading-[44px] tracking-[-0.02em] text-brand-ink">
+					Callers
+				</h1>
+				{#if loaded && tab === 'callers'}
+					<span class="pb-1 font-mono text-xs tracking-[0.06em] text-brand-mute">
+						{liveCount} LIVE
+					</span>
+				{/if}
 			</div>
-
-			<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-				Integrations
-			</h1>
-
-			<p class="text-gray-600 font-bold mt-2 text-sm sm:text-base max-w-2xl">
-				Connect Pictify to your favorite tools. Automate image generation, sync templates, and
-				stream events to your infrastructure.
+			<p class="font-sans text-sm text-brand-mute">
+				{tab === 'webhooks'
+					? 'Get a POST from Pictify every time a render finishes.'
+					: 'Everything that renders through your account.'}
 			</p>
 		</div>
 
-		<div class="text-right hidden md:block">
-			<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-				Available
-			</div>
-			<div class="text-lg sm:text-xl font-black text-gray-900 tabular-nums">
-				{integrations.filter((i) => !i.comingSoon).length} Active
-			</div>
-		</div>
-	</div>
-
-	<!-- Content -->
-	<div in:fade={{ duration: 200 }}>
-		<!-- Grid -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			{#each integrations as item}
+		<div class="flex gap-2 pt-6" role="tablist" aria-label="Callers sections">
+			{#each [{ id: 'callers', label: 'CALLERS' }, { id: 'webhooks', label: 'WEBHOOKS' }] as t (t.id)}
+				{@const active = tab === t.id}
 				<button
-					disabled={item.comingSoon}
-					on:click={() => handleCardClick(item)}
-					class="group text-left h-full relative bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-brutal-xl transition-all duration-200 flex flex-col {item.comingSoon
-						? 'opacity-75 cursor-not-allowed'
-						: 'hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px]'}"
+					type="button"
+					role="tab"
+					aria-selected={active}
+					on:click={() => pickTab(t.id)}
+					class="rounded-btn border px-4 py-2 font-mono text-xs tracking-[0.06em] {active
+						? 'border-brand-ink bg-brand-field font-medium text-brand-ink'
+						: 'border-brand-rule bg-brand-paper text-brand-slate hover:border-brand-ink'}"
 				>
-					<!-- Icon Badge -->
-					<div class="mb-6 flex justify-between items-start w-full">
-						<div
-							class={`w-14 h-14 ${item.bgColor} border-[3px] border-gray-900 rounded-lg flex items-center justify-center shadow-[3px_3px_0_0_rgba(0,0,0,0.2)] group-hover:scale-110 transition-transform duration-300`}
-						>
-							<svg
-								class="w-7 h-7 text-gray-900"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2.5"
-									d={item.iconPath}
-								/>
-							</svg>
-						</div>
-
-						{#if item.comingSoon}
-							<span
-								class="px-2 py-1 bg-yellow-100 text-yellow-700 border border-yellow-200 rounded text-[10px] font-black uppercase tracking-wider"
-							>
-								Coming Soon
-							</span>
-						{:else if item.external}
-							<span class="text-gray-400 group-hover:text-gray-900 transition-colors">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-									/></svg
-								>
-							</span>
-						{/if}
-					</div>
-
-					<!-- Text -->
-					<div class="flex-grow">
-						<h3
-							class="text-xl font-black text-gray-900 mb-2 group-hover:text-brand-danger transition-colors"
-						>
-							{item.name}
-						</h3>
-						<p class="text-sm font-bold text-gray-500 leading-relaxed">
-							{item.description}
-						</p>
-					</div>
-
-					<!-- Footer / Category -->
-					<div
-						class="mt-6 pt-4 border-t-2 border-dashed border-gray-200 w-full flex justify-between items-center"
-					>
-						<span
-							class="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded"
-						>
-							{item.category}
-						</span>
-						<span
-							class="text-xs font-bold text-gray-900 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
-						>
-							{#if item.comingSoon}
-								Available Soon
-							{:else}
-								{item.external ? 'Connect' : 'Configure'} <span aria-hidden="true">→</span>
-							{/if}
-						</span>
-					</div>
+					{t.label}
 				</button>
 			{/each}
 		</div>
 
-		<!-- Request Section -->
-		<div
-			class="mt-16 text-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl p-8"
-		>
-			<p class="text-gray-500 font-bold mb-4">Don't see the tool you use?</p>
-			<a
-				href="mailto:support@pictify.io?subject=Integration Request"
-				class="inline-flex items-center gap-2 text-sm font-black text-gray-900 border-b-2 border-gray-900 hover:text-brand-danger hover:border-brand-danger transition-colors pb-0.5"
-			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-					/></svg
-				>
-				Request an Integration
-			</a>
-		</div>
+		{#if errorMessage}
+			<p role="alert" class="mt-6 flex items-start gap-2.5 rounded-btn bg-brand-rose px-4 py-3 font-sans text-sm text-brand-ink">
+				<span class="mt-1.5 block h-2 w-2 flex-shrink-0 bg-brand-ink" aria-hidden="true"></span>
+				{errorMessage}
+			</p>
+		{/if}
+
+		{#if tab === 'webhooks'}
+			<WebhooksTab />
+		{:else if !loaded}
+			<div class="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+				{#each Array(5) as _}
+					<div class="h-[239px] animate-pulse rounded-card bg-brand-canvas"></div>
+				{/each}
+			</div>
+		{:else}
+			<div class="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2 xl:grid-cols-3">
+				{#each callers as caller (caller.source)}
+					<CallerCard {caller} {windowLabel} on:action={handleAction} />
+				{/each}
+			</div>
+
+			{#if unattributed > 0}
+				<!-- Renders made before caller attribution existed can't be assigned
+				     to a card. Saying so beats letting a busy account read as five
+				     dead integrations. -->
+				<p class="pt-4 font-mono text-xs tracking-[0.06em] text-brand-mute">
+					Counts start {new Date(windowStart).toLocaleDateString('en-US', {
+						month: 'short',
+						day: 'numeric'
+					})} — {unattributed.toLocaleString()} older render{unattributed === 1 ? " isn't" : "s aren't"} attributed to a caller.
+				</p>
+			{/if}
+
+			{#if setupVariant}
+				<div class="flex flex-col gap-3 pt-8">
+					<div class="flex items-center justify-between">
+						<span class="font-mono text-[11px] uppercase tracking-[0.12em] text-brand-mute">
+							Set up — {CALLERS.find((c) => c.variant === setupVariant)?.name}
+						</span>
+						<button
+							type="button"
+							on:click={() => (setupVariant = null)}
+							class="font-sans text-[13px] font-semibold text-brand-slate underline underline-offset-[3px]"
+						>
+							Close
+						</button>
+					</div>
+					<NextStepCard
+						variant={setupVariant}
+						{apiKey}
+						templateName={templates[0]?.name || ''}
+						variables={templates[0]?.variables || []}
+					/>
+				</div>
+			{/if}
+		{/if}
 	</div>
-</section>
+</div>
