@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme variables for the vendored timeline's CANVAS layer.
+ *
+ * The timeline draws its tracks and ruler into a Fabric canvas, so Tailwind
+ * classes cannot reach them. The vendor's own theming hook reads these four
+ * CSS custom properties off the document and falls back to its upstream dark
+ * values when they are missing — which is what had been happening, because
+ * nothing in this app ever defined them. That left a dark track bar and grey
+ * ruler ticks sitting under an otherwise light studio.
+ *
+ * These are the vendor's hook, not our palette's: only the four names it looks
+ * for belong here. Everything else the vendored React tree uses is a Tailwind
+ * semantic token, remapped in tailwind.config.js. */
+:root {
+	--muted: #f4f6f4; /* brand-subtle — empty track ground */
+	--muted-foreground: #8a8a85; /* brand-mute — "drag media here", ruler labels */
+	--border: #e5e7eb; /* brand-rule — ruler ticks and lane hairlines */
+	--card: #ffffff; /* brand-paper */
+}
+
 /* Laptop density: the type/spacing scale is tuned for large displays and reads
  * "zoomed in" on typical laptops. Tailwind sizes are rem-based, so scaling the
  * root font-size scales text AND spacing proportionally, app-wide. Pixel-based

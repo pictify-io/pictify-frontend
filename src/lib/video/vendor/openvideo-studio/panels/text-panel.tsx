@@ -75,7 +75,13 @@ export default function PanelText() {
             <button
               key={index}
               onClick={() => handleAddText(preset)}
-              className="group relative flex aspect-[3/2] w-full items-center justify-center overflow-hidden rounded border border-border bg-muted/60 p-2 transition-colors hover:border-primary/50 hover:bg-accent"
+              // Deliberately NOT a semantic token: this tile is a preview
+              // surface, not chrome. Nine of the ten presets are white text
+              // (they are meant to sit over footage), so when the semantic
+              // remap turned `bg-muted` from dark to near-white the previews
+              // became white-on-white. A dark ground is both readable and
+              // honest about what the preset actually looks like.
+              className="group relative flex aspect-[3/2] w-full items-center justify-center overflow-hidden rounded border border-border bg-brand-press p-2 transition-colors hover:border-brand-ink"
               title={`Add ${preset.name}`}
             >
               <PresetPreview preset={preset} />

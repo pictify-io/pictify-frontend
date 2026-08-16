@@ -1471,9 +1471,17 @@
 			class="studio-card flex h-full w-[264px] shrink-0 flex-col overflow-hidden rounded-card bg-brand-paper"
 		></div>
 
+		<!--
+			No fixed width: the rail island is the icon strip AND the library
+			drawer it opens, as siblings in one flex row. Pinning the card to the
+			strip's 64px put the drawer outside a card that clips, so every tool
+			button looked dead — it was opening a panel into the void. Sizing to
+			content lets the card widen into the drawer and shrink back when it
+			closes, which is also what the flyout is supposed to look like.
+		-->
 		<div
 			bind:this={railEl}
-			class="studio-card h-full w-16 shrink-0 overflow-hidden rounded-card bg-brand-paper"
+			class="studio-card h-full shrink-0 overflow-hidden rounded-card bg-brand-paper"
 		></div>
 
 		<div bind:this={canvasWrapEl} class="relative min-w-0 flex-1 overflow-hidden {STAGE} {Z.canvas}">

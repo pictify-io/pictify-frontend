@@ -333,32 +333,35 @@
 	});
 </script>
 
-<div class="flex h-full min-h-0 w-full">
+<!-- gap-4, matching the timeline kind: the two kinds are the same studio, so
+     the chat panel floats as its own card with the stage showing between them
+     rather than the two running together as one white slab. -->
+<div class="flex h-full min-h-0 w-full gap-4">
 	{#if showPane}
 		<!--
 			Chat first, code behind a tab. The composition is edited by describing
 			the change; the source is there for anyone who wants it, but it is no
 			longer the first thing the editor puts in front of you.
 		-->
-		<div class="flex min-h-0 w-[42%] max-w-[560px] flex-col border-r-[3px] border-black bg-gray-950">
-			<div class="flex shrink-0 items-center gap-1 border-b border-gray-800 px-2 py-1.5">
+		<div class="studio-card flex min-h-0 w-[42%] max-w-[560px] flex-col overflow-hidden rounded-card bg-brand-paper">
+			<div class="flex shrink-0 items-center gap-1 border-b border-brand-rule px-2 py-1.5">
 				{#each [['chat', 'Chat'], ['code', 'Code']] as [id, label] (id)}
 					<button
 						type="button"
 						on:click={() => (pane = id)}
-						class="rounded px-2 py-1 text-[10px] font-black uppercase tracking-widest transition-colors
-							{pane === id ? 'bg-gray-800 text-brand-accent' : 'text-gray-500 hover:text-gray-300'}"
+						class="rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] transition-colors
+							{pane === id ? 'bg-brand-subtle text-brand-ink' : 'text-brand-mute hover:text-brand-ink'}"
 					>
 						{label}
 					</button>
 				{/each}
 				<span
-					class="ml-auto rounded px-1.5 py-0.5 text-[10px] font-black uppercase tracking-widest
+					class="ml-auto rounded px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-[0.08em]
 						{status === 'live'
-						? 'bg-brand-success/15 text-brand-success'
+						? 'bg-brand-proof/15 text-brand-proof'
 						: status === 'error'
-							? 'bg-brand-danger/15 text-brand-danger'
-							: 'bg-gray-800 text-gray-400'}"
+							? 'bg-brand-alarm/15 text-brand-alarm'
+							: 'bg-brand-subtle text-brand-slate'}"
 				>
 					{status === 'live' ? 'Live' : status === 'error' ? 'Error' : 'Compiling'}
 				</span>
@@ -378,7 +381,7 @@
 					<!-- Line numbers scroll with the textarea rather than in their own box. -->
 					<div
 						bind:this={gutterEl}
-						class="ov-gutter shrink-0 overflow-hidden bg-gray-900 py-3 pl-3 pr-2 text-right font-mono text-[11px] leading-[1.55] text-gray-600"
+						class="ov-gutter shrink-0 overflow-hidden bg-brand-subtle py-3 pl-3 pr-2 text-right font-mono text-[11px] leading-[1.55] text-brand-mute"
 						aria-hidden="true"
 					>
 						{#each Array(lineCount) as _, i (i)}
@@ -395,14 +398,14 @@
 						autocomplete="off"
 						autocapitalize="off"
 						aria-label="Composition source"
-						class="ov-code min-h-0 flex-1 resize-none bg-gray-950 py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55] text-gray-100 outline-none"
+						class="ov-code min-h-0 flex-1 resize-none bg-brand-paper py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55] text-brand-ink outline-none"
 					></textarea>
 				</div>
 
 				{#if compileErrors.length}
-					<div class="max-h-40 shrink-0 overflow-y-auto border-t-[3px] border-black bg-brand-danger/10 p-3">
+					<div class="max-h-40 shrink-0 overflow-y-auto border-t border-brand-rule bg-brand-alarm/10 p-3">
 						{#each compileErrors as error (error)}
-							<p class="font-mono text-[11px] leading-snug text-brand-danger">{error}</p>
+							<p class="font-mono text-[11px] leading-snug text-brand-alarm">{error}</p>
 						{/each}
 					</div>
 				{/if}
@@ -410,7 +413,7 @@
 		</div>
 	{/if}
 
-	<div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-gray-950">
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
 		<div class="flex min-h-0 flex-1 items-center justify-center p-4">
 			<div
 				bind:this={playerEl}
@@ -426,12 +429,12 @@
 				two numbers are safely editable from a UI; the rest of a Remotion
 				scene is arithmetic on the frame with no timeline representation.
 			-->
-			<div class="shrink-0 border-t-[3px] border-black bg-gray-900 px-3 py-2" data-testid="sequence-track">
+			<div class="shrink-0 border-t border-brand-rule bg-brand-subtle px-3 py-2" data-testid="sequence-track">
 				<div class="mb-1.5 flex items-baseline justify-between">
-					<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+					<span class="text-[10px] font-mono uppercase tracking-[0.08em] text-brand-slate">
 						Beats
 					</span>
-					<span class="text-[10px] font-bold text-gray-500">
+					<span class="text-[10px] font-bold text-brand-mute">
 						{#if editableBars === bars.length}
 							Drag to retime
 						{:else}
@@ -455,8 +458,8 @@
 								on:pointerdown={(e) => startDrag(e, bar, 'move')}
 								class="absolute top-0 flex h-6 items-center rounded border-[2px] px-1.5 text-[10px] font-bold
 									{bar.editable
-									? 'cursor-grab border-black bg-brand-accent text-black active:cursor-grabbing'
-									: 'cursor-not-allowed border-gray-700 bg-gray-800 text-gray-400'}"
+									? 'cursor-grab border-brand-rule bg-brand-field text-black active:cursor-grabbing'
+									: 'cursor-not-allowed border-brand-rule bg-brand-subtle text-brand-slate'}"
 								style="left: {bar.left * 100}%; width: max(28px, {bar.width * 100}%);"
 							>
 								<span class="truncate">{bar.label || `Beat ${bar.index + 1}`}</span>
