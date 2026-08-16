@@ -13,6 +13,7 @@
  * (shapes, effects), then captions, which are generated from clips that are
  * already there and so can only be the last step.
  */
+import * as React from "react";
 import { create } from "zustand";
 import { cn } from "./ui";
 import {
@@ -23,6 +24,7 @@ import {
   RiMagicLine,
   RiClosedCaptioningLine,
   RiSearchLine,
+  RiSparkling2Line,
 } from "./icons";
 import PanelText from "./panels/text-panel";
 import PanelMedia from "./panels/media-panel";
@@ -33,15 +35,24 @@ import PanelCaptions from "./panels/captions-panel";
 import PanelStock from "./panels/stock-panel";
 import PanelTranscript from "./panels/transcript-panel";
 import PanelCopilot from "./panels/copilot-panel";
+import { useCopilotActivity } from "./copilot-activity";
 
 export type Tab = "text" | "media" | "stock" | "audio" | "shapes" | "effects" | "captions" | "transcript" | "copilot";
 
+/*
+ * Say it is the FIRST item and the default-open one: describing the change is
+ * the primary edit path, and the rail should read top-to-bottom as "tell it
+ * what you want, or go get a thing yourself". A rule separates it from the
+ * libraries below because it is a different kind of action, not another
+ * drawer of assets.
+ *
+ * It shares the one flyout slot with every library — exactly one panel open at
+ * a time. It briefly had a permanently-open column of its own, which was the
+ * right instinct and the wrong trade: it cost ~264px of stage on every screen,
+ * including all the time the user was cutting clips and not talking to it.
+ */
 const tabs: { key: Tab; label: string; icon: React.ComponentType<any> }[] = [
-  // Copilot is NOT here: v2 gives it its own always-open column to the left of
-  // this rail (studioHost.mountCopilotPanel), because describing the change is
-  // the primary edit path and a primary path should not be behind a tab. The
-  // 'copilot' Tab type and PANEL_COMPONENTS entry stay so the store's existing
-  // states remain valid.
+  { key: "copilot", label: "Say it", icon: RiSparkling2Line },
   { key: "text", label: "Text", icon: RiTBoxLine },
   { key: "media", label: "Media", icon: RiImage2Line },
   { key: "stock", label: "Stock", icon: RiSearchLine },
@@ -60,7 +71,7 @@ interface ToolPanelStore {
 }
 
 export const useToolPanelStore = create<ToolPanelStore>((set, get) => ({
-  activeTab: "text",
+  activeTab: "copilot",
   isOpen: true,
   setActiveTab: (tab) => set({ activeTab: tab, isOpen: true }),
   toggle: (tab) => {
@@ -84,7 +95,10 @@ const PANEL_COMPONENTS: Record<Tab, React.ComponentType> = {
 
 export default function ToolRail() {
   const { activeTab, isOpen, toggle } = useToolPanelStore();
-  const ActivePanel = PANEL_COMPONENTS[activeTab];
+  const copilotBusy = useCopilotActivity((s) => s.busy);
+  // Copilot is rendered separately below and kept mounted, so it is excluded
+  // from the generic slot rather than looked up here.
+  const ActivePanel = activeTab === "copilot" ? null : PANEL_COMPONENTS[activeTab];
 
   return (
     <div className="flex h-full bg-background text-foreground">
@@ -96,20 +110,25 @@ export default function ToolRail() {
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key && isOpen;
+          const isCopilot = tab.key === "copilot";
           return (
+            <React.Fragment key={tab.key}>
             <button
-              key={tab.key}
               onClick={() => toggle(tab.key)}
               className={cn(
+                "relative",
+                // Say it wears ink when active, not the field green the
+                // libraries use: it is the one item that is a different kind of
+                // action, and the rule below it is only half the separation.
+                isCopilot && isActive && "bg-foreground text-background hover:bg-foreground",
                 // w-full, not w-12: the longest label ("Transcript") is wider
                 // than 48px and was being clipped to "RANSCRIPT" at both ends.
                 // Active is primary/primary-foreground (field on ink) — the old
                 // accent/primary pair became pale-green-on-near-white once the
                 // semantic tokens were re-pointed to the Repro Shop palette.
                 "flex w-full flex-col items-center gap-0.5 rounded py-2 transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                isActive && !isCopilot && "bg-primary text-primary-foreground",
+                !isActive && "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
               title={tab.label}
             >
@@ -117,15 +136,39 @@ export default function ToolRail() {
               <span className="w-full text-center text-[9px] font-bold uppercase leading-none">
                 {tab.label}
               </span>
+              {/* Progress, while you are looking somewhere else. It never pulls
+                  focus back — finishing a thought in another panel matters more
+                  than watching this one work. */}
+              {isCopilot && copilotBusy && !isActive && (
+                <span
+                  className="absolute right-1.5 top-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-brand-pink"
+                  aria-hidden="true"
+                />
+              )}
+              {isCopilot && copilotBusy && (
+                <span className="sr-only">Working</span>
+              )}
             </button>
+            {isCopilot && <div className="my-1 h-px w-8 shrink-0 bg-border" />}
+            </React.Fragment>
           );
         })}
       </div>
 
-      {/* Panel drawer */}
+      {/* Panel drawer — one slot, one panel at a time. */}
       {isOpen && (
         <div className="h-full w-64 shrink-0 border-r border-border bg-background">
-          <ActivePanel />
+          {/*
+            Copilot stays mounted and is hidden with CSS rather than swapped
+            out. Its conversation, its draft and its in-flight request all live
+            in component state, so unmounting on a tab switch would throw away
+            a run the user is waiting on — which is exactly when they are most
+            likely to go look at something else.
+          */}
+          <div className="h-full" hidden={activeTab !== "copilot"}>
+            <PanelCopilot />
+          </div>
+          {ActivePanel && <ActivePanel />}
         </div>
       )}
     </div>

@@ -50,6 +50,7 @@ import {
 import { buildCaptionClips } from "../../../captions";
 import { getGroupedFonts } from "../font-utils";
 import { fontManager } from "@openvideo/engine-pixi";
+import { useCopilotActivity } from "../copilot-activity";
 import {
   TRANSITION_OPTIONS,
   previousClip,
@@ -79,6 +80,12 @@ export default function CopilotPanel() {
   // long enough that "working…" for a minute reads as a hang; "designing",
   // "building", "reviewing" reads as progress.
   const [phase, setPhase] = React.useState("Working out what to change…");
+  // Mirror the run state out so the rail can put a dot on the Say it item
+  // while the user is looking at another tab.
+  const setActivity = useCopilotActivity((s) => s.setBusy);
+  React.useEffect(() => {
+    setActivity(busy);
+  }, [busy, setActivity]);
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const lastCount = React.useRef(0);
 

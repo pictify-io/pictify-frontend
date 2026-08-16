@@ -21,7 +21,7 @@
 	 *   2. A binding declared on a clip field that can't hold a token.
 	 */
 	import { onMount, onDestroy, tick } from 'svelte';
-	import { goto, beforeNavigate } from '$app/navigation';
+	import { goto, beforeNavigate, replaceState } from '$app/navigation';
 	import { analytics } from '$lib/telemetry.js';
 	import {
 		createVideoTemplate,
@@ -215,7 +215,16 @@
 	let canvasWrapEl;
 	/** Safe-area guides are opt-in: useful for checking, noisy for working. */
 	let showSafeAreas = false;
-	let compositionSettings = { width: 1080, height: 1920 };
+	/*
+	 * The live composition size, tracked from the engine store rather than from
+	 * `template`, which is only as fresh as the last save. Everything that
+	 * states a size — the safe-area guides, the topbar meta chip, the payload a
+	 * save sends — reads this, so they cannot disagree with the artboard.
+	 */
+	let compositionSettings = {
+		width: template?.width || 1080,
+		height: template?.height || 1920
+	};
 
 	/**
 	 * Text clips whose value runs outside its box at the current test values.
@@ -277,7 +286,6 @@
 	};
 	let timelineEl;
 	let railEl;
-	let copilotEl;
 	let propsEl;
 
 	// ── Engine handles ───────────────────────────────────────────────────
@@ -285,7 +293,6 @@
 	let timelinePanel = null;
 	let toolRail = null;
 	let propertiesPanel = null;
-	let copilotPanel = null;
 	let studioRuntime = null;
 	let unsubscribeSelection = null;
 
@@ -307,10 +314,94 @@
 	let suppressDirty = false;
 	let lastClips = null;
 	let lastTracks = null;
+	// null until the first store push, so opening a template does not read as
+	// an edit. See the settings comparison in onState.
+	let lastSettingsKey = null;
 
 	let isSaving = false;
 	let saveMessage = '';
 	let saveError = '';
+
+	// ── Autosave ─────────────────────────────────────────────────────────
+	//
+	// There is no Save button, matching the image studio. A template is a live
+	// document; asking someone to remember to press a button is asking them to
+	// lose work. 2s of quiet is long enough that a drag does not fire a save on
+	// every frame, short enough that closing the tab straight after a change is
+	// safe — and both of those edges are covered explicitly below anyway.
+	const SAVE_DEBOUNCE_MS = 2000;
+	let saveTimer = null;
+	/**
+	 * 'saved' | 'saving' | 'dirty' | 'error' | 'failed' — mirrored to the chip.
+	 * `error` means a retry is scheduled; `failed` means we have stopped trying.
+	 */
+	let saveState = 'saved';
+	let retryTimer = null;
+	let retryCount = 0;
+	// Three tries over ~20s. Past that it is not a blip, and a spinner that
+	// never resolves is worse than being told plainly that it did not work.
+	const RETRY_DELAYS_MS = [3000, 6000, 12000];
+	/** A hard stop, e.g. the plan's template cap. Retrying cannot fix it. */
+	let saveBlocked = '';
+
+	function queueSave() {
+		if (saveBlocked) return;
+		// A new edit is a new attempt: reset the backoff so a user who fixes
+		// their connection and keeps working is not stuck on a dead counter.
+		retryCount = 0;
+		clearTimeout(retryTimer);
+		clearTimeout(saveTimer);
+		saveTimer = setTimeout(() => {
+			flushSave();
+		}, SAVE_DEBOUNCE_MS);
+	}
+
+	/**
+	 * Save now, skipping the debounce. Used by Cmd+S, by Render (the server must
+	 * render what is on screen) and on the way out of the page.
+	 *
+	 * The chip follows the SERVER, never the intent: `persist` returns null on
+	 * failure and the api wrappers swallow their errors, so an optimistic
+	 * "Saved" here is exactly how a studio ends up lying about work it dropped.
+	 */
+	async function flushSave() {
+		clearTimeout(saveTimer);
+		if (saveBlocked || isSaving || !isDirty) return uid;
+		saveState = 'saving';
+		const result = await save({ silent: true, deferNavigation: true });
+		if (result) {
+			retryCount = 0;
+			clearTimeout(retryTimer);
+			saveState = 'saved';
+			// Shallow: the /new and /[uid] route nodes are different, so `goto`
+			// would remount the component and tear down the engine mid-session.
+			// The URL is the only thing that needs to change.
+			if (!template?.uid && typeof window !== 'undefined') {
+				const target = `/dashboard/video-templates/${result}/studio`;
+				if (window.location.pathname !== target) {
+					try {
+						replaceState(target, {});
+					} catch (error) {
+						/* shallow routing is a nicety; the save already landed */
+					}
+				}
+			}
+		} else if (saveBlocked) {
+			saveState = 'failed';
+		} else {
+			// The chip says RETRYING, so it has to actually retry.
+			const delay = RETRY_DELAYS_MS[retryCount];
+			if (delay === undefined) {
+				saveState = 'failed';
+			} else {
+				retryCount += 1;
+				saveState = 'error';
+				clearTimeout(retryTimer);
+				retryTimer = setTimeout(() => flushSave(), delay);
+			}
+		}
+		return result;
+	}
 
 	// ── Variables state ──────────────────────────────────────────────────
 	let testValues = {};
@@ -533,7 +624,30 @@
 							height: state.settings.height
 						};
 					}
-					if (trackDirty && (state.clips !== lastClips || state.tracks !== lastTracks)) {
+					/*
+					 * Settings count as an edit.
+					 *
+					 * This used to compare clips and tracks only, so changing the
+					 * canvas size, the frame rate or the background never marked the
+					 * document dirty — autosave had nothing to react to, and the chip
+					 * sat on SAVED while the server still held the old size. A
+					 * composition setting is as much the document as a clip is.
+					 */
+					const settingsKey = JSON.stringify([
+						state.settings?.width,
+						state.settings?.height,
+						state.settings?.fps,
+						state.settings?.duration,
+						state.settings?.backgroundColor,
+						state.settings?.bitrate
+					]);
+					const settingsChanged = lastSettingsKey !== null && settingsKey !== lastSettingsKey;
+					lastSettingsKey = settingsKey;
+
+					if (
+						trackDirty &&
+						(state.clips !== lastClips || state.tracks !== lastTracks || settingsChanged)
+					) {
 						if (!suppressDirty) {
 							markDirty();
 							// A real user edit while previewing: keep the authored copy
@@ -599,9 +713,7 @@
 				studio: editor.studio
 			});
 
-			const { mountToolRail, mountPropertiesPanel, mountCopilotPanel } = await import(
-				'$lib/video/studioHost.js'
-			);
+			const { mountToolRail, mountPropertiesPanel } = await import('$lib/video/studioHost.js');
 			toolRail = mountToolRail(railEl, {
 				core: editor.core,
 				studio: editor.studio,
@@ -652,10 +764,6 @@
 				core: editor.core,
 				studio: editor.studio
 			});
-
-			// After the rail, which is what installs the editor context and host
-			// callbacks the copilot reads.
-			if (copilotEl) copilotPanel = mountCopilotPanel(copilotEl);
 
 			// The vendored panels keep selection in a zustand store. Subscribe so
 			// the Svelte side (bindings panel) sees the same selection.
@@ -725,7 +833,6 @@
 		clearTimeout(detectTimer);
 		if (exportController) exportController.abort();
 		if (unsubscribeSelection) unsubscribeSelection();
-		if (copilotPanel) copilotPanel.destroy();
 		if (toolRail) toolRail.destroy();
 		if (propertiesPanel) propertiesPanel.destroy();
 		if (timelinePanel) timelinePanel.destroy();
@@ -737,7 +844,14 @@
 	beforeNavigate(({ cancel, willUnload }) => {
 		if (!isDirty || isSaving) return;
 		if (willUnload) return; // the beforeunload handler covers this case
-		if (!confirm('You have unsaved changes. Leave the studio and lose them?')) cancel();
+		// Autosave means a pending change is a debounce away, not lost work — so
+		// flush it and let them go. The prompt is kept ONLY for the case autosave
+		// cannot rescue: a save the server has refused outright.
+		if (!saveBlocked) {
+			flushSave();
+			return;
+		}
+		if (!confirm(`${saveBlocked} Leave anyway and lose this template?`)) cancel();
 	});
 
 	function undo() {
@@ -755,6 +869,8 @@
 	const markDirty = () => {
 		isDirty = true;
 		saveMessage = '';
+		if (!saveBlocked) saveState = 'dirty';
+		queueSave();
 	};
 
 	// ── Variable detection ───────────────────────────────────────────────
@@ -1081,6 +1197,17 @@
 		const doc = structuredClone(filling ? authoredDoc : editor.exportProject());
 		// Never persist a binding to a variable that no longer exists.
 		pruneBindings(doc, new Set(variableDefinitions.map((v) => v.name)));
+		/*
+		 * The engine's export does not carry composition settings, but
+		 * `importProject` is what rebuilds the scene on reopen — so without this
+		 * the studio would reopen at whatever size the template row says and
+		 * quietly disagree with the document again. Stamp the live size in.
+		 */
+		doc.settings = {
+			...(doc.settings || {}),
+			width: compositionSettings.width,
+			height: compositionSettings.height
+		};
 		return doc;
 	}
 
@@ -1164,13 +1291,33 @@
 		} catch (error) {
 			// 422 carries per-error compile messages; anything else is a message.
 			const errors = error?.body?.errors || error?.errors;
-			saveError = Array.isArray(errors)
-				? errors.join('  ')
-				: error?.message || 'Could not save this template.';
+			classifySaveFailure(error);
+			saveError = saveBlocked
+				? saveBlocked
+				: Array.isArray(errors)
+					? errors.join('  ')
+					: error?.message || 'Could not save this template.';
 			return null;
 		} finally {
 			isSaving = false;
 		}
+	}
+
+	/**
+	 * A save that retrying cannot fix.
+	 *
+	 * 402 on the first create is the saved-template cap. Autosave would
+	 * otherwise re-hit it every two seconds forever, which burns requests and
+	 * tells the user nothing. Latch it, say so once, and point at the fix.
+	 */
+	function classifySaveFailure(error) {
+		if (error?.status === 402) {
+			saveBlocked =
+				"You've used every template your plan allows, so this one could not be created.";
+			clearTimeout(saveTimer);
+			return true;
+		}
+		return false;
 	}
 
 	async function persist({ publish = false, silent = false, deferNavigation = false } = {}) {
@@ -1193,8 +1340,19 @@
 				name: name.trim() || 'Untitled video',
 				projectJson,
 				variableDefinitions,
-				width: Math.round(settings.width || template?.width || 1080),
-				height: Math.round(settings.height || template?.height || 1920),
+				/*
+				 * compositionSettings first: it is tracked live off the engine
+				 * store, whereas `settings` comes from the exported document and
+				 * `template` is only as fresh as the last save. When the export
+				 * omitted settings — which it does — this fell through to
+				 * `template` and wrote the size the studio was OPENED with, so a
+				 * resize could never be persisted no matter how many times it
+				 * saved.
+				 */
+				width: Math.round(compositionSettings.width || settings.width || template?.width || 1080),
+				height: Math.round(
+					compositionSettings.height || settings.height || template?.height || 1920
+				),
 				fps,
 				durationInFrames,
 				status: publish ? 'published' : status
@@ -1244,7 +1402,8 @@
 			}
 			return uid;
 		} catch (error) {
-			saveError = error?.message || 'The save failed. Please try again.';
+			classifySaveFailure(error);
+			saveError = saveBlocked || error?.message || 'The save failed. Please try again.';
 			return null;
 		} finally {
 			isSaving = false;
@@ -1329,7 +1488,10 @@
 			// Defer the URL swap: navigating to /[uid]/studio remounts this
 			// component, and the render would be lost mid-flight.
 			const wasNew = !uid;
-			const savedUid = uid && !isDirty ? uid : await save({ silent: true, deferNavigation: true });
+			// Flush, don't just save: a debounced autosave may be pending, and the
+			// server must render what is on screen rather than what was on screen
+			// two seconds ago. flushSave keeps the chip honest while it runs.
+			const savedUid = uid && !isDirty ? uid : await flushSave();
 			if (!savedUid) throw new Error(saveError || 'Save the template before rendering.');
 			const response = await renderVideoTemplate(savedUid, {
 				variables: testValues,
@@ -1379,8 +1541,19 @@
 <svelte:window
 	on:beforeunload={(event) => {
 		if (!isDirty) return;
+		// Last chance: fire the pending save before the tab goes. It may not
+		// complete, which is why the warning still stands behind it.
+		flushSave();
 		event.preventDefault();
 		event.returnValue = '';
+	}}
+	on:keydown={(event) => {
+		// Cmd/Ctrl+S. There is no Save button, but the reflex is universal and
+		// letting the browser open its Save-page dialog here would be absurd.
+		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+			event.preventDefault();
+			flushSave();
+		}
 	}}
 />
 
@@ -1394,9 +1567,9 @@
 	<VideoTopBar
 		{name}
 		kind={template?.kind || 'timeline'}
-		saveState={isSaving ? 'saving' : isDirty || !uid ? 'dirty' : 'saved'}
-		width={template?.width || 1080}
-		height={template?.height || 1920}
+		saveState={isSaving ? 'saving' : saveState}
+		width={compositionSettings.width}
+		height={compositionSettings.height}
 		fps={template?.fps || 30}
 		durationInFrames={template?.durationInFrames || 150}
 		format={exportFormat}
@@ -1417,9 +1590,13 @@
 			{mountError}
 		</div>
 	{/if}
-	{#if saveError}
+	<!-- Suppressed while `saveBlocked` is set: the cap banner above says the same
+	     thing and offers the only action that can actually resolve it. A second
+	     copy with a "Try again" button next to it would be advising a retry that
+	     is guaranteed to fail. -->
+	{#if saveError && !saveBlocked}
 		<div
-			class="flex shrink-0 items-center gap-3 border-b-[3px] border-brand-alarm bg-brand-alarm/15 px-4 py-2 text-[11px] font-bold text-brand-alarm"
+			class="flex shrink-0 items-center gap-3 border-b border-brand-alarm bg-brand-alarm/15 px-4 py-2 text-[11px] font-bold text-brand-alarm"
 			role="alert"
 		>
 			<span class="flex-1">{saveError}</span>
@@ -1434,6 +1611,26 @@
 			</button>
 		</div>
 	{/if}
+	<!--
+		The one save failure retrying cannot fix. Stated once, with the way out,
+		instead of a chip that quietly says COULDN'T SAVE forever.
+	-->
+	{#if saveBlocked}
+		<div
+			class="flex shrink-0 items-center gap-3 border-b border-brand-rule bg-brand-rose px-4 py-2.5 text-[12px] text-brand-ink"
+			role="alert"
+		>
+			<span class="block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true"></span>
+			<span class="flex-1">{saveBlocked}</span>
+			<a
+				href="/dashboard/upgrade"
+				class="flex-shrink-0 rounded-btn bg-brand-ink px-3 py-1.5 font-sans text-[12px] font-medium text-white hover:opacity-90"
+			>
+				See plans
+			</a>
+		</div>
+	{/if}
+
 	{#if mediaWarning}
 		<div
 			class="flex shrink-0 items-center gap-3 border-b border-brand-rule bg-brand-rose px-4 py-2 text-[11px] font-bold text-brand-ink"
@@ -1476,17 +1673,6 @@
 				/>
 			</div>
 		{:else}
-		<!--
-			Copilot as the left column, always open: describing the change is the
-			primary way to edit, and a primary path does not belong behind a tab.
-			The panel itself is the vendored React island — same tool-call loop,
-			same validation — mounted here instead of inside the rail.
-		-->
-		<div
-			bind:this={copilotEl}
-			class="studio-card flex h-full w-[264px] shrink-0 flex-col overflow-hidden rounded-card bg-brand-paper"
-		></div>
-
 		<!--
 			No fixed width: the rail island is the icon strip AND the library
 			drawer it opens, as siblings in one flex row. Pinning the card to the

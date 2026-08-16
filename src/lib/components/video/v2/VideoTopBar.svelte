@@ -41,8 +41,22 @@
 	$: duration = `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 	$: meta = `${format.toUpperCase()} · ${width}×${height} · ${duration} · ${Math.round(fps)} FPS`;
 
+	/*
+	 * The chip is the truth about the SERVER, not about intent. Autosave makes
+	 * that distinction load-bearing: with no Save button this is the only thing
+	 * telling the user their work exists somewhere other than this tab, so a
+	 * failure has to say it failed and say what happens next.
+	 */
 	$: saveLabel =
-		saveState === 'error' ? 'NOT SAVED' : saveState === 'saving' ? 'SAVING' : saveState === 'dirty' ? 'UNSAVED' : 'SAVED';
+		saveState === 'failed'
+			? "COULDN'T SAVE"
+			: saveState === 'error'
+				? "COULDN'T SAVE — RETRYING"
+			: saveState === 'saving'
+				? 'SAVING…'
+				: saveState === 'dirty'
+					? 'UNSAVED'
+					: 'SAVED';
 
 	function commitName() {
 		renaming = false;
@@ -98,7 +112,7 @@
 
 	<span class="flex flex-shrink-0 items-center gap-1.5">
 		<span
-			class="block h-[7px] w-[7px] {saveState === 'error'
+			class="block h-[7px] w-[7px] {saveState === 'error' || saveState === 'failed'
 				? 'bg-brand-alarm'
 				: saveState === 'saving'
 					? 'animate-pulse bg-brand-field'
