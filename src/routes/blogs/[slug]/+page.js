@@ -1,10 +1,14 @@
 import { error, redirect } from '@sveltejs/kit';
 import { getBlog, getRecommendedBlogs } from '../../../api/blog';
-import { sanityEnabled, getSanityPost } from '$lib/sanity/client';
+import { sanityEnabled, getSanityPost, getSanityRelated } from '$lib/sanity/client';
 
 // Runs server-side (was client-only via onMount) so related posts ship in
 // the initial HTML crawlers see, instead of arriving after hydration.
-async function fetchRecommended(slug) {
+//
+// Legacy path only. The CMS path uses getSanityRelated, so a post served from
+// Sanity no longer reaches into the Mongo API for its own sidebar — that call
+// was the last thing keeping /blogs coupled to the pre-CMS backend.
+async function fetchRecommendedLegacy(slug) {
 	try {
 		const res = await getRecommendedBlogs({ slug, limit: 3 });
 		return res?.recommendedBlogs || [];
@@ -24,7 +28,13 @@ export async function load({ params, fetch }) {
 				if (matchedLegacy) {
 					throw redirect(301, `/blogs/${blog.slug}`);
 				}
-				const recommendedBlogs = await fetchRecommended(blog.slug);
+				// Never let a failed sidebar take down the article.
+				let recommendedBlogs = [];
+				try {
+					recommendedBlogs = await getSanityRelated(blog.slug, blog.tags, 3, fetch);
+				} catch (e) {
+					console.error('Sanity related-posts fetch failed:', e);
+				}
 				return { props: { blog, recommendedBlogs } };
 			}
 			// Migration moved every post into Sanity, so a clean miss here means
@@ -62,6 +72,6 @@ export async function load({ params, fetch }) {
 		throw redirect(301, `/blogs/${blog.slug}`);
 	}
 
-	const recommendedBlogs = await fetchRecommended(blog.slug || params.slug);
+	const recommendedBlogs = await fetchRecommendedLegacy(blog.slug || params.slug);
 	return { props: { blog, recommendedBlogs } };
 }

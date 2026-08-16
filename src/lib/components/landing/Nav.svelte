@@ -1,5 +1,6 @@
 <script>
 	import Wordmark from './Wordmark.svelte';
+	import { page } from '$app/stores';
 
 	export let ground = 'bg-brand-field';
 
@@ -7,10 +8,16 @@
 
 	const links = [
 		{ label: 'Formats', href: '/formats' },
+		{ label: 'Blog', href: '/blogs' },
 		{ label: 'Docs', href: '/docs' },
 		{ label: 'Pricing', href: '/pricing' },
 		{ label: 'Changelog', href: '/changelog' }
 	];
+
+	// Prefix match, so a post at /blogs/<slug> keeps Blog lit. Anchored with a
+	// boundary check so a future /blogsomething cannot claim it.
+	$: current = $page?.url?.pathname || '';
+	$: isActive = (href) => current === href || current.startsWith(`${href}/`);
 </script>
 
 <header class="w-full {ground}">
@@ -26,7 +33,13 @@
 		<ul class="hidden items-center gap-8 lg:flex">
 			{#each links as link (link.href)}
 				<li>
-					<a href={link.href} class="font-sans text-base text-brand-ink hover:underline">
+					<a
+						href={link.href}
+						aria-current={isActive(link.href) ? 'page' : undefined}
+						class="font-sans text-base text-brand-ink hover:underline {isActive(link.href)
+							? 'underline decoration-brand-ink decoration-2 underline-offset-[6px]'
+							: ''}"
+					>
 						{link.label}
 					</a>
 				</li>
