@@ -61,14 +61,15 @@
 					id: 'tpl-pdf',
 					name: 'Template → PDF',
 					method: 'POST',
-					path: () => '/pdf/render',
+					// The same render endpoint with format: 'pdf'. NOT /pdf/render —
+					// that path is FabricJS-only and answers "Template does not have
+					// FabricJS data" for every HTML template, which is all of them
+					// now. Page size comes from the template's own pdfPreset, set on
+					// the studio's format chip, so there is no per-render preset to
+					// offer here.
+					path: (uid) => `/templates/${uid || ':uid'}/render`,
 					needsTemplate: true,
-					needsPreset: true,
-					body: (vars, uid, preset) => ({
-						templateUid: uid || ':uid',
-						variables: vars,
-						options: { preset: preset || 'A4' }
-					})
+					body: (vars) => ({ variables: vars, format: 'pdf' })
 				},
 				{
 					id: 'tpl-video',
@@ -113,7 +114,6 @@
 	let openId = 'html-image';
 	let tab = 'CODE';
 	let lang = 'CURL';
-	let presets = [];
 	let sending = false;
 	let response = null;
 	let batchId = null;
@@ -172,16 +172,44 @@
 		selection = { ...selection, [call.id]: { ...(selection[call.id] || {}), [field]: value } };
 	}
 
+	/**
+	 * Send exactly the call the snippet describes.
+	 *
+	 * Bearer, not cookies. The render endpoints sit behind verifyApiToken —
+	 * `backend.post` would send the session cookie and 401, and the playground
+	 * would be demonstrating a call that does not work. Sending with the key is
+	 * also the honest thing: the pane says "your real key", so it should be the
+	 * key that authenticates.
+	 */
 	async function send() {
 		if (call.needsTemplate && !state.uid) {
 			showToast('Pick a template first.', 'error', 3000);
+			return;
+		}
+		if (!key) {
+			showToast('No API key on this account yet — create one in Settings.', 'error', 4000);
 			return;
 		}
 		sending = true;
 		response = null;
 		batchId = null;
 		try {
-			const res = await backend.post(path, bodyObj);
+			const raw = await fetch(`${PUBLIC_BACKEND_URL}${path}`, {
+				method: call.method,
+				headers: {
+					Authorization: `Bearer ${key}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(bodyObj)
+			});
+			const res = await raw.json().catch(() => ({}));
+			if (!raw.ok) {
+				// Surface the server's own words and status — a playground that
+				// flattens failures teaches nothing about the API.
+				response = { status: raw.status, ...res };
+				tab = 'RESPONSE';
+				return;
+			}
 			response = res;
 			batchId = res?.batchId || null;
 			analytics.track('playground_call_sent', { call: call.id });
@@ -199,7 +227,10 @@
 		for (let i = 0; i < 20; i++) {
 			await new Promise((r) => setTimeout(r, 2000));
 			try {
-				const status = await backend.get(`/templates/batch/${id}/results`);
+				const raw = await fetch(`${PUBLIC_BACKEND_URL}/templates/batch/${id}/results`, {
+					headers: { Authorization: `Bearer ${key}` }
+				});
+				const status = await raw.json();
 				response = { ...(response || {}), batchStatus: status };
 				if (['completed', 'failed', 'cancelled'].includes(status?.status)) return;
 			} catch {
@@ -211,7 +242,11 @@
 	async function cancelBatch() {
 		if (!batchId) return;
 		try {
-			await backend.post(`/templates/batch/${batchId}/cancel`, {});
+			await fetch(`${PUBLIC_BACKEND_URL}/templates/batch/${batchId}/cancel`, {
+				method: 'POST',
+				headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+				body: '{}'
+			});
 			showToast('Batch cancelled.', 'success', 3000);
 		} catch (e) {
 			showToast(e?.message || 'Could not cancel that batch.', 'error', 4000);
@@ -223,12 +258,6 @@
 
 	onMount(async () => {
 		getAPITokenAction().catch(() => {});
-		try {
-			const res = await backend.get('/pdf/presets');
-			presets = (res?.presets || []).map((p) => p.name);
-		} catch {
-			presets = ['A4'];
-		}
 		analytics.track('playground_v2_viewed');
 	});
 </script>
@@ -311,19 +340,6 @@
 								placeholder={call.video ? 'Select a video template…' : 'Select a template…'}
 								on:change={pickTemplate}
 							/>
-						</label>
-					{/if}
-
-					{#if call.needsPreset}
-						<label class="flex flex-col gap-1.5">
-							<span class="font-mono text-[10px] uppercase tracking-[0.1em] text-brand-mute">Preset</span>
-							<select
-								value={state.preset || 'A4'}
-								on:change={(e) => setField('preset', e.currentTarget.value)}
-								class="rounded-btn border-[1.5px] border-brand-rule px-3 py-2 font-sans text-[13px] text-brand-ink outline-none"
-							>
-								{#each presets as p (p)}<option value={p}>{p}</option>{/each}
-							</select>
 						</label>
 					{/if}
 
