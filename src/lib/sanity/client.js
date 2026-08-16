@@ -13,7 +13,21 @@ const API_VERSION = 'v2024-01-01';
 
 export const sanityEnabled = () => !!env.PUBLIC_SANITY_PROJECT_ID;
 
-export async function sanityQuery(query, params = {}, fetchFn = fetch) {
+/**
+ * `fetchFn` defaults to the PLATFORM fetch, not a caller-supplied one.
+ *
+ * Passing SvelteKit's request-scoped `fetch` here is actively wrong twice over.
+ * In a universal load it simulates CORS, so a response the browser could not
+ * read fails the load on the server too — which is how every dev session
+ * outside the project's CORS allowlist ended up silently serving the legacy
+ * Mongo blog. In a server load it decorates the request with the visitor's own
+ * headers, which Sanity's CDN answers with a 403, and which would send a
+ * reader's cookies to a third party if it did not.
+ *
+ * This is a public, cacheable GET to someone else's CDN. It wants a plain
+ * fetch and nothing else.
+ */
+export async function sanityQuery(query, params = {}, fetchFn = globalThis.fetch) {
 	const projectId = env.PUBLIC_SANITY_PROJECT_ID;
 	const dataset = env.PUBLIC_SANITY_DATASET || 'production';
 	if (!projectId) return null;
@@ -83,7 +97,7 @@ const LIST_PROJECTION = `{ ${POST_FIELDS} }`;
 const POST_PROJECTION = `{ ${POST_FIELDS}, content }`;
 
 /** One post by clean slug OR legacy slug. Returns { blog, matchedLegacy }. */
-export async function getSanityPost(slug, fetchFn = fetch) {
+export async function getSanityPost(slug, fetchFn = globalThis.fetch) {
 	const doc = await sanityQuery(
 		`*[_type == "post" && !(_id in path("drafts.**")) && (slug.current == $slug || $slug in legacySlugs)][0] ${POST_PROJECTION}`,
 		{ slug },
@@ -104,7 +118,7 @@ export async function getSanityPost(slug, fetchFn = fetch) {
  * the document's own update time puts it where it belongs without needing the
  * data fixed first.
  */
-export async function getSanityPosts(fetchFn = fetch) {
+export async function getSanityPosts(fetchFn = globalThis.fetch) {
 	const docs = await sanityQuery(
 		`*[_type == "post" && !(_id in path("drafts.**"))] | order(coalesce(publishedAt, _updatedAt) desc) ${LIST_PROJECTION}`,
 		{},
@@ -123,7 +137,7 @@ export async function getSanityPosts(fetchFn = fetch) {
  * `count(tags[@ in $tags])` is the overlap; posts with none still qualify, so a
  * post with unique tags gets neighbours instead of an empty strip.
  */
-export async function getSanityRelated(slug, tags = [], limit = 3, fetchFn = fetch) {
+export async function getSanityRelated(slug, tags = [], limit = 3, fetchFn = globalThis.fetch) {
 	const docs = await sanityQuery(
 		`*[_type == "post" && !(_id in path("drafts.**")) && slug.current != $slug]
 			| order(count(tags[@ in $tags]) desc, coalesce(publishedAt, _updatedAt) desc)

@@ -1,3 +1,9 @@
+/*
+ * SERVER load — see the note in ../+page.server.js. Universal loads run
+ * SvelteKit's CORS-simulating fetch, which failed every Sanity request from an
+ * origin outside the project's allowlist and quietly served the legacy Mongo
+ * post instead.
+ */
 import { error, redirect } from '@sveltejs/kit';
 import { getBlog, getRecommendedBlogs } from '../../../api/blog';
 import { sanityEnabled, getSanityPost, getSanityRelated } from '$lib/sanity/client';
@@ -17,13 +23,13 @@ async function fetchRecommendedLegacy(slug) {
 	}
 }
 
-export async function load({ params, fetch }) {
+export async function load({ params }) {
 	// CMS first: posts live in Sanity after the migration. Legacy
 	// punctuation-heavy slugs are stored on the doc as `legacySlugs`, so old
 	// URLs 301 to the clean slug without a hardcoded redirect map.
 	if (sanityEnabled()) {
 		try {
-			const { blog, matchedLegacy } = await getSanityPost(params.slug, fetch);
+			const { blog, matchedLegacy } = await getSanityPost(params.slug);
 			if (blog) {
 				if (matchedLegacy) {
 					throw redirect(301, `/blogs/${blog.slug}`);
@@ -31,7 +37,7 @@ export async function load({ params, fetch }) {
 				// Never let a failed sidebar take down the article.
 				let recommendedBlogs = [];
 				try {
-					recommendedBlogs = await getSanityRelated(blog.slug, blog.tags, 3, fetch);
+					recommendedBlogs = await getSanityRelated(blog.slug, blog.tags, 3);
 				} catch (e) {
 					console.error('Sanity related-posts fetch failed:', e);
 				}

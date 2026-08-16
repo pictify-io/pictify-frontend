@@ -166,6 +166,26 @@ export function formatDate(value, { month = 'short' } = {}) {
 	return date.toLocaleDateString('en-GB', { day: 'numeric', month, year: 'numeric' });
 }
 
+/**
+ * The UPDATED chip's date: "AUG 9" this year, "AUG 9, 2024" otherwise.
+ *
+ * The year is dropped only when it cannot mislead. Every post in the CMS today
+ * carries a 2026 `_updatedAt` because they were migrated together, but the
+ * moment one of them stops being touched, "UPD AUG 9" on a two-year-old page
+ * would claim freshness it does not have — which is the one thing this chip
+ * exists to tell the truth about.
+ */
+export function formatUpdated(value, now = new Date()) {
+	if (!value) return null;
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return null;
+	const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+	const day = date.getDate();
+	return date.getFullYear() === now.getFullYear()
+		? `${month} ${day}`
+		: `${month} ${day}, ${date.getFullYear()}`;
+}
+
 /** ~200 wpm, matching the CMS client's estimate so the two never disagree. */
 export function readingMinutes(post) {
 	if (post?.readingTime) return post.readingTime;

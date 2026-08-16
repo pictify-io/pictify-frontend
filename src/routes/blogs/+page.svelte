@@ -13,8 +13,9 @@
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
+	import DitherField from '$lib/components/DitherField.svelte';
 	import ProofStack from '$lib/components/blog/v2/ProofStack.svelte';
-	import { formatDate } from '$lib/blog/markdown.js';
+	import { formatUpdated } from '$lib/blog/markdown.js';
 
 	export let data;
 
@@ -116,17 +117,39 @@
 
 	<!-- ── Hero ──────────────────────────────────────────────────────── -->
 	<section class="relative w-full overflow-hidden bg-brand-field">
+		<!--
+			The same idle motion the landing hero runs: a faint dither breathing
+			across the whole field, and one cluster whose cells keep re-rendering
+			after the reveal. Both are absolutely positioned and contribute no
+			layout, so neither can shift the headline; both stop dead under
+			prefers-reduced-motion (DitherField pauses its loop, PixelCluster
+			drops the choreography entirely).
+
+			`cycle` is 3 here rather than the landing's 4: this band is shorter and
+			carries a smaller cluster, so a lower ratio keeps roughly the same
+			number of cells alive at once.
+		-->
+		<DitherField
+			colorFront="rgba(0, 0, 0, 0.06)"
+			shape="simplex"
+			type="4x4"
+			pxSize={6}
+			speed={0.12}
+			class="absolute inset-0"
+		/>
 		<PixelCluster
 			cells={heroCluster}
 			cell={22}
 			origin="e"
-			cycle={7}
+			delay={320}
+			cycle={3}
 			class="right-0 top-6 hidden lg:block"
 		/>
 		<PixelCluster
 			cells={baselineRun}
 			cell={14}
 			origin="w"
+			delay={520}
 			class="-bottom-3 left-[38%] hidden lg:block"
 		/>
 		<div class="mx-auto w-full max-w-page px-5 py-14 lg:px-10 lg:py-20">
@@ -156,7 +179,7 @@
 						type="button"
 						on:click={() => (typeFilter = t.id)}
 						aria-pressed={typeFilter === t.id}
-						class="rounded-btn border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] transition-colors {typeFilter ===
+						class="rounded-full border px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors {typeFilter ===
 						t.id
 							? 'border-brand-ink bg-brand-ink text-white'
 							: 'border-brand-rule text-brand-slate hover:border-brand-ink hover:text-brand-ink'}"
@@ -174,10 +197,10 @@
 							type="button"
 							on:click={() => (tagFilter = tagFilter === tag ? null : tag)}
 							aria-pressed={tagFilter === tag}
-							class="rounded-btn border px-2.5 py-1 font-mono text-[11px] tracking-[0.04em] transition-colors {tagFilter ===
+							class="rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors {tagFilter ===
 							tag
 								? 'border-brand-ink bg-brand-field text-brand-ink'
-								: 'border-brand-rule text-brand-slate hover:border-brand-ink hover:text-brand-ink'}"
+								: 'border-brand-rule text-brand-mute hover:border-brand-ink hover:text-brand-ink'}"
 						>
 							{tag}
 						</button>
@@ -186,7 +209,7 @@
 						<button
 							type="button"
 							on:click={() => (showAllTags = true)}
-							class="rounded-btn border border-brand-rule px-2.5 py-1 font-mono text-[11px] text-brand-mute hover:border-brand-ink hover:text-brand-ink"
+							class="rounded-full border border-brand-rule px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute hover:border-brand-ink hover:text-brand-ink"
 						>
 							+{hiddenTagCount}
 						</button>
@@ -194,14 +217,25 @@
 				</div>
 			{/if}
 
-			<div class="lg:ml-auto">
-				<label class="sr-only" for="blog-search">Search the guides</label>
+			<div class="relative lg:ml-auto">
+				<label class="sr-only" for="blog-search">Search the shelf</label>
+				<svg
+					class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-brand-mute"
+					width="13"
+					height="13"
+					viewBox="0 0 16 16"
+					fill="none"
+					aria-hidden="true"
+				>
+					<circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6" />
+					<path d="M10.8 10.8L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+				</svg>
 				<input
 					id="blog-search"
 					type="search"
 					bind:value={search}
-					placeholder="Search"
-					class="w-full rounded-btn border border-brand-rule bg-brand-paper px-3 py-1.5 font-sans text-sm text-brand-ink outline-none transition-colors placeholder:text-brand-mute focus:border-brand-ink lg:w-[220px]"
+					placeholder="Search the shelf"
+					class="w-full rounded-full border border-brand-ink bg-brand-paper py-1.5 pl-9 pr-3 font-sans text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-mute focus:shadow-[0_0_0_3px_rgba(0,120,191,0.18)] lg:w-[240px]"
 				/>
 			</div>
 		</div>
@@ -249,11 +283,11 @@
 							{(featured.author || 'P').trim().charAt(0).toUpperCase()}
 						</span>
 						<span class="font-sans text-sm text-brand-ink">{featured.author}</span>
-						{#if formatDate(featured.updatedAt)}
+						{#if formatUpdated(featured.updatedAt)}
 							<span
-								class="rounded-btn bg-brand-field px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-ink"
+								class="rounded-full border border-brand-ink bg-brand-field px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] text-brand-ink"
 							>
-								Upd {formatDate(featured.updatedAt)}
+								Updated {formatUpdated(featured.updatedAt)}
 							</span>
 						{/if}
 						{#if featured.readingTime}
@@ -311,11 +345,11 @@
 									</p>
 								{/if}
 								<div class="mt-auto flex items-center gap-2.5 pt-3">
-									{#if formatDate(post.updatedAt)}
+									{#if formatUpdated(post.updatedAt)}
 										<span
-											class="rounded-btn bg-brand-field px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-ink"
+											class="rounded-full bg-brand-field px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-ink"
 										>
-											Upd {formatDate(post.updatedAt)}
+											Upd {formatUpdated(post.updatedAt)}
 										</span>
 									{/if}
 									{#if post.readingTime}

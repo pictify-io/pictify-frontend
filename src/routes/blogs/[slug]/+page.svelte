@@ -21,6 +21,7 @@
 		extractTldr,
 		stripLeadingH1,
 		formatDate,
+		formatUpdated,
 		readingMinutes
 	} from '$lib/blog/markdown.js';
 
@@ -296,9 +297,19 @@
 		</div>
 	</header>
 
-	<!-- Hero plate, overlapping the band. -->
+	<!--
+		Hero plate, overlapping the band by 72px.
+
+		`relative z-10` is load-bearing, not decoration. The header above is
+		`relative` so it can hold the capsule deco, which puts it in the
+		positioned-elements layer — and a positioned element paints above a
+		static sibling regardless of DOM order. The plate was therefore sliding
+		UNDER the lime band, which clipped its top edge and swallowed the ink
+		border and offset shadow on that side. The overlap is the move; it only
+		reads if the plate is the thing on top.
+	-->
 	{#if blogImage}
-		<div class="mx-auto -mt-[72px] w-full max-w-[1120px] px-5 lg:px-10">
+		<div class="relative z-10 mx-auto -mt-[72px] w-full max-w-[1120px] px-5 lg:px-10">
 			<div
 				class="overflow-hidden rounded-[14px] border-[1.5px] border-brand-ink bg-brand-canvas"
 				style="box-shadow: 6px 6px 0 0 #000"
@@ -494,9 +505,9 @@
 								<span class="font-display text-[16px] font-bold leading-[1.2] text-brand-ink group-hover:underline">
 									{post.title}
 								</span>
-								{#if formatDate(post.updatedAt)}
-									<span class="mt-auto w-fit rounded-btn bg-brand-field px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-brand-ink">
-										Upd {formatDate(post.updatedAt)}
+								{#if formatUpdated(post.updatedAt)}
+									<span class="mt-auto w-fit rounded-full bg-brand-field px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-brand-ink">
+										Upd {formatUpdated(post.updatedAt)}
 									</span>
 								{/if}
 							</a>
