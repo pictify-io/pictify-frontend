@@ -38,6 +38,7 @@
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
 	import InlineTextEditor from './InlineTextEditor.svelte';
 	import RemotionStage from './RemotionStage.svelte';
+	import VideoTopBar from './v2/VideoTopBar.svelte';
 	import ClipBindingsPanel from './ClipBindingsPanel.svelte';
 	import {
 		detectReferences,
@@ -266,6 +267,7 @@
 	};
 	let timelineEl;
 	let railEl;
+	let copilotEl;
 	let propsEl;
 
 	// ── Engine handles ───────────────────────────────────────────────────
@@ -273,6 +275,7 @@
 	let timelinePanel = null;
 	let toolRail = null;
 	let propertiesPanel = null;
+	let copilotPanel = null;
 	let studioRuntime = null;
 	let unsubscribeSelection = null;
 
@@ -498,7 +501,12 @@
 				width: template?.width,
 				height: template?.height,
 				fps: template?.fps,
-				backgroundColor: '#0a0a0c',
+				// The backdrop OUTSIDE the artboard, not the video's own background.
+				// Canvas greige, so the artboard reads as a sheet on the stage the
+				// same way the image studio's proof does — and so a video with a
+				// dark background is visibly a dark video rather than blending into
+				// chrome that happens to be dark too.
+				backgroundColor: '#E2E4DD',
 				onState: (state) => {
 					canUndo = state.canUndo;
 					canRedo = state.canRedo;
@@ -577,7 +585,9 @@
 				studio: editor.studio
 			});
 
-			const { mountToolRail, mountPropertiesPanel } = await import('$lib/video/studioHost.js');
+			const { mountToolRail, mountPropertiesPanel, mountCopilotPanel } = await import(
+				'$lib/video/studioHost.js'
+			);
 			toolRail = mountToolRail(railEl, {
 				core: editor.core,
 				studio: editor.studio,
@@ -628,6 +638,10 @@
 				core: editor.core,
 				studio: editor.studio
 			});
+
+			// After the rail, which is what installs the editor context and host
+			// callbacks the copilot reads.
+			if (copilotEl) copilotPanel = mountCopilotPanel(copilotEl);
 
 			// The vendored panels keep selection in a zustand store. Subscribe so
 			// the Svelte side (bindings panel) sees the same selection.
@@ -697,6 +711,7 @@
 		clearTimeout(detectTimer);
 		if (exportController) exportController.abort();
 		if (unsubscribeSelection) unsubscribeSelection();
+		if (copilotPanel) copilotPanel.destroy();
 		if (toolRail) toolRail.destroy();
 		if (propertiesPanel) propertiesPanel.destroy();
 		if (timelinePanel) timelinePanel.destroy();
@@ -1355,181 +1370,34 @@
 	}}
 />
 
-<div class="flex h-screen w-full flex-col overflow-hidden {STAGE} text-gray-100">
-	<!-- ── Top bar ───────────────────────────────────────────────────── -->
-	<header
-		class="relative flex h-14 shrink-0 items-center gap-3 border-b-[3px] border-black px-3 transition-colors
-			{filling ? 'bg-brand-accent' : 'bg-gray-900'} {Z.dock}"
-	>
-		<a
-			href="/dashboard/template?type=video"
-			class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all focus-brutal
-				{filling
-				? 'bg-black/10 text-black hover:bg-black/20'
-				: 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-gray-100'}"
-		>
-			<i class="fa fa-arrow-left text-[10px]" aria-hidden="true"></i>
-			Templates
-		</a>
-
-		<input
-			class="min-w-0 max-w-xs flex-1 rounded-lg border-[2px] border-transparent bg-transparent px-2 py-1 text-sm font-black transition-all focus:outline-none focus-brutal
-				{filling
-				? 'text-black focus:border-black focus:bg-white/40'
-				: 'text-gray-100 focus:border-brand-accent focus:bg-gray-950'}"
-			bind:value={name}
-			on:input={markDirty}
-			aria-label="Template name"
-			placeholder="Untitled video"
-		/>
-
-		<div class="flex shrink-0 items-center gap-1">
-			<button
-				type="button"
-				on:click={undo}
-				disabled={!canUndo || isBooting}
-				title="Undo (⌘Z)"
-				aria-label="Undo"
-				class="{BUTTON_ICON} {filling ? '!bg-black/10 !text-black' : ''}"
-			>
-				<i class="fa fa-rotate-left text-[11px]" aria-hidden="true"></i>
-			</button>
-			<button
-				type="button"
-				on:click={redo}
-				disabled={!canRedo || isBooting}
-				title="Redo (⌘⇧Z)"
-				aria-label="Redo"
-				class="{BUTTON_ICON} {filling ? '!bg-black/10 !text-black' : ''}"
-			>
-				<i class="fa fa-rotate-right text-[11px]" aria-hidden="true"></i>
-			</button>
-		</div>
-
-		<span
-			class="{filling ? CHIP_ACCENT : CHIP_NEUTRAL} {filling
-				? '!bg-black !text-brand-accent'
-				: ''} hidden sm:inline-flex"
-		>
-			{status === 'published' ? 'Published' : 'Draft'}
-		</span>
-		{#if variableCount > 0}
-			<button
-				type="button"
-				on:click={() => (activeTab = 'variables')}
-				class="{filling ? '!bg-black !text-brand-accent' : CHIP_NEUTRAL} {CHIP_NEUTRAL} hidden md:inline-flex focus-brutal"
-				title="Show variables"
-			>
-				{variableCount} variable{variableCount === 1 ? '' : 's'}
-			</button>
-		{/if}
-
-		<div class="flex-1"></div>
-
-		{#if filling}
-			<span class="text-[10px] font-black uppercase tracking-widest text-black">
-				Preview values · {filledPreviewCount} applied
-			</span>
-		{:else if saveMessage}
-			<span class="text-[10px] font-black uppercase tracking-widest text-data-green">
-				{saveMessage}
-			</span>
-		{:else if isDirty}
-			<span class="text-[10px] font-black uppercase tracking-widest {TEXT_FAINT}">
-				Unsaved changes
-			</span>
-		{/if}
-
-		<!--
-			Timeline-only. A composition already renders with its values, so there is
-			no state to toggle into; leaving the button here would be a control that
-			does nothing, which is what it did before this branch existed
-			(startFilling returns early with no Pixi engine).
-		-->
-		{#if !isCode}
-		<button
-			type="button"
-			on:click={toggleFilling}
-			disabled={isBooting || (!filling && variableCount === 0)}
-			title={filling
-				? 'Go back to editing the template'
-				: variableCount === 0
-					? 'Declare a variable first'
-					: 'Show your preview values on the canvas'}
-			class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all focus-brutal disabled:opacity-40 disabled:cursor-not-allowed
-				{filling
-				? 'bg-black text-brand-accent'
-				: 'bg-gray-800 text-gray-100 hover:bg-gray-700'}"
-		>
-			<i class="fa {filling ? 'fa-eye-slash' : 'fa-eye'} text-[10px]" aria-hidden="true"></i>
-			{filling ? 'Exit preview' : 'Preview'}
-		</button>
-		{:else if variableCount > 0}
-			<span
-				class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-gray-800 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-300"
-				title="A Remotion scene always renders with your values, so there is nothing to toggle"
-			>
-				<i class="fa fa-eye text-[10px]" aria-hidden="true"></i>
-				Values live
-			</span>
-		{/if}
-
-		<button
-			type="button"
-			on:click={() => save()}
-			disabled={isSaving || isBooting || filling}
-			title={filling ? 'Exit preview to save' : 'Save this template'}
-			class="{BUTTON_SECONDARY} !px-3 !py-1.5 !text-[10px]"
-		>
-			{isSaving ? 'Saving…' : isDirty || !uid ? 'Save' : 'Saved'}
-		</button>
-
-		<!-- Output format, joined to the Render button it configures -->
-		<div
-			class="inline-flex overflow-hidden rounded-lg border-[2px] border-black"
-			role="group"
-			aria-label="Render output format"
-		>
-			{#each ['mp4', 'gif'] as option}
-				<button
-					type="button"
-					on:click={() => (exportFormat = option)}
-					disabled={isExporting}
-					aria-pressed={exportFormat === option}
-					title={option === 'gif'
-						? 'Animated GIF: renders on the server, capped at 15fps for shareable file sizes'
-						: 'MP4 video'}
-					class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors
-						{exportFormat === option
-						? 'bg-brand-accent text-black'
-						: 'bg-gray-900 text-gray-400 hover:text-white'}
-						{option === 'mp4' ? 'border-r-[2px] border-black' : ''}"
-				>
-					{option}
-				</button>
-			{/each}
-		</div>
-
-		<button
-			type="button"
-			on:click={exportVideo}
-			disabled={isExporting || isBooting}
-			class="{BUTTON_PRIMARY} !px-4 !py-1.5 !text-[10px]"
-		>
-			{#if isExporting}
-				<i class="fa fa-spinner fa-spin text-[10px]" aria-hidden="true"></i>
-				{Math.round(exportProgress * 100)}%
-			{:else}
-				<i class="fa fa-film text-[10px]" aria-hidden="true"></i>
-				Render {exportFormat.toUpperCase()}
-			{/if}
-		</button>
-	</header>
-
+<!--
+	v2 shell: everything floats as white cards on the Repro Shop canvas, the
+	same object language as the image studio. The old shell was a dark
+	full-bleed app with ink-bordered panels; two studios in one product should
+	not look like two products.
+-->
+<div class="flex h-screen w-full flex-col overflow-hidden bg-brand-canvas">
+	<VideoTopBar
+		{name}
+		kind={template?.kind || 'timeline'}
+		saveState={isSaving ? 'saving' : isDirty || !uid ? 'dirty' : 'saved'}
+		width={template?.width || 1080}
+		height={template?.height || 1920}
+		fps={template?.fps || 30}
+		durationInFrames={template?.durationInFrames || 150}
+		format={exportFormat}
+		rendering={isExporting}
+		renderDisabled={isBooting || filling}
+		on:rename={(e) => {
+			name = e.detail.name;
+			markDirty();
+		}}
+		on:render={exportVideo}
+	/>
 	<!-- ── Notices ───────────────────────────────────────────────────── -->
 	{#if mountError}
 		<div
-			class="shrink-0 border-b-[3px] border-brand-danger bg-brand-danger/15 px-4 py-2 font-mono text-[11px] font-bold text-brand-danger"
+			class="shrink-0 border-b-[3px] border-brand-alarm bg-brand-alarm/15 px-4 py-2 font-mono text-[11px] font-bold text-brand-alarm"
 			role="alert"
 		>
 			{mountError}
@@ -1537,7 +1405,7 @@
 	{/if}
 	{#if saveError}
 		<div
-			class="flex shrink-0 items-center gap-3 border-b-[3px] border-brand-danger bg-brand-danger/15 px-4 py-2 text-[11px] font-bold text-brand-danger"
+			class="flex shrink-0 items-center gap-3 border-b-[3px] border-brand-alarm bg-brand-alarm/15 px-4 py-2 text-[11px] font-bold text-brand-alarm"
 			role="alert"
 		>
 			<span class="flex-1">{saveError}</span>
@@ -1554,7 +1422,7 @@
 	{/if}
 	{#if mediaWarning}
 		<div
-			class="flex shrink-0 items-center gap-3 border-b-[3px] border-black bg-brand-accent/20 px-4 py-2 text-[11px] font-bold text-brand-accent"
+			class="flex shrink-0 items-center gap-3 border-b border-brand-rule bg-brand-rose px-4 py-2 text-[11px] font-bold text-brand-ink"
 			role="status"
 		>
 			<i class="fa fa-triangle-exclamation" aria-hidden="true"></i>
@@ -1570,8 +1438,8 @@
 		</div>
 	{/if}
 
-	<!-- ── Studio: rail | stage | panel ──────────────────────────────── -->
-	<div class="flex min-h-0 flex-1">
+	<!-- ── Studio: copilot | rail | stage | inspector ────────────────── -->
+	<div class="flex min-h-0 flex-1 gap-4 px-5 pb-4">
 		{#if isCode}
 			<!--
 				A Remotion composition has no clips, so the rail's tools (text, media,
@@ -1592,15 +1460,29 @@
 				/>
 			</div>
 		{:else}
-		<div bind:this={railEl} class="h-full shrink-0 border-r-[3px] border-black"></div>
+		<!--
+			Copilot as the left column, always open: describing the change is the
+			primary way to edit, and a primary path does not belong behind a tab.
+			The panel itself is the vendored React island — same tool-call loop,
+			same validation — mounted here instead of inside the rail.
+		-->
+		<div
+			bind:this={copilotEl}
+			class="studio-card flex h-full w-[264px] shrink-0 flex-col overflow-hidden rounded-card bg-brand-paper"
+		></div>
+
+		<div
+			bind:this={railEl}
+			class="studio-card h-full w-16 shrink-0 overflow-hidden rounded-card bg-brand-paper"
+		></div>
 
 		<div bind:this={canvasWrapEl} class="relative min-w-0 flex-1 overflow-hidden {STAGE} {Z.canvas}">
 			{#if isBooting}
 				<div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
 					<div
-						class="h-10 w-10 animate-pulse rounded-xl border-[3px] border-black bg-brand-accent shadow-brutal-sm"
+						class="h-10 w-10 animate-pulse rounded-tile border border-brand-rule bg-brand-field"
 					></div>
-					<p class="text-[10px] font-black uppercase tracking-widest {TEXT_MUTED}">
+					<p class="text-[10px] font-mono uppercase tracking-[0.08em] {TEXT_MUTED}">
 						Starting the studio
 					</p>
 				</div>
@@ -1622,8 +1504,8 @@
 				on:click={() => (showSafeAreas = !showSafeAreas)}
 				aria-pressed={showSafeAreas}
 				title="Show where Reels, TikTok and YouTube put their own interface over your video"
-				class="absolute bottom-2 right-2 z-30 rounded border-[2px] border-black px-2 py-1 text-[9px] font-black uppercase tracking-widest transition-colors
-					{showSafeAreas ? 'bg-brand-accent text-black' : 'bg-gray-900/90 text-gray-300 hover:text-white'}"
+				class="absolute bottom-2 right-2 z-30 rounded border border-brand-rule px-2 py-1 text-[9px] font-mono uppercase tracking-[0.08em] transition-colors
+					{showSafeAreas ? 'bg-brand-field text-black' : 'border border-brand-rule bg-brand-paper text-brand-slate hover:text-brand-ink'}"
 			>
 				Safe areas
 			</button>
@@ -1663,10 +1545,10 @@
 								{/if}
 							</div>
 							<div
-								class="mt-3 h-2 overflow-hidden rounded-full border-[2px] border-black bg-gray-950"
+								class="mt-3 h-2 overflow-hidden rounded-full border border-brand-rule bg-brand-subtle"
 							>
 								<div
-									class="h-full bg-brand-accent transition-[width] duration-200"
+									class="h-full bg-brand-field transition-[width] duration-200"
 									style={`width: ${Math.round(exportProgress * 100)}%`}
 								></div>
 							</div>
@@ -1677,9 +1559,9 @@
 							</p>
 						{:else if exportError}
 							<div class="flex items-start gap-3">
-								<i class="fa fa-circle-exclamation mt-0.5 text-brand-danger" aria-hidden="true"></i>
+								<i class="fa fa-circle-exclamation mt-0.5 text-brand-alarm" aria-hidden="true"></i>
 								<div class="min-w-0 flex-1">
-									<p class="text-xs font-black uppercase tracking-widest text-brand-danger">
+									<p class="text-xs font-mono uppercase tracking-[0.08em] text-brand-alarm">
 										Render failed
 									</p>
 									<p class="mt-1 text-[11px] font-bold {TEXT_MUTED}">{exportError}</p>
@@ -1711,7 +1593,7 @@
 							</div>
 						{:else}
 							<div class="flex items-center justify-between gap-3">
-								<p class="text-xs font-black uppercase tracking-widest text-data-green">
+								<p class="text-xs font-mono uppercase tracking-[0.08em] text-data-green">
 									Your {renderedFormat === 'gif' ? 'GIF' : 'video'} is ready
 								</p>
 								<button
@@ -1729,21 +1611,21 @@
 								<img
 									src={renderUrl}
 									alt="Rendered GIF"
-									class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black object-contain"
+									class="mt-3 max-h-56 w-full rounded-tile border border-brand-rule bg-black object-contain"
 								/>
 							{:else}
 								<!-- svelte-ignore a11y-media-has-caption -->
 								<video
 									controls
 									src={renderUrl}
-									class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black"
+									class="mt-3 max-h-56 w-full rounded-tile border border-brand-rule bg-black"
 								></video>
 							{/if}
 							<div class="mt-3 flex flex-wrap items-center gap-2">
 								<a
 									href={renderUrl}
 									download
-									class="{BUTTON_COMPACT} !bg-brand-accent !text-black"
+									class="{BUTTON_COMPACT} !bg-brand-field !text-black"
 								>
 									<i class="fa fa-download text-[10px]" aria-hidden="true"></i>
 									Download
@@ -1771,18 +1653,18 @@
 
 		<!-- Right panel: clip properties + variables -->
 		<aside
-			class="flex h-full w-80 shrink-0 flex-col border-l-[3px] border-black {PANEL} {Z.dock}"
+			class="studio-card flex h-full w-[300px] shrink-0 flex-col overflow-hidden rounded-card {PANEL} {Z.dock}"
 			aria-label="Inspector"
 		>
-			<div class="flex shrink-0 border-b-[3px] border-black" role="tablist">
+			<div class="flex shrink-0 border-b border-brand-rule" role="tablist">
 				<button
 					role="tab"
 					aria-selected={activeTab === 'properties'}
 					on:click={() => (activeTab = 'properties')}
-					class="flex-1 px-3 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors focus-brutal
+					class="flex-1 px-3 py-2.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors
 						{activeTab === 'properties'
-						? 'bg-gray-800 text-brand-accent'
-						: 'text-gray-400 hover:text-gray-100'}"
+						? 'bg-brand-field text-brand-ink'
+						: 'text-brand-mute hover:text-brand-ink'}"
 				>
 					Properties
 				</button>
@@ -1790,15 +1672,15 @@
 					role="tab"
 					aria-selected={activeTab === 'variables'}
 					on:click={() => (activeTab = 'variables')}
-					class="flex-1 border-l-[3px] border-black px-3 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors focus-brutal
+					class="flex-1 border-l border-brand-rule px-3 py-2.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors
 						{activeTab === 'variables'
-						? 'bg-gray-800 text-brand-accent'
-						: 'text-gray-400 hover:text-gray-100'}"
+						? 'bg-brand-field text-brand-ink'
+						: 'text-brand-mute hover:text-brand-ink'}"
 				>
 					Variables
 					{#if variableCount}
 						<span
-							class="ml-1 rounded-full border-[1.5px] border-black bg-brand-accent px-1.5 text-[9px] text-black"
+							class="ml-1 rounded-btn border border-brand-ink bg-brand-paper px-1.5 text-[9px] text-brand-ink"
 						>
 							{variableCount}
 						</span>
@@ -1865,9 +1747,11 @@
 	<!-- Clip-only: a Remotion composition has no tracks, and the player brings
 	     its own transport. -->
 	{#if !isCode}
-	<footer class="shrink-0 {STAGE} {Z.dock}">
+	<footer class="shrink-0 px-5 pb-4 {STAGE} {Z.dock}">
+		<!-- The grab handle sits on the canvas, above the card, so the card keeps
+		     its own uninterrupted rounded edge. -->
 		<div
-			class="h-1.5 cursor-row-resize touch-none bg-gray-900 transition-colors hover:bg-brand-accent"
+			class="mx-auto mb-1 h-1 w-16 cursor-row-resize touch-none rounded-full bg-brand-rule transition-colors hover:bg-brand-ink"
 			role="separator"
 			aria-orientation="horizontal"
 			aria-label="Resize timeline"
@@ -1878,12 +1762,12 @@
 		></div>
 		<div
 			bind:this={timelineEl}
-			class="w-full border-t-[3px] border-black"
+			class="studio-card w-full overflow-hidden rounded-card bg-brand-paper"
 			style={`height: ${timelineHeight}px`}
 		>
 			{#if isBooting}
 				<div
-					class="flex h-full items-center justify-center text-[10px] font-black uppercase tracking-widest {TEXT_FAINT}"
+					class="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.08em] {TEXT_FAINT}"
 				>
 					Loading the timeline
 				</div>
@@ -1894,15 +1778,23 @@
 </div>
 
 <style>
+	/* One card treatment for every floating panel in the studio — matches the
+	   image studio's cards so the two surfaces read as one product. */
+	:global(.studio-card) {
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+	}
+
 	/* The vendored studio panels render into plain divs from React, so their
-	   primitive styling has to be global. Accent is #ffc480 (brand-accent),
-	   not the upstream yellow. */
+	   primitive styling has to be global. These are the two primitives Tailwind
+	   cannot reach through the semantic-token remap — a range input's track and
+	   thumb, and a scrollbar — so they carry literal Repro Shop hexes: rule
+	   #E5E7EB for tracks, ink #000000 for the thumb, mute #8A8A85 for the bar. */
 	:global(.ov-slider) {
 		-webkit-appearance: none;
 		appearance: none;
 		height: 4px;
 		border-radius: 9999px;
-		background: #27272a;
+		background: #E5E7EB;
 		outline: none;
 		cursor: pointer;
 	}
@@ -1912,7 +1804,7 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 9999px;
-		background: #ffc480;
+		background: #000000;
 		border: none;
 		cursor: pointer;
 	}
@@ -1920,19 +1812,19 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 9999px;
-		background: #ffc480;
+		background: #000000;
 		border: none;
 		cursor: pointer;
 	}
 	:global(.ov-scroll) {
 		scrollbar-width: thin;
-		scrollbar-color: #3f3f46 transparent;
+		scrollbar-color: #8A8A85 transparent;
 	}
 	:global(.ov-scroll::-webkit-scrollbar) {
 		width: 6px;
 	}
 	:global(.ov-scroll::-webkit-scrollbar-thumb) {
-		background: #3f3f46;
+		background: #8A8A85;
 		border-radius: 9999px;
 	}
 </style>

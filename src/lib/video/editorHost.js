@@ -41,7 +41,7 @@ const instances = new Map();
  * @param {number} [options.width] - Composition width (used when project is null).
  * @param {number} [options.height] - Composition height (used when project is null).
  * @param {number} [options.fps]
- * @param {string} [options.backgroundColor] - Backdrop color outside the artboard.
+ * @param {string} [options.backgroundColor] - Backdrop color outside the artboard. Defaults to the Repro Shop canvas greige.
  * @param {Function} [options.onState] - Called with { currentTime, isPlaying, tracks, clips, settings } on every store change.
  * @param {Function} [options.onSelection] - Called with the selected clip array.
  * @param {Function} [options.onError]
@@ -53,7 +53,7 @@ export const mountVideoEditor = async (canvasEl, options = {}) => {
 		width = DEFAULT_SETTINGS.width,
 		height = DEFAULT_SETTINGS.height,
 		fps = DEFAULT_SETTINGS.fps,
-		backgroundColor = '#101014',
+		backgroundColor = '#E2E4DD',
 		onState,
 		onSelection,
 		onError

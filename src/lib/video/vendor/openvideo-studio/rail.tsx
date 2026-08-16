@@ -37,9 +37,11 @@ import PanelCopilot from "./panels/copilot-panel";
 export type Tab = "text" | "media" | "stock" | "audio" | "shapes" | "effects" | "captions" | "transcript" | "copilot";
 
 const tabs: { key: Tab; label: string; icon: React.ComponentType<any> }[] = [
-  // First: it is the fastest way to change anything, and a tool nobody
-  // finds is a tool nobody uses.
-  { key: "copilot", label: "Copilot", icon: RiMagicLine },
+  // Copilot is NOT here: v2 gives it its own always-open column to the left of
+  // this rail (studioHost.mountCopilotPanel), because describing the change is
+  // the primary edit path and a primary path should not be behind a tab. The
+  // 'copilot' Tab type and PANEL_COMPONENTS entry stay so the store's existing
+  // states remain valid.
   { key: "text", label: "Text", icon: RiTBoxLine },
   { key: "media", label: "Media", icon: RiImage2Line },
   { key: "stock", label: "Stock", icon: RiSearchLine },
@@ -87,7 +89,10 @@ export default function ToolRail() {
   return (
     <div className="flex h-full bg-background text-foreground">
       {/* Vertical tab rail */}
-      <div className="flex h-full w-14 shrink-0 flex-col items-center gap-1 border-r border-border bg-popover py-2">
+      {/* w-16, not w-14: the rail is its own 64px card in the Pictify shell, and
+          56px clipped the "Transcript" label. Matches the host card exactly so
+          there is no seam between the card edge and the rail's own background. */}
+      <div className="flex h-full w-16 shrink-0 flex-col items-center gap-1 border-r border-border bg-popover py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key && isOpen;
@@ -96,15 +101,22 @@ export default function ToolRail() {
               key={tab.key}
               onClick={() => toggle(tab.key)}
               className={cn(
-                "flex w-12 flex-col items-center gap-0.5 rounded py-2 transition-colors",
+                // w-full, not w-12: the longest label ("Transcript") is wider
+                // than 48px and was being clipped to "RANSCRIPT" at both ends.
+                // Active is primary/primary-foreground (field on ink) — the old
+                // accent/primary pair became pale-green-on-near-white once the
+                // semantic tokens were re-pointed to the Repro Shop palette.
+                "flex w-full flex-col items-center gap-0.5 rounded py-2 transition-colors",
                 isActive
-                  ? "bg-accent text-primary"
-                  : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
               title={tab.label}
             >
               <Icon size={18} />
-              <span className="text-[9px] font-bold uppercase tracking-wide">{tab.label}</span>
+              <span className="w-full text-center text-[9px] font-bold uppercase leading-none">
+                {tab.label}
+              </span>
             </button>
           );
         })}

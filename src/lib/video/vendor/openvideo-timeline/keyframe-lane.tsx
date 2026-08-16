@@ -177,7 +177,7 @@ const KeyframeLane = ({
                 key={frame.at}
                 type="button"
                 className={
-                  "pointer-events-auto absolute z-10 h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-[1px] border border-black bg-brand-accent " +
+                  "pointer-events-auto absolute z-10 h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-[1px] border border-brand-ink bg-brand-field " +
                   (isDragged(frame.at)
                     ? "scale-125 cursor-grabbing"
                     : "cursor-grab transition-transform hover:scale-125")

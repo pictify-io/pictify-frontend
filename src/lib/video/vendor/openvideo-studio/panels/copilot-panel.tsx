@@ -765,13 +765,13 @@ export default function CopilotPanel() {
         {turns.map((turn, index) =>
           turn.role === "user" ? (
             <div key={index} className="mb-2 flex justify-end">
-              <p className="max-w-[85%] rounded-lg rounded-br-sm border-[2px] border-black bg-brand-accent px-2 py-1.5 text-[11px] font-bold leading-snug text-black">
+              <p className="max-w-[85%] rounded-btn rounded-br-sm border border-brand-ink bg-brand-field px-2 py-1.5 text-[11px] font-bold leading-snug text-brand-ink">
                 {turn.text}
               </p>
             </div>
           ) : (
             <div key={index} className="mb-3">
-              <p className="max-w-[90%] rounded-lg rounded-bl-sm border border-border bg-muted/60 px-2 py-1.5 text-[11px] leading-snug text-foreground">
+              <p className="max-w-[90%] rounded-btn rounded-bl-sm border border-border bg-muted/60 px-2 py-1.5 text-[11px] leading-snug text-foreground">
                 {turn.text}
               </p>
               {/* The refusals, in the tool's own words. "It didn't work" tells
@@ -783,15 +783,15 @@ export default function CopilotPanel() {
                   disabled={busy}
                   onClick={() => restoreScene(turn.restore)}
                   title="Put the scene back exactly as it was before this run"
-                  className="mt-1.5 rounded border-[2px] border-black bg-muted px-2 py-1 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-accent"
+                  className="mt-1.5 rounded border border-border bg-muted px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-foreground transition-colors hover:bg-accent"
                 >
                   Undo this run
                 </button>
               ) : null}
               {turn.errors?.length ? (
-                <div className="mt-1 rounded border border-brand-danger/40 bg-brand-danger/10 p-1.5">
+                <div className="mt-1 rounded border border-brand-alarm/40 bg-brand-alarm/10 p-1.5">
                   {turn.errors.map((error) => (
-                    <p key={error} className="font-mono text-[10px] leading-snug text-brand-danger">
+                    <p key={error} className="font-mono text-[10px] leading-snug text-brand-alarm">
                       {error}
                     </p>
                   ))}
@@ -803,7 +803,7 @@ export default function CopilotPanel() {
 
         {busy && (
           <div className="flex items-center gap-2 px-1 py-1 text-[11px] text-muted-foreground">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-accent" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-field" />
             {phase}
           </div>
         )}
@@ -814,7 +814,7 @@ export default function CopilotPanel() {
           event.preventDefault();
           send();
         }}
-        className="shrink-0 border-t-[3px] border-black bg-muted/40 p-2"
+        className="shrink-0 border-t border-border bg-muted/40 p-2"
       >
         <textarea
           value={draft}
@@ -839,7 +839,7 @@ export default function CopilotPanel() {
           <button
             type="submit"
             disabled={busy || !draft.trim()}
-            className="rounded border-[2px] border-black bg-brand-accent px-3 py-1 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:-translate-y-px disabled:translate-y-0 disabled:opacity-40"
+            className="rounded border border-brand-ink bg-brand-field px-3 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-brand-ink transition-all hover:-translate-y-px disabled:translate-y-0 disabled:opacity-40"
           >
             {busy ? "Editing…" : "Send"}
           </button>

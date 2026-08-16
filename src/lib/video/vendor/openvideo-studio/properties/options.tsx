@@ -1792,7 +1792,7 @@ export function KeyframesProperty({
       {hasPreset && (
         // Said before anything is edited, because the preset is lost the moment
         // the first keyframe is written.
-        <p className="mb-1 rounded border border-brand-accent/40 bg-brand-accent/10 px-2 py-1.5 text-[10px] leading-snug text-foreground">
+        <p className="mb-1 rounded border border-brand-ink/40 bg-brand-field/10 px-2 py-1.5 text-[10px] leading-snug text-foreground">
           This clip uses an animation preset. Adding a keyframe replaces it —
           a clip can only have one animation.
         </p>

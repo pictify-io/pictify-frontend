@@ -251,8 +251,8 @@
 		every time.
 	-->
 	{#if overflowing.length}
-		<div class="shrink-0 border-b-[3px] border-black bg-brand-danger/10 px-3 py-2.5">
-			<p class="text-[11px] font-black uppercase tracking-wider text-brand-danger">
+		<div class="shrink-0 border-b border-brand-rule bg-brand-alarm/10 px-3 py-2.5">
+			<p class="text-[11px] font-mono uppercase tracking-[0.08em] text-brand-alarm">
 				{overflowing.length} value{overflowing.length === 1 ? '' : 's'} too long
 			</p>
 			<p class="mt-1 text-[10px] leading-snug {TEXT_FAINT}">
@@ -264,14 +264,14 @@
 						type="button"
 						on:click={() => dispatch('fixOverflow', item)}
 						title="Set this text to shrink so it always fits"
-						class="flex items-center justify-between gap-2 rounded border border-brand-danger/40 bg-gray-900/60 px-2 py-1.5 text-left transition-colors hover:border-brand-danger"
+						class="flex items-center justify-between gap-2 rounded border border-brand-alarm/40 bg-brand-subtle px-2 py-1.5 text-left transition-colors hover:border-brand-alarm"
 					>
 						<span class="min-w-0">
-							<span class="block truncate text-[11px] font-bold text-gray-100">{item.name}</span>
+							<span class="block truncate text-[11px] font-bold text-brand-ink">{item.name}</span>
 							<span class="block truncate text-[10px] {TEXT_FAINT}">{item.text}</span>
 						</span>
 						<span
-							class="shrink-0 text-[9px] font-black uppercase tracking-widest text-brand-danger"
+							class="shrink-0 text-[9px] font-mono uppercase tracking-[0.08em] text-brand-alarm"
 						>
 							Shrink
 						</span>
@@ -282,7 +282,7 @@
 	{/if}
 
 	<!-- Toolbar -->
-	<div class="shrink-0 border-b-[3px] border-black bg-gray-800/60 px-3 py-3">
+	<div class="shrink-0 border-b border-brand-rule bg-brand-subtle px-3 py-3">
 		<div class="flex items-center justify-between gap-2">
 			<div class="min-w-0">
 				<h3 class={HEADING}>Variables</h3>
@@ -301,7 +301,7 @@
 					<i class="fa fa-dice text-[10px]" aria-hidden="true"></i>
 					Sample
 				</button>
-				<button type="button" on:click={addVar} class="{BUTTON_COMPACT} !bg-brand-accent !text-black">
+				<button type="button" on:click={addVar} class="{BUTTON_COMPACT} !bg-brand-field !text-brand-ink">
 					<i class="fa fa-plus text-[10px]" aria-hidden="true"></i>
 					Add
 				</button>
@@ -311,7 +311,7 @@
 		{#if variableDefinitions.length > 3}
 			<div class="relative mt-2.5">
 				<i
-					class="fa fa-magnifying-glass pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-500"
+					class="fa fa-magnifying-glass pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-brand-mute"
 					aria-hidden="true"
 				></i>
 				<input
@@ -331,13 +331,13 @@
 			<!-- Empty state teaches BOTH entry points. On a canvas, neither is
 			     discoverable: you can't see that typing {{name}} does something,
 			     and you can't see that a clip field can be bound. -->
-			<div class="rounded-2xl border-[3px] border-dashed border-gray-700 p-5 text-center">
+			<div class="rounded-tile border border-dashed border-brand-rule p-5 text-center">
 				<div
-					class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border-[3px] border-black bg-brand-accent shadow-brutal-sm"
+					class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-tile border border-brand-rule bg-brand-field"
 				>
-					<i class="fa fa-cube text-black" aria-hidden="true"></i>
+					<i class="fa fa-cube text-brand-ink" aria-hidden="true"></i>
 				</div>
-				<p class="text-xs font-black uppercase tracking-widest text-gray-100">
+				<p class="text-xs font-mono uppercase tracking-[0.08em] text-brand-ink">
 					No variables yet
 				</p>
 				<p class="mt-1.5 text-[11px] font-bold leading-relaxed {TEXT_MUTED}">
@@ -345,32 +345,32 @@
 				</p>
 
 				<div class="mt-4 space-y-2 text-left">
-					<div class="rounded-lg border-[2px] border-black bg-gray-950 p-2.5">
+					<div class="rounded-btn border border-brand-rule bg-brand-paper p-2.5">
 						<div class="mb-1.5 flex items-center gap-2">
 							<span
-								class="flex h-4 w-4 items-center justify-center rounded border-[2px] border-black bg-brand-accent text-[9px] font-black text-black"
+								class="flex h-4 w-4 items-center justify-center rounded border border-brand-rule bg-brand-field text-[9px] font-semibold text-brand-ink"
 								>1</span
 							>
-							<span class="text-[10px] font-black uppercase tracking-widest text-gray-100">
+							<span class="text-[10px] font-mono uppercase tracking-[0.08em] text-brand-ink">
 								In text
 							</span>
 						</div>
 						<p class="text-[11px] font-semibold leading-snug {TEXT_MUTED}">
 							Type
 							<code
-								class="rounded border-[1.5px] border-black bg-gray-900 px-1 py-0.5 font-mono text-[10px] text-brand-accent"
+								class="rounded border border-brand-rule bg-brand-subtle px-1 py-0.5 font-mono text-[10px] text-brand-ink"
 								>{'{{'}name{'}}'}</code
 							>
 							in any text clip. It gets declared automatically.
 						</p>
 					</div>
-					<div class="rounded-lg border-[2px] border-black bg-gray-950 p-2.5">
+					<div class="rounded-btn border border-brand-rule bg-brand-paper p-2.5">
 						<div class="mb-1.5 flex items-center gap-2">
 							<span
-								class="flex h-4 w-4 items-center justify-center rounded border-[2px] border-black bg-data-green text-[9px] font-black text-black"
+								class="flex h-4 w-4 items-center justify-center rounded border border-brand-rule bg-brand-proof text-[9px] font-semibold text-brand-ink"
 								>2</span
 							>
-							<span class="text-[10px] font-black uppercase tracking-widest text-gray-100">
+							<span class="text-[10px] font-mono uppercase tracking-[0.08em] text-brand-ink">
 								On a clip
 							</span>
 						</div>
@@ -381,14 +381,14 @@
 					</div>
 				</div>
 
-				<button type="button" on:click={addVar} class="{BUTTON_COMPACT} mt-4 !bg-brand-accent !text-black">
+				<button type="button" on:click={addVar} class="{BUTTON_COMPACT} mt-4 !bg-brand-field !text-brand-ink">
 					<i class="fa fa-plus text-[10px]" aria-hidden="true"></i>
 					Add one manually
 				</button>
 			</div>
 		{:else if filtered.length === 0}
 			<p class="mt-4 text-center text-[11px] font-bold {TEXT_FAINT}">
-				Nothing matches "<span class="font-mono text-gray-200">{searchQuery}</span>"
+				Nothing matches "<span class="font-mono text-brand-ink">{searchQuery}</span>"
 			</p>
 		{:else}
 			<div class="space-y-1.5">
@@ -408,38 +408,38 @@
 								openProperty(i);
 							}
 						}}
-						class="group cursor-pointer rounded-lg border-[2px] px-2.5 py-2 transition-all focus-brutal
+						class="group cursor-pointer rounded-btn border-[2px] px-2.5 py-2 transition-all focus-brutal
 							{openIndex === i
-							? 'border-brand-accent bg-gray-800 shadow-brutal-accent-sm'
-							: 'border-black bg-gray-950 hover:border-gray-700 hover:bg-gray-800'}"
+							? 'border-brand-ink bg-brand-subtle'
+							: 'border-brand-rule bg-brand-paper hover:border-brand-ink hover:bg-brand-subtle'}"
 					>
 						<div class="flex items-center gap-2">
-							<span class="truncate font-mono text-xs font-bold text-gray-100" title={v.name}>
+							<span class="truncate font-mono text-xs font-bold text-brand-ink" title={v.name}>
 								{v.name}
 							</span>
 							<span
-								class="shrink-0 rounded border-[1.5px] border-black bg-gray-800 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-gray-300"
+								class="shrink-0 rounded border border-brand-rule bg-brand-subtle px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-[0.08em] text-brand-slate"
 							>
 								{TYPE_LABELS[v.type] || v.type || 'Text'}
 							</span>
 							{#if v.validation?.required}
 								<i
-									class="fa fa-asterisk text-[8px] text-gray-500"
+									class="fa fa-asterisk text-[8px] text-brand-mute"
 									title="Required at render time"
 									aria-label="Required"
 								></i>
 							{/if}
 							{#if autoAdded.includes(v.name)}
 								<span
-									class="shrink-0 rounded border-[1.5px] border-black bg-brand-accent px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-black"
+									class="shrink-0 rounded border border-brand-rule bg-brand-field px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-[0.08em] text-brand-ink"
 									title="Declared automatically from a token you typed"
 								>
 									Auto
 								</span>
 							{/if}
 							<i
-								class="fa fa-chevron-right ml-auto shrink-0 text-[9px] text-gray-600 transition-transform
-									{openIndex === i ? 'rotate-90 text-brand-accent' : ''}"
+								class="fa fa-chevron-right ml-auto shrink-0 text-[9px] text-brand-mute transition-transform
+									{openIndex === i ? 'rotate-90 text-brand-ink' : ''}"
 								aria-hidden="true"
 							></i>
 						</div>
@@ -459,7 +459,7 @@
 									on:click|stopPropagation
 									on:input={(e) => setTestValue(v.name, e.target.value)}
 									aria-label="Preview value for {v.name}"
-									class="h-7 w-9 shrink-0 cursor-pointer rounded border-[2px] border-black bg-transparent p-0.5"
+									class="h-7 w-9 shrink-0 cursor-pointer rounded border border-brand-rule bg-transparent p-0.5"
 								/>
 								<input
 									type="text"
@@ -481,9 +481,9 @@
 									on:click|stopPropagation
 									on:input={(e) => setTestValue(v.name, Number(e.target.value))}
 									aria-label="Preview value for {v.name}"
-									class="h-7 min-w-0 flex-1 accent-brand-accent"
+									class="h-7 min-w-0 flex-1 accent-brand-ink"
 								/>
-								<span class="w-12 shrink-0 text-right font-mono text-[10px] text-gray-400">
+								<span class="w-12 shrink-0 text-right font-mono text-[10px] text-brand-slate">
 									{numberValue(testValues[v.name] ?? v.defaultValue, ctl)}
 								</span>
 							{:else if ctl.control === 'select'}
@@ -499,14 +499,14 @@
 									{/each}
 								</select>
 							{:else if ctl.control === 'toggle'}
-								<label class="flex flex-1 items-center gap-2 text-[11px] text-gray-300">
+								<label class="flex flex-1 items-center gap-2 text-[11px] text-brand-slate">
 									<input
 										type="checkbox"
 										checked={truthy(testValues[v.name] ?? v.defaultValue)}
 										on:click|stopPropagation
 										on:change={(e) => setTestValue(v.name, e.target.checked)}
 										aria-label="Preview value for {v.name}"
-										class="h-4 w-4 rounded border-[2px] border-black accent-brand-accent"
+										class="h-4 w-4 rounded border border-brand-rule accent-brand-ink"
 									/>
 									{truthy(testValues[v.name] ?? v.defaultValue) ? 'On' : 'Off'}
 								</label>
@@ -541,7 +541,7 @@
 										type="button"
 										on:click|stopPropagation={() => dispatch('pickMedia', { name: v.name, accept: ctl.accept })}
 										title="Choose from your {ctl.accept} library"
-										class="shrink-0 rounded border-[2px] border-black bg-gray-800 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-gray-100 hover:bg-gray-700"
+										class="shrink-0 rounded border border-brand-rule bg-brand-subtle px-2 py-1 text-[9px] font-mono uppercase tracking-[0.08em] text-brand-ink hover:bg-brand-rule"
 									>
 										Pick
 									</button>
@@ -551,7 +551,7 @@
 
 						<!-- Where it's used. A variable declared but never referenced
 						     renders nothing, which is confusing enough to call out. -->
-						<p class="mt-1 text-[9px] font-black uppercase tracking-widest {used ? 'text-gray-600' : 'text-brand-danger'}">
+						<p class="mt-1 text-[9px] font-mono uppercase tracking-[0.08em] {used ? 'text-brand-mute' : 'text-brand-alarm'}">
 							{used || 'Not used in this video yet'}
 						</p>
 					</div>
@@ -562,17 +562,17 @@
 
 	<!-- Footer: what these values do -->
 	{#if variableDefinitions.length > 0}
-		<div class="shrink-0 border-t-[3px] border-black bg-gray-800/60 px-3 py-2.5">
+		<div class="shrink-0 border-t border-brand-rule bg-brand-subtle px-3 py-2.5">
 			<p class="text-[10px] font-bold leading-snug {TEXT_MUTED}">
 				{#if filling}
-					<span class="font-black uppercase tracking-widest text-brand-accent">Previewing</span>
+					<span class="font-mono uppercase tracking-[0.08em] text-brand-ink">Previewing</span>
 					these values on the canvas. Your template still holds the tokens.
 				{:else if alwaysLive}
 					<span class={LABEL}>Preview values</span>: shown in the player as you type, and
 					prefilled when you render.
 				{:else}
 					<span class={LABEL}>Preview values</span>: used by
-					<span class="font-black text-gray-200">Preview</span> and prefilled when you render.
+					<span class="font-semibold text-brand-ink">Preview</span> and prefilled when you render.
 				{/if}
 			</p>
 		</div>

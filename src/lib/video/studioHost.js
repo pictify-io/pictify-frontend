@@ -17,6 +17,7 @@ import { setEditorContext, setHostCallbacks } from './vendor/openvideo-studio/ru
 import { resetMediaLibrary } from './vendor/openvideo-studio/use-media-library';
 import ToolRail from './vendor/openvideo-studio/rail';
 import PropertiesPanel from './vendor/openvideo-studio/properties/properties-panel';
+import CopilotPanel from './vendor/openvideo-studio/panels/copilot-panel';
 
 const instances = new Map();
 
@@ -125,3 +126,20 @@ export const mountPropertiesPanel = (el, { core, studio }) => {
 	setEditorContext({ core, studio: studio || null });
 	return mountIsland(el, React.createElement(PropertiesPanel));
 };
+
+/**
+ * Mount the copilot on its own, outside the tool rail.
+ *
+ * In v2 the copilot is not a drawer you find behind a tab — it is the left
+ * column of the studio, always open, because describing the change you want is
+ * the primary way to edit. It is removed from the rail's tabs so it exists in
+ * exactly one place.
+ *
+ * Takes no props: the panel reads the same editor context and host callbacks
+ * the rail set up, so this must be called after mountToolRail (or after
+ * setEditorContext/setHostCallbacks have run).
+ *
+ * @param {HTMLElement} el
+ * @returns {{ destroy: () => void }}
+ */
+export const mountCopilotPanel = (el) => mountIsland(el, React.createElement(CopilotPanel));

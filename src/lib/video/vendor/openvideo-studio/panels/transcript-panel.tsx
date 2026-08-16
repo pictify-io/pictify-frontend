@@ -144,8 +144,8 @@ export default function TranscriptPanel() {
             </div>
           )}
           {error && (
-            <div className="mt-3 rounded border border-brand-danger/40 bg-brand-danger/10 p-2">
-              <p className="text-[11px] leading-snug text-brand-danger">{error}</p>
+            <div className="mt-3 rounded border border-brand-alarm/40 bg-brand-alarm/10 p-2">
+              <p className="text-[11px] leading-snug text-brand-alarm">{error}</p>
             </div>
           )}
         </ScrollArea>
@@ -188,7 +188,7 @@ export default function TranscriptPanel() {
               className={
                 "mb-1 block w-full rounded px-2 py-1.5 text-left text-[11px] leading-relaxed transition-colors " +
                 (marked
-                  ? "bg-brand-danger/15 text-muted-foreground line-through"
+                  ? "bg-brand-alarm/15 text-muted-foreground line-through"
                   : "text-foreground hover:bg-accent")
               }
             >
@@ -199,7 +199,7 @@ export default function TranscriptPanel() {
       </ScrollArea>
 
       {removed.size > 0 && (
-        <div className="shrink-0 border-t-[3px] border-black bg-gray-900 p-2">
+        <div className="shrink-0 border-t border-border bg-gray-900 p-2">
           <p className="pb-1.5 text-[10px] leading-snug text-muted-foreground">
             Removing {seconds(pendingUs)} of video. Clips after this one move earlier to close the
             gap.
@@ -208,14 +208,14 @@ export default function TranscriptPanel() {
             <button
               type="button"
               onClick={() => setRemoved(new Set())}
-              className="flex-1 rounded border-[2px] border-black bg-gray-800 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-gray-100 transition-colors hover:bg-gray-700"
+              className="flex-1 rounded border border-border bg-gray-800 px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-gray-100 transition-colors hover:bg-gray-700"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={applyCuts}
-              className="flex-1 rounded border-[2px] border-black bg-brand-danger px-2 py-1 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:-translate-y-px"
+              className="flex-1 rounded border border-border bg-brand-alarm px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-white transition-all hover:-translate-y-px"
             >
               Remove
             </button>

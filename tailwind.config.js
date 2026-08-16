@@ -28,19 +28,24 @@ export default {
 				card: ['26px', { lineHeight: '1.05', letterSpacing: '-0.03em' }]
 			},
 			colors: {
-				// Semantic tokens used by the vendored OpenVideo timeline island
-				// (src/lib/video/vendor/openvideo-timeline). Upstream is a shadcn
-				// app on Tailwind v4 CSS variables; here they are fixed dark-editor
-				// values matching the /dashboard/video-editor chrome. No other
-				// part of the site uses these names.
-				background: '#101014',
-				foreground: '#f4f4f5',
-				muted: { DEFAULT: '#1c1c22', foreground: '#9ca3af' },
-				accent: { DEFAULT: '#26262e', foreground: '#fafafa' },
-				popover: { DEFAULT: '#16161c', foreground: '#e4e4e7' },
-				primary: { DEFAULT: '#facc15', foreground: '#101014' },
-				destructive: '#f87171',
-				border: '#27272a',
+				// Semantic tokens used by the vendored OpenVideo studio + timeline
+				// islands (src/lib/video/vendor/**). Upstream is a shadcn app on
+				// Tailwind v4 CSS variables; nothing else in this codebase uses
+				// these names.
+				//
+				// v2 (2026-08-16): re-pointed from the old dark-editor values to the
+				// Repro Shop palette. The vendored panels are written entirely
+				// against these semantic names, so remapping here restyles all 64
+				// vendored files at once — no edits to third-party source, and no
+				// override stylesheet fighting them on specificity.
+				background: '#FFFFFF', // paper — panels sit on white cards
+				foreground: '#000000', // ink
+				muted: { DEFAULT: '#F4F6F4', foreground: '#8A8A85' }, // subtle / mute
+				accent: { DEFAULT: '#F4F6F4', foreground: '#000000' },
+				popover: { DEFAULT: '#FFFFFF', foreground: '#000000' },
+				primary: { DEFAULT: '#D8F34A', foreground: '#000000' }, // field
+				destructive: '#B0483A', // alarm
+				border: '#E5E7EB', // rule
 				brand: {
 					// ── v2 (rebrand 2026) ──────────────────────────────────────────
 					// Grounds
