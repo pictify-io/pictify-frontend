@@ -207,7 +207,9 @@ const PlayerView = ({
 	width,
 	height,
 	onFrame,
-	onError
+	onError,
+	onReady,
+	onPlayState
 }) => {
 	const ref = React.useRef(null);
 	React.useEffect(() => {
@@ -216,13 +218,28 @@ const PlayerView = ({
 		const handleFrame = (event) => onFrame && onFrame(event.detail.frame);
 		const handleError = (event) =>
 			onError && onError(event.detail?.error?.message || 'The scene crashed while playing.');
+		const handlePlay = () => onPlayState && onPlayState(true);
+		const handlePause = () => onPlayState && onPlayState(false);
 		player.addEventListener('frameupdate', handleFrame);
 		player.addEventListener('error', handleError);
+		player.addEventListener('play', handlePlay);
+		player.addEventListener('pause', handlePause);
+		player.addEventListener('ended', handlePause);
+		// Hand the ref out so the studio can drive the transport itself. Autoplay
+		// is a request, not a guarantee — a browser can refuse it, and a remount
+		// after an edit can drop it — so a surface with no controls of its own has
+		// no way back to a playing video.
+		if (onReady) onReady(player);
+		if (onPlayState) onPlayState(Boolean(player.isPlaying && player.isPlaying()));
 		return () => {
 			player.removeEventListener('frameupdate', handleFrame);
 			player.removeEventListener('error', handleError);
+			player.removeEventListener('play', handlePlay);
+			player.removeEventListener('pause', handlePause);
+			player.removeEventListener('ended', handlePause);
+			if (onReady) onReady(null);
 		};
-	}, [onFrame, onError]);
+	}, [onFrame, onError, onReady, onPlayState]);
 	return React.createElement(PlayerModule.Player, {
 		ref,
 		component,
@@ -231,7 +248,10 @@ const PlayerView = ({
 		compositionWidth: width,
 		compositionHeight: height,
 		inputProps,
-		controls: true,
+		// The studio draws its own transport pill under the canvas and drives it
+		// through the ref above. Remotion's built-in bar would be a second set of
+		// controls for the same player, disagreeing on style and on state.
+		controls: false,
 		loop: true,
 		autoPlay: true,
 		// Muted autoplay: an unmuted Player stalls its playback loop waiting on
@@ -243,6 +263,33 @@ const PlayerView = ({
 		errorFallback
 	});
 };
+
+/**
+ * Catches a throw from PlayerView itself.
+ *
+ * `errorFallback` above is Remotion's own prop and only covers errors raised
+ * INSIDE the composition while it renders. Anything that throws in PlayerView
+ * — the Player component missing from the module, a bad ref, a prop Remotion
+ * rejects — escapes it, and an uncaught error unmounts the whole React root,
+ * which reads as a white rectangle where the video should be. A compile error
+ * is a normal state on this surface, so it has to look like one.
+ */
+class PlayerBoundary extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = { error: null };
+	}
+	static getDerivedStateFromError(error) {
+		return { error };
+	}
+	componentDidCatch(error) {
+		if (this.props.onError) this.props.onError(error?.message || String(error));
+	}
+	render() {
+		if (this.state.error) return errorFallback({ error: this.state.error });
+		return this.props.children;
+	}
+}
 
 // ── Mount registry ───────────────────────────────────────────────────────
 
@@ -263,7 +310,9 @@ export const mountVideoPlayer = (el, options) => {
 		durationInFrames,
 		onError,
 		onSchema,
-		onFrame
+		onFrame,
+		onReady,
+		onPlayState
 	} = options;
 
 	let instance = instances.get(el);
@@ -292,16 +341,22 @@ export const mountVideoPlayer = (el, options) => {
 	}
 
 	instance.root.render(
-		React.createElement(PlayerView, {
-			component,
-			inputProps,
-			durationInFrames: Math.max(1, Math.floor(durationInFrames) || 1),
-			fps: Math.max(1, Math.floor(fps) || 30),
-			width: Math.max(16, Math.floor(width) || 1080),
-			height: Math.max(16, Math.floor(height) || 1080),
-			onFrame,
-			onError
-		})
+		React.createElement(
+			PlayerBoundary,
+			{ onError },
+			React.createElement(PlayerView, {
+				component,
+				inputProps,
+				durationInFrames: Math.max(1, Math.floor(durationInFrames) || 1),
+				fps: Math.max(1, Math.floor(fps) || 30),
+				width: Math.max(16, Math.floor(width) || 1080),
+				height: Math.max(16, Math.floor(height) || 1080),
+				onFrame,
+				onError,
+				onReady,
+				onPlayState
+			})
+		)
 	);
 	return true;
 };

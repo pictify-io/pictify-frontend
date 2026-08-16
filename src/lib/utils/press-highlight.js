@@ -20,7 +20,7 @@ import { tags as t } from '@lezer/highlight';
 export const PRESS = {
 	bg: '#131417',
 	text: '#ADB9C6', // press-text — default
-	keyword: '#A9D7F2', // powder — tags, keywords, calls
+	keyword: '#A9D7F2', // sky — tags, keywords, calls
 	string: '#D8F34A', // field — strings and values
 	token: '#FF48B0', // pink — {{template variables}}
 	property: '#FFD3E8', // rose — attribute and property names
@@ -62,6 +62,90 @@ export const pressEditorTheme = EditorView.theme(
 
 /** Every CodeMirror pane wants both; exported together so none forgets one. */
 export const pressTheme = [pressEditorTheme, pressHighlight];
+
+// ── Editable panes: rules + segmenter ────────────────────────────────────
+//
+// A pane the user types into cannot be an innerHTML string, so these produce
+// SEGMENTS — `{ text, color, weight }` runs a template renders as elements.
+// The overlay technique (transparent textarea over a coloured <pre>) keeps
+// native undo, selection, IME and paste, which a contenteditable re-implements
+// badly and CodeMirror brings a parser along for.
+
+/** HTML templates — the image studio's pane. */
+export const HTML_RULES = [
+	{ re: /\{\{[^}]*\}\}/g, color: PRESS.token, weight: 500 },
+	{ re: /<!--[\s\S]*?-->/g, color: PRESS.comment },
+	{ re: /"[^"\n]*"|'[^'\n]*'/g, color: PRESS.string },
+	{ re: /<\/?[a-zA-Z][\w-]*/g, color: PRESS.keyword },
+	{ re: /\b[a-zA-Z-]+(?==)/g, color: PRESS.property }
+];
+
+/**
+ * Remotion scenes — the video studio's code pane.
+ *
+ * Schema field names are matched FIRST and painted pink, the same pink a
+ * `{{token}}` gets in an HTML template. That is the whole point of the colour:
+ * in both languages it marks "this is an input someone fills in when they
+ * render", and it is the only thing on screen a non-programmer needs to find.
+ * The pattern is deliberately narrow — an identifier at the head of a line
+ * whose value opens with `type:` — because that IS the shape of a schema
+ * declaration, and a looser rule would paint half the file pink.
+ */
+export const TSX_RULES = [
+	{ re: /^[ \t]*[A-Za-z_$][\w$]*(?=\s*:\s*\{\s*type\s*:)/gm, color: PRESS.token, weight: 500 },
+	{ re: /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, color: PRESS.comment },
+	{ re: /'[^'\n]*'|"[^"\n]*"|`[^`]*`/g, color: PRESS.string },
+	{ re: /<\/?[A-Za-z][\w.]*/g, color: PRESS.keyword },
+	{
+		re: /\b(?:import|export|from|const|let|var|function|return|default|if|else|new|await|async|typeof|interface|type)\b/g,
+		color: PRESS.keyword
+	},
+	{ re: /\b[A-Za-z_$][\w$]*(?=\s*[:=](?!=))/g, color: PRESS.property }
+];
+
+/**
+ * Split `source` into coloured runs using a priority-ordered rule list.
+ *
+ * Earlier rules win: an overlapping later match is dropped rather than nested,
+ * so `{{token}}` inside a string stays a token. Each regex's `lastIndex` is
+ * reset on entry — a /g regex carries it between calls and silently
+ * mis-highlights every other match when the same rule list is reused.
+ *
+ * @param {string} source
+ * @param {Array<{re: RegExp, color: string, weight?: number}>} rules
+ * @returns {Array<{text: string, color: string|null, weight?: number}>}
+ */
+export function segmentize(source, rules) {
+	const src = source || '';
+	const spans = [];
+	const overlaps = (a, b) => spans.some((s) => a < s.end && b > s.start);
+	for (const rule of rules) {
+		rule.re.lastIndex = 0;
+		let m;
+		while ((m = rule.re.exec(src)) !== null) {
+			if (!m[0].length) break;
+			// Leading indentation is matched by the schema rule (it anchors to the
+			// line head) but must not be painted, or the pink starts in the margin.
+			const start = m.index + (m[0].length - m[0].trimStart().length);
+			const end = m.index + m[0].length;
+			if (!overlaps(start, end)) {
+				spans.push({ start, end, color: rule.color, weight: rule.weight });
+			}
+		}
+	}
+	spans.sort((a, b) => a.start - b.start);
+
+	const out = [];
+	let cursor = 0;
+	for (const s of spans) {
+		if (s.start < cursor) continue;
+		if (s.start > cursor) out.push({ text: src.slice(cursor, s.start), color: null });
+		out.push({ text: src.slice(s.start, s.end), color: s.color, weight: s.weight });
+		cursor = s.end;
+	}
+	if (cursor < src.length) out.push({ text: src.slice(cursor), color: null });
+	return out;
+}
 
 const ESCAPE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESCAPE[c]);

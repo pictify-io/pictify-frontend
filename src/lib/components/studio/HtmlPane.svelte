@@ -12,7 +12,7 @@
 	 * and markup in the Use it panel are coloured identically.
 	 */
 	import { createEventDispatcher } from 'svelte';
-	import { PRESS } from '$lib/utils/press-highlight.js';
+	import { PRESS, HTML_RULES, segmentize } from '$lib/utils/press-highlight.js';
 
 	const dispatch = createEventDispatcher();
 
@@ -42,52 +42,11 @@
 	/**
 	 * Segment the source into coloured runs.
 	 *
-	 * Ordered by priority, not by position: `{{tokens}}` win over strings so a
-	 * variable inside an attribute value still reads as a variable, which is
-	 * the distinction the palette exists to draw. Computed here rather than
-	 * tested inline because a /g regex carries lastIndex between calls and
-	 * silently mis-highlights every other match when reused in a template loop.
+	 * Rules and segmenter both live in press-highlight.js so the video studio's
+	 * code pane paints from the same definition — a `{{token}}` and a Remotion
+	 * schema field are the same pink because they are the same idea.
 	 */
-	const RULES = [
-		{ re: /\{\{[^}]*\}\}/g, color: PRESS.token, weight: 500 },
-		{ re: /<!--[\s\S]*?-->/g, color: PRESS.comment },
-		{ re: /"[^"\n]*"|'[^'\n]*'/g, color: PRESS.string },
-		{ re: /<\/?[a-zA-Z][\w-]*/g, color: PRESS.keyword },
-		{ re: /\b[a-zA-Z-]+(?==)/g, color: PRESS.property }
-	];
-
-	$: segments = (() => {
-		const src = html || '';
-		const spans = [];
-		const overlaps = (a, b) => spans.some((s) => a < s.end && b > s.start);
-		for (const rule of RULES) {
-			rule.re.lastIndex = 0;
-			let m;
-			while ((m = rule.re.exec(src)) !== null) {
-				if (!m[0].length) break;
-				if (!overlaps(m.index, m.index + m[0].length)) {
-					spans.push({
-						start: m.index,
-						end: m.index + m[0].length,
-						color: rule.color,
-						weight: rule.weight
-					});
-				}
-			}
-		}
-		spans.sort((a, b) => a.start - b.start);
-
-		const out = [];
-		let cursor = 0;
-		for (const s of spans) {
-			if (s.start < cursor) continue;
-			if (s.start > cursor) out.push({ text: src.slice(cursor, s.start), color: null });
-			out.push({ text: src.slice(s.start, s.end), color: s.color, weight: s.weight });
-			cursor = s.end;
-		}
-		if (cursor < src.length) out.push({ text: src.slice(cursor), color: null });
-		return out;
-	})();
+	$: segments = segmentize(html, HTML_RULES);
 
 	function onInput(event) {
 		dispatch('change', { html: event.currentTarget.value });

@@ -5,6 +5,7 @@
  * vendor directory.
  */
 import { Control, Resizable, ResizableProps } from "@openvideo/timeline";
+import { CLIP_FILL, CLIP_LABEL } from "../clip-palette";
 import { IDisplay } from "@openvideo/timeline";
 import { createResizeControls } from "../controls";
 import {
@@ -12,6 +13,7 @@ import {
   TIMELINE_SELECTED_BORDER_COLOR,
   TIMELINE_UNSELECTED_BORDER_COLOR,
   TIMELINE_BORDER_WIDTH,
+  TIMELINE_SELECTED_BORDER_WIDTH,
   TIMELINE_ITEM_BORDER_RADIUS,
 } from "../constants";
 
@@ -30,7 +32,7 @@ class Text extends Resizable {
 
   constructor(props: TextProps) {
     super(props);
-    this.fill = "#0081ae";
+    this.fill = CLIP_FILL.text;
     this.id = props.id;
     this.borderColor = "transparent";
     this.stroke = "transparent";
@@ -54,13 +56,13 @@ class Text extends Resizable {
     // 1. Draw SVG Path first (icon)
     ctx.save();
     ctx.translate(12, (this.height - 11.3333) / 2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+    ctx.fillStyle = CLIP_LABEL;
     ctx.fill(textPath);
     ctx.restore();
 
     // 2. Draw text second
     ctx.font = `400 12px ${SECONDARY_FONT}`;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+    ctx.fillStyle = CLIP_LABEL;
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.fillText(this.text, 30, this.height / 2);
@@ -71,7 +73,9 @@ class Text extends Resizable {
     const borderColor = this.isSelected
       ? TIMELINE_SELECTED_BORDER_COLOR
       : TIMELINE_UNSELECTED_BORDER_COLOR;
-    const borderWidth = TIMELINE_BORDER_WIDTH;
+    const borderWidth = this.isSelected
+      ? TIMELINE_SELECTED_BORDER_WIDTH
+      : TIMELINE_BORDER_WIDTH;
     const borderRadius = TIMELINE_ITEM_BORDER_RADIUS;
 
     ctx.save();

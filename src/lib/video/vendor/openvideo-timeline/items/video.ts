@@ -13,6 +13,7 @@ import {
   unitsToTimeUs,
 } from "@openvideo/timeline";
 import { Filmstrip, FilmstripBacklogOptions } from "../types";
+import { CLIP_FILL } from "../clip-palette";
 import ThumbnailCache from "../utils/thumbnail-cache";
 import { IDisplay, IMetadata, ITrim } from "@openvideo/timeline";
 import { calculateOffscreenSegments, calculateThumbnailSegmentLayout } from "../utils/filmstrip";
@@ -22,6 +23,7 @@ import {
   TIMELINE_SELECTED_BORDER_COLOR,
   TIMELINE_UNSELECTED_BORDER_COLOR,
   TIMELINE_BORDER_WIDTH,
+  TIMELINE_SELECTED_BORDER_WIDTH,
   TIMELINE_ITEM_BORDER_RADIUS,
 } from "../constants";
 import { extractFrames } from "../utils/mediabunny";
@@ -101,7 +103,7 @@ class Video extends Trimmable {
     this.trim = props.trim;
     this.duration = props.duration;
     this.prevDuration = props.duration;
-    this.fill = "#27272a";
+    this.fill = CLIP_FILL.video;
     this.borderOpacityWhenMoving = 1;
     this.metadata = props.metadata;
 
@@ -451,7 +453,9 @@ class Video extends Trimmable {
     const borderColor = this.isSelected
       ? TIMELINE_SELECTED_BORDER_COLOR
       : TIMELINE_UNSELECTED_BORDER_COLOR;
-    const borderWidth = TIMELINE_BORDER_WIDTH;
+    const borderWidth = this.isSelected
+      ? TIMELINE_SELECTED_BORDER_WIDTH
+      : TIMELINE_BORDER_WIDTH;
     const borderRadius = TIMELINE_ITEM_BORDER_RADIUS;
 
     ctx.save();

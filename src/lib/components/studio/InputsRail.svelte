@@ -9,7 +9,7 @@
 	 * looking at.
 	 */
 	import { createEventDispatcher } from 'svelte';
-	import CodeBlock from './CodeBlock.svelte';
+	import UseItCard from './UseItCard.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -21,9 +21,6 @@
 	/** Disables editing while the agent is mid-change. */
 	export let busy = false;
 
-	const TABS = ['API', 'AGENT', 'ZAPIER', 'SHEET'];
-	let tab = 'API';
-
 	const TYPE_LABEL = {
 		text: 'TEXT',
 		date: 'DATE',
@@ -33,38 +30,6 @@
 		color: 'COLOR'
 	};
 
-	$: sampleObject = Object.fromEntries(inputs.map((i) => [i.name, i.value ?? '']));
-	$: slug = templateName ? templateName.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) : templateUid;
-	$: keyOrPlaceholder = apiKey || 'YOUR_API_KEY';
-	// Shown masked, copied whole — same split NextStepCard uses. A live secret
-	// rendered in full sits on screen for every passer-by and screenshot, and
-	// the snippet is only useful if what lands on the clipboard is real.
-	$: keyMasked = apiKey ? `pic_live_••••${apiKey.slice(-5)}` : 'YOUR_API_KEY';
-
-	// Snippets carry the ACTUAL sample values, not placeholders — the point is
-	// that you can paste this and get the file you just looked at.
-	$: varsJson = inputs.length ? JSON.stringify(sampleObject, null, 2).replace(/\n/g, '\n  ') : null;
-	const buildSnippets = (key) => ({
-		API: `curl -X POST https://api.pictify.io/image \\
-  -H "Authorization: Bearer ${key}" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-  "template": "${templateUid}"${varsJson ? `,\n  "variables": ${varsJson}` : ''}
-}'`,
-		AGENT: `Render my "${templateName || slug}" template${
-			inputs.length ? ` with ${inputs.map((i) => `${i.name} "${i.value || '…'}"`).join(', ')}` : ''
-		}`,
-		ZAPIER: `Action: Pictify → Render template
-Template: ${templateName || slug} (${templateUid})
-${inputs.length ? inputs.map((i) => `  ${i.name} → map a field (e.g. "${i.value || '…'}")`).join('\n') : '  No inputs — renders the same file every time.'}`,
-		SHEET: inputs.length
-			? `${inputs.map((i) => i.name).join(',')}\n${inputs.map((i) => String(i.value ?? '').replace(/,/g, ' ')).join(',')}`
-			: 'This template has no inputs, so a sheet has nothing to fill.'
-	});
-
-	// Two renderings of the same snippet: one safe to look at, one safe to run.
-	$: snippets = buildSnippets(keyMasked);
-	$: copyableSnippets = buildSnippets(keyOrPlaceholder);
 </script>
 
 <aside class="flex w-[320px] flex-shrink-0 flex-col overflow-y-auto border-l border-brand-rule bg-brand-paper">
@@ -117,28 +82,7 @@ ${inputs.length ? inputs.map((i) => `  ${i.name} → map a field (e.g. "${i.valu
 		</div>
 	</div>
 
-	<div class="flex flex-col gap-3 px-5 py-5">
-		<span class="font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-brand-ink">
-			Use it — the call, with these inputs
-		</span>
-		<div class="flex flex-wrap gap-1.5">
-			{#each TABS as t (t)}
-				<button
-					type="button"
-					on:click={() => (tab = t)}
-					class="rounded-btn border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] {tab === t
-						? 'border-brand-ink bg-brand-field text-brand-ink'
-						: 'border-brand-rule text-brand-slate hover:border-brand-ink'}"
-				>
-					{t}
-				</button>
-			{/each}
-		</div>
-		<CodeBlock
-			code={snippets[tab]}
-			copyValue={copyableSnippets[tab]}
-			copyLabel="Copy full snippet"
-			maxHeight="max-h-[200px]"
-		/>
+	<div class="px-5 py-5">
+		<UseItCard {inputs} {templateUid} {templateName} {apiKey} kind="image" />
 	</div>
 </aside>

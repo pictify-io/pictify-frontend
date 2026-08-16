@@ -38,6 +38,8 @@
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
 	import InlineTextEditor from './InlineTextEditor.svelte';
 	import RemotionStage from './RemotionStage.svelte';
+	import UseItCard from '$lib/components/studio/UseItCard.svelte';
+	import { activeApiToken, getAPITokenAction } from '../../../store/user.store';
 	import VideoTopBar from './v2/VideoTopBar.svelte';
 	import ClipBindingsPanel from './ClipBindingsPanel.svelte';
 	import {
@@ -127,6 +129,14 @@
 	 * typing a value did nothing.
 	 */
 	$: previewValues = isCode ? resolveValues(variableDefinitions, testValues) : {};
+
+	// The snippet shows the values currently in the preview, so the call a user
+	// copies is the call that made what they are looking at.
+	$: useItInputs = variableDefinitions.map((v) => ({
+		name: v.name,
+		value: testValues?.[v.name] ?? v.defaultValue ?? v.default ?? ''
+	}));
+	$: apiKeyForSnippet = $activeApiToken?.token || '';
 
 	const onCodeChange = (event) => {
 		tsxSource = event.detail.tsx;
@@ -487,6 +497,10 @@
 	// ── Mount ────────────────────────────────────────────────────────────
 	onMount(async () => {
 		analytics.page('Video Studio');
+		// The studio sits outside the dashboard rail, so nothing else on this
+		// page loads the key — without this the Use it snippet would hand the
+		// user YOUR_API_KEY to paste.
+		getAPITokenAction().catch(() => {});
 		// A Remotion template has no scene graph, so none of the engine, the
 		// timeline or the clip panels apply. RemotionStage mounts its own player.
 		if (isCode) {
@@ -1457,6 +1471,8 @@
 					showPane={showCodePane}
 					on:change={onCodeChange}
 					on:schema={onCodeSchema}
+					on:hidePane={() => (showCodePane = false)}
+					on:showPane={() => (showCodePane = true)}
 				/>
 			</div>
 		{:else}
@@ -1704,20 +1720,30 @@
 				class:hidden={activeTab !== 'properties'}
 			>
 				{#if isCode}
-					<div class="px-3 py-3">
-						<h3 class="mb-1 text-xs font-semibold text-foreground">Composition</h3>
-						<p class="mb-3 text-[11px] leading-snug text-muted-foreground">
-							This template is a Remotion scene. Describe changes in Chat, set its
-							inputs on the Variables tab, and drag its beats under the preview.
-						</p>
-						<label class="flex items-center gap-2 text-xs text-muted-foreground">
-							<input
-								type="checkbox"
-								bind:checked={showCodePane}
-								class="h-3.5 w-3.5 rounded border-border bg-muted text-primary focus:ring-1 focus:ring-primary"
-							/>
-							Show the side pane
-						</label>
+					<div class="flex flex-col gap-4 px-3 py-3">
+						<div>
+							<h3 class="mb-1 font-display text-[13px] font-bold text-brand-ink">Composition</h3>
+							<p class="text-[11px] leading-snug text-brand-slate">
+								This template is a Remotion scene. Describe changes in Say it, set its
+								inputs on the Variables tab, and drag its beats under the preview.
+							</p>
+						</div>
+
+						<!--
+							Nothing is selected in a Remotion scene — there are no clips to
+							select — so this pane is always the template-level view. What
+							belongs here is the thing a template is FOR: the call that runs
+							it. (The old "Show the side pane" checkbox lived here; hiding the
+							editor is a view preference, so it moved onto the panel it hides.)
+						-->
+						<UseItCard
+							inputs={useItInputs}
+							templateUid={uid || ''}
+							templateName={name}
+							apiKey={apiKeyForSnippet}
+							kind="video"
+							heading="Use it — the call, with these inputs"
+						/>
 					</div>
 				{/if}
 				<div bind:this={propsEl} class:hidden={isCode}></div>

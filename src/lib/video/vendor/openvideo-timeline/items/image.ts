@@ -5,11 +5,13 @@
  * vendor directory.
  */
 import { Resizable, ResizableProps, Pattern, util, Control } from "@openvideo/timeline";
+import { CLIP_FILL } from "../clip-palette";
 import { createResizeControls } from "../controls";
 import {
   TIMELINE_SELECTED_BORDER_COLOR,
   TIMELINE_UNSELECTED_BORDER_COLOR,
   TIMELINE_BORDER_WIDTH,
+  TIMELINE_SELECTED_BORDER_WIDTH,
   TIMELINE_ITEM_BORDER_RADIUS,
 } from "../constants";
 
@@ -30,6 +32,9 @@ class Image extends Resizable {
     super(props);
     this.id = props.id;
     this.src = props.src;
+    // A base fill under the thumbnail pattern: without it the clip is a black
+    // rectangle for as long as the image takes to load.
+    this.fill = CLIP_FILL.image;
     this.display = props.display;
     this.tScale = props.tScale;
     this.rx = TIMELINE_ITEM_BORDER_RADIUS;
@@ -67,7 +72,9 @@ class Image extends Resizable {
     const borderColor = this.isSelected
       ? TIMELINE_SELECTED_BORDER_COLOR
       : TIMELINE_UNSELECTED_BORDER_COLOR;
-    const borderWidth = TIMELINE_BORDER_WIDTH;
+    const borderWidth = this.isSelected
+      ? TIMELINE_SELECTED_BORDER_WIDTH
+      : TIMELINE_BORDER_WIDTH;
     const borderRadius = TIMELINE_ITEM_BORDER_RADIUS;
 
     ctx.save();
