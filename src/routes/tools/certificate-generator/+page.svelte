@@ -1,13 +1,20 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /tools/certificate-generator — the v2 tool page, column mode.
+	 *
+	 * Bulk upsell, gallery, form and preview become the tool card; the quota
+	 * ladder and Generate move to its toolbar. SEO copy is frozen.
+	 */
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
@@ -130,7 +137,7 @@
 		},
 		{
 			q: 'Can I email certificates to recipients automatically?',
-			a: 'Yes, this is what makes Pictify different from other certificate makers. A workflow run renders each row\'s certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row.'
+			a: "Yes, this is what makes Pictify different from other certificate makers. A workflow run renders each row's certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row."
 		},
 		{
 			q: 'Can I generate certificates from Google Sheets?',
@@ -318,6 +325,32 @@
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'certificate_generator' });
 	});
+
+	const TOOL_NAME = 'certificate_generator';
+	const TOOL_PATH = '/tools/certificate-generator';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	const RELATED = [
+		{
+			title: 'CSV to PDF',
+			meta: 'CSV → PDF',
+			href: '/tools/csv-to-pdf',
+			art: '/landing/tools/csv-to-pdf.svg'
+		},
+		{
+			title: 'Badge maker',
+			meta: 'TEXT → PNG',
+			href: '/tools/badge',
+			art: '/landing/tools/badge-maker.svg'
+		},
+		{
+			title: 'Membership card',
+			meta: 'MEMBER → PNG',
+			href: '/tools/membership-card',
+			art: '/landing/tools/membership-card.svg'
+		}
+	];
 </script>
 
 <svelte:head>
@@ -377,398 +410,326 @@
 	{@html `<script type="application/ld+json">${templateListSchemaJson}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
-	<Nav />
-
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
-
-	<main
-		class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-24 md:pb-32 relative z-10"
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="CERTIFICATE GENERATOR"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 5 TEMPLATES"
+	related={RELATED}
+	loggedIn={isUserLoggedIn}
+	hasResult={!!generatedImageUrl}
+	longform="column"
+>
+	<h1
+		slot="h1"
+		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
 	>
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">Certificate Generator</li>
-			</ol>
-		</nav>
+		<span>CERTIFICATE</span>
+		<span>GENERATOR</span>
+	</h1>
 
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					Free Tool
-				</div>
-			</div>
+	<p
+		slot="hero-sub"
+		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+	>
+		Create <span class="font-medium">professional certificates</span> in seconds.
+		<span class="text-brand-slate">
+			5 beautiful templates with real-time preview and instant download
+		</span>
+	</p>
 
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">CERTIFICATE</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Create <span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>professional certificates</span
-					>
-					in seconds.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>5 beautiful templates with real-time preview and instant download</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="certificate_generator" />
-
-		<!-- Bulk Workflow Upsell -->
-		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
-			<div
-				class="bg-brand-accent border-[3px] border-black shadow-brutal-xl rounded-xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
-			>
-				<div class="flex-1">
+	<div slot="tool">
+		<ToolCard>
+			<div class="flex flex-col gap-6 p-5 lg:p-7">
+				<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
 					<div
-						class="inline-flex items-center gap-2 px-3 py-1 bg-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-3 shadow-brutal-sm"
+						class="bg-brand-field border border-brand-ink rounded-xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
 					>
-						<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						Bulk
-					</div>
-					<h2 class="text-lg sm:text-xl font-black text-black tracking-tight mb-1">
-						Need certificates for a whole list?
-					</h2>
-					<p class="text-sm sm:text-base font-bold text-gray-800">
-						Upload a CSV and email every recipient automatically. Or trigger it by webhook: issue a
-						certificate the moment your LMS reports a completion.
-					</p>
-				</div>
-				<a
-					href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew%3Fpack%3Dcertificates"
-					class="flex-shrink-0 px-6 py-3 bg-black text-white border-[3px] border-black font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-center"
-				>
-					Start a Bulk Run →
-				</a>
-			</div>
-		</div>
-
-		<!-- Template Gallery -->
-		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
-			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">
-				<span
-					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-						/></svg
-					>
-				</span>
-				CHOOSE A TEMPLATE
-			</h2>
-
-			<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-				{#each certificateHtmlTemplates as template}
-					<button
-						class="flex-shrink-0 w-44 bg-white border-[3px] {selectedTemplate.id === template.id
-							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
-							: 'border-black shadow-brutal-lg'} p-3 overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
-						on:click={() => selectTemplate(template)}
-						aria-label="{template.name} certificate template: {template.description}"
-						title="{template.name} certificate template"
-					>
-						{#if selectedTemplate.id === template.id}
+						<div class="flex-1">
 							<div
-								class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center rounded-full"
+								class="inline-flex items-center gap-2 px-3 py-1 bg-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-3"
 							>
-								<span class="text-white font-black text-sm">&#10003;</span>
+								<svg
+									class="w-3 h-3 sm:w-4 sm:h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/></svg
+								>
+								Bulk
 							</div>
-						{/if}
-						<div
-							class="w-full h-20 rounded-lg mb-2 border-[2px] border-gray-200"
-							role="img"
-							aria-label="{template.name} certificate template preview"
-							style="background-color: {template.thumbnailColor};"
-						/>
-						<span class="text-xs font-black text-gray-900 uppercase tracking-wide block text-center"
-							>{template.name}</span
+							<h2 class="text-lg sm:text-xl font-semibold text-brand-ink tracking-tight mb-1">
+								Need certificates for a whole list?
+							</h2>
+							<p class="text-sm sm:text-base font-bold text-brand-slate">
+								Upload a CSV and render every row against this template. Or trigger it by webhook:
+								issue a certificate the moment your LMS reports a completion.
+							</p>
+						</div>
+						<a
+							href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew%3Fpack%3Dcertificates"
+							class="flex-shrink-0 px-6 py-3 bg-brand-ink text-white border border-brand-ink font-semibold text-sm tracking-wide transition-all rounded-xl text-center"
 						>
+							Start a Bulk Run →
+						</a>
+					</div>
+				</div>
+				<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
+					<h2 class="text-xl sm:text-2xl font-semibold mb-6 flex items-center gap-3">
 						<span
-							class="text-[10px] text-gray-500 font-medium block text-center mt-0.5 line-clamp-1"
-							>{template.description}</span
+							class="w-8 h-8 bg-brand-field border border-brand-ink flex items-center justify-center"
 						>
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<!-- Main Editor Stack -->
-		<div class="max-w-4xl mx-auto flex flex-col gap-6 sm:gap-8 items-stretch mb-10">
-			<!-- Left Column: Form -->
-			<div
-				class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
-			>
-				<!-- Terminal Header -->
-				<div
-					class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] border-black"
-				>
-					<h2 class="font-bold font-mono tracking-widest text-xs uppercase flex items-center gap-2">
-						<span class="animate-pulse">_</span> CERTIFICATE DETAILS
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+								/></svg
+							>
+						</span>
+						CHOOSE A TEMPLATE
 					</h2>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-brand-danger border border-black" />
-						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-data-green border border-black" />
+
+					<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
+						{#each certificateHtmlTemplates as template}
+							<button
+								class="flex-shrink-0 w-44 bg-brand-paper border-[3px] {selectedTemplate.id ===
+								template.id
+									? 'border-brand-danger'
+									: 'border-black'} p-3 overflow-hidden transition-all cursor-pointer rounded-xl relative"
+								on:click={() => selectTemplate(template)}
+								aria-label="{template.name} certificate template: {template.description}"
+								title="{template.name} certificate template"
+							>
+								{#if selectedTemplate.id === template.id}
+									<div
+										class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center rounded-full"
+									>
+										<span class="text-white font-semibold text-sm">&#10003;</span>
+									</div>
+								{/if}
+								<div
+									class="w-full h-20 rounded-lg mb-2 border-[2px] border-gray-200"
+									role="img"
+									aria-label="{template.name} certificate template preview"
+									style="background-color: {template.thumbnailColor};"
+								/>
+								<span class="text-xs font-semibold text-brand-ink tracking-wide block text-center"
+									>{template.name}</span
+								>
+								<span
+									class="text-[10px] text-brand-mute font-medium block text-center mt-0.5 line-clamp-1"
+									>{template.description}</span
+								>
+							</button>
+						{/each}
 					</div>
 				</div>
 
-				<div class="p-4 sm:p-6 space-y-5">
-					<!-- Recipient Name -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
-								>1</span
-							>
-							Recipient Name
-						</h3>
-						<input
-							bind:value={formValues.recipientName}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
-							placeholder="John Doe"
-						/>
-					</div>
-
-					<!-- Organization Name -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-data-sky border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>2</span
-							>
-							Organization Name
-						</h3>
-						<input
-							bind:value={formValues.organizationName}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
-							placeholder="Your Organization"
-						/>
-					</div>
-
-					<!-- Date -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-data-violet border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>3</span
-							>
-							Date
-						</h3>
-						<input
-							bind:value={formValues.date}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
-							placeholder="April 13, 2026"
-						/>
-					</div>
-
-					<!-- Achievement Text -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>4</span
-							>
-							Achievement
-						</h3>
-						<textarea
-							bind:value={formValues.achievementText}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none rounded-lg"
-							placeholder="for successfully completing the Advanced Training Program"
-							rows="3"
-						/>
-					</div>
-
-					<!-- Workflow CTA: bulk generation + delivery -->
-					<a
-						href="/dashboard/workflows/new"
-						class="w-full py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						Start a Certificate Run
-					</a>
-				</div>
-			</div>
-
-			<!-- Right Column: Live Preview -->
-			<div class="space-y-4 sm:space-y-6">
-				<div
-					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
-				>
-					<!-- Preview Header -->
-					<div
-						class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
-					>
-						<div class="flex items-center gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
-						</div>
+				<div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8">
+					<div class="bg-brand-paper border border-brand-ink overflow-hidden rounded-xl">
+						<!-- Terminal Header -->
 						<div
-							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
+							class="bg-brand-ink text-white px-4 py-3 flex justify-between items-center border-b border-brand-ink"
 						>
-							<span
-								class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
-								>Live Preview</span
-							>
-							{selectedTemplate.width} x {selectedTemplate.height}px
+							<h2 class="font-bold font-mono tracking-widest text-xs flex items-center gap-2">
+								<span class="animate-pulse">_</span> CERTIFICATE DETAILS
+							</h2>
+							<div class="flex gap-2">
+								<div class="w-3 h-3 bg-brand-pink border border-black" />
+								<div class="w-3 h-3 bg-brand-field border border-black" />
+								<div class="w-3 h-3 bg-brand-proof border border-black" />
+							</div>
 						</div>
-					</div>
 
-					<!-- Live HTML Preview (scaled iframe of the exact render HTML) -->
-					<div
-						class="p-4 sm:p-6 bg-gray-100 flex flex-col items-center justify-center relative min-h-[300px]"
-					>
-						<div
-							class="absolute inset-0 opacity-10"
-							style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
-						/>
-
-						<div class="relative z-10 w-full" bind:clientWidth={previewContainerWidth}>
-							<div
-								class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
-								style="height: {Math.round(selectedTemplate.height * previewScale)}px;"
-							>
-								<iframe
-									title="Certificate preview"
-									srcdoc={previewHtml}
-									sandbox="allow-scripts"
-									scrolling="no"
-									style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
+						<div class="p-4 sm:p-6 space-y-5">
+							<!-- Recipient Name -->
+							<div class="space-y-2">
+								<h3
+									class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+								>
+									<span
+										class="w-6 h-6 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
+										>1</span
+									>
+									Recipient Name
+								</h3>
+								<input
+									bind:value={formValues.recipientName}
+									type="text"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none rounded-lg"
+									placeholder="John Doe"
 								/>
 							</div>
+
+							<!-- Organization Name -->
+							<div class="space-y-2">
+								<h3
+									class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+								>
+									<span
+										class="w-6 h-6 bg-data-sky border border-brand-ink flex items-center justify-center text-xs text-white"
+										>2</span
+									>
+									Organization Name
+								</h3>
+								<input
+									bind:value={formValues.organizationName}
+									type="text"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none rounded-lg"
+									placeholder="Your Organization"
+								/>
+							</div>
+
+							<!-- Date -->
+							<div class="space-y-2">
+								<h3
+									class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+								>
+									<span
+										class="w-6 h-6 bg-data-violet border border-brand-ink flex items-center justify-center text-xs text-white"
+										>3</span
+									>
+									Date
+								</h3>
+								<input
+									bind:value={formValues.date}
+									type="text"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none rounded-lg"
+									placeholder="April 13, 2026"
+								/>
+							</div>
+
+							<!-- Achievement Text -->
+							<div class="space-y-2">
+								<h3
+									class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+								>
+									<span
+										class="w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center text-xs text-white"
+										>4</span
+									>
+									Achievement
+								</h3>
+								<textarea
+									bind:value={formValues.achievementText}
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none rounded-lg"
+									placeholder="for successfully completing the Advanced Training Program"
+									rows="3"
+								/>
+							</div>
+
+							<!-- Workflow CTA: bulk generation + delivery -->
+							<a
+								href="/dashboard/workflows/new"
+								class="w-full py-3 bg-brand-proof text-brand-ink border border-brand-ink font-semibold text-sm tracking-wide transition-all flex items-center justify-center gap-2 rounded-xl"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/></svg
+								>
+								Start a Certificate Run
+							</a>
+						</div>
+					</div>
+					<div class="flex flex-col gap-4">
+						<div class="bg-brand-paper border border-brand-ink overflow-hidden rounded-xl">
+							<!-- Preview Header -->
+							<div
+								class="bg-brand-subtle border-b border-brand-ink p-4 flex items-center justify-between"
+							>
+								<div class="flex items-center gap-2">
+									<div class="w-3.5 h-3.5 rounded-full bg-brand-pink border border-brand-ink" />
+									<div class="w-3.5 h-3.5 rounded-full bg-brand-field border border-brand-ink" />
+									<div class="w-3.5 h-3.5 rounded-full bg-brand-proof border border-brand-ink" />
+								</div>
+								<div class="font-mono text-xs font-bold text-brand-mute flex items-center gap-2">
+									<span
+										class="px-2 py-0.5 bg-brand-proof/20 border border-brand-proof rounded text-brand-slate"
+										>Live Preview</span
+									>
+									{selectedTemplate.width} x {selectedTemplate.height}px
+								</div>
+							</div>
+
+							<!-- Live HTML Preview (scaled iframe of the exact render HTML) -->
+							<div
+								class="p-4 sm:p-6 bg-brand-subtle flex flex-col items-center justify-center relative min-h-[300px]"
+							>
+								<div
+									class="absolute inset-0 opacity-10"
+									style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
+								/>
+
+								<div class="relative z-10 w-full" bind:clientWidth={previewContainerWidth}>
+									<div
+										class="overflow-hidden bg-brand-paper border border-brand-ink rounded-lg"
+										style="height: {Math.round(selectedTemplate.height * previewScale)}px;"
+									>
+										<iframe
+											title="Certificate preview"
+											srcdoc={previewHtml}
+											sandbox="allow-scripts"
+											scrolling="no"
+											style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
+										/>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-
-				<!-- Generate Button -->
-				<button
-					on:click={handleGenerate}
-					disabled={isGenerating}
-					class="w-full bg-brand-danger hover:bg-data-red text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
-				>
-					{#if isGenerating}
-						<svg
-							class="animate-spin h-5 w-5"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							/>
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							/>
-						</svg>
-						GENERATING...
-					{:else}
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						GENERATE CERTIFICATE
-					{/if}
-				</button>
 			</div>
-		</div>
 
-		<!-- Generated Result + NextSteps -->
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+					NAMES → CERTIFICATES
+				</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label="Generate Certificate"
+					loading={isGenerating}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={handleGenerate}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
+
+	<div slot="result">
 		{#if generatedImageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
 				<div
-					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
+					class="bg-brand-proof/10 border-[3px] border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
+					<div class="absolute top-0 right-0 w-32 h-32 bg-brand-proof/20 rounded-full blur-2xl" />
 
-					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
+					<h3 class="text-2xl font-semibold text-brand-ink tracking-tight mb-6">
 						Your certificate is ready!
 					</h3>
 
-					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
-					>
+					<div class="inline-block bg-brand-paper border border-brand-ink p-2 rotate-1 mb-8">
 						<img
 							loading="lazy"
 							src={generatedImageUrl}
@@ -783,7 +744,7 @@
 								downloadFile(generatedImageUrl, 'certificate.png', {
 									tool_name: 'certificate_generator'
 								})}
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -797,7 +758,7 @@
 						</button>
 						<a
 							href="/dashboard/workflows/new"
-							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-brand-proof text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -827,14 +788,14 @@
 			</div>
 		{:else if generationError}
 			<div class="max-w-3xl mx-auto px-4 mb-12">
-				<div class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4">
+				<div class="bg-red-50 border-[3px] border-red-500 rounded-tile p-6 flex items-center gap-4">
 					<div
-						class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500 font-black"
+						class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500 font-semibold"
 					>
 						!
 					</div>
 					<div>
-						<h4 class="font-black text-red-900 uppercase">Generation Failed</h4>
+						<h4 class="font-semibold text-red-900">Generation Failed</h4>
 						<p class="text-red-700 font-medium">{generationError}</p>
 					</div>
 					<button on:click={handleGenerate} class="ml-auto underline font-bold text-red-900"
@@ -843,38 +804,41 @@
 				</div>
 			</div>
 		{/if}
+	</div>
 
-		<!-- SEO Content Sections -->
+	<svelte:fragment slot="longform">
 		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
 			<!-- Separator -->
 			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
+				<div
+					class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-subtle px-4 sm:px-6"
+				>
 					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
+						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-field border border-brand-ink flex items-center justify-center"
 					>
-						<span class="font-black text-sm sm:text-lg">?</span>
+						<span class="font-semibold text-sm sm:text-lg">?</span>
 					</div>
 				</div>
 			</div>
 
 			<h2
-				class="text-2xl sm:text-3xl md:text-5xl font-black mb-8 sm:mb-12 text-center text-gray-900 tracking-tighter px-2"
+				class="text-2xl sm:text-3xl md:text-5xl font-semibold mb-8 sm:mb-12 text-center text-brand-ink tracking-[-0.02em] px-2"
 			>
 				LEARN MORE ABOUT <br class="md:hidden" />
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-2 sm:px-4">CERTIFICATES</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
+						class="absolute inset-0 bg-brand-pink transform -skew-x-2 border border-brand-ink -z-0"
 					/>
 				</span>
 			</h2>
 
 			<!-- What is Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -887,11 +851,11 @@
 					Overview
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					What is a Certificate Generator?
 				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
 					A certificate generator is a tool that lets you create professional, customizable
 					certificates for any occasion. Whether you need certificates for course completions,
 					employee awards, event attendance, or academic achievements, a certificate generator
@@ -903,10 +867,10 @@
 
 			<!-- Benefits Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -919,17 +883,17 @@
 					Benefits
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					Why Use Our Certificate Generator?
 				</h3>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					{#each ['5 professionally designed certificate templates', 'Real-time live preview as you type', 'Customize recipient name, organization, date, and achievement', 'High-resolution 1920x1080px PNG output', 'API available for bulk certificate generation', 'No signup required to get started'] as benefit}
 						<div
-							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-center gap-3 transition-all"
 						>
-							<span class="font-black text-data-green">&#10003;</span>
-							<span class="font-bold text-black text-sm">{benefit}</span>
+							<span class="font-semibold text-brand-proof">&#10003;</span>
+							<span class="font-bold text-brand-ink text-sm">{benefit}</span>
 						</div>
 					{/each}
 				</div>
@@ -937,10 +901,10 @@
 
 			<!-- How to Use Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -958,7 +922,7 @@
 					Guide
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					How to Make a Certificate Online in 6 Steps
 				</h3>
@@ -966,10 +930,10 @@
 					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Watch the live preview update as you type' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate, or start a workflow run to email them in bulk' }] as step}
 						<div class="flex items-start gap-4">
 							<span
-								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
+								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
 								>{step.num}</span
 							>
-							<span class="font-bold text-black text-sm pt-1">{step.text}</span>
+							<span class="font-bold text-brand-ink text-sm pt-1">{step.text}</span>
 						</div>
 					{/each}
 				</div>
@@ -977,10 +941,10 @@
 
 			<!-- Bulk Certificates for Events: the delivery wedge -->
 			<section
-				class="mb-8 sm:mb-12 bg-gray-900 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 rounded-none"
+				class="mb-8 sm:mb-12 bg-brand-ink border border-brand-ink p-4 sm:p-6 md:p-10 rounded-none"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -992,61 +956,63 @@
 					>
 					Bulk + Delivered
 				</div>
-				<h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-white tracking-tight">
+				<h3
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-white tracking-tight"
+				>
 					Bulk Certificate Generator for Events: Delivered, Not Downloaded
 				</h3>
-				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium mb-6">
+				<p class="text-sm sm:text-base text-brand-rule leading-relaxed font-medium mb-6">
 					Generating 300 certificates was never the hard part. Getting 300 certificates into 300
 					inboxes before the deadline is. Every other path stops one step short of the send:
 				</p>
 				<div class="grid sm:grid-cols-3 gap-4 mb-6">
 					<a
 						href="/alternatives/autocrat"
-						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="block bg-brand-paper border border-brand-ink p-4 transition-all"
 					>
-						<h4 class="font-black text-black text-sm mb-1">Sheets add-ons</h4>
-						<p class="text-xs text-gray-600 leading-relaxed">
+						<h4 class="font-semibold text-brand-ink text-sm mb-1">Sheets add-ons</h4>
+						<p class="text-xs text-brand-slate leading-relaxed">
 							Autocrat rides Apps Script (6-minute cap) and your Gmail quota, and broke across its
 							81M-install base in June 2026. →
 						</p>
 					</a>
 					<a
 						href="/alternatives/canva-bulk-create"
-						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="block bg-brand-paper border border-brand-ink p-4 transition-all"
 					>
-						<h4 class="font-black text-black text-sm mb-1">Canva Bulk Create</h4>
-						<p class="text-xs text-gray-600 leading-relaxed">
+						<h4 class="font-semibold text-brand-ink text-sm mb-1">Canva Bulk Create</h4>
+						<p class="text-xs text-brand-slate leading-relaxed">
 							Makes beautiful variants, then stops at download. No email delivery of any kind; the
 							zip file is your problem. →
 						</p>
 					</a>
 					<a
 						href="/solutions/mail-merge-with-attachments"
-						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+						class="block bg-brand-paper border border-brand-ink p-4 transition-all"
 					>
-						<h4 class="font-black text-black text-sm mb-1">Mail merge</h4>
-						<p class="text-xs text-gray-600 leading-relaxed">
-							Word can't attach the file. Gmail caps at 500–1,500 a day and locks you out
-							mid-batch. →
+						<h4 class="font-semibold text-brand-ink text-sm mb-1">Mail merge</h4>
+						<p class="text-xs text-brand-slate leading-relaxed">
+							Word can't attach the file. Gmail caps at 500–1,500 a day and locks you out mid-batch.
+							→
 						</p>
 					</a>
 				</div>
-				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium">
+				<p class="text-sm sm:text-base text-brand-rule leading-relaxed font-medium">
 					A Pictify workflow run does the whole job: upload the attendee CSV, every row renders its
 					own certificate, and every certificate emails itself to its recipient from an isolated
-					sending domain. You watch <span class="text-data-green font-black"
+					sending domain. You watch <span class="text-brand-proof font-semibold"
 						>delivered / bounced / suppressed per person</span
-					>, and re-send any single row with a corrected address. That's the difference between "sent"
-					and "delivered".
+					>, and re-send any single row with a corrected address. That's the difference between
+					"sent" and "delivered".
 				</p>
 			</section>
 
 			<!-- FAQ Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1059,22 +1025,22 @@
 					FAQ
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					Frequently Asked Questions
 				</h3>
 				<div class="space-y-3">
 					{#each faqs as faq}
 						<details
-							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
 						>
 							<summary
-								class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none text-sm"
+								class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none text-sm"
 							>
 								<span>{faq.q}</span>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
+									class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
 									viewBox="0 0 20 20"
 									fill="currentColor"
 								>
@@ -1085,7 +1051,9 @@
 									/>
 								</svg>
 							</summary>
-							<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+							<div
+								class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm"
+							>
 								{faq.a}
 							</div>
 						</details>
@@ -1095,10 +1063,10 @@
 
 			<!-- Certificate Templates Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-violet border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-violet border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1111,22 +1079,22 @@
 					Templates
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					Certificate Templates: Choose from 5 Free Designs
 				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-6">
-					Every certificate template works for any certificate type: award, achievement,
-					completion, participation, or appreciation. Pick a design that matches your brand and
-					customize the title, recipient name, date, and achievement text. All templates are free
-					and come with commercial-use rights.
+				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium mb-6">
+					Every certificate template works for any certificate type: award, achievement, completion,
+					participation, or appreciation. Pick a design that matches your brand and customize the
+					title, recipient name, date, and achievement text. All templates are free and come with
+					commercial-use rights.
 				</p>
 				<div class="space-y-5">
 					<div class="border-l-[4px] border-brand-accent pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+						<h4 class="text-base sm:text-lg font-semibold text-brand-ink mb-1">
 							Certificate of Achievement Template
 						</h4>
-						<p class="text-sm text-gray-700 font-medium">
+						<p class="text-sm text-brand-slate font-medium">
 							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong
 								>Elegant</strong
 							> template, with gold borders and serif typography, is our most popular certificate of
@@ -1134,20 +1102,20 @@
 						</p>
 					</div>
 					<div class="border-l-[4px] border-data-sky pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+						<h4 class="text-base sm:text-lg font-semibold text-brand-ink mb-1">
 							Certificate of Completion Template
 						</h4>
-						<p class="text-sm text-gray-700 font-medium">
+						<p class="text-sm text-brand-slate font-medium">
 							Issue a certificate of completion for courses, training programs, workshops, and
 							onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek,
 							contemporary feel that reads well on-screen and in print.
 						</p>
 					</div>
-					<div class="border-l-[4px] border-data-green pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+					<div class="border-l-[4px] border-brand-proof pl-4 sm:pl-5">
+						<h4 class="text-base sm:text-lg font-semibold text-brand-ink mb-1">
 							Certificate of Participation Template
 						</h4>
-						<p class="text-sm text-gray-700 font-medium">
+						<p class="text-sm text-brand-slate font-medium">
 							Acknowledge attendance and engagement with a certificate of participation. The <strong
 								>Corporate</strong
 							> template's navy header and formal layout make it the right certificate of participation
@@ -1155,21 +1123,21 @@
 						</p>
 					</div>
 					<div class="border-l-[4px] border-brand-danger pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+						<h4 class="text-base sm:text-lg font-semibold text-brand-ink mb-1">
 							Award Certificate Template
 						</h4>
-						<p class="text-sm text-gray-700 font-medium">
+						<p class="text-sm text-brand-slate font-medium">
 							Celebrate winners and honorees with a bold award certificate. The <strong
 								>Creative</strong
-							> template (coral accents and playful geometry) works well for employee-of-the-month
-							awards, tournament winners, and community recognition.
+							> template (coral accents and playful geometry) works well for employee-of-the-month awards,
+							tournament winners, and community recognition.
 						</p>
 					</div>
 					<div class="border-l-[4px] border-[#1f2937] pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
+						<h4 class="text-base sm:text-lg font-semibold text-brand-ink mb-1">
 							Certificate of Appreciation Template
 						</h4>
-						<p class="text-sm text-gray-700 font-medium">
+						<p class="text-sm text-brand-slate font-medium">
 							Thank volunteers, partners, and team members with a certificate of appreciation. The <strong
 								>Minimalist</strong
 							> template's generous whitespace and refined typography puts the focus on the recipient,
@@ -1181,10 +1149,10 @@
 
 			<!-- Online Certificate Maker Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -1197,20 +1165,20 @@
 					Free Online
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					Use Our Online Certificate Maker for Free
 				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
+				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium mb-4">
 					Pictify's online certificate maker runs entirely in your browser: no downloads, no
 					installs, no signup. The certificate maker supports a real-time preview that updates as
 					you type, and high-resolution PNG export at 1920×1080. Generate one certificate in under a
 					minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds
 					at once from a spreadsheet or database.
 				</p>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					Every template here is plain HTML and CSS, the same template a Pictify workflow renders
-					at scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
+				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
+					Every template here is plain HTML and CSS, the same template a Pictify workflow renders at
+					scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
 					certificate, emailed to its recipient. That's the difference between a one-off certificate
 					generator and a programmable certificate builder: the fast free tool today, delivery-grade
 					automation when you're ready to scale.
@@ -1220,28 +1188,28 @@
 			<!-- Bulk Run CTA -->
 			<section class="mb-12 sm:mb-16 text-center">
 				<div
-					class="bg-gray-900 border-[3px] border-black rounded-2xl p-8 sm:p-12 relative overflow-hidden"
+					class="bg-brand-ink border border-brand-ink rounded-tile p-8 sm:p-12 relative overflow-hidden"
 				>
 					<div
-						class="absolute top-0 right-0 w-40 h-40 bg-brand-accent/20 rounded-full blur-2xl pointer-events-none"
+						class="absolute top-0 right-0 w-40 h-40 bg-brand-field/20 rounded-full blur-2xl pointer-events-none"
 					/>
 					<div
-						class="absolute bottom-0 left-0 w-32 h-32 bg-brand-danger/20 rounded-full blur-2xl pointer-events-none"
+						class="absolute bottom-0 left-0 w-32 h-32 bg-brand-pink/20 rounded-full blur-2xl pointer-events-none"
 					/>
 
 					<h3
-						class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-4 relative z-10"
+						class="text-2xl sm:text-3xl font-semibold text-white tracking-tight mb-4 relative z-10"
 					>
 						Need Them Delivered, Not Just Downloaded?
 					</h3>
-					<p class="text-gray-400 font-bold mb-8 max-w-lg mx-auto relative z-10">
-						Start a workflow run to generate personalized certificates in bulk, and email each
-						one to its recipient with per-person delivery status. Perfect for events, courses,
+					<p class="text-brand-mute font-bold mb-8 max-w-lg mx-auto relative z-10">
+						Start a workflow run to generate personalized certificates in bulk: one render per row,
+						a CDN link for each, and a webhook when the run finishes. Perfect for events, courses,
 						and training programs.
 					</p>
 					<a
 						href="/dashboard/workflows/new"
-						class="px-8 py-4 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
+						class="px-8 py-4 bg-brand-field text-brand-ink border border-brand-ink font-semibold text-lg tracking-wide transition-all inline-flex items-center gap-3 rounded-tile relative z-10"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1256,9 +1224,11 @@
 				</div>
 			</section>
 		</div>
-	</main>
+	</svelte:fragment>
 
-	<RelatedTools tools={['badge', 'course-certificate', 'receipt', 'event-ticket']} />
-
-	<Footer />
-</section>
+	<svelte:fragment slot="footer-links">
+		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
+			<RelatedTools tools={['badge', 'course-certificate', 'receipt', 'event-ticket']} />
+		</div>
+	</svelte:fragment>
+</ToolPageShell>
