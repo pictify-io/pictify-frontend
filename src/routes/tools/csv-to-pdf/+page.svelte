@@ -578,17 +578,17 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 				{#if mode === 'per-row'}
 					<div class="border-t border-white/20 pt-5">
 						<p class="font-bold text-brand-press-text text-sm leading-relaxed">
-							<span class="text-white font-semibold">Next step:</span> these documents are still on
-							your disk; the deadline wants them in inboxes. A workflow run renders every row
+							<span class="text-white font-semibold">Next step:</span> this run stopped at the free
+							cap. A batch render takes the whole sheet
 							{rows.length > rowsToRender ? `(all ${rows.length}, not just ${rowsToRender})` : ''}
-							with a branded template and
-							<span class="text-brand-proof font-semibold">emails each one to its recipient</span> with
-							delivered/bounced status per person.
+							against a branded template and gives you
+							<span class="text-brand-proof font-semibold">a result per row</span>: a CDN link for
+							each document, and a webhook when the batch finishes.
 						</p>
 						<a
 							href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew"
 							class="inline-block mt-4 px-6 py-3 bg-brand-paper text-brand-ink border border-white/30 font-semibold text-sm tracking-wide transition-all"
-							>Email These Documents →</a
+							>Render The Whole Sheet →</a
 						>
 					</div>
 				{/if}

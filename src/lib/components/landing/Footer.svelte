@@ -5,7 +5,7 @@
 		{
 			title: 'Product',
 			links: [
-				['Formats', '/tools/html-to-image'],
+				['HTML to image', '/tools/html-to-image'],
 				['Templates', '/templates'],
 				['Video', '/video'],
 				['Pricing', '/pricing']
