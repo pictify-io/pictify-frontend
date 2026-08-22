@@ -1,23 +1,28 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
+	/**
+	 * /tools/code-to-image — the v2 tool page, column mode.
+	 *
+	 * Controls and editor become the tool card's two columns; the quota ladder
+	 * and Generate move to its toolbar. SEO copy is frozen.
+	 */
 	import SEOHead from '$lib/seo/SEOHead.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
 	import { user } from '../../../store/user.store';
-	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
-	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
-	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
 	let stickyBar;
 
 	// Syntax highlighting via refractor (Prism under the hood)
@@ -895,6 +900,32 @@
 			}
 		]
 	};
+
+	const TOOL_NAME = 'code_to_image';
+	const TOOL_PATH = '/tools/code-to-image';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	const RELATED = [
+		{
+			title: 'Markdown to image',
+			meta: 'MD → PNG',
+			href: '/tools/markdown',
+			art: '/landing/tools/markdown-to-image.svg'
+		},
+		{
+			title: 'HTML to image',
+			meta: 'HTML → PNG · JPG · WEBP',
+			href: '/tools/html-to-image',
+			art: '/landing/tools/html-to-image.svg'
+		},
+		{
+			title: 'Tweet screenshot',
+			meta: 'TWEET URL → PNG',
+			href: '/tools/tweet-screenshot',
+			art: '/landing/tools/tweet-screenshot.svg'
+		}
+	];
 </script>
 
 <SEOHead
@@ -917,519 +948,456 @@
 	]}
 />
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
-	<Nav />
-
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
-
-	<main
-		class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-24 md:pb-32 relative z-10"
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="CODE TO IMAGE"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 20+ LANGUAGES"
+	related={RELATED}
+	loggedIn={isUserLoggedIn}
+	hasResult={!!generatedImage}
+	longform="column"
+>
+	<h1
+		slot="h1"
+		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
 	>
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">Code to Image</li>
-			</ol>
-		</nav>
+		<span>CODE TO</span>
+		<span>IMAGE</span>
+	</h1>
 
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
+	<p
+		slot="hero-sub"
+		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+	>
+		Create beautiful, <span class="font-medium">syntax-highlighted</span> code screenshots.
+		<span class="text-brand-slate">Perfect for social media, blogs, and documentation</span>
+	</p>
+
+	<div slot="tool">
+		<ToolCard>
+			<div class="grid grid-cols-1 items-start gap-6 p-5 lg:grid-cols-[340px_1fr] lg:gap-8 lg:p-7">
 				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					★ Free Tool
-				</div>
-			</div>
-
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">CODE TO</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Create beautiful, <span
-						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>syntax-highlighted</span
-					>
-					code screenshots.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Perfect for social media, blogs, and documentation</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<!-- Post-signup welcome with API key -->
-		<PostSignupWelcome toolName="code_to_image" />
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="code_to_image" />
-
-		<div class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 lg:gap-8 items-start">
-			<!-- Left Column: Controls -->
-			<div
-				class="bg-white border-[3px] border-black shadow-brutal-xl lg:shadow-brutal-2xl lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1"
-			>
-				<!-- Terminal Header -->
-				<div
-					class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] border-black"
-				>
-					<h2 class="font-bold font-mono tracking-widest text-xs uppercase flex items-center gap-2">
-						<span class="animate-pulse">_</span> CONFIG
-					</h2>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-brand-danger border border-black" />
-						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-data-green border border-black" />
-					</div>
-				</div>
-				<div
-					class="p-4 sm:p-6 overflow-y-auto custom-scrollbar max-h-[60vh] lg:max-h-[calc(100vh-14rem)]"
-				>
-					<div class="space-y-6">
-						<!-- Language & Theme -->
-						<div class="space-y-4">
-							<div>
-								<label
-									for="language"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Language</label
-								>
-								<div class="relative">
-									<select
-										id="language"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-										bind:value={language}
-										on:change={() => {
-											/* update filename via reactive */
-										}}
-									>
-										{#each languageOptions as opt}
-											<option value={opt.id}>{opt.name}</option>
-										{/each}
-									</select>
-									<div
-										class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black"
-									>
-										<svg
-											class="fill-current h-4 w-4"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 20 20"
-											><path
-												d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-											/></svg
-										>
-									</div>
-								</div>
-							</div>
-
-							<div>
-								<label
-									for="theme"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Theme</label
-								>
-								<div class="relative">
-									<select
-										id="theme"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-										bind:value={themeId}
-									>
-										{#each themeOptions as opt}
-											<option value={opt.id}>{opt.name}</option>
-										{/each}
-									</select>
-									<div
-										class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black"
-									>
-										<svg
-											class="fill-current h-4 w-4"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 20 20"
-											><path
-												d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-											/></svg
-										>
-									</div>
-								</div>
-							</div>
-
-							<div>
-								<label
-									for="font"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Font</label
-								>
-								<div class="relative">
-									<select
-										id="font"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-										bind:value={fontId}
-									>
-										{#each fontOptions as opt}
-											<option value={opt.id}>{opt.name}</option>
-										{/each}
-									</select>
-									<div
-										class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black"
-									>
-										<svg
-											class="fill-current h-4 w-4"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 20 20"
-											><path
-												d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-											/></svg
-										>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="h-[3px] bg-black" />
-
-						<!-- Appearance -->
-						<div class="space-y-4">
-							<div>
-								<label
-									for="backdrop"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Background</label
-								>
-								<div class="relative">
-									<select
-										id="backdrop"
-										class="w-full bg-white border-[3px] border-black text-black text-sm font-bold shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-										bind:value={backdrop}
-									>
-										{#each backdropOptions as option}
-											<option value={option.id}>{option.name}</option>
-										{/each}
-									</select>
-									<div
-										class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black"
-									>
-										<svg
-											class="fill-current h-4 w-4"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 20 20"
-											><path
-												d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-											/></svg
-										>
-									</div>
-								</div>
-							</div>
-
-							{#if backdrop === 'solid'}
-								<div>
-									<label
-										for="solidBg"
-										class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-										>Color</label
-									>
-									<div class="flex items-center gap-2">
-										<input
-											id="solidBg"
-											class="h-10 w-full border-[3px] border-black cursor-pointer shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
-											type="color"
-											bind:value={solidBackground}
-										/>
-										<input
-											type="text"
-											class="w-24 border-[3px] border-black p-2 text-sm font-mono shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-											bind:value={solidBackground}
-										/>
-									</div>
-								</div>
-							{/if}
-							{#if backdrop === 'custom-gradient'}
-								<div class="grid grid-cols-2 gap-2">
-									<div>
-										<label
-											for="gradientStart"
-											class="block text-xs font-black text-black mb-1 uppercase tracking-wider"
-											>Start</label
-										>
-										<input
-											id="gradientStart"
-											class="h-8 w-full border-[3px] border-black cursor-pointer shadow-brutal-sm"
-											type="color"
-											bind:value={customGradientStart}
-										/>
-									</div>
-									<div>
-										<label
-											for="gradientEnd"
-											class="block text-xs font-black text-black mb-1 uppercase tracking-wider"
-											>End</label
-										>
-										<input
-											id="gradientEnd"
-											class="h-8 w-full border-[3px] border-black cursor-pointer shadow-brutal-sm"
-											type="color"
-											bind:value={customGradientEnd}
-										/>
-									</div>
-								</div>
-							{/if}
-
-							<div>
-								<label
-									for="padding"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Padding ({padding}px)</label
-								>
-								<input
-									id="padding"
-									type="range"
-									min="16"
-									max="128"
-									bind:value={padding}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-						</div>
-
-						<div class="h-px bg-gray-200" />
-
-						<!-- Window Settings -->
-						<div class="space-y-3">
-							<div
-								class="flex items-center justify-between p-3 bg-[#f8f8f8] border-[2px] border-black"
-							>
-								<label for="chrome" class="text-xs font-black text-black uppercase tracking-wider"
-									>Window Controls</label
-								>
-								<div class="relative inline-block w-12 align-middle select-none">
-									<input
-										type="checkbox"
-										name="chrome"
-										id="chrome"
-										bind:checked={showWindowChrome}
-										class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-danger"
-									/>
-									<label
-										for="chrome"
-										class="toggle-label block overflow-hidden h-6 bg-gray-200 cursor-pointer border-[3px] border-black"
-									/>
-								</div>
-							</div>
-
-							<div
-								class="flex items-center justify-between p-3 bg-[#f8f8f8] border-[2px] border-black"
-							>
-								<label
-									for="lineNumbers"
-									class="text-xs font-black text-black uppercase tracking-wider">Line Numbers</label
-								>
-								<div class="relative inline-block w-12 align-middle select-none">
-									<input
-										type="checkbox"
-										name="lineNumbers"
-										id="lineNumbers"
-										bind:checked={showLineNumbers}
-										class="toggle-checkbox absolute block w-6 h-6 bg-white border-[3px] border-black appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-danger"
-									/>
-									<label
-										for="lineNumbers"
-										class="toggle-label block overflow-hidden h-6 bg-gray-200 cursor-pointer border-[3px] border-black"
-									/>
-								</div>
-							</div>
-						</div>
-
-						<div class="h-[3px] bg-black" />
-
-						<!-- Advanced Styling -->
-						<div class="space-y-4">
-							<h3
-								class="text-xs font-black text-black uppercase tracking-widest flex items-center gap-2 pb-2 border-b-[2px] border-black"
-							>
-								<span
-									class="w-5 h-5 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
-									>⚙</span
-								>
-								Advanced Styling
-							</h3>
-
-							<div>
-								<label
-									for="fontSize"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Font Size ({fontSize}px)</label
-								>
-								<input
-									id="fontSize"
-									type="range"
-									min="10"
-									max="24"
-									bind:value={fontSize}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="lineHeight"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Line Height ({lineHeight})</label
-								>
-								<input
-									id="lineHeight"
-									type="range"
-									min="1"
-									max="2.5"
-									step="0.1"
-									bind:value={lineHeight}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="opacity"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Card Opacity ({Math.round(cardOpacity * 100)}%)</label
-								>
-								<input
-									id="opacity"
-									type="range"
-									min="0"
-									max="1"
-									step="0.05"
-									bind:value={cardOpacity}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="shadow"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Shadow Intensity</label
-								>
-								<input
-									id="shadow"
-									type="range"
-									min="0"
-									max="1"
-									step="0.05"
-									bind:value={shadowIntensity}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="blur"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Blur ({blurEffect}px)</label
-								>
-								<input
-									id="blur"
-									type="range"
-									min="0"
-									max="20"
-									bind:value={blurEffect}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="radius"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Border Radius ({borderRadius}px)</label
-								>
-								<input
-									id="radius"
-									type="range"
-									min="0"
-									max="32"
-									bind:value={borderRadius}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="tabWidth"
-									class="block text-xs font-black text-black mb-1.5 uppercase tracking-wider"
-									>Tab Width ({codeTabWidth})</label
-								>
-								<input
-									id="tabWidth"
-									type="range"
-									min="2"
-									max="8"
-									step="2"
-									bind:value={codeTabWidth}
-									class="w-full cursor-pointer"
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Right Column: Preview & Editor -->
-			<div class="space-y-4 sm:space-y-6 order-1 lg:order-2">
-				<!-- Editor Area -->
-				<div
-					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden"
+					class="bg-brand-paper border border-brand-ink lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1"
 				>
 					<!-- Terminal Header -->
 					<div
-						class="bg-black text-white px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between border-b-[3px] border-black"
+						class="bg-brand-ink text-white px-4 py-3 flex justify-between items-center border-b border-brand-ink"
+					>
+						<h2 class="font-bold font-mono tracking-widest text-xs flex items-center gap-2">
+							<span class="animate-pulse">_</span> CONFIG
+						</h2>
+						<div class="flex gap-2">
+							<div class="w-3 h-3 bg-brand-pink border border-black" />
+							<div class="w-3 h-3 bg-brand-field border border-black" />
+							<div class="w-3 h-3 bg-brand-proof border border-black" />
+						</div>
+					</div>
+					<div
+						class="p-4 sm:p-6 overflow-y-auto custom-scrollbar max-h-[60vh] lg:max-h-[calc(100vh-14rem)]"
+					>
+						<div class="space-y-6">
+							<!-- Language & Theme -->
+							<div class="space-y-4">
+								<div>
+									<label
+										for="language"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Language</label
+									>
+									<div class="relative">
+										<select
+											id="language"
+											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+											bind:value={language}
+											on:change={() => {
+												/* update filename via reactive */
+											}}
+										>
+											{#each languageOptions as opt}
+												<option value={opt.id}>{opt.name}</option>
+											{/each}
+										</select>
+										<div
+											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
+										>
+											<svg
+												class="fill-current h-4 w-4"
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 20 20"
+												><path
+													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+												/></svg
+											>
+										</div>
+									</div>
+								</div>
+
+								<div>
+									<label
+										for="theme"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Theme</label
+									>
+									<div class="relative">
+										<select
+											id="theme"
+											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+											bind:value={themeId}
+										>
+											{#each themeOptions as opt}
+												<option value={opt.id}>{opt.name}</option>
+											{/each}
+										</select>
+										<div
+											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
+										>
+											<svg
+												class="fill-current h-4 w-4"
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 20 20"
+												><path
+													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+												/></svg
+											>
+										</div>
+									</div>
+								</div>
+
+								<div>
+									<label
+										for="font"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Font</label
+									>
+									<div class="relative">
+										<select
+											id="font"
+											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+											bind:value={fontId}
+										>
+											{#each fontOptions as opt}
+												<option value={opt.id}>{opt.name}</option>
+											{/each}
+										</select>
+										<div
+											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
+										>
+											<svg
+												class="fill-current h-4 w-4"
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 20 20"
+												><path
+													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+												/></svg
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="h-[3px] bg-brand-ink" />
+
+							<!-- Appearance -->
+							<div class="space-y-4">
+								<div>
+									<label
+										for="backdrop"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Background</label
+									>
+									<div class="relative">
+										<select
+											id="backdrop"
+											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
+											bind:value={backdrop}
+										>
+											{#each backdropOptions as option}
+												<option value={option.id}>{option.name}</option>
+											{/each}
+										</select>
+										<div
+											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
+										>
+											<svg
+												class="fill-current h-4 w-4"
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 20 20"
+												><path
+													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+												/></svg
+											>
+										</div>
+									</div>
+								</div>
+
+								{#if backdrop === 'solid'}
+									<div>
+										<label
+											for="solidBg"
+											class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+											>Color</label
+										>
+										<div class="flex items-center gap-2">
+											<input
+												id="solidBg"
+												class="h-10 w-full border border-brand-ink cursor-pointer transition-all"
+												type="color"
+												bind:value={solidBackground}
+											/>
+											<input
+												type="text"
+												class="w-24 border border-brand-ink p-2 text-sm font-mono transition-all outline-none"
+												bind:value={solidBackground}
+											/>
+										</div>
+									</div>
+								{/if}
+								{#if backdrop === 'custom-gradient'}
+									<div class="grid grid-cols-2 gap-2">
+										<div>
+											<label
+												for="gradientStart"
+												class="block text-xs font-semibold text-brand-ink mb-1 tracking-wider"
+												>Start</label
+											>
+											<input
+												id="gradientStart"
+												class="h-8 w-full border border-brand-ink cursor-pointer"
+												type="color"
+												bind:value={customGradientStart}
+											/>
+										</div>
+										<div>
+											<label
+												for="gradientEnd"
+												class="block text-xs font-semibold text-brand-ink mb-1 tracking-wider"
+												>End</label
+											>
+											<input
+												id="gradientEnd"
+												class="h-8 w-full border border-brand-ink cursor-pointer"
+												type="color"
+												bind:value={customGradientEnd}
+											/>
+										</div>
+									</div>
+								{/if}
+
+								<div>
+									<label
+										for="padding"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Padding ({padding}px)</label
+									>
+									<input
+										id="padding"
+										type="range"
+										min="16"
+										max="128"
+										bind:value={padding}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+							</div>
+
+							<div class="h-px bg-brand-rule" />
+
+							<!-- Window Settings -->
+							<div class="space-y-3">
+								<div
+									class="flex items-center justify-between p-3 bg-brand-subtle border border-brand-ink"
+								>
+									<label for="chrome" class="text-xs font-semibold text-brand-ink tracking-wider"
+										>Window Controls</label
+									>
+									<div class="relative inline-block w-12 align-middle select-none">
+										<input
+											type="checkbox"
+											name="chrome"
+											id="chrome"
+											bind:checked={showWindowChrome}
+											class="toggle-checkbox absolute block w-6 h-6 bg-brand-paper border border-brand-ink appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-pink"
+										/>
+										<label
+											for="chrome"
+											class="toggle-label block overflow-hidden h-6 bg-brand-rule cursor-pointer border border-brand-ink"
+										/>
+									</div>
+								</div>
+
+								<div
+									class="flex items-center justify-between p-3 bg-brand-subtle border border-brand-ink"
+								>
+									<label
+										for="lineNumbers"
+										class="text-xs font-semibold text-brand-ink tracking-wider">Line Numbers</label
+									>
+									<div class="relative inline-block w-12 align-middle select-none">
+										<input
+											type="checkbox"
+											name="lineNumbers"
+											id="lineNumbers"
+											bind:checked={showLineNumbers}
+											class="toggle-checkbox absolute block w-6 h-6 bg-brand-paper border border-brand-ink appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-pink"
+										/>
+										<label
+											for="lineNumbers"
+											class="toggle-label block overflow-hidden h-6 bg-brand-rule cursor-pointer border border-brand-ink"
+										/>
+									</div>
+								</div>
+							</div>
+
+							<div class="h-[3px] bg-brand-ink" />
+
+							<!-- Advanced Styling -->
+							<div class="space-y-4">
+								<h3
+									class="text-xs font-semibold text-brand-ink tracking-widest flex items-center gap-2 pb-2 border-b-[2px] border-black"
+								>
+									<span
+										class="w-5 h-5 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
+										>⚙</span
+									>
+									Advanced Styling
+								</h3>
+
+								<div>
+									<label
+										for="fontSize"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Font Size ({fontSize}px)</label
+									>
+									<input
+										id="fontSize"
+										type="range"
+										min="10"
+										max="24"
+										bind:value={fontSize}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+
+								<div>
+									<label
+										for="lineHeight"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Line Height ({lineHeight})</label
+									>
+									<input
+										id="lineHeight"
+										type="range"
+										min="1"
+										max="2.5"
+										step="0.1"
+										bind:value={lineHeight}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+
+								<div>
+									<label
+										for="opacity"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Card Opacity ({Math.round(cardOpacity * 100)}%)</label
+									>
+									<input
+										id="opacity"
+										type="range"
+										min="0"
+										max="1"
+										step="0.05"
+										bind:value={cardOpacity}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+
+								<div>
+									<label
+										for="shadow"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Shadow Intensity</label
+									>
+									<input
+										id="shadow"
+										type="range"
+										min="0"
+										max="1"
+										step="0.05"
+										bind:value={shadowIntensity}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+
+								<div>
+									<label
+										for="blur"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Blur ({blurEffect}px)</label
+									>
+									<input
+										id="blur"
+										type="range"
+										min="0"
+										max="20"
+										bind:value={blurEffect}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+
+								<div>
+									<label
+										for="radius"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Border Radius ({borderRadius}px)</label
+									>
+									<input
+										id="radius"
+										type="range"
+										min="0"
+										max="32"
+										bind:value={borderRadius}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+
+								<div>
+									<label
+										for="tabWidth"
+										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
+										>Tab Width ({codeTabWidth})</label
+									>
+									<input
+										id="tabWidth"
+										type="range"
+										min="2"
+										max="8"
+										step="2"
+										bind:value={codeTabWidth}
+										class="w-full cursor-pointer"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Editor Area -->
+				<div class="bg-brand-paper border border-brand-ink overflow-hidden">
+					<!-- Terminal Header -->
+					<div
+						class="bg-brand-ink text-white px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between border-b border-brand-ink"
 					>
 						<div class="flex items-center gap-2">
 							<div class="flex gap-1.5 sm:gap-2 mr-2 sm:mr-4">
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-danger border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-accent border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-data-green border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-pink border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-field border border-black" />
+								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-proof border border-black" />
 							</div>
-							<span class="font-mono text-[10px] sm:text-xs tracking-widest uppercase"
-								>~ code_editor</span
-							>
+							<span class="font-mono text-[10px] sm:text-xs tracking-widest">~ code_editor</span>
 						</div>
 						<button
-							class="px-2 sm:px-3 py-1 bg-brand-danger hover:bg-data-red text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider border-[2px] border-black shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="px-2 sm:px-3 py-1 bg-brand-pink hover:bg-data-red text-white text-[10px] sm:text-xs font-bold tracking-wider border border-brand-ink transition-all"
 							on:click={() => {
 								code = sampleCode[language] || '';
 								isUsingSample = true;
@@ -1440,7 +1408,7 @@
 					</div>
 					<textarea
 						id="codeInput"
-						class="w-full p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[150px] sm:min-h-[200px] focus:outline-none resize-y bg-white border-none"
+						class="w-full p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[150px] sm:min-h-[200px] focus:outline-none resize-y bg-brand-paper border-none"
 						bind:value={code}
 						on:input={() => {
 							isUsingSample = false;
@@ -1456,14 +1424,14 @@
 
 				<!-- Action Bar -->
 				<div
-					class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#e5e7eb] border-[3px] border-black p-3 sm:p-4"
+					class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#e5e7eb] border border-brand-ink p-3 sm:p-4"
 				>
 					<div class="flex items-center gap-2 sm:gap-3">
 						{#if previewFrame}
 							<div
-								class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border-[3px] border-black"
+								class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-paper border border-brand-ink"
 							>
-								<span class="text-[10px] font-bold text-black uppercase tracking-wider">SIZE:</span>
+								<span class="text-[10px] font-bold text-brand-ink tracking-wider">SIZE:</span>
 								<input
 									type="number"
 									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-brand-danger"
@@ -1496,7 +1464,7 @@
 					<button
 						on:click={generateImage}
 						disabled={isGenerating}
-						class="bg-brand-danger hover:bg-data-red text-white px-4 sm:px-8 py-2.5 sm:py-3 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
+						class="bg-brand-pink hover:bg-data-red text-white px-4 sm:px-8 py-2.5 sm:py-3 border border-brand-ink transition-all font-semibold tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
 					>
 						{#if isGenerating}
 							<svg
@@ -1542,19 +1510,19 @@
 
 				<!-- Preview Area -->
 				<div
-					class="bg-white border-[3px] border-black overflow-hidden relative min-h-[350px] sm:min-h-[500px] lg:min-h-[600px]"
+					class="bg-brand-paper border border-brand-ink overflow-hidden relative min-h-[350px] sm:min-h-[500px] lg:min-h-[600px]"
 				>
 					<!-- Preview Header -->
 					<div
-						class="bg-[#e5e7eb] px-3 sm:px-4 py-2 border-b-[3px] border-black flex items-center justify-between"
+						class="bg-[#e5e7eb] px-3 sm:px-4 py-2 border-b border-brand-ink flex items-center justify-between"
 					>
-						<span class="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider"
+						<span class="font-mono text-[10px] sm:text-xs font-bold tracking-wider"
 							>PREVIEW OUTPUT</span
 						>
 						<div class="flex gap-1">
-							<div class="w-2 h-2 bg-black" />
-							<div class="w-2 h-2 bg-black" />
-							<div class="w-2 h-2 bg-black" />
+							<div class="w-2 h-2 bg-brand-ink" />
+							<div class="w-2 h-2 bg-brand-ink" />
+							<div class="w-2 h-2 bg-brand-ink" />
 						</div>
 					</div>
 					<!-- Checkered Preview Background -->
@@ -1569,7 +1537,7 @@
 							>
 								{#key srcdocKey}
 									<iframe
-										class="bg-transparent transition-all duration-300 ease-out border-[3px] border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] sm:shadow-[8px_8px_0_0_rgba(0,0,0,0.2)] max-w-full"
+										class="bg-transparent transition-all duration-300 ease-out border border-brand-ink max-w-full"
 										title="code-image-preview"
 										srcdoc={srcdocContent}
 										sandbox="allow-scripts"
@@ -1584,7 +1552,7 @@
 									loading="lazy"
 									src={generatedImage.url}
 									alt="Generated output"
-									class="max-w-full h-auto border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl"
+									class="max-w-full h-auto border border-brand-ink"
 								/>
 							</div>
 						{/if}
@@ -1593,9 +1561,9 @@
 					<!-- Action bar below preview (only when image is generated) -->
 					{#if generatedImage}
 						<div
-							class="bg-data-green border-t-[3px] border-black px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
+							class="bg-brand-proof border-t border-brand-ink px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
 						>
-							<span class="font-black text-xs sm:text-sm uppercase tracking-widest text-black"
+							<span class="font-semibold text-xs sm:text-sm tracking-widest text-brand-ink"
 								>✓ Image generated</span
 							>
 							<div class="flex items-center gap-2 sm:gap-3 flex-wrap">
@@ -1604,22 +1572,22 @@
 										downloadFile(generatedImage.url, 'code-snippet.png', {
 											tool_name: 'code_to_image'
 										})}
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-paper border border-brand-ink font-bold tracking-wide text-xs transition-all"
 									>Download PNG</button
 								>
 								<a
 									href={generatedImage.url}
 									target="_blank"
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-paper border border-brand-ink font-bold tracking-wide text-xs transition-all"
 									>Open in Tab</a
 								>
 								<button
 									on:click={() => copyToClipboard(generatedImage.url)}
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white border-[2px] border-black font-bold uppercase tracking-wide text-xs shadow-[2px_2px_0_0_#666] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-ink text-white border border-brand-ink font-bold tracking-wide text-xs transition-all"
 									>Copy URL</button
 								>
 								<button
-									class="px-3 sm:px-4 py-1.5 sm:py-2 border-[2px] border-black font-bold bg-black text-white text-xs shadow-[2px_2px_0_0_#444] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 border border-brand-ink font-bold bg-brand-ink text-white text-xs transition-all"
 									on:click={() => handleSocialShare('twitter')}
 								>
 									<span class="inline-flex items-center gap-1.5 justify-center">
@@ -1632,7 +1600,7 @@
 									</span>
 								</button>
 								<button
-									class="px-3 sm:px-4 py-1.5 sm:py-2 border-[2px] border-black font-bold bg-[#0A66C2] text-white text-xs shadow-[2px_2px_0_0_#084c94] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase"
+									class="px-3 sm:px-4 py-1.5 sm:py-2 border border-brand-ink font-bold bg-[#0A66C2] text-white text-xs transition-all"
 									on:click={() => handleSocialShare('linkedin')}
 								>
 									<span class="inline-flex items-center gap-1.5 justify-center">
@@ -1661,235 +1629,532 @@
 					/>
 				{/if}
 			</div>
-		</div>
 
-		<!-- SEO Content Sections -->
-		<div class="max-w-5xl mx-auto px-0 mt-12 sm:mt-16 lg:mt-20">
-			<!-- Separator -->
-			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
-					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">SNIPPET → PNG</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label="Generate Image"
+					loading={isGenerating}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generateImage}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
+
+	<svelte:fragment slot="longform">
+		<!-- Section banner for the long-form block; text is frozen. -->
+		<h2
+			class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+		>
+			LEARN MORE ABOUT <span>CODE TO IMAGE</span>
+		</h2>
+
+		<AutomateSection
+			title="Automate with the"
+			titleHighlight="API"
+			toolName={TOOL_NAME}
+			description="Generate syntax-highlighted code screenshots programmatically. Same renderer as this page, driven by one POST."
+			codeExamples={codeToImageExamples}
+		/>
+
+		<!-- Code to Image — Comparison -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-subtle border border-brand-ink p-4 sm:p-6 md:p-10 transition-all duration-300"
+		>
+			<h3 class="text-xl sm:text-2xl font-semibold mb-6 text-brand-ink tracking-tight">
+				Code Screenshot Tools Compared
+			</h3>
+			<div class="overflow-x-auto">
+				<table class="w-full text-left border-collapse text-sm">
+					<thead>
+						<tr class="border-b border-brand-ink">
+							<th class="p-3 font-semibold text-xs">Feature</th>
+							<th class="p-3 font-semibold text-xs">Pictify</th>
+							<th class="p-3 font-semibold text-xs">Carbon.sh</th>
+							<th class="p-3 font-semibold text-xs">Ray.so</th>
+						</tr>
+					</thead>
+					<tbody class="font-medium text-brand-slate">
+						<tr class="border-b border-gray-200">
+							<td class="p-3 font-bold">API Access</td>
+							<td class="p-3 text-green-600 font-bold">Yes</td>
+							<td class="p-3 text-red-500">No</td>
+							<td class="p-3 text-red-500">No</td>
+						</tr>
+						<tr class="border-b border-gray-200">
+							<td class="p-3 font-bold">Batch Generation</td>
+							<td class="p-3 text-green-600 font-bold">Yes</td>
+							<td class="p-3 text-red-500">No</td>
+							<td class="p-3 text-red-500">No</td>
+						</tr>
+						<tr class="border-b border-gray-200">
+							<td class="p-3 font-bold">Custom Themes</td>
+							<td class="p-3">18+</td>
+							<td class="p-3">15+</td>
+							<td class="p-3">8</td>
+						</tr>
+						<tr class="border-b border-gray-200">
+							<td class="p-3 font-bold">Languages</td>
+							<td class="p-3">25+</td>
+							<td class="p-3">150+</td>
+							<td class="p-3">20+</td>
+						</tr>
+						<tr class="border-b border-gray-200">
+							<td class="p-3 font-bold">CI/CD Integration</td>
+							<td class="p-3 text-green-600 font-bold">Yes</td>
+							<td class="p-3 text-red-500">No</td>
+							<td class="p-3 text-red-500">No</td>
+						</tr>
+						<tr>
+							<td class="p-3 font-bold">Free Tier</td>
+							<td class="p-3 text-green-600 font-bold">Yes</td>
+							<td class="p-3 text-green-600">Yes</td>
+							<td class="p-3 text-green-600">Yes</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<!-- What is a Code to Image Generator Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
+			>
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M13 10V3L4 14h7v7l9-11h-7z"
+					/></svg
+				>
+				Overview
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
+			>
+				What is a Code to Image Generator?
+			</h3>
+			<p class="text-sm sm:text-base text-brand-slate leading-relaxed mb-3 sm:mb-4 font-medium">
+				A Code to Image Generator is a powerful tool that converts your source code into beautiful,
+				syntax-highlighted images. Perfect for sharing code snippets on social media, creating
+				documentation, presentations, or blog posts.
+			</p>
+			<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
+				Whether you're a developer sharing code on Twitter, a technical writer creating
+				documentation, or an educator preparing tutorials, our code to image generator makes your
+				code visually appealing.
+			</p>
+		</section>
+
+		<!-- Benefits Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
+			>
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+					/></svg
+				>
+				Features
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
+			>
+				Benefits of Using Our Code to Image Generator
+			</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-brand-pink p-2 border border-brand-ink text-white flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>Support for 25+ programming languages including JavaScript, Python, Java, C++, and more</span
 					>
-						<span class="font-black text-sm sm:text-lg">?</span>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-brand-field p-2 border border-brand-ink text-brand-ink flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>18+ beautiful syntax highlighting themes including dark and light options</span
+					>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-brand-proof p-2 border border-brand-ink text-brand-ink flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span
+					>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-data-sky p-2 border border-brand-ink text-white flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>Customizable window frames and backgrounds for professional appearance</span
+					>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-data-violet p-2 border border-brand-ink text-white flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>Advanced styling options including opacity, shadows, and blur effects</span
+					>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-data-pink p-2 border border-brand-ink text-white flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+							/><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>Real-time preview to see exactly how your image will look</span
+					>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-[#facc15] p-2 border border-brand-ink text-brand-ink flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>High-quality PNG output perfect for social media and documentation</span
+					>
+				</div>
+
+				<div
+					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
+				>
+					<div class="bg-[#22c55e] p-2 border border-brand-ink text-white flex-shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/></svg
+						>
+					</div>
+					<span class="font-bold text-brand-ink text-sm"
+						>Free to try (guest limits may apply). Create a free account to remove watermarks.</span
+					>
+				</div>
+			</div>
+		</section>
+
+		<!-- How to Use Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
+			>
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+					/><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/></svg
+				>
+				Guide
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
+			>
+				How to Use Our Code to Image Generator
+			</h3>
+			<div class="space-y-5">
+				<div class="flex items-start gap-4">
+					<span
+						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
+						>1</span
+					>
+					<div>
+						<h4 class="font-semibold text-lg text-brand-ink mb-1">
+							Choose Your Programming Language
+						</h4>
+						<p class="text-brand-slate text-sm">
+							Select from 25+ supported programming languages including JavaScript, Python, Java,
+							C++, TypeScript, and more.
+						</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-4">
+					<span
+						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
+						>2</span
+					>
+					<div>
+						<h4 class="font-semibold text-lg text-brand-ink mb-1">Paste or Type Your Code</h4>
+						<p class="text-brand-slate text-sm">
+							Enter your code in the text area. You can use our sample code for each language or
+							paste your own code snippet.
+						</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-4">
+					<span
+						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
+						>3</span
+					>
+					<div>
+						<h4 class="font-semibold text-lg text-brand-ink mb-1">Customize the Appearance</h4>
+						<p class="text-brand-slate text-sm">
+							Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background
+							styles, and advanced effects.
+						</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-4">
+					<span
+						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
+						>4</span
+					>
+					<div>
+						<h4 class="font-semibold text-lg text-brand-ink mb-1">Preview Your Image</h4>
+						<p class="text-brand-slate text-sm">
+							See exactly how your code image will look with our real-time preview. Adjust
+							dimensions and settings as needed.
+						</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-4">
+					<span
+						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
+						>5</span
+					>
+					<div>
+						<h4 class="font-semibold text-lg text-brand-ink mb-1">Generate and Download</h4>
+						<p class="text-brand-slate text-sm">
+							Click "Generate Image" to create your high-quality PNG image. Copy the URL or download
+							directly to use in your projects.
+						</p>
 					</div>
 				</div>
 			</div>
+		</section>
 
-			<h2
-				class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black mb-8 sm:mb-12 lg:mb-16 text-center text-gray-900 tracking-tighter px-2"
+		<!-- Real-World Use Cases Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 			>
-				LEARN MORE ABOUT <br class="md:hidden" />
-				<span class="relative inline-block text-white mt-2">
-					<span class="relative z-10 px-2 sm:px-4">CODE TO IMAGE</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h2>
-
-			<ApiCodeSection
-				title="Automate with the"
-				titleHighlight="API"
-				toolName="code_to_image"
-				description="Generate syntax-highlighted code screenshots programmatically. Render code snippets as images in your docs pipeline, blog CMS, or CI/CD workflows."
-				codeExamples={codeToImageExamples}
-			/>
-
-			<!-- Code to Image — Comparison -->
-			<section
-				class="mb-8 sm:mb-12 bg-brand-bg border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 transition-all duration-300"
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+					/></svg
+				>
+				Applications
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
 			>
-				<h3 class="text-xl sm:text-2xl font-black mb-6 text-black tracking-tight">
-					Code Screenshot Tools Compared
-				</h3>
-				<div class="overflow-x-auto">
-					<table class="w-full text-left border-collapse text-sm">
-						<thead>
-							<tr class="border-b-[3px] border-black">
-								<th class="p-3 font-black uppercase text-xs">Feature</th>
-								<th class="p-3 font-black uppercase text-xs">Pictify</th>
-								<th class="p-3 font-black uppercase text-xs">Carbon.sh</th>
-								<th class="p-3 font-black uppercase text-xs">Ray.so</th>
-							</tr>
-						</thead>
-						<tbody class="font-medium text-gray-700">
-							<tr class="border-b border-gray-200">
-								<td class="p-3 font-bold">API Access</td>
-								<td class="p-3 text-green-600 font-bold">Yes</td>
-								<td class="p-3 text-red-500">No</td>
-								<td class="p-3 text-red-500">No</td>
-							</tr>
-							<tr class="border-b border-gray-200">
-								<td class="p-3 font-bold">Batch Generation</td>
-								<td class="p-3 text-green-600 font-bold">Yes</td>
-								<td class="p-3 text-red-500">No</td>
-								<td class="p-3 text-red-500">No</td>
-							</tr>
-							<tr class="border-b border-gray-200">
-								<td class="p-3 font-bold">Custom Themes</td>
-								<td class="p-3">18+</td>
-								<td class="p-3">15+</td>
-								<td class="p-3">8</td>
-							</tr>
-							<tr class="border-b border-gray-200">
-								<td class="p-3 font-bold">Languages</td>
-								<td class="p-3">25+</td>
-								<td class="p-3">150+</td>
-								<td class="p-3">20+</td>
-							</tr>
-							<tr class="border-b border-gray-200">
-								<td class="p-3 font-bold">CI/CD Integration</td>
-								<td class="p-3 text-green-600 font-bold">Yes</td>
-								<td class="p-3 text-red-500">No</td>
-								<td class="p-3 text-red-500">No</td>
-							</tr>
-							<tr>
-								<td class="p-3 font-bold">Free Tier</td>
-								<td class="p-3 text-green-600 font-bold">Yes</td>
-								<td class="p-3 text-green-600">Yes</td>
-								<td class="p-3 text-green-600">Yes</td>
-							</tr>
-						</tbody>
-					</table>
+				Real-World Use Cases
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
+					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
+						<span
+							class="w-8 h-8 bg-brand-pink border border-brand-ink flex items-center justify-center flex-shrink-0"
+						>
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+								/></svg
+							>
+						</span>
+						Social Media Sharing
+					</h4>
+					<p class="text-brand-slate text-sm">
+						Share beautiful code snippets on Twitter, LinkedIn, Instagram. Stand out with
+						professional-looking code images.
+					</p>
 				</div>
-			</section>
-
-			<!-- What is a Code to Image Generator Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 10V3L4 14h7v7l9-11h-7z"
-						/></svg
-					>
-					Overview
+				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
+					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
+						<span
+							class="w-8 h-8 bg-brand-field border border-brand-ink flex items-center justify-center flex-shrink-0"
+						>
+							<svg
+								class="w-4 h-4 text-brand-ink"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+								/></svg
+							>
+						</span>
+						Documentation & Tutorials
+					</h4>
+					<p class="text-brand-slate text-sm">
+						Create stunning code examples for technical documentation, API guides, and programming
+						tutorials.
+					</p>
 				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					What is a Code to Image Generator?
-				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed mb-3 sm:mb-4 font-medium">
-					A Code to Image Generator is a powerful tool that converts your source code into
-					beautiful, syntax-highlighted images. Perfect for sharing code snippets on social media,
-					creating documentation, presentations, or blog posts.
-				</p>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					Whether you're a developer sharing code on Twitter, a technical writer creating
-					documentation, or an educator preparing tutorials, our code to image generator makes your
-					code visually appealing.
-				</p>
-			</section>
-
-			<!-- Benefits Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-						/></svg
-					>
-					Features
+				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
+					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
+						<span
+							class="w-8 h-8 bg-brand-proof border border-brand-ink flex items-center justify-center flex-shrink-0"
+						>
+							<svg
+								class="w-4 h-4 text-brand-ink"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+								/></svg
+							>
+						</span>
+						Presentations & Slides
+					</h4>
+					<p class="text-brand-slate text-sm">
+						Include beautiful code images in your technical presentations, conference talks, and
+						educational slides.
+					</p>
 				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight"
-				>
-					Benefits of Using Our Code to Image Generator
-				</h3>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-brand-danger p-2 border-[2px] border-black text-white flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
+					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
+						<span
+							class="w-8 h-8 bg-data-sky border border-brand-ink flex items-center justify-center flex-shrink-0"
+						>
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
 								/></svg
 							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>Support for 25+ programming languages including JavaScript, Python, Java, C++, and
-							more</span
+						</span>
+						Blog Posts & Articles
+					</h4>
+					<p class="text-brand-slate text-sm">
+						Enhance your technical blog posts and articles with syntax-highlighted code images.
+					</p>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
+					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
+						<span
+							class="w-8 h-8 bg-data-violet border border-brand-ink flex items-center justify-center flex-shrink-0"
 						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-brand-accent p-2 border-[2px] border-black text-black flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>18+ beautiful syntax highlighting themes including dark and light options</span
-						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-data-green p-2 border-[2px] border-black text-black flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span
-						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-data-sky p-2 border-[2px] border-black text-white flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>Customizable window frames and backgrounds for professional appearance</span
-						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-data-violet p-2 border-[2px] border-black text-white flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
 									stroke-linecap="round"
 									stroke-linejoin="round"
@@ -1897,1146 +2162,704 @@
 									d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
 								/></svg
 							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>Advanced styling options including opacity, shadows, and blur effects</span
-						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-data-pink p-2 border-[2px] border-black text-white flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-								/><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>Real-time preview to see exactly how your image will look</span
-						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-[#facc15] p-2 border-[2px] border-black text-black flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>High-quality PNG output perfect for social media and documentation</span
-						>
-					</div>
-
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-4 shadow-brutal-lg flex items-start gap-4 hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="bg-[#22c55e] p-2 border-[2px] border-black text-white flex-shrink-0">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-black text-sm"
-							>Free to try (guest limits may apply). Create a free account to remove watermarks.</span
-						>
-					</div>
-				</div>
-			</section>
-
-			<!-- How to Use Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-						/><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					Guide
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight"
-				>
-					How to Use Our Code to Image Generator
-				</h3>
-				<div class="space-y-5">
-					<div class="flex items-start gap-4">
-						<span
-							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
-							>1</span
-						>
-						<div>
-							<h4 class="font-black text-lg text-black mb-1">Choose Your Programming Language</h4>
-							<p class="text-gray-600 text-sm">
-								Select from 25+ supported programming languages including JavaScript, Python, Java,
-								C++, TypeScript, and more.
-							</p>
-						</div>
-					</div>
-					<div class="flex items-start gap-4">
-						<span
-							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
-							>2</span
-						>
-						<div>
-							<h4 class="font-black text-lg text-black mb-1">Paste or Type Your Code</h4>
-							<p class="text-gray-600 text-sm">
-								Enter your code in the text area. You can use our sample code for each language or
-								paste your own code snippet.
-							</p>
-						</div>
-					</div>
-					<div class="flex items-start gap-4">
-						<span
-							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
-							>3</span
-						>
-						<div>
-							<h4 class="font-black text-lg text-black mb-1">Customize the Appearance</h4>
-							<p class="text-gray-600 text-sm">
-								Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background
-								styles, and advanced effects.
-							</p>
-						</div>
-					</div>
-					<div class="flex items-start gap-4">
-						<span
-							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
-							>4</span
-						>
-						<div>
-							<h4 class="font-black text-lg text-black mb-1">Preview Your Image</h4>
-							<p class="text-gray-600 text-sm">
-								See exactly how your code image will look with our real-time preview. Adjust
-								dimensions and settings as needed.
-							</p>
-						</div>
-					</div>
-					<div class="flex items-start gap-4">
-						<span
-							class="bg-brand-danger text-white w-10 h-10 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-md"
-							>5</span
-						>
-						<div>
-							<h4 class="font-black text-lg text-black mb-1">Generate and Download</h4>
-							<p class="text-gray-600 text-sm">
-								Click "Generate Image" to create your high-quality PNG image. Copy the URL or
-								download directly to use in your projects.
-							</p>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Real-World Use Cases Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-						/></svg
-					>
-					Applications
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight"
-				>
-					Real-World Use Cases
-				</h3>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
-							<span
-								class="w-8 h-8 bg-brand-danger border-[2px] border-black flex items-center justify-center flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-									/></svg
-								>
-							</span>
-							Social Media Sharing
-						</h4>
-						<p class="text-gray-600 text-sm">
-							Share beautiful code snippets on Twitter, LinkedIn, Instagram. Stand out with
-							professional-looking code images.
-						</p>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
-							<span
-								class="w-8 h-8 bg-brand-accent border-[2px] border-black flex items-center justify-center flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-black"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-									/></svg
-								>
-							</span>
-							Documentation & Tutorials
-						</h4>
-						<p class="text-gray-600 text-sm">
-							Create stunning code examples for technical documentation, API guides, and programming
-							tutorials.
-						</p>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
-							<span
-								class="w-8 h-8 bg-data-green border-[2px] border-black flex items-center justify-center flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-black"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-									/></svg
-								>
-							</span>
-							Presentations & Slides
-						</h4>
-						<p class="text-gray-600 text-sm">
-							Include beautiful code images in your technical presentations, conference talks, and
-							educational slides.
-						</p>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
-							<span
-								class="w-8 h-8 bg-data-sky border-[2px] border-black flex items-center justify-center flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-									/></svg
-								>
-							</span>
-							Blog Posts & Articles
-						</h4>
-						<p class="text-gray-600 text-sm">
-							Enhance your technical blog posts and articles with syntax-highlighted code images.
-						</p>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
-							<span
-								class="w-8 h-8 bg-data-violet border-[2px] border-black flex items-center justify-center flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-									/></svg
-								>
-							</span>
-							Education & Teaching
-						</h4>
-						<p class="text-gray-600 text-sm">
-							Create clear, readable code examples for programming courses, workshops, and
-							educational materials.
-						</p>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-5 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="text-lg font-black mb-2 text-black flex items-center gap-3">
-							<span
-								class="w-8 h-8 bg-black border-[2px] border-black flex items-center justify-center flex-shrink-0"
-							>
-								<svg
-									class="w-4 h-4 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-									/></svg
-								>
-							</span>
-							Portfolio & Resume
-						</h4>
-						<p class="text-gray-600 text-sm">
-							Showcase your coding skills in portfolios and resumes with beautiful code screenshots.
-						</p>
-					</div>
-				</div>
-			</section>
-
-			<!-- Best Practices Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-						/></svg
-					>
-					Tips
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight"
-				>
-					Best Practices for Creating Code Images
-				</h3>
-				<p class="text-base text-gray-600 leading-relaxed mb-6">
-					To create the most effective and professional-looking code images, follow these best
-					practices:
-				</p>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<div class="space-y-4">
-						<h4 class="font-black text-lg text-black flex items-center gap-2">
-							<span
-								class="w-8 h-8 bg-brand-danger text-white border-[2px] border-black flex items-center justify-center text-sm shadow-brutal-sm"
-								>&lt;/&gt;</span
-							>
-							Code Quality
-						</h4>
-						<div class="space-y-2">
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-brand-danger flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm"
-									>Keep code snippets concise and focused</span
-								>
-							</div>
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-brand-danger flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm"
-									>Use proper indentation and formatting</span
-								>
-							</div>
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-brand-danger flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm"
-									>Include meaningful comments when necessary</span
-								>
-							</div>
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-brand-danger flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm"
-									>Remove sensitive information like API keys</span
-								>
-							</div>
-						</div>
-					</div>
-
-					<div class="space-y-4">
-						<h4 class="font-black text-lg text-black flex items-center gap-2">
-							<span
-								class="w-8 h-8 bg-data-green text-black border-[2px] border-black flex items-center justify-center text-sm shadow-brutal-sm"
-								>🎨</span
-							>
-							Visual Design
-						</h4>
-						<div class="space-y-2">
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-data-green flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm">Choose themes that match your brand</span
-								>
-							</div>
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-data-green flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm"
-									>Use high-contrast themes for readability</span
-								>
-							</div>
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-data-green flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm"
-									>Select clear, professional-looking fonts</span
-								>
-							</div>
-							<div
-								class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-start gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								<svg
-									class="w-5 h-5 text-data-green flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="3"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span class="font-bold text-black text-sm">Use appropriate padding and spacing</span
-								>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="mt-8 p-5 bg-brand-accent border-[3px] border-black shadow-brutal-lg">
-					<h4 class="font-black text-lg text-black mb-4 flex items-center gap-2">
-						<span
-							class="w-7 h-7 bg-black text-white border-[2px] border-black flex items-center justify-center text-sm"
-							>💡</span
-						>
-						Pro Tips
+						</span>
+						Education & Teaching
 					</h4>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-						<div class="flex items-start gap-2 p-2">
-							<span class="font-black text-black">→</span>
-							<span class="font-bold text-black text-sm"
-								>Use line numbers for longer code snippets</span
-							>
-						</div>
-						<div class="flex items-start gap-2 p-2">
-							<span class="font-black text-black">→</span>
-							<span class="font-bold text-black text-sm">Test different background styles</span>
-						</div>
-						<div class="flex items-start gap-2 p-2">
-							<span class="font-black text-black">→</span>
-							<span class="font-bold text-black text-sm"
-								>Consider platform-specific image sizes</span
-							>
-						</div>
-						<div class="flex items-start gap-2 p-2">
-							<span class="font-black text-black">→</span>
-							<span class="font-bold text-black text-sm"
-								>Save favorite settings for consistency</span
-							>
-						</div>
-					</div>
+					<p class="text-brand-slate text-sm">
+						Create clear, readable code examples for programming courses, workshops, and educational
+						materials.
+					</p>
 				</div>
-			</section>
-
-			<!-- FAQ Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					FAQ
+				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
+					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
+						<span
+							class="w-8 h-8 bg-brand-ink border border-brand-ink flex items-center justify-center flex-shrink-0"
+						>
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+								/></svg
+							>
+						</span>
+						Portfolio & Resume
+					</h4>
+					<p class="text-brand-slate text-sm">
+						Showcase your coding skills in portfolios and resumes with beautiful code screenshots.
+					</p>
 				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-8 text-black tracking-tight"
-				>
-					Frequently Asked Questions
-				</h3>
-				<div class="space-y-3">
-					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<summary
-							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
-						>
-							<span class="text-sm">What programming languages are supported?</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-						</summary>
-						<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-							We support 25+ programming languages including JavaScript, TypeScript, Python, Java,
-							C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many
-							more.
-						</div>
-					</details>
-
-					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<summary
-							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
-						>
-							<span class="text-sm">Can I customize the appearance?</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-						</summary>
-						<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-							Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius,
-							background styles, window frames, and advanced effects like shadows and blur.
-						</div>
-					</details>
-
-					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<summary
-							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
-						>
-							<span class="text-sm">What image formats are supported?</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-						</summary>
-						<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-							We generate high-quality PNG images, perfect for social media, documentation, and
-							presentations with crisp text rendering and transparency support.
-						</div>
-					</details>
-
-					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<summary
-							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
-						>
-							<span class="text-sm">Is there a limit on code length?</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-						</summary>
-						<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-							No strict limit, but we recommend keeping snippets reasonably sized for best visual
-							results. Focus on the most important parts of your code.
-						</div>
-					</details>
-
-					<details
-						class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<summary
-							class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none"
-						>
-							<span class="text-sm">Can I use images commercially?</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-						</summary>
-						<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-							Yes! All generated images can be used for personal and commercial purposes. Guest
-							limits may apply, and free accounts remove watermarks.
-						</div>
-					</details>
-				</div>
-			</section>
-
-			<!-- Supported Languages Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-						/></svg
-					>
-					Languages
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					Supported Programming Languages
-				</h3>
-				<p class="text-sm sm:text-base text-gray-600 leading-relaxed mb-4 sm:mb-6">
-					Our code to image generator supports syntax highlighting for all major programming
-					languages:
-				</p>
-				<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">⚡</div>
-						<span class="font-bold text-black text-xs">JavaScript</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🔷</div>
-						<span class="font-bold text-black text-xs">TypeScript</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🐍</div>
-						<span class="font-bold text-black text-xs">Python</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">☕</div>
-						<span class="font-bold text-black text-xs">Java</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">⚙️</div>
-						<span class="font-bold text-black text-xs">C++</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🔷</div>
-						<span class="font-bold text-black text-xs">C#</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🐘</div>
-						<span class="font-bold text-black text-xs">PHP</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">💎</div>
-						<span class="font-bold text-black text-xs">Ruby</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🐹</div>
-						<span class="font-bold text-black text-xs">Go</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🦀</div>
-						<span class="font-bold text-black text-xs">Rust</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🍎</div>
-						<span class="font-bold text-black text-xs">Swift</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🌐</div>
-						<span class="font-bold text-black text-xs">HTML</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🎨</div>
-						<span class="font-bold text-black text-xs">CSS</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">🗃️</div>
-						<span class="font-bold text-black text-xs">SQL</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">📄</div>
-						<span class="font-bold text-black text-xs">JSON</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">📝</div>
-						<span class="font-bold text-black text-xs">YAML</span>
-					</div>
-					<div
-						class="bg-[#f8f8f8] border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">📋</div>
-						<span class="font-bold text-black text-xs">Markdown</span>
-					</div>
-					<div
-						class="bg-brand-danger border-[3px] border-black p-3 text-center shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<div class="text-xl mb-1">+</div>
-						<span class="font-bold text-white text-xs">More!</span>
-					</div>
-				</div>
-			</section>
-		</div>
-
-		<!-- First Generation Prompt -->
-		{#if showFirstGenerationPrompt}
-			<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-				<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
-					<!-- Modal Header -->
-					<div
-						class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
-					>
-						<h3 class="text-lg font-black text-black uppercase tracking-wider">
-							🎉 Great First Image!
-						</h3>
-						<button
-							class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors"
-							on:click={() => (showFirstGenerationPrompt = false)}
-						>
-							<span class="font-black">×</span>
-						</button>
-					</div>
-
-					<div class="p-6">
-						<p class="text-black font-bold mb-4">Create a free account to unlock:</p>
-
-						<ul class="space-y-2 mb-6">
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-data-green">✓</span>
-								<span class="font-bold text-black text-sm">Unlimited image generations</span>
-							</li>
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-data-green">✓</span>
-								<span class="font-bold text-black text-sm">No watermarks</span>
-							</li>
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-data-green">✓</span>
-								<span class="font-bold text-black text-sm">API Access</span>
-							</li>
-						</ul>
-
-						<div class="space-y-3">
-							<a
-								href="/signup?redirect=/tools/code-to-image"
-								on:click={() =>
-									analytics.track('tool_signup_click', {
-										tool_name: 'code_to_image',
-										cta_location: 'free_tier_card'
-									})}
-								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								Create Free Account
-							</a>
-
-							<button
-								class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
-								on:click={() => (showFirstGenerationPrompt = false)}
-							>
-								Continue as Guest
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		{/if}
-
-		<!-- Upgrade Prompt -->
-		{#if showUpgradePrompt}
-			<div
-				class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-				style="margin-top: 0px;"
-			>
-				<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
-					<!-- Modal Header -->
-					<div
-						class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
-					>
-						<h3 class="text-lg font-black text-white uppercase tracking-wider">
-							🎨 Ready to Create More?
-						</h3>
-						<button
-							class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-							on:click={() => (showUpgradePrompt = false)}
-						>
-							<span class="font-black">×</span>
-						</button>
-					</div>
-
-					<div class="p-6">
-						<p class="text-black font-bold mb-4">
-							You've reached the guest limit. Sign up to unlock:
-						</p>
-
-						<ul class="space-y-2 mb-6">
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-brand-danger">✓</span>
-								<span class="font-bold text-black text-sm">Unlimited image generations</span>
-							</li>
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-brand-danger">✓</span>
-								<span class="font-bold text-black text-sm">No watermarks</span>
-							</li>
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-brand-danger">✓</span>
-								<span class="font-bold text-black text-sm">API Access</span>
-							</li>
-							<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-								<span class="font-black text-brand-danger">✓</span>
-								<span class="font-bold text-black text-sm">Priority support</span>
-							</li>
-						</ul>
-
-						<div class="space-y-3">
-							<a
-								href="/signup?redirect=/tools/code-to-image"
-								on:click={() =>
-									analytics.track('tool_signup_click', {
-										tool_name: 'code_to_image',
-										cta_location: 'limit_reached_modal'
-									})}
-								class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								Sign Up Free
-							</a>
-
-							<button
-								class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
-								on:click={() => (showUpgradePrompt = false)}
-							>
-								Maybe Later
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		{/if}
-
-		<RelatedTools tools={['json-to-image', 'markdown', 'api-response-card', 'changelog-card']} />
-
-		<!-- Related Tools -->
-		<section class="mb-12 max-w-5xl mx-auto px-4">
-			<h3 class="text-xl font-black mb-4 text-black uppercase text-center">Related Tools</h3>
-			<div class="flex flex-wrap gap-3 justify-center">
-				<a
-					href="/tools/html-to-png"
-					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-					>HTML to PNG</a
-				>
-				<a
-					href="/tools/url-to-image-generator"
-					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-					>URL to Image</a
-				>
-				<a
-					href="/tools/og-image-generator"
-					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-					>OG Image Generator</a
-				>
-				<a
-					href="/tools/markdown"
-					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-					>Markdown to Image</a
-				>
-				<a
-					href="/alternatives"
-					class="px-4 py-2 border-[3px] border-black bg-white font-bold text-sm hover:bg-brand-accent hover:shadow-brutal-lg transition-all"
-					>Compare Alternatives</a
-				>
 			</div>
 		</section>
 
-		<Footer />
-	</main>
-	<Toast />
-	<StickySignupBar bind:this={stickyBar} toolName="code_to_image" />
-</section>
+		<!-- Best Practices Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
+			>
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+					/></svg
+				>
+				Tips
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
+			>
+				Best Practices for Creating Code Images
+			</h3>
+			<p class="text-base text-brand-slate leading-relaxed mb-6">
+				To create the most effective and professional-looking code images, follow these best
+				practices:
+			</p>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div class="space-y-4">
+					<h4 class="font-semibold text-lg text-brand-ink flex items-center gap-2">
+						<span
+							class="w-8 h-8 bg-brand-pink text-white border border-brand-ink flex items-center justify-center text-sm"
+							>&lt;/&gt;</span
+						>
+						Code Quality
+					</h4>
+					<div class="space-y-2">
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-pink flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Keep code snippets concise and focused</span
+							>
+						</div>
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-pink flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Use proper indentation and formatting</span
+							>
+						</div>
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-pink flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Include meaningful comments when necessary</span
+							>
+						</div>
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-pink flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Remove sensitive information like API keys</span
+							>
+						</div>
+					</div>
+				</div>
 
-<style>
-	/* Custom Scrollbar */
-	.custom-scrollbar::-webkit-scrollbar {
-		width: 12px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-track {
-		background: #f1f1f1;
-		border-left: 3px solid #111827;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background: #ffc480;
-		border: 3px solid #111827;
-		border-radius: 0;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: #ffb05c;
-	}
+				<div class="space-y-4">
+					<h4 class="font-semibold text-lg text-brand-ink flex items-center gap-2">
+						<span
+							class="w-8 h-8 bg-brand-proof text-brand-ink border border-brand-ink flex items-center justify-center text-sm"
+							>🎨</span
+						>
+						Visual Design
+					</h4>
+					<div class="space-y-2">
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-proof flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Choose themes that match your brand</span
+							>
+						</div>
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-proof flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Use high-contrast themes for readability</span
+							>
+						</div>
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-proof flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Select clear, professional-looking fonts</span
+							>
+						</div>
+						<div
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
+						>
+							<svg
+								class="w-5 h-5 text-brand-proof flex-shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="3"
+									d="M5 13l4 4L19 7"
+								/>
+							</svg>
+							<span class="font-bold text-brand-ink text-sm"
+								>Use appropriate padding and spacing</span
+							>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mt-8 p-5 bg-brand-field border border-brand-ink">
+				<h4 class="font-semibold text-lg text-brand-ink mb-4 flex items-center gap-2">
+					<span
+						class="w-7 h-7 bg-brand-ink text-white border border-brand-ink flex items-center justify-center text-sm"
+						>💡</span
+					>
+					Pro Tips
+				</h4>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<div class="flex items-start gap-2 p-2">
+						<span class="font-semibold text-brand-ink">→</span>
+						<span class="font-bold text-brand-ink text-sm"
+							>Use line numbers for longer code snippets</span
+						>
+					</div>
+					<div class="flex items-start gap-2 p-2">
+						<span class="font-semibold text-brand-ink">→</span>
+						<span class="font-bold text-brand-ink text-sm">Test different background styles</span>
+					</div>
+					<div class="flex items-start gap-2 p-2">
+						<span class="font-semibold text-brand-ink">→</span>
+						<span class="font-bold text-brand-ink text-sm"
+							>Consider platform-specific image sizes</span
+						>
+					</div>
+					<div class="flex items-start gap-2 p-2">
+						<span class="font-semibold text-brand-ink">→</span>
+						<span class="font-bold text-brand-ink text-sm"
+							>Save favorite settings for consistency</span
+						>
+					</div>
+				</div>
+			</div>
+		</section>
 
-	/* Neo-Brutalist Range Input */
-	input[type='range'] {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 100%;
-		background: transparent;
-	}
+		<!-- FAQ Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
+			>
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/></svg
+				>
+				FAQ
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
+			>
+				Frequently Asked Questions
+			</h3>
+			<div class="space-y-3">
+				<details
+					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
+				>
+					<summary
+						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
+					>
+						<span class="text-sm">What programming languages are supported?</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</summary>
+					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
+						We support 25+ programming languages including JavaScript, TypeScript, Python, Java,
+						C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many
+						more.
+					</div>
+				</details>
 
-	input[type='range']:focus {
-		outline: none;
-	}
+				<details
+					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
+				>
+					<summary
+						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
+					>
+						<span class="text-sm">Can I customize the appearance?</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</summary>
+					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
+						Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius,
+						background styles, window frames, and advanced effects like shadows and blur.
+					</div>
+				</details>
 
-	/* Webkit (Chrome, Safari, Edge) */
-	input[type='range']::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		height: 20px;
-		width: 20px;
-		border-radius: 50%;
-		background: #ff6b6b;
-		border: 3px solid #111827;
-		cursor: pointer;
-		margin-top: -8px;
-		box-shadow: 2px 2px 0 0 #1f2937;
-		transition: all 0.1s ease;
-	}
+				<details
+					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
+				>
+					<summary
+						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
+					>
+						<span class="text-sm">What image formats are supported?</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</summary>
+					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
+						We generate high-quality PNG images, perfect for social media, documentation, and
+						presentations with crisp text rendering and transparency support.
+					</div>
+				</details>
 
-	input[type='range']::-webkit-slider-thumb:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 4px 4px 0 0 #1f2937;
-	}
+				<details
+					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
+				>
+					<summary
+						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
+					>
+						<span class="text-sm">Is there a limit on code length?</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</summary>
+					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
+						No strict limit, but we recommend keeping snippets reasonably sized for best visual
+						results. Focus on the most important parts of your code.
+					</div>
+				</details>
 
-	input[type='range']::-webkit-slider-thumb:active {
-		transform: translate(1px, 1px);
-		box-shadow: 0 0 0 0 #1f2937;
-	}
+				<details
+					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
+				>
+					<summary
+						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
+					>
+						<span class="text-sm">Can I use images commercially?</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</summary>
+					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
+						Yes! All generated images can be used for personal and commercial purposes. Guest limits
+						may apply, and free accounts remove watermarks.
+					</div>
+				</details>
+			</div>
+		</section>
 
-	input[type='range']::-webkit-slider-runnable-track {
-		width: 100%;
-		height: 4px;
-		cursor: pointer;
-		background: #111827;
-		border-radius: 2px;
-	}
+		<!-- Supported Languages Section -->
+		<section
+			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
+		>
+			<div
+				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
+			>
+				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+					/></svg
+				>
+				Languages
+			</div>
+			<h3
+				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
+			>
+				Supported Programming Languages
+			</h3>
+			<p class="text-sm sm:text-base text-brand-slate leading-relaxed mb-4 sm:mb-6">
+				Our code to image generator supports syntax highlighting for all major programming
+				languages:
+			</p>
+			<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">⚡</div>
+					<span class="font-bold text-brand-ink text-xs">JavaScript</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🔷</div>
+					<span class="font-bold text-brand-ink text-xs">TypeScript</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🐍</div>
+					<span class="font-bold text-brand-ink text-xs">Python</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">☕</div>
+					<span class="font-bold text-brand-ink text-xs">Java</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">⚙️</div>
+					<span class="font-bold text-brand-ink text-xs">C++</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🔷</div>
+					<span class="font-bold text-brand-ink text-xs">C#</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🐘</div>
+					<span class="font-bold text-brand-ink text-xs">PHP</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">💎</div>
+					<span class="font-bold text-brand-ink text-xs">Ruby</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🐹</div>
+					<span class="font-bold text-brand-ink text-xs">Go</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🦀</div>
+					<span class="font-bold text-brand-ink text-xs">Rust</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🍎</div>
+					<span class="font-bold text-brand-ink text-xs">Swift</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🌐</div>
+					<span class="font-bold text-brand-ink text-xs">HTML</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🎨</div>
+					<span class="font-bold text-brand-ink text-xs">CSS</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">🗃️</div>
+					<span class="font-bold text-brand-ink text-xs">SQL</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">📄</div>
+					<span class="font-bold text-brand-ink text-xs">JSON</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">📝</div>
+					<span class="font-bold text-brand-ink text-xs">YAML</span>
+				</div>
+				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">📋</div>
+					<span class="font-bold text-brand-ink text-xs">Markdown</span>
+				</div>
+				<div class="bg-brand-pink border border-brand-ink p-3 text-center transition-all">
+					<div class="text-xl mb-1">+</div>
+					<span class="font-bold text-white text-xs">More!</span>
+				</div>
+			</div>
+		</section>
+	</svelte:fragment>
 
-	/* Firefox */
-	input[type='range']::-moz-range-thumb {
-		height: 20px;
-		width: 20px;
-		border-radius: 50%;
-		background: #ff6b6b;
-		border: 3px solid #111827;
-		cursor: pointer;
-		box-shadow: 2px 2px 0 0 #1f2937;
-	}
+	<svelte:fragment slot="footer-links">
+		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
+			<RelatedTools tools={['json-to-image', 'markdown', 'api-response-card', 'changelog-card']} />
+			<!-- Related Tools -->
+			<section class="mb-12 max-w-5xl mx-auto px-4">
+				<h3 class="text-xl font-semibold mb-4 text-brand-ink text-center">Related Tools</h3>
+				<div class="flex flex-wrap gap-3 justify-center">
+					<a
+						href="/tools/html-to-png"
+						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
+						>HTML to PNG</a
+					>
+					<a
+						href="/tools/url-to-image-generator"
+						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
+						>URL to Image</a
+					>
+					<a
+						href="/tools/og-image-generator"
+						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
+						>OG Image Generator</a
+					>
+					<a
+						href="/tools/markdown"
+						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
+						>Markdown to Image</a
+					>
+					<a
+						href="/alternatives"
+						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
+						>Compare Alternatives</a
+					>
+				</div>
+			</section>
+		</div>
+	</svelte:fragment>
+</ToolPageShell>
 
-	input[type='range']::-moz-range-track {
-		width: 100%;
-		height: 4px;
-		cursor: pointer;
-		background: #111827;
-		border-radius: 2px;
-	}
-</style>
+{#if showFirstGenerationPrompt}
+	<div class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4">
+		<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+			<!-- Modal Header -->
+			<div
+				class="bg-brand-proof px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+			>
+				<h3 class="text-lg font-semibold text-brand-ink tracking-wider">🎉 Great First Image!</h3>
+				<button
+					class="w-8 h-8 bg-brand-paper border border-brand-ink flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors"
+					on:click={() => (showFirstGenerationPrompt = false)}
+				>
+					<span class="font-semibold">×</span>
+				</button>
+			</div>
+
+			<div class="p-6">
+				<p class="text-brand-ink font-bold mb-4">Create a free account to unlock:</p>
+
+				<ul class="space-y-2 mb-6">
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-proof">✓</span>
+						<span class="font-bold text-brand-ink text-sm">Unlimited image generations</span>
+					</li>
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-proof">✓</span>
+						<span class="font-bold text-brand-ink text-sm">No watermarks</span>
+					</li>
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-proof">✓</span>
+						<span class="font-bold text-brand-ink text-sm">API Access</span>
+					</li>
+				</ul>
+
+				<div class="space-y-3">
+					<a
+						href="/signup?redirect=/tools/code-to-image"
+						on:click={() =>
+							analytics.track('tool_signup_click', {
+								tool_name: 'code_to_image',
+								cta_location: 'free_tier_card'
+							})}
+						class="block w-full py-3 px-6 border border-brand-ink font-semibold bg-brand-pink tracking-wide text-center text-white transition-all"
+					>
+						Create Free Account
+					</a>
+
+					<button
+						class="w-full py-3 px-6 font-bold text-brand-ink hover:text-brand-pink transition-colors tracking-wide"
+						on:click={() => (showFirstGenerationPrompt = false)}
+					>
+						Continue as Guest
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Upgrade Prompt -->
+{#if showUpgradePrompt}
+	<div
+		class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4"
+		style="margin-top: 0px;"
+	>
+		<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+			<!-- Modal Header -->
+			<div
+				class="bg-brand-pink px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+			>
+				<h3 class="text-lg font-semibold text-white tracking-wider">🎨 Ready to Create More?</h3>
+				<button
+					class="w-8 h-8 bg-brand-paper border border-brand-ink flex items-center justify-center hover:bg-brand-ink hover:text-white transition-colors"
+					on:click={() => (showUpgradePrompt = false)}
+				>
+					<span class="font-semibold">×</span>
+				</button>
+			</div>
+
+			<div class="p-6">
+				<p class="text-brand-ink font-bold mb-4">
+					You've reached the guest limit. Sign up to unlock:
+				</p>
+
+				<ul class="space-y-2 mb-6">
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-pink">✓</span>
+						<span class="font-bold text-brand-ink text-sm">Unlimited image generations</span>
+					</li>
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-pink">✓</span>
+						<span class="font-bold text-brand-ink text-sm">No watermarks</span>
+					</li>
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-pink">✓</span>
+						<span class="font-bold text-brand-ink text-sm">API Access</span>
+					</li>
+					<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+						<span class="font-semibold text-brand-pink">✓</span>
+						<span class="font-bold text-brand-ink text-sm">Priority support</span>
+					</li>
+				</ul>
+
+				<div class="space-y-3">
+					<a
+						href="/signup?redirect=/tools/code-to-image"
+						on:click={() =>
+							analytics.track('tool_signup_click', {
+								tool_name: 'code_to_image',
+								cta_location: 'limit_reached_modal'
+							})}
+						class="block w-full py-3 px-6 border border-brand-ink font-semibold bg-brand-pink tracking-wide text-center text-white transition-all"
+					>
+						Sign Up Free
+					</a>
+
+					<button
+						class="w-full py-3 px-6 font-bold text-brand-ink hover:text-brand-pink transition-colors tracking-wide"
+						on:click={() => (showUpgradePrompt = false)}
+					>
+						Maybe Later
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
