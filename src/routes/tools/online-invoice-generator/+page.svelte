@@ -442,11 +442,10 @@
 			<div class="grid grid-cols-1 items-start gap-6 p-5 lg:grid-cols-2 lg:gap-8 lg:p-7">
 				<div class="bg-brand-paper border border-brand-ink overflow-hidden">
 					<!-- Panel header: keeps the frozen H2, drops the v1 window chrome. -->
-				<div class="flex items-center gap-2 border-b border-brand-ink bg-brand-press px-4 py-2.5">
-					<h2 class="font-mono text-xs tracking-[0.06em] text-white">
-						<span class="animate-pulse">_</span> INVOICE DETAILS
-					</h2>
-				</div>
+					<div class="flex items-center gap-2 border-b border-brand-ink bg-brand-press px-4 py-2.5">
+						<h2 class="font-mono text-xs tracking-[0.06em] text-white">
+							<span class="animate-pulse">_</span> INVOICE DETAILS
+						</h2>
 					</div>
 
 					<div class="p-4 sm:p-6 space-y-4">
