@@ -1,7 +1,17 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /tools/linkedin-banner-generator — the v2 tool page, column mode.
+	 *
+	 * Category filter, gallery, preview and controls become the tool card; the
+	 * quota ladder and Generate move to its toolbar. SEO copy is frozen.
+	 */
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { onMount } from 'svelte';
 	import { toast } from '../../../store/toast.store';
@@ -406,7 +416,11 @@
 		const doc = iframe?.contentWindow?.document;
 		if (!doc?.documentElement) {
 			isImageGenerating = false;
-			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			toast.set({
+				message: 'Preview is still loading. Please try again.',
+				type: 'error',
+				duration: 3000
+			});
 			return;
 		}
 		let html = doc.documentElement.outerHTML;
@@ -533,6 +547,32 @@
 			{ '@type': 'ListItem', position: 3, name: 'LinkedIn Banner Generator' }
 		]
 	});
+
+	const TOOL_NAME = 'linkedin_banner_generator';
+	const TOOL_PATH = '/tools/linkedin-banner-generator';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	const RELATED = [
+		{
+			title: 'OG image generator',
+			meta: 'TITLE · LOGO → 1200×630',
+			href: '/tools/og-image-generator',
+			art: '/landing/tools/og-image-generator.svg'
+		},
+		{
+			title: 'Tweet screenshot',
+			meta: 'TWEET URL → PNG',
+			href: '/tools/tweet-screenshot',
+			art: '/landing/tools/tweet-screenshot.svg'
+		},
+		{
+			title: 'Portfolio card',
+			meta: 'PROFILE → PNG',
+			href: '/tools/portfolio-card',
+			art: '/landing/tools/portfolio-card.svg'
+		}
+	];
 </script>
 
 <svelte:head>
@@ -571,419 +611,293 @@
 	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
-	<Nav />
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="LINKEDIN BANNER"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 1584×396"
+	related={RELATED}
+	loggedIn={isUserLoggedIn}
+	hasResult={!!imageUrl}
+	longform="column"
+>
+	<h1
+		slot="h1"
+		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
+	>
+		<span>LINKEDIN BANNER</span>
+		<span>GENERATOR</span>
+	</h1>
 
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
+	<p
+		slot="hero-sub"
+		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+	>
+		Choose from <span class="font-medium">{allTemplates.length}+ templates</span> designed for
+		developers, marketers, designers, and professionals.
+		<span class="text-brand-slate">Perfect 1584×396 dimensions guaranteed</span>
+	</p>
 
-	<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative z-10">
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">LinkedIn Banner</li>
-			</ol>
-		</nav>
-
-		<!-- Hero Section -->
-		<div class="relative flex flex-col items-center justify-center text-center mb-16">
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-8"
-			>
-				<div
-					class="px-6 py-2 bg-data-green border-[4px] border-black text-black font-black text-sm uppercase tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					Free • No Signup Required
-				</div>
-			</div>
-
-			<!-- Main Title -->
-			<h1
-				class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-8 leading-none"
-			>
-				<span class="block">LINKEDIN BANNER</span>
-				<span class="relative inline-block text-white mt-2">
-					<span class="relative z-10 px-4">GENERATOR</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[4px] border-black shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto">
-				<p
-					class="text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-6 shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Choose from <span class="bg-brand-accent px-1 border-b-[3px] border-black"
-						>{allTemplates.length}+ templates</span
-					>
-					designed for developers, marketers, designers, and professionals.
-					<span class="text-gray-500 text-base mt-3 block font-semibold"
-						>Perfect 1584×396 dimensions guaranteed</span
-					>
-				</p>
-			</div>
-
-			<!-- Stats -->
-			<div class="flex items-center justify-center gap-4 mt-8">
-				<div
-					class="px-4 py-2 bg-white border-[3px] border-gray-900 shadow-brutal-lg font-black text-sm"
-				>
-					<span class="text-brand-danger">{totalBannersCreated.toLocaleString()}</span> banners created
-				</div>
-				<div
-					class="px-4 py-2 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg font-black text-sm flex items-center gap-1"
-				>
-					<span class="text-yellow-700">★★★★★</span>
-					<span>4.9/5</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Category Filter -->
-		<div class="mb-12">
-			<div class="flex flex-wrap justify-center gap-3">
-				<button
-					on:click={() => (selectedCategory = 'all')}
-					class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all {selectedCategory ===
-					'all'
-						? 'bg-gray-900 text-white shadow-brutal-accent -translate-x-1 -translate-y-1'
-						: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
-				>
-					All Templates
-				</button>
-				{#each linkedinBannerCategories as category}
-					<button
-						on:click={() => (selectedCategory = category.id)}
-						class="px-5 py-3 border-[3px] border-gray-900 text-sm font-black uppercase tracking-wider transition-all flex items-center gap-2 {selectedCategory ===
-						category.id
-							? 'bg-gray-900 text-white shadow-brutal-accent -translate-x-1 -translate-y-1'
-							: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px]'}"
-					>
-						{@html categoryIcons[category.icon]}
-						{category.label}
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<!-- Template Gallery -->
-		<div class="mb-16">
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-				{#each filteredTemplates as template}
-					<button
-						on:click={() => selectTemplate(template)}
-						class="group relative bg-white border-[3px] border-gray-900 p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden {selectedTemplate?.id ===
-						template.id
-							? 'ring-4 ring-brand-accent ring-offset-2'
-							: ''}"
-					>
-						{#if template.popular}
-							<div
-								class="absolute top-3 left-3 z-10 bg-brand-accent text-black text-xs font-black uppercase tracking-wider px-3 py-1 border-[2px] border-gray-900 shadow-brutal-sm"
-							>
-								Popular
-							</div>
-						{/if}
-						<div
-							class="aspect-[4/1] bg-gray-100 border-b-[3px] border-gray-900 relative overflow-hidden"
+	<div slot="tool">
+		<ToolCard>
+			<div class="flex flex-col gap-6 p-5 lg:p-7">
+				<div class="mb-12">
+					<div class="flex flex-wrap justify-center gap-3">
+						<button
+							on:click={() => (selectedCategory = 'all')}
+							class="px-5 py-3 border border-brand-ink text-sm font-semibold tracking-wider transition-all {selectedCategory ===
+							'all'
+								? 'bg-brand-ink text-white -translate-x-1 -translate-y-1'
+								: 'bg-brand-paper text-brand-ink hover:bg-brand-subtle hover:'}"
 						>
+							All Templates
+						</button>
+						{#each linkedinBannerCategories as category}
+							<button
+								on:click={() => (selectedCategory = category.id)}
+								class="px-5 py-3 border border-brand-ink text-sm font-semibold tracking-wider transition-all flex items-center gap-2 {selectedCategory ===
+								category.id
+									? 'bg-brand-ink text-white -translate-x-1 -translate-y-1'
+									: 'bg-brand-paper text-brand-ink hover:bg-brand-subtle hover:'}"
+							>
+								{@html categoryIcons[category.icon]}
+								{category.label}
+							</button>
+						{/each}
+					</div>
+				</div>
+				<div class="mb-16">
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+						{#each filteredTemplates as template}
+							<button
+								on:click={() => selectTemplate(template)}
+								class="group relative bg-brand-paper border border-brand-ink p-1 transition-all duration-200 overflow-hidden {selectedTemplate?.id ===
+								template.id
+									? 'ring-4 ring-brand-accent ring-offset-2'
+									: ''}"
+							>
+								{#if template.popular}
+									<div
+										class="absolute top-3 left-3 z-10 bg-brand-field text-brand-ink text-xs font-semibold tracking-wider px-3 py-1 border border-brand-ink"
+									>
+										Popular
+									</div>
+								{/if}
+								<div
+									class="aspect-[4/1] bg-brand-subtle border-b border-brand-ink relative overflow-hidden"
+								>
+									<OgImageTemplate
+										html={template.html}
+										width={LINKEDIN_BANNER_WIDTH}
+										height={LINKEDIN_BANNER_HEIGHT}
+										scale={0.25}
+									/>
+									<!-- Safe Zone Overlay on Cards (rectangular, bottom-left) -->
+									{#if showSafeZone}
+										<div
+											class="absolute pointer-events-none z-10"
+											style="
+				                    left: calc({SAFE_ZONE.left}px * 0.25);
+				                    top: calc({SAFE_ZONE.top}px * 0.25);
+				                    width: calc({SAFE_ZONE.width}px * 0.25);
+				                    height: calc({SAFE_ZONE.height}px * 0.25);
+				                    border: 2px dashed #ff6b6b;
+				                    background: rgba(255, 107, 107, 0.15);
+				                    border-radius: 4px;
+				                  "
+										/>
+									{/if}
+								</div>
+								<div class="p-4 bg-brand-paper">
+									<p
+										class="text-base font-semibold text-brand-ink tracking-wide group-hover:text-brand-pink transition-colors"
+									>
+										{template.name}
+									</p>
+									<p class="text-xs font-bold text-brand-mute tracking-wider mt-1">
+										{template.category.replace('-', ' ')}
+									</p>
+								</div>
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				{#if selectedTemplate}
+					<div
+						class="relative bg-[#f0f0f0] flex items-center justify-center p-6 border-b-[4px] border-black"
+						style="background-image: repeating-linear-gradient(45deg, #e5e5e5 25%, transparent 25%, transparent 75%, #e5e5e5 75%, #e5e5e5), repeating-linear-gradient(45deg, #e5e5e5 25%, #f0f0f0 25%, #f0f0f0 75%, #e5e5e5 75%, #e5e5e5); background-position: 0 0, 10px 10px; background-size: 20px 20px;"
+					>
+						<div class="relative inline-block border border-brand-ink overflow-hidden">
 							<OgImageTemplate
-								html={template.html}
+								html={selectedTemplate.html}
 								width={LINKEDIN_BANNER_WIDTH}
 								height={LINKEDIN_BANNER_HEIGHT}
-								scale={0.25}
+								scale={0.65}
 							/>
-							<!-- Safe Zone Overlay on Cards (rectangular, bottom-left) -->
+
+							<!-- Safe Zone Overlay - Rectangle at bottom-left -->
 							{#if showSafeZone}
 								<div
 									class="absolute pointer-events-none z-10"
 									style="
-                    left: calc({SAFE_ZONE.left}px * 0.25);
-                    top: calc({SAFE_ZONE.top}px * 0.25);
-                    width: calc({SAFE_ZONE.width}px * 0.25);
-                    height: calc({SAFE_ZONE.height}px * 0.25);
-                    border: 2px dashed #ff6b6b;
-                    background: rgba(255, 107, 107, 0.15);
-                    border-radius: 4px;
-                  "
-								/>
-							{/if}
-						</div>
-						<div class="p-4 bg-white">
-							<p
-								class="text-base font-black text-gray-900 uppercase tracking-wide group-hover:text-brand-danger transition-colors"
-							>
-								{template.name}
-							</p>
-							<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">
-								{template.category.replace('-', ' ')}
-							</p>
-						</div>
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<!-- Editor Section -->
-		{#if selectedTemplate}
-			<div class="mb-16" bind:this={bannerTemplateWrapper}>
-				<div class="relative">
-					<!-- Shadow layer -->
-					<div
-						class="absolute inset-0 bg-black translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
-					/>
-
-					<div class="relative border-[4px] border-black bg-white">
-						<!-- Window Header -->
-						<div
-							class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[4px] border-black"
-						>
-							<div class="flex items-center gap-3">
-								<div class="flex gap-2">
-									<div class="w-4 h-4 bg-brand-danger border-2 border-gray-700" />
-									<div class="w-4 h-4 bg-brand-accent border-2 border-gray-700" />
-									<div class="w-4 h-4 bg-data-green border-2 border-gray-700" />
-								</div>
-								<span class="font-mono font-bold tracking-wider text-sm uppercase"
-									>PREVIEW: {LINKEDIN_BANNER_WIDTH} × {LINKEDIN_BANNER_HEIGHT}px</span
+					                      left: calc({SAFE_ZONE.left}px * 0.65);
+					                      top: calc({SAFE_ZONE.top}px * 0.65);
+					                      width: calc({SAFE_ZONE.width}px * 0.65);
+					                      height: calc({SAFE_ZONE.height}px * 0.65);
+					                      border: 3px dashed #ff6b6b;
+					                      background: rgba(255, 107, 107, 0.15);
+					                      border-radius: 8px;
+					                    "
 								>
-							</div>
-							<label
-								class="flex items-center gap-2 text-sm font-bold cursor-pointer hover:text-brand-accent transition-colors"
-							>
-								<input
-									type="checkbox"
-									bind:checked={showSafeZone}
-									class="w-4 h-4 accent-brand-accent"
-								/>
-								Show Safe Zone
-							</label>
-						</div>
-
-						<!-- Banner Preview -->
-						<div
-							class="relative bg-[#f0f0f0] flex items-center justify-center p-6 border-b-[4px] border-black"
-							style="background-image: repeating-linear-gradient(45deg, #e5e5e5 25%, transparent 25%, transparent 75%, #e5e5e5 75%, #e5e5e5), repeating-linear-gradient(45deg, #e5e5e5 25%, #f0f0f0 25%, #f0f0f0 75%, #e5e5e5 75%, #e5e5e5); background-position: 0 0, 10px 10px; background-size: 20px 20px;"
-						>
-							<div
-								class="relative inline-block border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden"
-							>
-								<OgImageTemplate
-									html={selectedTemplate.html}
-									width={LINKEDIN_BANNER_WIDTH}
-									height={LINKEDIN_BANNER_HEIGHT}
-									scale={0.65}
-								/>
-
-								<!-- Safe Zone Overlay - Rectangle at bottom-left -->
-								{#if showSafeZone}
 									<div
-										class="absolute pointer-events-none z-10"
-										style="
-                      left: calc({SAFE_ZONE.left}px * 0.65);
-                      top: calc({SAFE_ZONE.top}px * 0.65);
-                      width: calc({SAFE_ZONE.width}px * 0.65);
-                      height: calc({SAFE_ZONE.height}px * 0.65);
-                      border: 3px dashed #ff6b6b;
-                      background: rgba(255, 107, 107, 0.15);
-                      border-radius: 8px;
-                    "
+										class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 bg-brand-pink text-white text-[10px] font-semibold tracking-wider border border-brand-ink whitespace-nowrap"
 									>
-										<div
-											class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 bg-brand-danger text-white text-[10px] font-black uppercase tracking-wider border-[2px] border-black whitespace-nowrap"
-										>
-											Safe Zone (568×264px)
-										</div>
-									</div>
-								{/if}
-							</div>
-						</div>
-
-						<!-- Controls -->
-						<div class="p-6 md:p-8 bg-brand-bg">
-							<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-								<!-- Dynamic Text Inputs based on Template Variables -->
-								<div class="space-y-6">
-									{#each Object.entries(templateVariables) as [variableId, variable]}
-										<div>
-											<label
-												class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3"
-												>{variable.label}</label
-											>
-											<input
-												type="text"
-												value={variable.value}
-												on:input={(e) => handleVariableChange(variableId, e)}
-												class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-brutal-accent transition-all bg-white"
-												placeholder={variable.label}
-											/>
-										</div>
-									{/each}
-									<div>
-										<label
-											class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3"
-											>Logo (Optional)</label
-										>
-										<input
-											type="file"
-											accept="image/*"
-											on:change={handleLogoUpload}
-											class="w-full px-4 py-4 border-[3px] border-gray-900 font-bold focus:outline-none focus:shadow-brutal-accent transition-all bg-white file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-brand-accent file:text-black file:font-black file:uppercase file:text-xs file:tracking-wider file:cursor-pointer"
-										/>
-									</div>
-								</div>
-
-								<!-- Style Controls -->
-								<div class="space-y-6">
-									<div>
-										<label
-											class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3"
-											>Font Family</label
-										>
-										<div class="flex flex-wrap gap-2">
-											{#each combinedFonts as font}
-												<button
-													on:click={() => updateFont(font)}
-													class="px-4 py-2 border-[3px] border-gray-900 text-sm font-bold transition-all {selectedFont.id ===
-													font.id
-														? 'bg-gray-900 text-white shadow-[3px_3px_0_0_#ffc480]'
-														: 'bg-white text-gray-900 shadow-[3px_3px_0_0_#e5e7eb] hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
-													style="font-family: {font.id}"
-												>
-													{font.name}
-												</button>
-											{/each}
-										</div>
-									</div>
-
-									<div class="grid grid-cols-3 gap-4">
-										<div>
-											<label
-												class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3"
-												>Background</label
-											>
-											<div class="color-picker-wrapper">
-												<ColorPicker
-													bind:rgb={backgroundColorRgb}
-													on:input={updateBackgroundColor}
-													isPopup={true}
-												/>
-											</div>
-										</div>
-										<div>
-											<label
-												class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3"
-												>Heading</label
-											>
-											<div class="color-picker-wrapper">
-												<ColorPicker
-													bind:rgb={headingColorRgb}
-													on:input={updateHeadingColor}
-													isPopup={true}
-												/>
-											</div>
-										</div>
-										<div>
-											<label
-												class="block text-sm font-black text-gray-900 uppercase tracking-wider mb-3"
-												>Subheading</label
-											>
-											<div class="color-picker-wrapper">
-												<ColorPicker
-													bind:rgb={subHeadingColorRgb}
-													on:input={updateSubheadingColor}
-													isPopup={true}
-												/>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Generate Button -->
-							<div class="mt-8 flex flex-col items-center">
-								<button
-									on:click={generateBanner}
-									disabled={isImageGenerating}
-									class="px-12 py-5 bg-brand-danger text-white border-[4px] border-black font-black text-xl uppercase tracking-wider shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
-								>
-									{#if isImageGenerating}
-										<svg class="animate-spin h-6 w-6" viewBox="0 0 24 24">
-											<circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-												fill="none"
-											/>
-											<path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/>
-										</svg>
-										Generating...
-									{:else}
-										<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="3"
-												d="M13 10V3L4 14h7v7l9-11h-7z"
-											/>
-										</svg>
-										Generate Banner
-									{/if}
-								</button>
-							</div>
-
-							<!-- Progress Bar -->
-							{#if isImageGenerating}
-								<div class="mt-6 w-full max-w-md mx-auto">
-									<div class="h-3 bg-white border-[3px] border-gray-900">
-										<div class="h-full bg-data-green transition-all" style="width: {$progress}%" />
+										Safe Zone (568×264px)
 									</div>
 								</div>
 							{/if}
 						</div>
 					</div>
-				</div>
-			</div>
-		{/if}
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+						<!-- Dynamic Text Inputs based on Template Variables -->
+						<div class="space-y-6">
+							{#each Object.entries(templateVariables) as [variableId, variable]}
+								<div>
+									<label class="block text-sm font-semibold text-brand-ink tracking-wider mb-3"
+										>{variable.label}</label
+									>
+									<input
+										type="text"
+										value={variable.value}
+										on:input={(e) => handleVariableChange(variableId, e)}
+										class="w-full px-4 py-4 border border-brand-ink font-bold focus:outline-none transition-all bg-brand-paper"
+										placeholder={variable.label}
+									/>
+								</div>
+							{/each}
+							<div>
+								<label class="block text-sm font-semibold text-brand-ink tracking-wider mb-3"
+									>Logo (Optional)</label
+								>
+								<input
+									type="file"
+									accept="image/*"
+									on:change={handleLogoUpload}
+									class="w-full px-4 py-4 border border-brand-ink font-bold focus:outline-none transition-all bg-brand-paper file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-brand-field file:text-brand-ink file:font-semibold file: file:text-xs file:tracking-wider file:cursor-pointer"
+								/>
+							</div>
+						</div>
 
-		<!-- Result Section -->
+						<!-- Style Controls -->
+						<div class="space-y-6">
+							<div>
+								<label class="block text-sm font-semibold text-brand-ink tracking-wider mb-3"
+									>Font Family</label
+								>
+								<div class="flex flex-wrap gap-2">
+									{#each combinedFonts as font}
+										<button
+											on:click={() => updateFont(font)}
+											class="px-4 py-2 border border-brand-ink text-sm font-bold transition-all {selectedFont.id ===
+											font.id
+												? 'bg-brand-ink text-white'
+												: 'bg-brand-paper text-brand-ink hover:'}"
+											style="font-family: {font.id}"
+										>
+											{font.name}
+										</button>
+									{/each}
+								</div>
+							</div>
+
+							<div class="grid grid-cols-3 gap-4">
+								<div>
+									<label class="block text-sm font-semibold text-brand-ink tracking-wider mb-3"
+										>Background</label
+									>
+									<div class="color-picker-wrapper">
+										<ColorPicker
+											bind:rgb={backgroundColorRgb}
+											on:input={updateBackgroundColor}
+											isPopup={true}
+										/>
+									</div>
+								</div>
+								<div>
+									<label class="block text-sm font-semibold text-brand-ink tracking-wider mb-3"
+										>Heading</label
+									>
+									<div class="color-picker-wrapper">
+										<ColorPicker
+											bind:rgb={headingColorRgb}
+											on:input={updateHeadingColor}
+											isPopup={true}
+										/>
+									</div>
+								</div>
+								<div>
+									<label class="block text-sm font-semibold text-brand-ink tracking-wider mb-3"
+										>Subheading</label
+									>
+									<div class="color-picker-wrapper">
+										<ColorPicker
+											bind:rgb={subHeadingColorRgb}
+											on:input={updateSubheadingColor}
+											isPopup={true}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{#if isImageGenerating}
+						<div class="mt-6 w-full max-w-md mx-auto">
+							<div class="h-3 bg-brand-paper border border-brand-ink">
+								<div class="h-full bg-brand-proof transition-all" style="width: {$progress}%" />
+							</div>
+						</div>
+					{/if}
+				{/if}
+			</div>
+
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">TEMPLATE → 1584×396</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label="Generate Banner"
+					loading={isImageGenerating}
+					ready={!!selectedTemplate}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generateBanner}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
+
+	<div slot="result">
 		{#if imageUrl}
 			<div class="mb-16">
 				<div class="relative">
 					<div
-						class="absolute inset-0 bg-data-green translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
+						class="absolute inset-0 bg-brand-proof translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
 					/>
 
-					<div class="relative border-[4px] border-black bg-white">
+					<div class="relative border-[4px] border-black bg-brand-paper">
 						<!-- Header -->
 						<div
-							class="bg-data-green text-black px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
+							class="bg-brand-proof text-brand-ink px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
 						>
 							<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -993,14 +907,12 @@
 									d="M5 13l4 4L19 7"
 								/>
 							</svg>
-							<h3 class="text-2xl font-black uppercase tracking-tight">Your Banner is Ready!</h3>
+							<h3 class="text-2xl font-semibold tracking-tight">Your Banner is Ready!</h3>
 						</div>
 
 						<div class="p-6 md:p-8">
 							<!-- Banner Preview -->
-							<div
-								class="aspect-[4/1] border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden mb-6"
-							>
+							<div class="aspect-[4/1] border border-brand-ink overflow-hidden mb-6">
 								<img
 									loading="lazy"
 									src={imageUrl}
@@ -1011,11 +923,11 @@
 
 							<!-- Watermark Notice -->
 							{#if !isUserLoggedIn && generationCount > 2}
-								<div class="bg-brand-accent border-[3px] border-gray-900 p-5 mb-6 shadow-brutal-lg">
-									<p class="font-black text-gray-900 uppercase tracking-wide">
+								<div class="bg-brand-field border border-brand-ink p-5 mb-6">
+									<p class="font-semibold text-brand-ink tracking-wide">
 										Free downloads include a small Pictify watermark
 									</p>
-									<p class="text-sm font-bold text-gray-700 mt-1">
+									<p class="text-sm font-bold text-brand-slate mt-1">
 										Sign up free to download without watermark
 									</p>
 									<a
@@ -1025,7 +937,7 @@
 												tool_name: 'linkedin_banner_generator',
 												cta_location: 'remove_watermark'
 											})}
-										class="inline-block mt-3 px-6 py-3 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] hover:shadow-[2px_2px_0_0_#ff6b6b] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+										class="inline-block mt-3 px-6 py-3 bg-brand-ink text-white font-semibold tracking-wider border border-brand-ink transition-all"
 									>
 										Remove Watermark Free
 									</a>
@@ -1036,7 +948,7 @@
 							<div class="flex flex-wrap gap-4">
 								<button
 									on:click={downloadBanner}
-									class="flex-1 sm:flex-none px-8 py-4 bg-data-green text-black border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-brand-proof text-brand-ink border border-brand-ink font-semibold tracking-wider transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1050,7 +962,7 @@
 								</button>
 								<button
 									on:click={() => copyToClipboard(imageUrl)}
-									class="flex-1 sm:flex-none px-8 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+									class="flex-1 sm:flex-none px-8 py-4 bg-brand-paper text-brand-ink border border-brand-ink font-semibold tracking-wider transition-all flex items-center justify-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -1068,159 +980,131 @@
 				</div>
 			</div>
 		{/if}
+	</div>
 
-		<!-- How to Use Section -->
-		<div class="mb-16 bg-white border-[4px] border-gray-900 shadow-brutal-2xl">
-			<div class="bg-gray-900 text-white px-6 py-4 border-b-[4px] border-gray-900">
-				<h2 class="text-2xl font-black uppercase tracking-tight">
-					How to Add Your Banner to LinkedIn
-				</h2>
-			</div>
-
-			<div class="p-8">
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-					<div class="text-center">
-						<div
-							class="w-16 h-16 bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
-						>
-							01
-						</div>
-						<h3 class="font-black text-gray-900 uppercase tracking-wide mb-2">
-							Create Your Banner
-						</h3>
-						<p class="text-gray-600 font-bold text-sm">
-							Choose a template, customize it with your details, and download
-						</p>
+	<svelte:fragment slot="longform">
+		<LongformSection index="01" id="how-to" first>
+			<h2
+				slot="heading"
+				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
+			>
+				How to Add Your Banner to LinkedIn
+			</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div class="text-center">
+					<div
+						class="w-16 h-16 bg-brand-field border border-brand-ink flex items-center justify-center mx-auto mb-4 text-2xl font-semibold"
+					>
+						01
 					</div>
-					<div class="text-center">
-						<div
-							class="w-16 h-16 bg-brand-danger text-white border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
-						>
-							02
-						</div>
-						<h3 class="font-black text-gray-900 uppercase tracking-wide mb-2">Go to LinkedIn</h3>
-						<p class="text-gray-600 font-bold text-sm">
-							Open your LinkedIn profile and click the camera icon on your cover photo
-						</p>
+					<h3 class="font-semibold text-brand-ink tracking-wide mb-2">Create Your Banner</h3>
+					<p class="text-brand-slate font-bold text-sm">
+						Choose a template, customize it with your details, and download
+					</p>
+				</div>
+				<div class="text-center">
+					<div
+						class="w-16 h-16 bg-brand-pink text-white border border-brand-ink flex items-center justify-center mx-auto mb-4 text-2xl font-semibold"
+					>
+						02
 					</div>
-					<div class="text-center">
-						<div
-							class="w-16 h-16 bg-data-green border-[3px] border-gray-900 shadow-brutal-lg flex items-center justify-center mx-auto mb-4 text-2xl font-black"
-						>
-							03
-						</div>
-						<h3 class="font-black text-gray-900 uppercase tracking-wide mb-2">Upload & Save</h3>
-						<p class="text-gray-600 font-bold text-sm">
-							Upload your banner and adjust the positioning if needed
-						</p>
+					<h3 class="font-semibold text-brand-ink tracking-wide mb-2">Go to LinkedIn</h3>
+					<p class="text-brand-slate font-bold text-sm">
+						Open your LinkedIn profile and click the camera icon on your cover photo
+					</p>
+				</div>
+				<div class="text-center">
+					<div
+						class="w-16 h-16 bg-brand-proof border border-brand-ink flex items-center justify-center mx-auto mb-4 text-2xl font-semibold"
+					>
+						03
 					</div>
+					<h3 class="font-semibold text-brand-ink tracking-wide mb-2">Upload & Save</h3>
+					<p class="text-brand-slate font-bold text-sm">
+						Upload your banner and adjust the positioning if needed
+					</p>
 				</div>
 			</div>
-		</div>
+		</LongformSection>
 
-		<!-- Dimensions Info -->
-		<div class="mb-16">
-			<div class="relative">
-				<div
-					class="absolute inset-0 bg-brand-accent translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
-				/>
-
-				<div class="relative bg-white border-[4px] border-black">
-					<div class="bg-brand-accent text-black px-6 py-4 border-b-[4px] border-black">
-						<h2 class="text-2xl font-black uppercase tracking-tight">LinkedIn Banner Size Guide</h2>
-					</div>
-
-					<div class="p-8">
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-							<div>
-								<h3
-									class="font-black text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2"
-								>
-									<span
-										class="w-8 h-8 bg-gray-900 text-white flex items-center justify-center text-sm font-bold"
-										>✓</span
-									>
-									Recommended Dimensions
-								</h3>
-								<ul class="space-y-3">
-									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-data-green font-black">✓</span>
-										<span class="font-bold"
-											>Personal Profile: <strong class="text-brand-danger">1584 x 396 pixels</strong
-											></span
-										>
-									</li>
-									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-data-green font-black">✓</span>
-										<span class="font-bold"
-											>Company Page: <strong class="text-brand-danger">1128 x 191 pixels</strong
-											></span
-										>
-									</li>
-									<li class="flex items-center gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-data-green font-black">✓</span>
-										<span class="font-bold"
-											>Aspect Ratio: <strong class="text-brand-danger">4:1</strong></span
-										>
-									</li>
-								</ul>
-							</div>
-							<div>
-								<h3
-									class="font-black text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2"
-								>
-									<span
-										class="w-8 h-8 bg-brand-accent border-[2px] border-gray-900 flex items-center justify-center text-sm font-bold"
-										>!</span
-									>
-									Important Notes
-								</h3>
-								<ul class="space-y-3">
-									<li class="flex items-start gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-brand-accent font-black mt-0.5">⚠</span>
-										<span class="font-medium"
-											>Mobile App Profile Photo covers large left area (~600px)</span
-										>
-									</li>
-									<li class="flex items-start gap-3 p-3 bg-brand-bg border-[2px] border-gray-900">
-										<span class="text-blue-500 font-black mt-0.5">ℹ</span>
-										<span class="font-medium"
-											>All templates now keep important text on the right side</span
-										>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
+		<LongformSection index="02" id="size-guide">
+			<h2
+				slot="heading"
+				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
+			>
+				LinkedIn Banner Size Guide
+			</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div>
+					<h3 class="font-semibold text-brand-ink tracking-wide mb-4 flex items-center gap-2">
+						<span
+							class="w-8 h-8 bg-brand-ink text-white flex items-center justify-center text-sm font-bold"
+							>✓</span
+						>
+						Recommended Dimensions
+					</h3>
+					<ul class="space-y-3">
+						<li class="flex items-center gap-3 p-3 bg-brand-subtle border border-brand-ink">
+							<span class="text-brand-proof font-semibold">✓</span>
+							<span class="font-bold"
+								>Personal Profile: <strong class="text-brand-pink">1584 x 396 pixels</strong></span
+							>
+						</li>
+						<li class="flex items-center gap-3 p-3 bg-brand-subtle border border-brand-ink">
+							<span class="text-brand-proof font-semibold">✓</span>
+							<span class="font-bold"
+								>Company Page: <strong class="text-brand-pink">1128 x 191 pixels</strong></span
+							>
+						</li>
+						<li class="flex items-center gap-3 p-3 bg-brand-subtle border border-brand-ink">
+							<span class="text-brand-proof font-semibold">✓</span>
+							<span class="font-bold"
+								>Aspect Ratio: <strong class="text-brand-pink">4:1</strong></span
+							>
+						</li>
+					</ul>
+				</div>
+				<div>
+					<h3 class="font-semibold text-brand-ink tracking-wide mb-4 flex items-center gap-2">
+						<span
+							class="w-8 h-8 bg-brand-field border border-brand-ink flex items-center justify-center text-sm font-bold"
+							>!</span
+						>
+						Important Notes
+					</h3>
+					<ul class="space-y-3">
+						<li class="flex items-start gap-3 p-3 bg-brand-subtle border border-brand-ink">
+							<span class="text-brand-accent font-semibold mt-0.5">⚠</span>
+							<span class="font-medium"
+								>Mobile App Profile Photo covers large left area (~600px)</span
+							>
+						</li>
+						<li class="flex items-start gap-3 p-3 bg-brand-subtle border border-brand-ink">
+							<span class="text-blue-500 font-semibold mt-0.5">ℹ</span>
+							<span class="font-medium"
+								>All templates now keep important text on the right side</span
+							>
+						</li>
+					</ul>
 				</div>
 			</div>
+		</LongformSection>
+
+		<!-- API Section -->
+		<ApiPromptSection
+			title={apiCtaDetails.title}
+			description={apiCtaDetails.description}
+			featurePoints={apiCtaDetails.featurePoints}
+			codeSnippet={apiCtaDetails.codeSnippet}
+			docsUrl={apiCtaDetails.docsUrl}
+			docsLabel={apiCtaDetails.docsLabel}
+			secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
+		/>
+	</svelte:fragment>
+
+	<svelte:fragment slot="footer-links">
+		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
+			<RelatedTools tools={['twitter-header', 'youtube-thumbnail', 'responsive-image-generator']} />
 		</div>
-	</main>
-
-	<!-- API Section -->
-	<ApiPromptSection
-		title={apiCtaDetails.title}
-		description={apiCtaDetails.description}
-		featurePoints={apiCtaDetails.featurePoints}
-		codeSnippet={apiCtaDetails.codeSnippet}
-		docsUrl={apiCtaDetails.docsUrl}
-		docsLabel={apiCtaDetails.docsLabel}
-		secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
-	/>
-
-	<RelatedTools tools={['twitter-header', 'youtube-thumbnail', 'responsive-image-generator']} />
-
-	<Footer />
-</section>
-
-<style>
-	:global(.color-picker) {
-		--picker-width: 100%;
-	}
-
-	.color-picker-wrapper :global(button) {
-		border: 3px solid #1f2937 !important;
-		border-radius: 0 !important;
-		box-shadow: 3px 3px 0 0 #1f2937;
-	}
-</style>
+	</svelte:fragment>
+</ToolPageShell>
