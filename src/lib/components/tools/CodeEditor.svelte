@@ -127,11 +127,11 @@
 	let isImageLoading = false;
 	let containerWidth = 800;
 
-	// v2's preview pane is a 340px-tall column that also carries a caption and a
+	// v2's preview pane is a 520px-tall column that also carries a caption and a
 	// footnote, so the render gets a much shorter ceiling than v1's full-width
 	// panel. Both are named in the reactive statement below so a variant change
 	// re-scales rather than keeping the first value it saw.
-	$: MAX_PREVIEW_HEIGHT = variant === 'v2' ? 168 : 500;
+	$: MAX_PREVIEW_HEIGHT = variant === 'v2' ? 340 : 500;
 	$: PREVIEW_PADDING = variant === 'v2' ? 48 : 32;
 
 	$: previewScale = (() => {
@@ -312,7 +312,7 @@
 		size controls are NOT here — the tool card's toolbar owns them, so the
 		editor pane is only ever about the code.
 	-->
-	<div class="flex w-full flex-col lg:h-[340px] lg:flex-row">
+	<div class="flex w-full flex-col lg:h-[520px] lg:flex-row">
 		<!-- Editor pane -->
 		<div class="flex min-w-0 flex-1 flex-col bg-brand-press">
 			<div class="flex flex-shrink-0 items-center gap-1 border-b border-[#383A42] px-4 py-2.5">
@@ -328,7 +328,7 @@
 					PASTE OR TYPE · AUTOSAVES
 				</span>
 			</div>
-			<div class="min-h-[260px] flex-1 overflow-auto lg:min-h-0">
+			<div class="min-h-[360px] flex-1 overflow-auto lg:min-h-0">
 				<div bind:this={editorElement} />
 			</div>
 		</div>

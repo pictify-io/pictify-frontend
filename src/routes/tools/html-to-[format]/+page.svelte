@@ -32,7 +32,6 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import { saveLastRender } from '$lib/lastRender.js';
 	import posthog from 'posthog-js';
 	$: format = $page.params.format;
@@ -1459,7 +1458,7 @@
 			</ul>
 		</LongformSection>
 
-		<div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-10">
+		<div class="flex flex-col gap-10">
 			<LongformSection index="10" id="why-choose" compact>
 				<h2
 					slot="heading"
@@ -1506,12 +1505,12 @@
 						<thead>
 							<tr>
 								<th
-									class="px-6 py-4 bg-brand-ink text-left text-xs font-semibold text-white tracking-wider"
+									class="px-4 py-3 bg-brand-ink text-left text-xs font-semibold text-white tracking-wider"
 									>Feature</th
 								>
 								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format}
 									<th
-										class="px-6 py-4 bg-brand-ink border-l border-brand-rule text-left text-xs font-semibold text-white tracking-wider"
+										class="px-4 py-3 bg-brand-ink border-l border-brand-rule text-left text-xs font-semibold text-white tracking-wider"
 										>{format.fullName}</th
 									>
 								{/each}
@@ -1520,12 +1519,12 @@
 						<tbody class="bg-brand-paper divide-y divide-brand-rule">
 							<tr>
 								<td
-									class="px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
+									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
 									>Best For</td
 								>
 								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
 									<td
-										class={`px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink ${
+										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
 											i > 0 ? 'border-l border-brand-rule' : ''
 										}`}>{format.bestFor}</td
 									>
@@ -1533,12 +1532,12 @@
 							</tr>
 							<tr>
 								<td
-									class="px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
+									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
 									>Compression</td
 								>
 								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
 									<td
-										class={`px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink ${
+										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
 											i > 0 ? 'border-l border-brand-rule' : ''
 										}`}
 									>
@@ -1552,12 +1551,12 @@
 							</tr>
 							<tr>
 								<td
-									class="px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
+									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
 									>File Size</td
 								>
 								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
 									<td
-										class={`px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink ${
+										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
 											i > 0 ? 'border-l border-brand-rule' : ''
 										}`}
 									>
@@ -1571,12 +1570,12 @@
 							</tr>
 							<tr>
 								<td
-									class="px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
+									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
 									>Transparency</td
 								>
 								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
 									<td
-										class={`px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-ink ${
+										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
 											i > 0 ? 'border-l border-brand-rule' : ''
 										}`}
 									>
@@ -1669,14 +1668,14 @@
 		</div>
 
 		<!-- Social Share Section -->
-		<div class="w-full max-w-5xl mx-auto mb-20 text-center">
-			<p class="font-bold text-brand-mute tracking-widest mb-4">Spread the word</p>
-			<div class="flex flex-col md:flex-row justify-center md:space-x-6">
+		<div class="flex flex-col gap-4 border-t border-brand-rule pt-8 sm:flex-row sm:items-center sm:justify-between">
+			<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">SPREAD THE WORD</p>
+			<div class="flex flex-wrap gap-3">
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-brand-ink text-white font-semibold tracking-wide border border-brand-ink hover:bg-brand-paper hover:text-brand-ink transition-all hover: mb-4 md:mb-0"
+					class="flex h-10 items-center gap-2 rounded-lg border border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field"
 					on:click={() => handleSocialShare('twitter')}
 				>
-					<svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
+					<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
 						<path
 							d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
 						/>
@@ -1684,10 +1683,10 @@
 					Share on X
 				</button>
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-semibold tracking-wide border border-brand-ink hover:bg-brand-paper hover:text-[#0A66C2] transition-all hover:"
+					class="flex h-10 items-center gap-2 rounded-lg border border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field"
 					on:click={() => handleSocialShare('linkedin')}
 				>
-					<svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
+					<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
 						<path
 							d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
 						/>
@@ -1698,37 +1697,7 @@
 		</div>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools tools={['html-email', 'table', 'certificate', 'quote-card']} />
-			<!-- Internal Links -->
-			<section class="mb-16 w-full max-w-5xl mx-auto px-4">
-				<h2 class="text-2xl font-semibold mb-6 text-brand-ink text-center">Related Tools</h2>
-				<div class="flex flex-wrap gap-3 justify-center">
-					<a
-						href="/tools/url-to-image-generator"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field hover: transition-all"
-						>URL to Image</a
-					>
-					<a
-						href="/tools/code-to-image"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field hover: transition-all"
-						>Code to Image</a
-					>
-					<a
-						href="/tools/og-image-generator"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field hover: transition-all"
-						>OG Image Generator</a
-					>
-					<a
-						href="/alternatives"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field hover: transition-all"
-						>Compare Alternatives</a
-					>
-				</div>
-			</section>
-		</div>
-	</svelte:fragment>
+	
 </ToolPageShell>
 
 <!-- Anchors referenced by the HowTo schema steps. -->

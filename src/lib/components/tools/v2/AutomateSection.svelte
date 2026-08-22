@@ -48,8 +48,8 @@
 	}
 </script>
 
-<section class="flex flex-col gap-8 lg:flex-row lg:gap-8">
-	<div class="flex flex-1 flex-col justify-center gap-3">
+<section class="flex flex-col gap-6">
+	<div class="flex flex-col gap-3">
 		<p class="font-mono text-[11px] font-bold tracking-[0.08em] text-brand-royal">
 			THIS TOOL IS THIS CALL
 		</p>
@@ -72,7 +72,7 @@
 	</div>
 
 	{#if codeExamples.length}
-		<div class="w-full overflow-hidden rounded-tile lg:w-[620px] lg:flex-shrink-0">
+		<div class="w-full overflow-hidden rounded-tile">
 			<div class="flex items-center justify-between bg-brand-press px-4 py-2">
 				<div class="flex flex-wrap gap-1.5">
 					{#each codeExamples as lang (lang.id)}
