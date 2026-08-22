@@ -6,14 +6,14 @@
 
 	let open = false;
 
-	// Blog lives in the footer, not here: the nav carries the five surfaces a
-	// buyer moves between, and Tools is one of them.
+	// Tools leads: the free tools are the way in, and the formats family lives
+	// under /tools/html-to-* — there is no /formats page and there should not be.
 	const links = [
-		{ label: 'Formats', href: '/formats' },
+		{ label: 'Tools', href: '/tools' },
 		{ label: 'Docs', href: '/docs' },
 		{ label: 'Pricing', href: '/pricing' },
 		{ label: 'Changelog', href: '/changelog' },
-		{ label: 'Tools', href: '/tools' }
+		{ label: 'Blog', href: '/blogs' }
 	];
 
 	// Prefix match, so a page at /tools/<slug> keeps Tools lit. Anchored with a
